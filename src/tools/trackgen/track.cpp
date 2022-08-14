@@ -1973,300 +1973,64 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 startNeeded = 1;
                 runninglentgh = 0;
+                continue;
             }
-            else
+            
+            curBarrier = mseg->barrier[0];
+
+            // fence only has one side (j = 0)
+            if (curBarrier->style == TR_FENCE && j != 0)
+                continue;
+
+            CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
+            if (!curTexLink)
             {
-                curBarrier = mseg->barrier[0];
+                texLen = 0; // edited
+            }
+            trkpos.seg = seg;
+            if (startNeeded || (runninglentgh > LG_STEP_MAX))
+            {
+                NEWDISPLIST(0, sname, i);
+                if (curTexType == 0)
+                    texLen = 0;
+                runninglentgh = 0;
+                xprev = seg->vertex[TR_SR].x; // edited
+                yprev = seg->vertex[TR_SR].y; // edited
 
-                // fence only has one side (j = 0)
-                if (curBarrier->style == TR_FENCE && j != 0)
-                    continue;
-
-                CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
-                if (!curTexLink)
-                {
-                    texLen = 0; // edited
-                }
-                trkpos.seg = seg;
-                if (startNeeded || (runninglentgh > LG_STEP_MAX))
-                {
-                    NEWDISPLIST(0, sname, i);
-                    if (curTexType == 0)
-                        texLen = 0;
-                    runninglentgh = 0;
-                    xprev = seg->vertex[TR_SR].x; // edited
-                    yprev = seg->vertex[TR_SR].y; // edited
-
-                    switch (curBarrier->style)
-                    {
-                    case TR_FENCE:
-                        if (j == 0)
-                        {
-                            SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                            SETPOINT(texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                        }
-                        break;
-                    case TR_WALL:
-                        switch (j)
-                        {
-                        case 0:
-                            SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                            break;
-                        case 1:
-                            trkpos.toStart = 0;
-                            trkpos.toRight = -curBarrier->width;
-                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                            SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
-                            break;
-                        case 2:
-                            trkpos.toStart = 0;
-                            trkpos.toRight = -curBarrier->width;
-                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            if ((mseg->prev->barrier[0]->style != TR_WALL) || (mseg->prev->barrier[0]->height != curBarrier->height))
-                            {
-                                SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                                SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                            }
-                            SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
-                            SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_SR].z);
-                            break;
-                        }
-                        break;
-                    case TR_CURB:
-                    case TR_PLAN:
-                        // not supported
-                        break;
-                    case TR_PITBUILDING:
-                        // nothing to do
-                        break;
-                    }
-                }
-                switch (seg->type)
-                {
-                case TR_STR:
-                    ts = LMAX;
-
-                    trkpos.seg = seg;
-                    while (ts < seg->length)
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = 0;
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                SETPOINT(texLen, 0.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                        case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-
-                        ts += LMAX;
-                    }
-                    ts = seg->length;
-                    break;
-                case TR_LFT:
-                    step = LMAX / (mseg->radiusr);
-                    // texStep = step * mseg->radius / curTexSize; //edited
-                    anz = seg->angle[TR_ZS] + step;
-                    ts = step;
-                    // texLen += texStep;
-                    radiusr = seg->radiusr;
-                    trkpos.seg = seg;
-                    while (anz < seg->angle[TR_ZE])
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = 0;
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 0.0, x, y, curHeight);
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                SETPOINT(texLen, 0.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                        case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-
-                        ts += step;
-                        // removed
-                        anz += step;
-                    }
-                    ts = seg->arc;
-                    break;
-                case TR_RGT:
-                    step = LMAX / (mseg->radiusl);
-                    // removed
-                    anz = seg->angle[TR_ZS] - step;
-                    ts = step;
-                    // removed
-                    radiusr = seg->radiusr;
-                    trkpos.seg = seg;
-                    while (anz > seg->angle[TR_ZE])
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = 0;
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 0.0, x, y, curHeight);
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                SETPOINT(texLen, 0.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                trkpos.toRight = -curBarrier->width;
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                        case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-                        ts += step;
-                        anz -= step;
-                    }
-                    ts = seg->arc;
-                    break;
-                }
-                texStep = sqrt(pow((seg->vertex[TR_ER].y - yprev), 2.0f) + pow((seg->vertex[TR_ER].x - xprev), 2.0f)) / curTexSize; // new
-                texLen += texStep;                                                                                                  // edited
-                xprev = seg->vertex[TR_ER].x;                                                                                       // new
-                yprev = seg->vertex[TR_ER].y;                                                                                       // new
                 switch (curBarrier->style)
                 {
                 case TR_FENCE:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                        SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                     }
                     break;
                 case TR_WALL:
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                        SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                         break;
                     case 1:
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
-                        trkpos.toStart = ts;
+                        trkpos.toStart = 0;
                         trkpos.toRight = -curBarrier->width;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
+                        SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
                         break;
                     case 2:
-                        trkpos.toStart = ts;
+                        trkpos.toStart = 0;
                         trkpos.toRight = -curBarrier->width;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
-                        SETPOINT(texLen, 1.00, x, y, seg->vertex[TR_ER].z);
-                        if ((mseg->next->barrier[0]->style != TR_WALL) || (mseg->next->barrier[0]->height != curBarrier->height))
+                        if ((mseg->prev->barrier[0]->style != TR_WALL) || (mseg->prev->barrier[0]->height != curBarrier->height))
                         {
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                            SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                            SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                         }
+                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_SR].z);
                         break;
                     }
                     break;
@@ -2278,9 +2042,244 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     // nothing to do
                     break;
                 }
-                startNeeded = 0;
-                runninglentgh += seg->length;
             }
+            switch (seg->type)
+            {
+            case TR_STR:
+                ts = LMAX;
+
+                trkpos.seg = seg;
+                while (ts < seg->length)
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = 0;
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+
+                    ts += LMAX;
+                }
+                ts = seg->length;
+                break;
+            case TR_LFT:
+                step = LMAX / (mseg->radiusr);
+                // texStep = step * mseg->radius / curTexSize; //edited
+                anz = seg->angle[TR_ZS] + step;
+                ts = step;
+                // texLen += texStep;
+                radiusr = seg->radiusr;
+                trkpos.seg = seg;
+                while (anz < seg->angle[TR_ZE])
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = 0;
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+
+                    ts += step;
+                    // removed
+                    anz += step;
+                }
+                ts = seg->arc;
+                break;
+            case TR_RGT:
+                step = LMAX / (mseg->radiusl);
+                // removed
+                anz = seg->angle[TR_ZS] - step;
+                ts = step;
+                // removed
+                radiusr = seg->radiusr;
+                trkpos.seg = seg;
+                while (anz > seg->angle[TR_ZE])
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = 0;
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            trkpos.toRight = -curBarrier->width;
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+                    ts += step;
+                    anz -= step;
+                }
+                ts = seg->arc;
+                break;
+            }
+            texStep = sqrt(pow((seg->vertex[TR_ER].y - yprev), 2.0f) + pow((seg->vertex[TR_ER].x - xprev), 2.0f)) / curTexSize; // new
+            texLen += texStep;                                                                                                  // edited
+            xprev = seg->vertex[TR_ER].x;                                                                                       // new
+            yprev = seg->vertex[TR_ER].y;                                                                                       // new
+            switch (curBarrier->style)
+            {
+            case TR_FENCE:
+                if (j == 0)
+                {
+                    SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                }
+                break;
+            case TR_WALL:
+                switch (j)
+                {
+                case 0:
+                    SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    break;
+                case 1:
+                    SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    trkpos.toStart = ts;
+                    trkpos.toRight = -curBarrier->width;
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
+                    break;
+                case 2:
+                    trkpos.toStart = ts;
+                    trkpos.toRight = -curBarrier->width;
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(texLen, 1.00, x, y, seg->vertex[TR_ER].z);
+                    if ((mseg->next->barrier[0]->style != TR_WALL) || (mseg->next->barrier[0]->height != curBarrier->height))
+                    {
+                        SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                        SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    }
+                    break;
+                }
+                break;
+            case TR_CURB:
+            case TR_PLAN:
+                // not supported
+                break;
+            case TR_PITBUILDING:
+                // nothing to do
+                break;
+            }
+            startNeeded = 0;
+            runninglentgh += seg->length;
         }
     }
 
@@ -2303,311 +2302,66 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 runninglentgh = 0;
                 startNeeded = 1;
+                continue;
             }
-            else
+            
+            curBarrier = mseg->barrier[1];
+            
+            // fence only has one side (j = 0)
+            if (curBarrier->style == TR_FENCE && j != 0)
+                continue;
+            
+            CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
+            if (!curTexLink)
             {
-                curBarrier = mseg->barrier[1];
-
-                // fence only has one side (j = 0)
-                if (curBarrier->style == TR_FENCE && j != 0)
-                    continue;
-
-                CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
-                if (!curTexLink)
-                {
+                texLen = 0;
+            }
+            trkpos.seg = seg;
+            if (startNeeded || (runninglentgh > LG_STEP_MAX))
+            {
+                NEWDISPLIST(0, sname, i);
+                runninglentgh = 0;
+                if (curTexType == 0)
                     texLen = 0;
-                }
-                trkpos.seg = seg;
-                if (startNeeded || (runninglentgh > LG_STEP_MAX))
-                {
-                    NEWDISPLIST(0, sname, i);
-                    runninglentgh = 0;
-                    if (curTexType == 0)
-                        texLen = 0;
-                    xprev = seg->vertex[TR_SR].x; // edited
-                    yprev = seg->vertex[TR_SR].y; // edited
-
-                    switch (curBarrier->style)
-                    {
-                    case TR_FENCE:
-                        if (j == 0)
-                        {
-                            SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                            SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                        }
-                        break;
-                    case TR_WALL:
-                        switch (j)
-                        {
-                        case 0:
-                            trkpos.toStart = 0;
-                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
-                            trkpos.seg = seg;
-                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            if ((mseg->prev->barrier[1]->style != TR_WALL) || (mseg->prev->barrier[1]->height != curBarrier->height))
-                            {
-                                SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                                SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                            }
-                            SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
-                            break;
-                        case 1:
-                            trkpos.toStart = 0;
-                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
-                            trkpos.seg = seg;
-                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                            break;
-                        case 2:
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                            SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            break;
-                        }
-                        break;
-                    case TR_CURB:
-                    case TR_PLAN:
-                        // not supported
-                        break;
-                    case TR_PITBUILDING:
-                        // nothing to do
-                        break;
-                    }
-                }
-
-                switch (seg->type)
-                {
-                case TR_STR:
-                    ts = LMAX;
-
-                    trkpos.seg = seg;
-                    while (ts < seg->length)
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = RtTrackGetWidth(seg, ts);
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                        case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-
-                        ts += LMAX;
-                    }
-                    ts = seg->length;
-                    break;
-                case TR_LFT:
-                    step = LMAX / (mseg->radiusr);
-
-                    anz = seg->angle[TR_ZS] + step;
-                    ts = step;
-
-                    radiusl = seg->radiusl;
-                    trkpos.seg = seg;
-                    while (anz < seg->angle[TR_ZE])
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = RtTrackGetWidth(seg, ts);
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                        case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-
-                        ts += step;
-
-                        anz += step;
-                    }
-                    ts = seg->arc;
-                    break;
-                case TR_RGT:
-                    step = LMAX / (mseg->radiusl);
-
-                    anz = seg->angle[TR_ZS] - step;
-                    ts = step;
-
-                    radiusl = seg->radiusl;
-                    trkpos.seg = seg;
-                    while (anz > seg->angle[TR_ZE])
-                    {
-                        trkpos.toStart = ts;
-                        trkpos.toRight = RtTrackGetWidth(seg, ts);
-                        RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        curHeight = RtTrackHeightL(&trkpos);
-                        texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
-                        texLen += texStep;                                                            // new
-                        xprev = x;                                                                    // new
-                        yprev = y;                                                                    // new
-                        switch (curBarrier->style)
-                        {
-                        case TR_FENCE:
-                            if (j == 0)
-                            {
-                                SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                            }
-                            break;
-                        case TR_WALL:
-                            switch (j)
-                            {
-                            case 0:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, curHeight);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 1:
-                                trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
-                                trkpos.toRight = RtTrackGetWidth(seg, ts);
-                                RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                break;
-                            case 2:
-                                SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                                SETPOINT(texLen, 0, x, y, curHeight);
-                                break;
-                            }
-                            break;
-                        case TR_CURB:
-                            case TR_PLAN:
-                            // not supported
-                            break;
-                        case TR_PITBUILDING:
-                            // nothing to do
-                            break;
-                        }
-
-                        ts += step;
-
-                        anz -= step;
-                    }
-                    ts = seg->arc;
-                    break;
-                }
-                texStep = sqrt(pow((seg->vertex[TR_ER].y - yprev), 2.0f) + pow((seg->vertex[TR_ER].x - xprev), 2.0f)) / curTexSize; // new
-                texLen += texStep;                                                                                                  // edited
-                xprev = seg->vertex[TR_ER].x;                                                                                       // new
-                yprev = seg->vertex[TR_ER].y;
-
+                xprev = seg->vertex[TR_SR].x; // edited
+                yprev = seg->vertex[TR_SR].y; // edited
+            
                 switch (curBarrier->style)
                 {
                 case TR_FENCE:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                        SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                     }
                     break;
                 case TR_WALL:
                     switch (j)
                     {
                     case 0:
-                        trkpos.toStart = ts;
-                        trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                        trkpos.toStart = 0;
+                        trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
+                        trkpos.seg = seg;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
-                        if ((mseg->next->barrier[1]->style != TR_WALL) || (mseg->next->barrier[1]->height != curBarrier->height))
+                        if ((mseg->prev->barrier[1]->style != TR_WALL) || (mseg->prev->barrier[1]->height != curBarrier->height))
                         {
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                            SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                         }
+                        SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_SL].z);
+                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
                         break;
                     case 1:
-                        trkpos.toStart = ts;
-                        trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                        trkpos.toStart = 0;
+                        trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
+                        trkpos.seg = seg;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                         break;
                     case 2:
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                         break;
                     }
                     break;
@@ -2619,10 +2373,254 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     // nothing to do
                     break;
                 }
-
-                startNeeded = 0;
-                runninglentgh += seg->length;
             }
+            
+            switch (seg->type)
+            {
+            case TR_STR:
+                ts = LMAX;
+            
+                trkpos.seg = seg;
+                while (ts < seg->length)
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = RtTrackGetWidth(seg, ts);
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+            
+                    ts += LMAX;
+                }
+                ts = seg->length;
+                break;
+            case TR_LFT:
+                step = LMAX / (mseg->radiusr);
+            
+                anz = seg->angle[TR_ZS] + step;
+                ts = step;
+            
+                radiusl = seg->radiusl;
+                trkpos.seg = seg;
+                while (anz < seg->angle[TR_ZE])
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = RtTrackGetWidth(seg, ts);
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+            
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+            
+                    ts += step;
+            
+                    anz += step;
+                }
+                ts = seg->arc;
+                break;
+            case TR_RGT:
+                step = LMAX / (mseg->radiusl);
+            
+                anz = seg->angle[TR_ZS] - step;
+                ts = step;
+            
+                radiusl = seg->radiusl;
+                trkpos.seg = seg;
+                while (anz > seg->angle[TR_ZE])
+                {
+                    trkpos.toStart = ts;
+                    trkpos.toRight = RtTrackGetWidth(seg, ts);
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    curHeight = RtTrackHeightL(&trkpos);
+                    texStep = sqrt(pow((y - yprev), 2.0f) + pow((x - xprev), 2.0f)) / curTexSize; // new
+                    texLen += texStep;                                                            // new
+                    xprev = x;                                                                    // new
+                    yprev = y;                                                                    // new
+                    switch (curBarrier->style)
+                    {
+                    case TR_FENCE:
+                        if (j == 0)
+                        {
+                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                        }
+                        break;
+                    case TR_WALL:
+                        switch (j)
+                        {
+                        case 0:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 1.0, x, y, curHeight);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 1:
+                            trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            trkpos.toRight = RtTrackGetWidth(seg, ts);
+                            RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            break;
+                        case 2:
+                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(texLen, 0, x, y, curHeight);
+                            break;
+                        }
+                        break;
+                    case TR_CURB:
+                        case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
+                    }
+            
+                    ts += step;
+            
+                    anz -= step;
+                }
+                ts = seg->arc;
+                break;
+            }
+            texStep = sqrt(pow((seg->vertex[TR_ER].y - yprev), 2.0f) + pow((seg->vertex[TR_ER].x - xprev), 2.0f)) / curTexSize; // new
+            texLen += texStep;                                                                                                  // edited
+            xprev = seg->vertex[TR_ER].x;                                                                                       // new
+            yprev = seg->vertex[TR_ER].y;
+            
+            switch (curBarrier->style)
+            {
+            case TR_FENCE:
+                if (j == 0)
+                {
+                    SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                }
+                break;
+            case TR_WALL:
+                switch (j)
+                {
+                case 0:
+                    trkpos.toStart = ts;
+                    trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_EL].z);
+                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
+                    if ((mseg->next->barrier[1]->style != TR_WALL) || (mseg->next->barrier[1]->height != curBarrier->height))
+                    {
+                        SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    }
+                    break;
+                case 1:
+                    trkpos.toStart = ts;
+                    trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
+                    RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    break;
+                case 2:
+                    SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    break;
+                }
+                break;
+            case TR_CURB:
+            case TR_PLAN:
+                // not supported
+                break;
+            case TR_PITBUILDING:
+                // nothing to do
+                break;
+            }
+            
+            startNeeded = 0;
+            runninglentgh += seg->length;
         }
     }
 
