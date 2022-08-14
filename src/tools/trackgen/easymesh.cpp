@@ -2178,18 +2178,11 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
-            if (mseg->rside != nullptr)
-            {
-                seg = mseg->rside;
-                if (seg->rside != nullptr)
-                {
-                    seg = seg->rside;
-                }
-            }
-            else
-            {
-                seg = mseg;
-            }
+            // Find last side segment
+            seg = mseg;
+            while (seg->rside)
+                seg = seg->rside;
+
             if (startNeeded)
             {
                 ADD_POINT(seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z, GridStep, i + 1);
@@ -2274,18 +2267,11 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
-            if (mseg->lside)
-            {
-                seg = mseg->lside;
-                if (seg->lside)
-                {
-                    seg = seg->lside;
-                }
-            }
-            else
-            {
-                seg = mseg;
-            }
+            // Find last side segment
+            seg = mseg;
+            while (seg->lside)
+                seg = seg->lside;
+
             if (startNeeded)
             {
                 ADD_POINT(seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z, GridStep, i + 1);
