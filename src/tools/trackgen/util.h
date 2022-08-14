@@ -36,6 +36,7 @@ extern float getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, 
 extern tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1);
 extern bool loadPngTexture(const char *fname, ssgTextureInfo *info);
 extern bool loadJpegTexture(const char *fname, ssgTextureInfo *info);
+extern void dumpTrackSegs(tTrack *track);
 
 /* Use the texture name to select options like mipmap */
 class ssgLoaderOptionsEx : public ssgLoaderOptions

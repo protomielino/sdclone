@@ -80,6 +80,7 @@ class Application : public GfApplication
     bool MergeTerrain;
     int DoSaveElevation;
     bool Bridge;
+    bool DumpTrack;
 
 public:
 
@@ -109,6 +110,7 @@ Application::Application()
 , MergeTerrain(true)
 , DoSaveElevation(-1)
 , Bridge(true)
+, DumpTrack(false)
 {
 }
 
@@ -129,12 +131,13 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("S", "splitall", /* bHasValue = */ false);
     registerOption("E", "saveelev", /* bHasValue = */ true);
     registerOption("H", "height4", /* bHasValue = */ true);
-    registerOption("N", "nobridge", /* bHasValue = */ false);
+    registerOption("nb", "nobridge", /* bHasValue = */ false);
+    registerOption("dt", "dumptrack", /* bHasValue = */ false);
 
     // Help on specific options.
-    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-N|--nobridge]");
+    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge]");
     addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
-    addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]]");
+    addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]] [-dt|--dumptrack]");
 
     addOptionsHelpExplainLine("<cat>    : track category (road, speedway, dirt...)");
     addOptionsHelpExplainLine("<name>   : track name");
@@ -153,6 +156,8 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     addOptionsHelpExplainLine("  3: track only");
     addOptionsHelpExplainLine("  4: track elevations with height steps");
     addOptionsHelpExplainLine("<#hs> : nb of height steps for 4th elevation file [30]");
+    addOptionsHelpExplainLine("dumptrack : dump track segments to file name.dump");
+
 }
 
 // Parse the command line options.
@@ -220,6 +225,10 @@ bool Application::parseOptions()
         {
             Bridge = false;
         }
+        else if (itOpt->strLongName == "dumptrack")
+        {
+            DumpTrack = true;
+        }
     }
 
     if (TrackName.empty() || TrackCategory.empty())
@@ -282,6 +291,10 @@ int Application::generate()
         GfParmReleaseHandle(TrackHandle);
         return EXIT_SUCCESS;
     }
+
+    // dump the track segments to a file for debugging
+    if (DumpTrack)
+        dumpTrackSegs(Track);
 
     // Get the output file radix.
     char	buf2[1024];

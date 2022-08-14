@@ -31,6 +31,8 @@
 #include <unistd.h>
 #endif
 #include <cmath>
+#include <iostream>
+#include <fstream>
 
 #include <plib/ul.h>
 #include <tgfclient.h>
@@ -395,4 +397,173 @@ bool loadJpegTexture(const char *fname, ssgTextureInfo *info)
     }
 
     return true;
+}
+
+std::ostream &operator << (std::ostream &out, const t3Dd &v)
+{
+    out << v.x << ", " << v.y << ", " << v.z;
+
+    return out;
+}
+
+std::ostream &operator << (std::ostream &out, tSegType type)
+{
+    out << (type == TR_RGT ? "TR_RGT" :
+            type == TR_LFT ? "TR_LFT" :
+            type == TR_STR ? "TR_STR" :
+            std::to_string(type));
+
+    return out;
+}
+
+std::ostream &operator << (std::ostream &out, tSegType2 type2)
+{
+    out << (type2 == TR_MAIN ? "TR_MAIN" :
+            type2 == TR_LSIDE ? "TR_LSIDE" :
+            type2 == TR_RSIDE ? "TR_RSIDE" :
+            type2 == TR_LBORDER ? "TR_LBORDER" :
+            type2 == TR_RBORDER ? "TR_RBORDER" :
+            std::to_string(type2));
+
+    return out;
+}
+
+std::ostream &operator << (std::ostream &out, tSegStyle style)
+{
+    out << (style == TR_PLAN ? "TR_PLAN" :
+            style == TR_CURB ? "TR_CURB" :
+            style == TR_WALL ? "TR_WALL" :
+            style == TR_FENCE ? "TR_FENCE" :
+            style == TR_PITBUILDING ? "TR_PITBUILDING" :
+            std::to_string(style));
+
+    return out;
+}
+
+std::string dumpRaceInfo(unsigned int raceInfo)
+{
+    std::string info;
+    if (raceInfo  == 0)
+        info += "TR_NORMAL ";
+    if (raceInfo & TR_LAST)
+        info += "TR_LAST ";
+    if (raceInfo & TR_START)
+        info += "TR_START ";
+    if (raceInfo & TR_PITLANE)
+        info += "TR_PITLANE ";
+    if (raceInfo & TR_SPEEDLIMIT)
+        info += "TR_SPEEDLIMIT ";
+    if (raceInfo & TR_PITENTRY)
+        info += "TR_PITENTRY ";
+    if (raceInfo & TR_PITEXIT)
+        info += "TR_PITEXIT ";
+    if (raceInfo & TR_PIT)
+        info += "TR_PIT ";
+    if (raceInfo & TR_PITSTART)
+        info += "TR_PITSTART ";
+    if (raceInfo & TR_PITEND)
+        info += "TR_PITEND ";
+    if (raceInfo & TR_PITBUILD)
+        info += "TR_PITBUILD";
+    return info;
+}
+
+void dumpSeg(std::ofstream &ofs,const tTrackSeg *seg, const std::string & indent = "")
+{
+//    ofs << indent << std::hex << seg << std::dec << std::endl;
+    ofs << indent << "name          " << (seg->name ? seg->name : "") << std::endl;
+    ofs << indent << "id            " << seg->id << std::endl;
+    ofs << indent << "type          " << seg->type << std::endl;
+    ofs << indent << "type2         " << seg->type2  << std::endl;
+    ofs << indent << "style         " << seg->style << std::endl;
+    ofs << indent << "length        " << seg->length << std::endl;
+    ofs << indent << "width         " << seg->width << std::endl;
+    ofs << indent << "startWidth    " << seg->startWidth << std::endl;
+    ofs << indent << "endWidth      " << seg->endWidth << std::endl;
+    ofs << indent << "lgfromstart   " << seg->lgfromstart << std::endl;
+    ofs << indent << "radius        " << seg->radius << std::endl;
+    ofs << indent << "radiusr       " << seg->radiusr << std::endl;
+    ofs << indent << "radiusl       " << seg->radiusl << std::endl;
+    ofs << indent << "arc           " << seg->arc << std::endl;
+    ofs << indent << "center        " << seg->center << std::endl;
+    ofs << indent << "vertex[0]     " << seg->vertex[0] << std::endl;
+    ofs << indent << "vertex[1]     " << seg->vertex[1] << std::endl;
+    ofs << indent << "vertex[2]     " << seg->vertex[2] << std::endl;
+    ofs << indent << "vertex[3]     " << seg->vertex[3] << std::endl;
+    ofs << indent << "angle         ";
+    for (auto a : seg->angle)
+        ofs << a << " ";
+    ofs << std::endl;
+    ofs << indent << "sin           " << seg->sin << std::endl;
+    ofs << indent << "cos           " << seg->cos << std::endl;
+    ofs << indent << "Kzl           " << seg->Kzl << std::endl;
+    ofs << indent << "Kzw           " << seg->Kzw << std::endl;
+    ofs << indent << "Kyl           " << seg->Kyl << std::endl;
+    ofs << indent << "rgtSideNormal " << seg->rgtSideNormal << std::endl;
+    ofs << indent << "envIndex      " << seg->envIndex << std::endl;
+    ofs << indent << "height        " << seg->height << std::endl;
+    ofs << indent << "raceinfo      0x" << std::hex << seg->raceInfo << std::dec << " " << dumpRaceInfo(seg->raceInfo) << std::endl;
+    ofs << indent << "DoVfactor     " << seg->DoVfactor << std::endl;
+    if (seg->ext)
+    {
+        ofs << indent << "nbMarks       " << seg->ext->nbMarks << std::endl;
+        ofs << indent << "marks         ";
+        for (int i = 0; i < seg->ext->nbMarks; ++i)
+            ofs << seg->ext->marks[i] << " ";
+        ofs << std::endl;
+    }
+//    if (seg->next)
+//        ofs << indent << "next         " << std::hex << seg->next << std::dec << std::endl;
+//    if (seg->prev)
+//        ofs << indent << "prev         " << std::hex << seg->prev << std::dec << std::endl;
+    if (seg->barrier[TR_SIDE_RGT])
+    {
+        ofs << indent << "barrier[TR_SIDE_RGT]  " << std::endl;
+        ofs << indent << "    style     " << seg->barrier[TR_SIDE_RGT]->style << std::endl;
+        ofs << indent << "    width     " << seg->barrier[TR_SIDE_RGT]->width << std::endl;
+        ofs << indent << "    height    " << seg->barrier[TR_SIDE_RGT]->height << std::endl;
+        ofs << indent << "    surface   " << (seg->barrier[TR_SIDE_RGT]->surface && seg->barrier[TR_SIDE_RGT]->surface->material ? seg->barrier[TR_SIDE_RGT]->surface->material : "") << std::endl;
+    }
+    if (seg->barrier[TR_SIDE_LFT])
+    {
+        ofs << indent << "barrier[TR_SIDE_LFT]  " << std::endl;
+        ofs << indent << "    style     " << seg->barrier[TR_SIDE_LFT]->style << std::endl;
+        ofs << indent << "    width     " << seg->barrier[TR_SIDE_LFT]->width << std::endl;
+        ofs << indent << "    height    " << seg->barrier[TR_SIDE_LFT]->height << std::endl;
+        ofs << indent << "    surface   " << (seg->barrier[TR_SIDE_LFT]->surface && seg->barrier[TR_SIDE_LFT]->surface->material ? seg->barrier[TR_SIDE_LFT]->surface->material : "") << std::endl;
+    }
+    tTrackSeg *s = seg->rside;
+    std::string i = indent + "    ";
+    if (s)
+    {
+        ofs << indent << "--------------- right ----------------" << std::endl;
+        dumpSeg(ofs, s, i);
+    }
+    s = seg->lside;
+    i = indent + "    ";
+    if (s)
+    {
+        ofs << indent << "--------------- left -----------------" << std::endl;
+        dumpSeg(ofs, s, i);
+    }
+}
+
+void dumpTrackSegs(tTrack *track)
+{
+    tTrackSeg *seg;
+    int i;
+    std::string ofname = track->filename;
+    ofname.resize(ofname.size() - 3);
+    ofname.append("dump");
+    std::ofstream ofs;
+    ofs.open(ofname.c_str());
+    if (ofs)
+    {
+        for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next)
+        {
+            ofs << "-------------------------------------------" << std::endl;
+            dumpSeg(ofs, seg);
+        }
+        ofs.close();
+    }
 }
