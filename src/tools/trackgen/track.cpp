@@ -1978,6 +1978,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             else
             {
                 curBarrier = mseg->barrier[0];
+
+                // fence only has one side (j = 0)
+                if (curBarrier->style == TR_FENCE && j != 0)
+                    continue;
+
                 CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
                 if (!curTexLink)
                 {
@@ -2304,6 +2309,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             else
             {
                 curBarrier = mseg->barrier[1];
+
+                // fence only has one side (j = 0)
+                if (curBarrier->style == TR_FENCE && j != 0)
+                    continue;
+
                 CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
                 if (!curTexLink)
                 {
