@@ -1964,7 +1964,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         sprintf(sname, "B%dRt", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
-            if ((mseg->rside != nullptr) && (mseg->rside->raceInfo & TR_PITBUILD))
+            // Find last side segment
+            seg = mseg;
+            while (seg->rside)
+                seg = seg->rside;
+
+            if (seg->raceInfo & TR_PITBUILD)
             {
                 startNeeded = 1;
                 runninglentgh = 0;
@@ -1977,21 +1982,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 if (!curTexLink)
                 {
                     texLen = 0; // edited
-                }               /*else {
-                                  ;
-                              }                          auch edited        */
-                // texLen = curTexSeg / curTexSize;
-                if (mseg->rside)
-                {
-                    seg = mseg->rside;
-                    if (seg->rside)
-                    {
-                        seg = seg->rside;
-                    }
-                }
-                else
-                {
-                    seg = mseg;
                 }
                 trkpos.seg = seg;
                 if (startNeeded || (runninglentgh > LG_STEP_MAX))
@@ -2300,7 +2290,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         sprintf(sname, "B%dLt", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
-            if ((mseg->lside != nullptr) && (mseg->lside->raceInfo & TR_PITBUILD))
+            // Find last side segment
+            seg = mseg;
+            while (seg->lside)
+                seg = seg->lside;
+
+            if (seg->raceInfo & TR_PITBUILD)
             {
                 runninglentgh = 0;
                 startNeeded = 1;
@@ -2312,23 +2307,9 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
                 if (!curTexLink)
                 {
-                    texLen = 0; //*
-                }               /*else {
-                                  curTexSeg = mseg->lgfromstart;
-                              }
-                              texLen = curTexSeg / curTexSize; */
-                if (mseg->lside)
-                {
-                    seg = mseg->lside;
-                    if (seg->lside)
-                    {
-                        seg = seg->lside;
-                    }
+                    texLen = 0;
                 }
-                else
-                {
-                    seg = mseg;
-                }
+                trkpos.seg = seg;
                 if (startNeeded || (runninglentgh > LG_STEP_MAX))
                 {
                     NEWDISPLIST(0, sname, i);
