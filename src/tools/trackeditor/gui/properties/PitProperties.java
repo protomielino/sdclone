@@ -532,7 +532,11 @@ public class PitProperties extends PropertyPanel
 			this.pitInfo = pitInfo;
 			
 			surfaceComboBox.setSelectedItem(this.pitInfo.surface);
-			borderTypeComboBox.setSelectedItem(this.pitInfo.borderType);		
+			
+			String borderType = this.pitInfo.borderType;
+			if (borderType == null || borderType.isEmpty())
+				borderType = "none";
+			borderTypeComboBox.setSelectedItem(borderType);		
 		}
 
 		/**
