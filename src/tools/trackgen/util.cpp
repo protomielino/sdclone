@@ -411,7 +411,7 @@ std::ostream &operator << (std::ostream &out, tSegType type)
     out << (type == TR_RGT ? "TR_RGT" :
             type == TR_LFT ? "TR_LFT" :
             type == TR_STR ? "TR_STR" :
-            std::to_string(static_cast<int>(type)));
+            std::to_string(static_cast<unsigned long long>(type)));
 
     return out;
 }
@@ -423,7 +423,7 @@ std::ostream &operator << (std::ostream &out, tSegType2 type2)
             type2 == TR_RSIDE ? "TR_RSIDE" :
             type2 == TR_LBORDER ? "TR_LBORDER" :
             type2 == TR_RBORDER ? "TR_RBORDER" :
-            std::to_string(static_cast<int>(type2)));
+            std::to_string(static_cast<unsigned long long>(type2)));
 
     return out;
 }
@@ -435,7 +435,7 @@ std::ostream &operator << (std::ostream &out, tSegStyle style)
             style == TR_WALL ? "TR_WALL" :
             style == TR_FENCE ? "TR_FENCE" :
             style == TR_PITBUILDING ? "TR_PITBUILDING" :
-            std::to_string(static_cast<int>(style)));
+            std::to_string(static_cast<unsigned long long>(style)));
 
     return out;
 }
