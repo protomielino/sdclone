@@ -300,7 +300,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tdble tmVSpace = Track->graphic.turnMarksInfo.vSpace;
     tdble tmHSpace = Track->graphic.turnMarksInfo.hSpace;
     char buf[256];
-    int hasBorder;
+    bool hasBorder;
     tDispElt *theCurDispElt = nullptr;
     char sname[256];
     //	float		dmax = 0;
@@ -1193,7 +1193,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     texLen = 0;
     startNeeded = true;
     runninglentgh = 0;
-    hasBorder = 0;
+    hasBorder = false;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
     {
         if ((mseg->rside != nullptr) && ((mseg->rside->type2 == TR_RSIDE) || (mseg->rside->rside != nullptr)))
@@ -1202,10 +1202,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (seg->rside != nullptr)
             {
                 seg = seg->rside;
-                if (hasBorder == 0)
+                if (!hasBorder)
                 {
                     startNeeded = true;
-                    hasBorder = 1;
+                    hasBorder = true;
                 }
             }
             else
@@ -1213,7 +1213,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 if (hasBorder)
                 {
                     startNeeded = true;
-                    hasBorder = 0;
+                    hasBorder = false;
                 }
             }
 
@@ -1791,7 +1791,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     texLen = 0;
     startNeeded = true;
     runninglentgh = 0;
-    hasBorder = 0;
+    hasBorder = false;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
     {
         if ((mseg->lside != nullptr) && ((mseg->lside->type2 == TR_LSIDE) || (mseg->lside->lside != nullptr)))
@@ -1800,10 +1800,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (seg->lside)
             {
                 seg = seg->lside;
-                if (hasBorder == 0)
+                if (!hasBorder)
                 {
                     startNeeded = true;
-                    hasBorder = 1;
+                    hasBorder = true;
                 }
             }
             else
@@ -1811,7 +1811,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 if (hasBorder)
                 {
                     startNeeded = true;
-                    hasBorder = 0;
+                    hasBorder = false;
                 }
             }
 
