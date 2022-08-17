@@ -20,6 +20,8 @@
  */
 package gui;
 
+import java.awt.Point;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 /**
  * @author babis
@@ -73,6 +76,11 @@ public class TrackgenPanel extends JDialog implements Runnable
 		this.setContentPane(getJPanel());
 		this.setTitle("Trackgen");
 		this.setSize(475, 320);
+		Point p = new Point();
+		p.x = editorFrame.getProject().getTrackgenDialogX();
+		p.y = editorFrame.getProject().getTrackgenDialogY();
+		this.setLocation(p);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	public void run()
@@ -257,5 +265,15 @@ public class TrackgenPanel extends JDialog implements Runnable
 		}
 		return jPanel1;
 	}
- } //  @jve:decl-index=0:visual-constraint="10,10"
+
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			editorFrame.getProject().setTrackgenDialogX(this.getX());
+			editorFrame.getProject().setTrackgenDialogY(this.getY());
+		}
+	}
+} //  @jve:decl-index=0:visual-constraint="10,10"
 

@@ -38,6 +38,8 @@ public class Project
 	private int defaultSurfacesDialogY = 0;
 	private int defaultObjectsDialogX = 0;
 	private int defaultObjectsDialogY = 0;
+	private int trackgenDialogX = 0;
+	private int trackgenDialogY = 0;
 	
 	public Project()
 	{
@@ -159,5 +161,25 @@ public class Project
 	public void setDefaultObjectsDialogY(int defaultObjectsDialogY)
 	{
 		this.defaultObjectsDialogY = defaultObjectsDialogY;
+	}
+
+	public int getTrackgenDialogX()
+	{
+		return trackgenDialogX;
+	}
+
+	public void setTrackgenDialogX(int trackgenDialogX)
+	{
+		this.trackgenDialogX = trackgenDialogX;
+	}
+
+	public int getTrackgenDialogY()
+	{
+		return trackgenDialogY;
+	}
+
+	public void setTrackgenDialogY(int trackgenDialogY)
+	{
+		this.trackgenDialogY = trackgenDialogY;
 	}
 }
