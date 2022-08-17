@@ -739,6 +739,8 @@ public class EditorFrame extends JFrame
 		getProject().setTrackgenDialogY(preferences.getInt("TrackgenDialogY", 0));
 		getProject().setPreferencesDialogX(preferences.getInt("PreferencesDialogX", 0));
 		getProject().setPreferencesDialogY(preferences.getInt("PreferencesDialogY", 0));
+		getProject().setNewProjectDialogX(preferences.getInt("NewProjectDialogX", 0));
+		getProject().setNewProjectDialogY(preferences.getInt("NewProjectDialogY", 0));
 	}
 
 	/**
@@ -2322,6 +2324,8 @@ public class EditorFrame extends JFrame
 		preferences.putInt("TrackgenDialogY", getProject().getTrackgenDialogY());
 		preferences.putInt("PreferencesDialogX", getProject().getPreferencesDialogX());
 		preferences.putInt("PreferencesDialogY", getProject().getPreferencesDialogY());
+		preferences.putInt("NewProjectDialogX", getProject().getNewProjectDialogX());
+		preferences.putInt("NewProjectDialogY", getProject().getNewProjectDialogY());
 
 		System.exit(0);
 	}

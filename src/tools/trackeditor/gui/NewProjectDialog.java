@@ -20,6 +20,8 @@
  */
 package gui;
 
+import java.awt.Point;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -29,6 +31,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 /**
  * @author babis
@@ -84,8 +87,12 @@ public class NewProjectDialog extends JDialog
 		this.setSize(440, 285);
 		this.setContentPane(getJPanel());
 		this.setModal(true);
-		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
+		Point p = new Point();
+		p.x = editorFrame.getProject().getNewProjectDialogX();
+		p.y = editorFrame.getProject().getNewProjectDialogY();
+		this.setLocation(p);
 		this.setTitle("New Project");
 		this.getContentPane().setSize(447, 321);
 	}
@@ -400,6 +407,18 @@ public class NewProjectDialog extends JDialog
 	 */
 	protected void cancel()
 	{
+		editorFrame.getProject().setNewProjectDialogX(this.getX());
+		editorFrame.getProject().setNewProjectDialogY(this.getY());
 		this.dispose();
 	}
-  } //  @jve:decl-index=0:visual-constraint="6,6"
+
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			editorFrame.getProject().setNewProjectDialogX(this.getX());
+			editorFrame.getProject().setNewProjectDialogY(this.getY());
+		}
+	}
+} //  @jve:decl-index=0:visual-constraint="6,6"
