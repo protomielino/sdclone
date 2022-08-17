@@ -1,7 +1,9 @@
 package gui;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -10,6 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 public class PreferencesDialog extends JDialog
 {
@@ -40,8 +43,12 @@ public class PreferencesDialog extends JDialog
 		this.setSize(600, 285);
 		this.setContentPane(getJPanel());
 		this.setModal(true);
-		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
+		Point p = new Point();
+		p.x = editorFrame.getProject().getPreferencesDialogX();
+		p.y = editorFrame.getProject().getPreferencesDialogY();
+		this.setLocation(p);
 		this.setTitle("Preferences Dialog");
 	}
 	
@@ -269,6 +276,8 @@ public class PreferencesDialog extends JDialog
 
 	protected void cancel()
 	{
+		editorFrame.getProject().setPreferencesDialogX(this.getX());
+		editorFrame.getProject().setPreferencesDialogY(this.getY());
 		this.dispose();
 	}
 	
@@ -285,5 +294,15 @@ public class PreferencesDialog extends JDialog
 	public String getLibDirectory()
 	{
 		return getLibDirectoryTextField().getText();
+	}
+
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			editorFrame.getProject().setPreferencesDialogX(this.getX());
+			editorFrame.getProject().setPreferencesDialogY(this.getY());
+		}
 	}
 }

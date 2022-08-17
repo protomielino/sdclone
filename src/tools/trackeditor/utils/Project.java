@@ -40,6 +40,8 @@ public class Project
 	private int defaultObjectsDialogY = 0;
 	private int trackgenDialogX = 0;
 	private int trackgenDialogY = 0;
+	private int preferencesDialogX = 0;
+	private int preferencesDialogY = 0;
 	
 	public Project()
 	{
@@ -181,5 +183,25 @@ public class Project
 	public void setTrackgenDialogY(int trackgenDialogY)
 	{
 		this.trackgenDialogY = trackgenDialogY;
+	}
+
+	public int getPreferencesDialogX() 
+	{
+		return preferencesDialogX;
+	}
+
+	public void setPreferencesDialogX(int preferencesDialogX) 
+	{
+		this.preferencesDialogX = preferencesDialogX;
+	}
+
+	public int getPreferencesDialogY() 
+	{
+		return preferencesDialogY;
+	}
+
+	public void setPreferencesDialogY(int preferencesDialogY) 
+	{
+		this.preferencesDialogY = preferencesDialogY;
 	}
 }
