@@ -285,6 +285,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tdble curTexSeg;
     tdble curTexSize = 0;
     tdble curHeight;
+    int prevSurfType = 0x10;
+    int curSurfType = 0x10; // shaded single sided polygon
     tTexElt *texList = nullptr;
     tTexElt *curTexElt = nullptr;
     tTrackBarrier *curBarrier;
@@ -419,7 +421,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     aDispElt->name = strdup(_name);                                                                 \
                     aDispElt->id = _id;                                                                             \
                     aDispElt->texture = curTexElt;                                                                  \
-                    aDispElt->surfType = 0;                                                                         \
+                    aDispElt->surfType = curSurfType;                                                               \
                     if (Groups[_id].nb == 0)                                                                        \
                     {                                                                                               \
                         ActiveGroups++;                                                                             \
@@ -437,7 +439,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 else                                                                                                \
                 {                                                                                                   \
                     aDispElt->texture = curTexElt;                                                                  \
-                    aDispElt->surfType = 0;                                                                         \
+                    aDispElt->surfType = curSurfType;                                                               \
                 }                                                                                                   \
             }                                                                                                       \
             else                                                                                                    \
@@ -448,7 +450,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 aDispElt->name = strdup(_name);                                                                     \
                 aDispElt->id = _id;                                                                                 \
                 aDispElt->texture = curTexElt;                                                                      \
-                aDispElt->surfType = 0;                                                                             \
+                aDispElt->surfType = curSurfType;                                                                   \
                 aDispElt->next = aDispElt;                                                                          \
                 Groups[_id].dispList = aDispElt;                                                                    \
                 Groups[_id].nb++;                                                                                   \
@@ -479,7 +481,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.png");                              \
         mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, nullptr, 0);                              \
         SETTEXTURE(texname, texnamebump, texnameraceline, mipmap);                                                  \
-        if ((curTexId != prevTexId) || (startNeeded))                                                               \
+        if ((curTexId != prevTexId) || (curSurfType != prevSurfType) || startNeeded)                                \
         {                                                                                                           \
             const char *textype;                                                                                    \
             if (bump)                                                                                               \
@@ -509,7 +511,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXSIZE, nullptr, 20.0);                      \
             }                                                                                                       \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(true, name, id);                                                                               \
+            prevSurfType = curSurfType;                                                                             \
+            NEWDISPLIST(true, name, id);                                                                            \
         }                                                                                                           \
     } while (0)
 
@@ -522,7 +525,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         if (curTexId != prevTexId)                                                                                  \
         {                                                                                                           \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(true, name, id);                                                                               \
+            NEWDISPLIST(true, name, id);                                                                            \
         }                                                                                                           \
     } while (0)
 
@@ -533,7 +536,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         if (curTexId != prevTexId)                                                                                  \
         {                                                                                                           \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(true, name, id);                                                                               \
+            NEWDISPLIST(true, name, id);                                                                            \
         }                                                                                                           \
     } while (0)
 
@@ -1955,6 +1958,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Right barrier */
+    curSurfType = 0x10;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -1982,6 +1986,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (curBarrier->style == TR_FENCE && j != 0)
                 continue;
 
+            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
             if (!curTexLink)
             {
@@ -2284,6 +2289,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Left Barrier */
+    curSurfType = 0x10;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -2311,6 +2317,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (curBarrier->style == TR_FENCE && j != 0)
                 continue;
             
+            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
             if (!curTexLink)
             {
@@ -2626,6 +2633,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
     if (!bump)
     {
+        curSurfType = 0x10;
 
         /* Turn Marks */
         for (i = 0, seg = Track->seg->next; i < Track->nseg; i++, seg = seg->next)
@@ -2682,7 +2690,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         RtTrackSideNormalG(mseg, x, y, TR_LFT, &normvec);
                     }
                     CHECKDISPLIST2(buf, 0, "TuMk", mseg->id);
-                    aDispElt->surfType = 0x10;
 
                     SETPOINT(0.0, 0.0, x, y, z);
                     SETPOINT(1.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
@@ -2690,7 +2697,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     SETPOINT(1.0, 1.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
 
                     CHECKDISPLIST2("back-sign", 0, "TuMk", mseg->id);
-                    aDispElt->surfType = 0x10;
 
                     SETPOINT(0.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
                     SETPOINT(1.0, 0.0, x, y, z);
@@ -2705,6 +2711,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         /* Start Bridge */
         if (bridge)
         {
+            curSurfType = 0x10;
             CHECKDISPLIST2("pylon1", 4, "S0Bg", 0);
 #define BR_HEIGHT_1 8.0
 #define BR_HEIGHT_2 6.0
@@ -2887,6 +2894,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
         pits = &(Track->pits);
         initPits(Track, TrackHandle, pits);
+        curSurfType = 0x30; // this must be 2 sided
 
         switch (pits->type)
         {
@@ -3041,14 +3049,7 @@ static void saveObject(FILE *curFd, int nb, int start, char *texture, char *name
     }
 
     fprintf(curFd, "numsurf %d\n", nb - 2);
-    if (surfType)
-    {
-        fprintf(curFd, "SURF 0x10\n");
-    }
-    else
-    {
-        fprintf(curFd, "SURF 0x30\n");
-    }
+    fprintf(curFd, "SURF 0x%02x\n", surfType);
     fprintf(curFd, "mat 0\n");
     fprintf(curFd, "refs 3\n");
     fprintf(curFd, "%d %f %f\n", 0, tracktexcoord[2 * start], tracktexcoord[2 * start + 1]);
@@ -3058,14 +3059,7 @@ static void saveObject(FILE *curFd, int nb, int start, char *texture, char *name
     /* triangle strip conversion to triangles */
     for (i = 2; i < nb - 1; i++)
     {
-        if (surfType)
-        {
-            fprintf(curFd, "SURF 0x10\n");
-        }
-        else
-        {
-            fprintf(curFd, "SURF 0x30\n");
-        }
+        fprintf(curFd, "SURF 0x%02x\n", surfType);
         fprintf(curFd, "mat 0\n");
         fprintf(curFd, "refs 3\n");
         if ((i % 2) == 0)
