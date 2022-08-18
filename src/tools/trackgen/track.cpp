@@ -1979,19 +1979,20 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 runninglentgh = 0;
                 continue;
             }
-            
+
             curBarrier = mseg->barrier[0];
+            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
+            CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
+
+            if (!curTexLink)
+            {
+                texLen = 0; // edited
+            }
 
             // fence only has one side (j = 0)
             if (curBarrier->style == TR_FENCE && j != 0)
                 continue;
 
-            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
-            CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
-            if (!curTexLink)
-            {
-                texLen = 0; // edited
-            }
             trkpos.seg = seg;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
@@ -2312,17 +2313,18 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             }
             
             curBarrier = mseg->barrier[1];
-            
-            // fence only has one side (j = 0)
-            if (curBarrier->style == TR_FENCE && j != 0)
-                continue;
-            
             curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
+
             if (!curTexLink)
             {
                 texLen = 0;
             }
+
+            // fence only has one side (j = 0)
+            if (curBarrier->style == TR_FENCE && j != 0)
+                continue;
+
             trkpos.seg = seg;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
