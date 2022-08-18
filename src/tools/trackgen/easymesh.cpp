@@ -2014,7 +2014,7 @@ static void draw_ac(FILE *ac_file, const char *name)
         fprintf(ac_file, "numsurf %d\n", curGrp->nbsurf);
         for (j = 0; j < curGrp->nbsurf; j++)
         {
-            fprintf(ac_file, "SURF 0x30\n");
+            fprintf(ac_file, "SURF 0x10\n");
             fprintf(ac_file, "mat 0\n");
             fprintf(ac_file, "refs 3\n");
             for (k = 0; k < 3; k++)
