@@ -109,16 +109,19 @@ ApplyTransform(sgMat4 m, ssgBase *node)
     }
 }
 
+static void sgMakeScaleMat4(sgMat4 dst, const SGfloat scale)
+{
+    sgSetVec4(dst[0], scale,   SG_ZERO, SG_ZERO, SG_ZERO);
+    sgSetVec4(dst[1], SG_ZERO, scale,   SG_ZERO, SG_ZERO);
+    sgSetVec4(dst[2], SG_ZERO, SG_ZERO, scale,   SG_ZERO);
+    sgSetVec4(dst[3], SG_ZERO, SG_ZERO, SG_ZERO, SG_ONE);
+}
+
 static void scaleObject(ssgEntity *obj, tdble scale)
 {
-    sgMat4 identMat;
-    sgMat4 scaleMat;
-
-    sgMakeIdentMat4(identMat);
-    sgMakeIdentMat4(scaleMat);
-
-    sgScaleMat4(scaleMat, identMat, scale);
-    ApplyTransform(scaleMat, obj);
+    sgMat4 m;
+    sgMakeScaleMat4(m, scale);
+    ApplyTransform(m, obj);
 }
 
 static void
