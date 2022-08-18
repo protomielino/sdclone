@@ -618,6 +618,10 @@ public class XmlWriter
 			addContent(el, "orientation", null, object.getOrientation());
 			addContent(el, "delta height",null,  object.getDeltaHeight());
 			addContent(el, "delta vert", null, object.getDeltaVert());
+			addContent(el, "scale type", object.getScaleType());
+			addContent(el, "scale", null, object.getScale());
+			addContent(el, "scale min",null,  object.getScaleMin());
+			addContent(el, "scale max", null, object.getScaleMax());
 
 			objects.addContent(el);
 		}

@@ -428,6 +428,10 @@ public class XmlReader
             obj.setOrientation(getAttrNumValue(object, "orientation"));
             obj.setDeltaHeight(getAttrNumValue(object, "delta height"));
             obj.setDeltaVert(getAttrNumValue(object, "delta vert"));
+            obj.setScaleType(getAttrStrValue(object, "scale type"));
+            obj.setScale(getAttrNumValue(object, "scale"));
+            obj.setScaleMin(getAttrNumValue(object, "scale min"));
+            obj.setScaleMax(getAttrNumValue(object, "scale max"));
 
             objectData.add(obj);
         }

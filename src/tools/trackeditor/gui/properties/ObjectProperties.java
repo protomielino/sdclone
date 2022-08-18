@@ -94,7 +94,7 @@ public class ObjectProperties extends PropertyPanel
 		if (addObjectButton == null)
 		{
 			addObjectButton = new JButton();
-			addObjectButton.setBounds(10, 250, 120, 25);
+			addObjectButton.setBounds(10, 360, 120, 25);
 			addObjectButton.setText("Add Object");
 			addObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -123,7 +123,7 @@ public class ObjectProperties extends PropertyPanel
 		if (deleteObjectButton == null)
 		{
 			deleteObjectButton = new JButton();
-			deleteObjectButton.setBounds(140, 250, 120, 25);
+			deleteObjectButton.setBounds(140, 360, 120, 25);
 			deleteObjectButton.setText("Delete Object");
 			deleteObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -149,7 +149,7 @@ public class ObjectProperties extends PropertyPanel
 		if (copyObjectButton == null)
 		{
 			copyObjectButton = new JButton();
-			copyObjectButton.setBounds(270, 250, 120, 25);
+			copyObjectButton.setBounds(270, 360, 120, 25);
 			copyObjectButton.setText("Copy Object");
 			copyObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -173,7 +173,7 @@ public class ObjectProperties extends PropertyPanel
 		if (pasteObjectButton == null)
 		{
 			pasteObjectButton = new JButton();
-			pasteObjectButton.setBounds(400, 250, 120, 25);
+			pasteObjectButton.setBounds(400, 360, 120, 25);
 			pasteObjectButton.setText("Paste Object");
 			pasteObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -200,7 +200,7 @@ public class ObjectProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 230);
+			tabbedPane.setBounds(10, 10, 510, 340);
 
 			Vector<TrackObject> objects = null;
 			if (defaultObjects)
@@ -223,6 +223,7 @@ public class ObjectProperties extends PropertyPanel
 
 	private class ObjectPanel extends JPanel
 	{
+		private TrackObject 		object;
 		private JLabel				nameLabel				= new JLabel();
 		private JTextField 			nameTextField			= new JTextField();
 		private JLabel				objectLabel				= new JLabel();
@@ -237,6 +238,14 @@ public class ObjectProperties extends PropertyPanel
 		private JTextField			deltaHeightTextField	= new JTextField();
 		private JLabel				deltaVertLabel			= new JLabel();
 		private JTextField			deltaVertTextField		= new JTextField();
+		private JLabel				scaleTypeLabel			= new JLabel();
+		private JComboBox<String>	scaleTypeComboBox		= null;
+		private JLabel				scaleLabel				= new JLabel();
+		private JTextField			scaleTextField			= new JTextField();
+		private JLabel				scaleMinLabel			= new JLabel();
+		private JTextField			scaleMinTextField		= new JTextField();
+		private JLabel				scaleMaxLabel			= new JLabel();
+		private JTextField			scaleMaxTextField		= new JTextField();		
 		private JButton				objectButton			= null;
 
 		private final String sep = System.getProperty("file.separator");
@@ -247,13 +256,14 @@ public class ObjectProperties extends PropertyPanel
 		public ObjectPanel(TrackObject object)
 		{
 			super();
-			initialize(object);
+			this.object = object;
+			initialize();
 		}
 
 		/**
 		 *
 		 */
-		private void initialize(TrackObject object)
+		private void initialize()
 		{
 			setLayout(null);
 
@@ -264,6 +274,10 @@ public class ObjectProperties extends PropertyPanel
 			addLabel(this, 4, orientationLabel, "Orientation", 160);
 			addLabel(this, 5, deltaHeightLabel, "Delta Height", 160);
 			addLabel(this, 6, deltaVertLabel, "Delta Vert", 160);
+			addLabel(this, 7, scaleTypeLabel, "Scale Type", 160);
+			addLabel(this, 8, scaleLabel, "Scale", 160);
+			addLabel(this, 9, scaleMinLabel, "Scale Min", 160);
+			addLabel(this, 10, scaleMaxLabel, "Scale Max", 160);
 
 			addTextField(this, 0, nameTextField, object.getName(), 120, 100);
 			addTextField(this, 1, objectTextField, object.getObject(), 120, 290);
@@ -276,6 +290,13 @@ public class ObjectProperties extends PropertyPanel
 			addTextField(this, 5, deltaHeightTextField, getString(object.getDeltaHeight()), 120, 100);
 			addTextField(this, 6, deltaVertTextField, getString(object.getDeltaVert()), 120, 100);
 
+			add(getScaleTypeComboBox(), null);
+			getScaleTypeComboBox().setSelectedItem(getString(object.getScaleType()));
+
+			addTextField(this, 8, scaleTextField, getString(object.getScale()), 120, 100);
+			addTextField(this, 9, scaleMinTextField, getString(object.getScaleMin()), 120, 100);
+			addTextField(this, 10, scaleMaxTextField, getString(object.getScaleMax()), 120, 100);
+
 			if (defaultObjects)
 			{
 				nameTextField.setEnabled(false);
@@ -285,6 +306,10 @@ public class ObjectProperties extends PropertyPanel
 				orientationTextField.setEnabled(false);
 				deltaHeightTextField.setEnabled(false);
 				deltaVertTextField.setEnabled(false);
+				scaleTypeComboBox.setEnabled(false);
+				scaleTextField.setEnabled(false);
+				scaleMinTextField.setEnabled(false);
+				scaleMaxTextField.setEnabled(false);		
 			}
 			else
 			{
@@ -318,13 +343,68 @@ public class ObjectProperties extends PropertyPanel
 		{
 			if (orientationTypeComboBox == null)
 			{
-				String[] items = {"none", "random", "standard"};
+				String[] items = {"none", "random", "standard", "track", "terrain", "border"};
 				orientationTypeComboBox = new JComboBox<String>(items);
 				orientationTypeComboBox.setBounds(120, 91, 120, 23);
 			}
 			return orientationTypeComboBox;
 		}
 
+		public JComboBox<String> getScaleTypeComboBox()
+		{
+			if (scaleTypeComboBox == null)
+			{
+				String[] items = {"none", "random", "fixed"};
+				scaleTypeComboBox = new JComboBox<String>(items);
+				scaleTypeComboBox.setBounds(120, 201, 120, 23);
+				scaleTypeComboBox.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						scaleTypeChanged();
+					}
+				});
+			}
+			return scaleTypeComboBox;
+		}
+
+		private void scaleTypeChanged()
+		{
+			String type = scaleTypeComboBox.getSelectedItem().toString();
+			object.setScaleType(type);
+			if (type.equals("none"))
+			{
+				scaleTextField.setEnabled(false);
+				scaleMinTextField.setEnabled(false);
+				scaleMaxTextField.setEnabled(false);
+				object.setScale(Double.NaN);
+				object.setScaleMin(Double.NaN);
+				object.setScaleMax(Double.NaN);
+			}
+			else if (type.equals("random"))
+			{
+				scaleTextField.setEnabled(false);
+				scaleMinTextField.setEnabled(true);
+				scaleMaxTextField.setEnabled(true);					
+				object.setScale(Double.NaN);
+				object.setScaleMin(0.5);
+				object.setScaleMax(2.0);
+			}
+			else if (type.equals("fixed"))
+			{
+				scaleTextField.setEnabled(true);
+				scaleMinTextField.setEnabled(false);
+				scaleMaxTextField.setEnabled(false);
+				object.setScale(1.0);
+				object.setScaleMin(Double.NaN);
+				object.setScaleMax(Double.NaN);
+			}
+			
+			scaleTextField.setText(getString(object.getScale()));
+			scaleMinTextField.setText(getString(object.getScaleMin()));
+			scaleMaxTextField.setText(getString(object.getScaleMax()));
+		}
+		
 		/**
 		 * This method initializes objectButton
 		 *
@@ -438,7 +518,31 @@ public class ObjectProperties extends PropertyPanel
                 object.setDeltaVert(doubleResult.getValue());
                 getEditorFrame().documentIsModified = true;
             }
-		}
+
+            if (isDifferent(panel.getScaleTypeComboBox().getSelectedItem().toString(), object.getScaleType(), stringResult))
+            {
+                object.setScaleType(stringResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
+            if (isDifferent(panel.scaleTextField.getText(), object.getScale(), doubleResult))
+            {
+                object.setScale(doubleResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
+            if (isDifferent(panel.scaleMinTextField.getText(), object.getScaleMin(), doubleResult))
+            {
+                object.setScaleMin(doubleResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
+            if (isDifferent(panel.scaleMaxTextField.getText(), object.getScaleMax(), doubleResult))
+            {
+                object.setScaleMax(doubleResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+        }
 		if (objects.size() > tabbedPane.getTabCount())
 		{
 			// need to trim envMaps

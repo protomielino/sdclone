@@ -24,6 +24,7 @@
 */
 
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cctype>
@@ -73,6 +74,10 @@ typedef struct objdef
     tdble		deltaHeight;
     tdble		deltaVert;
     float 		distance;
+    bool        scaleRandom, scaleFixed;
+    tdble       scale;
+    tdble       scaleMin;
+    tdble       scaleMax;
 } tobjdef;
 
 GF_TAILQ_HEAD(objlist, objdef);
@@ -104,6 +109,18 @@ ApplyTransform(sgMat4 m, ssgBase *node)
     }
 }
 
+static void scaleObject(ssgEntity *obj, tdble scale)
+{
+    sgMat4 identMat;
+    sgMat4 scaleMat;
+
+    sgMakeIdentMat4(identMat);
+    sgMakeIdentMat4(scaleMat);
+
+    sgScaleMat4(scaleMat, identMat, scale);
+    ApplyTransform(scaleMat, obj);
+}
+
 static void
 InitObjects(tTrack *track, void *TrackHandle)
 {
@@ -130,7 +147,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 
     for (int i = 0; i < objnb; i++)
     {
-        objdef	*curObj = (struct objdef *)malloc(sizeof(struct objdef));
+        objdef	*curObj = (struct objdef *)calloc(1, sizeof(struct objdef));
         curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
         const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, nullptr);
 
@@ -149,6 +166,26 @@ InitObjects(tTrack *track, void *TrackHandle)
         }
 
         ssgFlatten(curObj->obj);
+
+        std::string scaleType = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_TYPE, "");
+        if (scaleType == "random")
+        {
+            curObj->scaleFixed = false;
+            curObj->scaleRandom = true;
+            curObj->scaleMin = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_MIN, nullptr, 0.5);
+            curObj->scaleMax = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_MAX, nullptr, 2.0);
+        }
+        else if (scaleType == "fixed")
+        {
+            curObj->scaleFixed = true;
+            curObj->scaleRandom = false;
+            curObj->scale = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE, nullptr, 1.0);
+        }
+        else
+        {
+            curObj->scaleFixed = false;
+            curObj->scaleRandom = false;
+        }
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "random") == 0)
         {
@@ -221,18 +258,16 @@ AddToRoot(ssgEntity *node)
 static void
 AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
 {
-    struct objdef	*curObj;
-    ssgEntity		*obj;
-    sgMat4		m;
-    tdble		dv=0, angle=0;
-    float z=0;
-    float xNeu, yNeu, zNeu;
-
-    for (curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
+    for (struct objdef *curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
     {
         if (clr == curObj->color)
         {
-            obj = (ssgEntity*)curObj->obj->clone(SSG_CLONE_RECURSIVE | SSG_CLONE_GEOMETRY | SSG_CLONE_STATE);
+            sgMat4		m;
+            tdble		dv=0, angle=0;
+            float       z=0;
+            float       xNeu, yNeu, zNeu;
+
+            ssgEntity *obj = (ssgEntity*)curObj->obj->clone(SSG_CLONE_RECURSIVE | SSG_CLONE_GEOMETRY | SSG_CLONE_STATE);
 
             if (curObj->random)
             {
@@ -241,6 +276,22 @@ AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
                 /* 		ApplyTransform (m, obj); */
                 dv = curObj->deltaVert;
                 angle = 360.0 * rand() / (RAND_MAX + 1.0);
+            }
+
+            if (curObj->scaleRandom)
+            {
+                tdble random = ((tdble)rand()) / (tdble)RAND_MAX;
+
+                if (curObj->scaleMin > curObj->scaleMax)
+                    std::swap(curObj->scaleMin, curObj->scaleMax);
+
+                tdble scale = (random * (curObj->scaleMax - curObj->scaleMin)) + curObj->scaleMin;
+
+                scaleObject(obj, scale);
+            }
+            else if (curObj->scaleFixed)
+            {
+                scaleObject(obj, curObj->scale);
             }
 
             if (curObj->terrainOriented)
@@ -257,9 +308,7 @@ AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
 
             if (curObj->borderOriented)
             {
-
                 /* NEW: calculate angle for border-aligned orientation */
-
                 angle= getBorderAngle(track, TrackHandle, x, y, curObj->distance, &xNeu, &yNeu, &zNeu);
                 //noch was mit x und y machen
                 x= xNeu;

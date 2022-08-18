@@ -133,6 +133,11 @@
 #define TRK_ATT_SEED                "random seed"
 #define TRK_ATT_ORIENTATION_TYPE    "orientation type"
 #define TRK_ATT_ORIENTATION         "orientation"
+#define TRK_ATT_SCALE_TYPE          "scale type"
+#define TRK_ATT_SCALE               "scale"
+#define TRK_ATT_SCALE_MIN           "scale min"
+#define TRK_ATT_SCALE_MAX           "scale max"
+
 #define TRK_ATT_DH                  "delta height"
 #define TRK_ATT_DV                  "delta vert"
 #define TRK_SECT_OBJMAP             "Object Maps"

@@ -8,6 +8,10 @@ public final class TrackObject {
     private double orientation		= Double.NaN;
     private double deltaHeight		= Double.NaN;
     private double deltaVert		= Double.NaN;
+    private String scaleType		= null;
+    private double scale			= Double.NaN;
+    private double scaleMin			= Double.NaN;
+    private double scaleMax			= Double.NaN;
 
     public String getName() {
 		return name;
@@ -65,6 +69,38 @@ public final class TrackObject {
 		this.deltaVert = deltaVert;
 	}
 
+	public String getScaleType() {
+		return scaleType;
+	}
+
+	public void setScaleType(String scaleType) {
+		this.scaleType = scaleType;
+	}
+
+	public double getScale() {
+		return scale;
+	}
+
+	public void setScale(double scale) {
+		this.scale = scale;
+	}
+
+	public double getScaleMin() {
+		return scaleMin;
+	}
+
+	public void setScaleMin(double scaleMin) {
+		this.scaleMin = scaleMin;
+	}
+
+	public double getScaleMax() {
+		return scaleMax;
+	}
+
+	public void setScaleMax(double scaleMax) {
+		this.scaleMax = scaleMax;
+	}
+
 	public void dump(String indent)
     {
 		System.out.println(indent + "TrackObject");
@@ -75,5 +111,9 @@ public final class TrackObject {
 		System.out.println(indent + "  orientation     : " + orientation);
 		System.out.println(indent + "  deltaHeight     : " + deltaHeight);
 		System.out.println(indent + "  deltaVert       : " + deltaVert);
+		System.out.println(indent + "  scaleType       : " + scaleType);
+		System.out.println(indent + "  scale           : " + scale);
+		System.out.println(indent + "  scaleMin        : " + scaleMin);
+		System.out.println(indent + "  scaleMax        : " + scaleMax);
     }
 }
