@@ -30,6 +30,7 @@ This file deals with car setup
 #include <tracks.h>
 #include <drivers.h>
 #include <playerpref.h>
+#include <portability.h>
 
 #include "carsetupmenu.h"
 
@@ -394,7 +395,7 @@ void CarSetupMenu::loadSettings()
             }
 
             attribute &att = items[page][index];
-            std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
+            std::string strIndex(std::to_string(index));
 
             att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
             att.editId = getDynamicControlId(std::string("Edit" + strIndex).c_str());
@@ -468,7 +469,7 @@ void CarSetupMenu::loadSettings()
             for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
             {
                 attribute &att = items[page][index];
-                std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
+                std::string strIndex(std::to_string(index));
 
                 if (!att.labelId)
                     att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
@@ -600,7 +601,7 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
     // Create items.
     for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
+        std::string strIndex(std::to_string(index));
         createLabelControl(std::string("Label" + strIndex).c_str());
         createEditControl(std::string("Edit" + strIndex).c_str(), this, NULL, NULL);
         createComboboxControl(std::string("Combo" + strIndex).c_str(), &comboCallbackData[index], onComboCallback);

@@ -114,6 +114,21 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 #endif
 #if _MSC_VER < 1800
 #define copysign _copysign
+
+#include <string>
+
+namespace std
+{
+    inline string to_string(size_t value)
+    {
+        return to_string(static_cast<unsigned long long>(value));
+    }
+
+    inline string to_string(int value)
+    {
+        return to_string(static_cast<long long>(value));
+    }
+}
 #endif
 
 #include <cstdarg>
