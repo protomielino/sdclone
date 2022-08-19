@@ -178,6 +178,7 @@ InitSides(void *TrackHandle, tTrack *theTrack)
     style = GfParmGetStr(TrackHandle, path, TRK_ATT_STYLE, TRK_VAL_PLAN);
     if (strcmp(style, TRK_VAL_PLAN) == 0) {
         borderStyle[side] = TR_PLAN;
+        borderHeight[side] = 0;
     } else if (strcmp(style, TRK_VAL_CURB) == 0) {
         borderStyle[side] = TR_CURB;
     } else {
@@ -254,6 +255,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
         style = GfParmGetStr(TrackHandle, path2, TRK_ATT_STYLE, ValStyle[borderStyle[side]]);
         if (strcmp(style, TRK_VAL_PLAN) == 0) {
         borderStyle[side] = TR_PLAN;
+        borderHeight[side] = 0;
         } else if (strcmp(style, TRK_VAL_CURB) == 0) {
         borderStyle[side] = TR_CURB;
         } else {
