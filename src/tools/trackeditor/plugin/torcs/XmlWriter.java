@@ -520,7 +520,7 @@ public class XmlWriter
 
 			addContent(el, "segment", camera.getSegment());
 			addContent(el, "to right", null, camera.getToRight());
-			addContent(el, "to start", null, camera.getToStart());
+			addContent(el, "to start", "deg", camera.getToStart());
 			addContent(el, "height", null, camera.getHeight());
 			addContent(el, "fov start", camera.getFovStart());
 			addContent(el, "fov end", camera.getFovEnd());
@@ -616,7 +616,7 @@ public class XmlWriter
 			addContent(el, "object", object.getObject());
 			addHexContent(el, "color", null, object.getColor());
 			addContent(el, "orientation type", object.getOrientationType());
-			addContent(el, "orientation", null, object.getOrientation());
+			addContent(el, "orientation", "deg", object.getOrientation());
 			addContent(el, "delta height",null,  object.getDeltaHeight());
 			addContent(el, "delta vert", null, object.getDeltaVert());
 			addContent(el, "scale type", object.getScaleType());

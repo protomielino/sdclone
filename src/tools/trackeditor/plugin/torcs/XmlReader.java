@@ -225,7 +225,7 @@ public class XmlReader
             cam.setName(camera.getAttribute("name").getValue());
             cam.setSegment(getAttrStrValue(camera, "segment"));
             cam.setToRight(getAttrNumValue(camera, "to right"));
-            cam.setToStart(getAttrNumValue(camera, "to start"));
+            cam.setToStart(getAttrNumValue(camera, "to start", "deg"));
             cam.setHeight(getAttrNumValue(camera, "height"));
             cam.setFovStart(getAttrStrValue(camera, "fov start"));
             cam.setFovEnd(getAttrStrValue(camera, "fov end"));
@@ -426,7 +426,7 @@ public class XmlReader
             obj.setObject(getAttrStrValue(object, "object"));
             obj.setColor(getAttrIntValue(object, "color"));
             obj.setOrientationType(getAttrStrValue(object, "orientation type"));
-            obj.setOrientation(getAttrNumValue(object, "orientation"));
+            obj.setOrientation(getAttrNumValue(object, "orientation", "deg"));
             obj.setDeltaHeight(getAttrNumValue(object, "delta height"));
             obj.setDeltaVert(getAttrNumValue(object, "delta vert"));
             obj.setScaleType(getAttrStrValue(object, "scale type"));
@@ -673,7 +673,7 @@ public class XmlReader
             shape.setLength(getAttrNumValue(seg, "lg", "m"));
         } else
         {
-            double arc = getAttrNumValue(seg, "arc");
+            double arc = getAttrNumValue(seg, "arc", "deg");
             arc = (arc * Math.PI) / 180;
             ((Curve) shape).setArc(arc);
             double startRad = getAttrNumValue(seg, "radius", "m");
@@ -751,8 +751,8 @@ public class XmlReader
         }
 
         shape.setGrade(getAttrNumValue(seg, "grade"));
-        shape.setBankingStart(getAttrNumValue(seg, "banking start"));
-        shape.setBankingEnd(getAttrNumValue(seg, "banking end"));
+        shape.setBankingStart(getAttrNumValue(seg, "banking start", "deg"));
+        shape.setBankingEnd(getAttrNumValue(seg, "banking end", "deg"));
         shape.setProfil(getAttrStrValue(seg, "profil"));
         shape.setProfilSteps(getAttrNumValue(seg, "profil steps"));
         shape.setProfilStepsLength(getAttrNumValue(seg, "profil steps length", "m"));
