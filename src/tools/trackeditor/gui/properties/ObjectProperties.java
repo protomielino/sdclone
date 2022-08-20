@@ -223,7 +223,6 @@ public class ObjectProperties extends PropertyPanel
 
 	private class ObjectPanel extends JPanel
 	{
-		private TrackObject 		object;
 		private JLabel				nameLabel				= new JLabel();
 		private JTextField 			nameTextField			= new JTextField();
 		private JLabel				objectLabel				= new JLabel();
@@ -256,14 +255,13 @@ public class ObjectProperties extends PropertyPanel
 		public ObjectPanel(TrackObject object)
 		{
 			super();
-			this.object = object;
-			initialize();
+			initialize(object);
 		}
 
 		/**
 		 *
 		 */
-		private void initialize()
+		private void initialize(TrackObject object)
 		{
 			setLayout(null);
 
@@ -371,38 +369,33 @@ public class ObjectProperties extends PropertyPanel
 		private void scaleTypeChanged()
 		{
 			String type = scaleTypeComboBox.getSelectedItem().toString();
-			object.setScaleType(type);
 			if (type.equals("none"))
 			{
 				scaleTextField.setEnabled(false);
+				scaleTextField.setText(null);
 				scaleMinTextField.setEnabled(false);
+				scaleMinTextField.setText(null);
 				scaleMaxTextField.setEnabled(false);
-				object.setScale(Double.NaN);
-				object.setScaleMin(Double.NaN);
-				object.setScaleMax(Double.NaN);
+				scaleMaxTextField.setText(null);
 			}
 			else if (type.equals("random"))
 			{
 				scaleTextField.setEnabled(false);
+				scaleTextField.setText(null);
 				scaleMinTextField.setEnabled(true);
+				scaleMinTextField.setText(getString(0.5));
 				scaleMaxTextField.setEnabled(true);					
-				object.setScale(Double.NaN);
-				object.setScaleMin(0.5);
-				object.setScaleMax(2.0);
+				scaleMaxTextField.setText(getString(2.0));
 			}
 			else if (type.equals("fixed"))
 			{
 				scaleTextField.setEnabled(true);
+				scaleTextField.setText(getString(1.0));
 				scaleMinTextField.setEnabled(false);
+				scaleMinTextField.setText(null);
 				scaleMaxTextField.setEnabled(false);
-				object.setScale(1.0);
-				object.setScaleMin(Double.NaN);
-				object.setScaleMax(Double.NaN);
+				scaleMaxTextField.setText(null);
 			}
-			
-			scaleTextField.setText(getString(object.getScale()));
-			scaleMinTextField.setText(getString(object.getScaleMin()));
-			scaleMaxTextField.setText(getString(object.getScaleMax()));
 		}
 		
 		/**
@@ -573,6 +566,10 @@ public class ObjectProperties extends PropertyPanel
 		object.setOrientation(getDouble(panel.orientationTextField.getText()));
 		object.setDeltaHeight(getDouble(panel.deltaHeightTextField.getText()));
 		object.setDeltaVert(getDouble(panel.deltaVertTextField.getText()));
+		object.setScaleType(getString(panel.scaleTypeComboBox.getSelectedItem().toString()));
+		object.setScale(getDouble(panel.scaleTextField.getText()));
+		object.setScaleMin(getDouble(panel.scaleMinTextField.getText()));
+		object.setScaleMax(getDouble(panel.scaleMaxTextField.getText()));
 	}
 
 	private void setPanelFromObject(TrackObject object, ObjectPanel panel)
@@ -584,6 +581,10 @@ public class ObjectProperties extends PropertyPanel
 		panel.orientationTextField.setText(setDouble(object.getOrientation()));
 		panel.deltaHeightTextField.setText(setDouble(object.getDeltaHeight()));
 		panel.deltaVertTextField.setText(setDouble(object.getDeltaVert()));
+		panel.scaleTypeComboBox.setSelectedItem(getString(object.getScaleType()));		
+		panel.scaleTextField.setText(setDouble(object.getScale()));
+		panel.scaleMinTextField.setText(setDouble(object.getScaleMin()));
+		panel.scaleMaxTextField.setText(setDouble(object.getScaleMax()));
 	}
 
 	private String setInteger(int value)
