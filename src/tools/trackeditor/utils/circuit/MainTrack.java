@@ -11,6 +11,7 @@ public class MainTrack
 	private double				racelineWidthscale			= Double.NaN;
 	private double				racelineInt					= Double.NaN;
 	private double				racelineExt					= Double.NaN;
+	private String				profil						= null;
 	private double				profilStepsLength			= Double.NaN;
 	private Pits				pits						= new Pits();
 	private SegmentSide			left						= new SegmentSide();
@@ -128,6 +129,14 @@ public class MainTrack
 		this.racelineExt = racelineExt;
 	}
 
+	public String getProfil() {
+		return profil;
+	}
+
+	public void setProfil(String profil) {
+		this.profil = profil;
+	}
+
 	public void dump(String indent)
     {
 		System.out.println(indent + "MainTrack");
@@ -136,6 +145,7 @@ public class MainTrack
 		System.out.println(indent + "  racelineWidthscale : " + racelineWidthscale);
 		System.out.println(indent + "  racelineInt        : " + racelineInt);
 		System.out.println(indent + "  racelineExt        : " + racelineExt);
+		System.out.println(indent + "  profil             : " + profil);
 		System.out.println(indent + "  profilStepsLength  : " + profilStepsLength);
 		pits.dump(indent + "    ");
     }

@@ -135,6 +135,7 @@ public class XmlWriter
 		Comment com = null;
 		track.setAttribute(name);
 		addContent(track, "width", "m", editorFrame.getTrackData().getMainTrack().getWidth());
+		addContent(track, "profil", editorFrame.getTrackData().getMainTrack().getProfil());
 		addContent(track, "profil steps length", "m", editorFrame.getTrackData().getMainTrack().getProfilStepsLength());
 		addContent(track, "surface", editorFrame.getTrackData().getMainTrack().getSurface());
 		addContent(track, "raceline widthscale", null, editorFrame.getTrackData().getMainTrack().getRacelineWidthscale());

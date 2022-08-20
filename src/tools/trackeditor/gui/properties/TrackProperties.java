@@ -50,6 +50,8 @@ public class TrackProperties extends PropertyPanel
 	private JTextField			widthTextField				= new JTextField();
 	private JLabel				surfaceLabel				= new JLabel();
 	private SurfaceComboBox		surfaceComboBox				= null;
+	private JLabel				profilLabel					= new JLabel();
+	private JComboBox<String>	profilComboBox				= null;
 	private JLabel				profilStepsLengthLabel		= new JLabel();
 	private JTextField			profilStepsLengthTextField	= new JTextField();
 	private JLabel				racelineWidthscaleLabel		= new JLabel();
@@ -134,19 +136,21 @@ public class TrackProperties extends PropertyPanel
 
 		addLabel(this, 0, widthLabel, "Width", 140);
 		addLabel(this, 1, surfaceLabel, "Surface", 140);
-		addLabel(this, 2, profilStepsLengthLabel, "Profil Steps Length", 140);
-		addLabel(this, 3, racelineWidthscaleLabel, "Raceline Width Scale", 140);
-		addLabel(this, 4, racelineIntLabel, "Raceline Int", 140);
-		addLabel(this, 5, racelineExtLabel, "Raceline Ext", 140);
+		addLabel(this, 2, profilLabel, "Profil", 140);
+		addLabel(this, 3, profilStepsLengthLabel, "Profil Steps Length", 140);
+		addLabel(this, 4, racelineWidthscaleLabel, "Raceline Width Scale", 140);
+		addLabel(this, 5, racelineIntLabel, "Raceline Int", 140);
+		addLabel(this, 6, racelineExtLabel, "Raceline Ext", 140);
 
 		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getMainTrack().getWidth(), 150, 50);
 
 		this.add(getSurfaceComboBox(), null);
+		this.add(getProfilComboBox(), null);
 
-		addTextField(this, 2, profilStepsLengthTextField, getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), 150, 50);
-		addTextField(this, 3, racelineWidthscaleTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineWidthscale(), 150, 50);
-		addTextField(this, 4, racelineIntTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineInt(), 150, 50);
-		addTextField(this, 5, racelineExtTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineExt(), 150, 50);
+		addTextField(this, 3, profilStepsLengthTextField, getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), 150, 50);
+		addTextField(this, 4, racelineWidthscaleTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineWidthscale(), 150, 50);
+		addTextField(this, 5, racelineIntTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineInt(), 150, 50);
+		addTextField(this, 6, racelineExtTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineExt(), 150, 50);
 
 		this.add(getTabbedPane(), null);
 	}
@@ -218,6 +222,26 @@ public class TrackProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes profilComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox<String> getProfilComboBox()
+	{
+		if (profilComboBox == null)
+		{
+			String[] items = {"none", "linear", "spline"};
+			profilComboBox = new JComboBox<String>(items);
+			profilComboBox.setBounds(150, 64, 100, 23);						
+			String profil = getEditorFrame().getTrackData().getMainTrack().getProfil();
+			if (profil == null || profil.isEmpty())
+				profil = "none";
+			profilComboBox.setSelectedItem(profil);
+		}
+		return profilComboBox;
+	}
+
+	/**
 	 * This method initializes tabbedPane
 	 *
 	 * @return javax.swing.JTabbedPane
@@ -228,7 +252,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 172, 510, 370);
+			tabbedPane.setBounds(10, 205, 510, 370);
 
 			tabbedPane.addTab("Left", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getLeft()), null);
 			tabbedPane.addTab("Right", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getRight()), null);

@@ -157,6 +157,7 @@ public class XmlReader
 
         editorFrame.getTrackData().getMainTrack().setWidth(getAttrNumValue(mainTrack, "width", "m"));
         editorFrame.getTrackData().getMainTrack().setSurface(getAttrStrValue(mainTrack, "surface"));
+        editorFrame.getTrackData().getMainTrack().setProfil(getAttrStrValue(mainTrack, "profil"));
         editorFrame.getTrackData().getMainTrack().setProfilStepsLength(getAttrNumValue(mainTrack, "profil steps length", "m"));
         editorFrame.getTrackData().getMainTrack().setRacelineWidthscale(getAttrNumValue(mainTrack, "raceline widthscale"));
         editorFrame.getTrackData().getMainTrack().setRacelineInt(getAttrNumValue(mainTrack, "raceline int"));
