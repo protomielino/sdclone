@@ -756,12 +756,12 @@ public class XmlReader
         shape.setProfil(getAttrStrValue(seg, "profil"));
         shape.setProfilSteps(getAttrNumValue(seg, "profil steps"));
         shape.setProfilStepsLength(getAttrNumValue(seg, "profil steps length", "m"));
-        shape.setProfilStartTangent(getAttrNumValue(seg, "profil start tangent"));
-        shape.setProfilEndTangent(getAttrNumValue(seg, "profil end tangent"));
-        shape.setProfilStartTangentLeft(getAttrNumValue(seg, "profil start tangent left"));
-        shape.setProfilEndTangentLeft(getAttrNumValue(seg, "profil end tangent left"));
-        shape.setProfilStartTangentRight(getAttrNumValue(seg, "profil start tangent right"));
-        shape.setProfilEndTangentRight(getAttrNumValue(seg, "profil end tangent right"));
+        shape.setProfilStartTangent(getAttrNumValue(seg, "profil start tangent", "%"));
+        shape.setProfilEndTangent(getAttrNumValue(seg, "profil end tangent", "%"));
+        shape.setProfilStartTangentLeft(getAttrNumValue(seg, "profil start tangent left", "%"));
+        shape.setProfilEndTangentLeft(getAttrNumValue(seg, "profil end tangent left", "%"));
+        shape.setProfilStartTangentRight(getAttrNumValue(seg, "profil start tangent right", "%"));
+        shape.setProfilEndTangentRight(getAttrNumValue(seg, "profil end tangent right", "%"));
 
         setSide(seg, left, "Left");
         setSide(seg, right, "Right");

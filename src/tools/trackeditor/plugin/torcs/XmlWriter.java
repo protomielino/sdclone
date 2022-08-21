@@ -314,12 +314,12 @@ public class XmlWriter
 		addContent(segment, "profil", shape.getProfil());
 		addContent(segment, "profil steps", "m", shape.getProfilSteps());
 		addContent(segment, "profil steps length", "m", shape.getProfilStepsLength());
-		addContent(segment, "profil start tangent", "m", shape.getProfilStartTangent());
+		addContent(segment, "profil start tangent", "%", shape.getProfilStartTangent());
 		addContent(segment, "profil end tangent", "%", shape.getProfilEndTangent());
-		addContent(segment, "profil start tangent left", "m", shape.getProfilStartTangentLeft());
-		addContent(segment, "profil end tangent left", "m", shape.getProfilEndTangentLeft());
-		addContent(segment, "profil start tangent right", "m", shape.getProfilStartTangentRight());
-		addContent(segment, "profil end tangent right", "m", shape.getProfilEndTangentRight());
+		addContent(segment, "profil start tangent left", "%", shape.getProfilStartTangentLeft());
+		addContent(segment, "profil end tangent left", "%", shape.getProfilEndTangentLeft());
+		addContent(segment, "profil start tangent right", "%", shape.getProfilStartTangentRight());
+		addContent(segment, "profil end tangent right", "%", shape.getProfilEndTangentRight());
 		addContent(segment, "surface", shape.getSurface());
 		com = new Comment("Left part of segment");
 		segment.addContent(com);
