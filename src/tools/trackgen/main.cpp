@@ -206,7 +206,7 @@ bool Application::parseOptions()
         }
         else if (itOpt->strLongName == "name")
         {
-            TrackName = itOpt->strValue.c_str();
+            TrackName = itOpt->strValue;
         }
         else if (itOpt->strLongName == "saveelev")
         {
@@ -215,7 +215,7 @@ bool Application::parseOptions()
         }
         else if (itOpt->strLongName == "category")
         {
-            TrackCategory = itOpt->strValue.c_str();
+            TrackCategory = itOpt->strValue;
         }
         else if (itOpt->strLongName == "steps4")
         {
