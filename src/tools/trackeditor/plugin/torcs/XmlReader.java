@@ -750,7 +750,7 @@ public class XmlReader
             shape.setHeightEndRight(z);
         }
 
-        shape.setGrade(getAttrNumValue(seg, "grade"));
+        shape.setGrade(getAttrNumValue(seg, "grade", "%"));
         shape.setBankingStart(getAttrNumValue(seg, "banking start", "deg"));
         shape.setBankingEnd(getAttrNumValue(seg, "banking end", "deg"));
         shape.setProfil(getAttrStrValue(seg, "profil"));
