@@ -246,6 +246,10 @@ public class ObjectProperties extends PropertyPanel
 		private JLabel				scaleMaxLabel			= new JLabel();
 		private JTextField			scaleMaxTextField		= new JTextField();		
 		private JButton				objectButton			= null;
+		
+		private double				lastScale				= 1.0;
+		private double				lastScaleMin			= 0.5;
+		private double				lastScaleMax			= 2.0;
 
 		private final String sep = System.getProperty("file.separator");
 
@@ -263,6 +267,16 @@ public class ObjectProperties extends PropertyPanel
 		 */
 		private void initialize(TrackObject object)
 		{
+			if (object.getScaleType() != null && object.getScaleType().equals("random"))
+			{
+				lastScaleMin = object.getScaleMin();
+				lastScaleMax = object.getScaleMax();
+			}
+			else if (object.getScaleType() != null && object.getScaleType().equals("fixed"))
+			{
+				lastScale = object.getScale();
+			}
+
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 160);
@@ -368,6 +382,28 @@ public class ObjectProperties extends PropertyPanel
 
 		private void scaleTypeChanged()
 		{
+			if (scaleTextField.isEnabled())
+			{
+				String text = scaleTextField.getText();
+				if (text != null && !text.isEmpty())
+				{
+					lastScale = getDouble(text);
+				}
+			}
+			else if (scaleMinTextField.isEnabled())
+			{
+				String text = scaleMinTextField.getText();
+				if (text != null && !text.isEmpty())
+				{
+					lastScaleMin = getDouble(text);
+				}
+				text = scaleMaxTextField.getText();
+				if (text != null && !text.isEmpty())
+				{
+					lastScaleMax = getDouble(text);			
+				}
+			}
+			
 			String type = scaleTypeComboBox.getSelectedItem().toString();
 			if (type.equals("none"))
 			{
@@ -383,14 +419,14 @@ public class ObjectProperties extends PropertyPanel
 				scaleTextField.setEnabled(false);
 				scaleTextField.setText(null);
 				scaleMinTextField.setEnabled(true);
-				scaleMinTextField.setText(getString(0.5));
+				scaleMinTextField.setText(getString(lastScaleMin));
 				scaleMaxTextField.setEnabled(true);					
-				scaleMaxTextField.setText(getString(2.0));
+				scaleMaxTextField.setText(getString(lastScaleMax));
 			}
 			else if (type.equals("fixed"))
 			{
 				scaleTextField.setEnabled(true);
-				scaleTextField.setText(getString(1.0));
+				scaleTextField.setText(getString(lastScale));
 				scaleMinTextField.setEnabled(false);
 				scaleMinTextField.setText(null);
 				scaleMaxTextField.setEnabled(false);
@@ -433,7 +469,7 @@ public class ObjectProperties extends PropertyPanel
 			fc.setDialogTitle("Object file selection");
 			fc.setVisible(true);
 			fc.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("AC and ACC models", "ac", "acc");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("AC models", "ac");
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 			int result = fc.showOpenDialog(this);
