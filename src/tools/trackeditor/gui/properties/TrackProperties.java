@@ -74,7 +74,7 @@ public class TrackProperties extends PropertyPanel
      "barrier", "barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		roadSurfaceVector			= new Vector<String>(Arrays.asList(roadSurfaceItems));
 
-	private String[]			styleItems					= {"none", "plan", "wall", "fence", "curb"};
+	private String[]			borderStyleItems			= {"none", "plan", "wall", "curb"};
 	
 	private String[]			borderSurfaceItems			=
 	{"curb-5cm-r", "curb-5cm-l", "curb-l", "tar-grass3-l",
@@ -98,6 +98,7 @@ public class TrackProperties extends PropertyPanel
 	 "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 	 "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector			= new Vector<String>(Arrays.asList(sideSurfaceItems));
+	private String[]			barrierStyleItems			= {"none", "wall", "fence"};
 	private String[]			barrierSurfaceItems			=
 	{"barrier", "barrier2", "barrier-turn", "barrier-grille",
 	 "wall", "wall2", "tire-wall", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both",
@@ -429,7 +430,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				borderStyleComboBox = new JComboBox<String>();
 				borderStyleComboBox.setBounds(150, 199, 100, 23);
-				borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
+				borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(borderStyleItems));
 				String style = side.getBorderStyle();
 				if (style == null || style.isEmpty())
 					style = "none";
@@ -484,7 +485,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				barrierStyleComboBox = new JComboBox<String>();
 				barrierStyleComboBox.setBounds(150, 307, 100, 23);
-				barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
+				barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(barrierStyleItems));
 				String style = side.getBarrierStyle();
 				if (style == null || style.isEmpty())
 					style = "none";
