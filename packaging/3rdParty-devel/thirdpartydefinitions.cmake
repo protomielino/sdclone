@@ -35,21 +35,21 @@
 
 
 # SDL2
-set(SDL2_VERSION 2.0.22)
+set(SDL2_VERSION 2.24.0)
 set(SDL2_PROJECT SDL2-${SDL2_VERSION})
 set(SDL2_FILE ${SDL2_PROJECT}.tar.gz)
 set(SDL2_URL https://www.libsdl.org/release/${SDL2_FILE})
-set(SDL2_HASH SHA256=fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e)
+set(SDL2_HASH SHA256=91e4c34b1768f92d399b078e171448c6af18cafda743987ed2064a28954d6d97)
 
 # SDL2_MIXER
-set(SDL2_MIXER_VERSION 2.6.1)
+set(SDL2_MIXER_VERSION 2.6.2)
 set(SDL2_MIXER_PROJECT SDL2_mixer-${SDL2_MIXER_VERSION})
 set(SDL2_MIXER_FILE ${SDL2_MIXER_PROJECT}.tar.gz)
 #set(SDL2_MIXER_URL https://www.libsdl.org/projects/SDL_mixer/release/${SDL2_MIXER_FILE})
 
 set(SDL2_MIXER_URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-${SDL2_MIXER_VERSION}/${SDL2_MIXER_FILE})
 #https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.1/SDL2_mixer-2.6.1.tar.gz
-set(SDL2_MIXER_HASH SHA256=bc5c7b85f297e5f3cb34c99c366a4746922fc41365b15fd78a164dda71a861a3)
+set(SDL2_MIXER_HASH SHA256=8cdea810366decba3c33d32b8071bccd1c309b2499a54946d92b48e6922aa371)
 
 # OpenAL-soft
 set(OPENAL_PROJECT_VERSION 1.22.2)
