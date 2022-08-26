@@ -189,19 +189,11 @@ public class CameraProperties extends PropertyPanel
 
 			addTextField(this, 0, nameTextField, camera.getName(), 150, 100);
 			addTextField(this, 1, segmentTextField, camera.getSegment(), 150, 100);
-			addTextField(this, 2, toRightTextField, getString(camera.getToRight()), 150, 100);
-			addTextField(this, 3, toStartTextField, getString(camera.getToStart()), 150, 100);
-			addTextField(this, 4, heightTextField, getString(camera.getHeight()), 150, 100);
+			addTextField(this, 2, toRightTextField, camera.getToRight(), 150, 100);
+			addTextField(this, 3, toStartTextField, camera.getToStart(), 150, 100);
+			addTextField(this, 4, heightTextField, camera.getHeight(), 150, 100);
 			addTextField(this, 5, fovStartTextField, camera.getFovStart(), 150, 100);
 			addTextField(this, 6, fovEndTextField, camera.getFovEnd(), 150, 100);
-		}
-
-		private String getString(double value)
-		{
-			if (!Double.isNaN(value))
-				return String.valueOf(value);
-
-			return null;
 		}
 	}
 

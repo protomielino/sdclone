@@ -293,21 +293,21 @@ public class ObjectProperties extends PropertyPanel
 
 			addTextField(this, 0, nameTextField, object.getName(), 120, 100);
 			addTextField(this, 1, objectTextField, object.getObject(), 120, 290);
-			addTextField(this, 2, colorTextField, getString(object.getColor()), 120, 100);
+			addTextField(this, 2, colorTextField, toHexString(object.getColor()), 120, 100);
 
 			add(getOrientationTypeComboBox(), null);
-			getOrientationTypeComboBox().setSelectedItem(getString(object.getOrientationType()));
+			getOrientationTypeComboBox().setSelectedItem(toNoneString(object.getOrientationType()));
 
-			addTextField(this, 4, orientationTextField, getString(object.getOrientation()), 120, 100);
-			addTextField(this, 5, deltaHeightTextField, getString(object.getDeltaHeight()), 120, 100);
-			addTextField(this, 6, deltaVertTextField, getString(object.getDeltaVert()), 120, 100);
+			addTextField(this, 4, orientationTextField, object.getOrientation(), 120, 100);
+			addTextField(this, 5, deltaHeightTextField, object.getDeltaHeight(), 120, 100);
+			addTextField(this, 6, deltaVertTextField, object.getDeltaVert(), 120, 100);
 
 			add(getScaleTypeComboBox(), null);
-			getScaleTypeComboBox().setSelectedItem(getString(object.getScaleType()));
+			getScaleTypeComboBox().setSelectedItem(toNoneString(object.getScaleType()));
 
-			addTextField(this, 8, scaleTextField, getString(object.getScale()), 120, 100);
-			addTextField(this, 9, scaleMinTextField, getString(object.getScaleMin()), 120, 100);
-			addTextField(this, 10, scaleMaxTextField, getString(object.getScaleMax()), 120, 100);
+			addTextField(this, 8, scaleTextField, object.getScale(), 120, 100);
+			addTextField(this, 9, scaleMinTextField, object.getScaleMin(), 120, 100);
+			addTextField(this, 10, scaleMaxTextField, object.getScaleMax(), 120, 100);
 
 			if (defaultObjects)
 			{
@@ -327,28 +327,6 @@ public class ObjectProperties extends PropertyPanel
 			{
 				add(getObjectButton(), null);
 			}
-		}
-
-		private String getString(double value)
-		{
-			if (!Double.isNaN(value))
-				return String.valueOf(value);
-
-			return null;
-		}
-		private String getString(int value)
-		{
-			if (value != Integer.MAX_VALUE)
-				return "0x" + Integer.toHexString(value).toUpperCase();
-
-			return null;
-		}
-		private String getString(String string)
-		{
-			if (string == null || string.isEmpty())
-				return "none";
-
-			return string;
 		}
 
 		public JComboBox<String> getOrientationTypeComboBox()
@@ -419,14 +397,14 @@ public class ObjectProperties extends PropertyPanel
 				scaleTextField.setEnabled(false);
 				scaleTextField.setText(null);
 				scaleMinTextField.setEnabled(true);
-				scaleMinTextField.setText(getString(lastScaleMin));
+				setTextField(scaleMinTextField, lastScaleMin);
 				scaleMaxTextField.setEnabled(true);					
-				scaleMaxTextField.setText(getString(lastScaleMax));
+				setTextField(scaleMaxTextField, lastScaleMax);
 			}
 			else if (type.equals("fixed"))
 			{
 				scaleTextField.setEnabled(true);
-				scaleTextField.setText(getString(lastScale));
+				setTextField(scaleTextField, lastScale);
 				scaleMinTextField.setEnabled(false);
 				scaleMinTextField.setText(null);
 				scaleMaxTextField.setEnabled(false);
@@ -610,38 +588,16 @@ public class ObjectProperties extends PropertyPanel
 
 	private void setPanelFromObject(TrackObject object, ObjectPanel panel)
 	{
-		panel.nameTextField.setText(new String(object.getName()));
-		panel.objectTextField.setText(new String(object.getObject()));
-		panel.colorTextField.setText(setInteger(object.getColor()));
-		panel.orientationTypeComboBox.setSelectedItem(getString(object.getOrientationType()));		
-		panel.orientationTextField.setText(setDouble(object.getOrientation()));
-		panel.deltaHeightTextField.setText(setDouble(object.getDeltaHeight()));
-		panel.deltaVertTextField.setText(setDouble(object.getDeltaVert()));
-		panel.scaleTypeComboBox.setSelectedItem(getString(object.getScaleType()));		
-		panel.scaleTextField.setText(setDouble(object.getScale()));
-		panel.scaleMinTextField.setText(setDouble(object.getScaleMin()));
-		panel.scaleMaxTextField.setText(setDouble(object.getScaleMax()));
-	}
-
-	private String setInteger(int value)
-	{
-		if (value != Integer.MAX_VALUE)
-			return "0x" + Integer.toHexString(value).toUpperCase();
-
-		return null;
-	}
-
-	private String setDouble(double value)
-	{
-		if (Double.isNaN(value))
-			return null;
-		return "" + value;
-	}
-
-	private String setString(String value)
-	{
-		if (value == null || value.isEmpty())
-			return "none";
-		return value;
+		setTextField(panel.nameTextField, object.getName());
+		setTextField(panel.objectTextField, object.getObject());
+		setTextField(panel.colorTextField, toHexString(object.getColor()));
+		panel.orientationTypeComboBox.setSelectedItem(toNoneString(object.getOrientationType()));		
+		setTextField(panel.orientationTextField, object.getOrientation());
+		setTextField(panel.deltaHeightTextField, object.getDeltaHeight());
+		setTextField(panel.deltaVertTextField, object.getDeltaVert());
+		panel.scaleTypeComboBox.setSelectedItem(toNoneString(object.getScaleType()));		
+		setTextField(panel.scaleTextField, object.getScale());
+		setTextField(panel.scaleMinTextField, object.getScaleMin());
+		setTextField(panel.scaleMaxTextField, object.getScaleMax());
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

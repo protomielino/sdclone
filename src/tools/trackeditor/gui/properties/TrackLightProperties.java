@@ -218,36 +218,21 @@ public class TrackLightProperties extends PropertyPanel
 
 			addTextField(this, 0, nameTextField, light.getName(), 120, 100);
 			addTextField(this, 1, roleTextField, light.getRole(), 120, 100);
-			addTextField(this, 2, topLeftXTextField, getString(light.getTopLeftX()), 120, 100);
-			addTextField(this, 3, topLeftYTextField, getString(light.getTopLeftY()), 120, 100);
-			addTextField(this, 4, topLeftZTextField, getString(light.getTopLeftZ()), 120, 100);
-			addTextField(this, 5, bottomRightXTextField, getString(light.getBottomRightX()), 120, 100);
-			addTextField(this, 6, bottomRightYTextField, getString(light.getBottomRightY()), 120, 100);
-			addTextField(this, 7, bottomRightZTextField, getString(light.getBottomRightZ()), 120, 100);
+			addTextField(this, 2, topLeftXTextField, light.getTopLeftX(), 120, 100);
+			addTextField(this, 3, topLeftYTextField, light.getTopLeftY(), 120, 100);
+			addTextField(this, 4, topLeftZTextField, light.getTopLeftZ(), 120, 100);
+			addTextField(this, 5, bottomRightXTextField, light.getBottomRightX(), 120, 100);
+			addTextField(this, 6, bottomRightYTextField, light.getBottomRightY(), 120, 100);
+			addTextField(this, 7, bottomRightZTextField, light.getBottomRightZ(), 120, 100);
 			addTextField(this, 8, textureOnTextField, light.getTextureOn(), 120, 290);
 			addTextField(this, 9, textureOffTextField, light.getTextureOff(), 120, 290);
-			addTextField(this, 10, indexTextField, getString(light.getIndex()), 120, 100);
-			addTextField(this, 11, redTextField, getString(light.getRed()), 120, 100);
-			addTextField(this, 12, greenTextField, getString(light.getGreen()), 120, 100);
-			addTextField(this, 13, blueTextField, getString(light.getBlue()), 120, 100);
+			addTextField(this, 10, indexTextField, light.getIndex(), 120, 100);
+			addTextField(this, 11, redTextField, light.getRed(), 120, 100);
+			addTextField(this, 12, greenTextField, light.getGreen(), 120, 100);
+			addTextField(this, 13, blueTextField, light.getBlue(), 120, 100);
 
 			add(getTextureOnButton(), null);
 			add(getTextureOffButton(), null);
-		}
-
-		private String getString(double value)
-		{
-			if (!Double.isNaN(value))
-				return String.valueOf(value);
-
-			return null;
-		}
-		private String getString(int value)
-		{
-			if (value != Integer.MAX_VALUE)
-				return Integer.toString(value);
-
-			return null;
 		}
 
 		private JButton getTextureOnButton()

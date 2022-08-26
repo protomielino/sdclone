@@ -172,10 +172,26 @@ public class PropertyPanel extends JPanel
 
 	protected String getString(String string)
 	{
-		if (string == "none")
+		if (string == null || string == "none" || string.isEmpty())
 			return null;
 
 		return string;
+	}
+
+	public String toNoneString(String string)
+	{
+		if (string == null || string.isEmpty())
+			return "none";
+
+		return string;
+	}
+
+	public String toHexString(int value)
+	{
+		if (value != Integer.MAX_VALUE)
+			return "0x" + Integer.toHexString(value).toUpperCase();
+
+		return null;
 	}
 
 	public class MutableString
