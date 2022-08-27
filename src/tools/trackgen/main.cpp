@@ -81,6 +81,8 @@ class Application : public GfApplication
     int DoSaveElevation;
     bool Bridge;
     bool DumpTrack;
+    std::string TrackXMLFilePath;   // Full path to track XML input file to read from (mainly for unittests)
+    std::string TrackACFilePath;    // Full path to track AC output file to write into (mainly for unittests)
 
 public:
 
@@ -133,11 +135,14 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("H", "height4", /* bHasValue = */ true);
     registerOption("nb", "nobridge", /* bHasValue = */ false);
     registerOption("dt", "dumptrack", /* bHasValue = */ false);
+    registerOption("i", "inpath", /* bHasValue = */ true);
+    registerOption("o", "outpath", /* bHasValue = */ true);
 
     // Help on specific options.
     addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge]");
     addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
     addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]] [-dt|--dumptrack]");
+    addOptionsHelpSyntaxLine("[-i xml_path] [-o ac_path]");
 
     addOptionsHelpExplainLine("<cat>    : track category (road, speedway, dirt...)");
     addOptionsHelpExplainLine("<name>   : track name");
@@ -229,6 +234,14 @@ bool Application::parseOptions()
         {
             DumpTrack = true;
         }
+        else if (itOpt->strLongName == "inpath")
+        {
+            TrackXMLFilePath = itOpt->strValue;
+        }
+        else if (itOpt->strLongName == "outpath")
+        {
+            TrackACFilePath = itOpt->strValue;
+        }
     }
 
     if (TrackName.empty() || TrackCategory.empty())
@@ -274,7 +287,11 @@ int Application::generate()
 
     // This is the track definition.
     char	trackdef[1024];
-    sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
+    if (TrackXMLFilePath.empty())
+        snprintf(trackdef, sizeof(trackdef), "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
+    else
+        snprintf(trackdef, sizeof(trackdef), "%s/%s.xml", TrackXMLFilePath.c_str(), TrackName.c_str());
+
     void *TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
         GfLogError("Cannot find %s\n", trackdef);
@@ -298,7 +315,10 @@ int Application::generate()
 
     // Get the output file radix.
     char	buf2[1024];
-    sprintf(buf2, "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
+    if (TrackACFilePath.empty())
+        snprintf(buf2, sizeof(buf2), "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
+    else
+        snprintf(buf2, sizeof(buf2), "%s/%s", TrackACFilePath.c_str(), Track->internalname);
     std::string OutputFileName(buf2);
 
     // Number of groups for the complete track.
