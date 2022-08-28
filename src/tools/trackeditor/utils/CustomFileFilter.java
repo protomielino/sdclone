@@ -33,8 +33,8 @@ import javax.swing.filechooser.FileFilter;
  */
 public class CustomFileFilter extends FileFilter
 {
-	private Vector	valid	= new Vector();
-	private Vector	invalid	= new Vector();
+	private Vector<String>	valid	= new Vector<String>();
+	private Vector<String>	invalid	= new Vector<String>();
 	private String description = "";
 
 	public boolean accept(File file)
@@ -49,7 +49,7 @@ public class CustomFileFilter extends FileFilter
 		int size = valid.size();
 		for(int i=0; i<size; i++)
 		{
-			if(filename.endsWith((String)valid.get(i)))
+			if(filename.endsWith(valid.get(i)))
 			{
 				out = true;
 			}
@@ -58,7 +58,7 @@ public class CustomFileFilter extends FileFilter
 		size = invalid.size();
 		for(int i=0; i<size; i++)
 		{
-			if(filename.endsWith((String)invalid.get(i)))
+			if(filename.endsWith(invalid.get(i)))
 			{
 				out = false;
 			}
