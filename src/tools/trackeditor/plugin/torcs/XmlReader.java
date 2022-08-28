@@ -695,7 +695,7 @@ public class XmlReader
             String tmp = name.substring(6);
             try
             {
-                Integer tmpInt = new Integer(tmp);
+                Integer tmpInt = Integer.parseInt(tmp);
                 int i = tmpInt.intValue();
                 if (i > Editor.getProperties().getCurveNameCount())
                 {
@@ -712,7 +712,7 @@ public class XmlReader
             String tmp = name.substring(9);
             try
             {
-                Integer tmpInt = new Integer(tmp);
+                Integer tmpInt = Integer.parseInt(tmp);
                 int i = tmpInt.intValue();
                 if (i > Editor.getProperties().getStraightNameCount())
                 {
