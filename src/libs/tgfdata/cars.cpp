@@ -95,6 +95,10 @@ GfCars::GfCars()
 		// Ignore "." and ".." folders.
 		if (pFolder->name[0] == '.') 
 			continue;
+
+		// Ignore "CMakeLists.txt"
+		if (strcmp(pFolder->name, "CMakeLists.txt") == 0)
+			continue;
 			
 		// Open the XML file of the car.
 		const char* pszCarId = pFolder->name;
@@ -104,7 +108,7 @@ GfCars::GfCars()
 		void* hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
 		if (!hparmCar)
 		{
-			GfLogInfo("Ignoring car %s (file %s not %s)\n",
+			GfLogError("Ignoring car %s (file %s not %s)\n",
 						 pszCarId, ossCarFileName.str().c_str(),
 						 GfFileExists(ossCarFileName.str().c_str()) ? "readable" : "found");
 			continue;
@@ -120,7 +124,7 @@ GfCars::GfCars()
 			void* hparmCat = GfParmReadFile(ossCatFileName.str(), GFPARM_RMODE_STD);
 			if (!hparmCat)
 			{
-				GfLogInfo("Ignoring car %s (category file %s not %s)\n",
+				GfLogError("Ignoring car %s (category file %s not %s)\n",
 							 pszCarId, ossCatFileName.str().c_str(),
 							 GfFileExists(ossCatFileName.str().c_str()) ? "readable" : "found");
 				GfParmReleaseHandle(hparmCar);

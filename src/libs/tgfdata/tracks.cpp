@@ -101,7 +101,11 @@ GfTracks::GfTracks()
 		const char* pszCatId = pCatFolder->name;
 		if (pszCatId[0] == '.') 
 			continue;
-			
+
+		// Ignore "CMakeLists.txt"
+		if (strcmp(pszCatId, "CMakeLists.txt") == 0)
+			continue;
+
 		// Get the list of sub-dirs in the "tracks" folder (the track categories).
 		std::string strDirName("tracks/");
 		strDirName += pszCatId;
@@ -120,17 +124,25 @@ GfTracks::GfTracks()
 		do 
 		{
 			//GfLogDebug("GfTracks::GfTracks() : Examining track %s\n", pTrackFolder->name);
-		
+
 			// Determine and check the XML file of the track.
 			const char* pszTrackId = pTrackFolder->name;
-			
+
+			// Ignore "." and ".." folders.
+			if (pszTrackId[0] == '.')
+				continue;
+
+			// Ignore "CMakeLists.txt"
+			if (strcmp(pszTrackId, "CMakeLists.txt") == 0)
+				continue;
+
 			std::ostringstream ossFileName;
 			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
 						<< '/' << pszTrackId << '.' << TRKEXT;
 			const std::string strTrackFileName(ossFileName.str());
 			if (!GfFileExists(strTrackFileName.c_str()))
 			{
-				GfLogInfo("Ignoring track %s : %s not found\n",
+				GfLogError("Ignoring track %s : %s not found\n",
 							 pszTrackId, strTrackFileName.c_str());
 				continue;
 			}
