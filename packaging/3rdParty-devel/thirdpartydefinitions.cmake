@@ -151,7 +151,7 @@ set(ZLIB_FILE ${ZLIB_PROJECT}.tar.gz)
 #set(ZLIB_URL https://github.com/madler/zlib/archive/v${ZLIB_VERSION}.tar.gz)
 #set(ZLIB_HASH SHA256=d8688496ea40fb61787500e863cc63c9afcbc524468cedeb478068924eb54932)
 set(ZLIB_URL https://zlib.net/${ZLIB_FILE})
-set(ZLIB_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1)
+set(ZLIB_HASH SHA256=91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9)
 
 # libpng
 message(STATUS "Note special path handling (version in path) AND hard-coded 'libpng16'")
