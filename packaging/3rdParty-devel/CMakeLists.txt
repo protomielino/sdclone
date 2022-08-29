@@ -365,7 +365,6 @@ else(OPTION_EXPAT)
 endif(OPTION_EXPAT)
 
 if(OPTION_ZLIB)
-   set(ZLIB_PROJECT zlib-1.2.11)
    ExternalProject_Add(${ZLIB_PROJECT}
       DOWNLOAD_NAME ${ZLIB_FILE}
       URL ${ZLIB_URL}
