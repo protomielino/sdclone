@@ -2425,7 +2425,6 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
 void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation,
                      bool useBorder)
 {
-    const char *FileName;
     const char *mat;
     FILE *curFd = nullptr;
 
@@ -2460,18 +2459,21 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
     TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, nullptr, 20.0f);
     TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, nullptr, (tdble)(TexSize / 10.0));
 
-    FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, nullptr);
-    if (FileName)
+    std::string inputPath(track->filename);
+    inputPath.resize(inputPath.find_last_of("/"));
+
+    std::string FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, "");
+    if (!FileName.empty())
     {
-        sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, FileName);
+        snprintf(buf, sizeof(buf), "%s/%s", inputPath.c_str(), FileName.c_str());
         LoadRelief(track, TrackHandle, buf);
     }
     if (noElevation == -1)
     {
-        FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ELEVATION, nullptr);
-        if (FileName)
+        FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ELEVATION, "");
+        if (!FileName.empty())
         {
-            sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, FileName);
+            snprintf(buf, sizeof(buf), "%s/%s", inputPath.c_str(), FileName.c_str());
             LoadElevation(track, TrackHandle, buf);
         }
     }

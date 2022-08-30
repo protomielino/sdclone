@@ -96,8 +96,11 @@ LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
 
     options.setCreateBranchCallback(hookNode);
 
+    std::string inputPath(track->filename);
+    inputPath.resize(inputPath.find_last_of("/"));
+
     char path[1024];
-    sprintf(path, "%stracks/%s/%s;%sdata/objects;%sdata/textures;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
+    snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
     ssgTexturePath(path);
     ssgModelPath(path);
 

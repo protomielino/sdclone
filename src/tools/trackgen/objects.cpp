@@ -138,10 +138,13 @@ InitObjects(tTrack *track, void *TrackHandle)
 
     GF_TAILQ_INIT(&objhead);
 
-    sprintf(buf, "%stracks/%s/%s;%sdata/objects", GfDataDir(), track->category, track->internalname, GfDataDir());
+    std::string inputPath(track->filename);
+    inputPath.resize(inputPath.find_last_of("/"));
+
+    snprintf(buf, sizeof(buf), "%s;%sdata/objects", inputPath.c_str(), GfDataDir());
     search = strdup(buf);
 
-    sprintf(path, "%stracks/%s/%s;%sdata/objects;%sdata/textures;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
+    snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
     ssgTexturePath(path);
     ssgModelPath(path);
 
@@ -567,11 +570,13 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     tdble		kX, kY, dX, dY;
     unsigned int	clr;
     int			index;
+    std::string inputPath(track->filename);
+    inputPath.resize(inputPath.find_last_of("/"));
 
     ssgSetCurrentOptions(&options);
-    sprintf(buf, "%stracks/%s/%s;%sdata/textures;%sdata/img;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
+    snprintf(buf, sizeof(buf), "%s;%s/data/objects;%sdata/textures;%sdata/img;.", inputPath.c_str(), GfDataDir(), GfDataDir(), GfDataDir());
     ssgTexturePath(buf);
-    sprintf(buf, ".;%stracks/%s/%s;%sdata/objects", GfDataDir(), track->category, track->internalname, GfDataDir());
+    snprintf(buf, sizeof(buf), ".;%s;%sdata/objects", inputPath.c_str(), GfDataDir());
     ssgModelPath(buf);
     TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
@@ -600,7 +605,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         index++;
         const char *map = GfParmGetCurStr(TrackHandle, path, TRK_ATT_OBJMAP, "");
-        sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, map);
+        snprintf(buf, sizeof(buf), "%s/%s", inputPath.c_str(), map);
 
         printf("Processing object map %s\n", buf);
         unsigned char *MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0, false);

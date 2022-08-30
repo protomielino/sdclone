@@ -151,10 +151,13 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 		return;
 	}
 
+	std::string inputPath(track->filename);
+	inputPath.resize(inputPath.find_last_of("/"));
+
 	ssgSetCurrentOptions(&options);
-	sprintf(buf, "%stracks/%s/%s;%sdata/textures;%sdata/img;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
+	snprintf(buf, sizeof(buf), "%s;%sdata/textures;%sdata/img;.", inputPath.c_str(), GfDataDir(), GfDataDir());
 	ssgTexturePath(buf);
-	sprintf(buf, ".;%stracks/%s/%s", GfDataDir(), track->category, track->internalname);
+	snprintf(buf, sizeof(buf), ".;%s", inputPath.c_str());
 	ssgModelPath(buf);
 	root = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
