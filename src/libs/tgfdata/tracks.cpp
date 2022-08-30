@@ -20,6 +20,7 @@
 #include <map>
 #include <sstream>
 #include <algorithm>
+#include <cstring>
 
 #include <tgf.h>
 #include <itrackloader.h>
