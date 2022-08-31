@@ -76,34 +76,34 @@ ENDIF(OPTION_USE_MACPORTS)
 
 IF (NOT APPLE OR OPTION_USE_MACPORTS)
   FIND_LIBRARY(PLIB_UL_LIBRARY 
-	NAMES plibul
+	NAMES plibul ul
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
   FIND_LIBRARY(PLIB_JS_LIBRARY
-	NAMES plibjs
+	NAMES plibjs js
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
   FIND_LIBRARY(PLIB_SG_LIBRARY
-	NAMES plibsg
+	NAMES plibsg sg
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
 IF(NOT OPTION_USE_MACPORTS)
   FIND_LIBRARY(PLIB_SL_LIBRARY
-	NAMES plibsl
+	NAMES plibsl sl
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
 ENDIF(NOT OPTION_USE_MACPORTS)
 
   FIND_LIBRARY(PLIB_SSG_LIBRARY
-	NAMES plibssg
+	NAMES plibssg ssg
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
   FIND_LIBRARY(PLIB_SSGAUX_LIBRARY
-	NAMES plibssgaux
+	NAMES plibssgaux ssgaux
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
