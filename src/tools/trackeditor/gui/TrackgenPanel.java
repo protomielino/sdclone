@@ -139,6 +139,16 @@ public class TrackgenPanel extends JDialog implements Runnable
 						{
 							errorsTextArea.append(str.substring(index) + newline);
 						}
+						index = str.indexOf("WARNING:");
+						if (index != -1)
+						{
+							errorsTextArea.append(str.substring(index) + newline);
+						}
+						index = str.indexOf("libpng warning:");
+						if (index != -1)
+						{
+							errorsTextArea.append(str.substring(index) + newline);
+						}
 					}
 				
 					if (ls_in.ready()) 
