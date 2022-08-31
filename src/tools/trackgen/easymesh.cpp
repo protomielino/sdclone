@@ -85,9 +85,9 @@ struct sid
 
     int mark; /* is it off, is on the boundary */
 
-    double s;
-
     int new_numb; /* used for renumeration */
+
+    double s;
 } side[MAX_NODES * 3];
 
 struct nod node[MAX_NODES], *point;
