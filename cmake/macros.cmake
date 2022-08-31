@@ -73,6 +73,8 @@ ENDIF(IN_SOURCETREE)
 # Determine the default value of the user settings folder.
 IF(WIN32)
   SET(SD_LOCALDIR "~/speed-dreams-2.settings" CACHE STRING "Where the user settings files should go")
+ELSEIF(HAIKU)
+  SET(SD_LOCALDIR "~/config/settings/speed-dreams" CACHE STRING "Where the user settings files should go")
 ELSE(WIN32) #UNIX
   SET(SD_LOCALDIR "~/.speed-dreams-2" CACHE STRING "Where the user settings files should go")
 ENDIF(WIN32)
