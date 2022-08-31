@@ -33,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import utils.Editor;
+
 /**
  * @author babis
  * 
@@ -85,8 +87,10 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	public void run()
 	{
+		String path = Editor.getProperties().getPath();
+		String trackName = path.substring(path.lastIndexOf(sep) + 1);
 		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
-		String name = " -n " + editorFrame.getTrackData().getHeader().getName();
+		String name = " -n " + trackName;
 		String args = " -a" + category + name;
 
 		System.out.println(args);
