@@ -172,6 +172,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 							}else if (tmp.equals("FATAL:"))
 							{
 								errorsTextArea.append(ls_str + newline);
+							}else if (tmp.equals("WARNING:"))
+							{
+								errorsTextArea.append(ls_str + newline);
 							}else
 							{
 								this.nodesTextField.setText(ls_str);
