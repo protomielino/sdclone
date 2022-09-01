@@ -2165,7 +2165,6 @@ public class EditorFrame extends JFrame
 		public void actionPerformed(ActionEvent e)
 		{
 		    calculateDeltas();
-
 		}
 	}
 
@@ -2247,7 +2246,12 @@ public class EditorFrame extends JFrame
      */
     private void calculateDeltas()
     {
-        DeltaPanel tg = new DeltaPanel(this, "", false);
+		if (trackData == null)
+		{
+			message("No track", "Can't calculate deltas.");
+			return;
+		}
+		DeltaPanel tg = new DeltaPanel(this, "", false);
 		//tg.setModal(false);
 		tg.setVisible(true);
     }
