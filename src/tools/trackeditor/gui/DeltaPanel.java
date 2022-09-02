@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import utils.Editor;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
@@ -45,6 +46,7 @@ import javax.swing.JTextField;
  */
 public class DeltaPanel extends JDialog implements Runnable
 {
+	private final static String sep	= System.getProperty("file.separator");
     private EditorFrame editorFrame;
     private Thread ac3d;
 
@@ -101,88 +103,77 @@ public class DeltaPanel extends JDialog implements Runnable
 
     public synchronized void run()
     {
-        //while(!finish);
-        finish = false;
-        waitLabel.setText("Calculating track data. Please wait...");
-        String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
-        String name = " -n " + editorFrame.getTrackData().getHeader().getName();
-        String args = " -z" + category + name;
+		finish = false;
+		waitLabel.setText("Calculating track data. Please wait...");
+		String path = Editor.getProperties().getPath();
+		String trackName = path.substring(path.lastIndexOf(sep) + 1);
 
-        //System.out.println(args);
+		try {
+			String ls_str;
+			String tmp = "";
+			String trackgen = "sd2-trackgen";
+			if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty()) {
+				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
+			}
 
-        try
-        {
-            String ls_str;
-            String tmp = "";
+			/* Create the ProcessBuilder */
+			ProcessBuilder pb = new ProcessBuilder(trackgen, "-z", "-c",
+					editorFrame.getTrackData().getHeader().getCategory(), "-n", trackName);
+			pb.redirectErrorStream(true);
 
-            Process ls_proc = Runtime.getRuntime().exec("trackgen" + args);
-            // get its output (your input) stream
-            BufferedReader ls_in = new BufferedReader(new InputStreamReader(
-                    ls_proc.getInputStream()));
+			/* Start the process */
+			Process proc = pb.start();
 
-            try
-            {
-                while ((ls_str = ls_in.readLine()) != null)
-                {
-                    if (ls_str.indexOf("=") != -1)
-                    {
-                        tmp = ls_str.substring(0, ls_str.indexOf("="));
-                        if (tmp.equals("name      "))
-                        {
-                            nameLabel.setText(ls_str);
-                        } else if (tmp.equals("author    "))
-                        {
-                            this.authorLabel.setText(ls_str);
-                        } else if (tmp.equals("filename  "))
-                        {
-                            this.fileNameLabel.setText(ls_str);
-                        } else if (tmp.equals("length    "))
-                        {
-                            String len = ls_str;
-                            this.lengthLabel.setText(len);
-                            len = len.substring(len.indexOf("=")+2);
-                            length = Double.valueOf(len).doubleValue();
-                        } else if (tmp.equals("width     "))
-                        {
-                            this.widthLabel.setText(ls_str);
-                        } else if (tmp.equals("XSize     "))
-                        {
-                            this.xSizeLabel.setText(ls_str);
-                        } else if (tmp.equals("YSize     "))
-                        {
-                            this.ySizeLabel.setText(ls_str);
-                        } else if (tmp.equals("Delta X   "))
-                        {
-                            String len = ls_str;
-                            len = len.substring(len.indexOf("=")+2);
-                            dX = Double.valueOf(len).doubleValue();
-                            this.deltaXLabel.setText(ls_str);
-                        } else if (tmp.equals("Delta Y   "))
-                        {
-                            String len = ls_str;
-                            len = len.substring(len.indexOf("=")+2);
-                            dY = Double.valueOf(len).doubleValue();
-                            this.deltaYLabel.setText(ls_str);
-                        } else if (tmp.equals("Delta Ang "))
-                        {
-                            String ang = ls_str;
-                            ang = ang.substring(ang.indexOf("(")+1,ang.indexOf(")"));
-                            angle = Double.valueOf(ang).doubleValue();
-                            this.deltaAngLabel.setText(ls_str);
-                        }
-                    }
-                }
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        } catch (IOException e1)
-        {
-            System.err.println(e1);
-        }
-        this.waitLabel.setText("Calculation finished");
-        finish = true;
-        notifyAll();
+			/* Read the process's output */
+			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((ls_str = in.readLine()) != null) {
+				if (ls_str.indexOf("=") != -1) {
+					tmp = ls_str.substring(0, ls_str.indexOf("="));
+					if (tmp.equals("name      ")) {
+						nameLabel.setText(ls_str);
+					} else if (tmp.equals("author    ")) {
+						this.authorLabel.setText(ls_str);
+					} else if (tmp.equals("filename  ")) {
+						this.fileNameLabel.setText(ls_str);
+					} else if (tmp.equals("length    ")) {
+						String len = ls_str;
+						this.lengthLabel.setText(len);
+						len = len.substring(len.indexOf("=") + 2);
+						length = Double.valueOf(len).doubleValue();
+					} else if (tmp.equals("width     ")) {
+						this.widthLabel.setText(ls_str);
+					} else if (tmp.equals("XSize     ")) {
+						this.xSizeLabel.setText(ls_str);
+					} else if (tmp.equals("YSize     ")) {
+						this.ySizeLabel.setText(ls_str);
+					} else if (tmp.equals("Delta X   ")) {
+						String len = ls_str;
+						len = len.substring(len.indexOf("=") + 2);
+						dX = Double.valueOf(len).doubleValue();
+						this.deltaXLabel.setText(ls_str);
+					} else if (tmp.equals("Delta Y   ")) {
+						String len = ls_str;
+						len = len.substring(len.indexOf("=") + 2);
+						dY = Double.valueOf(len).doubleValue();
+						this.deltaYLabel.setText(ls_str);
+					} else if (tmp.equals("Delta Ang ")) {
+						String ang = ls_str;
+						ang = ang.substring(ang.indexOf("(") + 1, ang.indexOf(")"));
+						angle = Double.valueOf(ang).doubleValue();
+						this.deltaAngLabel.setText(ls_str);
+					}
+				}
+			}
+
+			/* Clean-up */
+			proc.destroy();
+		} catch (IOException e1) {
+			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Delta Dialog", JOptionPane.ERROR_MESSAGE);
+		}
+		this.waitLabel.setText("Calculation finished");
+		finish = true;
+		notifyAll();
     }
 
     /**
@@ -616,4 +607,4 @@ public class DeltaPanel extends JDialog implements Runnable
             }
         }
 	}
-   } //  @jve:decl-index=0:visual-constraint="10,10"
+} //  @jve:decl-index=0:visual-constraint="10,10"
