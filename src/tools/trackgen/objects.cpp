@@ -78,6 +78,7 @@ typedef struct objdef
     tdble       scale;
     tdble       scaleMin;
     tdble       scaleMax;
+    const char  *filename;
 } tobjdef;
 
 GF_TAILQ_HEAD(objlist, objdef);
@@ -170,6 +171,8 @@ InitObjects(tTrack *track, void *TrackHandle)
         {
             exit(1);
         }
+
+        curObj->filename = strdup(buf);
 
         ssgFlatten(curObj->obj);
 
@@ -327,7 +330,7 @@ AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
                 z=getHOT(TrackRoot, x, y);
             }
 
-            printf("placing object so: x: %g y: %g z: %g \n", x, y, z);
+            printf("placing object %s: x: %g y: %g z: %g \n", curObj->filename, x, y, z);
             sgMakeRotMat4(m, angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0  - dv * rand() / (RAND_MAX + 1.0));
             ApplyTransform(m, obj);
 
