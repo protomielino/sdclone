@@ -37,6 +37,7 @@
 
 #include <tgfclient.h>
 #include <track.h>
+#include <portability.h>
 
 #include "trackgen.h"
 #include "util.h"

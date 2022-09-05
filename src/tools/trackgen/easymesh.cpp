@@ -17,6 +17,7 @@
 #include <robottools.h>
 #include <tgf.h>
 #include <track.h>
+#include <portability.h>
 
 #include "ac3d.h"
 #include "easymesh.h"
