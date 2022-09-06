@@ -637,7 +637,6 @@ public class XmlWriter
 		tmp += "auto generated      : by " + Editor.getProperties().title + "\n";
 		tmp += "version             : " + Editor.getProperties().version + "\n";
 		tmp += "copyright           : (C) 2005 by Charalampos Alexopoulos\n";
-		tmp += "email               : \n";
 
 		return tmp;
 	}

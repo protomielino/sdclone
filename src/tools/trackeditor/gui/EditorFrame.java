@@ -489,7 +489,9 @@ public class EditorFrame extends JFrame
 //		if (documentIsModified)
 		if (true)
 		{
-			String filename = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
+			String filename = Editor.getProperties().getPath();
+			String trackname = filename.substring(filename.lastIndexOf(sep) + 1);
+			filename = filename + sep + trackname + ".prj.xml";
 			
 			//System.out.println("saveProject writing : " + filename);
 			
@@ -2093,7 +2095,9 @@ public class EditorFrame extends JFrame
 			message("No track", "Nothing to export");
 			return;
 		}
-		String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".xml";
+		String fileName = Editor.getProperties().getPath();
+		String trackName = fileName.substring(fileName.lastIndexOf(sep) + 1);
+		fileName = fileName + sep + trackName + ".xml";
 		
 		//System.out.println("exportTrack writing : " + fileName);
 	
