@@ -145,7 +145,7 @@ public class XmlWriter
 		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
 			getSideV3(track, editorFrame.getTrackData().getMainTrack().getLeft(), "l");
-			getSideV3(track, editorFrame.getTrackData().getMainTrack().getLeft(), "r");
+			getSideV3(track, editorFrame.getTrackData().getMainTrack().getRight(), "r");
 			getPitsV3(track);
 		}
 		else
@@ -207,7 +207,19 @@ public class XmlWriter
 	 */
 	private synchronized void getPitsV3(Element pits)
 	{
-		addContent(pits, "pit type", null, editorFrame.getTrackData().getMainTrack().getPits().getStyle());
+		if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 0)
+		{
+			addContent(pits, "pit type", "no pits");
+		}
+		else if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 1)
+		{
+			addContent(pits, "pit type", "track side");
+		}
+		else if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 2)
+		{
+			addContent(pits, "pit type", "seperate path");
+		}
+
 		addContent(pits, "pit side", editorFrame.getTrackData().getMainTrack().getPits().getSide());
 		addContent(pits, "pit entry", editorFrame.getTrackData().getMainTrack().getPits().getEntry());
 		addContent(pits, "pit start", editorFrame.getTrackData().getMainTrack().getPits().getStart());
@@ -321,26 +333,35 @@ public class XmlWriter
 		addContent(segment, "profil start tangent right", "%", shape.getProfilStartTangentRight());
 		addContent(segment, "profil end tangent right", "%", shape.getProfilEndTangentRight());
 		addContent(segment, "surface", shape.getSurface());
-		com = new Comment("Left part of segment");
-		segment.addContent(com);
-		if (shape.getLeft().getHasSide())
-			segment.addContent(getSide(shape.getLeft(), "Left"));
-		if (shape.getLeft().getHasBorder())
-			segment.addContent(getBorder(shape.getLeft(), "Left"));
-		if (shape.getLeft().getHasBarrier())
-			segment.addContent(getBarrier(shape.getLeft(), "Left"));
-		com = new Comment("End of left part");
-		segment.addContent(com);
-		com = new Comment("Right part of segment");
-		segment.addContent(com);
-		if (shape.getRight().getHasSide())
-			segment.addContent(getSide(shape.getRight(), "Right"));
-		if (shape.getRight().getHasBorder())
-		    segment.addContent(getBorder(shape.getRight(), "Right"));
-		if (shape.getRight().getHasBarrier())
-		    segment.addContent(getBarrier(shape.getRight(), "Right"));
-		com = new Comment("End of right part");
-		segment.addContent(com);
+		
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
+		{
+			getSideV3(segment, shape.getLeft(), "l");
+			getSideV3(segment, shape.getRight(), "r");
+		}
+		else
+		{		
+			com = new Comment("Left part of segment");
+			segment.addContent(com);
+			if (shape.getLeft().getHasSide())
+				segment.addContent(getSide(shape.getLeft(), "Left"));
+			if (shape.getLeft().getHasBorder())
+				segment.addContent(getBorder(shape.getLeft(), "Left"));
+			if (shape.getLeft().getHasBarrier())
+				segment.addContent(getBarrier(shape.getLeft(), "Left"));
+			com = new Comment("End of left part");
+			segment.addContent(com);
+			com = new Comment("Right part of segment");
+			segment.addContent(com);
+			if (shape.getRight().getHasSide())
+				segment.addContent(getSide(shape.getRight(), "Right"));
+			if (shape.getRight().getHasBorder())
+			    segment.addContent(getBorder(shape.getRight(), "Right"));
+			if (shape.getRight().getHasBarrier())
+			    segment.addContent(getBarrier(shape.getRight(), "Right"));
+			com = new Comment("End of right part");
+			segment.addContent(com);
+		}
 
 		return segment;
 	}

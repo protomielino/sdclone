@@ -575,7 +575,24 @@ public class XmlReader
     */
    private void setPitsV3(Element mainTrack)
    {
-       editorFrame.getTrackData().getMainTrack().getPits().setStyle(getAttrIntValue(mainTrack, "pit type"));
+       String pitStyle = getAttrStrValue(mainTrack, "pit type");
+
+       if (pitStyle != null)
+       {
+    	   if (pitStyle.equals("no pit"))
+    	   {
+               editorFrame.getTrackData().getMainTrack().getPits().setStyle(0);
+    	   }
+    	   else if (pitStyle.equals("track side"))
+    	   {
+               editorFrame.getTrackData().getMainTrack().getPits().setStyle(1);
+    	   }
+    	   else if (pitStyle.equals("seperate path"))
+    	   {
+               editorFrame.getTrackData().getMainTrack().getPits().setStyle(2);
+    	   }
+       }
+
        editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(mainTrack, "pit side"));
        editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(mainTrack, "pit entry"));
        editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(mainTrack, "pit start"));
@@ -765,8 +782,16 @@ public class XmlReader
         shape.setProfilStartTangentRight(getAttrNumValue(seg, "profil start tangent right", "%"));
         shape.setProfilEndTangentRight(getAttrNumValue(seg, "profil end tangent right", "%"));
 
-        setSide(seg, left, "Left");
-        setSide(seg, right, "Right");
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
+        {
+            setSideV3(seg, left, "l");
+            setSideV3(seg, right, "r");
+        }
+        else
+        {
+        	setSide(seg, left, "Left");
+        	setSide(seg, right, "Right");
+        }
 
         return shape;
     }
