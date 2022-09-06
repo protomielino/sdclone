@@ -751,10 +751,14 @@ public class XmlWriter
 	 */
 	private synchronized Element getGraphic()
 	{
+		String sep = System.getProperty("file.separator");
+		String filename = Editor.getProperties().getPath();
+		String trackname = filename.substring(filename.lastIndexOf(sep) + 1);
+
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Graphic"));
 
-		addContent(element, "3d description", editorFrame.getTrackData().getHeader().getName() + ".ac");	// TODO
+		addContent(element, "3d description", trackname + ".ac");
 		addContent(element, "3d description night", editorFrame.getTrackData().getGraphic().getDescriptionNight());
 		addContent(element, "3d description rain+night", editorFrame.getTrackData().getGraphic().getDescriptionRainNight());
 		addContent(element, "background image", editorFrame.getTrackData().getGraphic().getBackgroundImage());
