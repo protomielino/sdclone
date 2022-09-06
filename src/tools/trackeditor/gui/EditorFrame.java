@@ -213,6 +213,8 @@ public class EditorFrame extends JFrame
 		public int		version;
 		public String	path;
 		public String	author;
+		public String	email;
+		public String	copyright;
 		public String	description;
 	}
 	
@@ -615,6 +617,8 @@ public class EditorFrame extends JFrame
         trackData.getHeader().setVersion(newProjectInfo.version);
         Editor.getProperties().setPath(newProjectInfo.path);
         trackData.getHeader().setAuthor(newProjectInfo.author);
+        trackData.getHeader().setEmail(newProjectInfo.email);
+        trackData.getHeader().setCopyright(newProjectInfo.copyright);
         trackData.getHeader().setDescription(newProjectInfo.description);
 
         trackData.getMainTrack().setProfilStepsLength(MainTrack.DEFAULT_PROFIL_STEPS_LENGTH);
@@ -624,6 +628,8 @@ public class EditorFrame extends JFrame
         trackData.getMainTrack().getRight().setNewTrackDefaults();
 
         trackData.setSegments(track);
+        
+		documentIsModified = true;
    }
 
     /**
@@ -2119,8 +2125,8 @@ public class EditorFrame extends JFrame
 				message("No track", "Nothing to export");
 				return;
 			}			
-			exportAc3d();
 			exportTrack();
+			exportAc3d();
 		}
 	}
 	public class ExportAC3Action extends AbstractAction

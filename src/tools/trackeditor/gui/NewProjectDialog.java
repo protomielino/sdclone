@@ -60,6 +60,10 @@ public class NewProjectDialog extends JDialog
 	private EditorFrame			editorFrame;
 	private JLabel 				authorLabel 				= null;
 	private JTextField 			authorTextField 			= null;
+	private JLabel 				emailLabel 					= null;
+	private JTextField 			emailTextField 				= null;
+	private JLabel 				copyrightLabel 				= null;
+	private JTextField 			copyrightTextField 			= null;
 	private JLabel 				descriptionLabel 			= null;
 	private JTextField 			descriptionTextField		= null;
 	
@@ -84,7 +88,7 @@ public class NewProjectDialog extends JDialog
 	 */
 	private void initialize()
 	{
-		this.setSize(440, 285);
+		this.setSize(540, 329);
 		this.setContentPane(getJPanel());
 		this.setModal(true);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -94,7 +98,7 @@ public class NewProjectDialog extends JDialog
 		p.y = editorFrame.getProject().getNewProjectDialogY();
 		this.setLocation(p);
 		this.setTitle("New Project");
-		this.getContentPane().setSize(447, 321);
+		this.getContentPane().setSize(547, 335);
 	}
 	/**
 	 * This method initializes jPanel
@@ -106,6 +110,8 @@ public class NewProjectDialog extends JDialog
 		if (jPanel == null)
 		{
 			authorLabel = new JLabel();
+			emailLabel = new JLabel();
+			copyrightLabel = new JLabel();
 			descriptionLabel = new JLabel();
 			pathLabel = new JLabel();
 			projectNameLabel = new JLabel();
@@ -126,9 +132,12 @@ public class NewProjectDialog extends JDialog
 			pathLabel.setText("Path");
 			authorLabel.setBounds(10, 145, 60, 23);
 			authorLabel.setText("Author");
-			descriptionLabel.setBounds(10, 172, 80, 23);
+			emailLabel.setBounds(10, 172, 60, 23);
+			emailLabel.setText("Email");
+			copyrightLabel.setBounds(10, 199, 60, 23);
+			copyrightLabel.setText("Copyright");
+			descriptionLabel.setBounds(10, 226, 80, 23);
 			descriptionLabel.setText("Description");
-			jPanel.add(getPathTextField(), null);
 			jPanel.add(getBrowseButton(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
@@ -137,6 +146,10 @@ public class NewProjectDialog extends JDialog
 			jPanel.add(pathLabel, null);
 			jPanel.add(authorLabel, null);
 			jPanel.add(getAuthorTextField(), null);
+			jPanel.add(emailLabel, null);
+			jPanel.add(getEmailTextField(), null);
+			jPanel.add(copyrightLabel, null);
+			jPanel.add(getCopyrightTextField(), null);
 			jPanel.add(getDescriptionTextField(), null);
 			jPanel.add(descriptionLabel, null);
 			jPanel.add(trackCategoryLabel, null);
@@ -145,6 +158,7 @@ public class NewProjectDialog extends JDialog
 			jPanel.add(getTrackVersionComboBox(), null);
 			jPanel.add(trackSubcategoryLabel, null);
 			jPanel.add(getTrackSubcategoryComboBox(), null);
+			jPanel.add(getPathTextField(), null);
 		}
 		return jPanel;
 	}
@@ -251,7 +265,40 @@ public class NewProjectDialog extends JDialog
 		if (pathTextField == null)
 		{
 			pathTextField = new JTextField();
-			pathTextField.setBounds(65, 118, 260, 23);
+			pathTextField.setBounds(95, 118, 331, 23);
+			
+			String path = null;
+			File dataDir = new File(editorFrame.getDataDirectory());
+			if (dataDir != null && dataDir.isDirectory() && dataDir.canWrite())
+			{
+				File tracksDir = new File(dataDir.getAbsolutePath() + sep + "tracks");
+				if (tracksDir.exists() && tracksDir.isDirectory() && tracksDir.canWrite())
+				{
+					File categoryDir = new File(tracksDir.getAbsolutePath() + sep + trackCategoryComboBox.getSelectedItem().toString());
+					if (categoryDir.exists() && categoryDir.isDirectory() && categoryDir.canWrite())
+					{
+						path = categoryDir.getAbsolutePath();
+					}
+				}
+			}
+			
+			if (path == null)
+			{
+				String defaultPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+				
+				File userTracksDir = new File(defaultPath + sep + "tracks");
+				
+				if (userTracksDir.exists() && userTracksDir.isDirectory() && userTracksDir.canWrite())
+					path = userTracksDir.getAbsolutePath();
+				else
+				{
+					File userDir = new File(defaultPath);
+
+					if (userDir.exists() && userDir.isDirectory() && userDir.canWrite())
+						path = userDir.getAbsolutePath();
+				}
+			}
+			pathTextField.setText(path);
 			pathTextField.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -275,7 +322,7 @@ public class NewProjectDialog extends JDialog
 		if (browseButton == null)
 		{
 			browseButton = new JButton();
-			browseButton.setBounds(335, 117, 80, 25);
+			browseButton.setBounds(433, 117, 80, 25);
 			browseButton.setText("Browse");
 			browseButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -295,9 +342,33 @@ public class NewProjectDialog extends JDialog
 	private JTextField getAuthorTextField() {
 		if (authorTextField == null) {
 			authorTextField = new JTextField();
-			authorTextField.setBounds(65, 145, 260, 23);
+			authorTextField.setBounds(95, 145, 418, 23);
 		}
 		return authorTextField;
+	}
+	/**
+	 * This method initializes emailTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */    
+	private JTextField getEmailTextField() {
+		if (emailTextField == null) {
+			emailTextField = new JTextField();
+			emailTextField.setBounds(95, 172, 418, 23);
+		}
+		return emailTextField;
+	}
+	/**
+	 * This method initializes copyrightTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */    
+	private JTextField getCopyrightTextField() {
+		if (copyrightTextField == null) {
+			copyrightTextField = new JTextField();
+			copyrightTextField.setBounds(95, 199, 418, 23);
+		}
+		return copyrightTextField;
 	}
 	/**
 	 * This method initializes descriptionTextField	
@@ -307,7 +378,7 @@ public class NewProjectDialog extends JDialog
 	private JTextField getDescriptionTextField() {
 		if (descriptionTextField == null) {
 			descriptionTextField = new JTextField();
-			descriptionTextField.setBounds(95, 172, 320, 23);
+			descriptionTextField.setBounds(95, 226, 418, 23);
 		}
 		return descriptionTextField;
 	}
@@ -324,7 +395,8 @@ public class NewProjectDialog extends JDialog
 		fc.setDialogTitle("Project path selection");
 		fc.setVisible(true);
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fc.setCurrentDirectory(new File(System.getProperty("user.dir") +sep+ "tracks"));
+		String path = pathTextField.getText();
+		fc.setCurrentDirectory(new File(path));
 		int result = fc.showDialog(this, "Ok");
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
@@ -341,7 +413,7 @@ public class NewProjectDialog extends JDialog
 		if (okButton == null)
 		{
 			okButton = new JButton();
-			okButton.setBounds(105, 210, 78, 25);
+			okButton.setBounds(155, 254, 78, 25);
 			okButton.setText("Ok");
 			okButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -363,7 +435,7 @@ public class NewProjectDialog extends JDialog
 		if (cancelButton == null)
 		{
 			cancelButton = new JButton();
-			cancelButton.setBounds(240, 210, 78, 25);
+			cancelButton.setBounds(290, 254, 78, 25);
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -397,6 +469,8 @@ public class NewProjectDialog extends JDialog
 		newProjectInfo.version = Integer.parseInt((String) getTrackVersionComboBox().getSelectedItem());
 		newProjectInfo.path = tmpPath + sep + tmpName;
 		newProjectInfo.author = getAuthorTextField().getText();
+		newProjectInfo.email = getEmailTextField().getText();
+		newProjectInfo.copyright = getCopyrightTextField().getText();
 		newProjectInfo.description = getDescriptionTextField().getText();
 
 		APPROVE = true;

@@ -49,6 +49,10 @@ public class GeneralProperties extends PropertyPanel
 	private JComboBox<String>	skyVersionComboBox		= null;
 	private JLabel				authorLabel				= new JLabel();
 	private JTextField			authorTextField			= new JTextField();
+	private JLabel				emailLabel				= new JLabel();
+	private JTextField			emailTextField			= new JTextField();
+	private JLabel				copyrightLabel			= new JLabel();
+	private JTextField			copyrightTextField		= new JTextField();
 	private JLabel				descriptionLabel		= new JLabel();
 	private JTextField			descriptionTextField	= new JTextField();
 
@@ -77,7 +81,9 @@ public class GeneralProperties extends PropertyPanel
 		addLabel(this, 3, versionLabel, "Version", 110);
 		addLabel(this, 4, skyVersionLabel, "Sky Version", 110);
 		addLabel(this, 5, authorLabel, "Author", 80);
-		addLabel(this, 6, descriptionLabel, "Description", 80);
+		addLabel(this, 6, emailLabel, "Email", 80);
+		addLabel(this, 7, copyrightLabel, "Copyright", 80);
+		addLabel(this, 8, descriptionLabel, "Description", 80);
 
 		addTextField(this, 0, nameTextField, getEditorFrame().getTrackData().getHeader().getName(), 130, 150);
 
@@ -87,7 +93,9 @@ public class GeneralProperties extends PropertyPanel
 		add(getSkyVersionComboBox(), null);
 
 		addTextField(this, 5, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 435);
-		addTextField(this, 6, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 435);
+		addTextField(this, 6, emailTextField, getEditorFrame().getTrackData().getHeader().getEmail(), 85, 435);
+		addTextField(this, 7, copyrightTextField, getEditorFrame().getTrackData().getHeader().getCopyright(), 85, 435);
+		addTextField(this, 8, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 435);
 	}
 
 	/**
@@ -245,6 +253,20 @@ public class GeneralProperties extends PropertyPanel
 			getEditorFrame().getTrackData().getHeader().getAuthor(), stringResult))
 		{
 			getEditorFrame().getTrackData().getHeader().setAuthor(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(emailTextField.getText(),
+			getEditorFrame().getTrackData().getHeader().getEmail(), stringResult))
+		{
+			getEditorFrame().getTrackData().getHeader().setEmail(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(copyrightTextField.getText(),
+			getEditorFrame().getTrackData().getHeader().getCopyright(), stringResult))
+		{
+			getEditorFrame().getTrackData().getHeader().setCopyright(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
