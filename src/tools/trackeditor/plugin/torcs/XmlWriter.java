@@ -632,8 +632,11 @@ public class XmlWriter
 
 	private synchronized String getCredit()
 	{
+		String sep = System.getProperty("file.separator");
+		String filename = Editor.getProperties().getPath();
+		String trackname = filename.substring(filename.lastIndexOf(sep) + 1);
 		String tmp = "\n";
-		tmp += "file                : " + editorFrame.getTrackData().getHeader().getName() + ".xml\n";
+		tmp += "file                : " + trackname + ".xml\n";
 		tmp += "auto generated      : by " + Editor.getProperties().title + "\n";
 		tmp += "version             : " + Editor.getProperties().version + "\n";
 		tmp += "copyright           : (C) 2005 by Charalampos Alexopoulos\n";
