@@ -247,12 +247,6 @@ public class XmlReader
         if (lights == null)
             return;
 
-        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
-        	lights = getChildWithName(lights, "List");
-        
-        if (lights == null)
-            return;
-
         Vector<TrackLight> lightData = new Vector<TrackLight>();
         List<Element> sections = lights.getChildren();
         Iterator<Element> it = sections.iterator();

@@ -556,19 +556,11 @@ public class XmlWriter
 	{
 		Element lights = new Element("section");
 		lights.setAttribute(new Attribute("name", "Track Lights"));
-		Element root = lights;
 
 		Vector<TrackLight> lightData = editorFrame.getTrackData().getTrackLights();
 
 		if (lightData == null)
 			return lights;
-
-		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
-		{
-			lights = new Element("section");
-			lights.setAttribute(new Attribute("name", "List"));
-			root.addContent(lights);
-		}
 
 		for (int i = 0; i < lightData.size(); i++)
 		{
@@ -613,7 +605,7 @@ public class XmlWriter
 			lights.addContent(el);
 		}
 
-		return root;
+		return lights;
 	}
 
 	private synchronized Element getObjects()
