@@ -195,6 +195,8 @@ public class XmlReader
         editorFrame.getTrackData().getHeader().setVersion(getAttrIntValue(header, "version"));
         editorFrame.getTrackData().getHeader().setSkyVersion(getAttrIntValue(header, "sky version"));
         editorFrame.getTrackData().getHeader().setAuthor(getAttrStrValue(header, "author"));
+        editorFrame.getTrackData().getHeader().setEmail(getAttrStrValue(header, "email"));
+        editorFrame.getTrackData().getHeader().setCopyright(getAttrStrValue(header, "copyright"));
         editorFrame.getTrackData().getHeader().setDescription(getAttrStrValue(header, "description"));
     }
 

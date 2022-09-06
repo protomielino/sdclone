@@ -685,6 +685,18 @@ public class XmlWriter
 		}
 		addContent(header, "author", tmp);
 
+		if (editorFrame.getTrackData().getHeader().getCopyright() != null)
+		{
+			tmp = editorFrame.getTrackData().getHeader().getCopyright();
+			addContent(header, "copyright", tmp);
+		}
+
+		if (editorFrame.getTrackData().getHeader().getEmail() != null)
+		{
+			tmp = editorFrame.getTrackData().getHeader().getEmail();
+			addContent(header, "email", tmp);
+		}
+
 		if (editorFrame.getTrackData().getHeader().getDescription() != null)
 		{
 			tmp = editorFrame.getTrackData().getHeader().getDescription();

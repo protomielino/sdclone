@@ -43,6 +43,8 @@
 #define TRK_ATT_NAME                "name"
 #define TRK_ATT_VERSION             "version"
 #define TRK_ATT_AUTHOR              "author"
+#define TRK_ATT_EMAIL               "email"
+#define TRK_ATT_COPYRIGHT           "copyright"
 #define TRK_ATT_DESCR               "description"
 #define TRK_ATT_CAT                 "category"
 #define TRK_ATT_SUBCAT              "subcategory"
@@ -681,6 +683,8 @@ typedef struct Track
     const char	  *name;        /**< Name of the track */
     const char	  *descr;       /**< Description of the track */
     const char	  *authors;     /**< Authors names */
+    const char    *email;       /**< Email address of author */
+    const char    *copyright;   /**< Copyright of the track description */
     char          *filename;    /**< Filename of the track description */
     void          *params;      /**< Parameters handle */
     char          *internalname;/**< Internal name of the track */

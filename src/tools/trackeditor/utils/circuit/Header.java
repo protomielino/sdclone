@@ -7,6 +7,8 @@ public class Header {
 	private int	version			= 4;
 	private int skyVersion		= Integer.MAX_VALUE;
 	private String	author		= null;
+	private String	email		= null;
+	private String	copyright	= null;
 	private String	description	= null;
 
 	/**
@@ -121,6 +123,26 @@ public class Header {
 		this.description = description;
 	}
 
+	public String getCopyright()
+	{
+		return copyright;
+	}
+
+	public void setCopyright(String copyright)
+	{
+		this.copyright = copyright;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+
 	public void dump(String indent)
     {
 		System.out.println(indent + "Header");
@@ -130,6 +152,8 @@ public class Header {
 		System.out.println(indent + "  version     : " + version);
 		System.out.println(indent + "  skyVersion  : " + skyVersion);
 		System.out.println(indent + "  author      : " + author);
+		System.out.println(indent + "  email       : " + email);
+		System.out.println(indent + "  copyright   : " + copyright);
 		System.out.println(indent + "  description : " + description);
     }
 }

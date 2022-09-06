@@ -138,6 +138,8 @@ GetTrackHeader(void *TrackHandle) {
     theTrack->version = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_VERSION, (char*)NULL, 0);
     theTrack->width = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, (char*)NULL, 15.0);
     theTrack->authors = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, "none");
+    theTrack->email = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_EMAIL, "none");
+    theTrack->copyright = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_COPYRIGHT, "none");
     theTrack->category = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_CAT, "road");
     theTrack->subcategory = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_SUBCAT, "none");
 
