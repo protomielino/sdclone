@@ -2427,7 +2427,7 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
                      bool useBorder)
 {
     const char *mat;
-    FILE *curFd = nullptr;
+    FILE *curFd = NULL;
 
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, 10.0);
     GfOut("Track step: %.2f\n", TrackStep);

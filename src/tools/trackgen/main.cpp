@@ -322,7 +322,7 @@ int Application::generate()
     std::string OutputFileName(buf2);
 
     // Number of groups for the complete track.
-    FILE *outfd = nullptr;
+    FILE *outfd = NULL;
     if (TrackOnly) {
         // Track.
         if (!Bump && !Raceline)

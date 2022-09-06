@@ -513,6 +513,11 @@ void dumpSeg(std::ofstream &ofs,const tTrackSeg *seg, const std::string & indent
             ofs << seg->ext->marks[i] << " ";
         ofs << std::endl;
     }
+    if (seg->surface)
+    {
+        ofs << indent << "surface" << std::endl;
+        ofs << indent << "    material  " << (seg->surface->material ? seg->surface->material : "none") << std::endl;
+    }
 //    if (seg->next)
 //        ofs << indent << "next         " << std::hex << seg->next << std::dec << std::endl;
 //    if (seg->prev)
