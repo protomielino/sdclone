@@ -1611,7 +1611,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
      */
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
     if (GfParmListSeekFirst(TrackHandle, path) == 0 &&
-		GfParmGetEltNb(TrackHandle, TRK_SECT_CAM) > 0) {
+		GfParmGetEltNb(TrackHandle, path) > 0) {
 	do {
 	    curCam = (tRoadCam*)calloc(1, sizeof(tRoadCam));
 	    if (!curCam) {
