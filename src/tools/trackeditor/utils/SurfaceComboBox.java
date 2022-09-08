@@ -3,12 +3,16 @@ package utils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -109,7 +113,40 @@ public class SurfaceComboBox extends JComboBox<String>
 						try
 						{
 							URL url = file.toURI().toURL();
-							tooltipText = "<html><img src=\"" + url + "\"><br>" + textureName + "</html>";
+							int width = 256;
+							int height = 256;
+
+							// TODO this is very inefficient
+							// add a static global map of url to tooltip text
+							try
+							{
+								InputStream stream = url.openStream();
+								ImageInputStream input = ImageIO.createImageInputStream(stream);
+								ImageReader reader = ImageIO.getImageReaders(input).next();
+								reader.setInput(input);
+								width = reader.getWidth(0);
+								height = reader.getHeight(0);
+								reader.dispose();
+								if (width > 256 || height > 256)
+								{
+									if (width == height)
+									{
+										width = 256;
+										height = 256;
+									}
+									else
+									{
+										height = height * 256 / width;
+										width = 256;
+									}
+								}
+							}
+							catch (Exception e)
+							{
+								e.printStackTrace();
+							}
+
+							tooltipText = "<html><img src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" ><br>" + textureName + "</html>";
 						}
 						catch (MalformedURLException e)
 						{
