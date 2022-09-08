@@ -2186,7 +2186,7 @@ public class EditorFrame extends JFrame
 			checkSurface(segment.getRight().getSideSurface(), "Segment " + segment.getName() + " Right Side");
 			checkSurface(segment.getRight().getBarrierSurface(), "Segment " + segment.getName() + " Right Barrier");
 		}
-		checkSurface(trackData.getGraphic().getTerrainGeneration().getSurface(), "Terrain ");
+		checkSurface(trackData.getGraphic().getTerrainGeneration().getSurface(), "Terrain");
 	}
 	private class ExportAction extends AbstractAction
 	{
