@@ -198,12 +198,6 @@ public class GeneralProperties extends PropertyPanel
 
 		// get the track name from the path
 		int index = tmpPath.lastIndexOf(sep);
-		String nameFromPath = tmpPath.substring(index + 1);
-		if (!nameFromPath.equals(tmpName))
-		{
-			// TODO Which one should we use?
-			System.out.println("different!!! name from path: " + nameFromPath + " name: " + tmpName);
-		}
 
 		// remove the track name from the path
 		String pathToCategory = tmpPath.substring(0, index);
