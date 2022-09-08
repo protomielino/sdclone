@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -23,10 +24,12 @@ import utils.circuit.Surface;
 
 public class SurfaceComboBox extends JComboBox<String>
 {
-	private EditorFrame		editorFrame;
-	private Vector<String>	surfaceVector;
+	static private HashMap<String, String>	tooltipMap = new HashMap<>();
+	
+	private EditorFrame						editorFrame;
+	private Vector<String>					surfaceVector;
 
-	private String 			sep	= System.getProperty("file.separator");
+	private String 							sep	= System.getProperty("file.separator");
 
 	public SurfaceComboBox(EditorFrame editorFrame, Vector<String> surfaceVector)
 	{
@@ -113,40 +116,47 @@ public class SurfaceComboBox extends JComboBox<String>
 						try
 						{
 							URL url = file.toURI().toURL();
-							int width = 256;
-							int height = 256;
-
-							// TODO this is very inefficient
-							// add a static global map of url to tooltip text
-							try
+							
+							if (tooltipMap.containsKey(url.toString()))
 							{
-								InputStream stream = url.openStream();
-								ImageInputStream input = ImageIO.createImageInputStream(stream);
-								ImageReader reader = ImageIO.getImageReaders(input).next();
-								reader.setInput(input);
-								width = reader.getWidth(0);
-								height = reader.getHeight(0);
-								reader.dispose();
-								if (width > 256 || height > 256)
+								tooltipText = tooltipMap.get(url.toString());
+							}
+							else
+							{							
+								int width = 256;
+								int height = 256;
+
+								try
 								{
-									if (width == height)
+									InputStream stream = url.openStream();
+									ImageInputStream input = ImageIO.createImageInputStream(stream);
+									ImageReader reader = ImageIO.getImageReaders(input).next();
+									reader.setInput(input);
+									width = reader.getWidth(0);
+									height = reader.getHeight(0);
+									reader.dispose();
+									if (width > 256 || height > 256)
 									{
-										width = 256;
-										height = 256;
-									}
-									else
-									{
-										height = height * 256 / width;
-										width = 256;
+										if (width == height)
+										{
+											width = 256;
+											height = 256;
+										}
+										else
+										{
+											height = height * 256 / width;
+											width = 256;
+										}
 									}
 								}
-							}
-							catch (Exception e)
-							{
-								e.printStackTrace();
-							}
+								catch (Exception e)
+								{
+									e.printStackTrace();
+								}
 
-							tooltipText = "<html><img src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" ><br>" + textureName + "</html>";
+								tooltipText = "<html><img src=\"" + url.toString() + "\" width=\"" + width + "\" height=\"" + height + "\" ><br>" + textureName + "</html>";
+								tooltipMap.put(url.toString(), tooltipText);
+							}
 						}
 						catch (MalformedURLException e)
 						{
