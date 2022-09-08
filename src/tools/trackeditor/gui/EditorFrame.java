@@ -145,6 +145,7 @@ public class EditorFrame extends JFrame
 	private JButton				openButton							= null;
 	private JButton				helpButton							= null;
 	private JButton				checkButton							= null;
+	private JButton				propertiesButton					= null;
 	private JMenuItem			zoomPlusMenuItem					= null;
 	private JMenuItem			zoomMinusMenuItem					= null;
 	private JMenuItem			zoomOneMenuItem						= null;
@@ -1577,6 +1578,24 @@ public class EditorFrame extends JFrame
 		return checkButton;
 	}
 	/**
+	 * This method initializes propertiesButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getPropertiesButton()
+	{
+		if (propertiesButton == null)
+		{
+			propertiesButton = new JButton();
+			propertiesButton.setAction(propertiesAction);
+			if (propertiesButton.getIcon() != null)
+			{
+				propertiesButton.setText("");
+			}
+		}
+		return propertiesButton;
+	}
+	/**
 	 * This method initializes jContentPane
 	 *
 	 * @return javax.swing.JPanel
@@ -1781,6 +1800,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getNewButton());
 			jToolBar.add(getOpenButton());
 			jToolBar.add(getSaveButton());
+			jToolBar.add(getPropertiesButton());
 			jToolBar.add(getUndoButton());
 			jToolBar.add(getRedoButton());
 			jToolBar.add(getToggleButtonDelete());
@@ -1843,6 +1863,7 @@ public class EditorFrame extends JFrame
 	 */
 	private void createActions()
 	{
+		propertiesAction = new PropertiesAction("Properties", createNavigationIcon("Properties24"), "Properties dialog.", KeyEvent.VK_S);
 		undoAction = new UndoAction("Undo", createNavigationIcon("Undo24"), "Undo.", KeyEvent.VK_Z);
 		redoAction = new RedoAction("Redo", createNavigationIcon("Redo24"), "Redo.", KeyEvent.VK_R);
 		deleteAction = new DeleteAction("Delete", createNavigationIcon("Cut24"), "Delete.", KeyEvent.VK_L);
@@ -1866,7 +1887,6 @@ public class EditorFrame extends JFrame
 		/** ******************************************************************* */
 		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", KeyEvent.VK_S);
 		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", KeyEvent.VK_S);
-		propertiesAction = new PropertiesAction("Properties", null, "Properties dialog.", KeyEvent.VK_S);
 		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
