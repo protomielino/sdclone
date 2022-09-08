@@ -34,6 +34,7 @@ public class Project
 	private int segmentEditorY = 0;
 	private int propertiesEditorX = 0;
 	private int propertiesEditorY = 0;
+	private int propertiesEditorTab = 0;
 	private int defaultSurfacesDialogX = 0;
 	private int defaultSurfacesDialogY = 0;
 	private int defaultObjectsDialogX = 0;
@@ -225,5 +226,15 @@ public class Project
 	public void setNewProjectDialogY(int newProjectDialogY) 
 	{
 		this.newProjectDialogY = newProjectDialogY;
+	}
+
+	public int getPropertiesEditorTab()
+	{
+		return propertiesEditorTab;
+	}
+
+	public void setPropertiesEditorTab(int propertiesEditorTab)
+	{
+		this.propertiesEditorTab = propertiesEditorTab;
 	}
 }

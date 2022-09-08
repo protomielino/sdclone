@@ -742,6 +742,7 @@ public class EditorFrame extends JFrame
 		getProject().setSegmentEditorY(preferences.getInt("SegmentEditorY", 0));
 		getProject().setPropertiesEditorX(preferences.getInt("PropertiesEditorX", 0));
 		getProject().setPropertiesEditorY(preferences.getInt("PropertiesEditorY", 0));
+		getProject().setPropertiesEditorTab(preferences.getInt("PropertiesEditorTab", 0));
 		getProject().setDefaultSurfacesDialogX(preferences.getInt("DefaultSurfacesDialogX", 0));
 		getProject().setDefaultSurfacesDialogY(preferences.getInt("DefaultSurfacesDialogY", 0));
 		getProject().setDefaultObjectsDialogX(preferences.getInt("DefaultObjectsDialogX", 0));
@@ -2463,6 +2464,7 @@ public class EditorFrame extends JFrame
 		preferences.putInt("SegmentEditorY", getProject().getSegmentEditorY());
 		preferences.putInt("PropertiesEditorX", getProject().getPropertiesEditorX());
 		preferences.putInt("PropertiesEditorY", getProject().getPropertiesEditorY());
+		preferences.putInt("PropertiesEditorTab", getProject().getPropertiesEditorTab());
 		preferences.putInt("DefaultSurfacesDialogX", getProject().getDefaultSurfacesDialogX());
 		preferences.putInt("DefaultSurfacesDialogY", getProject().getDefaultSurfacesDialogY());
 		preferences.putInt("DefaultObjectsDialogX", getProject().getDefaultObjectsDialogX());

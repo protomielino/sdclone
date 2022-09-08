@@ -113,7 +113,8 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Objects", null, getObjectProperties(), null);
 			tabbedPane.addTab("Cameras", null, getCameraProperties(), null);
 			tabbedPane.addTab("Lights", null, getTrackLightProperties(), null);
-			tabbedPane.addTab("Image", null, getImageProperties(), null);
+			tabbedPane.addTab("Image", null, getImageProperties(), null);			
+			tabbedPane.setSelectedIndex(editorFrame.getProject().getPropertiesEditorTab());
 		}
 		return tabbedPane;
 	}
@@ -365,6 +366,7 @@ public class PropertiesDialog extends JDialog
 		{
 			editorFrame.getProject().setPropertiesEditorX(this.getX());
 			editorFrame.getProject().setPropertiesEditorY(this.getY());
+			editorFrame.getProject().setPropertiesEditorTab(this.tabbedPane.getSelectedIndex());
 		}
 	}
 
@@ -399,6 +401,7 @@ public class PropertiesDialog extends JDialog
 	{
 		editorFrame.getProject().setPropertiesEditorX(this.getX());
 		editorFrame.getProject().setPropertiesEditorY(this.getY());
+		editorFrame.getProject().setPropertiesEditorTab(this.tabbedPane.getSelectedIndex());
 		this.dispose();
 	}
 } //  @jve:decl-index=0:visual-constraint="6,6"
