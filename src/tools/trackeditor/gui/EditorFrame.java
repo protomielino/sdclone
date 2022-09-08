@@ -109,6 +109,7 @@ public class EditorFrame extends JFrame
 	ExportAC3Action				ac3Action							= null;
 	PropertiesAction			propertiesAction					= null;
 	CalcDeltaAction				calcDeltaAction						= null;
+	CheckAction					checkAction							= null;
 
 	private JPanel				jContentPane						= null;
 
@@ -143,6 +144,7 @@ public class EditorFrame extends JFrame
 	private JButton				saveButton							= null;
 	private JButton				openButton							= null;
 	private JButton				helpButton							= null;
+	private JButton				checkButton							= null;
 	private JMenuItem			zoomPlusMenuItem					= null;
 	private JMenuItem			zoomMinusMenuItem					= null;
 	private JMenuItem			zoomOneMenuItem						= null;
@@ -1557,6 +1559,24 @@ public class EditorFrame extends JFrame
 		return helpButton;
 	}
 	/**
+	 * This method initializes checkButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCheckButton()
+	{
+		if (checkButton == null)
+		{
+			checkButton = new JButton();
+			checkButton.setAction(checkAction);
+			if (checkButton.getIcon() != null)
+			{
+				checkButton.setText("");
+			}
+		}
+		return checkButton;
+	}
+	/**
 	 * This method initializes jContentPane
 	 *
 	 * @return javax.swing.JPanel
@@ -1774,6 +1794,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getShowArrowsButton());
 			jToolBar.add(getShowBackgroundButton());
 			jToolBar.add(getCalculateDeltaButton());
+			jToolBar.add(getCheckButton());
 			jToolBar.add(getHelpButton());
 		}
 		return jToolBar;
@@ -1840,6 +1861,7 @@ public class EditorFrame extends JFrame
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
 		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"),
 				"Show background image.", KeyEvent.VK_S);
+		checkAction = new CheckAction("Check", createNavigationIcon("Check24"), "Check.", KeyEvent.VK_S);
 		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
 		/** ******************************************************************* */
 		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", KeyEvent.VK_S);
@@ -2071,9 +2093,100 @@ public class EditorFrame extends JFrame
 		    int type = JOptionPane.PLAIN_MESSAGE;
 		    String msg = Editor.getProperties().title + " " + Editor.getProperties().version + "\n\n"
                 + "Copyright Charalampos Alexopoulos\n"
-                + "Copyright Robert Reif\n";
+                + "Copyright (2022) Robert Reif\n";
 		    JOptionPane.showMessageDialog(null,msg,"About",type);
 		}
+	}
+	public class CheckAction extends AbstractAction
+	{
+		public CheckAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			checkTrack();
+		}
+	}
+	private void checkTrack()
+	{
+		if (trackData == null)
+		{
+			message("No track", "Nothing to check");
+			return;
+		}
+		
+		checkSurfaces();
+		
+		System.out.println("Checking complete!");
+	}
+	private void checkSurfaceTexture(String surface, String description, String texture)
+	{
+		if (texture == null)
+			return;
+
+		File file = new File(Editor.getProperties().getPath() + sep + texture);
+		
+		if (!file.exists())
+		{
+			if (dataDirectory != null)
+			{
+				file = new File(dataDirectory + sep + "data" + sep + "textures" + sep + texture);
+				if (!file.exists())
+				{
+					System.out.println(description + " surface " + surface + " texture " + texture + " not found");						
+				}
+			}
+		}
+	}
+	private void checkSurface(String surface, String description)
+	{
+		if (surface == null)
+			return;
+		
+		for (int i = 0; i < trackData.getSurfaces().size(); i++)
+		{
+			if (trackData.getSurfaces().get(i).getName().equals(surface))
+			{
+				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getTextureName());
+				return;
+			}
+		}
+		for (int i = 0; i < defaultSurfaces.size(); i++)
+		{
+			if (defaultSurfaces.get(i).getName().equals(surface))
+			{
+				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getTextureName());
+				return;
+			}
+		}
+		
+		System.out.println(description + " surface " + surface + " not found");
+	}
+	private void checkSurfaces()
+	{
+		checkSurface(trackData.getMainTrack().getSurface(), "Main Track");
+		checkSurface(trackData.getMainTrack().getLeft().getBorderSurface(), "Main Track Left Border");
+		checkSurface(trackData.getMainTrack().getLeft().getSideSurface(), "Main Track Left Side");
+		checkSurface(trackData.getMainTrack().getLeft().getBarrierSurface(), "Main Track Left Barrier");
+		checkSurface(trackData.getMainTrack().getRight().getBorderSurface(), "Main Track Right Border");
+		checkSurface(trackData.getMainTrack().getRight().getSideSurface(), "Main Track Right Side");
+		checkSurface(trackData.getMainTrack().getRight().getBarrierSurface(), "Main Track Right Barrier");
+		for (int i = 0; i < trackData.getSegments().size(); i++)
+		{
+			Segment segment = trackData.getSegments().get(i);
+			
+			checkSurface(segment.getSurface(), "Segment " + segment.getName() + " Track");
+			checkSurface(segment.getLeft().getBorderSurface(), "Segment " + segment.getName() + " Left Border");
+			checkSurface(segment.getLeft().getSideSurface(), "Segment " + segment.getName() + " Left Side");
+			checkSurface(segment.getLeft().getBarrierSurface(), "Segment " + segment.getName() + " Left Barrier");
+			checkSurface(segment.getRight().getBorderSurface(), "Segment " + segment.getName() + " Right Border");
+			checkSurface(segment.getRight().getSideSurface(), "Segment " + segment.getName() + " Right Side");
+			checkSurface(segment.getRight().getBarrierSurface(), "Segment " + segment.getName() + " Right Barrier");
+		}
+		checkSurface(trackData.getGraphic().getTerrainGeneration().getSurface(), "Terrain ");
 	}
 	private class ExportAction extends AbstractAction
 	{
