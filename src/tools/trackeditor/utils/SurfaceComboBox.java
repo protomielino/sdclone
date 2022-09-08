@@ -109,7 +109,7 @@ public class SurfaceComboBox extends JComboBox<String>
 						try
 						{
 							URL url = file.toURI().toURL();
-							tooltipText = "<html><img src=" + url + "><br>" + textureName + "</html>";
+							tooltipText = "<html><img src=\"" + url + "\"><br>" + textureName + "</html>";
 						}
 						catch (MalformedURLException e)
 						{
