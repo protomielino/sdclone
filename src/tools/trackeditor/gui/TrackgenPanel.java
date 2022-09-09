@@ -47,6 +47,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private final static String newline 		= "\n";
 	private final static String sep				= System.getProperty("file.separator");
 	private EditorFrame			editorFrame;
+	private String				additionalArgs	= null;
 	private Thread 				ac3d 			= new Thread(this);
 
 	private JPanel				jPanel			= null;
@@ -64,10 +65,11 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JPanel				jPanel2			= null;
 	private JTextArea			errorsTextArea	= null;
 	
-	public TrackgenPanel(EditorFrame editorFrame)
+	public TrackgenPanel(EditorFrame editorFrame, String additionalArgs)
 	{
 		super();
 		this.editorFrame = editorFrame;
+		this.additionalArgs = additionalArgs;
 		initialize();
 		ac3d.start();
 	}
@@ -97,6 +99,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
 		String name = " -n " + trackName;
 		String args = " -a" + category + name;
+		
+		if (additionalArgs != null)
+			args = args + additionalArgs;
 
 		System.out.println(args);
 

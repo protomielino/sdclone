@@ -107,6 +107,11 @@ public class EditorFrame extends JFrame
 	ExportAction				exportAction						= null;
 	ExportAllAction				allAction							= null;
 	ExportAC3Action				ac3Action							= null;
+	ExportAC3E0Action			ac3E0Action							= null;
+	ExportAC3E1Action			ac3E1Action							= null;
+	ExportAC3E2Action			ac3E2Action							= null;
+	ExportAC3E3Action			ac3E3Action							= null;
+	ExportAC3E4Action			ac3E4Action							= null;
 	PropertiesAction			propertiesAction					= null;
 	CalcDeltaAction				calcDeltaAction						= null;
 	CheckAction					checkAction							= null;
@@ -180,8 +185,12 @@ public class EditorFrame extends JFrame
 	private JMenu				exportMenu							= null;
 	private JMenuItem			exportMenuItem						= null;
 	private JMenuItem			exportAllMenuItem					= null;
-	private JMenuItem			exportXmlMenuItem					= null;
 	private JMenuItem			exportAC3MenuItem					= null;
+	private JMenuItem			exportAC3E0MenuItem					= null;
+	private JMenuItem			exportAC3E1MenuItem					= null;
+	private JMenuItem			exportAC3E2MenuItem					= null;
+	private JMenuItem			exportAC3E3MenuItem					= null;
+	private JMenuItem			exportAC3E4MenuItem					= null;
 	private JMenuItem			propertiesMenuItem					= null;
 
 	private Project				prj;
@@ -1220,6 +1229,11 @@ public class EditorFrame extends JFrame
 			exportMenu.addSeparator();
 			exportMenu.add(getExportMenuItem());
 			exportMenu.add(getExportAC3MenuItem());
+			exportMenu.add(getExportAC3E0MenuItem());
+			exportMenu.add(getExportAC3E1MenuItem());
+			exportMenu.add(getExportAC3E2MenuItem());
+			exportMenu.add(getExportAC3E3MenuItem());
+			exportMenu.add(getExportAC3E4MenuItem());
 		}
 		return exportMenu;
 	}
@@ -1268,6 +1282,86 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3MenuItem;
 	}
+	/**
+	 * This method initializes exportAC3E0MenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3E0MenuItem()
+	{
+		if (exportAC3E0MenuItem == null)
+		{
+			exportAC3E0MenuItem = new JMenuItem();
+			exportAC3E0MenuItem.setAction(ac3E0Action);
+			exportAC3E0MenuItem.setIcon(null);
+		}
+		return exportAC3E0MenuItem;
+	}
+	
+	/**
+	 * This method initializes exportAC3E1MenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3E1MenuItem()
+	{
+		if (exportAC3E1MenuItem == null)
+		{
+			exportAC3E1MenuItem = new JMenuItem();
+			exportAC3E1MenuItem.setAction(ac3E1Action);
+			exportAC3E1MenuItem.setIcon(null);
+		}
+		return exportAC3E1MenuItem;
+	}
+	
+	/**
+	 * This method initializes exportAC3E2MenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3E2MenuItem()
+	{
+		if (exportAC3E2MenuItem == null)
+		{
+			exportAC3E2MenuItem = new JMenuItem();
+			exportAC3E2MenuItem.setAction(ac3E2Action);
+			exportAC3E2MenuItem.setIcon(null);
+		}
+		return exportAC3E2MenuItem;
+	}
+	
+	/**
+	 * This method initializes exportAC3E3MenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3E3MenuItem()
+	{
+		if (exportAC3E3MenuItem == null)
+		{
+			exportAC3E3MenuItem = new JMenuItem();
+			exportAC3E3MenuItem.setAction(ac3E3Action);
+			exportAC3E3MenuItem.setIcon(null);
+		}
+		return exportAC3E3MenuItem;
+	}
+	
+	/**
+	 * This method initializes exportAC3E4MenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3E4MenuItem()
+	{
+		if (exportAC3E4MenuItem == null)
+		{
+			exportAC3E4MenuItem = new JMenuItem();
+			exportAC3E4MenuItem.setAction(ac3E4Action);
+			exportAC3E4MenuItem.setIcon(null);
+		}
+		return exportAC3E4MenuItem;
+	}
+	
 	/**
 	 * This method initializes propertiesMenuItem
 	 *
@@ -1821,9 +1915,9 @@ public class EditorFrame extends JFrame
 		return jToolBar;
 	}
 
-	private void exportAc3d()
+	private void exportAc3d(String additionalArgs)
 	{
-		TrackgenPanel tg = new TrackgenPanel(this);
+		TrackgenPanel tg = new TrackgenPanel(this, additionalArgs);
 		tg.setModal(true);
 		tg.setVisible(true);
 	}
@@ -1871,8 +1965,7 @@ public class EditorFrame extends JFrame
 		zoomPlusAction = new ZoomPlusAction("Zoom in", createNavigationIcon("ZoomIn24"), "Zoom in.", KeyEvent.VK_M);
 		zoomOneAction = new ZoomOneAction("Zoom 1:1", createNavigationIcon("Zoom24"), "Zoom 1:1.", KeyEvent.VK_N);
 		zoomMinusAction = new ZoomMinusAction("Zoom out", createNavigationIcon("ZoomOut24"), "Zoom out.", KeyEvent.VK_O);
-		straightAction = new StraightAction("Add straight", createNavigationIcon("Straight24"),
-				"Add a straight segment.", KeyEvent.VK_P);
+		straightAction = new StraightAction("Add straight", createNavigationIcon("Straight24"), "Add a straight segment.", KeyEvent.VK_P);
 		rightAction = new RightAction("Add right", createNavigationIcon("TurnRight24"), "Add a right turn segment.", KeyEvent.VK_Q);
 		leftAction = new LeftAction("Add left", createNavigationIcon("TurnLeft24"), "Add a left turn segment.",	KeyEvent.VK_S);
 		newAction = new NewAction("New", createNavigationIcon("New24"), "New circuit.", KeyEvent.VK_S);
@@ -1881,13 +1974,17 @@ public class EditorFrame extends JFrame
 		saveAction = new SaveAction("Save", createNavigationIcon("Save24"), "Save the circuit.", KeyEvent.VK_S);
 		moveAction = new MoveAction("Move", createNavigationIcon("Export24"), "Move.", KeyEvent.VK_S);
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
-		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"),
-				"Show background image.", KeyEvent.VK_S);
+		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"), "Show background image.", KeyEvent.VK_S);
 		checkAction = new CheckAction("Check", createNavigationIcon("Check24"), "Check.", KeyEvent.VK_S);
 		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
 		/** ******************************************************************* */
-		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", KeyEvent.VK_S);
-		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", KeyEvent.VK_S);
+		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", null);
+		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", null);
+		ac3E0Action = new ExportAC3E0Action("AC3 with all elevation maps", null, "Create AC3 file and all elevation maps.", null);
+		ac3E1Action = new ExportAC3E1Action("AC3 with terrain and track elevation map", null, "Create AC3 file and terrain and track elevation map.", null);
+		ac3E2Action = new ExportAC3E2Action("AC3 with terrain and white track elevation map", null, "Create AC3 file and terrain and white track elevation map.", null);
+		ac3E3Action = new ExportAC3E3Action("AC3 with track elevation map", null, "Create AC3 file and track elevation map.", null);
+		ac3E4Action = new ExportAC3E4Action("AC3 with track with height steps elevation map", null, "Create AC3 file and track with height steps elevation map.", null);
 		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
@@ -2268,7 +2365,7 @@ public class EditorFrame extends JFrame
 				return;
 			}			
 			exportTrack();
-			exportAc3d();
+			exportAc3d(null);
 		}
 	}
 	public class ExportAC3Action extends AbstractAction
@@ -2286,7 +2383,97 @@ public class EditorFrame extends JFrame
 				message("No track", "Nothing to export");
 				return;
 			}			
-			exportAc3d();
+			exportAc3d(null);
+		}
+	}
+	public class ExportAC3E0Action extends AbstractAction
+	{
+		public ExportAC3E0Action(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -E 0");
+		}
+	}
+	public class ExportAC3E1Action extends AbstractAction
+	{
+		public ExportAC3E1Action(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -E 1");
+		}
+	}
+	public class ExportAC3E2Action extends AbstractAction
+	{
+		public ExportAC3E2Action(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -E 2");
+		}
+	}
+	public class ExportAC3E3Action extends AbstractAction
+	{
+		public ExportAC3E3Action(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -E 3");
+		}
+	}
+	public class ExportAC3E4Action extends AbstractAction
+	{
+		public ExportAC3E4Action(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -E 4");
 		}
 	}
 	public class PropertiesAction extends AbstractAction
