@@ -268,6 +268,7 @@ public class SurfaceProperties extends PropertyPanel
 		private JTextField 			reboundTextField				= new JTextField();
 		private JButton				textureNameButton				= null;
 		private JButton				racelineNameButton				= null;
+		private JButton				bumpNameButton					= null;
 
 		private final String sep = System.getProperty("file.separator");
 
@@ -332,7 +333,7 @@ public class SurfaceProperties extends PropertyPanel
 			addTextField(this, 12, textureMipMapTextField, surface.getTextureMipMap(), 190, 100);
 			addTextField(this, 13, frictionTextField, surface.getFriction(), 190, 100);
 			addTextField(this, 14, rollingResistanceTextField, surface.getRollingResistance(), 190, 100);
-			addTextField(this, 15, bumpNameTextField, surface.getBumpName(), 190, 100);
+			addTextField(this, 15, bumpNameTextField, surface.getBumpName(), 190, 220);
 			addTextField(this, 16, bumpSizeTextField, surface.getBumpSize(), 190, 100);
 			addTextField(this, 17, roughnessTextField, surface.getRoughness(), 190, 100);
 			addTextField(this, 18, roughnessWavelengthTextField, surface.getRoughnessWavelength(), 190, 100);
@@ -369,6 +370,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				add(getTextureNameButton(), null);
 				add(getRacelineNameButton(), null);
+				add(getBumpNameButton(), null);
 			}
 		}
 
@@ -453,6 +455,57 @@ public class SurfaceProperties extends PropertyPanel
 				if (pathToFile.equals(Editor.getProperties().getPath()))
 					fileName = fileName.substring(index + 1);
 				textureNameTextField.setText(fileName);
+			}
+		}
+		
+		/**
+		 * This method initializes bumpNameButton
+		 *
+		 * @return javax.swing.JButton
+		 */
+		private JButton getBumpNameButton()
+		{
+			if (bumpNameButton == null)
+			{
+				bumpNameButton = new JButton();
+				bumpNameButton.setBounds(420, 415, 80, 25);
+				bumpNameButton.setText("Browse");
+				bumpNameButton.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						bumpNameFile();
+					}
+				});
+			}
+			return bumpNameButton;
+		}
+
+		protected void bumpNameFile()
+		{
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			JFileChooser fc = new JFileChooser();
+			fc.setSelectedFiles(null);
+			fc.setSelectedFile(null);
+			fc.rescanCurrentDirectory();
+			fc.setApproveButtonMnemonic(0);
+			fc.setDialogTitle("Surface bump image file selection");
+			fc.setVisible(true);
+			fc.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+			fc.addChoosableFileFilter(filter);
+			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
+			int result = fc.showOpenDialog(this);
+			UIManager.put("FileChooser.readOnly", old);
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				String fileName = fc.getSelectedFile().toString();
+				int index = fileName.lastIndexOf(sep);
+				String pathToFile = fileName.substring(0, index);
+				if (pathToFile.equals(Editor.getProperties().getPath()))
+					fileName = fileName.substring(index + 1);
+				bumpNameTextField.setText(fileName);
 			}
 		}
 		

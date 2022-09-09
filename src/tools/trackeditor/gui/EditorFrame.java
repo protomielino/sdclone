@@ -2143,7 +2143,7 @@ public class EditorFrame extends JFrame
 		
 		System.out.println("Checking complete!");
 	}
-	private void checkSurfaceTexture(String surface, String description, String texture)
+	private void checkSurfaceTexture(String surface, String description, String texture, String name)
 	{
 		if (texture == null)
 			return;
@@ -2157,7 +2157,7 @@ public class EditorFrame extends JFrame
 				file = new File(dataDirectory + sep + "data" + sep + "textures" + sep + texture);
 				if (!file.exists())
 				{
-					System.out.println(description + " surface " + surface + " texture " + texture + " not found");						
+					System.out.println(description + " surface " + surface + name + " texture " + texture + " not found");						
 				}
 			}
 		}
@@ -2171,7 +2171,9 @@ public class EditorFrame extends JFrame
 		{
 			if (trackData.getSurfaces().get(i).getName().equals(surface))
 			{
-				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getTextureName());
+				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getTextureName(), "");
+				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getBumpName(), " Bump");
+				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getRacelineName(), " Raceline");
 				return;
 			}
 		}
@@ -2179,7 +2181,9 @@ public class EditorFrame extends JFrame
 		{
 			if (defaultSurfaces.get(i).getName().equals(surface))
 			{
-				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getTextureName());
+				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getTextureName(), "");
+				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getBumpName(), " Bump");
+				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getRacelineName(), " Raceline");
 				return;
 			}
 		}
