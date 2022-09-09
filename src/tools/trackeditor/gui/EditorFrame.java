@@ -2424,17 +2424,17 @@ public class EditorFrame extends JFrame
 			{
 				for (int j = i + 1; j < trackData.getSurfaces().size(); j++)
 				{
-					if (name.equals(trackData.getSurfaces().get(i).getName()))
+					if (name.equals(trackData.getSurfaces().get(j).getName()))
 					{
-						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Track surface " + (j + 1));						
+						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Track surface " + (j + 1) + " " + trackData.getSurfaces().get(i).getName());						
 					}
 				}
 				
 				for (int j = 0; j < defaultSurfaces.size(); j++)
 				{
-					if (name.equals(defaultSurfaces.get(i).getName()))
+					if (name.equals(defaultSurfaces.get(j).getName()))
 					{
-						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Default surface " + (j + 1));						
+						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Default surface " + (j + 1) + " " + defaultSurfaces.get(i).getName());						
 					}
 				}
 			}
