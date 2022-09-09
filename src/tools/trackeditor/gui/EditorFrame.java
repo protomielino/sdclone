@@ -2239,11 +2239,13 @@ public class EditorFrame extends JFrame
 			return;
 		}
 		
+		// TODO move these checks into CheckDialog someday
 		checkSurfaces();
 		checkObjects();
 		
 		System.out.println("Checking complete!");
 	}
+
 	private File findObjectFile(String object)
 	{
 		File file = new File(Editor.getProperties().getPath() + sep + object);
@@ -2409,6 +2411,35 @@ public class EditorFrame extends JFrame
 	}
 	private void checkSurfaces()
 	{
+		// check for duplicate surface names
+		for (int i = 0; i < trackData.getSurfaces().size(); i++)
+		{
+			String name = trackData.getSurfaces().get(i).getName();
+			
+			if (name == null || name.isEmpty())
+			{
+				System.out.println("Track surface " + (i + 1) + " missing name");
+			}
+			else
+			{
+				for (int j = i + 1; j < trackData.getSurfaces().size(); j++)
+				{
+					if (name.equals(trackData.getSurfaces().get(i).getName()))
+					{
+						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Track surface " + (j + 1));						
+					}
+				}
+				
+				for (int j = 0; j < defaultSurfaces.size(); j++)
+				{
+					if (name.equals(defaultSurfaces.get(i).getName()))
+					{
+						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Default surface " + (j + 1));						
+					}
+				}
+			}
+		}
+
 		checkSurface(trackData.getMainTrack().getSurface(), "Main Track");
 		checkSurface(trackData.getMainTrack().getLeft().getBorderSurface(), "Main Track Left Border");
 		checkSurface(trackData.getMainTrack().getLeft().getSideSurface(), "Main Track Left Side");
