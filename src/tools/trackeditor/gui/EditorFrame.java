@@ -38,9 +38,12 @@ import java.awt.event.WindowEvent;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -2237,16 +2240,82 @@ public class EditorFrame extends JFrame
 		}
 		
 		checkSurfaces();
+		checkObjects();
 		
 		System.out.println("Checking complete!");
 	}
-	private void checkSurfaceTexture(String surface, String description, String texture, String name)
+	private File findObjectFile(String object)
 	{
-		if (texture == null)
-			return;
+		File file = new File(Editor.getProperties().getPath() + sep + object);
 
-		File file = new File(Editor.getProperties().getPath() + sep + texture);
+		if (!file.exists())
+		{
+			file = new File(dataDirectory + sep + "data" + sep + "objects" + sep + object);
+			if (!file.exists())
+			{
+				return null;
+			}
+		}
+
+		return file;
+	}
+	private void checkTrackObject(TrackObject trackObject, String type)
+	{
+		String	object = trackObject.getObject();
+
+		if (object == null || object.isEmpty())
+		{
+			System.out.println(type + " object " + object + " missing model");
+			return;
+		}
+
+		File file = findObjectFile(object);
 		
+		if (file == null)
+		{
+			System.out.println(type + " object " + trackObject.getName() + " model " + object + " not found");
+			return;
+		}
+		
+		try
+		{
+			BufferedReader br = new BufferedReader(new FileReader(file));
+		    StringBuilder sb = new StringBuilder();
+		    String line = "";
+
+		    while ((line = br.readLine()) != null)
+		    {
+		        if (line.startsWith("texture"))
+		        {
+		        	String texture = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+		        	
+		        	file = findTextureFile(texture);
+		        	
+		        	if (file == null)
+		        		System.out.println(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " not found");						
+		        }
+		    }
+		} 
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	private void checkObjects()
+	{
+		for (int i = 0; i < trackData.getObjects().size(); i++)
+		{
+			checkTrackObject(trackData.getObjects().get(i), "Track");
+		}
+		for (int i = 0; i < defaultObjects.size(); i++)
+		{
+			checkTrackObject(defaultObjects.get(i), "Default");
+		}
+	}
+	private File findTextureFile(String texture)
+	{
+		File file = new File(Editor.getProperties().getPath() + sep + texture);
+
 		if (!file.exists())
 		{
 			if (dataDirectory != null)
@@ -2254,23 +2323,49 @@ public class EditorFrame extends JFrame
 				file = new File(dataDirectory + sep + "data" + sep + "textures" + sep + texture);
 				if (!file.exists())
 				{
-					System.out.println(description + " surface " + surface + name + " texture " + texture + " not found");						
+					return null;
 				}
 			}
 		}
+		return file;
 	}
 	private void checkSurface(String surface, String description)
 	{
 		if (surface == null)
 			return;
-		
+
 		for (int i = 0; i < trackData.getSurfaces().size(); i++)
 		{
 			if (trackData.getSurfaces().get(i).getName().equals(surface))
 			{
-				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getTextureName(), "");
-				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getBumpName(), " Bump");
-				checkSurfaceTexture(surface, description, trackData.getSurfaces().get(i).getRacelineName(), " Raceline");
+				String texture = trackData.getSurfaces().get(i).getTextureName();
+				if (texture == null || texture.isEmpty())
+				{
+					System.out.println(description + " surface " + surface + " missing texture");
+				}
+				else
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " texture " + texture + " not found");
+				}
+
+				texture = trackData.getSurfaces().get(i).getBumpName();
+				if (texture != null && !texture.isEmpty())
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " Bump texture " + texture + " not found");
+				}
+
+				texture = trackData.getSurfaces().get(i).getRacelineName();
+				if (texture != null && !texture.isEmpty())
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " Raceline texture " + texture + " not found");
+				}
+
 				return;
 			}
 		}
@@ -2278,9 +2373,34 @@ public class EditorFrame extends JFrame
 		{
 			if (defaultSurfaces.get(i).getName().equals(surface))
 			{
-				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getTextureName(), "");
-				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getBumpName(), " Bump");
-				checkSurfaceTexture(surface, description, defaultSurfaces.get(i).getRacelineName(), " Raceline");
+				String texture = defaultSurfaces.get(i).getTextureName();
+				if (texture == null || texture.isEmpty())
+				{
+					System.out.println(description + " surface " + surface + " missing texture");
+				}
+				else
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " texture " + texture + " not found");
+				}
+
+				texture = defaultSurfaces.get(i).getBumpName();
+				if (texture != null && !texture.isEmpty())
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " Bump texture " + texture + " not found");
+				}
+
+				texture = defaultSurfaces.get(i).getRacelineName();
+				if (texture != null && !texture.isEmpty())
+				{
+					File textureFile = findTextureFile(texture);
+					if (textureFile == null)
+						System.out.println(description + " surface " + surface + " Raceline texture " + texture + " not found");
+				}
+
 				return;
 			}
 		}
