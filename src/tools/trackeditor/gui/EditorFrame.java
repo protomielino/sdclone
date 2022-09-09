@@ -2305,6 +2305,35 @@ public class EditorFrame extends JFrame
 	}
 	private void checkObjects()
 	{
+		// check for duplicate object names
+		for (int i = 0; i < trackData.getObjects().size(); i++)
+		{
+			String name = trackData.getObjects().get(i).getName();
+			
+			if (name == null || name.isEmpty())
+			{
+				System.out.println("Track object " + (i + 1) + " missing name");
+			}
+			else
+			{
+				for (int j = i + 1; j < trackData.getObjects().size(); j++)
+				{
+					if (name.equals(trackData.getObjects().get(j).getName()))
+					{
+						System.out.println("Track object " + (i + 1) + " " + name + " has same name as Track object " + (j + 1) + " " + trackData.getObjects().get(i).getName());						
+					}
+				}
+				
+				for (int j = 0; j < defaultObjects.size(); j++)
+				{
+					if (name.equals(defaultObjects.get(j).getName()))
+					{
+						System.out.println("Track object " + (i + 1) + " " + name + " has same name as Default object " + (j + 1) + " " + defaultObjects.get(i).getName());						
+					}
+				}
+			}
+		}
+
 		for (int i = 0; i < trackData.getObjects().size(); i++)
 		{
 			checkTrackObject(trackData.getObjects().get(i), "Track");
