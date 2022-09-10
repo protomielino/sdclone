@@ -45,6 +45,10 @@ public class Project
 	private int preferencesDialogY = 0;
 	private int newProjectDialogX = 0;
 	private int newProjectDialogY = 0;
+	private int checkDialogX = 0;
+	private int checkDialogY = 0;
+	private int checkDialogWidth = 0;
+	private int checkDialogHeight = 0;
 	
 	public Project()
 	{
@@ -236,5 +240,45 @@ public class Project
 	public void setPropertiesEditorTab(int propertiesEditorTab)
 	{
 		this.propertiesEditorTab = propertiesEditorTab;
+	}
+
+	public int getCheckDialogX()
+	{
+		return checkDialogX;
+	}
+
+	public void setCheckDialogX(int checkDialogX)
+	{
+		this.checkDialogX = checkDialogX;
+	}
+
+	public int getCheckDialogY()
+	{
+		return checkDialogY;
+	}
+
+	public void setCheckDialogY(int checkDialogY)
+	{
+		this.checkDialogY = checkDialogY;
+	}
+
+	public int getCheckDialogWidth()
+	{
+		return checkDialogWidth;
+	}
+
+	public void setCheckDialogWidth(int checkDialogWidth)
+	{
+		this.checkDialogWidth = checkDialogWidth;
+	}
+
+	public int getCheckDialogHeight()
+	{
+		return checkDialogHeight;
+	}
+
+	public void setCheckDialogHeight(int checkDialogHeight)
+	{
+		this.checkDialogHeight = checkDialogHeight;
 	}
 }

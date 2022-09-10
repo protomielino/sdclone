@@ -38,12 +38,9 @@ import java.awt.event.WindowEvent;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -764,7 +761,11 @@ public class EditorFrame extends JFrame
 		getProject().setPreferencesDialogX(preferences.getInt("PreferencesDialogX", 0));
 		getProject().setPreferencesDialogY(preferences.getInt("PreferencesDialogY", 0));
 		getProject().setNewProjectDialogX(preferences.getInt("NewProjectDialogX", 0));
-		getProject().setNewProjectDialogY(preferences.getInt("NewProjectDialogY", 0));
+		getProject().setNewProjectDialogY(preferences.getInt("NewProjectDialogY", 0));		
+		getProject().setCheckDialogX(preferences.getInt("CheckDialogX", 0));
+		getProject().setCheckDialogY(preferences.getInt("CheckDialogY", 0));
+		getProject().setCheckDialogWidth(preferences.getInt("CheckDialogWidth", 500));
+		getProject().setCheckDialogHeight(preferences.getInt("CheckDialogHeight", 500));
 	}
 
 	/**
@@ -2239,257 +2240,11 @@ public class EditorFrame extends JFrame
 			return;
 		}
 		
-		// TODO move these checks into CheckDialog someday
-		checkSurfaces();
-		checkObjects();
-		
-		System.out.println("Checking complete!");
+		CheckDialog checkDialog = new CheckDialog(this);
+		checkDialog.setModal(true);
+		checkDialog.setVisible(true);
 	}
 
-	private File findObjectFile(String object)
-	{
-		File file = new File(Editor.getProperties().getPath() + sep + object);
-
-		if (!file.exists())
-		{
-			file = new File(dataDirectory + sep + "data" + sep + "objects" + sep + object);
-			if (!file.exists())
-			{
-				return null;
-			}
-		}
-
-		return file;
-	}
-	private void checkTrackObject(TrackObject trackObject, String type)
-	{
-		String	object = trackObject.getObject();
-
-		if (object == null || object.isEmpty())
-		{
-			System.out.println(type + " object " + object + " missing model");
-			return;
-		}
-
-		File file = findObjectFile(object);
-		
-		if (file == null)
-		{
-			System.out.println(type + " object " + trackObject.getName() + " model " + object + " not found");
-			return;
-		}
-		
-		try
-		{
-			BufferedReader br = new BufferedReader(new FileReader(file));
-		    StringBuilder sb = new StringBuilder();
-		    String line = "";
-
-		    while ((line = br.readLine()) != null)
-		    {
-		        if (line.startsWith("texture"))
-		        {
-		        	String texture = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
-		        	
-		        	file = findTextureFile(texture);
-		        	
-		        	if (file == null)
-		        		System.out.println(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " not found");						
-		        }
-		    }
-		} 
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	private void checkObjects()
-	{
-		// check for duplicate object names
-		for (int i = 0; i < trackData.getObjects().size(); i++)
-		{
-			String name = trackData.getObjects().get(i).getName();
-			
-			if (name == null || name.isEmpty())
-			{
-				System.out.println("Track object " + (i + 1) + " missing name");
-			}
-			else
-			{
-				for (int j = i + 1; j < trackData.getObjects().size(); j++)
-				{
-					if (name.equals(trackData.getObjects().get(j).getName()))
-					{
-						System.out.println("Track object " + (i + 1) + " " + name + " has same name as Track object " + (j + 1) + " " + trackData.getObjects().get(i).getName());						
-					}
-				}
-				
-				for (int j = 0; j < defaultObjects.size(); j++)
-				{
-					if (name.equals(defaultObjects.get(j).getName()))
-					{
-						System.out.println("Track object " + (i + 1) + " " + name + " has same name as Default object " + (j + 1) + " " + defaultObjects.get(i).getName());						
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i < trackData.getObjects().size(); i++)
-		{
-			checkTrackObject(trackData.getObjects().get(i), "Track");
-		}
-		for (int i = 0; i < defaultObjects.size(); i++)
-		{
-			checkTrackObject(defaultObjects.get(i), "Default");
-		}
-	}
-	private File findTextureFile(String texture)
-	{
-		File file = new File(Editor.getProperties().getPath() + sep + texture);
-
-		if (!file.exists())
-		{
-			if (dataDirectory != null)
-			{
-				file = new File(dataDirectory + sep + "data" + sep + "textures" + sep + texture);
-				if (!file.exists())
-				{
-					return null;
-				}
-			}
-		}
-		return file;
-	}
-	private void checkSurface(String surface, String description)
-	{
-		if (surface == null)
-			return;
-
-		for (int i = 0; i < trackData.getSurfaces().size(); i++)
-		{
-			if (trackData.getSurfaces().get(i).getName().equals(surface))
-			{
-				String texture = trackData.getSurfaces().get(i).getTextureName();
-				if (texture == null || texture.isEmpty())
-				{
-					System.out.println(description + " surface " + surface + " missing texture");
-				}
-				else
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " texture " + texture + " not found");
-				}
-
-				texture = trackData.getSurfaces().get(i).getBumpName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " Bump texture " + texture + " not found");
-				}
-
-				texture = trackData.getSurfaces().get(i).getRacelineName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " Raceline texture " + texture + " not found");
-				}
-
-				return;
-			}
-		}
-		for (int i = 0; i < defaultSurfaces.size(); i++)
-		{
-			if (defaultSurfaces.get(i).getName().equals(surface))
-			{
-				String texture = defaultSurfaces.get(i).getTextureName();
-				if (texture == null || texture.isEmpty())
-				{
-					System.out.println(description + " surface " + surface + " missing texture");
-				}
-				else
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " texture " + texture + " not found");
-				}
-
-				texture = defaultSurfaces.get(i).getBumpName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " Bump texture " + texture + " not found");
-				}
-
-				texture = defaultSurfaces.get(i).getRacelineName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-						System.out.println(description + " surface " + surface + " Raceline texture " + texture + " not found");
-				}
-
-				return;
-			}
-		}
-		
-		System.out.println(description + " surface " + surface + " not found");
-	}
-	private void checkSurfaces()
-	{
-		// check for duplicate surface names
-		for (int i = 0; i < trackData.getSurfaces().size(); i++)
-		{
-			String name = trackData.getSurfaces().get(i).getName();
-			
-			if (name == null || name.isEmpty())
-			{
-				System.out.println("Track surface " + (i + 1) + " missing name");
-			}
-			else
-			{
-				for (int j = i + 1; j < trackData.getSurfaces().size(); j++)
-				{
-					if (name.equals(trackData.getSurfaces().get(j).getName()))
-					{
-						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Track surface " + (j + 1) + " " + trackData.getSurfaces().get(i).getName());						
-					}
-				}
-				
-				for (int j = 0; j < defaultSurfaces.size(); j++)
-				{
-					if (name.equals(defaultSurfaces.get(j).getName()))
-					{
-						System.out.println("Track surface " + (i + 1) + " " + name + " has same name as Default surface " + (j + 1) + " " + defaultSurfaces.get(i).getName());						
-					}
-				}
-			}
-		}
-
-		checkSurface(trackData.getMainTrack().getSurface(), "Main Track");
-		checkSurface(trackData.getMainTrack().getLeft().getBorderSurface(), "Main Track Left Border");
-		checkSurface(trackData.getMainTrack().getLeft().getSideSurface(), "Main Track Left Side");
-		checkSurface(trackData.getMainTrack().getLeft().getBarrierSurface(), "Main Track Left Barrier");
-		checkSurface(trackData.getMainTrack().getRight().getBorderSurface(), "Main Track Right Border");
-		checkSurface(trackData.getMainTrack().getRight().getSideSurface(), "Main Track Right Side");
-		checkSurface(trackData.getMainTrack().getRight().getBarrierSurface(), "Main Track Right Barrier");
-		for (int i = 0; i < trackData.getSegments().size(); i++)
-		{
-			Segment segment = trackData.getSegments().get(i);
-			
-			checkSurface(segment.getSurface(), "Segment " + segment.getName() + " Track");
-			checkSurface(segment.getLeft().getBorderSurface(), "Segment " + segment.getName() + " Left Border");
-			checkSurface(segment.getLeft().getSideSurface(), "Segment " + segment.getName() + " Left Side");
-			checkSurface(segment.getLeft().getBarrierSurface(), "Segment " + segment.getName() + " Left Barrier");
-			checkSurface(segment.getRight().getBorderSurface(), "Segment " + segment.getName() + " Right Border");
-			checkSurface(segment.getRight().getSideSurface(), "Segment " + segment.getName() + " Right Side");
-			checkSurface(segment.getRight().getBarrierSurface(), "Segment " + segment.getName() + " Right Barrier");
-		}
-		checkSurface(trackData.getGraphic().getTerrainGeneration().getSurface(), "Terrain");
-	}
 	private class ExportAction extends AbstractAction
 	{
 		public ExportAction(String text, ImageIcon icon, String desc, Integer mnemonic)
@@ -2845,7 +2600,11 @@ public class EditorFrame extends JFrame
 		preferences.putInt("PreferencesDialogX", getProject().getPreferencesDialogX());
 		preferences.putInt("PreferencesDialogY", getProject().getPreferencesDialogY());
 		preferences.putInt("NewProjectDialogX", getProject().getNewProjectDialogX());
-		preferences.putInt("NewProjectDialogY", getProject().getNewProjectDialogY());
+		preferences.putInt("NewProjectDialogY", getProject().getNewProjectDialogY());		
+		preferences.putInt("CheckDialogX", getProject().getCheckDialogX());
+		preferences.putInt("CheckDialogY", getProject().getCheckDialogY());
+		preferences.putInt("CheckDialogWidth", getProject().getCheckDialogWidth());
+		preferences.putInt("CheckDialogHeight", getProject().getCheckDialogHeight());
 
 		System.exit(0);
 	}
