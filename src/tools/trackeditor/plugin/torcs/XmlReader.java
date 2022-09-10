@@ -550,6 +550,28 @@ public class XmlReader
             return;
 
         editorFrame.getTrackData().getMainTrack().getPits().setStyle(getAttrIntValue(pits, "pit style"));
+        // try alternate representation used by some TORCS tracks
+        if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == Integer.MAX_VALUE)
+        {
+        	String pitStyle = getAttrStrValue(pits, "type");
+        	
+            if (pitStyle != null)
+            {
+         	   if (pitStyle.equals("no pit"))
+         	   {
+                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(0);
+         	   }
+         	   else if (pitStyle.equals("track side"))
+         	   {
+                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(1);
+         	   }
+         	   else if (pitStyle.equals("seperate path"))
+         	   {
+                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(2);
+         	   }
+            }
+        }
+
         editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(pits, "side"));
         editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(pits, "entry"));
         editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(pits, "start"));
