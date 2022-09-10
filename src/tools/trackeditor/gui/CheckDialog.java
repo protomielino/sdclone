@@ -85,14 +85,39 @@ public class CheckDialog extends JDialog
 	private void checkTerrainGeneration()
 	{
 		String reliefFile = trackData.getGraphic().getTerrainGeneration().getReliefFile();
-		
+
 		if (reliefFile != null && !reliefFile.isEmpty())
 		{
 			File file = findObjectFile(reliefFile);
-			
+
 			if (file == null)
 			{
 				textArea.append("Terrain Generation relief file " + reliefFile + " not found\n");
+			}
+
+			try
+			{
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				String line = "";
+
+				while ((line = br.readLine()) != null)
+				{
+					if (line.startsWith("name"))
+					{
+						String name = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+
+						if (!(name.equals("interior") || name.equals("exterior")))
+						{
+							textArea.append("Terrain Generation relief file " + reliefFile + " invalid\n");
+							break;
+						}
+					}
+				}
+				br.close();
+			} 
+			catch (Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 	}
