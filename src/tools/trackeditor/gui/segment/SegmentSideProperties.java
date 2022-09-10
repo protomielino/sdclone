@@ -602,7 +602,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		surface = this.side.getBorderSurface();
 		addSurface(borderSurfaceVector, surface);	
 
-		if (surface != null)
+		if (surface != null && !surface.isEmpty())
 			this.getBorderSurfaceComboBox().setSelectedItem(surface);
 		else
 			this.getBorderSurfaceComboBox().setSelectedIndex(-1);

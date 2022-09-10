@@ -836,6 +836,11 @@ public class XmlReader
             }
             part.setSideSurface(getAttrStrValue(el, "surface"));
             part.setSideBankingType(getAttrStrValue(el, "banking type"));
+            // try alternate representation used by some TORCS tracks
+            if (part.getSideBankingType() == null)
+            {
+                part.setSideBankingType(getAttrStrValue(el, "type"));            	
+            }
         }
         else
             part.setHasSide(false);
