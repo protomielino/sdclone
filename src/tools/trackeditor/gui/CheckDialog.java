@@ -74,13 +74,29 @@ public class CheckDialog extends JDialog
 	    	{
 	    		checkSurfaces();
 	    		checkObjects();
+	    		checkTerrainGeneration();
 			
 	    		textArea.append("Checking complete!");	
 	    	}
 	    });
 	    this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
-	
+
+	private void checkTerrainGeneration()
+	{
+		String reliefFile = trackData.getGraphic().getTerrainGeneration().getReliefFile();
+		
+		if (reliefFile != null && !reliefFile.isEmpty())
+		{
+			File file = findObjectFile(reliefFile);
+			
+			if (file == null)
+			{
+				textArea.append("Terrain Generation relief file " + reliefFile + " not found\n");
+			}
+		}
+	}
+
 	private File findObjectFile(String object)
 	{
 		File file = new File(Editor.getProperties().getPath() + sep + object);
