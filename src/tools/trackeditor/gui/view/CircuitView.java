@@ -260,7 +260,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						Vector<Segment> data = editorFrame.getTrackData().getSegments();
 						int pos = data.indexOf(handledShape);
 						Curve newShape = new Curve("lft",handledShape);
-						newShape.setArc(Math.PI/2);
+						newShape.setArcDeg(90);
 						newShape.setRadiusStart(50);
 						newShape.setRadiusEnd(50);
 						newShape.inheritProperties(handledShape);
@@ -289,7 +289,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						Vector<Segment> data = editorFrame.getTrackData().getSegments();
 						int pos = data.indexOf(handledShape);
 						Curve newShape = new Curve("rgt",handledShape);
-						newShape.setArc(Math.PI/2);
+						newShape.setArcDeg(90);
 						newShape.setRadiusStart(50);
 						newShape.setRadiusEnd(50);
 						newShape.inheritProperties(handledShape);

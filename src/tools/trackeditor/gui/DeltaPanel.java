@@ -471,7 +471,7 @@ public class DeltaPanel extends JDialog implements Runnable
 				if(!obj.getType().equals("str"))
 				{
 				    Curve curve = (Curve) obj;
-				    curve.setArc(curve.getArc()*co);
+				    curve.setArcRad(curve.getArcRad()*co);
 				}
 			} catch (Exception e)
 			{

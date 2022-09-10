@@ -687,8 +687,7 @@ public class XmlReader
         } else
         {
             double arc = getAttrNumValue(seg, "arc", "deg");
-            arc = (arc * Math.PI) / 180;
-            ((Curve) shape).setArc(arc);
+            ((Curve) shape).setArcDeg(arc);
             double startRad = getAttrNumValue(seg, "radius", "m");
             ((Curve) shape).setRadiusStart(startRad);
             double endRad = getAttrNumValue(seg, "end radius", "m");

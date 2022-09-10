@@ -36,7 +36,7 @@ import miscel.EPMath;
 
 public class Curve extends Segment implements Cloneable
 {
-	protected double		arc;
+	protected double		arcDeg;
 	protected double		radiusStart;
 	protected double 		radiusEnd;
 
@@ -91,6 +91,7 @@ public class Curve extends Segment implements Cloneable
 		 */
 		
 		// calc turn length
+		double arc = arcDeg * Math.PI / 180;
 		length = arc * (radiusStart + radiusEnd) / 2;
 		nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
 
@@ -346,16 +347,30 @@ public class Curve extends Segment implements Cloneable
 	/**
 	 * @return Returns the arc.
 	 */
-	public double getArc()
+	public double getArcRad()
 	{
-		return arc;
+		return arcDeg * Math.PI / 180;
 	}
 	/**
 	 * @param arc The arc to set.
 	 */
-	public void setArc(double arc)
+	public void setArcRad(double arcRad)
 	{
-		this.arc = arc;
+		this.arcDeg = arcRad * 180 / Math.PI;
+	}
+	/**
+	 * @return Returns the arc.
+	 */
+	public double getArcDeg()
+	{
+		return arcDeg;
+	}
+	/**
+	 * @param arc The arc to set.
+	 */
+	public void setArcDeg(double arcDeg)
+	{
+		this.arcDeg = arcDeg;
 	}
 	/**
 	 * @return Returns the radiusEnd.
@@ -401,7 +416,7 @@ public class Curve extends Segment implements Cloneable
 	{
 		Curve s;
 		s = (Curve) super.clone();
-		s.arc = this.arc;
+		s.arcDeg = this.arcDeg;
 		s.radiusStart = this.radiusStart;
 		s.radiusEnd = this.radiusEnd;
 		

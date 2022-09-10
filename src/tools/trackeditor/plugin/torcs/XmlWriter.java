@@ -284,8 +284,7 @@ public class XmlWriter
 			addContent(segment, "lg", "m", ((Straight) shape).getLength());
 		} else
 		{
-			double arc = ((Curve) shape).getArc();
-			arc = (arc * 180) / Math.PI;
+			double arc = ((Curve) shape).getArcDeg();
 			addContent(segment, "arc", "deg", arc);
 
 			double radStart = ((Curve) shape).getRadiusStart();

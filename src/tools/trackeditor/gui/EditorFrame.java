@@ -583,7 +583,7 @@ public class EditorFrame extends JFrame
         shape = new Curve();
         ((Curve)shape).setRadiusStart(100);
         ((Curve)shape).setRadiusEnd(100);
-        ((Curve)shape).setArc(Math.PI);
+        ((Curve)shape).setArcDeg(180);
         shape.setHeightStartLeft(0);
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);
@@ -611,7 +611,7 @@ public class EditorFrame extends JFrame
         shape = new Curve();
         ((Curve)shape).setRadiusStart(100);
         ((Curve)shape).setRadiusEnd(100);
-        ((Curve)shape).setArc(Math.PI);
+        ((Curve)shape).setArcDeg(180);
         shape.setHeightStartLeft(0);
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);

@@ -355,10 +355,10 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			arcSlider.setMax(360);
 			arcSlider.setExtent(10);
 			arcSlider.setTickSpacing(1);
-			arcSlider.setRealToTextCoeff(180/Math.PI);
+			arcSlider.setRealToTextCoeff(1);
 			if (!shape.getType().equals("str"))
 			{
-				arcSlider.setMethod("Arc");
+				arcSlider.setMethod("ArcDeg");
 			}
 			arcSlider.addSliderListener(this);
 		}
@@ -770,7 +770,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				getGroupButton().setEnabled(true);
 				getGroupButton().setSelected(curve.getType());
 
-				this.getArcSlider().setValue(curve.getArc());
+				this.getArcSlider().setValue(curve.getArcDeg());
 				this.getRadiusStartSlider().setValue(curve.getRadiusStart());
 				this.getRadiusEndSlider().setValue(curve.getRadiusEnd());
 				this.getMarksTextField().setEnabled(true);
