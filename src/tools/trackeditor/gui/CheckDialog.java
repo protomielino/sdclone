@@ -120,6 +120,18 @@ public class CheckDialog extends JDialog
 				e.printStackTrace();
 			}
 		}
+
+		String elevationFile = trackData.getGraphic().getTerrainGeneration().getElevationMap();
+
+		if (elevationFile != null && !elevationFile.isEmpty())
+		{
+			File file = new File(Editor.getProperties().getPath() + sep + elevationFile);
+
+			if (!file.exists())
+			{
+				textArea.append("Terrain Generation elevation file " + elevationFile + " not found\n");
+			}
+		}	
 	}
 
 	private File findObjectFile(String object)
