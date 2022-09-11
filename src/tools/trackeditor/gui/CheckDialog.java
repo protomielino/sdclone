@@ -234,7 +234,7 @@ public class CheckDialog extends JDialog
 				{
 					if (name.equals(trackData.getObjects().get(j).getName()))
 					{
-						textArea.append("Track object " + (i + 1) + " " + name + " has same name as Track object " + (j + 1) + " " + trackData.getObjects().get(i).getName() + "\n");						
+						textArea.append("Track object " + (i + 1) + " " + name + " has same name as Track object " + (j + 1) + " " + trackData.getObjects().get(j).getName() + "\n");						
 					}
 				}
 				
@@ -242,7 +242,37 @@ public class CheckDialog extends JDialog
 				{
 					if (name.equals(defaultObjects.get(j).getName()))
 					{
-						textArea.append("Track object " + (i + 1) + " " + name + " has same name as Default object " + (j + 1) + " " + defaultObjects.get(i).getName() + "\n");						
+						textArea.append("Track object " + (i + 1) + " " + name + " has same name as Default object " + (j + 1) + " " + defaultObjects.get(j).getName() + "\n");						
+					}
+				}
+			}
+		}
+
+		// check for duplicate colors
+		for (int i = 0; i < trackData.getObjects().size(); i++)
+		{
+			String name = trackData.getObjects().get(i).getName();
+			int color = trackData.getObjects().get(i).getColor();
+			
+			if (color == Integer.MAX_VALUE)
+			{
+				textArea.append("Track object " + (i + 1) + " missing color\n");
+			}
+			else
+			{
+				for (int j = i + 1; j < trackData.getObjects().size(); j++)
+				{
+					if (color == trackData.getObjects().get(j).getColor())
+					{
+						textArea.append("Track object " + (i + 1) + " " + name + " has same color as Track object " + (j + 1) + " " + trackData.getObjects().get(j).getName() + "\n");						
+					}
+				}
+				
+				for (int j = 0; j < defaultObjects.size(); j++)
+				{
+					if (color == defaultObjects.get(j).getColor())
+					{
+						textArea.append("Track object " + (i + 1) + " " + name + " has same color as Default object " + (j + 1) + " " + defaultObjects.get(j).getName() + "\n");						
 					}
 				}
 			}
