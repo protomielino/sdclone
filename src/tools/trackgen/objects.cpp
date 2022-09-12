@@ -53,12 +53,10 @@ struct group
     ssgBranch	*br;
 };
 
-static struct group	*Groups;
 static float		GroupSize;
 static float		XGroupOffset;
 static float		YGroupOffset;
 static int		XGroupNb;
-static int		GroupNb;
 static int		ObjUniqId = 0;
 
 
@@ -482,32 +480,29 @@ ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
 
 /* insert one leaf in group */
 static void
-InsertInGroup(ssgEntity *ent, ssgRoot* GroupRoot)
+InsertInGroup(ssgLeaf *leaf, ssgRoot* GroupRoot, std::vector<ssgBranch*>& Groups)
 {
     int			grIdx;
-    struct group	*curGrp;
-    float		*center;
+    const float	*center;
 
-    ent->recalcBSphere();
-    center = (float*)ent->getBSphere()->getCenter();
+    leaf->recalcBSphere();
+    center = leaf->getBSphere()->getCenter();
 
     grIdx = (int)((center[0] - XGroupOffset) / GroupSize) +
             XGroupNb * (int)((center[1] - YGroupOffset) / GroupSize);
 
-    curGrp = &(Groups[grIdx]);
-
-    if (curGrp->br == 0)
+    if (Groups[grIdx] == nullptr)
     {
-        curGrp->br = new ssgBranch();
-        GroupRoot->addKid(curGrp->br);
+        Groups[grIdx] = new ssgBranch();
+        GroupRoot->addKid(Groups[grIdx]);
     }
 
-    curGrp->br->addKid(ent);
+    Groups[grIdx]->addKid(leaf);
 }
 
 /* insert leaves in groups */
 static void
-InsertInner(ssgEntity *ent, ssgRoot* GroupRoot)
+InsertInner(ssgEntity *ent, ssgRoot* GroupRoot, std::vector<ssgBranch*>& Groups)
 {
     /* WARNING - RECURSIVE! */
 
@@ -517,18 +512,22 @@ InsertInner(ssgEntity *ent, ssgRoot* GroupRoot)
 
         for (int i = 0; i < br->getNumKids (); i++)
         {
-            InsertInner(br->getKid (i), GroupRoot);
+            InsertInner(br->getKid (i), GroupRoot, Groups);
         }
 
         return;
     }
+    else if (ent->isAKindOf(ssgTypeLeaf()))
+    {
+        ssgLeaf* leaf = (ssgLeaf*)ent;
 
-    InsertInGroup (ent, GroupRoot);
+        InsertInGroup(leaf, GroupRoot, Groups);
+    }
 }
 
 
 static void
-Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot)
+Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot, std::vector<ssgBranch*> &Groups)
 {
     tdble	Margin;
 
@@ -539,16 +538,14 @@ Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot)
 
     XGroupNb = (int)((track->max.x + Margin - (track->min.x - Margin)) / GroupSize) + 1;
 
-    GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
+    int GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
 
-    if (Groups)
-    {
-        free(Groups);
-    }
+    Groups.resize(GroupNb);
 
-    Groups = (struct group *)calloc(GroupNb, sizeof (struct group));
+    for (size_t i = 0; i < Groups.size(); ++i)
+        Groups[i] = nullptr;
 
-    InsertInner(Root, GroupRoot);
+    InsertInner(Root, GroupRoot, Groups);
 }
 
 
@@ -626,9 +623,12 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
             }
         }
 
+        free(MapImage);
+
         ssgRoot *GroupRoot = new ssgRoot();
-        
-        Group(track, TrackHandle, Root, GroupRoot);
+        std::vector<ssgBranch*> Groups;
+
+        Group(track, TrackHandle, Root, GroupRoot, Groups);
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         sprintf(buf, "%s-%s-%d.ac", outputFile.c_str(), extName, index);
