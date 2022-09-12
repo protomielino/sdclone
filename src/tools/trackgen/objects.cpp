@@ -48,7 +48,6 @@
 static char		path[1024];
 static char		buf[1024];
 
-static ssgRoot	*Root = nullptr;
 static ssgRoot	*GroupRoot = nullptr;
 
 struct group
@@ -242,7 +241,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 
 /* Prune the group tree */
 static void
-AddToRoot(ssgEntity *node)
+AddToRoot(ssgRoot *Root, ssgEntity *node)
 {
     if (node->isAKindOf(ssgTypeLeaf()))
     {
@@ -254,13 +253,13 @@ AddToRoot(ssgEntity *node)
 
         for (int i = 0; i < br->getNumKids(); i++)
         {
-            AddToRoot(br->getKid(i));
+            AddToRoot(Root, br->getKid(i));
         }
     }
 }
 
 static void
-AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, unsigned int clr, tdble x, tdble y)
+AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, ssgRoot *Root, unsigned int clr, tdble x, tdble y)
 {
     for (struct objdef *curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
     {
@@ -331,7 +330,7 @@ AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, unsigned int clr
 
             sgMakeTransMat4(m, x, y, z);
             ApplyTransform(m, obj);
-            AddToRoot(obj);
+            AddToRoot(Root, obj);
 
             return;
         }
@@ -527,7 +526,7 @@ InsertInner(ssgEntity *ent)
 
 
 static void
-Group(tTrack *track, void *TrackHandle, ssgEntity *ent)
+Group(tTrack *track, void *TrackHandle, ssgRoot *Root)
 {
     tdble	Margin;
 
@@ -599,7 +598,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     index = 0;
     do
     {
-        Root = new ssgRoot();
+        ssgRoot *Root = new ssgRoot();
 
         index++;
         const char *map = GfParmGetCurStr(TrackHandle, path, TRK_ATT_OBJMAP, "");
@@ -627,7 +626,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
                 if (clr)
                 {
                     printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
-                    AddObject(track, TrackHandle, TrackRoot, clr, i * kX + dX, j * kY + dY);
+                    AddObject(track, TrackHandle, TrackRoot, Root, clr, i * kX + dX, j * kY + dY);
                 }
             }
         }
