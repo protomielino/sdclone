@@ -45,9 +45,6 @@
 #include "ac3d.h"
 #include "objects.h"
 
-static char		path[1024];
-static char		buf[1024];
-
 struct group
 {
     ssgBranch	*br;
@@ -82,9 +79,9 @@ tobjlist objhead;
 int
 GetObjectsNb(void *TrackHandle)
 {
-    sprintf(path, "%s/%s", TRK_SECT_TERRAIN, TRK_SECT_OBJMAP);
+    static const char *section = TRK_SECT_TERRAIN "/" TRK_SECT_OBJMAP;
 
-    return GfParmGetEltNb(TrackHandle, path);
+    return GfParmGetEltNb(TrackHandle, section);
 }
 
 static void
@@ -378,6 +375,7 @@ ssgSaveLeaf (ssgLeaf* vt, FILE *save_fd)
     }
 
     fprintf (save_fd, "OBJECT poly\n");
+    char buf[32];
     sprintf(buf, "obj%d", ObjUniqId++);
     fprintf (save_fd, "name \"%s\"\n", buf);
 
@@ -457,6 +455,7 @@ ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
     if (ent->isAKindOf (ssgTypeBranch()))
     {
         ssgBranch *br = (ssgBranch *) ent;
+        char buf[32];
         sprintf(buf, "objg%d", ObjUniqId++);
         Ac3dGroup (save_fd, buf, ent->getNumKids());
 
@@ -561,14 +560,18 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     tdble		kX, kY, dX, dY;
     unsigned int	clr;
     int			index;
+
+    ssgSetCurrentOptions(&options);
+
     std::string inputPath(track->filename);
     inputPath.resize(inputPath.find_last_of("/"));
 
-    ssgSetCurrentOptions(&options);
-    snprintf(buf, sizeof(buf), "%s;%s/data/objects;%sdata/textures;%sdata/img;.", inputPath.c_str(), GfDataDir(), GfDataDir(), GfDataDir());
-    ssgTexturePath(buf);
-    snprintf(buf, sizeof(buf), ".;%s;%sdata/objects", inputPath.c_str(), GfDataDir());
+    std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
     ssgModelPath("");   // don't need a search path because meshFile has a full path
+
+    std::string texturePath(modelPath + ";" + GfDataDir() + "data/textures");
+    ssgTexturePath(texturePath.c_str());
+
     ssgRoot *TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
     InitObjects(track, TrackHandle);
@@ -580,14 +583,14 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     ymin = track->min.y - Margin;
     ymax = track->max.y + Margin;
 
-    sprintf(path, "%s/%s", TRK_SECT_TERRAIN, TRK_SECT_OBJMAP);
+    static const char * section = TRK_SECT_TERRAIN "/" TRK_SECT_OBJMAP;
 
-    if (GfParmGetEltNb(TrackHandle, path) == 0)
+    if (GfParmGetEltNb(TrackHandle, section) == 0)
     {
         return;
     }
 
-    GfParmListSeekFirst(TrackHandle, path);
+    GfParmListSeekFirst(TrackHandle, section);
 
     index = 0;
     do
@@ -595,11 +598,11 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
         ssgRoot *Root = new ssgRoot();
 
         index++;
-        const char *map = GfParmGetCurStr(TrackHandle, path, TRK_ATT_OBJMAP, "");
-        snprintf(buf, sizeof(buf), "%s/%s", inputPath.c_str(), map);
+        const char *map = GfParmGetCurStr(TrackHandle, section, TRK_ATT_OBJMAP, "");
 
-        printf("Processing object map %s\n", buf);
-        unsigned char *MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0, false);
+        std::string imageFile(inputPath + "/" + map);
+        printf("Processing object map %s\n", imageFile.c_str());
+        unsigned char *MapImage = GfTexReadImageFromPNG(imageFile.c_str(), 2.2, &width, &height, 0, 0, false);
 
         if (!MapImage)
         {
@@ -633,8 +636,8 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
         Group(track, TrackHandle, Root, GroupRoot, Groups);
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
-        sprintf(buf, "%s-%s-%d.ac", outputFile.c_str(), extName, index);
-        FILE *curFd = Ac3dOpen(buf, 1);
+        std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
+        FILE *curFd = Ac3dOpen(objectFile.c_str(), 1);
         ssgSaveACInner(GroupRoot, curFd);
         Ac3dClose(curFd);
 
@@ -645,7 +648,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         delete Root;
         delete GroupRoot;
-    } while (!GfParmListSeekNext(TrackHandle, path));
+    } while (!GfParmListSeekNext(TrackHandle, section));
 
     delete TrackRoot;
 }
