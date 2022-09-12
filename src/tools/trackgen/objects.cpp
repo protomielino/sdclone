@@ -137,7 +137,8 @@ InitObjects(tTrack *track, void *TrackHandle)
     inputPath.resize(inputPath.find_last_of("/"));
 
     snprintf(buf, sizeof(buf), "%s;%sdata/objects", inputPath.c_str(), GfDataDir());
-    ssgModelPath(buf);
+    std::string searchPaths(buf);
+    ssgModelPath("");   // using our own search
 
     snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
     ssgTexturePath(path);
@@ -157,14 +158,16 @@ InitObjects(tTrack *track, void *TrackHandle)
             exit(1);
         }
 
-        curObj->obj = ssgLoadAC(objName);
+        char filename[1024];
+        GetFilename(objName, searchPaths.c_str(), filename);
+        curObj->obj = ssgLoadAC(filename);
 
         if (!curObj->obj)
         {
             exit(1);
         }
 
-        curObj->filename = strdup(buf);
+        curObj->filename = strdup(filename);
 
         ssgFlatten(curObj->obj);
 
