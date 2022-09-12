@@ -400,6 +400,7 @@ int Application::generate()
 
     GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName, OutputFileName);
 
+    Ac3dClose(outfd);
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);
 
