@@ -162,7 +162,7 @@ InitObjects(tTrack *track, void *TrackHandle)
             exit(1);
         }
 
-        curObj->obj = ssgLoadAC(buf);
+        curObj->obj = ssgLoadAC(objName);
 
         if (!curObj->obj)
         {
@@ -647,4 +647,6 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         delete (Root);
     } while (!GfParmListSeekNext(TrackHandle, path));
+
+    delete TrackRoot;
 }
