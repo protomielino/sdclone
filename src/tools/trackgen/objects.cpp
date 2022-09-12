@@ -136,12 +136,11 @@ InitObjects(tTrack *track, void *TrackHandle)
     std::string inputPath(track->filename);
     inputPath.resize(inputPath.find_last_of("/"));
 
-    snprintf(buf, sizeof(buf), "%s;%sdata/objects", inputPath.c_str(), GfDataDir());
-    std::string searchPaths(buf);
+    std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
     ssgModelPath("");   // using our own search
 
-    snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
-    ssgTexturePath(path);
+    std::string texturePath(modelPath + ";" + GfDataDir() + "data/textures");
+    ssgTexturePath(texturePath.c_str());
  
     int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
@@ -159,7 +158,7 @@ InitObjects(tTrack *track, void *TrackHandle)
         }
 
         char filename[1024];
-        GetFilename(objName, searchPaths.c_str(), filename);
+        GetFilename(objName, modelPath.c_str(), filename);
         curObj->obj = ssgLoadAC(filename);
 
         if (!curObj->obj)
