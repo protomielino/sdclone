@@ -129,7 +129,6 @@ static void scaleObject(ssgEntity *obj, tdble scale)
 static void
 InitObjects(tTrack *track, void *TrackHandle)
 {
-    static char		*search;
     ssgLoaderOptionsEx	options ;
 
     ObjUniqId = 0;
@@ -144,12 +143,11 @@ InitObjects(tTrack *track, void *TrackHandle)
     inputPath.resize(inputPath.find_last_of("/"));
 
     snprintf(buf, sizeof(buf), "%s;%sdata/objects", inputPath.c_str(), GfDataDir());
-    search = strdup(buf);
+    ssgModelPath(buf);
 
     snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
     ssgTexturePath(path);
-    ssgModelPath(path);
-
+ 
     int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
 
@@ -165,7 +163,6 @@ InitObjects(tTrack *track, void *TrackHandle)
             exit(1);
         }
 
-        GetFilename(objName, search, buf);
         curObj->obj = ssgLoadAC(buf);
 
         if (!curObj->obj)
@@ -242,8 +239,6 @@ InitObjects(tTrack *track, void *TrackHandle)
         GF_TAILQ_INSERT_HEAD(&objhead, curObj, link);
         GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
     }
-
-    free(search);
 }
 
 /* Prune the group tree */
@@ -581,7 +576,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     snprintf(buf, sizeof(buf), "%s;%s/data/objects;%sdata/textures;%sdata/img;.", inputPath.c_str(), GfDataDir(), GfDataDir(), GfDataDir());
     ssgTexturePath(buf);
     snprintf(buf, sizeof(buf), ".;%s;%sdata/objects", inputPath.c_str(), GfDataDir());
-    ssgModelPath(buf);
+    ssgModelPath("");   // don't need a search path because meshFile has a full path
     TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
     InitObjects(track, TrackHandle);
