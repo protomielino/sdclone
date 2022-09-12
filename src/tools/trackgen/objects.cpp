@@ -344,14 +344,12 @@ struct saveTriangle
     sgVec2 t[3];
 };
 
-static int
-ssgSaveLeaf (ssgEntity *ent, FILE *save_fd)
+static bool
+ssgSaveLeaf (ssgLeaf* vt, FILE *save_fd)
 {
     int i;
     static sgVec3       *vlist;
     static saveTriangle *tlist;
-
-    ssgLeaf *vt = (ssgLeaf *)ent;
 
     int num_verts = vt->getNumVertices();
     int num_tris  = vt->getNumTriangles();
@@ -448,10 +446,10 @@ ssgSaveLeaf (ssgEntity *ent, FILE *save_fd)
     delete[] vlist;
     delete[] tlist;
 
-    return TRUE;
+    return true;
 }
 
-static int
+static bool
 ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
 {
     /* WARNING - RECURSIVE! */
@@ -466,14 +464,20 @@ ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
         {
             if (! ssgSaveACInner(br->getKid (i), save_fd))
             {
-                return FALSE;
+                return false;
             }
         }
 
-        return TRUE;
+        return true;
+    }
+    else if (ent->isAKindOf(ssgTypeLeaf()))
+    {
+        ssgLeaf* vt = (ssgLeaf *)ent;
+
+        return ssgSaveLeaf(vt, save_fd);
     }
 
-    return ssgSaveLeaf (ent, save_fd);
+    return false;
 }
 
 /* insert one leaf in group */
