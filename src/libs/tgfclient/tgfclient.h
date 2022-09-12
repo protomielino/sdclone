@@ -98,6 +98,7 @@ TGFCLIENT_API tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex);
 
 TGFCLIENT_API bool GfScrUsingResizableWindow();
 TGFCLIENT_API void GfScrToggleFullScreen(void* unused);
+TGFCLIENT_API void GfScrToggleMultiFullScreens(void* unused);
 
 /********************
  * Music Interface *

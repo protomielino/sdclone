@@ -90,6 +90,7 @@ GfuiMenuDefaultKeysAdd(void* scr)
     if(GfScrUsingResizableWindow())
     {
         GfuiAddKey(scr, GFUIK_RETURN, GFUIM_ALT, "Toggle Full-screen", (void*)0, GfScrToggleFullScreen, NULL);
+        GfuiAddKey(scr, GFUIK_RETURN, GFUIM_CTRL | GFUIM_ALT, "Toggle Multi Full-screens", (void*)0, GfScrToggleMultiFullScreens, NULL);
     }
 }
 

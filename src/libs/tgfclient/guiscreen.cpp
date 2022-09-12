@@ -62,6 +62,8 @@ void GfScrInitialWindowedPosition();
 void gfScrSaveWindowState();
 bool gfScrAAOpenGLSetup();
 void gfScrDisableResizable();
+bool GfscrAllowMultiFullScreens();
+SDL_Rect GetMultiFullScreenBounds();
 
 
 // The screen properties.
@@ -1207,10 +1209,18 @@ void GfScrInitialWindowedPosition()
     SDL_SetWindowSize(GfuiWindow, w, h);
 
     if(max)
+    {
         SDL_MaximizeWindow(GfuiWindow);
+    }
 
-    if(full)
+    if(full == 1)
+    {
         SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+    else if(full == 2)
+    {
+        GfScrToggleMultiFullScreens(NULL);
+    }
 }
 
 bool GfScrInitSDL2()
@@ -1283,7 +1293,114 @@ void GfScrToggleFullScreen(void* unused)
     }
     else
     {
+        if (flags & SDL_WINDOW_BORDERLESS) // we are MultiFullScreen
+        {
+            GfScrToggleMultiFullScreens(NULL);
+        }
         GfScrSetFullscreen(true);
+    }
+    return;
+}
+
+SDL_Rect GetMultiFullScreenBounds()
+{
+    SDL_Rect bounds;
+    SDL_Rect maxBounds;
+    int nDisplays = SDL_GetNumVideoDisplays();
+    for(int i = 0;i < nDisplays;i++)
+    {
+        if(SDL_GetDisplayBounds(i, &bounds) == 0)
+        {
+            if(i == 0) 
+            {
+                maxBounds = bounds;
+            }
+            else
+            {
+                if(bounds.x < maxBounds.x)
+                    maxBounds.x = bounds.x;
+
+                maxBounds.w += bounds.w;
+            }
+        }
+    }
+    return maxBounds;
+}
+
+bool GfscrAllowMultiFullScreens()
+{
+    bool bRet = false;
+    SDL_Rect bounds;
+
+    int nDisplays = SDL_GetNumVideoDisplays();
+    if(nDisplays > 1)
+    {
+        int height = 0;
+        int top = 0;
+        for(int i = 0;i < nDisplays;i++)
+        {
+            if(SDL_GetDisplayBounds(i, &bounds) == 0)
+            {
+                if(i == 0) 
+                {
+                    top = bounds.y;
+                    height = bounds.h;
+                    bRet = true;
+                    continue;
+                }
+                if((bounds.h != height) || (bounds.y != top))
+                {
+                    bRet = false;
+                    break;
+                }
+            }
+            else
+            {
+                bRet = false;
+                break;
+            }
+        }
+    }
+
+    return bRet;
+}
+
+void GfScrToggleMultiFullScreens(void* unused)
+{
+    static int restoreX = 0;
+    static int restoreY = 0;
+    static int restoreW = 800;
+    static int restoreH = 600;
+    Uint32 flags = SDL_GetWindowFlags(GfuiWindow);
+
+    if (flags & SDL_WINDOW_BORDERLESS) // we are MultiFullScreen
+    {
+        SDL_SetWindowBordered(GfuiWindow, SDL_TRUE);
+        SDL_SetWindowPosition(GfuiWindow, restoreX, restoreY);
+        SDL_SetWindowSize(GfuiWindow, restoreW, restoreH);
+    }
+    else if(GfscrAllowMultiFullScreens()) // NOT in Full-multiscreen
+    {
+        if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP))
+        {
+            GfScrSetFullscreen(false);
+        }
+
+        SDL_GetWindowPosition(GfuiWindow, &restoreX, &restoreY);
+        SDL_GetWindowSize(GfuiWindow, &restoreW, &restoreH);
+
+        SDL_SetWindowBordered(GfuiWindow, SDL_FALSE);
+        SDL_Rect bounds = GetMultiFullScreenBounds();
+
+        if(!SDL_RectEmpty(&bounds))
+        {
+            SDL_SetWindowPosition(GfuiWindow,bounds.x, bounds.y);
+            SDL_SetWindowSize(GfuiWindow, bounds.w, bounds.h);
+        }
+        else
+        {
+            GfLogError("GetMultiFullScreenBounds() returned an empty rectangle.\n");
+        }
     }
     return;
 }
@@ -1296,12 +1413,18 @@ void gfScrSaveWindowState()
     int x = 0;
     int y = 0;
     int w = 0;
-    int h = 0; 
+    int h = 0;
     int full = 0;
     int max = 0;
+
     int dispIndex = SDL_GetWindowDisplayIndex(GfuiWindow);
 
     Uint32 flags = SDL_GetWindowFlags(GfuiWindow);
+    if (flags & SDL_WINDOW_BORDERLESS) // we are MultiFullScreen
+    {
+        full = 2;
+        GfScrToggleMultiFullScreens(NULL);
+    }
     if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP))
     {
         full = 1;
