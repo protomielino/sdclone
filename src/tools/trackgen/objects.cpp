@@ -50,7 +50,6 @@ static char		buf[1024];
 
 static ssgRoot	*Root = nullptr;
 static ssgRoot	*GroupRoot = nullptr;
-static ssgRoot	*TrackRoot = nullptr;
 
 struct group
 {
@@ -261,7 +260,7 @@ AddToRoot(ssgEntity *node)
 }
 
 static void
-AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
+AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, unsigned int clr, tdble x, tdble y)
 {
     for (struct objdef *curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
     {
@@ -577,7 +576,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     ssgTexturePath(buf);
     snprintf(buf, sizeof(buf), ".;%s;%sdata/objects", inputPath.c_str(), GfDataDir());
     ssgModelPath("");   // don't need a search path because meshFile has a full path
-    TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
+    ssgRoot *TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
     InitObjects(track, TrackHandle);
 
@@ -628,7 +627,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
                 if (clr)
                 {
                     printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
-                    AddObject(track, TrackHandle, clr, i * kX + dX, j * kY + dY);
+                    AddObject(track, TrackHandle, TrackRoot, clr, i * kX + dX, j * kY + dY);
                 }
             }
         }
