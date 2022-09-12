@@ -48,8 +48,6 @@
 static char		path[1024];
 static char		buf[1024];
 
-static ssgRoot	*GroupRoot = nullptr;
-
 struct group
 {
     ssgBranch	*br;
@@ -98,7 +96,7 @@ ApplyTransform(sgMat4 m, ssgBase *node)
     {
         ((ssgLeaf *)node)->transform(m);
     }
-    else
+    else if (node->isAKindOf(ssgTypeBranch()))
     {
         ssgBranch *br = (ssgBranch *)node;
 
@@ -247,7 +245,7 @@ AddToRoot(ssgRoot *Root, ssgEntity *node)
     {
         Root->addKid(node);
     }
-    else
+    else if (node->isAKindOf(ssgTypeBranch()))
     {
         ssgBranch *br = (ssgBranch *)node;
 
@@ -480,7 +478,7 @@ ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
 
 /* insert one leaf in group */
 static void
-InsertInGroup(ssgEntity *ent)
+InsertInGroup(ssgEntity *ent, ssgRoot* GroupRoot)
 {
     int			grIdx;
     struct group	*curGrp;
@@ -505,7 +503,7 @@ InsertInGroup(ssgEntity *ent)
 
 /* insert leaves in groups */
 static void
-InsertInner(ssgEntity *ent)
+InsertInner(ssgEntity *ent, ssgRoot* GroupRoot)
 {
     /* WARNING - RECURSIVE! */
 
@@ -515,27 +513,20 @@ InsertInner(ssgEntity *ent)
 
         for (int i = 0; i < br->getNumKids (); i++)
         {
-            InsertInner(br->getKid (i));
+            InsertInner(br->getKid (i), GroupRoot);
         }
 
         return;
     }
 
-    InsertInGroup (ent);
+    InsertInGroup (ent, GroupRoot);
 }
 
 
 static void
-Group(tTrack *track, void *TrackHandle, ssgRoot *Root)
+Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot)
 {
     tdble	Margin;
-
-    if (GroupRoot)
-    {
-        delete (GroupRoot);
-    }
-
-    GroupRoot = new ssgRoot();
 
     Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
     GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
@@ -553,7 +544,7 @@ Group(tTrack *track, void *TrackHandle, ssgRoot *Root)
 
     Groups = (struct group *)calloc(GroupNb, sizeof (struct group));
 
-    InsertInner(Root);
+    InsertInner(Root, GroupRoot);
 }
 
 
@@ -631,7 +622,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
             }
         }
 
-        Group(track, TrackHandle, Root);
+        ssgRoot *GroupRoot = new ssgRoot();
+        
+        Group(track, TrackHandle, Root, GroupRoot);
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         sprintf(buf, "%s-%s-%d.ac", outputFile.c_str(), extName, index);
@@ -644,7 +637,8 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
             ssgSaveACInner(GroupRoot, save_fd);
         }
 
-        delete (Root);
+        delete Root;
+        delete GroupRoot;
     } while (!GfParmListSeekNext(TrackHandle, path));
 
     delete TrackRoot;
