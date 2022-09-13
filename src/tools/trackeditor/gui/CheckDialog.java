@@ -175,11 +175,15 @@ public class CheckDialog extends JDialog
 
 		return file;
 	}
+	private Boolean hasText(String text)
+	{
+		return !(text == null || text.isEmpty() || text.isBlank());
+	}
 	private void checkTrackObject(TrackObject trackObject, String type)
 	{
 		String	object = trackObject.getObject();
 
-		if (object == null || object.isEmpty())
+		if (!hasText(object))
 		{
 			textArea.append(type + " object " + object + " missing model\n");
 			return;
@@ -203,18 +207,7 @@ public class CheckDialog extends JDialog
 		        if (line.startsWith("texture"))
 		        {
 		        	String texture = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
-
-		        	file = findTextureFile(texture);
-
-		        	if (file == null)
-		        	{
-		        		textArea.append(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " not found\n");
-		        	}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " should be converted to png format\n");
-					}
+		        	checkTexture(type + " object " + trackObject.getName() + " model " + object, texture);
 		        }
 		    }
 		    br.close();
@@ -223,6 +216,36 @@ public class CheckDialog extends JDialog
 		{
 			e.printStackTrace();
 		}
+	}
+	private void checkTexture(String description, String texture)
+	{
+		Vector<String> messages = new Vector<String>();
+		if (!hasText(texture))
+		{
+			messages.add(" missing texture\n");
+		}
+		else
+		{
+			File textureFile = findTextureFile(texture);
+			if (textureFile == null)
+			{
+				messages.add(" texture " + texture + " not found\n");
+			}
+
+			if (texture.endsWith(".rgb"))
+			{
+				messages.add(" texture " + texture + " should be converted to png format\n");
+			}
+			
+			if (texture.contains("/") || texture.contains("\\"))
+			{
+				messages.add(" texture " + texture + " should remove path\n");
+			}
+		}
+    	for (int i = 0; i < messages.size(); i++)
+    	{
+    		textArea.append(description + messages.get(i));
+    	}
 	}
 	private void checkObjects()
 	{
@@ -313,61 +336,25 @@ public class CheckDialog extends JDialog
 	}
 	private void checkSurface(String surface, String description)
 	{
-		if (surface == null)
+		if (surface == null || surface.isEmpty())
 			return;
+		
+		String message = description + " surface " + surface;
 
 		for (int i = 0; i < trackData.getSurfaces().size(); i++)
 		{
 			if (trackData.getSurfaces().get(i).getName().equals(surface))
 			{
 				String texture = trackData.getSurfaces().get(i).getTextureName();
-				if (texture == null || texture.isEmpty())
-				{
-					textArea.append(description + " surface " + surface + " missing texture\n");
-				}
-				else
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " texture " + texture + " should be converted to png format\n");
-					}
-				}
+				checkTexture(message, texture);
 
 				texture = trackData.getSurfaces().get(i).getBumpName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " Bump texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " Bump texture " + texture + " should be converted to png format\n");
-					}
-				}
+				if (hasText(texture))
+					checkTexture(message + " Bump ", texture);
 
 				texture = trackData.getSurfaces().get(i).getRacelineName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " should be converted to png format\n");
-					}
-				}
+				if (hasText(texture))
+					checkTexture(message + " Raceline ", texture);
 
 				return;
 			}
@@ -377,53 +364,15 @@ public class CheckDialog extends JDialog
 			if (defaultSurfaces.get(i).getName().equals(surface))
 			{
 				String texture = defaultSurfaces.get(i).getTextureName();
-				if (texture == null || texture.isEmpty())
-				{
-					textArea.append(description + " surface " + surface + " missing texture\n");
-				}
-				else
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " texture " + texture + " should be converted to png format\n");
-					}
-				}
+				checkTexture(message, texture);
 
 				texture = defaultSurfaces.get(i).getBumpName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " Bump texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " Bump texture " + texture + " should be converted to png format\n");
-					}
-				}
+				if (hasText(texture))
+					checkTexture(message + " Bump ", texture);
 
 				texture = defaultSurfaces.get(i).getRacelineName();
-				if (texture != null && !texture.isEmpty())
-				{
-					File textureFile = findTextureFile(texture);
-					if (textureFile == null)
-					{
-						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " not found\n");
-					}
-
-					if (texture.endsWith(".rgb"))
-					{
-						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " should be converted to png format\n");
-					}
-				}
+				if (hasText(texture))
+					checkTexture(message + " Raceline ", texture);
 
 				return;
 			}
@@ -438,7 +387,7 @@ public class CheckDialog extends JDialog
 		{
 			String name = trackData.getSurfaces().get(i).getName();
 			
-			if (name == null || name.isEmpty())
+			if (!hasText(name))
 			{
 				textArea.append("Track surface " + (i + 1) + " missing name\n");
 			}
