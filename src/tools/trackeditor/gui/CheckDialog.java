@@ -203,11 +203,18 @@ public class CheckDialog extends JDialog
 		        if (line.startsWith("texture"))
 		        {
 		        	String texture = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
-		        	
+
 		        	file = findTextureFile(texture);
-		        	
+
 		        	if (file == null)
-		        		textArea.append(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " not found\n");						
+		        	{
+		        		textArea.append(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " not found\n");
+		        	}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(type + " object " + trackObject.getName() + " model " + object + " texture " + texture + " should be converted to png format\n");
+					}
 		        }
 		    }
 		    br.close();
@@ -237,7 +244,7 @@ public class CheckDialog extends JDialog
 						textArea.append("Track object " + (i + 1) + " " + name + " has same name as Track object " + (j + 1) + " " + trackData.getObjects().get(j).getName() + "\n");						
 					}
 				}
-				
+
 				for (int j = 0; j < defaultObjects.size(); j++)
 				{
 					if (name.equals(defaultObjects.get(j).getName()))
@@ -267,7 +274,7 @@ public class CheckDialog extends JDialog
 						textArea.append("Track object " + (i + 1) + " " + name + " has same color as Track object " + (j + 1) + " " + trackData.getObjects().get(j).getName() + "\n");						
 					}
 				}
-				
+
 				for (int j = 0; j < defaultObjects.size(); j++)
 				{
 					if (color == defaultObjects.get(j).getColor())
@@ -322,7 +329,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				texture = trackData.getSurfaces().get(i).getBumpName();
@@ -330,7 +344,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " Bump texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " Bump texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				texture = trackData.getSurfaces().get(i).getRacelineName();
@@ -338,7 +359,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				return;
@@ -357,7 +385,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				texture = defaultSurfaces.get(i).getBumpName();
@@ -365,7 +400,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " Bump texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " Bump texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				texture = defaultSurfaces.get(i).getRacelineName();
@@ -373,7 +415,14 @@ public class CheckDialog extends JDialog
 				{
 					File textureFile = findTextureFile(texture);
 					if (textureFile == null)
+					{
 						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " not found\n");
+					}
+
+					if (texture.endsWith(".rgb"))
+					{
+						textArea.append(description + " surface " + surface + " Raceline texture " + texture + " should be converted to png format\n");
+					}
 				}
 
 				return;
