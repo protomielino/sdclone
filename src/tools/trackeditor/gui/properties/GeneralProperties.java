@@ -85,7 +85,7 @@ public class GeneralProperties extends PropertyPanel
 		addLabel(this, 7, copyrightLabel, "Copyright", 80);
 		addLabel(this, 8, descriptionLabel, "Description", 80);
 
-		addTextField(this, 0, nameTextField, getEditorFrame().getTrackData().getHeader().getName(), 130, 150);
+		addTextField(this, 0, nameTextField, getEditorFrame().getTrackData().getHeader().getName(), 130, 200);
 
 		add(getCategoryComboBox(), null);
 		add(getSubcategoryComboBox(), null);
@@ -109,7 +109,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			categoryComboBox = new JComboBox<String>(items);
-			categoryComboBox.setBounds(130, 37, 100, 23);
+			categoryComboBox.setBounds(130, 37, 125, 23);
 			categoryComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getCategory());
 		}
 		return categoryComboBox;
@@ -126,7 +126,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "short", "long"};
 			subcategoryComboBox = new JComboBox<String>(items);
-			subcategoryComboBox.setBounds(130, 64, 100, 23);
+			subcategoryComboBox.setBounds(130, 64, 125, 23);
 			String subcategory = getEditorFrame().getTrackData().getHeader().getSubcategory();
 			if (subcategory == null)
 				subcategory = "none";
@@ -146,7 +146,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"3", "4", "5"};
 			versionComboBox = new JComboBox<String>(items);
-			versionComboBox.setBounds(130, 91, 100, 23);
+			versionComboBox.setBounds(130, 91, 125, 23);
 			versionComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getVersion() + "");
 		}
 		return versionComboBox;
@@ -163,7 +163,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "1"};
 			skyVersionComboBox = new JComboBox<String>(items);
-			skyVersionComboBox.setBounds(130, 118, 100, 23);
+			skyVersionComboBox.setBounds(130, 118, 125, 23);
 			int version = getEditorFrame().getTrackData().getHeader().getSkyVersion();
 			String stringVersion;
 			if (version == Integer.MAX_VALUE)

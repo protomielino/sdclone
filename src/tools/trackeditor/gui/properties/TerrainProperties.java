@@ -127,16 +127,16 @@ public class TerrainProperties extends PropertyPanel
 		addLabel(this, 9, reliefFileLabel, "Reliefe File", 120);
 		addLabel(this, 10, surfaceLabel, "Surface", 120);
 
-		addTextField(this, 0, trackStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), 140, 100);
-		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 100);
-		addTextField(this, 2, borderStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderStep(), 140, 100);
-		addTextField(this, 3, borderHeightTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderHeight(), 140, 100);
+		addTextField(this, 0, trackStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), 140, 125);
+		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 125);
+		addTextField(this, 2, borderStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderStep(), 140, 125);
+		addTextField(this, 3, borderHeightTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderHeight(), 140, 125);
 
 		this.add(getOrientationComboBox(), null);
 
-		addTextField(this, 5, maximumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude(), 140, 100);
-		addTextField(this, 6, minimumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude(), 140, 100);
-		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), 140, 100);
+		addTextField(this, 5, maximumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude(), 140, 125);
+		addTextField(this, 6, minimumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude(), 140, 125);
+		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), 140, 125);
 		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), 140, 295);
 		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), 140, 295);
 
@@ -162,7 +162,7 @@ public class TerrainProperties extends PropertyPanel
 			String[] items =
 			{"none", "clockwise", "counter-clockwise"};
 			orientationComboBox = new JComboBox<String>(items);
-			orientationComboBox.setBounds(140, 118, 120, 23);
+			orientationComboBox.setBounds(140, 118, 125, 23);
 			String orientation = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getOrientation();
 			if (orientation == null || orientation.isEmpty())
 				orientation = "none";

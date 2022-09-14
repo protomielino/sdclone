@@ -152,19 +152,19 @@ public class PitProperties extends PropertyPanel
 
 		Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
 
-		addTextField(this, 2, entryTextField, pits.getEntry(), 120, 100);
-		addTextField(this, 3, startTextField, pits.getStart(), 120, 100);
-		addTextField(this, 4, startBuildingsTextField, pits.getStartBuildings(), 120, 100);
-		addTextField(this, 5, stopBuildingsTextField, pits.getStopBuildings(), 120, 100);
-		addTextField(this, 6, maxPitsTextField, pits.getMaxPits(), 120, 100);
-		addTextField(this, 7, endTextField, pits.getEnd(), 120, 100);
-		addTextField(this, 8, exitTextField, pits.getExit(), 120, 100);
-		addTextField(this, 9, widthTextField, pits.getWidth(), 120, 40);
-		addTextField(this, 10, lengthTextField, pits.getLength(), 120, 40);
+		addTextField(this, 2, entryTextField, pits.getEntry(), 120, 125);
+		addTextField(this, 3, startTextField, pits.getStart(), 120, 125);
+		addTextField(this, 4, startBuildingsTextField, pits.getStartBuildings(), 120, 125);
+		addTextField(this, 5, stopBuildingsTextField, pits.getStopBuildings(), 120, 125);
+		addTextField(this, 6, maxPitsTextField, pits.getMaxPits(), 120, 125);
+		addTextField(this, 7, endTextField, pits.getEnd(), 120, 125);
+		addTextField(this, 8, exitTextField, pits.getExit(), 120, 125);
+		addTextField(this, 9, widthTextField, pits.getWidth(), 120, 125);
+		addTextField(this, 10, lengthTextField, pits.getLength(), 120, 125);
 
 		add(getIndicatorComboBox(), null);
 
-		addTextField(this, 12, speedLimitTextField, pits.getSpeedLimit(), 120, 40);
+		addTextField(this, 12, speedLimitTextField, pits.getSpeedLimit(), 120, 125);
 
 		add(getGeneratePitsCheckBox(), null);
 		add(getTabbedPane(), null);		
@@ -207,7 +207,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "no pits", "on track side", "on separate path", "no building"};
 			styleComboBox = new JComboBox<String>(items);
-			styleComboBox.setBounds(120, 10, 120, 23);
+			styleComboBox.setBounds(120, 10, 125, 23);
 			int style = getEditorFrame().getTrackData().getMainTrack().getPits().getStyle();
 			if (style == Integer.MAX_VALUE)
 				style = 0;
@@ -229,7 +229,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "right", "left"};
 			sideComboBox = new JComboBox<String>(items);
-			sideComboBox.setBounds(120, 37, 80, 23);
+			sideComboBox.setBounds(120, 37, 125, 23);
 			String side = getEditorFrame().getTrackData().getMainTrack().getPits().getSide();
 			if (side == null || side.isEmpty())
 				side = "none";
@@ -249,7 +249,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "no", "yes"};
 			indicatorComboBox = new JComboBox<String>(items);
-			indicatorComboBox.setBounds(120, 307, 80, 23);
+			indicatorComboBox.setBounds(120, 307, 125, 23);
 			int indicator = getEditorFrame().getTrackData().getMainTrack().getPits().getIndicator();
 			if (indicator == Integer.MAX_VALUE)
 				indicator = 0;
@@ -521,8 +521,8 @@ public class PitProperties extends PropertyPanel
 			add(getSurfaceComboBox(), null);
 			add(getBorderTypeComboBox(), null);
 			add(getBorderSurfaceComboBox(), null);
-			addTextField(this, 3, borderHeightTextField, 0, 130, 100);
-			addTextField(this, 4, borderWidthTextField, 0, 130, 280);
+			addTextField(this, 3, borderHeightTextField, 0, 130, 125);
+			addTextField(this, 4, borderWidthTextField, 0, 130, 125);
 			
 			setPitInfo(pitInfo);
 		}
@@ -565,7 +565,7 @@ public class PitProperties extends PropertyPanel
 			{
 				String[] types = { "none", "curb", "wall" };
 				borderTypeComboBox = new JComboBox<String>(types);
-				borderTypeComboBox.setBounds(130, 38, 180, 23);
+				borderTypeComboBox.setBounds(130, 38, 125, 23);
 				borderTypeComboBox.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)

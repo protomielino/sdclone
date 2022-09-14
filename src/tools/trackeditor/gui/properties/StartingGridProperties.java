@@ -73,14 +73,14 @@ public class StartingGridProperties extends PropertyPanel
 		addLabel(this, 4, offsetWithinAColumnLabel, "Offset Within A Column", 180);
 		addLabel(this, 5, initialHeightLabel, "Initial Height", 180);
 
-		addTextField(this, 0, rowsTextField, getEditorFrame().getTrackData().getStartingGrid().getRows(), 190, 100);
+		addTextField(this, 0, rowsTextField, getEditorFrame().getTrackData().getStartingGrid().getRows(), 190, 125);
 
 		add(getPolePositionSideComboBox(), null);
 
-		addTextField(this, 2, distanceToStartTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceToStart(), 190, 100);
-		addTextField(this, 3, distanceBetweenColumnsTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceBetweenColumns(), 190, 100);
-		addTextField(this, 4, offsetWithinAColumnTextField, getEditorFrame().getTrackData().getStartingGrid().getOffsetWithinAColumn(), 190, 100);
-		addTextField(this, 5, initialHeightTextField, getEditorFrame().getTrackData().getStartingGrid().getInitialHeight(), 190, 100);
+		addTextField(this, 2, distanceToStartTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceToStart(), 190, 125);
+		addTextField(this, 3, distanceBetweenColumnsTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceBetweenColumns(), 190, 125);
+		addTextField(this, 4, offsetWithinAColumnTextField, getEditorFrame().getTrackData().getStartingGrid().getOffsetWithinAColumn(), 190, 125);
+		addTextField(this, 5, initialHeightTextField, getEditorFrame().getTrackData().getStartingGrid().getInitialHeight(), 190, 125);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class StartingGridProperties extends PropertyPanel
 		{
 			String[] items = {"none", "right", "left"};
 			polePositionSideComboBox = new JComboBox<String>(items);
-			polePositionSideComboBox.setBounds(190, 37, 80, 23);
+			polePositionSideComboBox.setBounds(190, 37, 125, 23);
 			String side = getEditorFrame().getTrackData().getStartingGrid().getPolePositionSide();
 			if (side == null || side.isEmpty())
 				side = "none";

@@ -69,7 +69,7 @@ public class ImageProperties extends PropertyPanel
 		addLabel(this, 1, pathLabel, "Image scale", 80);
 
 		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 335);
-		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 50);
+		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 125);
 
 		this.add(getPathButton(), null);
 	}

@@ -311,35 +311,35 @@ public class SurfaceProperties extends PropertyPanel
 			addLabel(this, 20, damageLabel, "Damage", 180);
 			addLabel(this, 21, reboundLabel, "Rebound", 180);
 
-			addTextField(this, 0, nameTextField, surface.getName(), 190, 100);
-			addTextField(this, 1, colorR1TextField, surface.getColorR1(), 190, 100);
-			addTextField(this, 2, colorG1TextField, surface.getColorG1(), 190, 100);
-			addTextField(this, 3, colorB1TextField, surface.getColorB1(), 190, 100);
-			addTextField(this, 4, colorR2TextField, surface.getColorR2(), 190, 100);
-			addTextField(this, 5, colorG2TextField, surface.getColorG2(), 190, 100);
-			addTextField(this, 6, colorB2TextField, surface.getColorB2(), 190, 100);
+			addTextField(this, 0, nameTextField, surface.getName(), 190, 125);
+			addTextField(this, 1, colorR1TextField, surface.getColorR1(), 190, 125);
+			addTextField(this, 2, colorG1TextField, surface.getColorG1(), 190, 125);
+			addTextField(this, 3, colorB1TextField, surface.getColorB1(), 190, 125);
+			addTextField(this, 4, colorR2TextField, surface.getColorR2(), 190, 125);
+			addTextField(this, 5, colorG2TextField, surface.getColorG2(), 190, 125);
+			addTextField(this, 6, colorB2TextField, surface.getColorB2(), 190, 125);
 			addTextField(this, 7, textureNameTextField, surface.getTextureName(), 190, 220);
 
 			add(getTextureTypeComboBox(), null);
 			getTextureTypeComboBox().setSelectedItem(toNoneString(surface.getTextureType()));
 
-			addTextField(this, 9, textureSizeTextField, surface.getTextureSize(), 190, 100);
+			addTextField(this, 9, textureSizeTextField, surface.getTextureSize(), 190, 125);
 
 			add(getTextureLinkWithPreviousComboBox(), null);
 			getTextureLinkWithPreviousComboBox().setSelectedItem(toNoneString(surface.getTextureLinkWithPrevious()));
 			add(getTextureStartOnBoundaryComboBox(), null);
 			getTextureStartOnBoundaryComboBox().setSelectedItem(toNoneString(surface.getTextureStartOnBoundary()));
 
-			addTextField(this, 12, textureMipMapTextField, surface.getTextureMipMap(), 190, 100);
-			addTextField(this, 13, frictionTextField, surface.getFriction(), 190, 100);
-			addTextField(this, 14, rollingResistanceTextField, surface.getRollingResistance(), 190, 100);
+			addTextField(this, 12, textureMipMapTextField, surface.getTextureMipMap(), 190, 125);
+			addTextField(this, 13, frictionTextField, surface.getFriction(), 190, 125);
+			addTextField(this, 14, rollingResistanceTextField, surface.getRollingResistance(), 190, 125);
 			addTextField(this, 15, bumpNameTextField, surface.getBumpName(), 190, 220);
-			addTextField(this, 16, bumpSizeTextField, surface.getBumpSize(), 190, 100);
-			addTextField(this, 17, roughnessTextField, surface.getRoughness(), 190, 100);
-			addTextField(this, 18, roughnessWavelengthTextField, surface.getRoughnessWavelength(), 190, 100);
+			addTextField(this, 16, bumpSizeTextField, surface.getBumpSize(), 190, 125);
+			addTextField(this, 17, roughnessTextField, surface.getRoughness(), 190, 125);
+			addTextField(this, 18, roughnessWavelengthTextField, surface.getRoughnessWavelength(), 190, 125);
 			addTextField(this, 19, racelineNameTextField, surface.getRacelineName(), 190, 220);
-			addTextField(this, 20, damageTextField, surface.getDammage(), 190, 100);
-			addTextField(this, 21, reboundTextField, surface.getRebound(), 190, 100);
+			addTextField(this, 20, damageTextField, surface.getDammage(), 190, 125);
+			addTextField(this, 21, reboundTextField, surface.getRebound(), 190, 125);
 
 			if (defaultSurfaces)
 			{
@@ -380,7 +380,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "discrete", "continuous"};
 				textureTypeComboBox = new JComboBox<String>(items);
-				textureTypeComboBox.setBounds(190, 226, 120, 23);
+				textureTypeComboBox.setBounds(190, 226, 125, 23);
 			}
 			return textureTypeComboBox;
 		}
@@ -391,7 +391,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "yes", "no"};
 				textureLinkWithPreviousComboBox = new JComboBox<String>(items);
-				textureLinkWithPreviousComboBox.setBounds(190, 280, 120, 23);
+				textureLinkWithPreviousComboBox.setBounds(190, 280, 125, 23);
 			}
 			return textureLinkWithPreviousComboBox;
 		}
@@ -402,7 +402,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "yes", "no"};
 				textureStartOnBoundaryComboBox = new JComboBox<String>(items);
-				textureStartOnBoundaryComboBox.setBounds(190, 307, 120, 23);
+				textureStartOnBoundaryComboBox.setBounds(190, 307, 125, 23);
 			}
 			return textureStartOnBoundaryComboBox;
 		}

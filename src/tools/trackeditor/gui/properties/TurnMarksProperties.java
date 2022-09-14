@@ -70,10 +70,10 @@ public class TurnMarksProperties extends PropertyPanel
 		addLabel(this, 2, verticalSpaceLabel, "Vertical Space", 120);
 		addLabel(this, 3, horizontalSpaceLabel, "Horizontal Space", 120);
 
-		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getWidth(), 130, 100);
-		addTextField(this, 1, heightTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHeight(), 130, 100);
-		addTextField(this, 2, verticalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getVerticalSpace(), 130, 100);
-		addTextField(this, 3, horizontalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHorizontalSpace(), 130, 100);
+		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getWidth(), 130, 125);
+		addTextField(this, 1, heightTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHeight(), 130, 125);
+		addTextField(this, 2, verticalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getVerticalSpace(), 130, 125);
+		addTextField(this, 3, horizontalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHorizontalSpace(), 130, 125);
 
 		add(getDefaultButton(), null);
 		add(getDeleteButton(), null);

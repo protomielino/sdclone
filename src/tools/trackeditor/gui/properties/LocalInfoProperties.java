@@ -78,14 +78,14 @@ public class LocalInfoProperties extends PropertyPanel
 		addLabel(this, 6, sunAscensionLabel, "Sun Ascension", 150);
 		addLabel(this, 7, altitudeLabel, "Altitude", 150);
 
-		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 100);
-		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 100);
-		addTextField(this, 2, overallRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getOverallRainLikelyhood(), 170, 100);
-		addTextField(this, 3, littleRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getLittleRainLikelyhood(), 170, 100);
-		addTextField(this, 4, mediumRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getMediumRainLikelyhood(), 170, 100);
-		addTextField(this, 5, timeOfDayTextField, getEditorFrame().getTrackData().getLocalInfo().getTimeOfDay(), 170, 100);
-		addTextField(this, 6, sunAscensionTextField, getEditorFrame().getTrackData().getLocalInfo().getSunAscension(), 170, 100);
-		addTextField(this, 7, altitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getAltitude(), 170, 100);
+		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 125);
+		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 125);
+		addTextField(this, 2, overallRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getOverallRainLikelyhood(), 170, 125);
+		addTextField(this, 3, littleRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getLittleRainLikelyhood(), 170, 125);
+		addTextField(this, 4, mediumRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getMediumRainLikelyhood(), 170, 125);
+		addTextField(this, 5, timeOfDayTextField, getEditorFrame().getTrackData().getLocalInfo().getTimeOfDay(), 170, 125);
+		addTextField(this, 6, sunAscensionTextField, getEditorFrame().getTrackData().getLocalInfo().getSunAscension(), 170, 125);
+		addTextField(this, 7, altitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getAltitude(), 170, 125);
 	}
 
 	/**

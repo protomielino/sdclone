@@ -132,30 +132,30 @@ public class GraphicProperties extends PropertyPanel
 		addLabel(this, 20, shininessLabel, "Shininess", 150);
 		addLabel(this, 21, fovFactorLabel, "Fov Factor", 150);
 
-		addTextField(this, 0, descriptionTextField, getEditorFrame().getTrackData().getGraphic().getDescription(), 160, 150);
-		addTextField(this, 1, descriptionNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), 160, 150);
-		addTextField(this, 2, descriptionRainNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), 160, 150);
+		addTextField(this, 0, descriptionTextField, getEditorFrame().getTrackData().getGraphic().getDescription(), 160, 200);
+		addTextField(this, 1, descriptionNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), 160, 200);
+		addTextField(this, 2, descriptionRainNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), 160, 200);
 		addTextField(this, 3, backgroundImageTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), 160, 275);
 
 		add(getBackgroundTypeComboBox(), null);
 
-		addTextField(this, 5, backgroundColorRTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), 160, 80);
-		addTextField(this, 6, backgroundColorGTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), 160, 80);
-		addTextField(this, 7, backgroundColorBTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), 160, 80);
-		addTextField(this, 8, ambientColorRTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), 160, 80);
-		addTextField(this, 9, ambientColorGTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), 160, 80);
-		addTextField(this, 10, ambientColorBTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), 160, 80);
-		addTextField(this, 11, diffuseColorRTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), 160, 80);
-		addTextField(this, 12, diffuseColorGTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), 160, 80);
-		addTextField(this, 13, diffuseColorBTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), 160, 80);
-		addTextField(this, 14, specularColorRTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), 160, 80);
-		addTextField(this, 15, specularColorGTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), 160, 80);
-		addTextField(this, 16, specularColorBTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), 160, 80);
-		addTextField(this, 17, lightPositionXTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionX(), 160, 80);
-		addTextField(this, 18, lightPositionYTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionY(), 160, 80);
-		addTextField(this, 19, lightPositionZTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), 160, 80);
-		addTextField(this, 20, shininessTextField, getEditorFrame().getTrackData().getGraphic().getShininess(), 160, 80);
-		addTextField(this, 21, fovFactorTextField, getEditorFrame().getTrackData().getGraphic().getFovFactor(), 160, 80);
+		addTextField(this, 5, backgroundColorRTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), 160, 125);
+		addTextField(this, 6, backgroundColorGTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), 160, 125);
+		addTextField(this, 7, backgroundColorBTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), 160, 125);
+		addTextField(this, 8, ambientColorRTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), 160, 125);
+		addTextField(this, 9, ambientColorGTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), 160, 125);
+		addTextField(this, 10, ambientColorBTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), 160, 125);
+		addTextField(this, 11, diffuseColorRTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), 160, 125);
+		addTextField(this, 12, diffuseColorGTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), 160, 125);
+		addTextField(this, 13, diffuseColorBTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), 160, 125);
+		addTextField(this, 14, specularColorRTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), 160, 125);
+		addTextField(this, 15, specularColorGTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), 160, 125);
+		addTextField(this, 16, specularColorBTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), 160, 125);
+		addTextField(this, 17, lightPositionXTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionX(), 160, 125);
+		addTextField(this, 18, lightPositionYTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionY(), 160, 125);
+		addTextField(this, 19, lightPositionZTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), 160, 125);
+		addTextField(this, 20, shininessTextField, getEditorFrame().getTrackData().getGraphic().getShininess(), 160, 125);
+		addTextField(this, 21, fovFactorTextField, getEditorFrame().getTrackData().getGraphic().getFovFactor(), 160, 125);
 
 		add(getBackgroundImageButton(), null);
 	}
@@ -172,7 +172,7 @@ public class GraphicProperties extends PropertyPanel
 			String[] types = {"none", "0", "2", "4"};
 			backgroundTypeComboBox = new JComboBox<String>();
 			backgroundTypeComboBox.setModel(new DefaultComboBoxModel<String>(types));
-			backgroundTypeComboBox.setBounds(160, 118, 80, 23);
+			backgroundTypeComboBox.setBounds(160, 118, 125, 23);
 			int value = getEditorFrame().getTrackData().getGraphic().getBackgroundType();
 			if (value != Integer.MAX_VALUE)
 				backgroundTypeComboBox.setSelectedItem(String.valueOf(value));

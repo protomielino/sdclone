@@ -216,20 +216,20 @@ public class TrackLightProperties extends PropertyPanel
 			addLabel(this, 12, greenLabel, "Green", 160);
 			addLabel(this, 13, blueLabel, "Blue", 160);
 
-			addTextField(this, 0, nameTextField, light.getName(), 120, 100);
-			addTextField(this, 1, roleTextField, light.getRole(), 120, 100);
-			addTextField(this, 2, topLeftXTextField, light.getTopLeftX(), 120, 100);
-			addTextField(this, 3, topLeftYTextField, light.getTopLeftY(), 120, 100);
-			addTextField(this, 4, topLeftZTextField, light.getTopLeftZ(), 120, 100);
-			addTextField(this, 5, bottomRightXTextField, light.getBottomRightX(), 120, 100);
-			addTextField(this, 6, bottomRightYTextField, light.getBottomRightY(), 120, 100);
-			addTextField(this, 7, bottomRightZTextField, light.getBottomRightZ(), 120, 100);
+			addTextField(this, 0, nameTextField, light.getName(), 120, 125);
+			addTextField(this, 1, roleTextField, light.getRole(), 120, 125);
+			addTextField(this, 2, topLeftXTextField, light.getTopLeftX(), 120, 125);
+			addTextField(this, 3, topLeftYTextField, light.getTopLeftY(), 120, 125);
+			addTextField(this, 4, topLeftZTextField, light.getTopLeftZ(), 120, 125);
+			addTextField(this, 5, bottomRightXTextField, light.getBottomRightX(), 120, 125);
+			addTextField(this, 6, bottomRightYTextField, light.getBottomRightY(), 120, 125);
+			addTextField(this, 7, bottomRightZTextField, light.getBottomRightZ(), 120, 125);
 			addTextField(this, 8, textureOnTextField, light.getTextureOn(), 120, 290);
 			addTextField(this, 9, textureOffTextField, light.getTextureOff(), 120, 290);
-			addTextField(this, 10, indexTextField, light.getIndex(), 120, 100);
-			addTextField(this, 11, redTextField, light.getRed(), 120, 100);
-			addTextField(this, 12, greenTextField, light.getGreen(), 120, 100);
-			addTextField(this, 13, blueTextField, light.getBlue(), 120, 100);
+			addTextField(this, 10, indexTextField, light.getIndex(), 120, 125);
+			addTextField(this, 11, redTextField, light.getRed(), 120, 125);
+			addTextField(this, 12, greenTextField, light.getGreen(), 120, 125);
+			addTextField(this, 13, blueTextField, light.getBlue(), 120, 125);
 
 			add(getTextureOnButton(), null);
 			add(getTextureOffButton(), null);

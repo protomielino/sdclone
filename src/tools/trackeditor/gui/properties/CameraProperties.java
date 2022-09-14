@@ -187,13 +187,13 @@ public class CameraProperties extends PropertyPanel
 			addLabel(this, 5, fovStartLabel, "Fov Start", 130);
 			addLabel(this, 6, fovEndLabel, "Fov End", 130);
 
-			addTextField(this, 0, nameTextField, camera.getName(), 150, 100);
-			addTextField(this, 1, segmentTextField, camera.getSegment(), 150, 100);
-			addTextField(this, 2, toRightTextField, camera.getToRight(), 150, 100);
-			addTextField(this, 3, toStartTextField, camera.getToStart(), 150, 100);
-			addTextField(this, 4, heightTextField, camera.getHeight(), 150, 100);
-			addTextField(this, 5, fovStartTextField, camera.getFovStart(), 150, 100);
-			addTextField(this, 6, fovEndTextField, camera.getFovEnd(), 150, 100);
+			addTextField(this, 0, nameTextField, camera.getName(), 150, 125);
+			addTextField(this, 1, segmentTextField, camera.getSegment(), 150, 125);
+			addTextField(this, 2, toRightTextField, camera.getToRight(), 150, 125);
+			addTextField(this, 3, toStartTextField, camera.getToStart(), 150, 125);
+			addTextField(this, 4, heightTextField, camera.getHeight(), 150, 125);
+			addTextField(this, 5, fovStartTextField, camera.getFovStart(), 150, 125);
+			addTextField(this, 6, fovEndTextField, camera.getFovEnd(), 150, 125);
 		}
 	}
 

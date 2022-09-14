@@ -291,23 +291,23 @@ public class ObjectProperties extends PropertyPanel
 			addLabel(this, 9, scaleMinLabel, "Scale Min", 160);
 			addLabel(this, 10, scaleMaxLabel, "Scale Max", 160);
 
-			addTextField(this, 0, nameTextField, object.getName(), 120, 100);
+			addTextField(this, 0, nameTextField, object.getName(), 120, 125);
 			addTextField(this, 1, objectTextField, object.getObject(), 120, 290);
-			addTextField(this, 2, colorTextField, toHexString(object.getColor()), 120, 100);
+			addTextField(this, 2, colorTextField, toHexString(object.getColor()), 120, 125);
 
 			add(getOrientationTypeComboBox(), null);
 			getOrientationTypeComboBox().setSelectedItem(toNoneString(object.getOrientationType()));
 
-			addTextField(this, 4, orientationTextField, object.getOrientation(), 120, 100);
-			addTextField(this, 5, deltaHeightTextField, object.getDeltaHeight(), 120, 100);
-			addTextField(this, 6, deltaVertTextField, object.getDeltaVert(), 120, 100);
+			addTextField(this, 4, orientationTextField, object.getOrientation(), 120, 125);
+			addTextField(this, 5, deltaHeightTextField, object.getDeltaHeight(), 120, 125);
+			addTextField(this, 6, deltaVertTextField, object.getDeltaVert(), 120, 125);
 
 			add(getScaleTypeComboBox(), null);
 			getScaleTypeComboBox().setSelectedItem(toNoneString(object.getScaleType()));
 
-			addTextField(this, 8, scaleTextField, object.getScale(), 120, 100);
-			addTextField(this, 9, scaleMinTextField, object.getScaleMin(), 120, 100);
-			addTextField(this, 10, scaleMaxTextField, object.getScaleMax(), 120, 100);
+			addTextField(this, 8, scaleTextField, object.getScale(), 120, 125);
+			addTextField(this, 9, scaleMinTextField, object.getScaleMin(), 120, 125);
+			addTextField(this, 10, scaleMaxTextField, object.getScaleMax(), 120, 125);
 
 			if (defaultObjects)
 			{
@@ -335,7 +335,7 @@ public class ObjectProperties extends PropertyPanel
 			{
 				String[] items = {"none", "random", "standard", "track", "terrain", "border"};
 				orientationTypeComboBox = new JComboBox<String>(items);
-				orientationTypeComboBox.setBounds(120, 91, 120, 23);
+				orientationTypeComboBox.setBounds(120, 91, 125, 23);
 			}
 			return orientationTypeComboBox;
 		}
@@ -346,7 +346,7 @@ public class ObjectProperties extends PropertyPanel
 			{
 				String[] items = {"none", "random", "fixed"};
 				scaleTypeComboBox = new JComboBox<String>(items);
-				scaleTypeComboBox.setBounds(120, 201, 120, 23);
+				scaleTypeComboBox.setBounds(120, 201, 125, 23);
 				scaleTypeComboBox.addActionListener(new java.awt.event.ActionListener()
 				{
 					public void actionPerformed(java.awt.event.ActionEvent e)
