@@ -79,6 +79,7 @@ public class CheckDialog extends JDialog
 	    		checkTerrainGeneration();
 	    		checkEnvironmentMapping();
 	    		checkTrackLights();
+	    		checkGraphic();
 			
 	    		textArea.append("Checking complete!");	
 	    	}
@@ -86,6 +87,13 @@ public class CheckDialog extends JDialog
 	    this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
+	private void checkGraphic()
+	{
+		String image = editorFrame.getTrackData().getGraphic().getBackgroundImage();
+		if (hasText(image))
+			checkTexture("Graphic Background Image ", image);
+	}
+	
 	private void checkTrackLights()
 	{
 		Vector<TrackLight> lightData = editorFrame.getTrackData().getTrackLights();
