@@ -115,21 +115,8 @@ public class CheckDialog extends JDialog
 		
 		for (int i = 0; i < envMaps.size(); i++)
 		{
-			String mapImage = envMaps.get(i).getEnvMapImage();
-
-			if (mapImage != null && !mapImage.isEmpty())
-			{
-				File file = new File(Editor.getProperties().getPath() + sep + mapImage);
-
-				if (!file.exists())
-				{
-					textArea.append("Environment Map " + envMaps.get(i).getName() + " file " + mapImage + " not found\n");
-				}
-			}
-			else
-			{
-				textArea.append("Environment Map " + envMaps.get(i).getName() + " missing image file\n");
-			}
+			String texture = envMaps.get(i).getEnvMapImage();
+			checkTexture("Environment Map " + envMaps.get(i).getName(), texture);
 		}
 	}
 	
