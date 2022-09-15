@@ -637,7 +637,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-        FILE *curFd = Ac3dOpen(objectFile.c_str(), 1);
+        FILE *curFd = Ac3dOpen(objectFile, 1);
         ssgSaveACInner(GroupRoot, curFd);
         Ac3dClose(curFd);
 
