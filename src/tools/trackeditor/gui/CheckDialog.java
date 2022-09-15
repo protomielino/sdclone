@@ -19,6 +19,7 @@ import utils.TrackData;
 import utils.circuit.EnvironmentMapping;
 import utils.circuit.Segment;
 import utils.circuit.Surface;
+import utils.circuit.TrackLight;
 import utils.circuit.TrackObject;
 
 public class CheckDialog extends JDialog
@@ -77,6 +78,7 @@ public class CheckDialog extends JDialog
 	    		checkObjects();
 	    		checkTerrainGeneration();
 	    		checkEnvironmentMapping();
+	    		checkTrackLights();
 			
 	    		textArea.append("Checking complete!");	
 	    	}
@@ -84,6 +86,21 @@ public class CheckDialog extends JDialog
 	    this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
+	private void checkTrackLights()
+	{
+		Vector<TrackLight> lightData = editorFrame.getTrackData().getTrackLights();
+
+		for (int i = 0; i < lightData.size(); i++)
+		{
+			TrackLight light = lightData.get(i);
+
+			String texture = light.getTextureOn();
+			checkTexture("Track Lights " + light.getName() + " Texture On ", texture);
+
+			texture = light.getTextureOff();
+			checkTexture("Track Lights " + light.getName() + " Texture Off ", texture);
+		}
+	}
 	private void checkEnvironmentMapping()
 	{
 		Vector<EnvironmentMapping>	envMaps = trackData.getGraphic().getEnvironmentMapping();
