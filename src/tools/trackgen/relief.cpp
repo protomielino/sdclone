@@ -40,7 +40,6 @@
 #include <portability.h>
 #include "trackgen.h"
 #include "easymesh.h"
-#include "util.h"
 
 #include "relief.h"
 
@@ -91,19 +90,11 @@ LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
     
     GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, GridStep);
 
-    ssgLoaderOptionsEx options;
-
-    ssgSetCurrentOptions(&options);
+    ssgLoaderOptions options;
 
     options.setCreateBranchCallback(hookNode);
 
-    std::string inputPath(track->filename);
-    inputPath.resize(inputPath.find_last_of("/"));
-
-    char path[1024];
-    snprintf(path, sizeof(path), "%s;%sdata/objects;%sdata/textures;.", inputPath.c_str(), GfDataDir(), GfDataDir());
-    ssgTexturePath(path);
-    ssgModelPath(path);
+    ssgSetCurrentOptions(&options);
 
     printf("\nLoading relief file %s\n", reliefFile);
     
