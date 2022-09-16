@@ -828,6 +828,7 @@ public class XmlWriter
 		addContent(element, "group size", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getGroupSize());
 		addContent(element, "elevation map", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getElevationMap());
 		addContent(element, "relief file", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefFile());
+		addContent(element, "relief border", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefBorder());
 		addContent(element, "surface", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getSurface());
 
 		element.addContent(getObjectMaps());

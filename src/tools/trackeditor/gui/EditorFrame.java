@@ -1921,7 +1921,16 @@ public class EditorFrame extends JFrame
 
 	private void exportAc3d(String additionalArgs)
 	{
-		TrackgenPanel tg = new TrackgenPanel(this, additionalArgs);
+		String reliefBorder = getTrackData().getGraphic().getTerrainGeneration().getReliefBorder();
+		String newArgs = additionalArgs;
+		if (reliefBorder !=  null && reliefBorder.equals("yes"))
+		{
+			if (newArgs == null)
+				newArgs = new String(" -B");
+			else
+				newArgs += " -B";
+		}
+		TrackgenPanel tg = new TrackgenPanel(this, newArgs);
 		tg.setModal(true);
 		tg.setVisible(true);
 	}

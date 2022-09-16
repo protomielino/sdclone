@@ -14,6 +14,7 @@ public class TerrainGeneration
 	public static final double	DEFAULT_GROUP_SIZE			= Double.NaN;
 	public static final String	DEFAULT_ELEVATION_MAP		= null;
 	public static final String	DEFAULT_RELIEF_FILE			= null;
+	public static final String	DEFAULT_RELIEF_BORDER		= null;
 	public static final String	DEFAULT_SURFACE				= null;
 
 	private double				trackStep					= Double.NaN;
@@ -26,6 +27,7 @@ public class TerrainGeneration
 	private double				groupSize					= Double.NaN;
 	private String				elevationMap				= null;
 	private String				reliefFile					= null;
+	private String				reliefBorder				= null;
 	private String				surface						= null;
 	private Vector<ObjectMap>	objectMaps					= new Vector<ObjectMap>();
 
@@ -195,11 +197,21 @@ public class TerrainGeneration
 		this.surface = surface;
 	}
 
-	public Vector<ObjectMap> getObjectMaps() {
+	public Vector<ObjectMap> getObjectMaps()
+	{
 		return objectMaps;
 	}
-	public void setObjectMaps(Vector<ObjectMap> objectMaps) {
+	public void setObjectMaps(Vector<ObjectMap> objectMaps)
+	{
 		this.objectMaps = objectMaps;
+	}
+	public String getReliefBorder()
+	{
+		return reliefBorder;
+	}
+	public void setReliefBorder(String reliefBorder)
+	{
+		this.reliefBorder = reliefBorder;
 	}
 
 	public void dump(String indent)
@@ -215,6 +227,7 @@ public class TerrainGeneration
 		System.out.println(indent + "  groupSize       : " + groupSize);
 		System.out.println(indent + "  elevationMap    : " + elevationMap);
 		System.out.println(indent + "  reliefFile      : " + reliefFile);
+		System.out.println(indent + "  reliefBorder    : " + reliefBorder);
 		System.out.println(indent + "  surface         : " + surface);
 		System.out.println(indent + "  objectMaps[" + objectMaps.size() + "]");
 		for (int i = 0; i < objectMaps.size(); i++)

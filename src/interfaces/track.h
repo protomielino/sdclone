@@ -125,6 +125,7 @@
 #define TRK_VAL_CCLOCK              "counter-clockwise"
 #define TRK_ATT_SURFRAND            "texture randomness"
 #define TRK_ATT_RELIEF              "relief file"
+#define TRK_ATT_RELIEF_BORDER       "relief border"
 #define TRK_ATT_ELEVATION           "elevation map"
 #define TRK_ATT_ALT_MAX             "maximum altitude"
 #define TRK_ATT_ALT_MIN             "minimum altitude"

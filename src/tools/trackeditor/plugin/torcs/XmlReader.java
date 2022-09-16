@@ -493,6 +493,7 @@ public class XmlReader
 	        data.getTerrainGeneration().setGroupSize(getAttrNumValue(terrain, "group size", "m"));
 	        data.getTerrainGeneration().setElevationMap(getAttrStrValue(terrain, "elevation map"));
 	        data.getTerrainGeneration().setReliefFile(getAttrStrValue(terrain, "relief file"));
+	        data.getTerrainGeneration().setReliefBorder(getAttrStrValue(terrain, "relief border"));
 	        data.getTerrainGeneration().setSurface(getAttrStrValue(terrain, "surface"));
 
 	        Element objects = getChildWithName(terrain, "Object Maps");

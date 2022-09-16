@@ -2,7 +2,7 @@
 
 # the first argument is the path of sd2-trackgen
 trackgen=$1
-#trackgen=~/speed-dreams-code/debug/bin/sd2-trackgen
+#trackgen=~/speed-dreams-code/release/bin/sd2-trackgen
 
 temp_dir=$(mktemp -d)
 pwd=`pwd`
@@ -21,6 +21,7 @@ check circuit tuna
 check development showroom
 check development straight-10
 check development testtrack
+check road e-track-4
 check speedway a-speedway
 
 rm -rf temp_dir

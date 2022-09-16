@@ -70,6 +70,8 @@ public class TerrainProperties extends PropertyPanel
 	private JTextField			elevationMapTextField		= new JTextField();
 	private JLabel				reliefFileLabel				= new JLabel();
 	private JTextField			reliefFileTextField			= new JTextField();
+	private JLabel				reliefBorderLabel			= new JLabel();
+	private JComboBox<String>	reliefBorderComboBox		= null;
 	private JLabel				surfaceLabel				= new JLabel();
 	private SurfaceComboBox		surfaceComboBox				= null;
 	private JButton				defaultButton				= null;
@@ -124,8 +126,9 @@ public class TerrainProperties extends PropertyPanel
 		addLabel(this, 6, minimumAltitudeLabel, "Minimum Altitude", 120);
 		addLabel(this, 7, groupSizeLabel, "Group Size", 120);
 		addLabel(this, 8, elevationMapLabel, "Elevation Map", 120);
-		addLabel(this, 9, reliefFileLabel, "Reliefe File", 120);
-		addLabel(this, 10, surfaceLabel, "Surface", 120);
+		addLabel(this, 9, reliefFileLabel, "Relief File", 120);
+		addLabel(this, 10, reliefBorderLabel, "Relief Border", 120);
+		addLabel(this, 11, surfaceLabel, "Surface", 120);
 
 		addTextField(this, 0, trackStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), 140, 125);
 		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 125);
@@ -148,6 +151,8 @@ public class TerrainProperties extends PropertyPanel
 		this.add(getDeleteObjectMapButton(), null);
 		this.add(getElevationMapButton(), null);
 		this.add(getReliefFileButton(), null);
+		this.add(getReliefBorderComboBox(), null);
+		getReliefBorderComboBox().setSelectedItem(toNoneString(getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefBorder()));
 	}
 
 	/**
@@ -183,10 +188,26 @@ public class TerrainProperties extends PropertyPanel
 			String surface = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface();
 			addSurface(roadSurfaceVector, surface);
 			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
-			surfaceComboBox.setBounds(140, 280, 180, 23);
+			surfaceComboBox.setBounds(140, 307, 180, 23);
 			surfaceComboBox.setSelectedItem(surface);
 		}
 		return surfaceComboBox;
+	}
+
+	/**
+	 * This method initializes reliefBorderComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox<String> getReliefBorderComboBox()
+	{
+		if (reliefBorderComboBox == null)
+		{
+			String[] items = {"none", "yes", "no"};
+			reliefBorderComboBox = new JComboBox<String>(items);
+			reliefBorderComboBox.setBounds(140, 280, 180, 23);
+		}
+		return reliefBorderComboBox;
 	}
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
@@ -415,7 +436,7 @@ public class TerrainProperties extends PropertyPanel
 		if (addObjectMapButton == null)
 		{
 			addObjectMapButton = new JButton();
-			addObjectMapButton.setBounds(10, 420, 130, 25);
+			addObjectMapButton.setBounds(10, 447, 130, 25);
 			addObjectMapButton.setText("Add Object Map");
 			addObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -441,7 +462,7 @@ public class TerrainProperties extends PropertyPanel
 		if (deleteObjectMapButton == null)
 		{
 			deleteObjectMapButton = new JButton();
-			deleteObjectMapButton.setBounds(155, 420, 140, 25);
+			deleteObjectMapButton.setBounds(155, 447, 140, 25);
 			deleteObjectMapButton.setText("Delete Object Map");
 			deleteObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -468,7 +489,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 312, 510, 100);
+			tabbedPane.setBounds(10, 339, 510, 100);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
 
@@ -643,6 +664,13 @@ public class TerrainProperties extends PropertyPanel
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefFile(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
+
+        if (isDifferent(reliefBorderComboBox.getSelectedItem().toString(),
+        	getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefBorder(), stringResult))
+        {
+        	getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefBorder(stringResult.getValue());
+            getEditorFrame().documentIsModified = true;
+        }
 
 		if (isDifferent((String) surfaceComboBox.getSelectedItem(),
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface(), stringResult))
