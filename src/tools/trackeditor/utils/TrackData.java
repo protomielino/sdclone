@@ -27,6 +27,7 @@ import utils.circuit.Graphic;
 import utils.circuit.Header;
 import utils.circuit.LocalInfo;
 import utils.circuit.MainTrack;
+import utils.circuit.Sector;
 import utils.circuit.Segment;
 import utils.circuit.StartingGrid;
 import utils.circuit.Surface;
@@ -52,6 +53,7 @@ public final class TrackData
     private Vector<TrackLight> 	trackLights				= new Vector<TrackLight>();
     private MainTrack			mainTrack				= new MainTrack();
     private Vector<Segment>		segments				= null;
+    private Vector<Sector>		sectors					= new Vector<Sector>();
 
 	/**
 	 * @return Returns the header.
@@ -203,4 +205,22 @@ public final class TrackData
     {
         this.segments = segments;
     }
+    
+	public Vector<TrackObject> getTrackObjects()
+	{
+		return trackObjects;
+	}
+	public void setTrackObjects(Vector<TrackObject> trackObjects)
+	{
+		this.trackObjects = trackObjects;
+	}
+	
+	public Vector<Sector> getSectors()
+	{
+		return sectors;
+	}
+	public void setSectors(Vector<Sector> sectors)
+	{
+		this.sectors = sectors;
+	}
 }

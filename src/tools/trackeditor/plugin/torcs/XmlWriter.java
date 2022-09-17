@@ -38,6 +38,7 @@ import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
 import utils.circuit.ObjectMap;
+import utils.circuit.Sector;
 import utils.circuit.Segment;
 import utils.circuit.SegmentSide;
 import utils.circuit.Straight;
@@ -97,6 +98,7 @@ public class XmlWriter
 		root.addContent(getGrid());
 		root.addContent(getTrack());
 		root.addContent(getCameras());
+		root.addContent(getSectors());
 	}
 
 	private synchronized void writeToFile(String fileName, Document doc) throws FileNotFoundException, IOException, SecurityException
@@ -605,6 +607,30 @@ public class XmlWriter
 		}
 
 		return lights;
+	}
+	private synchronized Element getSectors()
+	{
+		Element sectors = new Element("section");
+		sectors.setAttribute(new Attribute("name", "Sectors"));
+
+		Vector<Sector> sectorData = editorFrame.getTrackData().getSectors();
+
+		if (sectorData == null)
+			return sectors;
+
+		for (int i = 0; i < sectorData.size(); i++)
+		{
+			Sector sector = sectorData.get(i);
+
+			Element el = new Element("section");
+			el.setAttribute(new Attribute("name", sector.getName()));
+
+			addContent(el, "distance from start", "m", sector.getDistanceFromStart());
+
+			sectors.addContent(el);
+		}
+
+		return sectors;
 	}
 
 	private synchronized Element getObjects()

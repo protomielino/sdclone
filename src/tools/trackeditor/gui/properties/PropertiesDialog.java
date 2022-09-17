@@ -61,6 +61,7 @@ public class PropertiesDialog extends JDialog
 	private ObjectProperties		objectProperties		= null;
 	private CameraProperties		cameraProperties		= null;
 	private TrackLightProperties	trackLightProperties	= null;
+	private SectorProperties		sectorProperties		= null;
 
 	/**
 	 *
@@ -113,6 +114,7 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Objects", null, getObjectProperties(), null);
 			tabbedPane.addTab("Cameras", null, getCameraProperties(), null);
 			tabbedPane.addTab("Lights", null, getTrackLightProperties(), null);
+			tabbedPane.addTab("Sector", null, getSectorProperties(), null);			
 			tabbedPane.addTab("Image", null, getImageProperties(), null);			
 			tabbedPane.setSelectedIndex(editorFrame.getProject().getPropertiesEditorTab());
 		}
@@ -357,6 +359,18 @@ public class PropertiesDialog extends JDialog
 		return trackLightProperties;
 	}
 
+	/**
+	 * This method initializes sectorProperties
+	 *
+	 * @return gui.properties.SectorProperties
+	 */
+	private SectorProperties getSectorProperties() {
+		if (sectorProperties == null) {
+			sectorProperties = new SectorProperties(editorFrame);
+		}
+		return sectorProperties;
+	}
+
 	//	 Exit when window close
 
 	protected void processWindowEvent(WindowEvent e)
@@ -389,6 +403,7 @@ public class PropertiesDialog extends JDialog
 		this.objectProperties.exit();
 		this.cameraProperties.exit();
 		this.trackLightProperties.exit();
+		this.sectorProperties.exit();
 		Editor.getProperties().valueChanged();
 		APPROVE = true;
 		cancel();

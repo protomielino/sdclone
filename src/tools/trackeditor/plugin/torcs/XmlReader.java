@@ -48,6 +48,7 @@ import utils.circuit.Surface;
 import utils.circuit.TrackLight;
 import utils.circuit.TrackObject;
 import utils.circuit.ObjectMap;
+import utils.circuit.Sector;
 
 /**
  * @author Charalampos Alexopoulos
@@ -146,6 +147,7 @@ public class XmlReader
         setGraphic(root);
         setCameras(root);
         setMainTrack(root);
+        setSectors(root);
     }
 
     private synchronized void setMainTrack(Element root)
@@ -286,6 +288,32 @@ public class XmlReader
             lightData.add(lit);
         }
         editorFrame.getTrackData().setTrackLights(lightData);
+    }
+
+    /**
+     * @param root
+     */
+    private void setSectors(Element root)
+    {
+        Element sectors = getChildWithName(root, "Sectors");
+
+        if (sectors == null)
+            return;
+
+        Vector<Sector> sectorData = new Vector<Sector>();
+        List<Element> sections = sectors.getChildren();
+        Iterator<Element> it = sections.iterator();
+        while (it.hasNext())
+        {
+            Sector sector = new Sector();
+
+            Element element = it.next();
+            sector.setName(element.getAttribute("name").getValue());
+            sector.setDistanceFromStart(getAttrNumValue(element, "distance from start", "m"));
+
+            sectorData.add(sector);
+        }
+        editorFrame.getTrackData().setSectors(sectorData);
     }
 
     /**

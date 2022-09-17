@@ -46,6 +46,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/PitProperties.java
          gui/properties/PropertiesDialog.java
          gui/properties/PropertyPanel.java
+         gui/properties/SectorProperties.java
          gui/properties/StartingGridProperties.java
          gui/properties/SurfaceProperties.java
          gui/properties/TerrainProperties.java
@@ -91,6 +92,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/ObjShapeTerrain.java
          utils/circuit/ObjectMap.java
          utils/circuit/Pits.java
+         utils/circuit/Sector.java
          utils/circuit/Segment.java
          utils/circuit/SegmentListener.java
          utils/circuit/SegmentSide.java

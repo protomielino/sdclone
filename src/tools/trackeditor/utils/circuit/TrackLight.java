@@ -162,8 +162,8 @@ public final class TrackLight {
 
 	public void dump(String indent)
     {
-		System.out.println(indent + "Surface");
-		System.out.println(indent + "  name            : " + name);
+		System.out.println(indent + "TrackLight");
+		System.out.println(indent + "  name          : " + name);
 		System.out.println(indent + "  role          : " + role);
 		System.out.println(indent + "  topLeft       : " + topLeft.x + " " + topLeft.y + " " + topLeft.z);
 		System.out.println(indent + "  bottomRight   : " + bottomRight.x + " " + bottomRight.y + " " + bottomRight.z);
