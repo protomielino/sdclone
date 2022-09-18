@@ -84,7 +84,7 @@ public class SurfaceComboBox extends JComboBox<String>
 			JComponent comp = (JComponent) super.getListCellRendererComponent(
 				list, value, index, isSelected, cellHasFocus);
 
-			if (-1 < index && null != value && null != tooltips)
+			if (-1 < index && null != value && null != tooltips && index < tooltips.size())
 			{
 				list.setToolTipText(tooltips.get(index));
 			}

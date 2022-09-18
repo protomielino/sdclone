@@ -704,7 +704,7 @@ public class XmlReader
                 shape = new Straight();
             } else
             {
-                shape = new Curve(getAttrStrValue(e, "type"), null);
+                shape = new Curve(type, null);
             }
             shape = setSegment(e, shape, prev);
             try
@@ -753,6 +753,7 @@ public class XmlReader
             }
             ((Curve) shape).setMarks(getAttrStrValue(seg, "marks"));
         }
+        shape.setComment(getAttrStrValue(seg, "comment"));
         String name = getSegmentName(seg);
         shape.setName(name);
         if (name.startsWith("curve "))

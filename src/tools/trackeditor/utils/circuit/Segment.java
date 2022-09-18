@@ -46,6 +46,7 @@ public class Segment implements Cloneable
 	public Segment			nextShape;
 
 	protected String		name					= "";
+	protected String		comment					= null;
 
 	protected SegmentSide	left					= new SegmentSide();
 	protected SegmentSide	right					= new SegmentSide();
@@ -161,6 +162,17 @@ public class Segment implements Cloneable
 	{
 		this.name = name;
 	}
+	
+	public String getComment()
+	{
+		return comment;
+	}
+
+	public void setComment(String comment)
+	{
+		this.comment = comment;
+	}
+
 	/**
 	 * @return Returns the surface.
 	 */
@@ -672,6 +684,7 @@ public class Segment implements Cloneable
 			s.right = (SegmentSide) this.right.clone();
 			s.name = this.name;
 			s.type = this.type;
+			s.comment = this.comment;
 			s.length = this.length;
 			s.surface = this.surface;
 			s.heightStartLeft = this.heightStartLeft;

@@ -279,6 +279,7 @@ public class XmlWriter
 		Element segment = new Element("section");
 		name = new Attribute("name", shape.getName());
 		segment.setAttribute(name);
+		addContent(segment, "comment", shape.getComment());
 		el = attstrElement("type", shape.getType());
 		segment.addContent(el);
 		if (shape.getType().equals("str"))

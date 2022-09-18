@@ -99,6 +99,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 	private JLabel					marksLabel					= null;
 	private JTextField				marksTextField				= null;
+	private JLabel					commentLabel				= null;
+	private JTextField				commentTextField			= null;
 
 	private String[]				roadSurfaceItems			=
 	{"asphalt-lines", "asphalt-l-left", "asphalt-l-right",
@@ -252,6 +254,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			nameLabel = new JLabel();
 			surfaceLabel = new JLabel();
 			marksLabel = new JLabel();
+			commentLabel = new JLabel();
 			centerPanel = new JPanel();
 			centerPanel.setLayout(null);
 			nameLabel.setBounds(10, 5, 55, 23);
@@ -259,12 +262,16 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			surfaceLabel.setBounds(10, 33, 55, 23);
 			surfaceLabel.setText("Surface");
 	        marksLabel.setText("Marks");
-	        marksLabel.setBounds(480, 10, 60, 23);
+	        marksLabel.setBounds(440, 5, 60, 23);
+	        commentLabel.setText("Comment");
+	        commentLabel.setBounds(440, 33, 60, 23);
 	        centerPanel.add(nameLabel, null);
 	        centerPanel.add(surfaceLabel, null);
 			centerPanel.add(marksLabel, null);
+			centerPanel.add(commentLabel, null);
 			centerPanel.add(getNameTextField(), null);
 			centerPanel.add(getMarksTextField(), null);
+			centerPanel.add(getCommentTextField(), null);
 			centerPanel.add(getSurfaceComboBox(), null);
 			centerPanel.add(getRadiusStartSlider(), null);
 			centerPanel.add(getRadiusEndSlider(), null);
@@ -699,7 +706,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (marksTextField == null)
 		{
 			marksTextField = new JTextField();
-			marksTextField.setBounds(530, 10, 295, 23);
+			marksTextField.setBounds(510, 5, 315, 23);
 			marksTextField.addKeyListener(new KeyAdapter()
 			{
 				public void keyReleased(KeyEvent e)
@@ -712,6 +719,27 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			});
 		}
 		return marksTextField;
+	}
+	/**
+	 * This method initializes commentTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getCommentTextField()
+	{
+		if (commentTextField == null)
+		{
+			commentTextField = new JTextField();
+			commentTextField.setBounds(510, 33, 315, 23);
+			commentTextField.addKeyListener(new KeyAdapter()
+			{
+				public void keyReleased(KeyEvent e)
+				{
+					shape.setComment(commentTextField.getText());
+				}
+			});
+		}
+		return commentTextField;
 	}
 	/**
 	 * This method initializes surfaceComboBox
@@ -789,6 +817,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				this.getMarksTextField().setText("");
 			}
 			getNameTextField().setText(shape.getName());
+			getCommentTextField().setText(shape.getComment());
 
 			this.updateTitle();
 
@@ -902,7 +931,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (groupButton == null)
 		{
 			groupButton = new GroupButton();
-			groupButton.setBounds(320, 2, 70, 33);
+			groupButton.setBounds(270, 2, 70, 33);
 			groupButton.setParent(this);
 		}
 		return groupButton;
@@ -925,7 +954,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (profileButton == null)
 		{
 			profileButton = new ProfileButton();
-			profileButton.setBounds(400, 2, 70, 49);
+			profileButton.setBounds(350, 2, 70, 49);
 			profileButton.setParent(this);
 		}
 		return profileButton;

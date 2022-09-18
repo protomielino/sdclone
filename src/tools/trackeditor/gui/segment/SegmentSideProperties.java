@@ -584,12 +584,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		// update side
 		String surface = this.side.getSideSurface();
 		addSurface(sideSurfaceVector, surface);
-		
+
 		if (surface != null)
 			this.getSideSurfaceComboBox().setSelectedItem(surface);
 		else
 			this.getSideSurfaceComboBox().setSelectedIndex(-1);
-		
+
 		String bankingType = this.side.getSideBankingType();
 		if (bankingType == null || bankingType.isEmpty())
 			bankingType = "none";
