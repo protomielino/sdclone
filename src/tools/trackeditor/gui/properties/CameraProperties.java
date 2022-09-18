@@ -182,7 +182,7 @@ public class CameraProperties extends PropertyPanel
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 130);
-			addLabel(this, 1, segmentLabel, "Comment", 130);
+			addLabel(this, 1, commentLabel, "Comment", 130);
 			addLabel(this, 2, segmentLabel, "Segment", 130);
 			addLabel(this, 3, toRightLabel, "To Right", 130);
 			addLabel(this, 4, toStartLabel, "To Start", 130);
