@@ -2,6 +2,7 @@ package utils.circuit;
 
 public final class Camera {
 	private String name		= null;
+	private String comment	= null;
 	private String segment	= null;
 	private double toRight	= Double.NaN;
 	private double toStart	= Double.NaN;
@@ -15,6 +16,14 @@ public final class Camera {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public String getSegment() {
@@ -65,15 +74,15 @@ public final class Camera {
 		this.fovEnd = fovEnd;
 	}
 
-    public void dump()
+    public void dump(String indent)
     {
-      System.out.println("name        : "+name);
-      System.out.println("  segment   : "+segment);
-      System.out.println("  toRight   : "+toRight);
-      System.out.println("  toLeft    : "+toStart);
-      System.out.println("  height    : "+height);
-      System.out.println("  fovStart  : "+fovStart);
-      System.out.println("  fovEnd    : "+fovEnd);
+    	System.out.println(indent + "name        : "+name);
+		System.out.println(indent + "  comment   : "+comment);
+		System.out.println(indent + "  segment   : "+segment);
+		System.out.println(indent + "  toRight   : "+toRight);
+		System.out.println(indent + "  toLeft    : "+toStart);
+		System.out.println(indent + "  height    : "+height);
+		System.out.println(indent + "  fovStart  : "+fovStart);
+		System.out.println(indent + "  fovEnd    : "+fovEnd);
     }
-
 }

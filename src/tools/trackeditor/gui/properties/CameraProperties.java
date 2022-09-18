@@ -77,7 +77,7 @@ public class CameraProperties extends PropertyPanel
 		if (addCameraButton == null)
 		{
 			addCameraButton = new JButton();
-			addCameraButton.setBounds(10, 250, 120, 25);
+			addCameraButton.setBounds(10, 277, 120, 25);
 			addCameraButton.setText("Add Camera");
 			addCameraButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -106,7 +106,7 @@ public class CameraProperties extends PropertyPanel
 		if (deleteCameraButton == null)
 		{
 			deleteCameraButton = new JButton();
-			deleteCameraButton.setBounds(150, 250, 120, 25);
+			deleteCameraButton.setBounds(150, 277, 120, 25);
 			deleteCameraButton.setText("Delete Camera");
 			deleteCameraButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -133,7 +133,7 @@ public class CameraProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 230);
+			tabbedPane.setBounds(10, 10, 510, 257);
 
 			Vector<Camera> cameras = getEditorFrame().getTrackData().getCameras();
 
@@ -150,6 +150,8 @@ public class CameraProperties extends PropertyPanel
 	{
 		private JLabel				nameLabel			= new JLabel();
 		private JTextField 			nameTextField		= new JTextField();
+		private JLabel				commentLabel		= new JLabel();
+		private JTextField 			commentTextField	= new JTextField();
 		private JLabel				segmentLabel		= new JLabel();
 		private JTextField			segmentTextField	= new JTextField();
 		private JLabel				toRightLabel		= new JLabel();
@@ -180,20 +182,22 @@ public class CameraProperties extends PropertyPanel
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 130);
-			addLabel(this, 1, segmentLabel, "Segment", 130);
-			addLabel(this, 2, toRightLabel, "To Right", 130);
-			addLabel(this, 3, toStartLabel, "To Start", 130);
-			addLabel(this, 4, heightLabel, "Height", 130);
-			addLabel(this, 5, fovStartLabel, "Fov Start", 130);
-			addLabel(this, 6, fovEndLabel, "Fov End", 130);
+			addLabel(this, 1, segmentLabel, "Comment", 130);
+			addLabel(this, 2, segmentLabel, "Segment", 130);
+			addLabel(this, 3, toRightLabel, "To Right", 130);
+			addLabel(this, 4, toStartLabel, "To Start", 130);
+			addLabel(this, 5, heightLabel, "Height", 130);
+			addLabel(this, 6, fovStartLabel, "Fov Start", 130);
+			addLabel(this, 7, fovEndLabel, "Fov End", 130);
 
 			addTextField(this, 0, nameTextField, camera.getName(), 150, 125);
-			addTextField(this, 1, segmentTextField, camera.getSegment(), 150, 125);
-			addTextField(this, 2, toRightTextField, camera.getToRight(), 150, 125);
-			addTextField(this, 3, toStartTextField, camera.getToStart(), 150, 125);
-			addTextField(this, 4, heightTextField, camera.getHeight(), 150, 125);
-			addTextField(this, 5, fovStartTextField, camera.getFovStart(), 150, 125);
-			addTextField(this, 6, fovEndTextField, camera.getFovEnd(), 150, 125);
+			addTextField(this, 1, commentTextField, camera.getComment(), 150, 335);
+			addTextField(this, 2, segmentTextField, camera.getSegment(), 150, 125);
+			addTextField(this, 3, toRightTextField, camera.getToRight(), 150, 125);
+			addTextField(this, 4, toStartTextField, camera.getToStart(), 150, 125);
+			addTextField(this, 5, heightTextField, camera.getHeight(), 150, 125);
+			addTextField(this, 6, fovStartTextField, camera.getFovStart(), 150, 125);
+			addTextField(this, 7, fovEndTextField, camera.getFovEnd(), 150, 125);
 		}
 	}
 
@@ -219,6 +223,12 @@ public class CameraProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), camera.getName(), stringResult))
             {
                 camera.setName(stringResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
+            if (isDifferent(panel.commentTextField.getText(), camera.getComment(), stringResult))
+            {
+                camera.setComment(stringResult.getValue());
                 getEditorFrame().documentIsModified = true;
             }
 
@@ -275,6 +285,7 @@ public class CameraProperties extends PropertyPanel
 				Camera camera = new Camera();
 
 				camera.setName(panel.nameTextField.getText());
+				camera.setComment(panel.commentTextField.getText());
 				camera.setSegment(panel.segmentTextField.getText());
 				camera.setToRight(getDouble(panel.toRightTextField.getText()));
 				camera.setToStart(getDouble(panel.toStartTextField.getText()));

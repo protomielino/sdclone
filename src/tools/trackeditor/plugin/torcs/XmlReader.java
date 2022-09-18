@@ -227,6 +227,7 @@ public class XmlReader
 
             Element camera = it.next();
             cam.setName(camera.getAttribute("name").getValue());
+            cam.setComment(getAttrStrValue(camera, "comment"));
             cam.setSegment(getAttrStrValue(camera, "segment"));
             cam.setToRight(getAttrNumValue(camera, "to right"));
             cam.setToStart(getAttrNumValue(camera, "to start", "deg"));

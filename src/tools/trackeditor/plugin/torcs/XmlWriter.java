@@ -540,6 +540,7 @@ public class XmlWriter
 			Element el = new Element("section");
 			el.setAttribute(new Attribute("name", camera.getName()));
 
+			addContent(el, "comment", camera.getComment());
 			addContent(el, "segment", camera.getSegment());
 			addContent(el, "to right", null, camera.getToRight());
 			addContent(el, "to start", "deg", camera.getToStart());
