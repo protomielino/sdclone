@@ -2,8 +2,9 @@ package utils.circuit;
 
 public class Sector
 {
-	private String	name;
-	private double	distanceFromStart;
+	private String	name				= null;
+	private String	comment				= null;
+	private double	distanceFromStart	= Double.NaN;
 	
 	public String getName()
 	{
@@ -12,6 +13,15 @@ public class Sector
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public String getComment()
+	{
+		return comment;
+	}
+	public void setComment(String comment)
+	{
+		this.comment = comment;
 	}
 
 	public double getDistanceFromStart()
@@ -27,6 +37,7 @@ public class Sector
     {
 		System.out.println(indent + "Sector");
 		System.out.println(indent + "  name              : " + name);
+		System.out.println(indent + "  comment           : " + comment);
 		System.out.println(indent + "  distanceFromStart : " + distanceFromStart);
     }
 }

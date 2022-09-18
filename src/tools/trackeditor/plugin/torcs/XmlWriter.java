@@ -624,7 +624,7 @@ public class XmlWriter
 
 			Element el = new Element("section");
 			el.setAttribute(new Attribute("name", sector.getName()));
-
+			addContent(el, "comment", sector.getComment());
 			addContent(el, "distance from start", "m", sector.getDistanceFromStart());
 
 			sectors.addContent(el);

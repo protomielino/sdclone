@@ -309,6 +309,7 @@ public class XmlReader
 
             Element element = it.next();
             sector.setName(element.getAttribute("name").getValue());
+            sector.setComment(getAttrStrValue(element, "comment"));
             sector.setDistanceFromStart(getAttrNumValue(element, "distance from start", "m"));
 
             sectorData.add(sector);

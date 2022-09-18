@@ -56,15 +56,16 @@ public class SectorProperties extends PropertyPanel
 		if (addSectorButton == null)
 		{
 			addSectorButton = new JButton();
-			addSectorButton.setBounds(10, 120, 120, 25);
+			addSectorButton.setBounds(10, 147, 120, 25);
 			addSectorButton.setText("Add Sector");
 			addSectorButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					String name = "" + (tabbedPane.getTabCount() + 1);
+					Sector sector = new Sector();
+					sector.setName("" + (tabbedPane.getTabCount() + 1));
 
-					tabbedPane.addTab(name, null, new SectorPanel(name, Double.NaN), null);
+					tabbedPane.addTab(sector.getName(), null, new SectorPanel(sector), null);
 					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				}
 			});
@@ -82,7 +83,7 @@ public class SectorProperties extends PropertyPanel
 		if (deleteSectorButton == null)
 		{
 			deleteSectorButton = new JButton();
-			deleteSectorButton.setBounds(140, 120, 130, 25);
+			deleteSectorButton.setBounds(140, 147, 130, 25);
 			deleteSectorButton.setText("Delete Sector");
 			deleteSectorButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -109,14 +110,14 @@ public class SectorProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 100);
+			tabbedPane.setBounds(10, 10, 510, 127);
 
 			Vector<Sector> sectors = getEditorFrame().getTrackData().getSectors();
 
 			for (int i = 0; i < sectors.size(); i++)
 	        {
                 Sector sector = sectors.elementAt(i);
-				tabbedPane.addTab(sector.getName(), null, new SectorPanel(sector.getName(), sector.getDistanceFromStart()), null);
+				tabbedPane.addTab(sector.getName(), null, new SectorPanel(sector), null);
 			}
 		}
 		return tabbedPane;
@@ -126,30 +127,34 @@ public class SectorProperties extends PropertyPanel
 	{
 		private JLabel		nameLabel					= new JLabel();
 		private JTextField 	nameTextField				= new JTextField();
+		private JLabel		commentLabel				= new JLabel();
+		private JTextField 	commentTextField			= new JTextField();
 		private JLabel		distanceFromStartLabel		= new JLabel();
 		private JTextField	distanceFromStartTextField	= new JTextField();
 
 		/**
 		 *
 		 */
-		public SectorPanel(String name, double distanceFromStart)
+		public SectorPanel(Sector sector)
 		{
 			super();
-			initialize(name, distanceFromStart);
+			initialize(sector);
 		}
 
 		/**
 		 *
 		 */
-		private void initialize(String name, double distanceFromStart)
+		private void initialize(Sector sector)
 		{
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 150);
-			addLabel(this, 1, distanceFromStartLabel, "Distance From Start", 150);
+			addLabel(this, 1, commentLabel, "Comment", 150);
+			addLabel(this, 2, distanceFromStartLabel, "Distance From Start", 150);
 
-			addTextField(this, 0, nameTextField, name, 160, 225);
-			addTextField(this, 1, distanceFromStartTextField, distanceFromStart, 160, 225);
+			addTextField(this, 0, nameTextField, sector.getName(), 160, 125);
+			addTextField(this, 1, commentTextField, sector.getComment(), 160, 335);
+			addTextField(this, 2, distanceFromStartTextField, sector.getDistanceFromStart(), 160, 125);
 		}
 	}
 
@@ -175,6 +180,11 @@ public class SectorProperties extends PropertyPanel
                 sector.setName(stringResult.getValue());
                 getEditorFrame().documentIsModified = true;
             }
+            if (isDifferent(panel.commentTextField.getText(), sector.getComment(), stringResult))
+            {
+                sector.setComment(stringResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
             if (isDifferent(panel.distanceFromStartTextField.getText(), sector.getDistanceFromStart(), doubleResult))
             {
                 sector.setDistanceFromStart(doubleResult.getValue());
@@ -197,6 +207,7 @@ public class SectorProperties extends PropertyPanel
 	            SectorPanel panel = (SectorPanel) tabbedPane.getComponentAt(sectors.size());
 				Sector sector = new Sector();
 				sector.setName(panel.nameTextField.getText());
+				sector.setComment(panel.commentTextField.getText());
 				sector.setDistanceFromStart(getDouble(panel.distanceFromStartTextField.getText()));
 				sectors.add(sector);
 			}

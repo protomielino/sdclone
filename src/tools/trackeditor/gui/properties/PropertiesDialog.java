@@ -114,7 +114,7 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Objects", null, getObjectProperties(), null);
 			tabbedPane.addTab("Cameras", null, getCameraProperties(), null);
 			tabbedPane.addTab("Lights", null, getTrackLightProperties(), null);
-			tabbedPane.addTab("Sector", null, getSectorProperties(), null);			
+			tabbedPane.addTab("Sectors", null, getSectorProperties(), null);			
 			tabbedPane.addTab("Image", null, getImageProperties(), null);			
 			tabbedPane.setSelectedIndex(editorFrame.getProject().getPropertiesEditorTab());
 		}
