@@ -974,7 +974,7 @@ public class XmlWriter
 	{
 		if (string != null && !string.isEmpty())
 		{
-			section.addContent(attstrElement(attribute, string));
+			section.addContent(attstrElement(attribute, string.replace("\"", "&quot;")));
 		}
 	}
 }
