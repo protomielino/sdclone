@@ -17,15 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
 
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
-#include <cctype>
 #include <cstring>
 #ifndef WIN32
 #include <unistd.h>
@@ -35,60 +35,60 @@
 #include <cmath>
 #include <plib/ssg.h>
 
+#include "easymesh.h"
+#include "trackgen.h"
+#include <portability.h>
 #include <tgfclient.h>
 #include <track.h>
-#include <portability.h>
-#include "trackgen.h"
-#include "easymesh.h"
 
 #include "relief.h"
 
 typedef struct Line
 {
     GF_TAILQ_ENTRY(struct Line) link;
-    ssgBranch	*branch;
+    ssgBranch *branch;
 } tLine;
 
 GF_TAILQ_HEAD(RingListHead, tLine);
 
-tRingListHead	InteriorList;
-tRingListHead	ExteriorList;
+tRingListHead InteriorList;
+tRingListHead ExteriorList;
 
-static tdble	GridStep;
+static tdble GridStep;
 
-static ssgEntity	*Root = nullptr;
+static ssgEntity *Root = nullptr;
 
 /*
  * Read the faces from AC3D file
  * separate between interior and exterior lines
  */
-static ssgBranch *
-hookNode(char *s)
+static ssgBranch *hookNode(char *s)
 {
-    tLine	*line;
-    
-    line = reinterpret_cast<tLine*>(calloc(1, sizeof(tLine)));
+    tLine *line;
+
+    line = reinterpret_cast<tLine *>(calloc(1, sizeof(tLine)));
     line->branch = new ssgBranch();
 
-    if (strncmp(s, "interior", 8) == 0) {
-	GF_TAILQ_INSERT_TAIL(&InteriorList, line, link);
-    } else {
-	GF_TAILQ_INSERT_TAIL(&ExteriorList, line, link);
+    if (strncmp(s, "interior", 8) == 0)
+    {
+        GF_TAILQ_INSERT_TAIL(&InteriorList, line, link);
+    }
+    else
+    {
+        GF_TAILQ_INSERT_TAIL(&ExteriorList, line, link);
     }
     return line->branch;
 }
 
-
 /*
   Load a simple database
 */
-void
-LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
+void LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
 {
     GF_TAILQ_INIT(&InteriorList);
     GF_TAILQ_INIT(&ExteriorList);
-    
-    GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, GridStep);
+
+    GridStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, GridStep);
 
     ssgLoaderOptions options;
 
@@ -97,16 +97,15 @@ LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
     ssgSetCurrentOptions(&options);
 
     printf("\nLoading relief file %s\n", reliefFile);
-    
+
     Root = ssgLoadAC(reliefFile);
 }
 
-static void
-countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
+static void countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
 {
     if (e->isAKindOf(_SSG_TYPE_BRANCH))
     {
-        ssgBranch* br = dynamic_cast<ssgBranch*>(e);
+        ssgBranch *br = dynamic_cast<ssgBranch *>(e);
 
         for (int i = 0; i < br->getNumKids(); i++)
         {
@@ -115,52 +114,55 @@ countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
     }
     else if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
     {
-        ssgVtxTable* vt = dynamic_cast<ssgVtxTable*>(e);
+        ssgVtxTable *vt = dynamic_cast<ssgVtxTable *>(e);
 
         *nb_vert += vt->getNumVertices();
         *nb_seg += vt->getNumLines();
     }
 }
 
-void
-CountRelief(bool interior, int *nb_vert, int *nb_seg)
+void CountRelief(bool interior, int *nb_vert, int *nb_seg)
 {
-    tLine		*curLine;
-    tRingListHead	*curHead;
-    
+    tLine *curLine;
+    tRingListHead *curHead;
+
     *nb_vert = *nb_seg = 0;
-    
-    if (Root == nullptr) {
-	return;
+
+    if (Root == nullptr)
+    {
+        return;
     }
 
-    if (interior) {
-	curHead = &InteriorList;
-    } else {
-	curHead = &ExteriorList;
+    if (interior)
+    {
+        curHead = &InteriorList;
     }
-    
+    else
+    {
+        curHead = &ExteriorList;
+    }
+
     curLine = GF_TAILQ_FIRST(curHead);
-    while (curLine != nullptr) {
-	ssgBranch *br = curLine->branch->getParent(0);
-	ssgBranch *br2 = new ssgBranch();
-	
-	br2->addKid(br);
-	ssgFlatten(br);
-	curLine->branch = br2;
-	
-	countRec(dynamic_cast<ssgEntity *>(curLine->branch), nb_vert, nb_seg);
+    while (curLine != nullptr)
+    {
+        ssgBranch *br = curLine->branch->getParent(0);
+        ssgBranch *br2 = new ssgBranch();
 
-	curLine = GF_TAILQ_NEXT(curLine, link);
+        br2->addKid(br);
+        ssgFlatten(br);
+        curLine->branch = br2;
+
+        countRec(dynamic_cast<ssgEntity *>(curLine->branch), nb_vert, nb_seg);
+
+        curLine = GF_TAILQ_NEXT(curLine, link);
     }
 }
 
-static void
-genRec(ssgEntity *e)
+static void genRec(ssgEntity *e)
 {
     if (e->isAKindOf(_SSG_TYPE_BRANCH))
     {
-        ssgBranch* br = dynamic_cast<ssgBranch*>(e);
+        ssgBranch *br = dynamic_cast<ssgBranch *>(e);
 
         for (int i = 0; i < br->getNumKids(); i++)
         {
@@ -169,7 +171,7 @@ genRec(ssgEntity *e)
     }
     else if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
     {
-        ssgVtxTable* vt = dynamic_cast<ssgVtxTable*>(e);
+        ssgVtxTable *vt = dynamic_cast<ssgVtxTable *>(e);
 
         int nv = vt->getNumVertices();
         int nl = vt->getNumLines();
@@ -177,7 +179,7 @@ genRec(ssgEntity *e)
 
         for (int i = 0; i < nv; i++)
         {
-            float* vtx = vt->getVertex(i);
+            float *vtx = vt->getVertex(i);
 
             addPoint(vtx[0], vtx[1], vtx[2], GridStep, 100000);
         }
@@ -192,30 +194,30 @@ genRec(ssgEntity *e)
     }
 }
 
-
-
-void
-GenRelief(bool interior)
+void GenRelief(bool interior)
 {
-    tLine		*curLine;
-    tRingListHead	*curHead;
-    
-    
-    if (Root == nullptr) {
-	return;
+    tLine *curLine;
+    tRingListHead *curHead;
+
+    if (Root == nullptr)
+    {
+        return;
     }
 
-    if (interior) {
-	curHead = &InteriorList;
-    } else {
-	curHead = &ExteriorList;
+    if (interior)
+    {
+        curHead = &InteriorList;
     }
-    
+    else
+    {
+        curHead = &ExteriorList;
+    }
+
     curLine = GF_TAILQ_FIRST(curHead);
-    while (curLine != nullptr) {
-	genRec(dynamic_cast<ssgEntity *>(curLine->branch));
+    while (curLine != nullptr)
+    {
+        genRec(dynamic_cast<ssgEntity *>(curLine->branch));
 
-	curLine = GF_TAILQ_NEXT(curLine, link);
+        curLine = GF_TAILQ_NEXT(curLine, link);
     }
 }
-
