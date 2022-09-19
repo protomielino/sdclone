@@ -1260,7 +1260,7 @@ void relax()
     {
         for (s = 0; s < Ns; s++)
         {
-            if (side[s].mark == 0)
+            if (side[s].mark == 0 && !(side[s].a == OFF || side[s].b == OFF || side[s].c == OFF || side[s].d == OFF))
             {
                 if ((node[side[s].a].mark == 0) && (node[side[s].b].mark == 0) && (node[side[s].c].mark == 0) &&
                     (node[side[s].d].mark == 0))
