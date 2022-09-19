@@ -26,39 +26,10 @@
 #ifndef _EASYMESH_H_
 #define _EASYMESH_H_
 
-struct nod
-{
-    double x, y, z, F;
-			
-    double sumx, sumy;
-    int    Nne;
-
-    int mark;             /* is it off */
-
-    int next;             /* next node in the boundary chain */
-    int chain;            /* on which chains is the node */
-    int inserted;
-
-    int new_numb;         /* used for renumeration */
-};
-
-extern struct nod *point;
-
-struct seg
-{
-    int n0, n1;
-    int N;
-    int chain;
-    int bound;
-    int mark;
-};
-
-extern struct seg *segment;
-
-extern void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation, bool useBorder);
-
-extern int Nc;
-extern int Fl;
+void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation, bool useBorder);
+int getPointCount();
+void addPoint(double x, double y, double z, double F, int mark);
+void addSegment(int n0, int n1, int mark);
 
 #endif /* _EASYMESH_H_ */ 
 

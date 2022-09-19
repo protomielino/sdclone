@@ -91,7 +91,32 @@ struct sid
     double s;
 } side[MAX_NODES * 3];
 
+struct nod
+{
+    double x, y, z, F;
+
+    double sumx, sumy;
+    int    Nne;
+
+    int mark;             /* is it off */
+
+    int next;             /* next node in the boundary chain */
+    int chain;            /* on which chains is the node */
+    int inserted;
+
+    int new_numb;         /* used for renumeration */
+};
+
 struct nod node[MAX_NODES], *point;
+
+struct seg
+{
+    int n0, n1;
+    int N;
+    int chain;
+    int bound;
+    int mark;
+};
 
 struct seg *segment;
 
@@ -2087,6 +2112,29 @@ static int GetTrackOrientation(tTrack *track)
         return ANTICLOCKWISE;
     }
     return CLOCKWISE;
+}
+
+int getPointCount()
+{
+    return Nc;
+}
+
+void addPoint(double x, double y, double z, double F, int mark)
+{
+    point[Nc].x = x;
+    point[Nc].y = y;
+    point[Nc].z = z;
+    point[Nc].F = F;
+    point[Nc].mark = mark;
+    Nc++;
+}
+
+void addSegment(int n0, int n1, int mark)
+{
+    segment[Fl].n0 = n0;
+    segment[Fl].n1 = n1;
+    segment[Fl].mark = mark;
+    Fl++;
 }
 
 #define ADD_POINT(_x, _y, _z, _F, _mark)                    \

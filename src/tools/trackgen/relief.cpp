@@ -155,42 +155,39 @@ CountRelief(bool interior, int *nb_vert, int *nb_seg)
 static void
 genRec(ssgEntity *e)
 {
-    if (e->isAKindOf(_SSG_TYPE_BRANCH)) {
-	ssgBranch *br = (ssgBranch *)e;
-	
-	for (int i = 0; i < br->getNumKids(); i++) {
-	    genRec(br->getKid(i));
-	}
-    } else {
-	if (e->isAKindOf(_SSG_TYPE_VTXTABLE)) {
-	    ssgVtxTable *vt = (ssgVtxTable *)e;
-	    int nv = vt->getNumVertices();
-	    int nl = vt->getNumLines();
-	    int sv = Nc;
-	    int i;
+    if (e->isAKindOf(_SSG_TYPE_BRANCH))
+    {
+        ssgBranch* br = (ssgBranch*)e;
 
-	    for (i = 0; i < nv; i++) {
-		float *vtx = vt->getVertex(i);
-		point[Nc].x = vtx[0];
-		point[Nc].y = vtx[1];
-		point[Nc].z = vtx[2];
-		point[Nc].F = GridStep;
-		point[Nc].mark = 100000;
-		Nc++;
-	    }
+        for (int i = 0; i < br->getNumKids(); i++)
+        {
+            genRec(br->getKid(i));
+        }
+    }
+    else
+    {
+        if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
+        {
+            ssgVtxTable* vt = (ssgVtxTable*)e;
+            int nv = vt->getNumVertices();
+            int nl = vt->getNumLines();
+            int sv = getPointCount();
+ 
+            for (int i = 0; i < nv; i++)
+            {
+                float* vtx = vt->getVertex(i);
 
-	    for (i = 0; i < nl; i++) {
-		short vv0, vv1;
+                addPoint(vtx[0], vtx[1], vtx[2], GridStep, 100000);
+            }
 
-		vt->getLine(i, &vv0, &vv1);
+            for (int i = 0; i < nl; i++)
+            {
+                short vv0, vv1;
 
-		segment[Fl].n0 = vv0 + sv;
-		segment[Fl].n1 = vv1 + sv;
-		segment[Fl].mark = 100000;
-		
-		Fl++;
-	    }
-	}
+                vt->getLine(i, &vv0, &vv1);
+                addSegment(vv0 + sv, vv1 + sv, 100000);
+            }
+        }
     }
 }
 
