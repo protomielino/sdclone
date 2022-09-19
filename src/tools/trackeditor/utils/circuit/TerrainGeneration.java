@@ -16,6 +16,7 @@ public class TerrainGeneration
 	public static final String	DEFAULT_RELIEF_FILE			= null;
 	public static final String	DEFAULT_RELIEF_BORDER		= null;
 	public static final String	DEFAULT_SURFACE				= null;
+	public static final int		DEFAULT_RANDOM_SEED			= 1;
 
 	private double				trackStep					= Double.NaN;
 	private double				borderMargin				= Double.NaN;
@@ -29,6 +30,7 @@ public class TerrainGeneration
 	private String				reliefFile					= null;
 	private String				reliefBorder				= null;
 	private String				surface						= null;
+	private int					randomSeed					= Integer.MAX_VALUE;
 	private Vector<ObjectMap>	objectMaps					= new Vector<ObjectMap>();
 
 	/**
@@ -213,7 +215,16 @@ public class TerrainGeneration
 	{
 		this.reliefBorder = reliefBorder;
 	}
-
+	
+	public int getRandomSeed()
+	{
+		return randomSeed;
+	}
+	public void setRandomSeed(int randomSeed)
+	{
+		this.randomSeed = randomSeed;
+	}
+	
 	public void dump(String indent)
     {
 		System.out.println(indent + "TerrainGeneration");
@@ -229,6 +240,7 @@ public class TerrainGeneration
 		System.out.println(indent + "  reliefFile      : " + reliefFile);
 		System.out.println(indent + "  reliefBorder    : " + reliefBorder);
 		System.out.println(indent + "  surface         : " + surface);
+		System.out.println(indent + "  random seed     : " + randomSeed);
 		System.out.println(indent + "  objectMaps[" + objectMaps.size() + "]");
 		for (int i = 0; i < objectMaps.size(); i++)
 		{

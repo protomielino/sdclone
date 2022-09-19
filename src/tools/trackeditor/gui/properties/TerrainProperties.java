@@ -74,6 +74,8 @@ public class TerrainProperties extends PropertyPanel
 	private JComboBox<String>	reliefBorderComboBox		= null;
 	private JLabel				surfaceLabel				= new JLabel();
 	private SurfaceComboBox		surfaceComboBox				= null;
+	private JLabel				randomSeedLabel				= new JLabel();
+	private JTextField			randomSeedTextField			= new JTextField();
 	private JButton				defaultButton				= null;
 	private JButton				deleteButton				= null;
 	private JButton				addObjectMapButton			= null;
@@ -129,6 +131,7 @@ public class TerrainProperties extends PropertyPanel
 		addLabel(this, 9, reliefFileLabel, "Relief File", 120);
 		addLabel(this, 10, reliefBorderLabel, "Relief Border", 120);
 		addLabel(this, 11, surfaceLabel, "Surface", 120);
+		addLabel(this, 12, randomSeedLabel, "Random Seed", 120);
 
 		addTextField(this, 0, trackStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), 140, 125);
 		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 125);
@@ -142,6 +145,7 @@ public class TerrainProperties extends PropertyPanel
 		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), 140, 125);
 		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), 140, 295);
 		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), 140, 295);
+		addTextField(this, 12, randomSeedTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getRandomSeed(), 140, 125);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
@@ -436,7 +440,7 @@ public class TerrainProperties extends PropertyPanel
 		if (addObjectMapButton == null)
 		{
 			addObjectMapButton = new JButton();
-			addObjectMapButton.setBounds(10, 447, 130, 25);
+			addObjectMapButton.setBounds(10, 474, 130, 25);
 			addObjectMapButton.setText("Add Object Map");
 			addObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -462,7 +466,7 @@ public class TerrainProperties extends PropertyPanel
 		if (deleteObjectMapButton == null)
 		{
 			deleteObjectMapButton = new JButton();
-			deleteObjectMapButton.setBounds(155, 447, 140, 25);
+			deleteObjectMapButton.setBounds(155, 474, 140, 25);
 			deleteObjectMapButton.setText("Delete Object Map");
 			deleteObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -489,7 +493,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 339, 510, 100);
+			tabbedPane.setBounds(10, 366, 510, 100);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
 
@@ -594,6 +598,7 @@ public class TerrainProperties extends PropertyPanel
 	{
 		MutableString stringResult = new MutableString();
 		MutableDouble doubleResult = new MutableDouble();
+		MutableInteger integerResult = new MutableInteger();
 
 		if (isDifferent(trackStepTextField.getText(),
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), doubleResult))
@@ -676,6 +681,13 @@ public class TerrainProperties extends PropertyPanel
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface(), stringResult))
 		{
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(randomSeedTextField.getText(),
+			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getRandomSeed(), integerResult))
+		{
+			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setRandomSeed(integerResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
