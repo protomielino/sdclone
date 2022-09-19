@@ -140,9 +140,9 @@ public class CheckDialog extends JDialog
 
 				while ((line = br.readLine()) != null)
 				{
-					if (line.startsWith("name"))
+					if (line.startsWith("data"))
 					{
-						String name = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+						String name = br.readLine();
 
 						if (!(name.equals("interior") || name.equals("exterior")))
 						{
