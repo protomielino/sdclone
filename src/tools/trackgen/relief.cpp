@@ -67,7 +67,7 @@ hookNode(char *s)
 {
     tLine	*line;
     
-    line = (tLine*)calloc(1, sizeof(tLine));
+    line = reinterpret_cast<tLine*>(calloc(1, sizeof(tLine)));
     line->branch = new ssgBranch();
 
     if (strncmp(s, "interior", 8) == 0) {
@@ -104,18 +104,21 @@ LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
 static void
 countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
 {
-    if (e->isAKindOf(_SSG_TYPE_BRANCH)) {
-	ssgBranch *br = (ssgBranch *)e;
-	
-	for (int i = 0; i < br->getNumKids(); i++) {
-	    countRec(br->getKid(i), nb_vert, nb_seg);
-	}
-    } else {
-	if (e->isAKindOf(_SSG_TYPE_VTXTABLE)) {
-	    ssgVtxTable *vt = (ssgVtxTable *)e;
-	    *nb_vert += vt->getNumVertices();
-	    *nb_seg  += vt->getNumLines();
-	}
+    if (e->isAKindOf(_SSG_TYPE_BRANCH))
+    {
+        ssgBranch* br = dynamic_cast<ssgBranch*>(e);
+
+        for (int i = 0; i < br->getNumKids(); i++)
+        {
+            countRec(br->getKid(i), nb_vert, nb_seg);
+        }
+    }
+    else if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
+    {
+        ssgVtxTable* vt = dynamic_cast<ssgVtxTable*>(e);
+
+        *nb_vert += vt->getNumVertices();
+        *nb_seg += vt->getNumLines();
     }
 }
 
@@ -146,7 +149,7 @@ CountRelief(bool interior, int *nb_vert, int *nb_seg)
 	ssgFlatten(br);
 	curLine->branch = br2;
 	
-	countRec((ssgEntity *)curLine->branch, nb_vert, nb_seg);
+	countRec(dynamic_cast<ssgEntity *>(curLine->branch), nb_vert, nb_seg);
 
 	curLine = GF_TAILQ_NEXT(curLine, link);
     }
@@ -157,36 +160,34 @@ genRec(ssgEntity *e)
 {
     if (e->isAKindOf(_SSG_TYPE_BRANCH))
     {
-        ssgBranch* br = (ssgBranch*)e;
+        ssgBranch* br = dynamic_cast<ssgBranch*>(e);
 
         for (int i = 0; i < br->getNumKids(); i++)
         {
             genRec(br->getKid(i));
         }
     }
-    else
+    else if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
     {
-        if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
+        ssgVtxTable* vt = dynamic_cast<ssgVtxTable*>(e);
+
+        int nv = vt->getNumVertices();
+        int nl = vt->getNumLines();
+        int sv = getPointCount();
+
+        for (int i = 0; i < nv; i++)
         {
-            ssgVtxTable* vt = (ssgVtxTable*)e;
-            int nv = vt->getNumVertices();
-            int nl = vt->getNumLines();
-            int sv = getPointCount();
- 
-            for (int i = 0; i < nv; i++)
-            {
-                float* vtx = vt->getVertex(i);
+            float* vtx = vt->getVertex(i);
 
-                addPoint(vtx[0], vtx[1], vtx[2], GridStep, 100000);
-            }
+            addPoint(vtx[0], vtx[1], vtx[2], GridStep, 100000);
+        }
 
-            for (int i = 0; i < nl; i++)
-            {
-                short vv0, vv1;
+        for (int i = 0; i < nl; i++)
+        {
+            short vv0, vv1;
 
-                vt->getLine(i, &vv0, &vv1);
-                addSegment(vv0 + sv, vv1 + sv, 100000);
-            }
+            vt->getLine(i, &vv0, &vv1);
+            addSegment(vv0 + sv, vv1 + sv, 100000);
         }
     }
 }
@@ -212,7 +213,7 @@ GenRelief(bool interior)
     
     curLine = GF_TAILQ_FIRST(curHead);
     while (curLine != nullptr) {
-	genRec((ssgEntity *)curLine->branch);
+	genRec(dynamic_cast<ssgEntity *>(curLine->branch));
 
 	curLine = GF_TAILQ_NEXT(curLine, link);
     }
