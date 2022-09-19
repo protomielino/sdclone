@@ -28,9 +28,9 @@
 
 #include <plib/ssg.h>
 
-extern bool GetFilename(const char *filename, const char *filepath, char *buf);
-extern float getHOT(ssgRoot *root, float x, float y);
-extern float getTerrainAngle(ssgRoot *root, float x, float y);
+extern bool GetFilename(const char *filename, const char *filepaths, char *buf, size_t size);
+extern float getHOT(ssgBranch *root, float x, float y);
+extern float getTerrainAngle(ssgBranch *root, float x, float y);
 extern float getTrackAngle(tTrack *Track, void *TrackHandle, float x, float y);
 extern float getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distance, float *xRet, float *yRet, float *zRet);
 extern tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1);

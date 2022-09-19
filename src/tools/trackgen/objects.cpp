@@ -155,7 +155,7 @@ InitObjects(tTrack *track, void *TrackHandle)
         }
 
         char filename[1024];
-        GetFilename(objName, modelPath.c_str(), filename);
+        GetFilename(objName, modelPath.c_str(), filename, sizeof(filename));
         curObj->obj = ssgLoadAC(filename);
 
         if (!curObj->obj)
@@ -254,7 +254,7 @@ AddToRoot(ssgRoot *Root, ssgEntity *node)
 }
 
 static void
-AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, ssgRoot *Root, unsigned int clr, tdble x, tdble y)
+AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root, unsigned int clr, tdble x, tdble y)
 {
     for (struct objdef *curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
     {
@@ -295,13 +295,19 @@ AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, ssgRoot *Root, u
             if (curObj->terrainOriented)
             {
                 /* NEW: calculate angle for terrain-aligned orientation */
-                angle= getTerrainAngle(TrackRoot, x, y);
+                if (TrackRoot->isAKindOf(ssgTypeBranch()))
+                    angle = getTerrainAngle(reinterpret_cast<ssgBranch*>(TrackRoot), x, y);
+                else
+                {
+                    GfError("TrackRoot is not an ssgBranch\n");
+                    exit(1);
+                }
             }
 
             if (curObj->trackOriented)
             {
                 /* NEW: calculate angle for track-aligned orientation */
-                angle= getTrackAngle(track, TrackHandle, x, y);
+                angle = getTrackAngle(track, TrackHandle, x, y);
             }
 
             if (curObj->borderOriented)
@@ -316,7 +322,13 @@ AddObject(tTrack *track, void *TrackHandle, ssgRoot *TrackRoot, ssgRoot *Root, u
             }
             else
             {
-                z=getHOT(TrackRoot, x, y);
+                if (TrackRoot->isAKindOf(ssgTypeBranch()))
+                    z = getHOT(reinterpret_cast<ssgBranch *>(TrackRoot), x, y);
+                else
+                {
+                    GfError("TrackRoot is not an ssgBranch\n");
+                    exit(1);
+                }
             }
 
             printf("placing object %s: x: %g y: %g z: %g \n", curObj->filename, x, y, z);
@@ -572,7 +584,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     std::string texturePath(modelPath + ";" + GfDataDir() + "data/textures");
     ssgTexturePath(texturePath.c_str());
 
-    ssgRoot *TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
+    ssgEntity *TrackRoot = ssgLoadAC(meshFile.c_str());
 
     InitObjects(track, TrackHandle);
 

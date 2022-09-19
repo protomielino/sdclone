@@ -48,13 +48,13 @@ tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1)
 }
 
 bool
-GetFilename(const char *filename, const char *filepath, char *buf)
+GetFilename(const char *filename, const char *filepaths, char *buf, size_t size)
 {
     bool found = false;
 
-    if (filepath)
+    if (filepaths)
     {
-        const char *c1 = filepath;
+        const char *c1 = filepaths;
         const char *c2 = c1;
 
         while ((!found) && (c2 != nullptr))
@@ -63,7 +63,7 @@ GetFilename(const char *filename, const char *filepath, char *buf)
 
             if (c2 == nullptr)
             {
-                sprintf(buf, "%s/%s", c1, filename);
+                snprintf(buf, size, "%s/%s", c1, filename);
             }
             else
             {
@@ -71,13 +71,13 @@ GetFilename(const char *filename, const char *filepath, char *buf)
                 strncpy(buf, c1, lg);
                 buf[lg] = '/';
                 strcpy(buf + lg + 1, filename);
+                c1 = c2 + 1;
             }
 
             if (ulFileExists(buf))
             {
                 found = true;
             }
-            c1 = c2 + 1;
         }
     }
     else
@@ -92,14 +92,14 @@ GetFilename(const char *filename, const char *filepath, char *buf)
     if (!found)
     {
         printf("File %s not found\n", filename);
-        printf("File Path was %s\n", filepath);
+        printf("File Path was %s\n", filepaths);
     }
 
     return found;
 }
 
 float
-getHOT(ssgRoot *root, float x, float y)
+getHOT(ssgBranch *root, float x, float y)
 {
     sgVec3 test_vec;
     sgMat4 invmat;
@@ -107,7 +107,7 @@ getHOT(ssgRoot *root, float x, float y)
 
     invmat[3][0] = -x;
     invmat[3][1] = -y;
-    invmat[3][2] =  0.0f         ;
+    invmat[3][2] =  0.0f;
 
     test_vec [0] = 0.0f;
     test_vec [1] = 0.0f;
@@ -330,7 +330,7 @@ getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distanc
 *  FINISHED
 */
 float
-getTerrainAngle(ssgRoot *root, float x, float y)
+getTerrainAngle(ssgBranch *root, float x, float y)
 {
     sgVec3 test_vec;
     sgMat4 invmat;
