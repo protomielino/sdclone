@@ -35,12 +35,12 @@
 #include <cmath>
 #include <plib/ssg.h>
 
-#include "easymesh.h"
-#include "trackgen.h"
 #include <portability.h>
 #include <tgfclient.h>
 #include <track.h>
 
+#include "easymesh.h"
+#include "trackgen.h"
 #include "relief.h"
 
 typedef struct Line
