@@ -127,12 +127,12 @@ set(VORBIS_URL http://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
-set(EXPAT_VERSION 2.4.8)
+set(EXPAT_VERSION 2.4.9)
 string(REPLACE "." "_" EXPAT_TAG ${EXPAT_VERSION})
 set(EXPAT_PROJECT expat-${EXPAT_VERSION})
 set(EXPAT_FILE ${EXPAT_PROJECT}.tar.bz2)
 set(EXPAT_URL https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_TAG}/${EXPAT_FILE})
-set(EXPAT_HASH SHA256=a247a7f6bbb21cf2ca81ea4cbb916bfb9717ca523631675f99b3d4a5678dcd16)
+set(EXPAT_HASH SHA256=7f44d1469b110773a94b0d5abeeeffaef79f8bd6406b07e52394bcf48126437a)
 
 set(EXPAT_LEGACY_VERSION 2.2.10)
 string(REPLACE "." "_" EXPAT_LEGACY_TAG ${EXPAT_LEGACY_VERSION})
