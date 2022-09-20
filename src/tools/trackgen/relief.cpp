@@ -33,6 +33,7 @@
 #include <windows.h>
 #endif
 #include <cmath>
+#include <vector>
 #include <plib/ssg.h>
 
 #include <portability.h>
@@ -43,51 +44,37 @@
 #include "trackgen.h"
 #include "relief.h"
 
-typedef struct Line
-{
-    GF_TAILQ_ENTRY(struct Line) link;
-    ssgBranch *branch;
-} tLine;
-
-GF_TAILQ_HEAD(RingListHead, tLine);
-
-tRingListHead InteriorList;
-tRingListHead ExteriorList;
+static std::vector<ssgBranch*> InteriorList;
+static std::vector<ssgBranch*> ExteriorList;
 
 static tdble GridStep;
 
 static ssgEntity *Root = nullptr;
 
 /*
- * Read the faces from AC3D file
+ * Read the lines from AC3D file
  * separate between interior and exterior lines
  */
 static ssgBranch *hookNode(char *s)
 {
-    tLine *line;
-
-    line = reinterpret_cast<tLine *>(calloc(1, sizeof(tLine)));
-    line->branch = new ssgBranch();
+    ssgBranch *branch = new ssgBranch();
 
     if (strncmp(s, "interior", 8) == 0)
     {
-        GF_TAILQ_INSERT_TAIL(&InteriorList, line, link);
+        InteriorList.push_back(branch);
     }
     else
     {
-        GF_TAILQ_INSERT_TAIL(&ExteriorList, line, link);
+        ExteriorList.push_back(branch);
     }
-    return line->branch;
+    return branch;
 }
 
 /*
   Load a simple database
 */
-void LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
+void LoadRelief(tTrack *track, void *TrackHandle, const std::string &reliefFile)
 {
-    GF_TAILQ_INIT(&InteriorList);
-    GF_TAILQ_INIT(&ExteriorList);
-
     GridStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, GridStep);
 
     ssgLoaderOptions options;
@@ -96,9 +83,15 @@ void LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
 
     ssgSetCurrentOptions(&options);
 
-    printf("\nLoading relief file %s\n", reliefFile);
+    printf("\nLoading relief file %s\n", reliefFile.c_str());
 
-    Root = ssgLoadAC(reliefFile);
+    Root = ssgLoadAC(reliefFile.c_str());
+
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    printf("Relief: %Iu interior, %Iu exterior\n", InteriorList.size(), ExteriorList.size());
+#else
+    printf("Relief: %zu interior, %zu exterior\n", InteriorList.size(), ExteriorList.size());
+#endif
 }
 
 static void countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
@@ -123,38 +116,23 @@ static void countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
 
 void CountRelief(bool interior, int *nb_vert, int *nb_seg)
 {
-    tLine *curLine;
-    tRingListHead *curHead;
-
     *nb_vert = *nb_seg = 0;
 
     if (Root == nullptr)
-    {
         return;
-    }
 
-    if (interior)
-    {
-        curHead = &InteriorList;
-    }
-    else
-    {
-        curHead = &ExteriorList;
-    }
+    std::vector<ssgBranch*>& lines = interior ? InteriorList : ExteriorList;
 
-    curLine = GF_TAILQ_FIRST(curHead);
-    while (curLine != nullptr)
+    for (size_t i = 0; i < lines.size(); ++i)
     {
-        ssgBranch *br = curLine->branch->getParent(0);
+        ssgBranch *br = lines[i]->getParent(0);
         ssgBranch *br2 = new ssgBranch();
 
         br2->addKid(br);
         ssgFlatten(br);
-        curLine->branch = br2;
+        lines[i] = br2;
 
-        countRec(dynamic_cast<ssgEntity *>(curLine->branch), nb_vert, nb_seg);
-
-        curLine = GF_TAILQ_NEXT(curLine, link);
+        countRec(dynamic_cast<ssgEntity *>(lines[i]), nb_vert, nb_seg);
     }
 }
 
@@ -196,28 +174,13 @@ static void genRec(ssgEntity *e)
 
 void GenRelief(bool interior)
 {
-    tLine *curLine;
-    tRingListHead *curHead;
-
     if (Root == nullptr)
-    {
         return;
-    }
 
-    if (interior)
-    {
-        curHead = &InteriorList;
-    }
-    else
-    {
-        curHead = &ExteriorList;
-    }
+    std::vector<ssgBranch*>& lines = interior ? InteriorList : ExteriorList;
 
-    curLine = GF_TAILQ_FIRST(curHead);
-    while (curLine != nullptr)
+    for (size_t i = 0; i < lines.size(); ++i)
     {
-        genRec(dynamic_cast<ssgEntity *>(curLine->branch));
-
-        curLine = GF_TAILQ_NEXT(curLine, link);
+        genRec(dynamic_cast<ssgEntity *>(lines[i]));
     }
 }

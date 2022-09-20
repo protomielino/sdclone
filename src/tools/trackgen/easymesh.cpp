@@ -2514,8 +2514,8 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
     std::string FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, "");
     if (!FileName.empty())
     {
-        snprintf(buf, sizeof(buf), "%s/%s", inputPath.c_str(), FileName.c_str());
-        LoadRelief(track, TrackHandle, buf);
+        std::string reliefFile = inputPath + "/" + FileName;
+        LoadRelief(track, TrackHandle, reliefFile);
     }
     if (noElevation == -1)
     {
