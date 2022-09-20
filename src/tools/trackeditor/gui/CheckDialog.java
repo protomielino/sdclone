@@ -189,7 +189,7 @@ public class CheckDialog extends JDialog
 	}
 	private Boolean hasText(String text)
 	{
-		return !(text == null || text.isEmpty() || text.isBlank());
+		return !(text == null || text.trim().isEmpty());
 	}
 	private void checkTrackObject(TrackObject trackObject, String type)
 	{
