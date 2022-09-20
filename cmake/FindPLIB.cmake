@@ -18,7 +18,7 @@ IF(NOT APPLE OR OPTION_USE_MACPORTS)
   PATH_SUFFIXES 
 	Headers include/plib include develop/headers/plib develop/headers/x86/plib
   PATHS
-#Additional MacOS Paths
+  #Additional MacOS Paths
    	 ~/Library/Frameworks/plib.framework
   	 /Library/Frameworks/plib.framework
  	 /System/Library/Frameworks/plib.framework # Tiger
@@ -28,20 +28,22 @@ IF(NOT APPLE OR OPTION_USE_MACPORTS)
   DOC "Location of plib")
 ENDIF(NOT APPLE OR OPTION_USE_MACPORTS)
 
-IF(NOT APPLE OR OPTION_USE_MACPORTS)
- FIND_PATH(PLIB_PLIBINCLUDE_DIR ssg.h
-  HINTS ENV PLIB_DIR
-  PATH_SUFFIXES 
-	Headers include/plib include
-  PATHS
-#Additional MacOS Paths
-   	 ~/Library/Frameworks/plib.framework
-  	 /Library/Frameworks/plib.framework
- 	 /System/Library/Frameworks/plib.framework # Tiger
+IF(APPLE)
+   IF(NOT OPTION_USE_MACPORTS)
+    FIND_PATH(PLIB_PLIBINCLUDE_DIR ssg.h
+     HINTS ENV PLIB_DIR
+     PATH_SUFFIXES 
+	   Headers include/plib include
+     PATHS
+      #Additional MacOS Paths
+   	    ~/Library/Frameworks/plib.framework
+  	    /Library/Frameworks/plib.framework
+ 	    /System/Library/Frameworks/plib.framework # Tiger
 
-	/usr /usr/local
-  DOC "Location of plib")
-ENDIF(NOT APPLE OR OPTION_USE_MACPORTS)
+	   /usr /usr/local
+     DOC "Location of plib")
+   ENDIF(NOT OPTION_USE_MACPORTS)
+ENDIF(APPLE)
 
 SET(PLIB_INCLUDE_DIR ${PLIB_PLIBINCLUDE_DIR} CACHE STRING "Include dir for plib")
 
