@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <vector>
 
 #include <robottools.h>
 #include <tgf.h>
@@ -1515,7 +1516,7 @@ int load(void)
     double xt, yt, gab;
     int m;
     double xO, yO, zO, xN, yN, zN, L, Lx, Ly, Lz, dLm, ddL = 0, L_tot;
-    int *inserted;
+    std::vector<int> inserted(Nc, 0);
 
     memset(elem, 0, sizeof(elem));
     memset(side, 0, sizeof(side));
@@ -1528,7 +1529,6 @@ int load(void)
 
     printf("Segments = %d\n", Fl);
 
-    inserted = (int *)calloc(Nc, sizeof(int));
     chain = (struct chai *)calloc(Fl + 1, sizeof(struct chai)); /* approximation */
 
     for (n = 0; n < Nc; n++)
@@ -1837,7 +1837,6 @@ int load(void)
     }
 
     free(segment);
-    free(inserted);
 
     return 0;
 }
