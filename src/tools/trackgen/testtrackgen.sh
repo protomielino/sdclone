@@ -21,6 +21,7 @@ check circuit tuna
 check development showroom
 check development straight-10
 check development testtrack
+check dirt mixed-2
 check road e-track-4
 check speedway a-speedway
 
