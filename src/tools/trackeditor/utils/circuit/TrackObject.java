@@ -5,6 +5,7 @@ public final class TrackObject {
     private String object			= null;
     private int color				= Integer.MAX_VALUE;
     private String orientationType	= null;
+    private double borderDistance	= Double.NaN;
     private double orientation		= Double.NaN;
     private double deltaHeight		= Double.NaN;
     private double deltaVert		= Double.NaN;
@@ -43,6 +44,14 @@ public final class TrackObject {
 
 	public void setOrientationType(String orientationType) {
 		this.orientationType = orientationType;
+	}
+
+	public double getBorderDistance() {
+		return borderDistance;
+	}
+
+	public void setBorderDistance(double borderDistance) {
+		this.borderDistance = borderDistance;
 	}
 
 	public double getOrientation() {
@@ -108,6 +117,7 @@ public final class TrackObject {
 		System.out.println(indent + "  object          : " + object);
 		System.out.println(indent + "  color           : 0x" + Integer.toHexString(color).toUpperCase());
 		System.out.println(indent + "  orientationType : " + orientationType);
+		System.out.println(indent + "  borderDistance  : " + borderDistance);
 		System.out.println(indent + "  orientation     : " + orientation);
 		System.out.println(indent + "  deltaHeight     : " + deltaHeight);
 		System.out.println(indent + "  deltaVert       : " + deltaVert);

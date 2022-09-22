@@ -656,6 +656,7 @@ public class XmlWriter
 			addContent(el, "object", object.getObject());
 			addHexContent(el, "color", null, object.getColor());
 			addContent(el, "orientation type", object.getOrientationType());
+			addContent(el, "border distance", "m", object.getBorderDistance());
 			addContent(el, "orientation", "deg", object.getOrientation());
 			addContent(el, "delta height",null,  object.getDeltaHeight());
 			addContent(el, "delta vert", null, object.getDeltaVert());

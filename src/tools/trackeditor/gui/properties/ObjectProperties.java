@@ -94,7 +94,7 @@ public class ObjectProperties extends PropertyPanel
 		if (addObjectButton == null)
 		{
 			addObjectButton = new JButton();
-			addObjectButton.setBounds(10, 360, 120, 25);
+			addObjectButton.setBounds(10, 387, 120, 25);
 			addObjectButton.setText("Add Object");
 			addObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -123,7 +123,7 @@ public class ObjectProperties extends PropertyPanel
 		if (deleteObjectButton == null)
 		{
 			deleteObjectButton = new JButton();
-			deleteObjectButton.setBounds(140, 360, 120, 25);
+			deleteObjectButton.setBounds(140, 387, 120, 25);
 			deleteObjectButton.setText("Delete Object");
 			deleteObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -149,7 +149,7 @@ public class ObjectProperties extends PropertyPanel
 		if (copyObjectButton == null)
 		{
 			copyObjectButton = new JButton();
-			copyObjectButton.setBounds(270, 360, 120, 25);
+			copyObjectButton.setBounds(270, 387, 120, 25);
 			copyObjectButton.setText("Copy Object");
 			copyObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -173,7 +173,7 @@ public class ObjectProperties extends PropertyPanel
 		if (pasteObjectButton == null)
 		{
 			pasteObjectButton = new JButton();
-			pasteObjectButton.setBounds(400, 360, 120, 25);
+			pasteObjectButton.setBounds(400, 387, 120, 25);
 			pasteObjectButton.setText("Paste Object");
 			pasteObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -200,7 +200,7 @@ public class ObjectProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 340);
+			tabbedPane.setBounds(10, 10, 510, 367);
 
 			Vector<TrackObject> objects = null;
 			if (defaultObjects)
@@ -232,6 +232,8 @@ public class ObjectProperties extends PropertyPanel
 		private JLabel				orientationTypeLabel	= new JLabel();
 		private JComboBox<String>	orientationTypeComboBox	= null;
 		private JLabel				orientationLabel		= new JLabel();
+		private JTextField			borderDistanceTextField	= new JTextField();
+		private JLabel				borderDistanceLabel		= new JLabel();
 		private JTextField			orientationTextField	= new JTextField();
 		private JLabel				deltaHeightLabel		= new JLabel();
 		private JTextField			deltaHeightTextField	= new JTextField();
@@ -283,13 +285,14 @@ public class ObjectProperties extends PropertyPanel
 			addLabel(this, 1, objectLabel, "Object", 160);
 			addLabel(this, 2, colorLabel, "Color", 160);
 			addLabel(this, 3, orientationTypeLabel, "Orientation Type", 160);
-			addLabel(this, 4, orientationLabel, "Orientation", 160);
-			addLabel(this, 5, deltaHeightLabel, "Delta Height", 160);
-			addLabel(this, 6, deltaVertLabel, "Delta Vert", 160);
-			addLabel(this, 7, scaleTypeLabel, "Scale Type", 160);
-			addLabel(this, 8, scaleLabel, "Scale", 160);
-			addLabel(this, 9, scaleMinLabel, "Scale Min", 160);
-			addLabel(this, 10, scaleMaxLabel, "Scale Max", 160);
+			addLabel(this, 4, borderDistanceLabel, "Border Distance", 160);
+			addLabel(this, 5, orientationLabel, "Orientation", 160);
+			addLabel(this, 6, deltaHeightLabel, "Delta Height", 160);
+			addLabel(this, 7, deltaVertLabel, "Delta Vert", 160);
+			addLabel(this, 8, scaleTypeLabel, "Scale Type", 160);
+			addLabel(this, 9, scaleLabel, "Scale", 160);
+			addLabel(this, 10, scaleMinLabel, "Scale Min", 160);
+			addLabel(this, 11, scaleMaxLabel, "Scale Max", 160);
 
 			addTextField(this, 0, nameTextField, object.getName(), 120, 125);
 			addTextField(this, 1, objectTextField, object.getObject(), 120, 290);
@@ -298,16 +301,17 @@ public class ObjectProperties extends PropertyPanel
 			add(getOrientationTypeComboBox(), null);
 			getOrientationTypeComboBox().setSelectedItem(toNoneString(object.getOrientationType()));
 
-			addTextField(this, 4, orientationTextField, object.getOrientation(), 120, 125);
-			addTextField(this, 5, deltaHeightTextField, object.getDeltaHeight(), 120, 125);
-			addTextField(this, 6, deltaVertTextField, object.getDeltaVert(), 120, 125);
+			addTextField(this, 4, borderDistanceTextField, object.getBorderDistance(), 120, 125);
+			addTextField(this, 5, orientationTextField, object.getOrientation(), 120, 125);
+			addTextField(this, 6, deltaHeightTextField, object.getDeltaHeight(), 120, 125);
+			addTextField(this, 7, deltaVertTextField, object.getDeltaVert(), 120, 125);
 
 			add(getScaleTypeComboBox(), null);
 			getScaleTypeComboBox().setSelectedItem(toNoneString(object.getScaleType()));
 
-			addTextField(this, 8, scaleTextField, object.getScale(), 120, 125);
-			addTextField(this, 9, scaleMinTextField, object.getScaleMin(), 120, 125);
-			addTextField(this, 10, scaleMaxTextField, object.getScaleMax(), 120, 125);
+			addTextField(this, 9, scaleTextField, object.getScale(), 120, 125);
+			addTextField(this, 10, scaleMinTextField, object.getScaleMin(), 120, 125);
+			addTextField(this, 11, scaleMaxTextField, object.getScaleMax(), 120, 125);
 
 			if (defaultObjects)
 			{
@@ -346,7 +350,7 @@ public class ObjectProperties extends PropertyPanel
 			{
 				String[] items = {"none", "random", "fixed"};
 				scaleTypeComboBox = new JComboBox<String>(items);
-				scaleTypeComboBox.setBounds(120, 201, 125, 23);
+				scaleTypeComboBox.setBounds(120, 228, 125, 23);
 				scaleTypeComboBox.addActionListener(new java.awt.event.ActionListener()
 				{
 					public void actionPerformed(java.awt.event.ActionEvent e)
@@ -508,6 +512,12 @@ public class ObjectProperties extends PropertyPanel
                 getEditorFrame().documentIsModified = true;
             }
 
+            if (isDifferent(panel.borderDistanceTextField.getText(), object.getBorderDistance(), doubleResult))
+            {
+                object.setBorderDistance(doubleResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
             if (isDifferent(panel.orientationTextField.getText(), object.getOrientation(), doubleResult))
             {
                 object.setOrientation(doubleResult.getValue());
@@ -577,6 +587,7 @@ public class ObjectProperties extends PropertyPanel
 		object.setObject(panel.objectTextField.getText());
 		object.setColor(getInteger(panel.colorTextField.getText()));
 		object.setOrientationType(getString(panel.orientationTypeComboBox.getSelectedItem().toString()));
+		object.setBorderDistance(getDouble(panel.borderDistanceTextField.getText()));
 		object.setOrientation(getDouble(panel.orientationTextField.getText()));
 		object.setDeltaHeight(getDouble(panel.deltaHeightTextField.getText()));
 		object.setDeltaVert(getDouble(panel.deltaVertTextField.getText()));

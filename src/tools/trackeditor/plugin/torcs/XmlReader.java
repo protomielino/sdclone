@@ -452,6 +452,7 @@ public class XmlReader
             obj.setObject(getAttrStrValue(object, "object"));
             obj.setColor(getAttrIntValue(object, "color"));
             obj.setOrientationType(getAttrStrValue(object, "orientation type"));
+            obj.setBorderDistance(getAttrNumValue(object, "border distance", "m"));
             obj.setOrientation(getAttrNumValue(object, "orientation", "deg"));
             obj.setDeltaHeight(getAttrNumValue(object, "delta height"));
             obj.setDeltaVert(getAttrNumValue(object, "delta vert"));
