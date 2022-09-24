@@ -123,6 +123,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	static public final int		STATE_DELETE					= 4;
 	static public final int		STATE_SHOW_BGRD_START_POSITION	= 5;
 	static public final int		STATE_MOVE_SEGMENTS				= 6;
+	static public final int		STATE_SUBDIVIDE					= 7;
 
 	/** arrow showing state */
 	public boolean				showArrows						= false;
@@ -376,6 +377,173 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						}
 					}
 						break;
+
+					case STATE_SUBDIVIDE:
+					{
+						if (handledShape == null)
+						{
+							return;
+						}
+						SegmentVector data = editorFrame.getTrackData().getSegments();
+						int pos = data.indexOf(handledShape);
+						double splitPoint = 0.5;
+						switch (handledShape.getType())
+						{
+							case "lft":
+							{
+								Curve oldShape = (Curve)handledShape;
+								Curve cloneShape = (Curve)oldShape.clone();
+								Curve newShape2 = new Curve("lft", oldShape);
+								double arc = oldShape.getArcDeg();
+								double rStart = oldShape.getRadiusStart();
+								double rEnd = oldShape.getRadiusEnd();
+								double L = (rStart + rEnd) / 2.0 * oldShape.getArcDeg();
+								double nbSteps = (int)(L / 4.0 + 0.5) + 1;
+								double stepLength = L / nbSteps;
+								double deltaRadiusStep = (rEnd - rStart) / (nbSteps - 1.0);
+								double tmpAngle = 0.0;
+								double tmpRadius = rStart;
+								for (int curStep = 0; curStep < nbSteps; ++curStep)
+								{
+									tmpAngle += stepLength / tmpRadius;
+									tmpRadius += deltaRadiusStep;
+								}
+								stepLength *= arc / tmpAngle;
+								tmpAngle = 0.0;
+								tmpRadius = rStart;
+								for (int curStep = 0; curStep < nbSteps; ++curStep)
+								{
+									tmpAngle += stepLength / tmpRadius;
+									tmpRadius += deltaRadiusStep;
+									oldShape.setArcDeg(tmpAngle);
+									oldShape.setRadiusEnd(tmpRadius - deltaRadiusStep);
+									redrawCircuit();
+									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									{
+										splitPoint = curStep / nbSteps;
+										break;
+									}
+								}
+								newShape2.setArcDeg(arc - tmpAngle);
+								newShape2.setRadiusEnd(rEnd);
+								newShape2.setRadiusStart(tmpRadius);
+								double leftSide = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
+								double rightSide = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+								newShape2.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
+								newShape2.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
+								newShape2.getLeft().setSideStartWidth(leftSide);
+								newShape2.getRight().setSideStartWidth(rightSide);
+								newShape2.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
+								newShape2.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
+								oldShape.getRight().setSideEndWidth(rightSide);
+								oldShape.getLeft().setSideEndWidth(leftSide);
+								newShape2.setProfilStepsLength(4.0);
+								int count2 = Editor.getProperties().getCurveNameCount() + 1;
+								Editor.getProperties().setCurveNameCount(count2);
+								newShape2.setName("curve " + count2);
+								data.insertElementAt(newShape2, pos + 1);
+								//Undo.add(new UndoSplitSegment(cloneShape, newShape2));
+								break;
+							}
+							case "rgt":
+							{
+								Curve oldShape = (Curve)this.handledShape;
+								Curve cloneShape = (Curve)oldShape.clone();
+								Curve newShape2 = new Curve("rgt", oldShape);
+								double arc = oldShape.getArcDeg();
+								double rStart = oldShape.getRadiusStart();
+								double rEnd = oldShape.getRadiusEnd();
+								double L = (rStart + rEnd) / 2.0 * oldShape.getArcDeg();
+								double nbSteps = (int)(L / 4.0 + 0.5) + 1;
+								double stepLength = L / nbSteps;
+								final double deltaRadiusStep = (rEnd - rStart) / (nbSteps - 1.0);
+								double tmpAngle = 0.0;
+								double tmpRadius = rStart;
+								for (int curStep = 0; curStep < nbSteps; ++curStep)
+								{
+									tmpAngle += stepLength / tmpRadius;
+									tmpRadius += deltaRadiusStep;
+								}
+								stepLength *= arc / tmpAngle;
+								tmpAngle = 0.0;
+								tmpRadius = rStart;
+								for (int curStep = 0; curStep < nbSteps; ++curStep)
+								{
+									tmpAngle += stepLength / tmpRadius;
+									tmpRadius += deltaRadiusStep;
+									oldShape.setArcDeg(tmpAngle);
+									oldShape.setRadiusEnd(tmpRadius - deltaRadiusStep);
+									redrawCircuit();
+									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									{
+										splitPoint = curStep / nbSteps;
+										break;
+									}
+								}
+								newShape2.setArcDeg(arc - tmpAngle);
+								newShape2.setRadiusEnd(rEnd);
+								newShape2.setRadiusStart(tmpRadius);
+								double leftSide = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
+								double rightSide = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+								newShape2.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
+								newShape2.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
+								newShape2.getLeft().setSideStartWidth(leftSide);
+								newShape2.getRight().setSideStartWidth(rightSide);
+								newShape2.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
+								newShape2.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
+								oldShape.getRight().setSideEndWidth(rightSide);
+								oldShape.getLeft().setSideEndWidth(leftSide);
+								newShape2.setProfilStepsLength(4.0);
+								int count2 = Editor.getProperties().getCurveNameCount() + 1;
+								Editor.getProperties().setCurveNameCount(count2);
+								newShape2.setName("curve " + count2);
+								data.insertElementAt(newShape2, pos + 1);
+								//Undo.add(new UndoSplitSegment(cloneShape, newShape2));
+								break;
+							}
+							case "str":
+							{
+								Straight oldShape = (Straight)this.handledShape;
+								Straight cloneShape = (Straight)oldShape.clone();
+								Straight newShape3 = new Straight();
+								double length = oldShape.getLength();
+								for (int i = 0; i < 100; ++i)
+								{
+									splitPoint = i * 0.01;
+									newShape3.setLength(length * (1.0 - splitPoint));
+									oldShape.setLength(length * splitPoint);
+									redrawCircuit();
+									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									{
+										break;
+									}
+								}
+								double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
+								double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+								newShape3.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
+								newShape3.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
+								newShape3.getLeft().setSideStartWidth(leftSide2);
+								newShape3.getRight().setSideStartWidth(rightSide2);
+								newShape3.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
+								newShape3.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
+								oldShape.getRight().setSideEndWidth(rightSide2);
+								oldShape.getLeft().setSideEndWidth(leftSide2);
+								int count3 = Editor.getProperties().getStraightNameCount() + 1;
+								Editor.getProperties().setStraightNameCount(count3);
+								newShape3.setName("straight " + count3);
+								data.insertElementAt(newShape3, pos + 1);
+								//Undo.add(new UndoSplitSegment(cloneShape, newShape3));
+								break;
+							}
+							default:
+								break;
+						}
+						editorFrame.toggleButtonSubdivide.setSelected(false);
+						editorFrame.documentIsModified = true;
+						redrawCircuit();
+						setState(STATE_NONE);
+					}
+						break;
 				}
 			} catch (Exception ex)
 			{
@@ -599,6 +767,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				case STATE_CREATE_STRAIGHT :
 				case STATE_MOVE_SEGMENTS :
 				case STATE_DELETE :
+				case STATE_SUBDIVIDE :
 				{
 					if (dragging)
 						return;

@@ -103,6 +103,7 @@ public class EditorFrame extends JFrame
 	ShowArrowsAction			showArrowsAction					= null;
 	ShowBackgroundAction		showBackgroundAction				= null;
 	MoveAction					moveAction							= null;
+	SubdivideAction 			subdivideAction						= null;
 	HelpAction					helpAction							= null;
 	ImportAction				importAction						= null;
 	ExportAction				exportAction						= null;
@@ -137,6 +138,7 @@ public class EditorFrame extends JFrame
 	public JToggleButton		toggleButtonCreateLeftSegment		= null;
 	public JToggleButton		toggleButtonCreateRightSegment		= null;
 	public JToggleButton		toggleButtonDelete					= null;
+	public JToggleButton 		toggleButtonSubdivide				= null;
 	JButton						undoButton							= null;
 	JButton						redoButton							= null;
 	JMenu						viewMenu							= new JMenu();
@@ -163,6 +165,7 @@ public class EditorFrame extends JFrame
 	private JMenuItem			addLeftMenuItem						= null;
 	private JMenuItem			moveMenuItem						= null;
 	private JMenuItem			deleteMenuItem						= null;
+	private JMenuItem 			subdivideMenuItem					= null;
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
 	private JMenuItem			defaultSurfacesItem					= null;
@@ -924,6 +927,7 @@ public class EditorFrame extends JFrame
 			segmentMenu.addSeparator();
 			segmentMenu.add(getMoveMenuItem());
 			segmentMenu.add(getDeleteMenuItem());
+			segmentMenu.add(getSubdivideMenuItem());
 		}
 		return segmentMenu;
 	}
@@ -1017,6 +1021,21 @@ public class EditorFrame extends JFrame
 		}
 		return moveMenuItem;
 	}
+	/**
+	 * This method initializes subdivideMenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+    private JMenuItem getSubdivideMenuItem()
+    {
+        if (subdivideMenuItem == null)
+        {
+            subdivideMenuItem = new JMenuItem();
+            subdivideMenuItem.setAction(subdivideAction);
+            subdivideMenuItem.setIcon(null);
+        }
+        return subdivideMenuItem;
+    }
 	/**
 	 * This method initializes deleteMenuItem
 	 *
@@ -1438,6 +1457,25 @@ public class EditorFrame extends JFrame
 	}
 
 	/**
+	 * This method initializes toggleButtonSubdivide
+	 *
+	 * @return javax.swing.JToggleButton
+	 */
+    private JToggleButton getToggleButtonSubdivide()
+    {
+        if (toggleButtonSubdivide == null)
+        {
+            toggleButtonSubdivide = new JToggleButton();
+            toggleButtonSubdivide.setAction(subdivideAction);
+            if (toggleButtonSubdivide.getIcon() != null)
+            {
+                toggleButtonSubdivide.setText("");
+            }
+        }
+        return toggleButtonSubdivide;
+    }
+
+	/**
 	 * This method initializes buttonZoomPlus
 	 *
 	 * @return javax.swing.JButton
@@ -1789,6 +1827,8 @@ public class EditorFrame extends JFrame
 				getMoveButton().setSelected(false);
 			if (toggleButtonDelete != button)
 				toggleButtonDelete.setSelected(false);
+			if (toggleButtonSubdivide != button)
+				toggleButtonSubdivide.setSelected(false);
 		} else
 		{
 			view.setState(CircuitView.STATE_NONE);
@@ -1836,6 +1876,11 @@ public class EditorFrame extends JFrame
 		Undo.redo();
 		view.redrawCircuit();
 	}
+
+    void toggleButtonSubdivide_actionPerformed(ActionEvent e)
+    {
+        checkButtons(toggleButtonSubdivide, CircuitView.STATE_SUBDIVIDE);
+    }
 
 	void menuItemAddBackground_actionPerformed(ActionEvent e)
 	{
@@ -1901,6 +1946,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getUndoButton());
 			jToolBar.add(getRedoButton());
 			jToolBar.add(getToggleButtonDelete());
+			jToolBar.add(getToggleButtonSubdivide());
 			jToolBar.add(getButtonZoomPlus());
 			jToolBar.add(getButtonZoomOne());
 			jToolBar.add(getButtonZoomMinus());
@@ -1973,6 +2019,7 @@ public class EditorFrame extends JFrame
 		undoAction = new UndoAction("Undo", createNavigationIcon("Undo24"), "Undo.", KeyEvent.VK_Z);
 		redoAction = new RedoAction("Redo", createNavigationIcon("Redo24"), "Redo.", KeyEvent.VK_R);
 		deleteAction = new DeleteAction("Delete", createNavigationIcon("Cut24"), "Delete.", KeyEvent.VK_L);
+		subdivideAction = new SubdivideAction("Subdivide", createNavigationIcon("Subdivide24"), "Subdivide.", KeyEvent.VK_Q);
 		zoomPlusAction = new ZoomPlusAction("Zoom in", createNavigationIcon("ZoomIn24"), "Zoom in.", KeyEvent.VK_M);
 		zoomOneAction = new ZoomOneAction("Zoom 1:1", createNavigationIcon("Zoom24"), "Zoom 1:1.", KeyEvent.VK_N);
 		zoomMinusAction = new ZoomMinusAction("Zoom out", createNavigationIcon("ZoomOut24"), "Zoom out.", KeyEvent.VK_O);
@@ -2040,6 +2087,19 @@ public class EditorFrame extends JFrame
 			toggleButtonDelete_actionPerformed(e);
 		}
 	}
+    public class SubdivideAction extends AbstractAction
+    {
+        public SubdivideAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+        {
+            super(text, icon);
+            putValue(SHORT_DESCRIPTION, desc);
+            putValue(MNEMONIC_KEY, mnemonic);
+        }
+
+        public void actionPerformed(final ActionEvent e) {
+            toggleButtonSubdivide_actionPerformed(e);
+        }
+    }
 	public class ZoomPlusAction extends AbstractAction
 	{
 		public ZoomPlusAction(String text, ImageIcon icon, String desc, Integer mnemonic)
