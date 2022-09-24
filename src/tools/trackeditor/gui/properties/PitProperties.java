@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.SegmentVector;
 import utils.SurfaceComboBox;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
@@ -287,7 +288,7 @@ public class PitProperties extends PropertyPanel
 		if (generatePitsCheckBox.isSelected())
 		{
 			Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
-			Vector<Segment> data = getEditorFrame().getTrackData().getSegments();
+			SegmentVector data = getEditorFrame().getTrackData().getSegments();
 			Segment pitEntry = null;
 			Segment pitStart = null;
 			Segment pitEnd = null;
@@ -766,7 +767,7 @@ public class PitProperties extends PropertyPanel
 	private void createPits()
 	{
 		Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
-		Vector<Segment> data = getEditorFrame().getTrackData().getSegments();
+		SegmentVector data = getEditorFrame().getTrackData().getSegments();
 		Segment pitEntry = null;
 		Segment pitStart = null;
 		Segment pitStartBuildings = null;

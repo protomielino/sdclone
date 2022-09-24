@@ -34,6 +34,7 @@ import org.jdom.output.Format;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.SegmentVector;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
@@ -239,7 +240,7 @@ public class XmlWriter
 	 */
 	private synchronized Element getSegments()
 	{
-		Vector<Segment> segments = editorFrame.getTrackData().getSegments();
+		SegmentVector segments = editorFrame.getTrackData().getSegments();
 		Segment prev = null;
 		Attribute name = null;
 		if (editorFrame.getTrackData().getHeader().getVersion() == 3)

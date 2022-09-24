@@ -20,9 +20,8 @@
  */
 package utils.undo;
 
-import java.util.Vector;
-
 import gui.EditorFrame;
+import utils.SegmentVector;
 import utils.circuit.Segment;
 
 /**
@@ -54,7 +53,7 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void undo()
 	{
-		Vector<Segment> data = editorFrame.getTrackData().getSegments();
+		SegmentVector data = editorFrame.getTrackData().getSegments();
 		if (data != null)
 		{
 			pos = data.indexOf(original);
@@ -67,7 +66,7 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void redo()
 	{
-		Vector<Segment> data = editorFrame.getTrackData().getSegments();
+		SegmentVector data = editorFrame.getTrackData().getSegments();
 		pos = data.indexOf(clone);
 		data.set(pos,original);
 	}

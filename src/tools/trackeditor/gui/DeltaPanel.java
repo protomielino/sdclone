@@ -23,7 +23,6 @@ package gui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -32,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import utils.Editor;
+import utils.SegmentVector;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
@@ -420,7 +420,7 @@ public class DeltaPanel extends JDialog implements Runnable
 	        return;
 	    }
 	    co = newLength/length;
-		Vector<Segment> track = editorFrame.getTrackData().getSegments();
+		SegmentVector track = editorFrame.getTrackData().getSegments();
 		int size = track.size();
 
 		for(int i=0; i<size; i++)
@@ -460,7 +460,7 @@ public class DeltaPanel extends JDialog implements Runnable
 	    waitTrackgen();
 	    double co = 360/(360+angle);
 	    
-		Vector<Segment> track = editorFrame.getTrackData().getSegments();
+		SegmentVector track = editorFrame.getTrackData().getSegments();
 		int size = track.size();
 
 		for(int i=0; i<size; i++)

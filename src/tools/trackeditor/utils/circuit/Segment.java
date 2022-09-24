@@ -1474,20 +1474,6 @@ public class Segment implements Cloneable
         return value;
     }
    
-    public void addToPrevious(Segment previous)
-    {
-        previousShape = previous;
-        if (previous != null)
-            previous.nextShape = this;
-    }
-
-    public void addToNext(Segment next)
-    {
-        nextShape = next;
-        if (next != null)
-            next.previousShape = this;
-    }
-    
     public void inheritProperties(Segment previousShape)
     {
 		setSurface(previousShape.getSurface());
@@ -1542,4 +1528,14 @@ public class Segment implements Cloneable
 		getRight().setBorderSurface(previousShape.getRight().getBorderSurface());
 		getRight().setBorderStyle(previousShape.getRight().getBorderStyle());
     }
+    
+	public void dump(String indent)
+	{
+		System.out.println(indent + "Segment");
+		System.out.println(indent + "  previousShape : " + (previousShape != null ? previousShape.name : "null"));
+		System.out.println(indent + "  nextShape     : " + (nextShape != null ? nextShape.name : "null"));
+		System.out.println(indent + "  name          : " + name);
+		System.out.println(indent + "  type          : " + type);
+		System.out.println(indent + "  count         : " + count);
+	}
 }

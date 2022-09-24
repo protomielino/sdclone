@@ -35,6 +35,7 @@ import org.xml.sax.InputSource;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.SegmentVector;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
@@ -691,7 +692,7 @@ public class XmlReader
         if (segments == null)
             return;
 
-        Vector<Segment> trackData = new Vector<Segment>();
+        SegmentVector trackData = new SegmentVector();
         Iterator<Element> it;
         Segment prev = null;
         Segment shape = null;
@@ -726,15 +727,8 @@ public class XmlReader
     private synchronized Segment setSegment(Element seg, Segment shape,
             Segment prev)
     {
-        shape.addToPrevious(prev);
-
         SegmentSide left = shape.getLeft();
         SegmentSide right = shape.getRight();
-        if (prev != null)
-        {
-            SegmentSide prevLeft = prev.getLeft();
-            SegmentSide prevRight = prev.getRight();
-        }
 
         if (shape.getType().equals("str"))
         {

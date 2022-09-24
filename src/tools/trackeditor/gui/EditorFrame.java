@@ -69,6 +69,7 @@ import utils.CustomFileFilter;
 import utils.Editor;
 import utils.Project;
 import utils.Properties;
+import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.Curve;
 import utils.circuit.MainTrack;
@@ -566,7 +567,7 @@ public class EditorFrame extends JFrame
     {
         Segment shape;
         Segment previous = null;
-        Vector<Segment> track = new Vector<Segment>();
+        SegmentVector track = new SegmentVector();
 
         shape = new Straight();
         shape.setLength(100);
@@ -591,7 +592,6 @@ public class EditorFrame extends JFrame
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
-        shape.addToPrevious(previous);
         track.add(shape);
 
         previous = shape;
@@ -604,7 +604,6 @@ public class EditorFrame extends JFrame
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
-        shape.addToPrevious(previous);
         track.add(shape);
 
         previous = shape;
@@ -619,7 +618,6 @@ public class EditorFrame extends JFrame
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
-        shape.addToPrevious(previous);
         track.add(shape);
 
         trackData = null;
