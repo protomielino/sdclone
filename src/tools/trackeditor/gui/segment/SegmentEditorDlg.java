@@ -582,7 +582,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			heightStartLeftSlider.setSection("L Height");
 			heightStartLeftSlider.setAttr("Start");
 			heightStartLeftSlider.setMin(0);
-			heightStartLeftSlider.setMax(100);
+			heightStartLeftSlider.setMax(200);
 			heightStartLeftSlider.setExtent(2);
 			heightStartLeftSlider.setTickSpacing(0.5);
 			heightStartLeftSlider.setRealToTextCoeff(1);
@@ -606,7 +606,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			heightStartRightSlider.setSection("R Height");
 			heightStartRightSlider.setAttr("Start");
 			heightStartRightSlider.setMin(0);
-			heightStartRightSlider.setMax(100);
+			heightStartRightSlider.setMax(200);
 			heightStartRightSlider.setExtent(2);
 			heightStartRightSlider.setTickSpacing(0.5);
 			heightStartRightSlider.setRealToTextCoeff(1);
@@ -630,7 +630,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			heightEndLeftSlider.setSection("L Height");
 			heightEndLeftSlider.setAttr("End");
 			heightEndLeftSlider.setMin(0);
-			heightEndLeftSlider.setMax(100);
+			heightEndLeftSlider.setMax(200);
 			heightEndLeftSlider.setExtent(2);
 			heightEndLeftSlider.setTickSpacing(0.5);
 			heightEndLeftSlider.setRealToTextCoeff(1);
@@ -654,7 +654,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			heightEndRightSlider.setSection("R Height");
 			heightEndRightSlider.setAttr("End");
 			heightEndRightSlider.setMin(0);
-			heightEndRightSlider.setMax(100);
+			heightEndRightSlider.setMax(200);
 			heightEndRightSlider.setExtent(2);
 			heightEndRightSlider.setTickSpacing(0.5);
 			heightEndRightSlider.setRealToTextCoeff(1);
