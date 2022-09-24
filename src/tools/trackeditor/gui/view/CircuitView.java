@@ -611,33 +611,43 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						if (handles.size() > 0)
 						{
 							handles.clear();
+						}
+
+						if (handledShape != null)
+						{
 							handledShape = null;
 
 							invalidate();
 							repaint();
 						}
-					} else
+					}
+					else
 					{
 						handles.clear();
 						handledShape = obj;
 
-						double maxDist = Double.MAX_VALUE;
-						Iterator i = editorFrame.getTrackData().getSegments().iterator();
-						while (i.hasNext())
+						if (currentState == STATE_CREATE_LEFT_SEGMENT ||
+							currentState == STATE_CREATE_RIGHT_SEGMENT ||
+							currentState == STATE_CREATE_STRAIGHT)
 						{
-							Segment o = (Segment) i.next();
-
-							if (maxDist > o.endTrackCenter.distance(mousePoint))
+							double maxDist = Double.MAX_VALUE;
+							Iterator<Segment> i = editorFrame.getTrackData().getSegments().iterator();
+							while (i.hasNext())
 							{
-								maxDist = o.endTrackCenter.distance(mousePoint);
-								obj = o;
+								Segment o = i.next();
+
+								if (maxDist > o.endTrackCenter.distance(mousePoint))
+								{
+									maxDist = o.endTrackCenter.distance(mousePoint);
+									obj = o;
+								}
 							}
+
+							handledShape = obj;
+							handle.calcShape(handledShape.endTrackCenter);
+
+							handles.add(handle);
 						}
-
-						handledShape = obj;
-						handle.calcShape(handledShape.endTrackCenter);
-
-						handles.add(handle);
 						invalidate();
 						repaint();
 					}
