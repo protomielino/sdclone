@@ -78,6 +78,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/Project.java
          utils/Properties.java
          utils/SegmentSliderLayout.java
+         utils/SegmentVector.java
          utils/SurfaceComboBox.java
          utils/TrackData.java
          utils/TrackEditor.java
