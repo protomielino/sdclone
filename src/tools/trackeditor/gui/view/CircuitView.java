@@ -538,6 +538,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							default:
 								break;
 						}
+						handledShape = null;
 						editorFrame.toggleButtonSubdivide.setSelected(false);
 						editorFrame.documentIsModified = true;
 						redrawCircuit();
