@@ -107,4 +107,15 @@ public class SegmentVector extends Vector<Segment>
 			get(i).dump(indent + "    ");
 		}
     }
+	
+	public void dumpLinks()
+	{
+		for (int i = 0; i < size(); i++)
+		{
+			System.out.println("segment[" + i + "] " +
+					(get(i).previousShape != null ? get(i).previousShape.getName() : "null") +
+					" <- " + get(i).getName() + " -> " + 
+					(get(i).nextShape != null ? get(i).nextShape.getName() : "null"));
+		}
+	}
 }
