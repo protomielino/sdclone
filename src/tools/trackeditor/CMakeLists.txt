@@ -125,6 +125,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
             gui/icons/Cut24.gif
             gui/icons/Export24.gif
             gui/icons/FindAgain24.gif
+            gui/icons/Finish24.gif
             gui/icons/Help24.gif
             gui/icons/Movie24.gif
             gui/icons/New24.gif

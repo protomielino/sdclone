@@ -117,6 +117,7 @@ public class EditorFrame extends JFrame
 	PropertiesAction			propertiesAction					= null;
 	CalcDeltaAction				calcDeltaAction						= null;
 	CheckAction					checkAction							= null;
+	FinishLineAction			finishLineAction					= null;
 
 	private JPanel				jContentPane						= null;
 
@@ -153,6 +154,7 @@ public class EditorFrame extends JFrame
 	private JButton				openButton							= null;
 	private JButton				helpButton							= null;
 	private JButton				checkButton							= null;
+	public JToggleButton		finishLineToggleButton				= null;
 	private JButton				propertiesButton					= null;
 	private JMenuItem			zoomPlusMenuItem					= null;
 	private JMenuItem			zoomMinusMenuItem					= null;
@@ -1713,6 +1715,24 @@ public class EditorFrame extends JFrame
 		return checkButton;
 	}
 	/**
+	 * This method initializes finishLineToggleButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JToggleButton getFinishLineToggleButton()
+	{
+		if (finishLineToggleButton == null)
+		{
+			finishLineToggleButton = new JToggleButton();
+			finishLineToggleButton.setAction(finishLineAction);
+			if (finishLineToggleButton.getIcon() != null)
+			{
+				finishLineToggleButton.setText("");
+			}
+		}
+		return finishLineToggleButton;
+	}
+	/**
 	 * This method initializes propertiesButton
 	 *
 	 * @return javax.swing.JButton
@@ -1958,6 +1978,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getShowBackgroundButton());
 			jToolBar.add(getCalculateDeltaButton());
 			jToolBar.add(getCheckButton());
+			jToolBar.add(getFinishLineToggleButton());
 			jToolBar.add(getHelpButton());
 		}
 		return jToolBar;
@@ -2034,6 +2055,7 @@ public class EditorFrame extends JFrame
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
 		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"), "Show background image.", KeyEvent.VK_S);
 		checkAction = new CheckAction("Check", createNavigationIcon("Check24"), "Check.", KeyEvent.VK_S);
+		finishLineAction = new FinishLineAction("Finish Line", createNavigationIcon("Finish24"), "Finish Line.", KeyEvent.VK_S);
 		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
 		/** ******************************************************************* */
 		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", null);
@@ -2310,6 +2332,29 @@ public class EditorFrame extends JFrame
 		CheckDialog checkDialog = new CheckDialog(this);
 		checkDialog.setModal(true);
 		checkDialog.setVisible(true);
+	}
+
+	public class FinishLineAction extends AbstractAction
+	{
+		public FinishLineAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			finishLine();
+		}
+	}
+	private void finishLine()
+	{
+		if (trackData == null)
+		{
+			message("No track", "No track");
+			return;
+		}
+		checkButtons(finishLineToggleButton, CircuitView.STATE_FINISH_LINE);
 	}
 
 	private class ExportAction extends AbstractAction

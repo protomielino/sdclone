@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 
 import utils.Editor;
 import utils.EditorPoint;
@@ -124,6 +125,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	static public final int		STATE_SHOW_BGRD_START_POSITION	= 5;
 	static public final int		STATE_MOVE_SEGMENTS				= 6;
 	static public final int		STATE_SUBDIVIDE					= 7;
+	static public final int		STATE_FINISH_LINE				= 8;
 
 	/** arrow showing state */
 	public boolean				showArrows						= false;
@@ -545,6 +547,31 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						setState(STATE_NONE);
 					}
 						break;
+					case STATE_FINISH_LINE :
+					{
+						if (handledShape == null)
+							return;
+
+						boolean mustFireEvent = (selectedShape != null);
+
+						selectedShape = null;
+
+						if (mustFireEvent)
+							fireSelectionChanged(selectionChangedEvent);
+
+						JOptionPane.showMessageDialog(this, "Not implemented yet!", "Moving Finishh Line", JOptionPane.INFORMATION_MESSAGE);
+						
+						handledShape = null;
+						editorFrame.documentIsModified = true;
+
+						this.redrawCircuit();
+
+						setState(STATE_NONE);
+						editorFrame.finishLineToggleButton.setSelected(false);
+
+						editorFrame.documentIsModified = true;
+					}
+						break;
 				}
 			} catch (Exception ex)
 			{
@@ -769,6 +796,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				case STATE_MOVE_SEGMENTS :
 				case STATE_DELETE :
 				case STATE_SUBDIVIDE :
+				case STATE_FINISH_LINE :
 				{
 					if (dragging)
 						return;
@@ -798,7 +826,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 						if (currentState == STATE_CREATE_LEFT_SEGMENT ||
 							currentState == STATE_CREATE_RIGHT_SEGMENT ||
-							currentState == STATE_CREATE_STRAIGHT)
+							currentState == STATE_CREATE_STRAIGHT ||
+							currentState == STATE_FINISH_LINE)
 						{
 							double maxDist = Double.MAX_VALUE;
 							Iterator<Segment> i = editorFrame.getTrackData().getSegments().iterator();
