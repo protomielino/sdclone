@@ -6,6 +6,16 @@ import utils.circuit.Segment;
 
 public class SegmentVector extends Vector<Segment>
 {
+	public synchronized Segment set(int index, Segment segment)
+	{
+		Segment current = get(index);
+
+		segment.nextShape = current.nextShape;
+		segment.previousShape = current.previousShape;
+
+		return super.set(index,  segment);
+	}
+
     public synchronized boolean add(Segment segment)
     {
     	Segment last = null;

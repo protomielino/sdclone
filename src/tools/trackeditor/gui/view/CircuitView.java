@@ -40,6 +40,7 @@ import utils.undo.Undo;
 import utils.undo.UndoAddSegment;
 import utils.undo.UndoDeleteSegment;
 import utils.undo.UndoSegmentChange;
+import utils.undo.UndoSplitSegment;
 
 
 /**
@@ -444,7 +445,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
 								data.insertElementAt(newShape2, pos + 1);
-								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
+								Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
 								break;
 							}
 							case "rgt":
@@ -500,7 +501,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
 								data.insertElementAt(newShape2, pos + 1);
-								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
+								Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
 								break;
 							}
 							case "str":
@@ -534,7 +535,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setStraightNameCount(count3);
 								newShape3.setName("straight " + count3);
 								data.insertElementAt(newShape3, pos + 1);
-								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape3));
+								Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape3));
 								break;
 							}
 							default:
@@ -559,7 +560,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						if (mustFireEvent)
 							fireSelectionChanged(selectionChangedEvent);
 
-						JOptionPane.showMessageDialog(this, "Not implemented yet!", "Moving Finishh Line", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(this, "Not implemented yet!", "Moving Finish Line", JOptionPane.INFORMATION_MESSAGE);
 						
 						handledShape = null;
 						editorFrame.documentIsModified = true;

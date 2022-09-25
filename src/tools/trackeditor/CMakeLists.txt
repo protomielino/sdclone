@@ -110,7 +110,8 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/undo/UndoAddSegment.java
          utils/undo/UndoDeleteSegment.java
          utils/undo/UndoInterface.java
-         utils/undo/UndoSegmentChange.java)
+         utils/undo/UndoSegmentChange.java
+         utils/undo/UndoSplitSegment.java)
 
    #file(GLOB_RECURSE _JAVA_SRC ./*.java)
    #foreach(_jfile ${_JAVA_SRC})
