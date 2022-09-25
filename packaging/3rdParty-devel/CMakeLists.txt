@@ -345,7 +345,11 @@ endif(OPTION_SDL2_MIXER)
 if(OPTION_EXPAT)
    if(MSVC_VERSION GREATER 1900)
       #disable building unneeded sub projects
-      set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
+      set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off 
+                                             -DEXPAT_BUILD_EXAMPLES=off 
+                                             -DEXPAT_BUILD_TOOLS=off 
+                                             -DCMAKE_DEBUG_POSTFIX='' 
+                                             -DEXPAT_DEBUG_POSTFIX='')
       ExternalProject_Add(${EXPAT_PROJECT}
          DOWNLOAD_NAME ${EXPAT_FILE}
          URL ${EXPAT_URL}
