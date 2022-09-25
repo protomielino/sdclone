@@ -118,4 +118,56 @@ public class SegmentVector extends Vector<Segment>
 					(get(i).nextShape != null ? get(i).nextShape.getName() : "null"));
 		}
 	}
+	
+	public boolean validateLinks()
+	{
+		boolean valid = true;
+		if (size() > 0)
+		{
+			if (get(0).getPreviousShape() != null)
+			{
+				System.out.println("segment[0] previousShape not null");
+				valid = false;
+			}
+
+			if (get(size() - 1).getNextShape() != null)
+			{
+				System.out.println("segment[" + (size() - 1) + "] nextShape not null");
+				valid = false;
+			}
+		}
+
+		for (int i = 0; i < size(); i++)
+		{
+			Segment segment = get(i);
+
+			if (segment.previousShape == null && i != 0)
+			{
+				System.out.println("segment[" + i + "] previousShape null");
+				valid = false;
+			}
+			
+			if (segment.previousShape != null && segment.previousShape.nextShape != null &&
+					!segment.previousShape.nextShape.getName().equals(segment.getName()))
+			{
+				System.out.println("segment[" + i + "] previousShape bad");
+				valid = false;
+			}
+			
+			if (segment.nextShape == null && i != size() - 1)
+			{
+				System.out.println("segment[" + i + "] nextShape null");
+				valid = false;
+			}
+			
+			if (segment.nextShape != null && segment.nextShape.previousShape != null &&
+					!segment.nextShape.previousShape.getName().equals(segment.getName()))
+			{
+				System.out.println("segment[" + i + "] nextShape bad");
+				valid = false;
+			}
+		}
+			
+		return valid;
+	}
 }

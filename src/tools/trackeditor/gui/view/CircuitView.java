@@ -444,7 +444,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
 								data.insertElementAt(newShape2, pos + 1);
-								//Undo.add(new UndoSplitSegment(cloneShape, newShape2));
+								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
 								break;
 							}
 							case "rgt":
@@ -500,7 +500,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
 								data.insertElementAt(newShape2, pos + 1);
-								//Undo.add(new UndoSplitSegment(cloneShape, newShape2));
+								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape2));
 								break;
 							}
 							case "str":
@@ -534,7 +534,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								Editor.getProperties().setStraightNameCount(count3);
 								newShape3.setName("straight " + count3);
 								data.insertElementAt(newShape3, pos + 1);
-								//Undo.add(new UndoSplitSegment(cloneShape, newShape3));
+								//Undo.add(new UndoSplitSegment(editorFrame, oldShape, cloneShape, newShape3));
 								break;
 							}
 							default:
