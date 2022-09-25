@@ -200,3 +200,10 @@ set(SQLITE3_PROJECT sqlite3-${SQLITE3_VERSION})
 set(SQLITE3_FILE sqlite-amalgamation-3360000.zip)
 set(SQLITE3_URL https://www.sqlite.org/2021/${SQLITE3_FILE})
 set(SQLITE3_HASH SHA256=999826fe4c871f18919fdb8ed7ec9dd8217180854dd1fe21eea96aed36186729)
+
+# GLM
+set(GLM_VERSION 0.9.9.8)
+set(GLM_PROJECT glm-${GLM_VERSION})
+set(GLM_FILE ${GLM_PROJECT}.zip)
+set(GLM_URL https://github.com/g-truc/glm/releases/download/${GLM_VERSION}/${GLM_FILE})
+set(GLM_HASH SHA256=37e2a3d62ea3322e43593c34bae29f57e3e251ea89f4067506c94043769ade4c)

@@ -108,6 +108,7 @@ option(OPTION_SQLITE3 "Download and Build sqlite3" false)
 option(OPTION_FREETYPE "Download and Build FreeType" true)
 option(OPTION_CURL "Download and Build curl" true)
 option(OPTION_OSG "Download and Build OpenSceneGraph" true)
+option(OPTION_GLM "Download and install GLM math headers" false)
 option(OPTION_CACHED_ARCHIVES "Download from a defined cache" false)
 
 set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
@@ -132,6 +133,7 @@ if(OPTION_CACHED_ARCHIVES)
    set(FREETYPE_LEGACY_URL "${CACHED_URL}/${FREETYPE_LEGACY_FILE}")
    set(CURL_URL "${CACHED_URL}/${CURL_FILE}")
    set(OSG_URL "${CACHED_URL}/${OSG_FILE}")
+   set(OPTION_GLM "${CACHED_URL}/${GLM_FILE}")
    set(SQLITE3_URL "${CACHED_URL}/${SQLITE3_FILE}")
 endif()
 
@@ -498,6 +500,24 @@ if(OPTION_OSG)
       DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
+if(OPTION_GLM)
+   set(GLM_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX=''
+                                           -DBUILD_STATIC_LIBS=true
+                                           )
+   ExternalProject_Add(${GLM_PROJECT}
+      URL ${GLM_URL}
+      URL_HASH ${GLM_HASH}
+      CMAKE_ARGS ${GLM_ARGS}
+      )
+      ExternalProject_Add_Step(${GLM_PROJECT} glm_add_cmake_install
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/glm-0.9.9.8.CMakeLists.txt"
+           "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+else(OPTION_GLM)
+   set(GLM_PROJECT )
+endif(OPTION_GLM)
 
 # no-output target, for having some files available in IDEs.
 set(DOCSOURCES COPYING LICENSE readme.txt)
