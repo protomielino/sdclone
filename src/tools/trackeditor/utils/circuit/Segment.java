@@ -740,6 +740,28 @@ public class Segment implements Cloneable
         return dy;
     }
 
+	public String getValidSurface(EditorFrame editorFrame)
+	{
+		Segment previous = this;
+		String surf;
+		while (previous != null)
+		{
+			surf = surface;
+			if (surf != null)
+			{
+				return surf;
+			}
+			previous = previous.previousShape;
+		}
+
+		surf = editorFrame.getTrackData().getMainTrack().getSurface();
+		if (surf == null)
+		{
+			surf = MainTrack.DEFAULT_SURFACE;
+		}
+		return surf;
+	}
+
     public double getValidProfilStepsLength(EditorFrame editorFrame)
     {
         Segment previous = this;
@@ -1528,7 +1550,45 @@ public class Segment implements Cloneable
 		getRight().setBorderSurface(previousShape.getRight().getBorderSurface());
 		getRight().setBorderStyle(previousShape.getRight().getBorderStyle());
     }
-    
+
+	public void unoptimize(EditorFrame editorFrame)
+	{
+		surface = getValidSurface(editorFrame);
+		profilStepsLength = getValidProfilStepsLength(editorFrame);
+
+		// TODO: elevation, banking and other stuff needs to be implemented
+
+		left.setBarrierWidth(getValidLeftBarrierWidth(editorFrame));
+		left.setBarrierHeight(getValidLeftBarrierHeight(editorFrame));
+		left.setBarrierSurface(getValidLeftBarrierSurface(editorFrame));
+		left.setBarrierStyle(getValidLeftBarrierStyle(editorFrame));
+
+		left.setBorderWidth(getValidLeftBorderWidth(editorFrame));
+		left.setBorderHeight(getValidLeftBorderHeight(editorFrame));
+		left.setBorderSurface(getValidLeftBorderSurface(editorFrame));
+		left.setBorderStyle(getValidLeftBorderStyle(editorFrame));
+
+		left.setSideStartWidth(getValidLeftSideStartWidth(editorFrame));
+		left.setSideEndWidth(getValidLeftSideEndWidth(editorFrame));
+		left.setSideSurface(getValidLeftSideSurface(editorFrame));
+		left.setSideBankingType(getValidLeftSideBankingType(editorFrame));
+
+		right.setBarrierWidth(getValidRightBarrierWidth(editorFrame));
+		right.setBarrierHeight(getValidRightBarrierHeight(editorFrame));
+		right.setBarrierSurface(getValidRightBarrierSurface(editorFrame));
+		right.setBarrierStyle(getValidRightBarrierStyle(editorFrame));
+
+		right.setBorderWidth(getValidRightBorderWidth(editorFrame));
+		right.setBorderHeight(getValidRightBorderHeight(editorFrame));
+		right.setBorderSurface(getValidRightBorderSurface(editorFrame));
+		right.setBorderStyle(getValidRightBorderStyle(editorFrame));
+
+		right.setSideStartWidth(getValidRightSideStartWidth(editorFrame));
+		right.setSideEndWidth(getValidRightSideEndWidth(editorFrame));
+		right.setSideSurface(getValidRightSideSurface(editorFrame));
+		right.setSideBankingType(getValidRightSideBankingType(editorFrame));
+	}
+
 	public void dump(String indent)
 	{
 		System.out.println(indent + "Segment");
