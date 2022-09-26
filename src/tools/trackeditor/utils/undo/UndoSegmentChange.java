@@ -46,6 +46,13 @@ public class UndoSegmentChange implements UndoInterface
 		this.editorFrame = editorFrame;
 		clone = (Segment) segment.clone();
 		this.original = segment;
+
+		SegmentVector data = editorFrame.getTrackData().getSegments();
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoSegmentChange");
+			data.dumpLinks();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +65,12 @@ public class UndoSegmentChange implements UndoInterface
 		{
 			pos = data.indexOf(original);
 			data.set(pos,clone);
+
+			if (!data.validateLinks())
+			{
+				System.out.println("UndoSegmentChange.undo");
+				data.dumpLinks();
+			}
 		}
 	}
 
@@ -69,5 +82,11 @@ public class UndoSegmentChange implements UndoInterface
 		SegmentVector data = editorFrame.getTrackData().getSegments();
 		pos = data.indexOf(clone);
 		data.set(pos,original);
+
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoSegmentChange.redo");
+			data.dumpLinks();
+		}
 	}
 }
