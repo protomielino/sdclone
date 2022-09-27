@@ -208,30 +208,32 @@ public class CheckDialog extends JDialog
 			{
 				textArea.append("Terrain Generation relief file " + reliefFile + " not found\n");
 			}
-
-			try
+			else
 			{
-				BufferedReader br = new BufferedReader(new FileReader(file));
-				String line = "";
-
-				while ((line = br.readLine()) != null)
+				try
 				{
-					if (line.startsWith("data"))
-					{
-						String name = br.readLine();
+					BufferedReader br = new BufferedReader(new FileReader(file));
+					String line = "";
 
-						if (!(name.equals("interior") || name.equals("exterior")))
+					while ((line = br.readLine()) != null)
+					{
+						if (line.startsWith("data"))
 						{
-							textArea.append("Terrain Generation relief file " + reliefFile + " invalid\n");
-							break;
+							String name = br.readLine();
+
+							if (!(name.equals("interior") || name.equals("exterior")))
+							{
+								textArea.append("Terrain Generation relief file " + reliefFile + " invalid\n");
+								break;
+							}
 						}
 					}
+					br.close();
+				} 
+				catch (Exception e)
+				{
+					e.printStackTrace();
 				}
-				br.close();
-			} 
-			catch (Exception e)
-			{
-				e.printStackTrace();
 			}
 		}
 
