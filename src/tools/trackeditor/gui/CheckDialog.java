@@ -106,7 +106,7 @@ public class CheckDialog extends JDialog
 
 			double heightStartRight = segment.getHeightStartRight();			
 			boolean hasHeightStartRight = !Double.isNaN(heightStartRight);
-
+			
 			boolean hasBankingStartFromHeights = hasHeightStartLeft && hasHeightStartRight && heightStartLeft != heightStartRight;
 
 			double bankingStart = segment.getBankingStart();
@@ -118,7 +118,7 @@ public class CheckDialog extends JDialog
 				if (hasHeightStartLeft && hasHeightStartRight)
 				{
 					double centerHeight = (heightStartLeft + heightStartRight) / 2.0;
-					
+
 					if (centerHeight != 0.0)
 					{
 						textArea.append(segmentInfo + "Track height at start must be 0. Actual height: " + centerHeight +"\n");
@@ -129,9 +129,9 @@ public class CheckDialog extends JDialog
 			if (hasBankingStart && hasBankingStartFromHeights)
 			{
 				textArea.append(segmentInfo + "Banking start angle and banking from heights\n");
-				
+
 				double bankingFromHeights = Math.atan2(heightStartLeft - heightStartRight, width) * 180.0 / Math.PI;
-		
+
 				if (bankingStart != bankingFromHeights)
 				{
 					textArea.append(segmentInfo + "Banking start: " + bankingStart + " doesn't match banking from heights: " + bankingFromHeights + "\n");							
@@ -144,7 +144,8 @@ public class CheckDialog extends JDialog
 			double heightEndRight = segment.getHeightEndRight();			
 			boolean hasHeightEndRight = !Double.isNaN(heightEndRight);
 
-			boolean hasBankingEndFromHeights = hasHeightEndLeft && hasHeightEndRight && heightEndLeft != heightEndRight;
+			boolean hasHeightEnd = hasHeightEndLeft && hasHeightEndRight;
+			boolean hasBankingEndFromHeights = hasHeightEnd && heightEndLeft != heightEndRight;
 
 			double bankingEnd = segment.getBankingEnd();
 			boolean hasBankingEnd = !Double.isNaN(bankingEnd);
@@ -158,6 +159,21 @@ public class CheckDialog extends JDialog
 				if (bankingEnd != bankingFromHeights)
 				{
 					textArea.append(segmentInfo + "Banking end: " + bankingEnd + " doesn't match banking from heights: " + bankingFromHeights + "\n");							
+				}
+			}
+
+			double grade = segment.getGrade();
+			boolean hasGrade = !Double.isNaN(grade);
+
+			if (hasGrade && hasHeightEnd)
+			{
+				if (hasBankingEndFromHeights)
+				{
+					textArea.append(segmentInfo + "Grade and end banking from heights\n");
+				}
+				else
+				{
+					textArea.append(segmentInfo + "Grade and end height\n");
 				}
 			}
 		}
