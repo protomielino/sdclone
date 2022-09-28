@@ -1237,7 +1237,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	public void paint(Graphics g)
 	{
-		if (editorFrame.getTrackData() != null)
+		if (editorFrame.getTrackData() != null && editorFrame.getTrackData().getSegments() != null)
 		{
 			if (boundingRectangle == null)
 			{

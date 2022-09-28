@@ -27,10 +27,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
+import org.jdom.DefaultJDOMFactory;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.IllegalNameException;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+import org.jdom.input.SAXHandler;
 import org.xml.sax.InputSource;
 
 import gui.EditorFrame;
@@ -59,7 +65,57 @@ import utils.circuit.Sector;
  */
 public class XmlReader
 {
+	public class MyElement extends Element {
+		int lineNumber;
+
+		public MyElement(final String name, final Namespace namespace) {
+			super(name, namespace);
+		}
+
+		public int getLineNumber() {
+			return lineNumber;
+		}
+
+		public void setLineNumber(int lineNumber) {
+			this.lineNumber = lineNumber;
+		}
+	}
+
+	public class MySAXBuilder extends SAXBuilder {
+		public MySAXBuilder(boolean validate) {
+			super(validate);
+			setFactory(new MyFactory());
+		}
+
+		protected void configureContentHandler(SAXHandler contentHandler) {
+			super.configureContentHandler(contentHandler);
+			((MyFactory) getFactory()).setSAXHandler(contentHandler);
+		}
+	}
+
+	public class MyFactory extends DefaultJDOMFactory {
+		private SAXHandler saxHandler;
+
+		public void setSAXHandler(SAXHandler sh) {
+			this.saxHandler = sh;
+		}
+
+		public Element element(String name) {
+			return this.element(name, (Namespace) null);
+		}
+
+		public Element element(String name, Namespace namespace) {
+			MyElement e = new MyElement(name, namespace);
+
+			org.xml.sax.Locator loc = this.saxHandler.getDocumentLocator();
+			e.setLineNumber(loc.getLineNumber());
+
+			return e;
+		}
+	}
+	
 	private EditorFrame		editorFrame = null;
+	private String			filename	= null;
 	
 	public XmlReader(EditorFrame editorFrame)
 	{
@@ -68,6 +124,8 @@ public class XmlReader
 	
     public void readXml(String filename) throws JDOMException, IOException
     {
+    	this.filename = filename;
+    	
         Document doc = readFromFile(filename);
         Element element = doc.getRootElement();
         setTrackData(element);
@@ -76,7 +134,7 @@ public class XmlReader
     private Document readFromFile(String fname) throws JDOMException, IOException
     {
         Document d = null;
-        SAXBuilder sxb = new SAXBuilder(false);
+        MySAXBuilder sxb = new MySAXBuilder(false);
 
         sxb.setEntityResolver(new NoOpEntityResolver());
         d = sxb.build(new File(fname));
@@ -974,7 +1032,8 @@ public class XmlReader
                 }
                 catch (NumberFormatException exception)
                 {
-                    exception.printStackTrace();
+                	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+                	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -995,7 +1054,8 @@ public class XmlReader
                 }
                 catch (NumberFormatException exception)
                 {
-                    exception.printStackTrace();
+                	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+                	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
                 }
                 
                 if (!Double.isNaN(out))
@@ -1057,7 +1117,8 @@ public class XmlReader
                 }
                 catch (NumberFormatException exception)
                 {
-                    exception.printStackTrace();
+                	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+                	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
