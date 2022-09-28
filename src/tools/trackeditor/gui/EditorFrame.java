@@ -114,6 +114,7 @@ public class EditorFrame extends JFrame
 	ExportAC3E2Action			ac3E2Action							= null;
 	ExportAC3E3Action			ac3E3Action							= null;
 	ExportAC3E4Action			ac3E4Action							= null;
+	ExportAC3RacelineAction		ac3RacelineAction					= null;
 	PropertiesAction			propertiesAction					= null;
 	CalcDeltaAction				calcDeltaAction						= null;
 	CheckAction					checkAction							= null;
@@ -197,6 +198,7 @@ public class EditorFrame extends JFrame
 	private JMenuItem			exportAC3E2MenuItem					= null;
 	private JMenuItem			exportAC3E3MenuItem					= null;
 	private JMenuItem			exportAC3E4MenuItem					= null;
+	private JMenuItem			exportAC3RacelineMenuItem			= null;
 	private JMenuItem			propertiesMenuItem					= null;
 
 	private Project				prj;
@@ -1257,6 +1259,7 @@ public class EditorFrame extends JFrame
 			exportMenu.add(getExportAC3E2MenuItem());
 			exportMenu.add(getExportAC3E3MenuItem());
 			exportMenu.add(getExportAC3E4MenuItem());
+			exportMenu.add(getExportAC3RacelineMenuItem());
 		}
 		return exportMenu;
 	}
@@ -1383,6 +1386,22 @@ public class EditorFrame extends JFrame
 			exportAC3E4MenuItem.setIcon(null);
 		}
 		return exportAC3E4MenuItem;
+	}
+	
+	/**
+	 * This method initializes exportAC3RacelineMenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getExportAC3RacelineMenuItem()
+	{
+		if (exportAC3RacelineMenuItem == null)
+		{
+			exportAC3RacelineMenuItem = new JMenuItem();
+			exportAC3RacelineMenuItem.setAction(ac3RacelineAction);
+			exportAC3RacelineMenuItem.setIcon(null);
+		}
+		return exportAC3RacelineMenuItem;
 	}
 	
 	/**
@@ -2065,6 +2084,7 @@ public class EditorFrame extends JFrame
 		ac3E2Action = new ExportAC3E2Action("AC3 with terrain and white track elevation map", null, "Create AC3 file and terrain and white track elevation map.", null);
 		ac3E3Action = new ExportAC3E3Action("AC3 with track elevation map", null, "Create AC3 file and track elevation map.", null);
 		ac3E4Action = new ExportAC3E4Action("AC3 with track with height steps elevation map", null, "Create AC3 file and track with height steps elevation map.", null);
+		ac3RacelineAction = new ExportAC3RacelineAction("AC3 with track and race line", null, "Create AC3 file and track with race line.", null);
 		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
@@ -2521,6 +2541,24 @@ public class EditorFrame extends JFrame
 				return;
 			}			
 			exportAc3d(" -E 4");
+		}
+	}
+	public class ExportAC3RacelineAction extends AbstractAction
+	{
+		public ExportAC3RacelineAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d(" -r");
 		}
 	}
 	public class PropertiesAction extends AbstractAction
