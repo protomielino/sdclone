@@ -310,35 +310,36 @@ gfctrlJoyInit(void)
 			Joysticks[index] = SDL_JoystickOpen(index);
 		}
     
-		// Don't configure the joystick if it doesn't work
-		if (Joysticks[index] ==  NULL) {
-			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
-		} else {
-			names[index] = SDL_JoystickName(Joysticks[index]);
+        // Don't configure the joystick if it doesn't work
+        if (Joysticks[index] == NULL) {
+            GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
+            continue;
+        }
 
-			cfx_timeout[index] = 0;
-			rfx_timeout[index] = 0;
-			
-			// Find which Haptic device relates to this joystick
-			Haptics[index] = SDL_HapticOpenFromJoystick(Joysticks[index]);
+        names[index] = SDL_JoystickName(Joysticks[index]);
 
-			if (!Haptics[index]) {
-				GfLogInfo("Joystick %d does not support haptic\n", index);
-				break;
-			} else {
-				// add an CF effect on startup
-				gfctrlJoyConstantForce(index, 0, 0);
-			}
+        cfx_timeout[index] = 0;
+        rfx_timeout[index] = 0;
 
-			// Check for Rumble capability
-			if (SDL_HapticRumbleSupported(Haptics[index]) == SDL_TRUE) {
-				if (SDL_HapticRumbleInit(Haptics[index]) != 0) 
-					GfLogError("Couldn't init rumble on joystick %d: %s\n", index, SDL_GetError());
-				else
-					gfctrlJoyRumble(index, 0.5);
-			}
-                }
-     }
+        // Find which Haptic device relates to this joystick
+        Haptics[index] = SDL_HapticOpenFromJoystick(Joysticks[index]);
+
+        if (!Haptics[index]) {
+            GfLogInfo("Joystick %d does not support haptic\n", index);
+            continue;
+        }
+
+        // add an CF effect on startup
+        gfctrlJoyConstantForce(index, 0, 0);
+
+        // Check for Rumble capability
+        if (SDL_HapticRumbleSupported(Haptics[index]) == SDL_TRUE) {
+            if (SDL_HapticRumbleInit(Haptics[index]) != 0)
+                GfLogError("Couldn't init rumble on joystick %d: %s\n", index, SDL_GetError());
+            else
+                gfctrlJoyRumble(index, 0.5);
+        }
+    }
 }
 
 void
