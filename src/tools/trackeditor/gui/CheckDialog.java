@@ -95,8 +95,10 @@ public class CheckDialog extends JDialog
 
 		double width = editorFrame.getTrackData().getMainTrack().getWidth();
 
-		double previousHeightEndLeft = Double.NaN;;
-		double previousHeightEndRight = Double.NaN;;
+		double firstHeightStartLeft = Double.NaN;
+		double firstHeightStartRight = Double.NaN;
+		double previousHeightEndLeft = Double.NaN;
+		double previousHeightEndRight = Double.NaN;
 		
 		for (int i = 0; i < segments.size(); i++)
 		{
@@ -119,6 +121,9 @@ public class CheckDialog extends JDialog
 			// Track must start at an elevation of 0.0.
 			if (i == 0)
 			{
+				firstHeightStartLeft = heightStartLeft;
+				firstHeightStartRight = heightStartRight;
+
 				if (hasHeightStartLeft && hasHeightStartRight)
 				{
 					double centerHeight = (heightStartLeft + heightStartRight) / 2.0;
@@ -182,6 +187,7 @@ public class CheckDialog extends JDialog
 			}
 			
 			Segment previous = segment.previousShape;
+			Segment next = segment.nextShape;
 			
 			if (previous != null && hasHeightStart)
 			{
@@ -193,6 +199,20 @@ public class CheckDialog extends JDialog
 				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStartRight)
 				{
 					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStartRight + "\n");
+				}
+			}
+			else if (next == null && hasHeightEnd)
+			{
+				Segment first = segments.get(0);
+				
+				if (!Double.isNaN(firstHeightStartLeft) && firstHeightStartLeft != heightEndLeft)
+				{
+					textArea.append(segmentInfo + "Height end left : " + heightEndLeft + " doesn't match " + firstHeightStartLeft + "\n");
+				}
+				
+				if (!Double.isNaN(firstHeightStartRight) && firstHeightStartRight != heightEndRight)
+				{
+					textArea.append(segmentInfo + "Height end right : " + heightEndRight + " doesn't match " + firstHeightStartRight + "\n");
 				}
 			}
 			
