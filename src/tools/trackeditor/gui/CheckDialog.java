@@ -95,6 +95,9 @@ public class CheckDialog extends JDialog
 
 		double width = editorFrame.getTrackData().getMainTrack().getWidth();
 
+		double previousHeightEndLeft = Double.NaN;;
+		double previousHeightEndRight = Double.NaN;;
+		
 		for (int i = 0; i < segments.size(); i++)
 		{
 			Segment segment = segments.get(i);
@@ -107,7 +110,8 @@ public class CheckDialog extends JDialog
 			double heightStartRight = segment.getHeightStartRight();			
 			boolean hasHeightStartRight = !Double.isNaN(heightStartRight);
 			
-			boolean hasBankingStartFromHeights = hasHeightStartLeft && hasHeightStartRight && heightStartLeft != heightStartRight;
+			boolean hasHeightStart = hasHeightStartLeft && hasHeightStartRight;
+			boolean hasBankingStartFromHeights = hasHeightStart && heightStartLeft != heightStartRight;
 
 			double bankingStart = segment.getBankingStart();
 			boolean hasBankingStart = !Double.isNaN(bankingStart);
@@ -176,6 +180,24 @@ public class CheckDialog extends JDialog
 					textArea.append(segmentInfo + "Grade and end height\n");
 				}
 			}
+			
+			Segment previous = segment.previousShape;
+			
+			if (previous != null && hasHeightStart)
+			{
+				if (!Double.isNaN(previousHeightEndLeft) && previousHeightEndLeft != heightStartLeft)
+				{
+					textArea.append(segmentInfo + "Previous height end left : " + previousHeightEndLeft + " doesn't match " + heightStartLeft + "\n");
+				}
+				
+				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStartRight)
+				{
+					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStartRight + "\n");
+				}
+			}
+			
+			previousHeightEndLeft = heightEndLeft;
+			previousHeightEndRight = heightEndRight;
 		}
 	}
 
