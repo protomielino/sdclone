@@ -269,7 +269,7 @@ public class NewProjectDialog extends JDialog
 			
 			String path = null;
 			File dataDir = new File(editorFrame.getDataDirectory());
-			if (dataDir != null && dataDir.isDirectory() && dataDir.canWrite())
+			if (dataDir.isDirectory() && dataDir.canWrite())
 			{
 				File tracksDir = new File(dataDir.getAbsolutePath() + sep + "tracks");
 				if (tracksDir.exists() && tracksDir.isDirectory() && tracksDir.canWrite())

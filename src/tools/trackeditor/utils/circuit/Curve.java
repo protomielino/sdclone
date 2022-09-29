@@ -34,7 +34,7 @@ import miscel.EPMath;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 
-public class Curve extends Segment implements Cloneable
+public class Curve extends Segment
 {
 	protected double		arcDeg;
 	protected double		radiusStart;

@@ -32,7 +32,6 @@ import javax.swing.JOptionPane;
 import org.jdom.DefaultJDOMFactory;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.IllegalNameException;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;

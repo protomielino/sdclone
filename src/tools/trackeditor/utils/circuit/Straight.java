@@ -33,7 +33,7 @@ import utils.Editor;
  * Preferences - Java - Code Style - Code Templates
  */
 
-public class Straight extends Segment implements Cloneable
+public class Straight extends Segment
 {
 	public Straight()
 	{

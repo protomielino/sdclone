@@ -464,6 +464,7 @@ public class EditorFrame extends JFrame
 		{
 			XMLDecoder decoder = new XMLDecoder(new FileInputStream(projectFileName));
 			Editor.setProperties((Properties)decoder.readObject());
+			decoder.close();
 			
 			// update path from project file location
 			Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));

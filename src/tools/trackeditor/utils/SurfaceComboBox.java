@@ -148,6 +148,8 @@ public class SurfaceComboBox extends JComboBox<String>
 											width = 256;
 										}
 									}
+									input.close();
+									stream.close();
 								}
 								catch (Exception e)
 								{

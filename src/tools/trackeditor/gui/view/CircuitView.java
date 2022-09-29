@@ -1263,7 +1263,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (showBackground && backgroundImg != null)
 			{
-				Segment firstObj = (Segment) editorFrame.getTrackData().getSegments().get(0);
+				Segment firstObj = editorFrame.getTrackData().getSegments().get(0);
 				Point2D.Double p1 = new Point2D.Double(0, 0);
 				p1.setLocation(firstObj.points[0]);
 				p1.setLocation(p1.getX() + Editor.getProperties().getImgOffset().getX(), p1.getY() + Editor.getProperties().getImgOffset().getY());
@@ -1474,8 +1474,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		try
 		{
 			backgroundImg = new ImageIcon(fileName);
-			int width = (int) (backgroundImg.getIconWidth());
-			int height = (int) (backgroundImg.getIconHeight());
+			int width = backgroundImg.getIconWidth();
+			int height = backgroundImg.getIconHeight();
 			backgroundRectangle.setFrame(0, 0, width*scale, height*scale);
 			//System.out.println("Zoom = " + zoomFactor);
 			editorFrame.documentIsModified = true;
