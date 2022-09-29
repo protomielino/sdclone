@@ -15,7 +15,9 @@ public final class Surface {
     private String textureStartOnBoundary	= null;
     private double textureMipMap			= Double.NaN;
     private double friction					= Double.NaN;
+    private double frictionRain				= Double.NaN;
     private double rollingResistance		= Double.NaN;
+    private double rollingResistanceRain	= Double.NaN;
     private String bumpName					= null;
     private double bumpSize					= Double.NaN;
     private double roughness				= Double.NaN;
@@ -200,7 +202,23 @@ public final class Surface {
 		this.rebound = rebound;
 	}
 
-    public void dump(String indent)
+    public double getFrictionRain() {
+		return frictionRain;
+	}
+
+	public void setFrictionRain(double frictionRain) {
+		this.frictionRain = frictionRain;
+	}
+
+	public double getRollingResistanceRain() {
+		return rollingResistanceRain;
+	}
+
+	public void setRollingResistanceRain(double rollingResistanceRain) {
+		this.rollingResistanceRain = rollingResistanceRain;
+	}
+
+	public void dump(String indent)
     {
 		System.out.println(indent + "Surface");
         System.out.println(indent + "  name                    : " + name);

@@ -203,8 +203,6 @@ public class CheckDialog extends JDialog
 			}
 			else if (next == null && hasHeightEnd)
 			{
-				Segment first = segments.get(0);
-				
 				if (!Double.isNaN(firstHeightStartLeft) && firstHeightStartLeft != heightEndLeft)
 				{
 					textArea.append(segmentInfo + "Height end left : " + heightEndLeft + " doesn't match " + firstHeightStartLeft + "\n");
