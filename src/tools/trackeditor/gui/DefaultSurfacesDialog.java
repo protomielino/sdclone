@@ -22,7 +22,7 @@ public class DefaultSurfacesDialog extends JDialog
 	private void initialize()
 	{
 		this.setContentPane(getSurfaceProperties());
-		this.setSize(550, 777);
+		this.setSize(550, 804);
 		Point p = new Point();
 		p.x = editorFrame.getProject().getDefaultSurfacesDialogX();
 		p.y = editorFrame.getProject().getDefaultSurfacesDialogY();

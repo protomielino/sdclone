@@ -498,6 +498,7 @@ public class XmlWriter
 			addContent(el, "texture name", surface.getTextureName());
 			addContent(el, "texture type", surface.getTextureType());
 			addContent(el, "texture size", "m", surface.getTextureSize());
+			addContent(el, "texture radnomness", "m", surface.getTextureRandomness());
 			addContent(el, "texture link with previous", surface.getTextureLinkWithPrevious());
 			addContent(el, "texture start on boundary", surface.getTextureStartOnBoundary());
 			addContent(el, "texture mipmap", "m", surface.getTextureMipMap());

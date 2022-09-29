@@ -462,6 +462,7 @@ public class XmlReader
             surf.setTextureName(getAttrStrValue(surface, "texture name"));
             surf.setTextureType(getAttrStrValue(surface, "texture type"));
             surf.setTextureSize(getAttrNumValue(surface, "texture size", "m"));
+            surf.setTextureRandomness(getAttrNumValue(surface, "texture randomness", "m"));
             surf.setTextureLinkWithPrevious(getAttrStrValue(surface, "texture link with previous"));
             surf.setTextureStartOnBoundary(getAttrStrValue(surface, "texture start on boundary"));
             surf.setTextureMipMap(getAttrNumValue(surface, "texture mipmap", "m"));

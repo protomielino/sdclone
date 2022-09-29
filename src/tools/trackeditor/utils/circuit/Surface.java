@@ -11,6 +11,7 @@ public final class Surface {
     private String textureName				= null;
     private String textureType				= null;
     private double textureSize				= Double.NaN;
+    private double textureRandomness		= Double.NaN;
     private String textureLinkWithPrevious	= null;
     private String textureStartOnBoundary	= null;
     private double textureMipMap			= Double.NaN;
@@ -104,6 +105,14 @@ public final class Surface {
 
 	public void setTextureSize(double textureSize) {
 		this.textureSize = textureSize;
+	}
+
+	public double getTextureRandomness() {
+		return textureRandomness;
+	}
+
+	public void setTextureRandomness(double textureRandomness) {
+		this.textureRandomness = textureRandomness;
 	}
 
 	public String getTextureLinkWithPrevious() {
