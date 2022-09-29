@@ -2084,7 +2084,7 @@ public class EditorFrame extends JFrame
 		ac3E2Action = new ExportAC3E2Action("AC3 with terrain and white track elevation map", null, "Create AC3 file and terrain and white track elevation map.", null);
 		ac3E3Action = new ExportAC3E3Action("AC3 with track elevation map", null, "Create AC3 file and track elevation map.", null);
 		ac3E4Action = new ExportAC3E4Action("AC3 with track with height steps elevation map", null, "Create AC3 file and track with height steps elevation map.", null);
-		ac3RacelineAction = new ExportAC3RacelineAction("AC3 with track and race line", null, "Create AC3 file and track with race line.", null);
+		ac3RacelineAction = new ExportAC3RacelineAction("AC3 with race line", null, "Create AC3 file with race line.", null);
 		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
