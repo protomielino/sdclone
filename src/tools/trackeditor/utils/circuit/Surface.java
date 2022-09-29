@@ -239,12 +239,15 @@ public final class Surface {
         System.out.println(indent + "  colorB2                 : " + colorB2);
         System.out.println(indent + "  textureName             : " + textureName);
         System.out.println(indent + "  textureSize             : " + textureSize);
+        System.out.println(indent + "  textureRandomness       : " + textureRandomness);
         System.out.println(indent + "  textureType             : " + textureType);
         System.out.println(indent + "  textureLinkWithPrevious : " + textureLinkWithPrevious);
         System.out.println(indent + "  textureStartOnBoundary  : " + textureStartOnBoundary);
         System.out.println(indent + "  textureMipMap           : " + textureMipMap);
         System.out.println(indent + "  friction                : " + friction);
+        System.out.println(indent + "  frictionRain            : " + frictionRain);
         System.out.println(indent + "  rollingResistance       : " + rollingResistance);
+        System.out.println(indent + "  rollingResistanceRain   : " + rollingResistanceRain);
         System.out.println(indent + "  bumpName                : " + bumpName);
         System.out.println(indent + "  bumpSize                : " + bumpSize);
         System.out.println(indent + "  roughness               : " + roughness);
