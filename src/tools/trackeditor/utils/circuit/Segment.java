@@ -280,7 +280,7 @@ public class Segment implements Cloneable
 		return (new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY));
 	}
 
-	public void calcShape(EditorFrame editorFrame, Segment previousShape) throws Exception
+	public void calcShape(EditorFrame editorFrame) throws Exception
 	{
 		System.out.println("Segment.calcShape : Start ...");
 	}

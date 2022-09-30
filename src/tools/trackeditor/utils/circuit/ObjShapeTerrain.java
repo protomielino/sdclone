@@ -3,6 +3,8 @@ package utils.circuit;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import gui.EditorFrame;
+
 
 
 /**
@@ -30,8 +32,9 @@ public class ObjShapeTerrain extends Segment
 		super("terrain");
 	}
 
-	public void calcShape(double datas[], Rectangle2D.Double boundingRectangle)
+	public void calcShape(EditorFrame editorFrame, Rectangle2D.Double boundingRectangle)
 	{
+		// TODO get border and holes from relief file someday
 		if (points == null)
 		{
 			points = new Point2D.Double[4]; // 4 points in 2D
@@ -43,16 +46,18 @@ public class ObjShapeTerrain extends Segment
 				trPoints[i] = new Point2D.Double();
 		}
 
-		points[0].x = boundingRectangle.getX();
-		points[0].y = boundingRectangle.getY();
+		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+		
+		points[0].x = boundingRectangle.getX() - border;
+		points[0].y = boundingRectangle.getY() - border;
 
-		points[1].x = boundingRectangle.getX() + boundingRectangle.getWidth();
-		points[1].y = boundingRectangle.getY();
+		points[1].x = boundingRectangle.getX() + boundingRectangle.getWidth() + border;
+		points[1].y = boundingRectangle.getY() - border;
 
-		points[2].x = boundingRectangle.getX() + boundingRectangle.getWidth();
-		points[2].y = boundingRectangle.getY() + boundingRectangle.getHeight();
+		points[2].x = boundingRectangle.getX() + boundingRectangle.getWidth() + border;
+		points[2].y = boundingRectangle.getY() + boundingRectangle.getHeight() + border;
 
-		points[3].x = boundingRectangle.getX();
-		points[3].y = boundingRectangle.getY() + boundingRectangle.getHeight();
+		points[3].x = boundingRectangle.getX() - border;
+		points[3].y = boundingRectangle.getY() + boundingRectangle.getHeight() + border;
 	}
 }

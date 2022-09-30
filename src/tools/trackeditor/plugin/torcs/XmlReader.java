@@ -772,7 +772,7 @@ public class XmlReader
             shape = setSegment(e, shape, prev);
             try
             {
-                shape.calcShape(editorFrame, prev);
+                shape.calcShape(editorFrame);
             } catch (Exception e1)
             {
                 // TODO Auto-generated catch block

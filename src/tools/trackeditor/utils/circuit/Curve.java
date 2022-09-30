@@ -67,7 +67,7 @@ public class Curve extends Segment
 		return shape;
 	}
 
-	public void calcShape(EditorFrame editorFrame, Segment previousShape) throws Exception
+	public void calcShape(EditorFrame editorFrame) throws Exception
 	{
 		double	currentX	= Editor.getProperties().getCurrentX();
 		double	currentY	= Editor.getProperties().getCurrentY();

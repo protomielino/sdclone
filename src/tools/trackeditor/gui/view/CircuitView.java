@@ -1297,7 +1297,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (terrain != null && terrainBorderMustBeShown)
 			{
-				terrain.calcShape(null, boundingRectangle);
+				terrain.calcShape(editorFrame, boundingRectangle);
 				terrain.draw(g, affineTransform);
 			}
 
@@ -1567,7 +1567,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			obj.setCount(i+1);
 			try
 			{
-				obj.calcShape(editorFrame, null);
+				obj.calcShape(editorFrame);
 			} catch (Exception e)
 			{
 				// TODO Auto-generated catch block
