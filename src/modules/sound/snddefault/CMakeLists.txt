@@ -60,9 +60,7 @@ ADD_SDL2_LIBRARY(snddefault)
 
 ADD_SDLIB_LIBRARY(snddefault portability tgf tgfclient robottools)
 
-IF(OPENAL_FOUND)
-    TARGET_LINK_LIBRARIES(snddefault ${OPENAL_LIBRARY})
-ENDIF(OPENAL_FOUND)
+ADD_OPENAL_LIBRARY(snddefault)
 
 IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(snddefault ${OPENGL_LIBRARY})
