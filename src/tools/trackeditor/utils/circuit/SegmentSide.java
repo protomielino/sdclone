@@ -32,26 +32,36 @@ import java.util.Vector;
  */
 public class SegmentSide implements Cloneable
 {
-	public static final double	DEFAULT_SIDE_START_WIDTH	= 4.0;
-	public static final double	DEFAULT_SIDE_END_WIDTH		= 4.0;
-	public static final String	DEFAULT_SIDE_SURFACE		= "grass";
-	public static final String	DEFAULT_SIDE_BANKING_TYPE	= null;
-	public static final double	DEFAULT_BARRIER_HEIGHT		= 1.0;
-	public static final double	DEFAULT_BARRIER_WIDTH		= 0.1;
-	public static final String	DEFAULT_BARRIER_SURFACE		= "barrier";
-	public static final String	DEFAULT_BARRIER_STYLE		= "wall";
-	public static final double	DEFAULT_BORDER_WIDTH		= 0.5;
-	public static final double	DEFAULT_BORDER_HEIGHT		= 0.05;
-	public static final String	DEFAULT_BORDER_SURFACE		= "curb-5cm-r";
-	public static final String	DEFAULT_BORDER_STYLE		= "curb";
+	public static final double	DEFAULT_SIDE_START_WIDTH			= 4.0;
+	public static final double	DEFAULT_SIDE_END_WIDTH				= 4.0;
+	public static final String	DEFAULT_SIDE_SURFACE				= "grass";
+	public static final String	DEFAULT_SIDE_BANKING_TYPE			= null;
+	public static final double	DEFAULT_BARRIER_HEIGHT				= 1.0;
+	public static final double	DEFAULT_BARRIER_WIDTH				= 0.1;
+	public static final String	DEFAULT_BARRIER_SURFACE				= "barrier";
+	public static final String	DEFAULT_BARRIER_STYLE				= "wall";
+	public static final double	DEFAULT_BORDER_WIDTH				= 0.5;
+	public static final double	DEFAULT_BORDER_HEIGHT				= 0.05;
+	public static final String	DEFAULT_BORDER_SURFACE				= "curb-5cm-r";
+	public static final String	DEFAULT_BORDER_STYLE				= "curb";
 	
-	public static final String	DEFAULT_PIT_ENTRY_SURFACE	= "asphalt";
-	public static final String	DEFAULT_PIT_PITS_SURFACE	= "asphalt-pits";
-	public static final String	DEFAULT_PIT_EXIT_SURFACE	= "asphalt";
-	public static final double	DEFAULT_PIT_BORDER_WIDTH	= 0.5;
-	public static final double	DEFAULT_PIT_BORDER_HEIGHT	= 1.0;
-	public static final String	DEFAULT_PIT_BORDER_SURFACE	= "wall";
-	public static final String	DEFAULT_PIT_BORDER_STYLE	= "wall";
+	public static final String	DEFAULT_PIT_ENTRY_SURFACE			= "asphalt";
+	public static final String	DEFAULT_PIT_ENTRY_BORDER_STYLE		= null;
+	public static final String	DEFAULT_PIT_ENTRY_BORDER_SURFACE	= null;
+	public static final double	DEFAULT_PIT_ENTRY_BORDER_HEIGHT		= 0.0;
+	public static final double	DEFAULT_PIT_ENTRY_BORDER_WIDTH		= 0.0;
+	
+	public static final String	DEFAULT_PIT_PITS_SURFACE			= "asphalt-pits";
+	public static final double	DEFAULT_PIT_PITS_BORDER_WIDTH		= 0.5;
+	public static final double	DEFAULT_PIT_PITS_BORDER_HEIGHT		= 1.0;
+	public static final String	DEFAULT_PIT_PITS_BORDER_SURFACE		= "wall";
+	public static final String	DEFAULT_PIT_PITS_BORDER_STYLE		= "wall";
+	
+	public static final String	DEFAULT_PIT_EXIT_SURFACE			= "asphalt";
+	public static final String	DEFAULT_PIT_EXIT_BORDER_STYLE		= null;
+	public static final String	DEFAULT_PIT_EXIT_BORDER_SURFACE		= null;
+	public static final double	DEFAULT_PIT_EXIT_BORDER_HEIGHT		= 0.0;
+	public static final double	DEFAULT_PIT_EXIT_BORDER_WIDTH		= 0.0;
 
 	private Vector				sideListeners				= new Vector();
 	private SegmentSide			prev						= null;

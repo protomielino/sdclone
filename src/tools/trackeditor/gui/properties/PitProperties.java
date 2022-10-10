@@ -95,7 +95,6 @@ public class PitProperties extends PropertyPanel
 	private JCheckBox 			generatePitsCheckBox 	= null;
 	private JLabel 				generatePitsLabel 		= new JLabel();
 	private JTabbedPane			tabbedPane				= null;
-	private boolean 			generatePits			= false;
 
 	private PitInfo				entryPitInfo			= new PitInfo("Entry");
 	private PitInfo				pitsPitInfo				= new PitInfo("Pit");
@@ -348,10 +347,10 @@ public class PitProperties extends PropertyPanel
 				}
 				else
 				{
-					entryPitInfo.borderType = null;
-					entryPitInfo.borderSurface = null;
-					entryPitInfo.borderHeight = Double.NaN;
-					entryPitInfo.borderWidth = Double.NaN;
+					entryPitInfo.borderType = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_STYLE;
+					entryPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_SURFACE;
+					entryPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_HEIGHT;
+					entryPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_WIDTH;
 				}
 				entryPitInfo.surface = side.getSideSurface();
 			}
@@ -359,10 +358,10 @@ public class PitProperties extends PropertyPanel
 			{
 				// set default values
 				entryPitInfo.surface = SegmentSide.DEFAULT_PIT_ENTRY_SURFACE;
-				entryPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
-				entryPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
-				entryPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
-				entryPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+				entryPitInfo.borderType = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_STYLE;
+				entryPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_SURFACE;
+				entryPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_HEIGHT;
+				entryPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_ENTRY_BORDER_WIDTH;
 			}
 			PitPanel entryPitPanel = new PitPanel(entryPitInfo);
 			tabbedPane.addTab(entryPitInfo.name, null, entryPitPanel, null);
@@ -389,10 +388,10 @@ public class PitProperties extends PropertyPanel
 				}
 				else
 				{
-					pitsPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
-					pitsPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
-					pitsPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
-					pitsPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+					pitsPitInfo.borderType = SegmentSide.DEFAULT_PIT_PITS_BORDER_STYLE;
+					pitsPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_PITS_BORDER_SURFACE;
+					pitsPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_PITS_BORDER_HEIGHT;
+					pitsPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_PITS_BORDER_WIDTH;
 				}
 				pitsPitInfo.surface = side.getSideSurface();
 			}
@@ -400,10 +399,10 @@ public class PitProperties extends PropertyPanel
 			{
 				// set default values
 				pitsPitInfo.surface = SegmentSide.DEFAULT_PIT_PITS_SURFACE;
-				pitsPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
-				pitsPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
-				pitsPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
-				pitsPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+				pitsPitInfo.borderType = SegmentSide.DEFAULT_PIT_PITS_BORDER_STYLE;
+				pitsPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_PITS_BORDER_SURFACE;
+				pitsPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_PITS_BORDER_HEIGHT;
+				pitsPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_PITS_BORDER_WIDTH;
 			}
 			PitPanel pitsPitPanel = new PitPanel(pitsPitInfo);
 			tabbedPane.addTab(pitsPitInfo.name, null, pitsPitPanel, null);
@@ -439,31 +438,28 @@ public class PitProperties extends PropertyPanel
 				}
 				else
 				{
-					exitPitInfo.borderType = null;
-					exitPitInfo.borderSurface = null;
-					exitPitInfo.borderHeight = Double.NaN;
-					exitPitInfo.borderWidth = Double.NaN;
+					exitPitInfo.borderType = SegmentSide.DEFAULT_PIT_EXIT_BORDER_STYLE;
+					exitPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_EXIT_BORDER_SURFACE;
+					exitPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_EXIT_BORDER_HEIGHT;
+					exitPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_EXIT_BORDER_WIDTH;
 				}
 				exitPitInfo.surface = side.getSideSurface();
 			}
 			else
 			{
 				exitPitInfo.surface = SegmentSide.DEFAULT_PIT_EXIT_SURFACE;
-				exitPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
-				exitPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
-				exitPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
-				exitPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+				exitPitInfo.borderType = SegmentSide.DEFAULT_PIT_EXIT_BORDER_STYLE;
+				exitPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_EXIT_BORDER_SURFACE;
+				exitPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_EXIT_BORDER_HEIGHT;
+				exitPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_EXIT_BORDER_WIDTH;
 			}
 			
 			PitPanel exitPitPanel = new PitPanel(exitPitInfo);
 			tabbedPane.addTab(exitPitInfo.name, null, exitPitPanel, null);
-			
-			generatePits = true;
 		}
 		else
 		{
 			tabbedPane.removeAll();
-			generatePits = false;
 		}	
 	}
 	
@@ -770,8 +766,6 @@ public class PitProperties extends PropertyPanel
 		SegmentVector data = getEditorFrame().getTrackData().getSegments();
 		Segment pitEntry = null;
 		Segment pitStart = null;
-		Segment pitStartBuildings = null;
-		Segment pitStopBuildings = null;
 		Segment pitEnd = null;
 		Segment pitExit = null;
 
@@ -787,14 +781,6 @@ public class PitProperties extends PropertyPanel
 			if (name.equals(pits.getStart()))
 			{
 				pitStart = obj;
-			}
-			if (name.equals(pits.getStartBuildings()))
-			{
-				pitStartBuildings = obj;
-			}
-			if (name.equals(pits.getStopBuildings()))
-			{
-				pitStopBuildings = obj;
 			}
 			if (name.equals(pits.getEnd()))
 			{
@@ -925,20 +911,20 @@ public class PitProperties extends PropertyPanel
 			int index = (start - i) % data.size();
 			if (pits.getSide().equals("left"))
 			{
-				side = ((Segment) data.get(index)).getLeft();
+				side = data.get(index).getLeft();
 			}
 			else
 			{
-				side = ((Segment) data.get(index)).getRight();
+				side = data.get(index).getRight();
 			}
 			String borderType = exitPanel.getBorderTypeComboBox().getSelectedItem().toString();
 			if (i == 0 || borderType.equals("none"))
 			{
 				// no border on last segment
-				side.setBorderStyle(null);
-				side.setBorderSurface(null);
-				side.setBorderHeight(Double.NaN);
-				side.setBorderWidth(Double.NaN);
+				side.setBorderStyle(SegmentSide.DEFAULT_PIT_EXIT_BORDER_STYLE);
+				side.setBorderSurface(SegmentSide.DEFAULT_PIT_EXIT_BORDER_SURFACE);
+				side.setBorderHeight(SegmentSide.DEFAULT_PIT_EXIT_BORDER_HEIGHT);
+				side.setBorderWidth(SegmentSide.DEFAULT_PIT_EXIT_BORDER_WIDTH);
 				if (i == 0)
 				{
 					side.setSideStartWidth(pits.getWidth() * 3);
@@ -1022,20 +1008,20 @@ public class PitProperties extends PropertyPanel
 			int index = (start + i) % data.size();
 			if (pits.getSide().equals("left"))
 			{
-				side = ((Segment) data.get(index)).getLeft();
+				side = data.get(index).getLeft();
 			}
 			else
 			{
-				side = ((Segment) data.get(index)).getRight();
+				side = data.get(index).getRight();
 			}
 			String borderType = entryPanel.getBorderTypeComboBox().getSelectedItem().toString();
 			if (i == 0 || borderType.equals("none"))
 			{
 				// no border on first segment
-				side.setBorderStyle(null);
-				side.setBorderSurface(null);
-				side.setBorderHeight(Double.NaN);
-				side.setBorderWidth(Double.NaN);
+				side.setBorderStyle(SegmentSide.DEFAULT_PIT_ENTRY_BORDER_STYLE);
+				side.setBorderSurface(SegmentSide.DEFAULT_PIT_ENTRY_BORDER_SURFACE);
+				side.setBorderHeight(SegmentSide.DEFAULT_PIT_ENTRY_BORDER_HEIGHT);
+				side.setBorderWidth(SegmentSide.DEFAULT_PIT_ENTRY_BORDER_WIDTH);
 				if (i == 0)
 				{
 					side.setSideStartWidth(borderWidth + sideWidth);
@@ -1074,20 +1060,20 @@ public class PitProperties extends PropertyPanel
 			int index = (start + i) % data.size();
 			if (pits.getSide().equals("left"))
 			{
-				side = ((Segment) data.get(index)).getLeft();
+				side = data.get(index).getLeft();
 			}
 			else
 			{
-				side = ((Segment) data.get(index)).getRight();
+				side = data.get(index).getRight();
 			}
 			double width = pits.getWidth()*3;
 			String borderType = pitPanel.getBorderTypeComboBox().getSelectedItem().toString();
 			if (borderType.equals("none"))
 			{
-				side.setBorderHeight(0);
-				side.setBorderWidth(0);
-				side.setBorderSurface(null);
-				side.setBorderStyle(null);
+				side.setBorderHeight(SegmentSide.DEFAULT_PIT_PITS_BORDER_HEIGHT);
+				side.setBorderWidth(SegmentSide.DEFAULT_PIT_PITS_BORDER_WIDTH);
+				side.setBorderSurface(SegmentSide.DEFAULT_PIT_PITS_BORDER_SURFACE);
+				side.setBorderStyle(SegmentSide.DEFAULT_PIT_PITS_BORDER_STYLE);
 			}
 			else
 			{
