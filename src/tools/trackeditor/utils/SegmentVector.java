@@ -6,6 +6,21 @@ import utils.circuit.Segment;
 
 public class SegmentVector extends Vector<Segment>
 {
+	public Segment getSegmentFromName(String name)
+	{
+		for (int i = 0; i < size(); i++)
+		{
+			Segment segment = get(i);
+
+			if (segment.getName() != null && segment.getName().equals(name))
+			{
+				return segment;
+			}
+		}
+
+		return null;
+	}
+
 	public synchronized Segment set(int index, Segment segment)
 	{
 		Segment current = get(index);

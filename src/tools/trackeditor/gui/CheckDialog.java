@@ -18,6 +18,7 @@ import utils.Editor;
 import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.EnvironmentMapping;
+import utils.circuit.Pits;
 import utils.circuit.Segment;
 import utils.circuit.Surface;
 import utils.circuit.TrackLight;
@@ -82,11 +83,52 @@ public class CheckDialog extends JDialog
 	    		checkEnvironmentMapping();
 	    		checkTrackLights();
 	    		checkGraphic();
+	    		checkPits();
 			
 	    		textArea.append("Checking complete!");	
 	    	}
 	    });
 	    this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	}
+
+	private void checkPits()
+	{
+		Pits pits = editorFrame.getTrackData().getMainTrack().getPits();
+		SegmentVector segments = editorFrame.getTrackData().getSegments();
+
+		if (pits == null)
+			return;
+
+		boolean noSegments = pits.getEntry() == null && pits.getStart() == null && pits.getEnd() == null
+				&& pits.getExit() == null;
+
+		if (!noSegments)
+		{
+			if (pits.getEntry() == null)
+				textArea.append("Missing pit entry\n");
+			else if (segments.getSegmentFromName(pits.getEntry()) == null)
+				textArea.append("Invalid pit entry: " + pits.getEntry() + "\n");
+
+			if (pits.getStart() == null)
+				textArea.append("Missing pit start\n");
+			else if (segments.getSegmentFromName(pits.getStart()) == null)
+				textArea.append("Invalid pit start: " + pits.getStart() + "\n");
+
+			if (pits.getEnd() == null)
+				textArea.append("Missing pit end\n");
+			else if (segments.getSegmentFromName(pits.getEnd()) == null)
+				textArea.append("Invalid pit end: " + pits.getEnd() + "\n");
+
+			if (pits.getExit() == null)
+				textArea.append("Missing pit exit\n");
+			else if (segments.getSegmentFromName(pits.getExit()) == null)
+				textArea.append("Invalid pit exit: " + pits.getExit() + "\n");
+		}
+
+		if (pits.getSide() == null)
+			textArea.append("Missing pit side\n");
+		else if (!(pits.getSide().equals("left") || pits.getSide().equals("right")))
+			textArea.append("Invalid pit side: " + pits.getSide() + "\n");
 	}
 
 	private void checkTrackHeight()
