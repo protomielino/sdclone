@@ -94,7 +94,6 @@ public class CheckDialog extends JDialog
 	private void checkPits()
 	{
 		Pits pits = editorFrame.getTrackData().getMainTrack().getPits();
-		SegmentVector segments = editorFrame.getTrackData().getSegments();
 
 		if (pits == null)
 			return;
@@ -104,6 +103,8 @@ public class CheckDialog extends JDialog
 
 		if (!noSegments)
 		{
+			SegmentVector segments = editorFrame.getTrackData().getSegments();
+
 			if (pits.getEntry() == null)
 				textArea.append("Missing pit entry\n");
 			else if (segments.getSegmentFromName(pits.getEntry()) == null)
@@ -123,12 +124,12 @@ public class CheckDialog extends JDialog
 				textArea.append("Missing pit exit\n");
 			else if (segments.getSegmentFromName(pits.getExit()) == null)
 				textArea.append("Invalid pit exit: " + pits.getExit() + "\n");
-		}
 
-		if (pits.getSide() == null)
-			textArea.append("Missing pit side\n");
-		else if (!(pits.getSide().equals("left") || pits.getSide().equals("right")))
-			textArea.append("Invalid pit side: " + pits.getSide() + "\n");
+			if (pits.getSide() == null)
+				textArea.append("Missing pit side\n");
+			else if (!(pits.getSide().equals("left") || pits.getSide().equals("right")))
+				textArea.append("Invalid pit side: " + pits.getSide() + "\n");
+		}
 	}
 
 	private void checkTrackHeight()
