@@ -425,7 +425,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(obj.getType().equals("str"))
@@ -465,7 +465,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(!obj.getType().equals("str"))
@@ -488,7 +488,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(obj.getType().equals("str"))
@@ -512,7 +512,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(obj.getType().equals("str"))
@@ -539,7 +539,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(obj.getType().equals("str"))
@@ -563,7 +563,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			try
 			{
 				if(obj.getType().equals("str"))
