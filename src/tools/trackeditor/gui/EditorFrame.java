@@ -210,7 +210,8 @@ public class EditorFrame extends JFrame
 	private Preferences			preferences							= Preferences.userNodeForPackage(EditorFrame.class);
 	private List<String>		recentFiles							= new ArrayList<String>();
 	private final static String	RECENT_FILES_STRING					= "recent.files.";
-	private final static int	RECENT_FILES_MAX					= 10;
+	private int					recentFilesMax						= 10;
+	private final static String	RECENT_FILES_MAX					= "RecentFilesMax";
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
@@ -293,7 +294,8 @@ public class EditorFrame extends JFrame
 		dataDirectory = preferences.get(SD_DATA_DIRECTORY, null);
 		binDirectory = preferences.get(SD_BIN_DIRECTORY, null);
 		libDirectory = preferences.get(SD_LIB_DIRECTORY, null);
-		
+		recentFilesMax = Integer.parseInt(preferences.get(RECENT_FILES_MAX, "10"));
+
 		readDefaultSurfaces();
 		readDefaultObjects();
 	}
@@ -378,17 +380,38 @@ public class EditorFrame extends JFrame
 		preferences.put(SD_LIB_DIRECTORY, this.libDirectory);
 	}
 
+	public int getRecentFilesMax()
+	{
+		return recentFilesMax;
+	}
+	
+	public void setRecentFilesMax(int recentFilesMax)
+	{
+		this.recentFilesMax = recentFilesMax;
+		
+		while (recentFiles.size() > recentFilesMax)
+		{
+			int index = recentFiles.size() - 1;
+			System.out.println("removing " + index);
+			recentFiles.remove(index);
+			recentFilesMenu.remove(index);
+			preferences.remove(RECENT_FILES_STRING+index);
+		}
+
+		preferences.put(RECENT_FILES_MAX, this.recentFilesMax+"");
+	}
+
 	private void updateRecentFiles(String filename)
 	{
 		recentFiles.remove(filename);
 		recentFiles.add(0, filename);
-    
-		if (recentFiles.size() > RECENT_FILES_MAX)
+		
+		if (recentFiles.size() > recentFilesMax)
 		{
 			recentFiles.remove(recentFiles.size() - 1);
 		}
     
-		for (int i = 0; i < RECENT_FILES_MAX; i++)
+		for (int i = 0; i < recentFilesMax; i++)
 		{
 			if (i < recentFiles.size())
 			{
@@ -835,7 +858,9 @@ public class EditorFrame extends JFrame
 			});
 			recentFilesMenu.add(clearHistory);
 
-			for (int i = 0; i < RECENT_FILES_MAX; i++)
+			int recentFilesMax = Integer.parseInt(preferences.get(RECENT_FILES_MAX, "10"));
+
+			for (int i = 0; i < recentFilesMax; i++)
 			{
 				String file = preferences.get(RECENT_FILES_STRING + i, "");
 
@@ -1173,6 +1198,7 @@ public class EditorFrame extends JFrame
 			setDataDirectory(preferencesDialog.getDataDirectory());
 			setBinDirectory(preferencesDialog.getBinDirectory());
 			setLibDirectory(preferencesDialog.getLibDirectory());
+			setRecentFilesMax(preferencesDialog.getRecentFilesMax());
 			readDefaultSurfaces();
 			readDefaultObjects();
 		}

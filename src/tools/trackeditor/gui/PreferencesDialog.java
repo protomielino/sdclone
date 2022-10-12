@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -28,6 +29,8 @@ public class PreferencesDialog extends JDialog
 	private JLabel				libDirectoryLabel		= null;
 	private JTextField			libDirectoryTextField	= null;
 	private JButton				libDirectoryButton		= null;
+	private JLabel				recentFilesMaxLabel		= null;
+	private JTextField			recentFilesMaxTextField	= null;
 	private JButton				okButton				= null;
 	private JButton				cancelButton			= null;
 
@@ -65,17 +68,22 @@ public class PreferencesDialog extends JDialog
 			libDirectoryLabel = new JLabel();
 			libDirectoryLabel.setBounds(10, 76, 190, 23);
 			libDirectoryLabel.setText("Speed Dreams Lib Directory");
+			recentFilesMaxLabel = new JLabel();
+			recentFilesMaxLabel.setBounds(10, 109, 190, 23);
+			recentFilesMaxLabel.setText("Recent Files Maximum");
 			jPanel = new JPanel();
 			jPanel.setLayout(null);
 			jPanel.add(dataDirectoryLabel, null);
 			jPanel.add(binDirectoryLabel, null);
 			jPanel.add(libDirectoryLabel, null);
+			jPanel.add(recentFilesMaxLabel, null);
 			jPanel.add(getDataDirectoryTextField(), null);
 			jPanel.add(getDataDirectoryButton(), null);
 			jPanel.add(getBinDirectoryTextField(), null);
 			jPanel.add(getBinDirectoryButton(), null);
 			jPanel.add(getLibDirectoryTextField(), null);
 			jPanel.add(getLibDirectoryButton(), null);
+			jPanel.add(getRecentFilesMaxTextField(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
 		}
@@ -232,6 +240,17 @@ public class PreferencesDialog extends JDialog
 		}
 	}
 
+	private JTextField getRecentFilesMaxTextField()
+	{
+		if (recentFilesMaxTextField == null)
+		{
+			recentFilesMaxTextField = new JTextField();
+			recentFilesMaxTextField.setBounds(200, 109, 290, 23);
+			recentFilesMaxTextField.setText(editorFrame.getRecentFilesMax()+"");
+		}
+		return recentFilesMaxTextField;
+	}
+
 	private JButton getOkButton()
 	{
 		if (okButton == null)
@@ -270,8 +289,17 @@ public class PreferencesDialog extends JDialog
 
 	protected void exit()
 	{
-		APPROVE = true;
-		cancel();
+		try
+		{
+			Integer.parseInt(getRecentFilesMaxTextField().getText());
+		
+			APPROVE = true;
+			cancel();
+		}
+		catch (NumberFormatException e)
+		{
+			JOptionPane.showMessageDialog(this, "Invalid Recent Files Maximum : " + getRecentFilesMaxTextField().getText(), "Recent Files Maximum", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	protected void cancel()
@@ -294,6 +322,11 @@ public class PreferencesDialog extends JDialog
 	public String getLibDirectory()
 	{
 		return getLibDirectoryTextField().getText();
+	}
+
+	public int getRecentFilesMax()
+	{
+		return Integer.parseInt(getRecentFilesMaxTextField().getText());
 	}
 
 	protected void processWindowEvent(WindowEvent e)
