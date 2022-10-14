@@ -98,34 +98,34 @@ public class CheckDialog extends JDialog
 		if (pits == null)
 			return;
 
-		boolean noSegments = pits.getEntry() == null && pits.getStart() == null && pits.getEnd() == null
-				&& pits.getExit() == null;
+		boolean noSegments = !hasText(pits.getEntry()) && !hasText(pits.getStart()) && !hasText(pits.getEnd())
+				&& !hasText(pits.getExit());
 
 		if (!noSegments)
 		{
 			SegmentVector segments = editorFrame.getTrackData().getSegments();
 
-			if (pits.getEntry() == null)
+			if (!hasText(pits.getEntry()))
 				textArea.append("Missing pit entry\n");
 			else if (segments.getSegmentFromName(pits.getEntry()) == null)
 				textArea.append("Invalid pit entry: " + pits.getEntry() + "\n");
 
-			if (pits.getStart() == null)
+			if (!hasText(pits.getStart()))
 				textArea.append("Missing pit start\n");
 			else if (segments.getSegmentFromName(pits.getStart()) == null)
 				textArea.append("Invalid pit start: " + pits.getStart() + "\n");
 
-			if (pits.getEnd() == null)
+			if (!hasText(pits.getEnd()))
 				textArea.append("Missing pit end\n");
 			else if (segments.getSegmentFromName(pits.getEnd()) == null)
 				textArea.append("Invalid pit end: " + pits.getEnd() + "\n");
 
-			if (pits.getExit() == null)
+			if (!hasText(pits.getExit()))
 				textArea.append("Missing pit exit\n");
 			else if (segments.getSegmentFromName(pits.getExit()) == null)
 				textArea.append("Invalid pit exit: " + pits.getExit() + "\n");
 
-			if (pits.getSide() == null)
+			if (!hasText(pits.getSide()))
 				textArea.append("Missing pit side\n");
 			else if (!(pits.getSide().equals("left") || pits.getSide().equals("right")))
 				textArea.append("Invalid pit side: " + pits.getSide() + "\n");
