@@ -20,7 +20,6 @@
  */
 package gui.segment;
 
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -42,7 +41,7 @@ import utils.SegmentSliderLayout;
  */
 public class SegmentSlider extends JPanel
 {
-	private Vector		sliderListeners	= new Vector();
+	private Vector<SliderListener>	sliderListeners	= new Vector<SliderListener>();
 	private JLabel		sectionLabel	= null;
 	private JTextField	textField		= null;
 	private JLabel		attLabel		= null;
@@ -374,14 +373,14 @@ public class SegmentSlider extends JPanel
 		valueChanged();
 	}
 
-	public synchronized void removeSliderListener(ActionListener l)
+	public synchronized void removeSliderListener(SliderListener l)
 	{
 
 	}
 
 	public synchronized void addSliderListener(SliderListener l)
 	{
-		Vector v = sliderListeners == null ? new Vector(2) : (Vector) sliderListeners.clone();
+		Vector<SliderListener> v = sliderListeners == null ? new Vector<SliderListener>(2) : (Vector<SliderListener>) sliderListeners.clone();
 		if (!v.contains(l))
 		{
 			v.addElement(l);
@@ -393,11 +392,11 @@ public class SegmentSlider extends JPanel
 	{
 		if (sliderListeners != null)
 		{
-			Vector listeners = sliderListeners;
+			Vector<SliderListener> listeners = sliderListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SliderListener) listeners.elementAt(i)).sliderChanged(this);
+				listeners.elementAt(i).sliderChanged(this);
 			}
 		}
 	}

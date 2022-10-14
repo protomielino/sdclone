@@ -39,7 +39,7 @@ import gui.EditorFrame;
 
 public class Segment implements Cloneable
 {
-	private Vector			segmentListeners		= new Vector();
+	private Vector<SegmentSideListener>	segmentListeners	= new Vector<SegmentSideListener>();
 
 	// neighbours
 	public Segment			previousShape;
@@ -188,13 +188,13 @@ public class Segment implements Cloneable
 	{
 		this.surface = surface;
 	}
-	public Segment copyTo(Segment shape) throws CloneNotSupportedException
+	public Segment copyTo(Segment shape)
 	{
-		shape.points = (Point2D.Double[]) points.clone();
-		shape.trPoints = (Point2D.Double[]) trPoints.clone();
+		shape.points = points.clone();
+		shape.trPoints = trPoints.clone();
 		shape.type = new String(type);
-		shape.xToDraw = (int[]) xToDraw.clone();
-		shape.yToDraw = (int[]) yToDraw.clone();
+		shape.xToDraw = xToDraw.clone();
+		shape.yToDraw = yToDraw.clone();
 
 		return shape;
 	}
@@ -666,7 +666,7 @@ public class Segment implements Cloneable
 
 	public synchronized void addSideListener(SegmentSideListener l)
 	{
-		Vector v = segmentListeners == null ? new Vector(2) : (Vector) segmentListeners.clone();
+		Vector<SegmentSideListener> v = segmentListeners == null ? new Vector<SegmentSideListener>(2) : (Vector<SegmentSideListener>) segmentListeners.clone();
 		if (!v.contains(l))
 		{
 			v.addElement(l);

@@ -21,7 +21,6 @@
 package utils.circuit;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Vector;
 
 /**
@@ -63,7 +62,7 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_PIT_EXIT_BORDER_HEIGHT		= 0.0;
 	public static final double	DEFAULT_PIT_EXIT_BORDER_WIDTH		= 0.0;
 
-	private Vector				sideListeners				= new Vector();
+	private Vector<SegmentSideListener>	sideListeners		= new Vector<SegmentSideListener>();
 	private SegmentSide			prev						= null;
 	private SegmentSide			props						= null;
 
@@ -185,11 +184,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).barrierHeightChanged();
+				listeners.elementAt(i).barrierHeightChanged();
 			}
 		}
 	}
@@ -218,11 +217,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).barrierStyleChanged();
+				listeners.elementAt(i).barrierStyleChanged();
 			}
 		}
 	}
@@ -251,11 +250,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).barrierSurfaceChanged();
+				listeners.elementAt(i).barrierSurfaceChanged();
 			}
 		}
 	}
@@ -287,11 +286,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).barrierWidthChanged();
+				listeners.elementAt(i).barrierWidthChanged();
 			}
 		}
 	}
@@ -339,11 +338,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).borderHeightChanged();
+				listeners.elementAt(i).borderHeightChanged();
 			}
 		}
 	}
@@ -372,11 +371,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).borderStyleChanged();
+				listeners.elementAt(i).borderStyleChanged();
 			}
 		}
 	}
@@ -405,11 +404,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).borderSurfaceChanged();
+				listeners.elementAt(i).borderSurfaceChanged();
 			}
 		}
 	}
@@ -441,11 +440,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).borderWidthChanged();
+				listeners.elementAt(i).borderWidthChanged();
 			}
 		}
 	}
@@ -492,11 +491,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).sideEndWidthChanged();
+				listeners.elementAt(i).sideEndWidthChanged();
 			}
 		}
 	}
@@ -528,11 +527,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).sideStartWidthChanged();
+				listeners.elementAt(i).sideStartWidthChanged();
 			}
 		}
 	}
@@ -562,11 +561,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).sideSurfaceChanged();
+				listeners.elementAt(i).sideSurfaceChanged();
 			}
 		}
 	}
@@ -596,23 +595,23 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((SegmentSideListener) listeners.elementAt(i)).sideBankingTypeChanged();
+				listeners.elementAt(i).sideBankingTypeChanged();
 			}
 		}
 	}
 
-	public synchronized void removeSideListener(ActionListener l)
+	public synchronized void removeSideListener(SegmentSideListener l)
 	{
 
 	}
 
 	public synchronized void addSideListener(SegmentSideListener l)
 	{
-		Vector v = sideListeners == null ? new Vector(2) : (Vector) sideListeners.clone();
+		Vector<SegmentSideListener> v = sideListeners == null ? new Vector<SegmentSideListener>(2) : (Vector<SegmentSideListener>) sideListeners.clone();
 		if (!v.contains(l))
 		{
 			v.addElement(l);
@@ -624,11 +623,11 @@ public class SegmentSide implements Cloneable
 	{
 		if (sideListeners != null)
 		{
-			Vector listeners = sideListeners;
+			Vector<SegmentSideListener> listeners = sideListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((ActionListener) listeners.elementAt(i)).actionPerformed(null);
+				listeners.elementAt(i).actionPerformed(null);
 			}
 		}
 	}
@@ -892,7 +891,7 @@ public class SegmentSide implements Cloneable
 			s.sideEndWidth = this.sideEndWidth;
 			s.sideStartWidth = this.sideStartWidth;
 			s.sideSurface = this.sideSurface;
-			s.sideListeners = (Vector) this.sideListeners.clone();
+			s.sideListeners = (Vector<SegmentSideListener>) this.sideListeners.clone();
 			s.hasSide = this.hasSide;
 			s.hasBorder = this.hasBorder;
 			s.hasBarrier = this.hasBarrier;

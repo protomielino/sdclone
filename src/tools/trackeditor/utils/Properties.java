@@ -32,7 +32,7 @@ import java.util.Vector;
 public  class Properties
 {
 	private static Properties	instance				= new Properties();
-	private Vector				propertiesListeners		= new Vector();
+	private Vector<ActionListener>	propertiesListeners	= new Vector<ActionListener>();
 	public final String			title					= "sd2-trackeditor";
 	public final String			version					= "Beta";
 	private String				path;
@@ -161,7 +161,7 @@ public  class Properties
 
 	public synchronized void addPropertiesListener(ActionListener l)
 	{
-		Vector v = propertiesListeners == null ? new Vector(2) : (Vector) propertiesListeners.clone();
+		Vector<ActionListener> v = propertiesListeners == null ? new Vector<ActionListener>(2) : (Vector<ActionListener>) propertiesListeners.clone();
 		if (!v.contains(l))
 		{
 			v.addElement(l);
@@ -173,11 +173,11 @@ public  class Properties
 	{
 		if (propertiesListeners != null)
 		{
-			Vector listeners = propertiesListeners;
+			Vector<ActionListener> listeners = propertiesListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((ActionListener) listeners.elementAt(i)).actionPerformed(null);
+				listeners.elementAt(i).actionPerformed(null);
 			}
 		}
 	}

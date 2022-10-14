@@ -48,7 +48,6 @@ import javax.swing.event.DocumentListener;
 import utils.SurfaceComboBox;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
-import utils.circuit.Straight;
 import utils.circuit.Surface;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -989,13 +988,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 		try
 		{
-			if (shape.getType().equals("str"))
-			{
-				line.set("shape", (Straight) shape);
-			} else
-			{
-				line.set("shape", (Curve) shape);
-			}
+			line.set("shape", shape);
 
 			String method = slider.getMethod();
 

@@ -56,7 +56,7 @@ public class Curve extends Segment
 		this.previousShape = prev;
 	}
 
-	public Segment copyTo(Segment _shape) throws CloneNotSupportedException
+	public Segment copyTo(Segment _shape)
 	{
 		super.copyTo(_shape);
 

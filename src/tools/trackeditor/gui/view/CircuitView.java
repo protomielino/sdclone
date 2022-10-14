@@ -98,7 +98,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** mouse current point, in meters */
 	Point2D.Double				mousePoint						= new Point2D.Double(0, 0);
 	/** handles to be shown */
-	ArrayList					handles							= new ArrayList();
+	ArrayList<Segment>			handles							= new ArrayList<Segment>();
 	/** temp handle for calculs */
 	ObjShapeHandle				handle							= new ObjShapeHandle();
 	/** dragging handle index */
@@ -132,15 +132,15 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public boolean				showArrows						= false;
 
 	/** undo list */
-	protected ArrayList			undoSteps						= new ArrayList();
+	protected ArrayList<CircuitViewSelectionListener>	undoSteps	= new ArrayList<CircuitViewSelectionListener>();
 	/** redo list */
-	protected ArrayList			redoSteps						= new ArrayList();
+	protected ArrayList<CircuitViewSelectionListener>	redoSteps	= new ArrayList<CircuitViewSelectionListener>();
 
 	/** show terrain border */
 	boolean						terrainBorderMustBeShown		= true;
 
 	/** selection listener management */
-	private transient Vector	selectionListeners;
+	private transient Vector<CircuitViewSelectionListener>	selectionListeners;
 
 	//private double				imgCo							= 1.0; //3.4;
 	//private Point2D.Double		imgOffset						= new Point2D.Double(0, 0);
@@ -616,7 +616,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					dragging = true;
 
 					int curHandle = 0;
-					for (Iterator i = handles.iterator(); i.hasNext(); curHandle++)
+					for (Iterator<Segment> i = handles.iterator(); i.hasNext(); curHandle++)
 					{
 						ObjShapeHandle h = (ObjShapeHandle) i.next();
 
@@ -1280,10 +1280,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			//			Rectangle2D.Double br = boundingRectangle;
 			//			g.drawRect((int)br.x,(int)br.y,(int)br.width,(int)br.height);
 
-			Iterator i = editorFrame.getTrackData().getSegments().iterator();
+			Iterator<Segment> i = editorFrame.getTrackData().getSegments().iterator();
 			while (i.hasNext())
 			{
-				Segment obj = (Segment) i.next();
+				Segment obj = i.next();
 
 				if (obj != selectedShape)
 				{
@@ -1318,7 +1318,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			while (i.hasNext())
 			{
-				((Segment) i.next()).draw(g, affineTransform);
+				i.next().draw(g, affineTransform);
 			}
 
 		}
@@ -1516,7 +1516,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		if (selectionListeners != null && selectionListeners.contains(l))
 		{
-			Vector v = (Vector) selectionListeners.clone();
+			Vector<CircuitViewSelectionListener> v = (Vector<CircuitViewSelectionListener>) selectionListeners.clone();
 			v.removeElement(l);
 			selectionListeners = v;
 		}
@@ -1524,7 +1524,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	public synchronized void addSelectionListener(CircuitViewSelectionListener l)
 	{
-		Vector v = selectionListeners == null ? new Vector(2) : (Vector) selectionListeners.clone();
+		Vector<CircuitViewSelectionListener> v = selectionListeners == null ? new Vector<CircuitViewSelectionListener>(2) : (Vector<CircuitViewSelectionListener>) selectionListeners.clone();
 		if (!v.contains(l))
 		{
 			v.addElement(l);
@@ -1536,11 +1536,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		if (selectionListeners != null)
 		{
-			Vector listeners = selectionListeners;
+			Vector<CircuitViewSelectionListener> listeners = selectionListeners;
 			int count = listeners.size();
 			for (int i = 0; i < count; i++)
 			{
-				((CircuitViewSelectionListener) listeners.elementAt(i)).circuitViewSelectionChanged(e);
+				listeners.elementAt(i).circuitViewSelectionChanged(e);
 			}
 		}
 	}
