@@ -17,9 +17,11 @@ import javax.swing.WindowConstants;
 import utils.Editor;
 import utils.SegmentVector;
 import utils.TrackData;
+import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
+import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
 import utils.circuit.TrackLight;
 import utils.circuit.TrackObject;
@@ -84,11 +86,55 @@ public class CheckDialog extends JDialog
 	    		checkTrackLights();
 	    		checkGraphic();
 	    		checkPits();
+	    		checkTrack();
 			
 	    		textArea.append("Checking complete!");	
 	    	}
 	    });
 	    this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	}
+
+	private void checkTrack()
+	{
+		SegmentVector segments = editorFrame.getTrackData().getSegments();
+
+		for (int i = 0; i < segments.size(); i++)
+		{
+			Segment segment = segments.get(i);
+
+			if (!segment.getType().equals("str"))
+			{
+				Curve curve = (Curve) segment;
+				double startWidth = editorFrame.getTrackData().getMainTrack().getWidth() / 2.0;
+				double endWidth = startWidth;
+
+				if (segment.getType().equals("rgt"))
+				{
+					startWidth += curve.getValidRightBorderWidth(editorFrame);
+					endWidth = startWidth;
+					
+					startWidth += curve.getValidRightSideStartWidth(editorFrame);
+					endWidth += curve.getValidRightSideEndWidth(editorFrame);
+				}
+				else
+				{
+					startWidth += curve.getValidLeftBorderWidth(editorFrame);
+					endWidth = startWidth;
+					
+					startWidth += curve.getValidLeftSideStartWidth(editorFrame);
+					endWidth += curve.getValidLeftSideEndWidth(editorFrame);
+				}
+
+				if (startWidth > curve.getRadiusStart())
+				{
+					textArea.append("Segment " + curve.getName() + " Distance to barrier: " + startWidth + " greater than start radius: " + curve.getRadiusStart() + "\n");
+				}
+				if (endWidth > curve.getRadiusEnd())
+				{
+					textArea.append("Segment " + curve.getName() + " Distance to barrier: " + endWidth + " greater than end radius: " + curve.getRadiusEnd() + "\n");
+				}
+			}
+		}
 	}
 
 	private void checkPits()
