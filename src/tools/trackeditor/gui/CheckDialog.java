@@ -96,7 +96,7 @@ public class CheckDialog extends JDialog
 
 	private void checkTrack()
 	{
-		SegmentVector segments = editorFrame.getTrackData().getSegments();
+		SegmentVector segments = trackData.getSegments();
 
 		for (int i = 0; i < segments.size(); i++)
 		{
@@ -105,7 +105,7 @@ public class CheckDialog extends JDialog
 			if (!segment.getType().equals("str"))
 			{
 				Curve curve = (Curve) segment;
-				double startWidth = editorFrame.getTrackData().getMainTrack().getWidth() / 2.0;
+				double startWidth = trackData.getMainTrack().getWidth() / 2.0;
 				double endWidth = startWidth;
 
 				if (segment.getType().equals("rgt"))
@@ -139,7 +139,7 @@ public class CheckDialog extends JDialog
 
 	private void checkPits()
 	{
-		Pits pits = editorFrame.getTrackData().getMainTrack().getPits();
+		Pits pits = trackData.getMainTrack().getPits();
 
 		if (pits == null)
 			return;
@@ -149,7 +149,7 @@ public class CheckDialog extends JDialog
 
 		if (!noSegments)
 		{
-			SegmentVector segments = editorFrame.getTrackData().getSegments();
+			SegmentVector segments = trackData.getSegments();
 
 			if (!hasText(pits.getEntry()))
 				textArea.append("Missing pit entry\n");
@@ -180,9 +180,9 @@ public class CheckDialog extends JDialog
 
 	private void checkTrackHeight()
 	{
-		SegmentVector segments = editorFrame.getTrackData().getSegments();
+		SegmentVector segments = trackData.getSegments();
 
-		double width = editorFrame.getTrackData().getMainTrack().getWidth();
+		double width = trackData.getMainTrack().getWidth();
 
 		double firstHeightStartLeft = Double.NaN;
 		double firstHeightStartRight = Double.NaN;
@@ -310,14 +310,14 @@ public class CheckDialog extends JDialog
 
 	private void checkGraphic()
 	{
-		String image = editorFrame.getTrackData().getGraphic().getBackgroundImage();
+		String image = trackData.getGraphic().getBackgroundImage();
 		if (hasText(image))
 			checkTexture("Graphic Background Image ", image);
 	}
 	
 	private void checkTrackLights()
 	{
-		Vector<TrackLight> lightData = editorFrame.getTrackData().getTrackLights();
+		Vector<TrackLight> lightData = trackData.getTrackLights();
 
 		for (int i = 0; i < lightData.size(); i++)
 		{
