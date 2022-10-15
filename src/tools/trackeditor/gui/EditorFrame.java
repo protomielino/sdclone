@@ -226,6 +226,8 @@ public class EditorFrame extends JFrame
 	private DefaultSurfacesDialog	defaultSurfacesDialog			= null;
 	private DefaultObjectsDialog	defaultObjectsDialog			= null;
 	
+	private String				originalTitle						= null;
+	
 	public class NewProjectInfo
 	{
 		public String	name;
@@ -298,6 +300,8 @@ public class EditorFrame extends JFrame
 
 		readDefaultSurfaces();
 		readDefaultObjects();
+		
+		originalTitle = getTitle();
 	}
 	
 	private void readDefaultSurfaces()
@@ -508,7 +512,9 @@ public class EditorFrame extends JFrame
 		trackData = null;
 		trackData = new TrackData();		
 		readFile(file);
-		updateRecentFiles(projectFileName);	
+		updateRecentFiles(projectFileName);
+		
+		setTitle(originalTitle + " - Project: " + projectFileName);
 	}
 
 	/**
@@ -580,9 +586,14 @@ public class EditorFrame extends JFrame
 		newProject.setVisible(true);
 		if (NewProjectDialog.APPROVE)
 		{
+			setTitle(originalTitle);
 			try
 			{
 				createNewCircuit(newProjectInfo);
+				String filename = Editor.getProperties().getPath();
+				String trackname = filename.substring(filename.lastIndexOf(sep) + 1);
+				filename = filename + sep + trackname + ".prj.xml";
+				setTitle(originalTitle + " - Project: " + filename);
 			} catch (Exception e1)
 			{
 				e1.printStackTrace();
