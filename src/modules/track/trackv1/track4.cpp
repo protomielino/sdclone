@@ -274,10 +274,16 @@ static void AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int
                 barrierStyle[side] = TR_FENCE;
                 barrierWidth[side] = 0;
             }
-            else
+            else if (strcmp(style, TRK_VAL_WALL) == 0)
             {
                 barrierStyle[side] = TR_WALL;
                 barrierWidth[side] = GfParmGetNum(TrackHandle, path2, TRK_ATT_WIDTH, (char *)NULL, barrierWidth[side]);
+            }
+            else if (strcmp(style, TRK_VAL_NO_BARRIER) == 0)
+            {
+                barrierStyle[side] = TR_NO_BARRIER;
+                barrierWidth[side] = 0;
+                barrierHeight[side] = 0;
             }
         }
         else

@@ -74,7 +74,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 			"barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector		= new Vector<String>(Arrays.asList(sideSurfaceItems));
-	private String[]			barrierStyleItems		= {"none", "wall", "fence"};
+	private String[]			barrierStyleItems		= {"none", "no barrier", "wall", "fence"};
 	private String[]			barrierSurfaceItems		=
 														{"barrier", "barrier2", "barrier-turn", "barrier-grille",
 			"wall", "wall2", "tire-wall", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both",

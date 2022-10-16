@@ -436,6 +436,7 @@ std::ostream &operator << (std::ostream &out, tSegStyle style)
             style == TR_WALL ? "TR_WALL" :
             style == TR_FENCE ? "TR_FENCE" :
             style == TR_PITBUILDING ? "TR_PITBUILDING" :
+            style == TR_NO_BARRIER ? "TR_NO_BARRIER" :
             std::to_string(style));
 
     return out;

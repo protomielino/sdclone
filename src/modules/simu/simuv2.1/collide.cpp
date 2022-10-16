@@ -103,6 +103,10 @@ void SimCarCollideXYScene(tCar *car)
 			continue;
 		}
 
+		// check if barrier exists
+		if (curBarrier->style == TR_NO_BARRIER)
+			continue;
+
 		const tdble& nx = curBarrier->normal.x;
 		const tdble& ny = curBarrier->normal.y;
 

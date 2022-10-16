@@ -245,6 +245,7 @@
 #define TRK_VAL_WALL                "wall"
 #define TRK_VAL_CURB                "curb"
 #define TRK_VAL_FENCE               "fence"
+#define TRK_VAL_NO_BARRIER          "no barrier"
 
 
 #define TRK_SECT_CAM                "Cameras"
@@ -323,7 +324,8 @@ enum tSegStyle
     TR_CURB        = 1,      /**< Curb (border only) */
     TR_WALL        = 2,      /**< Wall (border and barrier) */
     TR_FENCE       = 3,      /**< Fence (no width) (barrier only) */
-    TR_PITBUILDING = 4       /**< Pit building wall (barrier only) */
+    TR_PITBUILDING = 4,      /**< Pit building wall (barrier only) */
+    TR_NO_BARRIER  = 5       /**< No Barrier (barrier only) */
 };
 
 /** Barrier */
@@ -386,6 +388,7 @@ typedef struct trackSeg
                                         - TR_WALL
                                         - TR_FENCE
                                         - TR_PITBUILDING
+                                        - TR_NO_BARRIER
                                 */
 
     tdble length;               /**< Length in meters of the middle of the track */

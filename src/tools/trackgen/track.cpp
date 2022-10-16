@@ -843,6 +843,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         break;
                     case TR_FENCE:
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // not supported
                         break;
                     }
@@ -922,6 +923,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1013,6 +1015,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1105,6 +1108,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1177,6 +1181,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     break;
                 case TR_FENCE:
                 case TR_PITBUILDING:
+                case TR_NO_BARRIER:
                     // not supported
                     break;
                 }
@@ -1444,6 +1449,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         break;
                     case TR_FENCE:
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // not supported
                         break;
                     }
@@ -1523,6 +1529,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1614,6 +1621,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1706,6 +1714,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         case TR_FENCE:
                         case TR_PITBUILDING:
+                        case TR_NO_BARRIER:
                             // not supported
                             break;
                         }
@@ -1775,6 +1784,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     break;
                 case TR_FENCE:
                 case TR_PITBUILDING:
+                case TR_NO_BARRIER:
                     // not supported
                     break;
                 }
@@ -1973,14 +1983,15 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             while (seg->rside)
                 seg = seg->rside;
 
-            if (seg->raceInfo & TR_PITBUILD)
+            curBarrier = mseg->barrier[0];
+
+            if (seg->raceInfo & TR_PITBUILD || curBarrier->style == TR_NO_BARRIER)
             {
                 startNeeded = true;
                 runninglentgh = 0;
                 continue;
             }
 
-            curBarrier = mseg->barrier[0];
             curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 
@@ -2045,6 +2056,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     // not supported
                     break;
                 case TR_PITBUILDING:
+                case TR_NO_BARRIER:
                     // nothing to do
                     break;
                 }
@@ -2100,6 +2112,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2162,6 +2175,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2226,6 +2240,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2281,6 +2296,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 // not supported
                 break;
             case TR_PITBUILDING:
+            case TR_NO_BARRIER:
                 // nothing to do
                 break;
             }
@@ -2305,14 +2321,15 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             while (seg->lside)
                 seg = seg->lside;
 
-            if (seg->raceInfo & TR_PITBUILD)
+            curBarrier = mseg->barrier[1];
+
+            if (seg->raceInfo & TR_PITBUILD || curBarrier->style == TR_NO_BARRIER)
             {
                 runninglentgh = 0;
                 startNeeded = true;
                 continue;
             }
             
-            curBarrier = mseg->barrier[1];
             curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 
@@ -2379,6 +2396,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     // not supported
                     break;
                 case TR_PITBUILDING:
+                case TR_NO_BARRIER:
                     // nothing to do
                     break;
                 }
@@ -2437,6 +2455,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2501,6 +2520,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2562,10 +2582,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         }
                         break;
                     case TR_CURB:
-                        case TR_PLAN:
+                    case TR_PLAN:
                         // not supported
                         break;
                     case TR_PITBUILDING:
+                    case TR_NO_BARRIER:
                         // nothing to do
                         break;
                     }
@@ -2624,6 +2645,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 // not supported
                 break;
             case TR_PITBUILDING:
+            case TR_NO_BARRIER:
                 // nothing to do
                 break;
             }

@@ -21,7 +21,6 @@ import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
-import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
 import utils.circuit.TrackLight;
 import utils.circuit.TrackObject;
