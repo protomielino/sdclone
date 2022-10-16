@@ -2226,6 +2226,10 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
+            // check if barrier exists
+            if (mseg->barrier[TR_SIDE_RGT]->style == TR_NO_BARRIER)
+                continue;
+
             // Find last side segment
             seg = mseg;
             while (seg->rside)
@@ -2315,6 +2319,10 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
+            // check if barrier exists
+            if (mseg->barrier[TR_SIDE_LFT]->style == TR_NO_BARRIER)
+                continue;
+
             // Find last side segment
             seg = mseg;
             while (seg->lside)
