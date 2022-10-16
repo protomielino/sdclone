@@ -67,6 +67,7 @@ using namespace std;
 #define PRV_STAY_TOGETHER			"stay together"
 #define PRV_PIT_ENTRY_OFFS			"pit entry offset"
 #define PRV_PIT_EXIT_OFFS			"pit exit offset"
+#define PRV_PIT_LAT_OFFS            "pit lat offset"
 #define PRV_PIT_DAMAGE_WARN			"pit damage warn limit"
 #define PRV_PIT_DAMAGE_DANGER		"pit damage danger limit"
 #define PRV_PIT_TIRE_WARN			"pit tire warn limit"
@@ -492,6 +493,7 @@ void	Driver::InitTrack(
         m_priv[p].STEER_K_DEC = SafeParmGetNum(hCarParm, sect.c_str(), PRV_STEER_K_DEC, 0, m_priv[p].STEER_K_DEC);
         m_priv[p].PIT_ENTRY_OFFSET = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_ENTRY_OFFS, 0, m_priv[p].PIT_ENTRY_OFFSET);
         m_priv[p].PIT_EXIT_OFFSET = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_EXIT_OFFS, 0, m_priv[p].PIT_EXIT_OFFSET);
+        m_priv[p].PIT_LAT_OFFSET = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_LAT_OFFS, 0, m_priv[p].PIT_LAT_OFFSET);
         m_priv[p].PIT_DAMAGE_WARN = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_DAMAGE_WARN, 0, (float)m_priv[p].PIT_DAMAGE_WARN);
         m_priv[p].PIT_TIRE_WARN = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_TIRE_WARN, 0, 0.3);
         m_priv[p].PIT_DAMAGE_DANGER = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_DAMAGE_DANGER, 0, (float)m_priv[p].PIT_DAMAGE_DANGER);
@@ -741,7 +743,9 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
             CarModel	pitCm(m_cm[p]);
             pitCm.BRAKE_MU_SCALE = 0.8;
             m_pitPath[p][i].MakePath( pCar->race.pit, &m_path[p], pitCm, i == 1,
-                                      m_priv[p].PIT_ENTRY_OFFSET, m_priv[p].PIT_EXIT_OFFSET );
+                                      m_priv[p].PIT_ENTRY_OFFSET,
+                                      m_priv[p].PIT_EXIT_OFFSET,
+                                      m_priv[p].PIT_LAT_OFFSET);
         }
     }
 

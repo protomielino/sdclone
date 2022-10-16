@@ -383,6 +383,7 @@ private:
         double				AVOID_WIDTH;			// in m.
         double				PIT_ENTRY_OFFSET;		// dist in m.
         double				PIT_EXIT_OFFSET;		// dist in m.
+        double              PIT_LAT_OFFSET;
         int					PIT_DAMAGE_WARN;		// fix damage if no extra pit stops required.
         int					PIT_DAMAGE_DANGER;		// fix damage even if extra pit stops required.
         double              PIT_TIRE_WARN;
@@ -421,6 +422,7 @@ private:
             AVOID_WIDTH = 0.5;			// in m.
             PIT_ENTRY_OFFSET = 0;		// dist in m.
             PIT_EXIT_OFFSET = 0;		// dist in m.
+            PIT_LAT_OFFSET = 0;
             PIT_DAMAGE_WARN = 5000;		// fix damage if no extra pit stops required.
             PIT_DAMAGE_DANGER = 7000;	// fix damage even if extra pit stops required.
             SKID_FACTOR = 0.0;

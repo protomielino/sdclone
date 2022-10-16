@@ -38,8 +38,9 @@ public:
     PitPath&			operator=( const PitPath& other );
     virtual PitPath&	operator=( const Path& other );
 
-    void	MakePath( const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
-                      int pitType, double entryOffset = 0, double exitOffset = 0 );
+    void	MakePath(const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
+                      int pitType, double entryOffset = 0,
+                     double exitOffset = 0 , double latoffset = 0);
 
     //	CPath overrides.
 //	virtual bool	ContainsPos( double trackPos ) const;

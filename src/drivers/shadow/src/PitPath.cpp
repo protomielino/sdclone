@@ -28,6 +28,11 @@
 
 #include <robottools.h>
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -80,7 +85,8 @@ void	PitPath::MakePath(
     const CarModel&	cm,
     int				pitType,
     double			entryOffset,
-    double			exitOffset )
+    double			exitOffset,
+    double          latoffset)
 {
     operator=( *pBasePath );
 
@@ -109,6 +115,11 @@ void	PitPath::MakePath(
     m_pitEndPos   = x[5];
     m_pitExitPos  = x[6];
 
+    LogSHADOW.info("Pit Entry Position = %.2f\n", m_pitEntryPos);
+    LogSHADOW.info("Pit Start position = %.2f\n", m_pitStartPos);
+    LogSHADOW.info("Pit End position   = %.2f\n", m_pitEndPos);
+    LogSHADOW.info("Pit Exit position  = %.2f\n", m_pitExitPos);
+
     // Normalizing spline segments to >= 0.0.
     {for( int i = 0; i < NPOINTS; i++ )
     {
@@ -131,21 +142,32 @@ void	PitPath::MakePath(
     if( x[5] < x[4] )
         x[5] = x[4];
 
+    LogSHADOW.info("Pit Entry Position2 = %.2f\n", m_pitEntryPos);
+    LogSHADOW.info("Pit Start position2 = %.2f\n", m_pitStartPos);
+    LogSHADOW.info("Pit End position2   = %.2f\n", m_pitEndPos);
+    LogSHADOW.info("Pit Exit position2  = %.2f\n", m_pitExitPos);
+
     // splice entry/exit of pit path into the base path provided.
     PtInfo	pi;
     pBasePath->GetPtInfo(m_pitEntryPos, pi);
     y[0] = pi.offs;
     s[0] = -tan(pi.oang - m_pTrack->CalcForwardAngle(m_pitEntryPos));
 
+
     pBasePath->GetPtInfo(m_pitExitPos, pi);
     y[6] = pi.offs;
     s[6] = -tan(pi.oang - m_pTrack->CalcForwardAngle(m_pitExitPos));
 
     double sign = (pPitInfo->side == TR_LFT) ? -1.0 : 1.0;
-    {for( int i = 1; i < NPOINTS - 1; i++ )
+    {for( int i = 0; i < NPOINTS - 1; i++ )
     {
-        y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - pPitInfo->width;
+            if (i == 0)
+                y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - (pPitInfo->width - latoffset);
+            else
+                y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - (pPitInfo->width - 0.5);
+
         y[i] *= sign;
+        LogSHADOW.info("y[i] = %.2f\n", y[i]);
     }}
 
     if( pitType == Strategy::PT_NORMAL )
@@ -159,6 +181,7 @@ void	PitPath::MakePath(
     {for( int i = 0; i < NPOINTS; i++ )
     {
         LocalToGlobalXY( x[i], y[i], s[i], &gp[i], &gv[i] );
+        LogSHADOW.info(" x[%d] = %.2f - y[%d] = %.2f - s[%d] = %.2f\n", i, x[i], i, y[i], i, s[i]);
     }}
 
     ParametricCubicSpline   pspline(NPOINTS, gp, gv);
