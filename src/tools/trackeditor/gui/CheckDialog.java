@@ -206,7 +206,7 @@ public class CheckDialog extends JDialog
 			double bankingStart = segment.getBankingStart();
 			boolean hasBankingStart = !Double.isNaN(bankingStart);
 
-			// Track must start at an elevation of 0.0.
+			// Track should start at an elevation of 0.0.
 			if (i == 0)
 			{
 				firstHeightStartLeft = heightStartLeft;
@@ -218,7 +218,9 @@ public class CheckDialog extends JDialog
 
 					if (centerHeight != 0.0)
 					{
-						textArea.append(segmentInfo + "Track height at start must be 0. Actual height: " + centerHeight +"\n");
+						// disabled because many tracks don't start at 0 because of banking 
+						// or because they use the actual elevation
+						//textArea.append(segmentInfo + "Track height at start should be 0. Actual height: " + centerHeight +"\n");
 					}
 				}
 			}
