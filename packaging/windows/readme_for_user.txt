@@ -6,7 +6,7 @@ The whole distribution is licensed according to the GPL 2+ and the Free Art Lice
 Installation instructions
 -------------------------
 
-Among the 5 binary packages (speed-dreams-xxxx-2.1.0-rYYYY-win32-setup.exe),
+Among the 5 binary packages (speed-dreams-xxxx-2.3.0-rYYYY-win32-setup.exe),
 only the "base" one is mandatory : it contains the core components of the game.
 It is also a kind of "demo" package, as it also ships 1 track (Espie)
 and 1 car set (the Supercars), plus the relevant AI drivers :
@@ -23,13 +23,11 @@ Completing the installation
 ---------------------------
 
 After installing Speed Dreams and starting it, if you get and error box 
-that says something like "Can't find MSVCR80.dll" or so,
-try installing the MS Visual C++ 2005 redistribuable package :
+that says something like "Can't find MSVCxxx.dll" or so,
+try installing the MS Visual C++ redistribuable package :
 - Be carefull to use the x86 (32bits) version, 
-  release 2.0.50727.762 (matching with Microsoft Visual C++ 2005 SP1 x86)
-  (the one shipped with VC 2005 Express doesn't work).
 - You can download it here, at Microsoft's official web site:
-  http://www.microsoft.com/downloads/details.aspx?familyid=200B2FD9-AE1A-4A14-984D-389C36F85647&displaylang=en
+  https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
 
 Game Requirements
 -----------------
@@ -50,17 +48,15 @@ Running the game
 ----------------
 
 - Read the "User manual" :
-  * Simon's great online tutorial videos http://www.youtube.com/user/mungewell/feed?feature=context
-  * WIP online manual http://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual
+  * Simon's great online tutorial videos http://www.youtube.com/user/mungewell/feed?feature=context https://www.youtube.com/user/mungewell/videos
+  * WIP online manual http://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual https://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual/
   * Windows : Start menu / Programs / Speed Dreams x.y.z / User Manual
-    (Note: Now out-dated, as was written for 1.4.0 ...)  
-  * Others (soon available online at http://www.speed-dreams.org) :
+  * Others (soon available online at https://sourceforge.net/projects/speed-dreams/) :
     - source distribution : open speed-dreams-x.y.z-src/doc/userman/how_to_drive.html 
       in a web browser
     - SubVersion repository : download a GNU tarball of the user manual here :
         http://speed-dreams.svn.sourceforge.net/p/speed-dreams/code/HEAD/tree/tags/x.y.z/doc/userman
       then uncompress it and finally open how_to_drive.html in a web browser
-      (Note: Now out-dated, as was written for 1.4.0)  
 
 - Start the game :
   * Windows : Start menu / Programs / Speed Dreams x.y.z / Speed Dreams
@@ -80,7 +76,7 @@ Running the game
 Getting Help
 ------------
 
-See here : http://www.speed-dreams.org
+See here : https://sourceforge.net/projects/speed-dreams/
 
 Car Setups
 ----------
@@ -91,18 +87,18 @@ For the player driver, the default car parameters are located in the files
 You can have your own customized version of these files by copying them
 to <My documents>/speed-dreams-2.settings/drivers/human/car*.xml
 and changing them with a text editor ; for more information look into the
-robot tutorial chapter 5 (http://www.berniw.org/torcs/robot/ch5/properties.html).
+robot tutorial chapter 5 (http://www.berniw.org/tutorials/robot/).
 
 Creating Tracks
 ---------------
 
-There is a new track editor in development (by Mart Kelder) :
-have a look soon at Speed Dreams SVN repository (in the 'subprojects' folder).
+There is a new track editor in development (by Robert) :
+have a look soon at Speed Dreams SVN repository (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/trunk/src/tools/trackeditor/).
 
 Robot programming
 -----------------
 
-You'll find a robot programming tutorial at www.berniw.org in the TORCS section.
+You'll find a robot programming tutorial at http://www.berniw.org/tutorials/robot/ in the TORCS section.
 
 Wolf-Dieter is also starting a new "Robot Programming Academy" : soon news !
 

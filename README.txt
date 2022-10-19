@@ -39,7 +39,7 @@ Getting Help
 During the game press F1
 (do it as well during the ride to learn about the options).
 
-For more in depth information visit http://www.speed-dreams.org,
+For more in depth information visit https://sourceforge.net/projects/speed-dreams/,
 you'll hopefully find there some information (documentation, HOWTO, FAQ ... work-in-progress).
 
 If you are stuck please report problems through speed-dreams-users mailing list
@@ -53,12 +53,12 @@ You can have you own version on the car setups for the human driver
 - Windows : <My documents>\speed-dreams-2.settings\human\...
 depending on the car used. You can change them with a text editor, 
 for more information look into the robot tutorial chapter 5
-(http://www.berniw.org/torcs/robot/ch5/properties.html).
+(http://www.berniw.org/tutorials/robot/).
 
 
 Creating Tracks
 ---------------
-There is a track editor in development, have a look at http://www.vmarti.es
+There is a track editor in development, have a look at https://sourceforge.net/p/speed-dreams/discussion/
 
 
 Robot programming
