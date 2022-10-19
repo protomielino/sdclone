@@ -13,7 +13,7 @@ SET(INTERNAL_NAME "speed-dreams")
 
 SET(CPACK_PACKAGE_NAME "Speed Dreams")
 SET(CPACK_PACKAGE_VENDOR "The Speed Dreams team")
-SET(CPACK_PACKAGE_CONTACT "https://www.speed-dreams.org")
+SET(CPACK_PACKAGE_CONTACT "https://sourceforge.net/projects/speed-dreams/")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Speed Dreams (an Open Motorsport Sim) is a racing simulation that allows you to drive in races against opponents simulated by the computer ; it is GPL 2+ and has been forked from TORCS in late 2008")
 SET(CPACK_RESOURCE_FILE_LICENSE "${SOURCE_DIR}/COPYING.txt")
 SET(CPACK_RESOURCE_FILE_README "${SOURCE_DIR}/README.txt")
