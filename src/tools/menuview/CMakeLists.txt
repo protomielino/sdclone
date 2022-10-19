@@ -52,9 +52,11 @@ ENDIF(UNIX)
 
 SD_INSTALL_FILES(BIN TARGETS ${_TARGET_NAME})
 
-# To avoid 'undefined reference to glActiveTextureARB [--no-allow-shlib-undefined]'
-IF(UNIX AND NOT APPLE)
-	IF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		 target_link_options(${_TARGET_NAME} PRIVATE -Wl,--allow-shlib-undefined)
-	ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-ENDIF(UNIX AND NOT APPLE)
+IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
+   # To avoid 'undefined reference to glActiveTextureARB [--no-allow-shlib-undefined]'
+   IF(UNIX AND NOT APPLE)
+	   IF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		    target_link_options(${_TARGET_NAME} PRIVATE -Wl,--allow-shlib-undefined)
+	   ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   ENDIF(UNIX AND NOT APPLE)
+ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
