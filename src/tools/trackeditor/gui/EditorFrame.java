@@ -41,6 +41,8 @@ import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -728,7 +730,7 @@ public class EditorFrame extends JFrame
 		} catch (InterruptedException ex)
 		{
 		}
-		menuItemAddBackground.setText("Add ...");
+		menuItemAddBackground.setText("Add background image");
 		menuItemAddBackground.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -1957,36 +1959,38 @@ public class EditorFrame extends JFrame
 
 	void menuItemAddBackground_actionPerformed(ActionEvent e)
 	{
-		try
+		if (trackData == null)
 		{
-			String tmp = "";
-			//			String filename = Editor.getProperties().getPath();
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
-			JFileChooser fc = new JFileChooser();
-			fc.setSelectedFiles(null);
-			fc.setSelectedFile(null);
-			fc.rescanCurrentDirectory();
-			fc.setApproveButtonMnemonic(0);
-			fc.setDialogTitle("Background image file selection");
-			fc.setVisible(true);
-			fc.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
-			fc.addChoosableFileFilter(filter);
-			fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
-			int result = fc.showOpenDialog(this);
-			UIManager.put("FileChooser.readOnly", old);
-			if (result == JFileChooser.APPROVE_OPTION)
-			{
-				tmp = fc.getSelectedFile().toString();
-				//Editor.getProperties().setImage(tmp);
-				//set view background image
-				view.setBackgroundImage(tmp);
-			}
+			message("No track", "Nothing to add to.");
+			return;
+		}
 
-		} catch (Exception ex)
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+		JFileChooser fc = new JFileChooser();
+		fc.setSelectedFiles(null);
+		fc.setSelectedFile(null);
+		fc.rescanCurrentDirectory();
+		fc.setApproveButtonMnemonic(0);
+		fc.setDialogTitle("Background image file selection");
+		fc.setVisible(true);
+		fc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
+		fc.addChoosableFileFilter(filter);
+		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
+		int result = fc.showOpenDialog(this);
+		UIManager.put("FileChooser.readOnly", old);
+		if (result == JFileChooser.APPROVE_OPTION)
 		{
-			ex.printStackTrace();
+			Path selectedFile = Paths.get(fc.getSelectedFile().toString());
+			Path trackPath = Paths.get(Editor.getProperties().getPath());
+
+			// remove directory if same as track directory
+			if (selectedFile.getParent().toString().equals(trackPath.toString()))
+			{
+				selectedFile = selectedFile.getFileName();
+			}
+			view.setBackgroundImage(selectedFile.toString());
 		}
 	}
 
@@ -2342,6 +2346,16 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
+			if (trackData == null)
+			{
+				if (showBackgroundButton.isSelected())
+				{
+					showBackgroundButton.setSelected(false);
+				}
+
+				message("No track", "Nothing to show.");
+				return;
+			}
 			toggleButtonShowBackground_actionPerformed(e);
 		}
 	}

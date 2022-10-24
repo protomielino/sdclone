@@ -21,6 +21,8 @@
 package gui.properties;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -45,8 +47,10 @@ public class ImageProperties extends PropertyPanel
 	private JButton		pathButton				= null;
 	private JLabel 		imageScaleLabel			= new JLabel();
 	private JTextField	imageScaleTextField		= new JTextField();
-
-	private final String sep = System.getProperty("file.separator");
+	private JLabel 		imageOffsetXLabel		= new JLabel();
+	private JTextField	imageOffsetXTextField	= new JTextField();
+	private JLabel 		imageOffsetYLabel		= new JLabel();
+	private JTextField	imageOffsetYTextField	= new JTextField();
 
 	/**
 	 *
@@ -65,11 +69,15 @@ public class ImageProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, imageScaleLabel, "Path", 80);
-		addLabel(this, 1, pathLabel, "Image scale", 80);
+		addLabel(this, 0, pathLabel, "Path", 80);
+		addLabel(this, 1, imageScaleLabel, "Image scale", 80);
+		addLabel(this, 2, imageOffsetXLabel, "Image Offset X", 80);
+		addLabel(this, 3, imageOffsetYLabel, "Image Offset Y", 80);
 
 		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 335);
 		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 125);
+		addTextField(this, 2, imageOffsetXTextField, Editor.getProperties().getImgOffset().getX(), 100, 125);
+		addTextField(this, 3, imageOffsetYTextField, Editor.getProperties().getImgOffset().getY(), 100, 125);
 
 		this.add(getPathButton(), null);
 	}
@@ -102,8 +110,8 @@ public class ImageProperties extends PropertyPanel
 	 */
 	protected void selectPath()
 	{
-		String tmp = "";
-		String filename = Editor.getProperties().getImage();
+		Path filename = Paths.get(pathTextField.getText());
+		Path trackPath = Paths.get(Editor.getProperties().getPath());
 		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
 		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
 		JFileChooser fc = new JFileChooser();
@@ -113,24 +121,43 @@ public class ImageProperties extends PropertyPanel
 		fc.setApproveButtonMnemonic(0);
 		fc.setDialogTitle("Background image file selection");
 		fc.setVisible(true);
-		if(Editor.getProperties().getImage().equals(""))
+		// check parent directory
+		if (filename.getParent() == null || filename.getParent().toString().equals(trackPath.toString()))
 		{
-			fc.setCurrentDirectory(new File(System.getProperty("user.dir") +sep+ "tracks"));
+			// use track directory
+			fc.setCurrentDirectory(new File(trackPath.toString()));
 		}
 		else
 		{
-			String tmpFile = Editor.getProperties().getImage().substring(0,Editor.getProperties().getImage().lastIndexOf(sep));
-			File file = new File(tmpFile);
-			fc.setCurrentDirectory(file);
+			// try to use actual directory
+			File file = new File(filename.getParent().toString());
+			if (file.exists())
+			{
+				// use file directory
+				fc.setCurrentDirectory(file);
+			}
+			else
+			{
+				// directory doesn't exist so use track directory
+				fc.setCurrentDirectory(new File(trackPath.toString()));
+			}
 		}
 		fc.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
 		fc.addChoosableFileFilter(filter);
 		int result = fc.showOpenDialog(this);
 		UIManager.put("FileChooser.readOnly", old);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
-			pathTextField.setText(fc.getSelectedFile().toString());
+			Path selectedFile = Paths.get(fc.getSelectedFile().toString());
+
+			// remove directory if same as track directory
+			if (selectedFile.getParent().toString().equals(trackPath.toString()))
+			{
+				selectedFile = selectedFile.getFileName();
+			}
+
+			pathTextField.setText(selectedFile.toString());
 		}
 	}
 
@@ -149,6 +176,20 @@ public class ImageProperties extends PropertyPanel
 			Editor.getProperties().getImageScale(), doubleResult))
 		{
 			Editor.getProperties().setImageScale(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(imageOffsetXTextField.getText(),
+			Editor.getProperties().getImgOffset().getX(), doubleResult))
+		{
+			Editor.getProperties().getImgOffset().setX(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(imageOffsetYTextField.getText(),
+			Editor.getProperties().getImgOffset().getY(), doubleResult))
+		{
+			Editor.getProperties().getImgOffset().setY(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 	}

@@ -19,6 +19,9 @@ import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -1470,21 +1473,33 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	public void setBackgroundImage(String fileName)
 	{
-	    double scale = Editor.getProperties().getImageScale();
-		try
+		Path imagePath = Paths.get(fileName);
+		Path trackPath = Paths.get(Editor.getProperties().getPath());
+
+		// add path to track to image file name if none present
+		if (imagePath.getParent() == null)
 		{
-			backgroundImg = new ImageIcon(fileName);
+			imagePath = Paths.get(trackPath.toString(), fileName);
+		}
+
+		File img = new File(imagePath.toString());
+
+		if (img.exists())
+		{
+			backgroundImg = new ImageIcon(imagePath.toString());
 			int width = backgroundImg.getIconWidth();
 			int height = backgroundImg.getIconHeight();
+			double scale = Editor.getProperties().getImageScale();
 			backgroundRectangle.setFrame(0, 0, width*scale, height*scale);
-			//System.out.println("Zoom = " + zoomFactor);
 			editorFrame.documentIsModified = true;
 
 			invalidate();
 			repaint();
-		} catch (Exception ex)
+		}
+		else
 		{
-			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Couldn't open : " + fileName, "Background Image", JOptionPane.ERROR_MESSAGE);
+			backgroundImg = null;
 		}
 	}
 	
