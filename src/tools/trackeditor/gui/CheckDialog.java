@@ -4,11 +4,17 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -19,6 +25,7 @@ import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
+import utils.circuit.ObjectMap;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
 import utils.circuit.Surface;
@@ -393,7 +400,107 @@ public class CheckDialog extends JDialog
 			{
 				textArea.append("Terrain Generation elevation file " + elevationFile + " not found\n");
 			}
-		}	
+		}
+
+		// get colors from image files
+		Vector<ObjectMap>	objectMaps = trackData.getGraphic().getTerrainGeneration().getObjectMaps();
+		Set<Integer>		colors = new HashSet<Integer>();
+
+		for (int i = 0; i < objectMaps.size(); i++)
+		{
+			ObjectMap objectMap = objectMaps.get(i);
+			String objectMapName = objectMap.getName();
+			String objectMapFile = objectMap.getObjectMap();
+
+			if (!hasText(objectMapName))
+			{
+				textArea.append("Terrain Generation object map " + (i + 1) + " missing name\n");
+				objectMapName = (i + 1) + "";
+			}
+
+			if (!hasText(objectMapFile))
+			{
+				textArea.append("Terrain Generation object map " + objectMapName + " missing file name\n");
+			}
+			else
+			{
+				File file = new File(Editor.getProperties().getPath() + sep + objectMapFile);
+
+				if (!file.exists())
+				{
+					textArea.append("Terrain Generation object map file " + objectMapFile + " not found\n");
+				}
+				else
+				{
+					BufferedImage image = null;
+					try
+					{
+						image = ImageIO.read(file);
+
+						for (int x = 0; x < image.getWidth(); x++)
+						{
+							for (int y = 0; y < image.getHeight(); y++)
+							{
+								int color = image.getRGB(x, y) & 0x00ffffff;
+
+								if (color != 0x0)
+								{
+									colors.add(color);
+								}
+							}
+						}
+					}
+					catch (IOException e)
+					{
+					    // TODO Auto-generated catch block
+					    e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		Set<Integer> definedColors = new HashSet<Integer>();
+
+		// get defined colors from track objects
+		for (int i = 0; i < trackData.getObjects().size(); i++)
+		{
+			int color = trackData.getObjects().get(i).getColor();
+
+			if (color == Integer.MAX_VALUE)
+			{
+				textArea.append("Track object " + (i + 1) + " missing color\n");
+			}
+			else
+			{
+				definedColors.add(color);
+			}
+		}
+
+		// get defined colors from default objects
+		for (int i = 0; i < defaultObjects.size(); i++)
+		{
+			int color = defaultObjects.get(i).getColor();
+
+			if (color == Integer.MAX_VALUE)
+			{
+				textArea.append("Default object " + (i + 1) + " missing color\n");
+			}
+			else
+			{
+				definedColors.add(color);
+			}
+		}
+
+		// check for undefined image colors
+		Iterator<Integer> colorsIterator = colors.iterator();
+
+		while (colorsIterator.hasNext())
+		{
+			if (!definedColors.contains(colorsIterator.next()))
+			{
+				textArea.append("No object for color " + Integer.toHexString(colorsIterator.next()).toUpperCase() + "\n");
+			}
+		}
 	}
 
 	private File findObjectFile(String object)
