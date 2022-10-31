@@ -483,7 +483,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (bumpNameButton == null)
 			{
 				bumpNameButton = new JButton();
-				bumpNameButton.setBounds(420, 415, 80, 25);
+				bumpNameButton.setBounds(420, 495, 80, 25);
 				bumpNameButton.setText("Browse");
 				bumpNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -534,7 +534,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (racelineNameButton == null)
 			{
 				racelineNameButton = new JButton();
-				racelineNameButton.setBounds(420, 522, 80, 25);
+				racelineNameButton.setBounds(420, 603, 80, 25);
 				racelineNameButton.setText("Browse");
 				racelineNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
