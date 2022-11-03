@@ -104,6 +104,7 @@ public class EditorFrame extends JFrame
 	SaveAction					saveAction							= null;
 	ShowArrowsAction			showArrowsAction					= null;
 	ShowBackgroundAction		showBackgroundAction				= null;
+	ShowObjectsAction			showObjectsAction					= null;
 	MoveAction					moveAction							= null;
 	SubdivideAction 			subdivideAction						= null;
 	HelpAction					helpAction							= null;
@@ -173,11 +174,13 @@ public class EditorFrame extends JFrame
 	private JMenuItem 			subdivideMenuItem					= null;
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
+	private JMenuItem			showObjectsMenuItem					= null;
 	private JMenuItem			defaultSurfacesItem					= null;
 	private JMenuItem			defaultObjectsItem					= null;
 	private JToggleButton		moveButton							= null;
 	private JToggleButton		showArrowsButton					= null;
 	private JToggleButton		showBackgroundButton				= null;
+	private JToggleButton		showObjectsButton					= null;
 	private JButton				newButton							= null;
 	//private DeltaPanel			deltaPanel							= null;
 
@@ -520,14 +523,6 @@ public class EditorFrame extends JFrame
 	}
 
 	/**
-	 * @param project
-	 */
-	private void setProject(Project project)
-	{
-		this.prj = project;
-	}
-
-	/**
 	 *
 	 */
 	protected void saveProject()
@@ -771,6 +766,7 @@ public class EditorFrame extends JFrame
 		viewMenu.addSeparator();
 		viewMenu.add(getShowArrowsMenuItem());
 		viewMenu.add(getShowBackgroundMenuItem());
+		viewMenu.add(getShowObjectsMenuItem());
 		viewMenu.add(menuItemShoStartPoint);
 		viewMenu.add(menuItemAddBackground);
 		viewMenu.addSeparator();
@@ -1105,6 +1101,7 @@ public class EditorFrame extends JFrame
 		}
 		return showArrowsMenuItem;
 	}
+
 	/**
 	 * This method initializes showBackgroundMenuItem
 	 *
@@ -1119,6 +1116,22 @@ public class EditorFrame extends JFrame
 			showBackgroundMenuItem.setIcon(null);
 		}
 		return showBackgroundMenuItem;
+	}
+
+	/**
+	 * This method initializes showObjectsMenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getShowObjectsMenuItem()
+	{
+		if (showObjectsMenuItem == null)
+		{
+			showObjectsMenuItem = new JMenuItem();
+			showObjectsMenuItem.setAction(showObjectsAction);
+			showObjectsMenuItem.setIcon(null);
+		}
+		return showObjectsMenuItem;
 	}
 
 	private JMenuItem getDefaultSurfacesMenuItem()
@@ -1680,6 +1693,24 @@ public class EditorFrame extends JFrame
 		return showBackgroundButton;
 	}
 	/**
+	 * This method initializes showObjectsButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JToggleButton getShowObjectsButton()
+	{
+		if (showObjectsButton == null)
+		{
+			showObjectsButton = new JToggleButton();
+			showObjectsButton.setAction(showObjectsAction);
+			if (showObjectsButton.getIcon() != null)
+			{
+				showObjectsButton.setText("");
+			}
+		}
+		return showObjectsButton;
+	}
+	/**
 	 * This method initializes newButton
 	 *
 	 * @return javax.swing.JButton
@@ -2005,6 +2036,13 @@ public class EditorFrame extends JFrame
 		view.invalidate();
 		view.repaint();
 	}
+
+	void toggleButtonShowObjects_actionPerformed(ActionEvent e)
+	{
+		view.setShowObjects(getShowObjectsButton().isSelected());
+		view.invalidate();
+		view.repaint();
+	}
 	/**
 	 * This method initializes jToolBar
 	 *
@@ -2033,6 +2071,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getMoveButton());
 			jToolBar.add(getShowArrowsButton());
 			jToolBar.add(getShowBackgroundButton());
+			jToolBar.add(getShowObjectsButton());
 			jToolBar.add(getCalculateDeltaButton());
 			jToolBar.add(getCheckButton());
 			jToolBar.add(getFinishLineToggleButton());
@@ -2111,6 +2150,7 @@ public class EditorFrame extends JFrame
 		moveAction = new MoveAction("Move", createNavigationIcon("Export24"), "Move.", KeyEvent.VK_S);
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
 		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"), "Show background image.", KeyEvent.VK_S);
+		showObjectsAction = new ShowObjectsAction("Show objects", createNavigationIcon("Object24"), "Show objects.", KeyEvent.VK_S);
 		checkAction = new CheckAction("Check", createNavigationIcon("Check24"), "Check.", KeyEvent.VK_S);
 		finishLineAction = new FinishLineAction("Finish Line", createNavigationIcon("Finish24"), "Finish Line.", KeyEvent.VK_S);
 		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
@@ -2357,6 +2397,27 @@ public class EditorFrame extends JFrame
 				return;
 			}
 			toggleButtonShowBackground_actionPerformed(e);
+		}
+	}
+	public class ShowObjectsAction extends AbstractAction
+	{
+		public ShowObjectsAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				if (showObjectsButton.isSelected())
+					showObjectsButton.setSelected(false);
+
+				message("No track", "Nothing to show.");
+				return;
+			}
+			toggleButtonShowObjects_actionPerformed(e);
 		}
 	}
 	public class HelpAction extends AbstractAction

@@ -21,8 +21,10 @@
 package gui.properties;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -30,7 +32,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -38,6 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import gui.EditorFrame;
 import utils.Editor;
 import utils.SurfaceComboBox;
+import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Surface;
 import utils.circuit.TerrainGeneration;
@@ -440,15 +445,17 @@ public class TerrainProperties extends PropertyPanel
 		if (addObjectMapButton == null)
 		{
 			addObjectMapButton = new JButton();
-			addObjectMapButton.setBounds(10, 474, 130, 25);
+			addObjectMapButton.setBounds(10, 731, 130, 25);
 			addObjectMapButton.setText("Add Object Map");
 			addObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					String name = "map " + (tabbedPane.getTabCount() + 1);
+					String		name = "map " + (tabbedPane.getTabCount() + 1);
+					ObjectMap	objectMap = new ObjectMap();
+					objectMap.setName(name);
 
-					tabbedPane.addTab(name, null, new ObjectMapPanel(name, ""), null);
+					tabbedPane.addTab(name, null, new ObjectMapPanel(objectMap), null);
 					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				}
 			});
@@ -466,7 +473,7 @@ public class TerrainProperties extends PropertyPanel
 		if (deleteObjectMapButton == null)
 		{
 			deleteObjectMapButton = new JButton();
-			deleteObjectMapButton.setBounds(155, 474, 140, 25);
+			deleteObjectMapButton.setBounds(155, 731, 140, 25);
 			deleteObjectMapButton.setText("Delete Object Map");
 			deleteObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -493,14 +500,14 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 366, 510, 100);
+			tabbedPane.setBounds(10, 366, 510, 355);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
 
 			for (int i = 0; i < objectMaps.size(); i++)
 	        {
                 ObjectMap objectMap = objectMaps.elementAt(i);
-				tabbedPane.addTab(objectMap.getName(), null, new ObjectMapPanel(objectMap.getName(), objectMap.getObjectMap()), null);
+				tabbedPane.addTab(objectMap.getName(), null, new ObjectMapPanel(objectMap), null);
 			}
 		}
 		return tabbedPane;
@@ -513,30 +520,32 @@ public class TerrainProperties extends PropertyPanel
 		private JLabel		objectMapLabel		= new JLabel();
 		private JTextField	objectMapTextField	= new JTextField();
 		private JButton		objectMapButton		= null;
+		private JTabbedPane	colorsTabbedPane	= null;
 
 		/**
 		 *
 		 */
-		public ObjectMapPanel(String name, String objectMap)
+		public ObjectMapPanel(ObjectMap objectMap)
 		{
 			super();
-			initialize(name, objectMap);
+			initialize(objectMap);
 		}
 
 		/**
 		 *
 		 */
-		private void initialize(String name, String objectMap)
+		private void initialize(ObjectMap objectMap)
 		{
 			setLayout(null);
 			
 			addLabel(this, 0, nameLabel, "Name", 120);
 			addLabel(this, 1, objectMapLabel, "Object Map", 120);
 
-			addTextField(this, 0, nameTextField, name, 130, 100);
-			addTextField(this, 1, objectMapTextField, objectMap, 130, 285);
+			addTextField(this, 0, nameTextField, objectMap.getName(), 130, 100);
+			addTextField(this, 1, objectMapTextField, objectMap.getObjectMap(), 130, 285);
 
 			add(getObjectMapButton(), null);
+			add(getColorsTabbedPane(objectMap), null);
 		}
 
 		/**
@@ -587,6 +596,67 @@ public class TerrainProperties extends PropertyPanel
 				if (pathToFile.equals(Editor.getProperties().getPath()))
 					fileName = fileName.substring(index + 1);
 				objectMapTextField.setText(fileName);
+			}
+		}
+
+		private JTabbedPane getColorsTabbedPane(ObjectMap objectMap)
+		{
+			if (colorsTabbedPane == null)
+			{
+				colorsTabbedPane = new JTabbedPane();
+				colorsTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+				colorsTabbedPane.setBounds(10, 64, 485, 255);
+
+				Iterator<Integer> colorsIterator = objectMap.getColors().iterator();
+				while (colorsIterator.hasNext())
+				{
+					int rgb = colorsIterator.next();
+					String color = String.format("0x%06X", rgb);
+					colorsTabbedPane.addTab(color, null, new ColorPanel(objectMap.getObjects(), rgb & 0x00ffffff), null);
+				}
+			}
+			return colorsTabbedPane;
+		}
+
+		private class ColorPanel extends JPanel
+		{
+			private JScrollPane			scrollPane		= null;
+			private JTextArea			textArea		= null;
+
+			public ColorPanel(Vector<ObjShapeObject> objects, int rgb)
+			{
+				super();
+				initialize(objects, rgb);
+			}
+
+			private void initialize(Vector<ObjShapeObject> objects, int rgb)
+			{
+				setLayout(null);
+
+				textArea = new JTextArea();
+			    textArea.setLineWrap(false);
+			    textArea.setEditable(false);
+			    textArea.setVisible(true);
+
+			    scrollPane = new JScrollPane (textArea);
+			    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			    scrollPane.setBounds(10, 10, 460, 210);
+
+			    add(scrollPane);
+
+			    int count = 1;
+
+			    for (int i = 0; i < objects.size(); i++)
+			    {
+			    	ObjShapeObject object = objects.get(i);
+
+			    	if (object.getRGB() == rgb)
+			    	{
+			    		textArea.append(count + " : " + object.getImageX() + " " + object.getImageY() + "\n");
+			    		count++;
+			    	}
+			    }
 			}
 		}
 	}
@@ -708,7 +778,13 @@ public class TerrainProperties extends PropertyPanel
             }
             if (isDifferent(panel.objectMapTextField.getText(), objectMap.getObjectMap(), stringResult))
             {
-                objectMap.setObjectMap(stringResult.getValue());
+            	try
+            	{
+            		objectMap.setObjectMap(stringResult.getValue());
+            	}
+            	catch (IOException e)
+            	{
+            	}
                 getEditorFrame().documentIsModified = true;
             }
 		}
@@ -728,7 +804,13 @@ public class TerrainProperties extends PropertyPanel
 	            ObjectMapPanel panel = (ObjectMapPanel) tabbedPane.getComponentAt(objectMaps.size());
 				ObjectMap objectMap = new ObjectMap();
 				objectMap.setName(panel.nameTextField.getText());
-				objectMap.setObjectMap(panel.objectMapTextField.getText());
+				try
+				{
+					objectMap.setObjectMap(panel.objectMapTextField.getText());
+            	}
+            	catch (IOException e)
+            	{
+            	}
 				objectMaps.add(objectMap);
 			}
 		}

@@ -909,6 +909,17 @@ public class XmlWriter
 			addContent(el, "object map", data.getObjectMap());
 
 			element.addContent(el);
+
+			if (data.getChanged())
+			{
+				try
+				{
+					data.writeImage();
+				}
+				catch (IOException e)
+				{
+				}
+			}
 		}
 
 		return element;

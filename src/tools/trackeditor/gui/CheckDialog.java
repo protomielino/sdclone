@@ -4,17 +4,16 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -25,6 +24,7 @@ import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
+import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
@@ -424,7 +424,17 @@ public class CheckDialog extends JDialog
 			}
 			else
 			{
-				File file = new File(Editor.getProperties().getPath() + sep + objectMapFile);
+				Path filename = Paths.get(objectMapFile);
+				Path trackPath = Paths.get(Editor.getProperties().getPath());
+
+				// check for parent directory
+				if (filename.getParent() == null)
+				{
+					// use track directory
+					filename = Paths.get(trackPath.toString(), filename.toString());
+				}
+
+				File file = new File(filename.toString());
 
 				if (!file.exists())
 				{
@@ -432,29 +442,7 @@ public class CheckDialog extends JDialog
 				}
 				else
 				{
-					BufferedImage image = null;
-					try
-					{
-						image = ImageIO.read(file);
-
-						for (int x = 0; x < image.getWidth(); x++)
-						{
-							for (int y = 0; y < image.getHeight(); y++)
-							{
-								int color = image.getRGB(x, y) & 0x00ffffff;
-
-								if (color != 0x0)
-								{
-									colors.add(color);
-								}
-							}
-						}
-					}
-					catch (IOException e)
-					{
-					    // TODO Auto-generated catch block
-					    e.printStackTrace();
-					}
+					colors.addAll(objectMap.getColors());
 				}
 			}
 		}
@@ -496,9 +484,57 @@ public class CheckDialog extends JDialog
 
 		while (colorsIterator.hasNext())
 		{
-			if (!definedColors.contains(colorsIterator.next()))
+			int color = colorsIterator.next();
+
+			if (!definedColors.contains(color))
 			{
-				textArea.append("No object for color " + Integer.toHexString(colorsIterator.next()).toUpperCase() + "\n");
+				textArea.append("No object for color " + String.format("0x%06X", color) + "\n");
+			}
+		}
+
+		// check for big pixels
+		colorsIterator = colors.iterator();
+
+		while (colorsIterator.hasNext())
+		{
+			int color = colorsIterator.next();
+			Set<Point> pixels = new HashSet<Point>();
+
+			for (int i = 0; i < objectMaps.size(); i++)
+			{
+				Vector<ObjShapeObject>	objects = objectMaps.get(i).getObjects();
+
+				for (int j = 0; j < objects.size(); j++)
+				{
+					ObjShapeObject object = objects.get(j);
+
+					if (object.getRGB() == color)
+					{
+						Point pixel = new Point(object.getImageX(), object.getImageY());
+
+						if (pixels.contains(pixel))
+						{
+							textArea.append("Duplicate objects for color " + String.format("0x%06X", color) +
+									" at " + object.getImageX() + ", " + object.getImageY() + "\n");
+						}
+						else
+						{
+							pixels.add(pixel);
+						}
+					}
+				}
+			}
+
+			Iterator<Point> pixelsIterator = pixels.iterator();
+
+			while (pixelsIterator.hasNext())
+			{
+				Point pixel = pixelsIterator.next();
+
+				if (pixels.contains(new Point(pixel.x + 1, pixel.y)) || pixels.contains(new Point(pixel.x, pixel.y + 1)))
+				{
+					textArea.append("Adjacent pixels for object color " + String.format("0x%06X", color) + " found at " + pixel.x + ", " + pixel.y + "\n");
+				}
 			}
 		}
 	}

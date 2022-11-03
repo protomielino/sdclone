@@ -602,7 +602,26 @@ public class XmlReader
 		            Element el = it.next();
 		            obj.setName(el.getAttribute("name").getValue());
 
-		            obj.setObjectMap(getAttrStrValue(el, "object map"));
+		            try
+		            {
+		            	obj.setObjectMap(getAttrStrValue(el, "object map"));
+		            }
+		            catch (IOException e)
+		            {
+		            }
+
+		            if (obj.getObjectMap() != null && !obj.getObjectMap().isEmpty())
+		            {
+		            	try
+		            	{
+		            		obj.readImage();
+		            	}
+		            	catch (IOException e)
+		            	{
+		            		String msg = obj.getObjectMap() + " : " + e.getLocalizedMessage();
+		                	JOptionPane.showMessageDialog(editorFrame, msg, "Object Map File", JOptionPane.ERROR_MESSAGE);
+		            	}
+		            }
 
 		            objMap.add(obj);
 		        }

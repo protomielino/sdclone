@@ -26,16 +26,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 
 import utils.Editor;
 import utils.EditorPoint;
 import utils.SegmentVector;
 import utils.circuit.Curve;
 import utils.circuit.ObjShapeHandle;
+import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjShapeTerrain;
+import utils.circuit.ObjectMap;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.XmlObjPits;
@@ -130,6 +135,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	static public final int		STATE_MOVE_SEGMENTS				= 6;
 	static public final int		STATE_SUBDIVIDE					= 7;
 	static public final int		STATE_FINISH_LINE				= 8;
+	static public final int		STATE_SHOW_OBJECTS				= 9;
 
 	/** arrow showing state */
 	public boolean				showArrows						= false;
@@ -155,7 +161,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	Rectangle2D.Double			backgroundRectangle				= new Rectangle2D.Double();
 	/** background image showing state */
 	public boolean				showBackground					= true;
-	
+
+	/** object showing state */
+	public boolean				showObjects						= false;
+
 	private int 				currentCount					= 0;
 
 	/** upward link to parent frame */
@@ -645,8 +654,15 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						if (selectedShape != null)
 						{
-							Undo.add(new UndoSegmentChange(editorFrame, selectedShape));
-							openSegmentDialog(selectedShape);
+							if (selectedShape.getType().equals("object"))
+							{
+								objectSelected(selectedShape, e);
+							}
+							else
+							{
+								Undo.add(new UndoSegmentChange(editorFrame, selectedShape));
+								openSegmentDialog(selectedShape);
+							}
 						}
 
 						if (selectedShapeChanged)
@@ -1128,6 +1144,39 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			ex.printStackTrace();
 		}
+
+		if (out == null)
+		{
+			if (showObjects)
+			{
+				Vector<ObjectMap> objectMaps = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
+
+				for (int j = 0; j < objectMaps.size(); j++)
+				{
+					Vector<ObjShapeObject> objects = objectMaps.get(j).getObjects();
+
+					for (int k = 0; k < objects.size(); k++)
+					{
+						ObjShapeObject object = objects.get(k);
+
+						try
+						{
+							if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
+									&& object.contains(mousePoint.getX(), mousePoint.getY()))
+							{
+								// object found !
+								out = object;
+								break;
+							}
+						}
+						catch (Exception ex)
+						{
+							ex.printStackTrace();
+						}
+					}
+				}
+			}
+		}
 		return out;
 	}
 
@@ -1324,7 +1373,25 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				i.next().draw(g, affineTransform);
 			}
 
+			if (showObjects)
+			{
+				Vector<ObjectMap> objectMaps = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
+
+				for (int j = 0; j < objectMaps.size(); j++)
+				{
+					Vector<ObjShapeObject> objects = objectMaps.get(j).getObjects();
+
+					for (int k = 0; k < objects.size(); k++)
+					{
+						ObjShapeObject object = objects.get(k);
+
+						g.setColor(object.getColor());
+						object.draw(g, affineTransform);
+					}
+				}
+			}
 		}
+
 		Rectangle2D.Double br = boundingRectangle;
 	}
 
@@ -1521,7 +1588,63 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				setBackgroundImage(Editor.getProperties().getImage());
 			}
 		}
-		
+
+	public void setObjects(Vector<ObjectMap> objectMaps)
+	{
+		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+
+		if (Double.isNaN(border))
+		{
+			border = 0;
+		}
+
+		for (int i = 0; i < objectMaps.size(); i++)
+	 	{
+			ObjectMap objectMap = objectMaps.get(i);
+			Vector<ObjShapeObject> objects = objectMap.getObjects();
+
+			for (int j = 0; j < objects.size(); j++)
+			{
+
+				ObjShapeObject object = objects.get(j);
+
+				Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
+																 boundingRectangle.getMinY() - border,
+																 boundingRectangle.getWidth() + (border * 2),
+																 boundingRectangle.getHeight() + (border * 2));
+
+				double widthScale = rect.getWidth() / objectMap.getImageWidth();
+				double heightScale = rect.getHeight() / objectMap.getImageHeight();
+
+				double worldX = rect.getMinX() + (object.getImageX() * widthScale);
+				double worldY = rect.getMinY() + ((objectMap.getImageHeight() - object.getImageY()) * heightScale);
+
+				Point2D.Double location = new Point2D.Double(worldX, worldY);
+
+				object.calcShape(location);
+			}
+	 	}
+	}
+
+	/**
+	 * @return Returns the showObjects.
+	 */
+	public boolean isShowObjects()
+	{
+		return showObjects;
+	}
+	/**
+	 * @param showObjects The showObjects to set.
+	 */
+	public void setShowObjects(boolean showObjects)
+	{
+		this.showObjects = showObjects;
+		if (showObjects && editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps().size() > 0)
+		{
+			setObjects(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps());
+		}
+	}
+
 	public void showTerrainBorder(boolean terrainBorderMustBeShown)
 	{
 		this.terrainBorderMustBeShown = terrainBorderMustBeShown;
@@ -1603,6 +1726,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			else
 				boundingRectangle.add(r);
 		}
+
+		if (showObjects)
+		{
+			setObjects(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps());
+		}
+
 //		 zoom
 		setZoomFactor(zoomFactor);
 	}
@@ -1620,6 +1749,56 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			segmentParamDialog = new SegmentEditorDlg(this, editorFrame, "", false, shape);
 			segmentParamDialog.addWindowListener(this);
 		}
+	}
+
+	private void objectSelected(Segment shape, MouseEvent me)
+	{
+	/*
+		class InfoAction extends AbstractAction
+		{
+			public InfoAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Object Info", JOptionPane.INFORMATION_MESSAGE);
+				shape.dump("");
+			}
+		}
+
+		InfoAction infoAction = new InfoAction("Object Info", null, "Object info.");
+
+		class DeleteAction extends AbstractAction
+		{
+			public DeleteAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Delete Object", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+
+		DeleteAction deleteAction = new DeleteAction("Delete Object", null, "Delete object.");
+
+		ObjShapeObject object = (ObjShapeObject) shape;
+
+		JPopupMenu menu = new JPopupMenu();
+	    JMenuItem item1 = new JMenuItem("Info");
+	    JMenuItem item2 = new JMenuItem("Delete");
+
+	    item1.setAction(infoAction);
+	    item2.setAction(deleteAction);
+
+	    menu.add(item1);
+	    menu.add(item2);
+
+	    menu.show(me.getComponent(), me.getX(), me.getY());
+	*/
 	}
 
 	/* (non-Javadoc)
