@@ -90,6 +90,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/LocalInfo.java
          utils/circuit/MainTrack.java
          utils/circuit/ObjShapeHandle.java
+         utils/circuit/ObjShapeObject.java
          utils/circuit/ObjShapeTerrain.java
          utils/circuit/ObjectMap.java
          utils/circuit/Pits.java
@@ -130,6 +131,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
             gui/icons/Help24.gif
             gui/icons/Movie24.gif
             gui/icons/New24.gif
+            gui/icons/Object24.gif
             gui/icons/Open24.gif
             gui/icons/Properties24.gif
             gui/icons/Redo24.gif
