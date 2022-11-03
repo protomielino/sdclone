@@ -30,9 +30,10 @@ I - Pre-requisites
 
 - Working OpenGL Driver and header files / associated libraries
 - CMake https://cmake.org/download/
+- Java development kit (for sd2-trackeditor)
 
 
-- SDL 2.0.x http://www.libsdl.org/
+- SDL 2.x.x http://www.libsdl.org/
 - PLIB 1.8.5 http://plib.sourceforge.net/
   Linux: Be careful to compile plib with -fPIC on AMD64 if you run a 64 bit version.
 - OpenAL soft 1.18 https://www.openal-soft.org/openal-releases/
@@ -42,13 +43,13 @@ I - Pre-requisites
   Linux: Be careful to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
 - Expat 2 https://github.com/libexpat/libexpat/releases
 - libpng https://sourceforge.net/projects/libpng/files/
-- zlib https://sourceforge.net/projects/libpng/files/zlib/
+- zlib https://sourceforge.net/projects/libpng/files/zlib/ OR https://github.com/madler/zlib/releases
 - libjpeg https://ijg.org/files
 - cURL 7.x https://curl.se/download/ OR https://github.com/curl/curl/releases
-- OpenSceneGraph https://github.com/openscenegraph/OpenSceneGraph/
+- OpenSceneGraph https://github.com/openscenegraph/OpenSceneGraph/tags
 - FreeSOLID 2.1.2 http://sourceforge.net/projects/freesolid
-- FreeType 2 http://sourceforge.net/projects/freetype
-- SDL2_mixer 2.0.4 https://www.libsdl.org/projects/SDL_mixer
+- FreeType 2 https://sourceforge.net/projects/freetype/files/
+- SDL2_mixer 2.x.x https://github.com/libsdl-org/SDL_mixer/releases
 
 WARNING: Under Windows, be careful to compile everything for multi-threaded DLL integration (/MD[d])
 
@@ -757,11 +758,14 @@ V - MacOS X installation from sources
   d. install CMake (http://www.cmake.org/download/) OR from Macports
 
   e. install the dependencies (via Macports)
+     sudo port -t install subversion
+     sudo port -t install cmake
      sudo port -t install python27
-     sudo port -t install libsdl
      sudo port -t install libsdl2
+     sudo port -t install libsdl2_mixer
      sudo port -t install openal-soft
      sudo port -t install plib
+     sudo port -t install FreeSOLID
      sudo port -t install libenet
      sudo port -t install libogg
      sudo port -t install libvorbis
@@ -772,26 +776,15 @@ V - MacOS X installation from sources
      sudo port -t install jasper
      sudo port -t install freetype
      sudo port -t install curl
-     sudo port -t install subversion
-     sudo port -t install cmake
+     sudo port -t install OpenSceneGraph
+     sudo port -t install openjdk8
 
-  f. As of Dec 2015, the OpenSceneGraph port is broken, so it needs to be
-     built from sources:
-     1. Download the source (http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip)
-     2. Unpack the source somewhere (eg /home/source/OpenSceneGraph-3.4.0)
-     3. From a Terminal: 
-        a) cd /home/source/OpenSceneGraph-3.4.0
-        b) mkdir build
-        c) cd build
-        d) cmake -G"Unix Makefiles" -D CMAKE_INSTALL_PREFIX=/opt/local -D CMAKE_PREFIX_PATH=/opt/local ..
-           Note: if you installed Macports to a non-standard location, adjust the CMAKE options accordingly.
-        e) sudo make install (this can take a long time). 
 
-  g. Download or checkout the Speed-Dreams sources from 
+  f. Download or checkout the Speed-Dreams sources from 
       (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/)
 
-  h. Unpack the source somewhere (eg /home/source/speed-dreams)
-  i. From a Terminal: 
+  g. Unpack the source somewhere (eg /home/source/speed-dreams)
+  h. From a Terminal: 
         1) cd /home/source/speed-dreams
         2) mkdir build
         3) cd build
