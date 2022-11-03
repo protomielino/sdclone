@@ -983,7 +983,7 @@ public class XmlWriter
 	{
 		if (value != Integer.MAX_VALUE)
 		{
-			section.addContent(attnumElement(attribute, units, "0x"+Integer.toHexString(value).toUpperCase()));
+			section.addContent(attnumElement(attribute, units, String.format("0x%06X", value)));
 		}
 	}
 

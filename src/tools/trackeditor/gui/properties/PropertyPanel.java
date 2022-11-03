@@ -189,7 +189,7 @@ public class PropertyPanel extends JPanel
 	public String toHexString(int value)
 	{
 		if (value != Integer.MAX_VALUE)
-			return "0x" + Integer.toHexString(value).toUpperCase();
+			return String.format("0x%06X", value);
 
 		return null;
 	}
