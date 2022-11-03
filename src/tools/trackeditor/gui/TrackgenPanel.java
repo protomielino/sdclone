@@ -30,8 +30,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 import utils.Editor;
@@ -44,26 +44,27 @@ import utils.Editor;
  */
 public class TrackgenPanel extends JDialog implements Runnable
 {
-	private final static String newline 		= "\n";
-	private final static String sep				= System.getProperty("file.separator");
+	private final static String newline 			= "\n";
+	private final static String sep					= System.getProperty("file.separator");
 	private EditorFrame			editorFrame;
-	private String				additionalArgs	= null;
-	private Thread 				ac3d 			= new Thread(this);
+	private String				additionalArgs		= null;
+	private Thread 				ac3d 				= new Thread(this);
 
-	private JPanel				jPanel			= null;
-	private JLabel				nameLabel		= null;
-	private JLabel				authorLabel		= null;
-	private JLabel				fileNameLabel	= null;
-	private JLabel				lengthLabel		= null;
-	private JLabel				widthLabel		= null;
-	private JLabel				xSizeLabel		= null;
-	private JLabel				ySizeLabel		= null;
-	private JTextField			nodesTextField	= null;
-	private JPanel				jPanel1			= null;
-	private JLabel				trackgenLabel	= null;
-	private JLabel				waitLabel		= null;
-	private JPanel				jPanel2			= null;
-	private JTextArea			errorsTextArea	= null;
+	private JPanel				panel				= null;
+	private JLabel				nameLabel			= null;
+	private JLabel				authorLabel			= null;
+	private JLabel				fileNameLabel		= null;
+	private JLabel				lengthLabel			= null;
+	private JLabel				widthLabel			= null;
+	private JLabel				xSizeLabel			= null;
+	private JLabel				ySizeLabel			= null;
+	private JScrollPane			nodesScrollPane		= null;
+	private JTextArea			nodesTextArea		= null;
+	private JPanel				infoPanel			= null;
+	private JLabel				trackgenLabel		= null;
+	private JLabel				waitLabel			= null;
+	private JScrollPane			errorsScrollPane	= null;
+	private JTextArea			errorsTextArea		= null;
 	
 	public TrackgenPanel(EditorFrame editorFrame, String additionalArgs)
 	{
@@ -81,9 +82,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 	 */
 	private void initialize()
 	{
-		this.setContentPane(getJPanel());
+		this.setContentPane(getPanel());
 		this.setTitle("Trackgen");
-		this.setSize(800, 520);
+		this.setSize(800, 670);
 		this.setResizable(false);
 		Point p = new Point();
 		p.x = editorFrame.getProject().getTrackgenDialogX();
@@ -136,28 +137,28 @@ public class TrackgenPanel extends JDialog implements Runnable
 						{
 							if (!str.contains("not released"))
 							{
-								errorsTextArea.append(str.substring(index) + newline);
+								append(errorsTextArea, str.substring(index));
 							}
 						}
 						index = str.indexOf("Warning");
 						if (index != -1)
 						{
-							errorsTextArea.append(str.substring(index) + newline);
+							append(errorsTextArea, str.substring(index));
 						}
 						index = str.indexOf("FATAL:");
 						if (index != -1)
 						{
-							errorsTextArea.append(str.substring(index) + newline);
+							append(errorsTextArea, str.substring(index));
 						}
 						index = str.indexOf("WARNING:");
 						if (index != -1)
 						{
-							errorsTextArea.append(str.substring(index) + newline);
+							append(errorsTextArea, str.substring(index));
 						}
 						index = str.indexOf("libpng warning:");
 						if (index != -1)
 						{
-							errorsTextArea.append(str.substring(index) + newline);
+							append(errorsTextArea, str.substring(index));
 						}
 					}
 				
@@ -191,13 +192,30 @@ public class TrackgenPanel extends JDialog implements Runnable
 								this.ySizeLabel.setText(ls_str);
 							}else if (tmp.equals("FATAL:"))
 							{
-								errorsTextArea.append(ls_str + newline);
+								append(errorsTextArea, ls_str);
 							}else if (tmp.equals("WARNING:"))
 							{
-								errorsTextArea.append(ls_str + newline);
+								append(errorsTextArea, ls_str);
 							}else
 							{
-								this.nodesTextField.setText(ls_str);
+								if (ls_str.endsWith(" Nodes"))
+								{
+									if (nodesTextArea.getText().endsWith(" Nodes"))
+									{
+										int lastLineBreak = nodesTextArea.getText().lastIndexOf('\n');
+										nodesTextArea.replaceRange(ls_str, lastLineBreak + 1, nodesTextArea.getText().length());
+									}
+									else
+									{
+										append(nodesTextArea, ls_str);
+									}
+								}
+								else
+								{
+									append(nodesTextArea, ls_str);
+								}
+								
+								nodesTextArea.setCaretPosition(nodesTextArea.getText().length());
 							}
 						}
 					}
@@ -213,60 +231,54 @@ public class TrackgenPanel extends JDialog implements Runnable
 		this.waitLabel.setText("Track finished");
 	}
 
+	private void append(JTextArea textArea, String text)
+	{
+		if (textArea.getText().length() > 0)
+		{
+			textArea.append(newline);
+		}
+
+		textArea.append(text);		
+	}
+	
 	/**
-	 * This method initializes jPanel
+	 * This method initializes panel
 	 * 
 	 * @return javax.swing.JPanel
 	 */
-	private JPanel getJPanel()
+	private JPanel getPanel()
 	{
-		if (jPanel == null)
+		if (panel == null)
 		{
 			trackgenLabel = new JLabel();
 			waitLabel = new JLabel();
-			jPanel = new JPanel();
-			jPanel.setLayout(null);
+			panel = new JPanel();
+			panel.setLayout(null);
 			trackgenLabel.setBounds(350, 10, 200, 20);
 			trackgenLabel.setText("Track data");
 			trackgenLabel.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 18));
-			waitLabel.setBounds(10, 260, 290, 25);
+			waitLabel.setBounds(10, 412, 290, 25);
 			waitLabel.setText("Constructing the .ac file. Please wait...");
-			jPanel.add(trackgenLabel, null);
-			jPanel.add(waitLabel, null);
+			panel.add(trackgenLabel, null);
+			panel.add(waitLabel, null);
 	
-			jPanel.add(getJPanel1(), null);
-			jPanel.add(getNodesTextField(), null);
-			jPanel.add(getJPanel2(), null);
+			panel.add(getInfoPanel(), null);
+			panel.add(getNodesScrollPane(), null);
+			panel.add(getErrorsScrollPane(), null);
 		}
-		return jPanel;
+		return panel;
 	}
 	/**
-	 * This method initializes nodesTextField
-	 * 
-	 * @return javax.swing.JTextField
-	 */
-	private JTextField getNodesTextField()
-	{
-		if (nodesTextField == null)
-		{
-			nodesTextField = new JTextField();
-			nodesTextField.setBounds(10, 230, 760, 25);
-			nodesTextField.setEditable(false);
-			nodesTextField.setText("");
-		}
-		return nodesTextField;
-	}
-	/**
-	 * This method initializes jPanel1	
+	 * This method initializes infoPanel	
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */    
-	private JPanel getJPanel1() {
-		if (jPanel1 == null) {
-			jPanel1 = new JPanel();
-			jPanel1.setLayout(null);
-			jPanel1.setBounds(10, 40, 760, 180);
-			jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+	private JPanel getInfoPanel() {
+		if (infoPanel == null) {
+			infoPanel = new JPanel();
+			infoPanel.setLayout(null);
+			infoPanel.setBounds(10, 40, 760, 180);
+			infoPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 			nameLabel = new JLabel();
 			authorLabel = new JLabel();
 			fileNameLabel = new JLabel();
@@ -288,32 +300,70 @@ public class TrackgenPanel extends JDialog implements Runnable
 			xSizeLabel.setBounds(5, 130, 740, 20);
 			ySizeLabel.setText("");
 			ySizeLabel.setBounds(5, 155, 740, 20);
-			jPanel1.add(ySizeLabel, null);
-			jPanel1.add(xSizeLabel, null);
-			jPanel1.add(widthLabel, null);
-			jPanel1.add(lengthLabel, null);
-			jPanel1.add(fileNameLabel, null);
-			jPanel1.add(authorLabel, null);
-			jPanel1.add(nameLabel, null);
+			infoPanel.add(ySizeLabel, null);
+			infoPanel.add(xSizeLabel, null);
+			infoPanel.add(widthLabel, null);
+			infoPanel.add(lengthLabel, null);
+			infoPanel.add(fileNameLabel, null);
+			infoPanel.add(authorLabel, null);
+			infoPanel.add(nameLabel, null);
 		}
-		return jPanel1;
+		return infoPanel;
 	}
 
 	/**
-	 * This method initializes jPanel2	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */    
-	private JPanel getJPanel2() {
-		if (jPanel2 == null) {
-			jPanel2 = new JPanel();
-			jPanel2.setLayout(null);
-			jPanel2.setBounds(10, 290, 760, 180);
-			jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-			jPanel2.add(getErrorsTextArea(), null);
+	 * This method initializes nodesScrollPane
+	 * 
+	 * @return javax.swing.JScrollPane
+	 */
+	private JScrollPane getNodesScrollPane()
+	{
+		if (nodesScrollPane == null)
+		{
+			nodesScrollPane = new JScrollPane(getNodesTextArea());
+			nodesScrollPane.setBounds(10, 230, 760, 180);
+			nodesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			nodesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			
+		    return nodesScrollPane;
 		}
-		return jPanel2;
+		return nodesScrollPane;
 	}
+
+	/**
+	 * This method initializes nodesTextArea
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextArea getNodesTextArea()
+	{
+		if (nodesTextArea == null)
+		{
+			nodesTextArea = new JTextArea();
+			nodesTextArea.setLineWrap(false);
+			nodesTextArea.setEditable(false);
+			nodesTextArea.setVisible(true);
+		}
+		return nodesTextArea;
+	}
+
+	/**
+	 * This method initializes errorsScrollPane
+	 * 
+	 * @return javax.swing.JScrollPane
+	 */
+	private JScrollPane getErrorsScrollPane()
+	{
+		if (errorsScrollPane == null)
+		{
+		    errorsScrollPane = new JScrollPane(getErrorsTextArea());
+		    errorsScrollPane.setBounds(10, 440, 760, 180);
+		    errorsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		    errorsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		}
+		return errorsScrollPane;
+	}
+
 	/**
 	 * This method initializes errorsTextArea
 	 * 
@@ -324,7 +374,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 		if (errorsTextArea == null)
 		{
 			errorsTextArea = new JTextArea();
-			errorsTextArea.setBounds(5, 10, 750, 165);
+			errorsTextArea.setLineWrap(false);
 			errorsTextArea.setEditable(false);
 			errorsTextArea.setText("");
 		}
