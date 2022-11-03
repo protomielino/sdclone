@@ -216,7 +216,8 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	}
 	
 	if (color_type == PNG_COLOR_TYPE_PALETTE) {
-		png_set_expand(png_ptr);
+		png_set_palette_to_rgb(png_ptr);
+		png_set_add_alpha(png_ptr, 0xffff, PNG_FILLER_AFTER);
 	}
 	
 	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
@@ -228,6 +229,8 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	}
 	
 	if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+		if (color_type == PNG_COLOR_TYPE_GRAY)
+			png_set_add_alpha(png_ptr, 0xffff, PNG_FILLER_AFTER);
 		png_set_gray_to_rgb(png_ptr);
 	}
 	
