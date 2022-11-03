@@ -323,7 +323,14 @@ AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root,
             else
             {
                 if (TrackRoot->isAKindOf(ssgTypeBranch()))
-                    z = getHOT(reinterpret_cast<ssgBranch *>(TrackRoot), x, y);
+                {
+                    z = getHOT(reinterpret_cast<ssgBranch*>(TrackRoot), x, y);
+                    if (z == -1000000.0f)
+                    {
+                        printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj->filename, x, y, z);
+                        return;
+                    }
+                }
                 else
                 {
                     GfError("TrackRoot is not an ssgBranch\n");
