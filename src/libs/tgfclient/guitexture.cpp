@@ -203,6 +203,9 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	png_get_IHDR(png_ptr, info_ptr, &src_width, &src_height,
 				 &bit_depth, &color_type, &interlace_type, NULL, NULL);
 
+	if (interlace_type != PNG_INTERLACE_NONE)
+		png_set_interlace_handling(png_ptr);
+
 	if (bit_depth == 1 && color_type == PNG_COLOR_TYPE_GRAY) 
 	    png_set_invert_mono(png_ptr);
 
