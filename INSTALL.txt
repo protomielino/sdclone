@@ -17,12 +17,16 @@ III - Windows Installation from sources
 
   1 - CMake and MS VC++ 2010 (10) and newer under Windows
 
-IV - FreeBSD Installation from sources (Work in progress)
+IV - FreeBSD Installation from sources
 
 V - MacOS X installation from sources 
   1 - CMake and McPorts
   2 - CMake and XCode (TODO)
 
+VI - Haiku
+  (TODO)
+
+VII - Historical Windows CMake and MinGW : (NOTE: outdated!)
 
 
 I - Pre-requisites
@@ -372,7 +376,153 @@ some tweaks might be needed for newer versions.
       
         Note: See II.2.b above about the order in which you need to extract the packages.
 
-1) CMake and MinGW : (NOTE: outdated!)
+
+
+2) CMake and MS VC++ 2010 (10) / 2012 (11) on Windows Vista 32, Windows 7, Windows 8, Windows 8.1
+
+  a.b.c. See above 0) Initial steps, common to all build methods
+
+  d.  Download the apprpriate "3rdParty" binary package from SF.net for your compiler
+        http://sourceforge.net/projects/speed-dreams/files/3rd%20party
+      (they contain necessary 3rd party libs compiled with/for a specific MSVC compiler)
+         (if your compiler is not listed See the Note below to compile your own)
+  e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources
+      are installed.  
+      Example: If sources are in c:\gamesources\speed-dreams\src-2.2.0
+               (inside which you should find at least the "src" and "data" folders), 
+               then extract 3rd party zip in c:\gamesources\speed-dreams\3rdParty
+               (inside which you should find at least the "include" and "lib" folders), 
+  f.  Startup CMake GUI and set :
+      * "Where is the source code" to c:\gamesources\speed-dreams\src-2.2.0
+      * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.2.0\build
+        (if you follow the folder specs above).
+  g.  Press "Configure" button, answer "Yes, create the ...\build folder",
+      select the right MSVC compiler version and don't change the "Use native compilers" option.
+      Press the "Configure" button again, until the "Generate" button is no more greyed.
+  h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams-2.sln"
+      and associated project files (*.vcxproj) in the ...\build folder
+      (Note : .sln/.vcxproj are OK for MSVC 2010, but you might get other files extensions
+           for different MSVC versions).
+  i.  Load speed-dreams-2.sln in MSVC IDE.
+  j.  Select the build configuration (Debug, Release, ...).
+  k.  Build the whole Solution (Build / Build Solution)
+  l.  (optional)Build the 'INSTALL' project (right click on it and select Build).
+  m.  Double-click on speed-dreams-2.exe in c:\speed-dreams-2-build\bin
+
+ Note: First-ever startups sometimes fail to correctly write the necessary stuff
+       into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
+       If this happens, simply remove the <My documents>\speed-dreams-2.settings folder
+       with Windows explorer, and restart the game : it should now work.
+
+ Note : If you need to compile the 3rdParty package from sources:
+        As of r6211 there is a work in progress CMake script at:
+        https://svn.code.sf.net/p/speed-dreams/code/trunk/packaging/3rdParty-devel/CMakeLists.txt
+
+        Please note: this CMake script uses CMake's ExternalProject module. It downloads the needed
+        sources and builds them. This can use considerable bandwith! (and take a long time).
+        Please see the readme.txt in that directory.
+
+
+IV - FreeBSD installation from sources
+--------------------------------------
+
+1 - Install CMake & Subversion 
+      sudo pkg install cmake
+      sudo pkg install subversion
+
+2 - Get the dependencies
+      sudo pkg install sdl2
+      sudo pkg install sdl2_mixer
+      sudo pkg install openal-soft
+      sudo pkg install plib
+      sudo pkg install enet
+      sudo pkg install libogg
+      sudo pkg install libvorbis
+      sudo pkg install expat
+      sudo pkg install zip
+      sudo pkg install png
+      sudo pkg install freetype2
+      sudo pkg install curl
+      sudo pkg install osg
+      sudo pkg install openjdk8 OR sudo pkg install openjdk18
+
+3 - Get the source code
+      Download Snapshot from:
+         (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/)
+         OR checkout the Speed-Dreams sources from
+      From a Terminal: 
+         1) cd /home/source/speed-dreams
+         2) svn co svn://svn.code.sf.net/p/speed-dreams/code/trunk .
+
+4 - Build and Install
+      From a Terminal: 
+        1) cd /home/source/speed-dreams
+        2) mkdir build
+        3) cd build
+        4) cmake -G"Unix Makefiles" -D OPTION_OFFICIAL=true -D CMAKE_BUILD_TYPE=Release ..
+        5) sudo make install
+
+V - MacOS X installation from sources
+--------------------------------------
+
+1 - CMake and McPorts via Terminal
+
+  a. install xcode (from app store)
+
+    1. If you haven't used it before, run xcode at least once. It might prompt you to agree to an Apple user agreement.
+
+  b. xcode command-line tools (xcode-select --install)
+
+  c. install Macports (https://www.macports.org/install.php)
+
+  d. install CMake (http://www.cmake.org/download/) OR from Macports
+
+  e. install the dependencies (via Macports)
+     sudo port -t install subversion
+     sudo port -t install cmake
+     sudo port -t install python27
+     sudo port -t install libsdl2
+     sudo port -t install libsdl2_mixer
+     sudo port -t install openal-soft
+     sudo port -t install plib
+     sudo port -t install FreeSOLID
+     sudo port -t install libenet
+     sudo port -t install libogg
+     sudo port -t install libvorbis
+     sudo port -t install expat
+     sudo port -t install zlib
+     sudo port -t install libpng
+     sudo port -t install jpeg
+     sudo port -t install jasper
+     sudo port -t install freetype
+     sudo port -t install curl
+     sudo port -t install OpenSceneGraph
+     sudo port -t install openjdk8
+
+
+  f. Download or checkout the Speed-Dreams sources from 
+      (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/)
+
+  g. Unpack the source somewhere (eg /home/source/speed-dreams)
+  h. From a Terminal: 
+        1) cd /home/source/speed-dreams
+        2) mkdir build
+        3) cd build
+        4) cmake -G"Unix Makefiles" -D CMAKE_INSTALL_PREFIX=speed-dreams-2.app -D OPTION_OFFICIAL=true -D CMAKE_BUILD_TYPE=Release ..
+        5) make install
+        6) Double-click on speed-dreams-2.app in Finder or drag speed-dreams-2.app into your Apllications folder.
+
+
+2 - CMake and XCode (TODO)
+
+VI - Haiku
+----------
+  (TODO)
+
+
+--------------------------------------
+VII - Historical Windows CMake and MinGW : (NOTE: outdated!)
+-----------------------------------------------------------
 
   Notes: 
    * Tested with success with CMake 2.8.2 and 2.8.8 + MinGW 2012 April (gcc 4.7.0),
@@ -670,128 +820,3 @@ some tweaks might be needed for newer versions.
           . Check the "Run in a terminal" option, to get the run-time traces in a console.
 
        * You can now "Compile / Run" or "Debug / Start debugging / Start debugging" from the menu !
-
-2) CMake and MS VC++ 2010 (10) / 2012 (11) on Windows Vista 32, Windows 7, Windows 8, Windows 8.1
-
-  a.b.c. See above 0) Initial steps, common to all build methods
-
-  d.  Download the apprpriate "3rdParty" binary package from SF.net for your compiler
-        http://sourceforge.net/projects/speed-dreams/files/3rd%20party
-      (they contain necessary 3rd party libs compiled with/for a specific MSVC compiler)
-         (if your compiler is not listed See the Note below to compile your own)
-  e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources
-      are installed.  
-      Example: If sources are in c:\gamesources\speed-dreams\src-2.2.0
-               (inside which you should find at least the "src" and "data" folders), 
-               then extract 3rd party zip in c:\gamesources\speed-dreams\3rdParty
-               (inside which you should find at least the "include" and "lib" folders), 
-  f.  Startup CMake GUI and set :
-      * "Where is the source code" to c:\gamesources\speed-dreams\src-2.2.0
-      * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.2.0\build
-        (if you follow the folder specs above).
-  g.  Press "Configure" button, answer "Yes, create the ...\build folder",
-      select the right MSVC compiler version and don't change the "Use native compilers" option.
-      Press the "Configure" button again, until the "Generate" button is no more greyed.
-  h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams-2.sln"
-      and associated project files (*.vcxproj) in the ...\build folder
-      (Note : .sln/.vcxproj are OK for MSVC 2010, but you might get other files extensions
-           for different MSVC versions).
-  i.  Load speed-dreams-2.sln in MSVC IDE.
-  j.  Select the build configuration (Debug, Release, ...).
-  k.  Build the whole Solution (Build / Build Solution)
-  l.  (optional)Build the 'INSTALL' project (right click on it and select Build).
-  m.  Double-click on speed-dreams-2.exe in c:\speed-dreams-2-build\bin
-
- Note: First-ever startups sometimes fail to correctly write the necessary stuff
-       into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
-       If this happens, simply remove the <My documents>\speed-dreams-2.settings folder
-       with Windows explorer, and restart the game : it should now work.
-
- Note : If you need to compile the 3rdParty package from sources:
-        As of r6211 there is a work in progress CMake script at:
-        https://svn.code.sf.net/p/speed-dreams/code/trunk/packaging/3rdParty-devel/CMakeLists.txt
-
-        Please note: this CMake script uses CMake's ExternalProject module. It downloads the needed
-        sources and builds them. This can use considerable bandwith! (and take a long time).
-        Please see the readme.txt in that directory.
-
-
-IV - FreeBSD installation from sources
---------------------------------------
-
-Mostly the same as for "Linux installation from sources" ...
-
-Some specific details though :
-
-2 - Installation from official tarballs
-
-  b - build and install:
-
-    1.  cd $HOME/sd/2.0.0/build
-    2.  ccmake ..
-    3.  press (t) for advanced options
-    4.  wanted rows CMake CPPFLAGS
-    5.  press (enter)
-    6.  add /usr/local/include
-    7.  press (enter)
-    8.  press (c) for configure
-    9.  press (g) for generate and press (e)
-   10.  make && sudo make install
-  
-     
-    TO BE COMPLETED
-
-
-V - MacOS X installation from sources
---------------------------------------
-
-1 - CMake and McPorts via Terminal
-
-  a. install xcode (from app store)
-
-    1. If you haven't used it before, run xcode at least once. It might prompt you to agree to an Apple user agreement.
-
-  b. xcode command-line tools (xcode-select --install)
-
-  c. install Macports (https://www.macports.org/install.php)
-
-  d. install CMake (http://www.cmake.org/download/) OR from Macports
-
-  e. install the dependencies (via Macports)
-     sudo port -t install subversion
-     sudo port -t install cmake
-     sudo port -t install python27
-     sudo port -t install libsdl2
-     sudo port -t install libsdl2_mixer
-     sudo port -t install openal-soft
-     sudo port -t install plib
-     sudo port -t install FreeSOLID
-     sudo port -t install libenet
-     sudo port -t install libogg
-     sudo port -t install libvorbis
-     sudo port -t install expat
-     sudo port -t install zlib
-     sudo port -t install libpng
-     sudo port -t install jpeg
-     sudo port -t install jasper
-     sudo port -t install freetype
-     sudo port -t install curl
-     sudo port -t install OpenSceneGraph
-     sudo port -t install openjdk8
-
-
-  f. Download or checkout the Speed-Dreams sources from 
-      (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/)
-
-  g. Unpack the source somewhere (eg /home/source/speed-dreams)
-  h. From a Terminal: 
-        1) cd /home/source/speed-dreams
-        2) mkdir build
-        3) cd build
-        4) cmake -G"Unix Makefiles" -D CMAKE_INSTALL_PREFIX=speed-dreams-2.app -D OPTION_OFFICIAL=true ..
-        5) make install
-        6) Double-click on speed-dreams-2.app in Finder or drag speed-dreams-2.app into your Apllications folder.
-
-
-2 - CMake and XCode (TODO)
-
