@@ -1770,7 +1770,9 @@ void	Driver::SpeedControl4(
             // slip more directly.
             double	MAX_BRK = fabs(k) < 0.0015 ? 0.95 :
                                                  fabs(k) < 0.0035 ? 0.75 : 0.6;
+
             double	err = spd0 - targetSpd;
+            MAX_BRK = MX(0, MN(MAX_BRK + err * 0.5, m_priv[PATH_NORMAL].BRAKE_LIMIT));
             double	t = m_accBrkCoeff.CalcY(err);
 
             if( t > 0 )
