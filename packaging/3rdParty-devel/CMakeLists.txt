@@ -203,7 +203,8 @@ if(OPTION_OPENAL)
          ExternalProject_Add(${OPENAL_PROJECT}
             URL ${OPENAL_URL}
             URL_HASH ${OPENAL_HASH}
-            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+            DEPENDS ${SDL2_PROJECT})
       endif()
    endif()
 endif(OPTION_OPENAL)

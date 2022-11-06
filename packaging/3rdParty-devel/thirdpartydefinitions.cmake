@@ -35,11 +35,11 @@
 
 
 # SDL2
-set(SDL2_VERSION 2.24.1)
+set(SDL2_VERSION 2.24.2)
 set(SDL2_PROJECT SDL2-${SDL2_VERSION})
 set(SDL2_FILE ${SDL2_PROJECT}.tar.gz)
 set(SDL2_URL https://www.libsdl.org/release/${SDL2_FILE})
-set(SDL2_HASH SHA256=bc121588b1105065598ce38078026a414c28ea95e66ed2adab4c44d80b309e1b)
+set(SDL2_HASH SHA256=b35ef0a802b09d90ed3add0dcac0e95820804202914f5bb7b0feb710f1a1329f)
 
 # SDL2_MIXER
 set(SDL2_MIXER_VERSION 2.6.2)
@@ -127,12 +127,12 @@ set(VORBIS_URL http://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
-set(EXPAT_VERSION 2.4.9)
+set(EXPAT_VERSION 2.5.0)
 string(REPLACE "." "_" EXPAT_TAG ${EXPAT_VERSION})
 set(EXPAT_PROJECT expat-${EXPAT_VERSION})
 set(EXPAT_FILE ${EXPAT_PROJECT}.tar.bz2)
 set(EXPAT_URL https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_TAG}/${EXPAT_FILE})
-set(EXPAT_HASH SHA256=7f44d1469b110773a94b0d5abeeeffaef79f8bd6406b07e52394bcf48126437a)
+set(EXPAT_HASH SHA256=6f0e6e01f7b30025fa05c85fdad1e5d0ec7fd35d9f61b22f34998de11969ff67)
 
 set(EXPAT_LEGACY_VERSION 2.2.10)
 string(REPLACE "." "_" EXPAT_LEGACY_TAG ${EXPAT_LEGACY_VERSION})
@@ -176,13 +176,13 @@ set(FREETYPE_LEGACY_URL https://sourceforge.net/projects/freetype/files/freetype
 set(FREETYPE_LEGACY_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
 
 # curl
-set(CURL_VERSION 7.85.0)
+set(CURL_VERSION 7.86.0)
 string(REPLACE "." "_" CURL_TAG ${CURL_VERSION})
 set(CURL_PROJECT curl-${CURL_VERSION})
 set(CURL_FILE ${CURL_PROJECT}.tar.bz2)
 #set(CURL_URL https://curl.se/download/${CURL_FILE})
 set(CURL_URL https://github.com/curl/curl/releases/download/curl-${CURL_TAG}/${CURL_FILE})
-set(CURL_HASH SHA256=21a7e83628ee96164ac2b36ff6bf99d467c7b0b621c1f7e317d8f0d96011539c)
+set(CURL_HASH SHA256=f5ca69db03eea17fa8705bdfb1a9f58d76a46c9010518109bb38f313137e0a28)
 
 # osg
 set(OSG_VERSION 3.6.5)
