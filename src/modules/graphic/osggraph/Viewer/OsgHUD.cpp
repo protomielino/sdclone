@@ -1400,7 +1400,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     changeImagePosition(
         hudImgElements["gforces-dot"],
         gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 3.5 * 1,//horizontal
-        gforcegraphbb.yMin()+position.y()+currCar->_DynGC.acc.x * 3.5 -1,//vertical
+        gforcegraphbb.yMin()+position.y()-(currCar->_DynGC.acc.x * 3.5),//vertical
         hudScale
     );
 
