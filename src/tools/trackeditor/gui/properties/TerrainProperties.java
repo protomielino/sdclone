@@ -20,13 +20,18 @@
  */
 package gui.properties;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -34,10 +39,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
 import utils.Editor;
@@ -515,12 +523,12 @@ public class TerrainProperties extends PropertyPanel
 
 	private class ObjectMapPanel extends JPanel
 	{
-		private JLabel		nameLabel			= new JLabel();
-		private JTextField 	nameTextField		= new JTextField();
-		private JLabel		objectMapLabel		= new JLabel();
-		private JTextField	objectMapTextField	= new JTextField();
-		private JButton		objectMapButton		= null;
-		private JTabbedPane	colorsTabbedPane	= null;
+		private JLabel				nameLabel			= new JLabel();
+		private JTextField 			nameTextField		= new JTextField();
+		private JLabel				objectMapLabel		= new JLabel();
+		private JTextField			objectMapTextField	= new JTextField();
+		private JButton				objectMapButton		= null;
+		private ObjectTablePanel	objectTablePanel	= null;
 
 		/**
 		 *
@@ -545,7 +553,7 @@ public class TerrainProperties extends PropertyPanel
 			addTextField(this, 1, objectMapTextField, objectMap.getObjectMap(), 130, 285);
 
 			add(getObjectMapButton(), null);
-			add(getColorsTabbedPane(objectMap), null);
+			add(getObjectTablePanel(objectMap), null);
 		}
 
 		/**
@@ -599,65 +607,194 @@ public class TerrainProperties extends PropertyPanel
 			}
 		}
 
-		private JTabbedPane getColorsTabbedPane(ObjectMap objectMap)
+		private ObjectTablePanel getObjectTablePanel(ObjectMap objectMap)
 		{
-			if (colorsTabbedPane == null)
+			if (objectTablePanel == null)
 			{
-				colorsTabbedPane = new JTabbedPane();
-				colorsTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-				colorsTabbedPane.setBounds(10, 64, 485, 255);
-
-				Iterator<Integer> colorsIterator = objectMap.getColors().iterator();
-				while (colorsIterator.hasNext())
-				{
-					int rgb = colorsIterator.next();
-					String color = String.format("0x%06X", rgb);
-					colorsTabbedPane.addTab(color, null, new ColorPanel(objectMap.getObjects(), rgb & 0x00ffffff), null);
-				}
+				objectTablePanel = new ObjectTablePanel(objectMap);
+				objectTablePanel.setBounds(10, 64, 485, 255);
 			}
-			return colorsTabbedPane;
+			return objectTablePanel;
 		}
 
-		private class ColorPanel extends JPanel
+		public class ColorRenderer extends DefaultTableCellRenderer
 		{
-			private JScrollPane			scrollPane		= null;
-			private JTextArea			textArea		= null;
+		    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+		        boolean hasFocus, int row, int column)
+		    {
+		        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		        JLabel label = (JLabel)c;
 
-			public ColorPanel(Vector<ObjShapeObject> objects, int rgb)
+		        if (column == 2)
+		    	{
+		    		int rgb = Integer.decode(value.toString());
+		    		Color color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+		    		label.setBackground(color);
+		    		if ((color.getRed()*0.299 + color.getGreen()*0.587 + color.getBlue()*0.114) > 186)
+				{
+			        	label.setForeground(Color.BLACK);
+				}
+		    		else
+		    		{
+			        	label.setForeground(Color.WHITE);
+				}
+		    	}
+		        else
+		        {
+		        	label.setBackground(Color.WHITE);
+		        	label.setForeground(Color.BLACK);
+		        }
+
+		        return label;
+		    }
+		}
+
+		class ObjectTableModel extends AbstractTableModel
+	    {
+	        private final String[] columnNames = { null, "Name", "Color", "X", "Y" };
+	        private final Class<?>[] columnClass = new Class[]
+	        {
+	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class
+	        };
+	        class Data
+	        {
+	        	String	name;
+	        	Integer	color;
+	        	Integer	x;
+	        	Integer	y;
+
+	        	Data(String name, Integer color, Integer x, Integer y)
+	        	{
+	        		this.name = name;
+	        		this.color = color;
+	        		this.x = x;
+	        		this.y = y;
+	        	}
+	        }
+
+			private Vector<Data> data = new Vector<Data>();
+
+			ObjectTableModel(ObjectMap objectMap)
 			{
-				super();
-				initialize(objects, rgb);
+				for (int i = 0; i < objectMap.getObjects().size(); i++)
+				{
+					ObjShapeObject object = objectMap.getObjects().get(i);
+
+					data.add(new Data(new String(object.getName()), object.getRGB(), object.getImageX(), object.getImageY()));
+				}
 			}
 
-			private void initialize(Vector<ObjShapeObject> objects, int rgb)
+			public int getRowCount()
 			{
-				setLayout(null);
-
-				textArea = new JTextArea();
-			    textArea.setLineWrap(false);
-			    textArea.setEditable(false);
-			    textArea.setVisible(true);
-
-			    scrollPane = new JScrollPane (textArea);
-			    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-			    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			    scrollPane.setBounds(10, 10, 460, 210);
-
-			    add(scrollPane);
-
-			    int count = 1;
-
-			    for (int i = 0; i < objects.size(); i++)
-			    {
-			    	ObjShapeObject object = objects.get(i);
-
-			    	if (object.getRGB() == rgb)
-			    	{
-			    		textArea.append(count + " : " + object.getImageX() + " " + object.getImageY() + "\n");
-			    		count++;
-			    	}
-			    }
+				return data.size();
 			}
+
+			public int getColumnCount()
+			{
+				return columnNames.length;
+			}
+
+	        public String getColumnName(int columnIndex)
+	        {
+	            return columnNames[columnIndex];
+	        }
+
+	        public Class<?> getColumnClass(int columnIndex)
+	        {
+	            return columnClass[columnIndex];
+	        }
+
+	        public boolean isCellEditable(int row, int columnIndex)
+	        {
+	        	/*
+	        	if (columnIndex == 1 || columnIndex == 3 || columnIndex == 4)
+	        	{
+	        		return true;
+	        	}
+	        	*/
+	        	return false;
+	        }
+
+			public Object getValueAt(int rowIndex, int columnIndex)
+			{
+				Data datum = data.get(rowIndex);
+
+				switch (columnIndex)
+				{
+				case 0:
+					return rowIndex + 1;
+				case 1:
+					return getEditorFrame().getObjectColorName(datum.color);
+				case 2:
+					return String.format("0x%06X", datum.color);
+				case 3:
+					return datum.x;
+				case 4:
+					return datum.y;
+				}
+				return null;
+			}
+
+			public void setValueAt(Object value, int rowIndex, int columnIndex)
+			{
+				Data datum = data.get(rowIndex);
+
+				switch (columnIndex)
+				{
+				case 1:
+					datum.name = (String) value;
+			        fireTableCellUpdated(rowIndex, columnIndex);
+			        datum.color = getEditorFrame().getObjectColor(datum.name);
+			        fireTableCellUpdated(rowIndex, columnIndex + 1);
+			        break;
+				case 3:
+					datum.x = (Integer) value;
+			        fireTableCellUpdated(rowIndex, columnIndex);
+					break;
+				case 4:
+					datum.y = (Integer) value;
+			        fireTableCellUpdated(rowIndex, columnIndex);
+					break;
+				}
+		    }
+	    }
+
+	    public void setUpNameColumn(JTable table, TableColumn nameColumn, Set<String> names)
+	    {
+	    	//Set up the editor for the name cells.
+	    	JComboBox<String> comboBox = new JComboBox<String>();
+
+	    	Iterator<String> it = names.iterator();
+			while (it.hasNext())
+			{
+				comboBox.addItem(it.next());
+			}
+
+	    	nameColumn.setCellEditor(new DefaultCellEditor(comboBox));
+
+	    	//Set up tool tips for the name cells.
+	    	DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+	    	//renderer.setToolTipText("Click to change object name");
+	    	nameColumn.setCellRenderer(renderer);
+	    }
+
+		class ObjectTablePanel extends JPanel
+		{
+			public ObjectTablePanel(ObjectMap objectMap)
+			{
+		        super(new GridLayout(1,0));
+
+		        JTable table = new JTable(new ObjectTableModel(objectMap));
+		        JScrollPane scrollPane = new JScrollPane(table);
+		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
+		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
+
+		        Set<String> names = getEditorFrame().getObjectColorNames();
+
+		        setUpNameColumn(table, table.getColumnModel().getColumn(1), names);
+
+		        add(scrollPane);
+		    }
 		}
 	}
 

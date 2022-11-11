@@ -44,7 +44,9 @@ import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.prefs.Preferences;
 
@@ -2949,5 +2951,69 @@ public class EditorFrame extends JFrame
 	public void clearDefaultObjectsDialog()
 	{
 		defaultObjectsDialog = null;
+	}
+
+	public String getObjectColorName(int rgb)
+	{
+		Vector<TrackObject>	trackObjects = trackData.getTrackObjects();
+
+		for (int i = 0; i < trackObjects.size(); i++)
+		{
+			if (trackObjects.get(i).getColor() == rgb)
+			{
+				return trackObjects.get(i).getName();
+			}
+		}
+
+		for (int i = 0; i < defaultObjects.size(); i++)
+		{
+			if (defaultObjects.get(i).getColor() == rgb)
+			{
+				return defaultObjects.get(i).getName();
+			}
+		}
+
+		return null;
+	}
+
+	public Set<String> getObjectColorNames()
+	{
+		Vector<TrackObject>	trackObjects = trackData.getTrackObjects();
+		Set<String> set = new HashSet<String>();
+
+		for (int i = 0; i < trackObjects.size(); i++)
+		{
+			set.add(trackObjects.get(i).getName());
+		}
+
+		for (int i = 0; i < defaultObjects.size(); i++)
+		{
+			set.add(defaultObjects.get(i).getName());
+		}
+
+		return set;
+	}
+
+	public int getObjectColor(String name)
+	{
+		Vector<TrackObject>	trackObjects = trackData.getTrackObjects();
+
+		for (int i = 0; i < trackObjects.size(); i++)
+		{
+			if (trackObjects.get(i).getName() == name)
+			{
+				return trackObjects.get(i).getColor();
+			}
+		}
+
+		for (int i = 0; i < defaultObjects.size(); i++)
+		{
+			if (defaultObjects.get(i).getName() == name)
+			{
+				return defaultObjects.get(i).getColor();
+			}
+		}
+
+		return 0;
 	}
 }
