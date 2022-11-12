@@ -35,6 +35,7 @@ public class ObjShapeObject extends Segment
 
 	public void setRGB(int rgb) {
 		this.rgb = rgb;
+		this.color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 	}
 
 	public Color getColor() {
@@ -43,6 +44,7 @@ public class ObjShapeObject extends Segment
 
 	public void setColor(Color color) {
 		this.color = color;
+		this.rgb = color.getRGB();
 	}
 
 	public int getImageX() {

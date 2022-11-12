@@ -23,6 +23,7 @@ package gui.properties;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -530,6 +532,29 @@ public class TerrainProperties extends PropertyPanel
 		private JButton				objectMapButton		= null;
 		private ObjectTablePanel	objectTablePanel	= null;
 
+        public class Data
+        {
+        	String	name;
+        	Integer	color;
+        	Integer	x;
+        	Integer	y;
+
+        	Data(String name, Integer color, Integer x, Integer y)
+        	{
+        		this.name = name;
+        		this.color = color;
+        		this.x = x;
+        		this.y = y;
+        	}
+        }
+
+		private Vector<Data> data = new Vector<Data>();
+
+		public Vector<Data> getData()
+		{
+			return data;
+		}
+
 		/**
 		 *
 		 */
@@ -598,14 +623,71 @@ public class TerrainProperties extends PropertyPanel
 			UIManager.put("FileChooser.readOnly", old);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
-				String fileName = fc.getSelectedFile().toString();
-				int index = fileName.lastIndexOf(sep);
-				String pathToFile = fileName.substring(0, index);
+				String selectedFile = fc.getSelectedFile().toString();
+				String fileName = selectedFile;
+				int index = selectedFile.lastIndexOf(sep);
+				String pathToFile = selectedFile.substring(0, index);
 				if (pathToFile.equals(Editor.getProperties().getPath()))
-					fileName = fileName.substring(index + 1);
+					fileName = selectedFile.substring(index + 1);
 				objectMapTextField.setText(fileName);
+
+				// update table with new data
+				try
+				{
+					getDataFromImage(selectedFile);
+					objectTablePanel.dataChanged();
+				}
+				catch (IOException e)
+				{
+				}
 			}
 		}
+
+    	public void getDataFromImage(String fileName) throws IOException
+    	{
+    		data.clear();
+
+			File file = new File(fileName);
+
+			if (file.exists())
+			{
+				BufferedImage image = ImageIO.read(file);
+				int imageWidth = image.getWidth();
+				int imageHeight = image.getHeight();
+
+				for (int x = 0; x < imageWidth; x++)
+				{
+					for (int y = 0; y < imageHeight; y++)
+					{
+						int rgb = image.getRGB(x, y) & 0x00ffffff;
+
+						if (rgb != 0x0)
+						{
+							String name = getEditorFrame().getObjectColorName(rgb);
+
+							if (name == null)
+							{
+								name = new String("Unknown");
+							}
+
+							data.add(new Data(name, rgb, x, y));
+						}
+					}
+				}
+			}
+    	}
+
+    	public void getDataFromObjectMap(ObjectMap objectMap)
+    	{
+    		data.clear();
+
+			for (int i = 0; i < objectMap.getObjects().size(); i++)
+			{
+				ObjShapeObject object = objectMap.getObjects().get(i);
+
+				data.add(new Data(new String(object.getName()), object.getRGB(), object.getImageX(), object.getImageY()));
+			}
+    	}
 
 		private ObjectTablePanel getObjectTablePanel(ObjectMap objectMap)
 		{
@@ -656,33 +738,11 @@ public class TerrainProperties extends PropertyPanel
 	        {
 	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class
 	        };
-	        class Data
-	        {
-	        	String	name;
-	        	Integer	color;
-	        	Integer	x;
-	        	Integer	y;
 
-	        	Data(String name, Integer color, Integer x, Integer y)
-	        	{
-	        		this.name = name;
-	        		this.color = color;
-	        		this.x = x;
-	        		this.y = y;
-	        	}
-	        }
-
-			private Vector<Data> data = new Vector<Data>();
-
-			ObjectTableModel(ObjectMap objectMap)
+	        ObjectTableModel(ObjectMap objectMap)
 			{
-				for (int i = 0; i < objectMap.getObjects().size(); i++)
-				{
-					ObjShapeObject object = objectMap.getObjects().get(i);
-
-					data.add(new Data(new String(object.getName()), object.getRGB(), object.getImageX(), object.getImageY()));
-				}
-			}
+	        	getDataFromObjectMap(objectMap);
+	        }
 
 			public int getRowCount()
 			{
@@ -724,7 +784,7 @@ public class TerrainProperties extends PropertyPanel
 				case 0:
 					return rowIndex + 1;
 				case 1:
-					return getEditorFrame().getObjectColorName(datum.color);
+					return datum.name;
 				case 2:
 					return String.format("0x%06X", datum.color);
 				case 3:
@@ -780,12 +840,17 @@ public class TerrainProperties extends PropertyPanel
 
 		class ObjectTablePanel extends JPanel
 		{
-			public ObjectTablePanel(ObjectMap objectMap)
+	        JTable 				table		= null;
+	        JScrollPane 		scrollPane	= null;
+	        ObjectTableModel	model		= null;
+
+	        public ObjectTablePanel(ObjectMap objectMap)
 			{
 		        super(new GridLayout(1,0));
 
-		        JTable table = new JTable(new ObjectTableModel(objectMap));
-		        JScrollPane scrollPane = new JScrollPane(table);
+		        model = new ObjectTableModel(objectMap);
+		        table = new JTable(model);
+		        scrollPane = new JScrollPane(table);
 		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
 		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
 
@@ -795,6 +860,11 @@ public class TerrainProperties extends PropertyPanel
 
 		        add(scrollPane);
 		    }
+
+	        void dataChanged()
+	        {
+	        	model.fireTableDataChanged();
+	        }
 		}
 	}
 
@@ -924,6 +994,56 @@ public class TerrainProperties extends PropertyPanel
             	}
                 getEditorFrame().documentIsModified = true;
             }
+
+            Vector<ObjectMapPanel.Data> data = panel.getData();
+            Vector<ObjShapeObject>	objects = objectMap.getObjects();
+    		int minDataCount = Math.min(data.size(), objects.size());
+
+    		if (data.size() != objects.size())
+    		{
+    			getEditorFrame().documentIsModified = true;
+    		}
+            for (int j = 0; j < minDataCount; j++)
+            {
+            	ObjectMapPanel.Data datum = data.get(j);
+            	ObjShapeObject object = objects.get(j);
+
+            	if (!datum.color.equals(object.getRGB()))
+            	{
+            		object.setRGB(datum.color);
+        			getEditorFrame().documentIsModified = true;
+            	}
+
+            	if (!datum.x.equals(object.getImageX()))
+            	{
+            		object.setImageX(datum.x);
+        			getEditorFrame().documentIsModified = true;
+            	}
+
+            	if (!datum.y.equals(object.getImageY()))
+            	{
+            		object.setImageY(datum.y);
+        			getEditorFrame().documentIsModified = true;
+            	}
+            }
+    		if (data.size() < objects.size())
+    		{
+    			// need to trim objects
+    			while (objects.size() > data.size())
+    			{
+    				objects.remove(objects.size() - 1);
+    			}
+    		}
+    		else if (objects.size() < data.size())
+    		{
+    			// need to add to objects
+    			while (objects.size() < data.size())
+    			{
+                	ObjectMapPanel.Data datum = data.get(objects.size());
+
+    				objects.add(new ObjShapeObject(datum.color, datum.x, datum.y));
+    			}
+    		}
 		}
 		if (objectMaps.size() > tabbedPane.getTabCount())
 		{
