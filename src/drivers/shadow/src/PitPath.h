@@ -19,8 +19,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _PITPATH_H_
-#define _PITPATH_H_
+#if !defined(AFX_PITPATH_H__CA8B7BDD_A9C1_4B01_A44B_FF6965813B40__INCLUDED_)
+#define AFX_PITPATH_H__CA8B7BDD_A9C1_4B01_A44B_FF6965813B40__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -32,36 +32,35 @@
 class PitPath : public Path
 {
 public:
-    PitPath();
-    virtual ~PitPath();
+	PitPath();
+	virtual ~PitPath();
 
-    PitPath&			operator=( const PitPath& other );
-    virtual PitPath&	operator=( const Path& other );
+	PitPath&			operator=( const PitPath& other );
+	virtual PitPath&	operator=( const Path& other );
 
-    void	MakePath(const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
-                      int pitType, double entryOffset = 0,
-                     double exitOffset = 0 , double latoffset = 0);
+	void	MakePath( const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
+					  int pitType, double entryOffset = 0, double exitOffset = 0 );
 
-    //	CPath overrides.
+	//	CPath overrides.
 //	virtual bool	ContainsPos( double trackPos ) const;
 //	virtual bool	GetPtInfo( double trackPos, PtInfo& pi ) const;
 
-    bool	InPitSection( double trackPos ) const;
-    bool	CanStop( double trackPos ) const;
-    double	EntryToPitDistance() const;
+	bool	InPitSection( double trackPos ) const;
+	bool	CanStop( double trackPos ) const;
+	double	EntryToPitDistance() const;
 
 private:
-    double	ToSplinePos( double trackPos ) const;
+	double	ToSplinePos( double trackPos ) const;
     void    LocalToGlobalXY( double dist, double offs, double slope, Vec2d* p, Vec2d* v );
 
 private:
 //	const MyTrack*	m_pTrack;
-    double			m_pitEntryPos;
-    double			m_pitExitPos;
-    double			m_pitStartPos;
-    double			m_pitEndPos;
-    int				m_stopIdx;
-    double			m_stopPos;
+	double			m_pitEntryPos;
+	double			m_pitExitPos;
+	double			m_pitStartPos;
+	double			m_pitEndPos;
+	int				m_stopIdx;
+	double			m_stopPos;
 };
 
-#endif // _PITPATH_H_
+#endif // !defined(AFX_PITPATH_H__CA8B7BDD_A9C1_4B01_A44B_FF6965813B40__INCLUDED_)

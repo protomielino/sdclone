@@ -743,9 +743,7 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
             CarModel	pitCm(m_cm[p]);
             pitCm.BRAKE_MU_SCALE = 0.8;
             m_pitPath[p][i].MakePath( pCar->race.pit, &m_path[p], pitCm, i == 1,
-                                      m_priv[p].PIT_ENTRY_OFFSET,
-                                      m_priv[p].PIT_EXIT_OFFSET,
-                                      m_priv[p].PIT_LAT_OFFSET);
+                                      m_priv[p].PIT_ENTRY_OFFSET, m_priv[p].PIT_EXIT_OFFSET );
         }
     }
 
