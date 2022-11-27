@@ -24,7 +24,7 @@
 #include "Utils.h"
 #include "CubicSpline.h"
 #include "ParametricCubicSpline.h"
-#include "PitControl.h"
+#include "Strategy.h"
 
 #include <robottools.h>
 
@@ -148,7 +148,7 @@ void	PitPath::MakePath(
 		y[i] *= sign;
 	}}
 
-	if( pitType == PitControl::PT_NORMAL )
+    if( pitType == Strategy::PT_NORMAL )
 		y[3] = (fabs(pPitInfo->driversPits->pos.toMiddle) + 1.0) * sign;
 	
 	//CubicSpline	spline(NPOINTS, x, y, s);
@@ -193,7 +193,7 @@ void	PitPath::MakePath(
 		m_pts[i].maxSpd = m_pts[i].spd = spd;
 	}}
 
-	if( pitType == PitControl::PT_NORMAL )
+    if( pitType == Strategy::PT_NORMAL )
 	{
 		double	stopPos = pPit->pos.seg->lgfromstart + pPit->pos.toStart + 2;
 		idx0 = m_pTrack->IndexFromPos(stopPos);
