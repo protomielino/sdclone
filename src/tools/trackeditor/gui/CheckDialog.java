@@ -541,10 +541,24 @@ public class CheckDialog extends JDialog
 
 	private File findObjectFile(String object)
 	{
+		// check if there is a path
+		if (object.contains(sep))
+		{
+			File path = new File(object);
+			if (!path.exists())
+			{
+				return null;
+			}
+
+			return path;
+		}
+
+		// try in track directory
 		File file = new File(Editor.getProperties().getPath() + sep + object);
 
 		if (!file.exists())
 		{
+			// try in data/objects directory
 			file = new File(dataDirectory + sep + "data" + sep + "objects" + sep + object);
 			if (!file.exists())
 			{

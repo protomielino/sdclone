@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -150,6 +151,10 @@ public class SurfaceComboBox extends JComboBox<String>
 									}
 									input.close();
 									stream.close();
+								}
+								catch (NoSuchElementException e)
+								{
+									// sgi rgb files are not supported
 								}
 								catch (Exception e)
 								{
