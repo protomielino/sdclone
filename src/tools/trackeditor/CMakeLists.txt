@@ -82,6 +82,11 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/SurfaceComboBox.java
          utils/TrackData.java
          utils/TrackEditor.java
+         utils/ac3d/Ac3d.java
+         utils/ac3d/Ac3dException.java
+         utils/ac3d/Ac3dMaterial.java
+         utils/ac3d/Ac3dObject.java
+         utils/ac3d/Ac3dSurface.java
          utils/circuit/Camera.java
          utils/circuit/Curve.java
          utils/circuit/EnvironmentMapping.java

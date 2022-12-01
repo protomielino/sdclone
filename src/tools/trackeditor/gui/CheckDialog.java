@@ -413,8 +413,6 @@ public class CheckDialog extends JDialog
 							}
 						}
 					}
-
-					ac3dFile.write(file.toString() + ".ac");
 				}
 				catch (Ac3dException e)
 				{
