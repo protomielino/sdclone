@@ -63,9 +63,13 @@ static ssgBranch *hookNode(char *s)
     {
         InteriorList.push_back(branch);
     }
-    else
+    else if (strncmp(s, "exterior", 8) == 0)
     {
         ExteriorList.push_back(branch);
+    }
+    else
+    {
+        printf("Relief: unsupported type %s\n", s);
     }
     return branch;
 }
@@ -136,7 +140,7 @@ void CountRelief(bool interior, int *nb_vert, int *nb_seg)
     }
 }
 
-static void genRec(ssgEntity *e)
+static void genRec(ssgEntity *e, bool interior)
 {
     if (e->isAKindOf(_SSG_TYPE_BRANCH))
     {
@@ -144,7 +148,7 @@ static void genRec(ssgEntity *e)
 
         for (int i = 0; i < br->getNumKids(); i++)
         {
-            genRec(br->getKid(i));
+            genRec(br->getKid(i), interior);
         }
     }
     else if (e->isAKindOf(_SSG_TYPE_VTXTABLE))
@@ -154,6 +158,11 @@ static void genRec(ssgEntity *e)
         int nv = vt->getNumVertices();
         int nl = vt->getNumLines();
         int sv = getPointCount();
+        GLenum pt = vt->getPrimitiveType();
+
+        printf("Relief: %s %s %d vertices %d lines\n", interior ? "interior" : "exterior",
+               pt == GL_LINE_LOOP ? "line loop" : pt == GL_LINE_STRIP ? "line strip" : "unsupported type",
+               nv, nl);
 
         for (int i = 0; i < nv; i++)
         {
@@ -181,6 +190,6 @@ void GenRelief(bool interior)
 
     for (size_t i = 0; i < lines.size(); ++i)
     {
-        genRec(dynamic_cast<ssgEntity *>(lines[i]));
+        genRec(dynamic_cast<ssgEntity *>(lines[i]), interior);
     }
 }
