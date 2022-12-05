@@ -429,15 +429,6 @@ void TDriver::updateBasics()
         free(str);
     }
 #endif
-
-    updateSector();
-    learnSpeedFactors();
-    getBrakedistfactor();
-    getSpeedFactors();
-    updateStuck();
-    updateAttackAngle();
-    updateCurveAhead();
-
     if (mHASTYC)
     {
         updateWheels();
@@ -448,6 +439,14 @@ void TDriver::updateBasics()
 
         LogDANDROID.debug("%s Wear per meter : %.15f\n", oCar->_name, wearPerM);
     }
+
+    updateSector();
+    learnSpeedFactors();
+    getBrakedistfactor();
+    getSpeedFactors();
+    updateStuck();
+    updateAttackAngle();
+    updateCurveAhead();
 
     mPit.update(mFromStart);
 }
@@ -2293,9 +2292,9 @@ void TDriver::increaseSpeedFactor(int sect, double inc)
 
 void TDriver::getBrakedistfactor()
 {
-    //double factor = (1.0 - mPit.tyreCondition()) + 1.0;
-    //LogDANDROID.debug(" # brake factor = %.3f\n", factor);
-    mBrakedistfactor = mSect[mSector].brakedistfactor;
+    double factor = (1.0 - (mPit.tyreCondition()+ 0.01));
+    LogDANDROID.info(" # brake factor = %.3f\n", factor);
+    mBrakedistfactor = mSect[mSector].brakedistfactor + factor;
     if (mCatchedRaceLine && mDrvPath == PATH_O)
     {
         mBrakedistfactor *= 1.0 /* factor*/;
@@ -2328,7 +2327,7 @@ void TDriver::getBrakedistfactor()
 
 void TDriver::getSpeedFactors()
 {
-    mSectSpeedfactor = mSect[mSector].speedfactor;
+    mSectSpeedfactor = mSect[mSector].speedfactor * mTirecondition;
 }
 
 void TDriver::updatePathCar(int path)
@@ -2520,7 +2519,7 @@ void TDriver::calcMaxspeed()
         if(mHASTYC)
         {
             mMaxspeed *= mPit.tyreCondition();
-            LogDANDROID.debug(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
+            LogDANDROID.info(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
         }
 
         // Special cases
@@ -2554,9 +2553,7 @@ void TDriver::calcMaxspeed()
     {
         break;
     }
-    }
-
-
+  }
 }
 
 void TDriver::limitSteerAngle(double& targetangle)
