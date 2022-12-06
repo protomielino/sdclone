@@ -255,7 +255,7 @@ void	Opponent::ProcessMyCar(
 
 //	double	distAhead = MX(20, mySit.spd * mySit.spd / 30);
 //	double	distAhead = MX(20, mySit.spd * mySit.spd / 25);
-    double	distAhead = MX(20, mySit.spd * mySit.spd / 20);
+    double	distAhead = MX(50, mySit.spd * mySit.spd / 20);
 
     if( (m_info.flags & F_DANGEROUS) == 0 )
         distAhead = MN(MX(40, distAhead), 80);
