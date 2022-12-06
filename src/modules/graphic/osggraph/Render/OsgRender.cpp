@@ -621,14 +621,11 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
 {
     static const double m_log01 = -log( 0.01 );
     static const double sqrt_m_log01 = sqrt( m_log01 );
-    //const GLfloat fog_exp2_density = sqrt_m_log01 / thesky->get_visibility();
     const GLfloat fog_exp2_density = sqrt_m_log01 / SDVisibility;
 
     SceneFog = osg::Vec4f(FogColor, 1.0f);
 
-    m_Fog = new osg::Fog();    // The fog object
-    m_Fog->setStart(SDVisibility);                    // Fog start
-    m_Fog->setEnd(12000.0);                           // Fog End
+    m_Fog = new osg::Fog();                           // The fog object
     m_Fog->setMode(osg::Fog::EXP2);                   // Fog type
     m_Fog->setDensity(fog_exp2_density);              // Fog density
     m_Fog->setColor(SceneFog);                        // Fog color
