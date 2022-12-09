@@ -2502,10 +2502,10 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     if( car->race.laps != m_lastLap )
     {
         m_lastLap = car->race.laps;
-        LogSHADOW.info( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
+        LogSHADOW.debug( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
 
         if (m_cm[PATH_NORMAL].HASTYC)
-            LogSHADOW.info( "[%d] Average wear/m: %.15f\n", car->index, m_Strategy.WearPerM(car) );
+            LogSHADOW.debug( "[%d] Average wear/m: %.15f\n", car->index, m_Strategy.WearPerM(car) );
 
         double a, b;
         m_accBrkCoeff.CalcCoeffs(&a, &b);

@@ -283,7 +283,7 @@ void Pit::update(double fromstart)
                 totalfuel += lastfuel + lastpitfuel - car->priv.fuel;
                 fuellapscounted++;
                 avgfuelperlap = totalfuel / fuellapscounted;
-                LogDANDROID.info("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
+                LogDANDROID.debug("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
             }
 
             lastfuel = car->priv.fuel;

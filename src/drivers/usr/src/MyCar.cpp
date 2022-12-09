@@ -304,7 +304,7 @@ void MyCar::setControls(double accel, double brake, double steer)
 
 double MyCar::brakeForce(double speed, double curvature, double curv_z, double mu, double pitchAngle, double rollAngle, PathType pathtype) const
 {
-    double friction = mu * (mMass * 9.81 * (1.0 + sin(pitchAngle) + sin(rollAngle)) + mCA * speed * speed);
+    double friction = mu * mTires.gripFactor() * (mMass * 9.81 * (1.0 + sin(pitchAngle) + sin(rollAngle)) + mCA * speed * speed);
     double centrifugal = mMass * speed * speed * fabs(curvature) * (1.0 - sin(rollAngle));
     centrifugal = MIN(centrifugal, friction);
     double brakeforce = MAX(0.03 * maxBrakeForce(), sqrt(friction * friction - centrifugal * centrifugal));

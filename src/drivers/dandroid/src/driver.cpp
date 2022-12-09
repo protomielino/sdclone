@@ -2293,7 +2293,7 @@ void TDriver::increaseSpeedFactor(int sect, double inc)
 void TDriver::getBrakedistfactor()
 {
     double factor = (1.0 - (mPit.tyreCondition()+ 0.01));
-    LogDANDROID.info(" # brake factor = %.3f\n", factor);
+    LogDANDROID.debug(" # brake factor = %.3f\n", factor);
     mBrakedistfactor = mSect[mSector].brakedistfactor + factor;
     if (mCatchedRaceLine && mDrvPath == PATH_O)
     {
@@ -2519,7 +2519,7 @@ void TDriver::calcMaxspeed()
         if(mHASTYC)
         {
             mMaxspeed *= mPit.tyreCondition();
-            LogDANDROID.info(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
+            LogDANDROID.debug(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
         }
 
         // Special cases
