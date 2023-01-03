@@ -264,7 +264,7 @@ void GfCars::print() const
 GfCar::GfCar(const std::string& strId, const std::string& strCatId,
 			 const std::string& strCatName, void* hparmCar)
 : _strId(strId), _strCatId(strCatId), _strCatName(strCatName)
-, _eDriveTrain(TRANS_RWD), _eEngineShape(ENGSHAPE_L), _eEnginePosition(ENGPOS_FRONT)
+, _eDriveTrain(TRANS_RWD), _nGears(0), _eEngineShape(ENGSHAPE_L), _eEnginePosition(ENGPOS_FRONT)
 {
 	load(hparmCar);
 }
