@@ -257,16 +257,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     /* loading raw car level 0*/
     //  selIndex = 0; 	/* current selector index */
-    snprintf(buf, nMaxTexPathSize, "%s.ac",
-             car->_carName); /* default car 3D model file */
+    snprintf(buf, nMaxTexPathSize, "%s.acc",
+        bMasterModel ? car->_masterModel : car->_carName); /* default car 3D model file */
     snprintf(path, nMaxTexPathSize, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
+    param = GfParmGetStr(handle, path, PRM_CAR, buf);
 
     std::string strPath = GfDataDir();
 
-    if(bMasterModel)
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
-    else
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
+    snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s", bMasterModel ? car->_masterModel : car->_carName, param);
 
     strPath+=buf;
 
