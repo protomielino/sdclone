@@ -275,6 +275,9 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\67gp-mango-ms7"
   File /r "${BUILD_INST_DIR}\data\cars\models\67gp-mango-ms7\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\67gp-murasama-37a"
+  File /r "${BUILD_INST_DIR}\data\cars\models\67gp-murasama-37a\*.*"
+
 SectionEnd
 
 Section -Tracks
