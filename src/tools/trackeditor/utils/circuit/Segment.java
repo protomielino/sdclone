@@ -199,56 +199,43 @@ public class Segment implements Cloneable
 		return shape;
 	}
 
-	public boolean contains(double x, double y)
+	// adapted from: https://web.archive.org/web/20130126163405/http://geomalgorithms.com/a03-_inclusion.html
+	// Copyright 2000 softSurfer, 2012 Dan Sunday
+	private double isLeft(Point2D.Double P0, Point2D.Double P1, Point2D.Double P2)
+	{
+		return ((P1.x - P0.x) * (P2.y - P0.y) - (P2.x -  P0.x) * (P1.y - P0.y));
+	}
+	
+	public boolean contains(Point2D.Double point)
 	{
 		for (int i = 0; i < points.length; i += 4)
 		{
-			boolean found = true;
+			int count = 0;
 
 			for (int j = 0; j < 4; j++)
 			{
-				int idxA = i + j;
-				int idxB = i + (j + 1) % 4;
-				int idxC = i + (j + 2) % 4;
-				int idxD = i + (j + 3) % 4;
+				int start = i + j;
+				int next = i + ((j + 1) % 4);
 
-				if (points[idxA].equals(points[idxB]) || points[idxB].equals(points[idxC])
-						|| points[idxC].equals(points[idxD]) || points[idxD].equals(points[idxA]))
+				if (points[start].y <= point.y)
 				{
-					found = false;
-					break;
-				}
-
-				if (points[idxA].x == points[idxB].x)
-				{
-					// vertical line
-					int localSign = (x > points[idxA].x ? 1 : -1);
-					int localSign2 = (points[idxC].x > points[idxA].x ? 1 : -1);
-
-					if (localSign != localSign2)
+					if (points[next].y > point.y)
 					{
-						found = false;
-						break;
+						if (isLeft(points[start], points[next], point) > 0)
+							++count;
 					}
-				} else
+				}
+				else
 				{
-					double a, b;
-
-					a = (points[idxB].y - points[idxA].y) / (points[idxB].x - points[idxA].x);
-					b = points[idxA].y - a * points[idxA].x;
-
-					int localSign = (y > a * x + b ? 1 : -1);
-					int localSign2 = (points[idxC].y > a * points[idxC].x + b ? 1 : -1);
-
-					if (localSign != localSign2)
+					if (points[next].y <= point.y)
 					{
-						found = false;
-						break;
+						if (isLeft(points[start], points[next], point) < 0)
+							--count;
 					}
 				}
 			}
 
-			if (found)
+			if (count != 0)
 				return true;
 		}
 

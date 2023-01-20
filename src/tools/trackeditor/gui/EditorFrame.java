@@ -2435,7 +2435,7 @@ public class EditorFrame extends JFrame
 		    int type = JOptionPane.PLAIN_MESSAGE;
 		    String msg = Editor.getProperties().title + " " + Editor.getProperties().version + "\n\n"
                 + "Copyright Charalampos Alexopoulos\n"
-                + "Copyright (2022) Robert Reif\n";
+                + "Copyright (2022-2023) Robert Reif\n";
 		    JOptionPane.showMessageDialog(null,msg,"About",type);
 		}
 	}

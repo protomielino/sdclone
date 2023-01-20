@@ -433,7 +433,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 									oldShape.setArcDeg(tmpAngle);
 									oldShape.setRadiusEnd(tmpRadius - deltaRadiusStep);
 									redrawCircuit();
-									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									if (oldShape.contains(mousePoint))
 									{
 										splitPoint = curStep / nbSteps;
 										break;
@@ -489,7 +489,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 									oldShape.setArcDeg(tmpAngle);
 									oldShape.setRadiusEnd(tmpRadius - deltaRadiusStep);
 									redrawCircuit();
-									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									if (oldShape.contains(mousePoint))
 									{
 										splitPoint = curStep / nbSteps;
 										break;
@@ -528,7 +528,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 									newShape3.setLength(length * (1.0 - splitPoint));
 									oldShape.setLength(length * splitPoint);
 									redrawCircuit();
-									if (oldShape.contains(mousePoint.x, mousePoint.y))
+									if (oldShape.contains(mousePoint))
 									{
 										break;
 									}
@@ -1132,7 +1132,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				Segment obj = i.next();
 
 				if (Class.forName("utils.circuit.Segment").isAssignableFrom(obj.getClass())
-						&& obj.contains(mousePoint.getX(), mousePoint.getY()))
+						&& obj.contains(mousePoint))
 				{
 					// object found !
 					out = obj;
@@ -1162,7 +1162,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						try
 						{
 							if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
-									&& object.contains(mousePoint.getX(), mousePoint.getY()))
+									&& object.contains(mousePoint))
 							{
 								// object found !
 								out = object;
