@@ -28,6 +28,8 @@ const double Opponent::BACKRANGE = 100.0;    // [m] distance to check for other 
 
 Opponent::Opponent()
 {
+  sidedist = 0.0;
+  mAngle = 0.0;
 }
 
 

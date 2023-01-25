@@ -61,6 +61,7 @@ TDriver::TDriver(int index)
     mPrevTargetdiff = 0.0;
     mOppInFrontspace = false;
     mPath[PATH_O].carpos.radius = 1000.0;
+    mPath[PATH_O].tarpos.type = TR_STR;
     mTargetToMiddle = 0.0;
     mCentrifugal = 0.0;
     mSectSpeedfactor = 1.0;
@@ -91,6 +92,9 @@ TDriver::TDriver(int index)
     mSkillDriver = 1.0;
     mGarage = false;
     mWatchdogCount = 0;
+    mHASTYC = false;
+    mCurveAheadFromStart = 0.0;
+    mPathChangeTime = 0.0;
     initVars();
     setPrevVars();
 }
