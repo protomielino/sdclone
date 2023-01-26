@@ -94,9 +94,9 @@ ReCarsUpdateCarPitTime(tCarElt *car)
             for (i=0; i<4; i++)
             {
                 car->_tyreCondition(i) = 1.01f;
-                car->_tyreT_in(i)  = car->priv.air_temp;
-                car->_tyreT_mid(i) = car->priv.air_temp;
-                car->_tyreT_out(i) = car->priv.air_temp;
+                car->_tyreT_in(i)  = car->_airtemp;
+                car->_tyreT_mid(i) = car->_airtemp;
+                car->_tyreT_out(i) = car->_airtemp;
             }
 
             GfLogInfo("%s in repair pit stop for %.1f s (refueling by %.1f l, repairing by %d).\n",
@@ -919,7 +919,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
     car->_distFromStartLine = car->_trkPos.seg->lgfromstart +
         (car->_trkPos.seg->type == TR_STR ? car->_trkPos.toStart : car->_trkPos.toStart * car->_trkPos.seg->radius);
     car->_distRaced = (car->_laps - 1) * ReInfo->track->length + car->_distFromStartLine;
-    
+
     // Remember current laptime at current track position
     int distFromStartLine = (int)car->_distFromStartLine;
     if (distFromStartLine < 0)
