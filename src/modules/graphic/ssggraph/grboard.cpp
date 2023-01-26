@@ -621,6 +621,8 @@ cGrBoard::grDispGGraph()
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 15.0);
       snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(3) - 273.0);
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 - 15.0);
+      snprintf(buf, sizeof(buf), "Air Temperature: %3.2f", car_->_airtemp - 273.0);
+      GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 65.0);
   }
 }
 
