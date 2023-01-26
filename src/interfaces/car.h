@@ -461,9 +461,9 @@ typedef struct
     t3Dd	collpos;                /**< Collision position, useful for sound ; Simu V2 only */
     int		dammage;
     int		debug;
-    tdble   air_temp;                /** < air temperature in race */
+    tdble   localairTemperature;     /** < air temperature in race */
+    tdble   localairPressure;        /**< Environment pressure at cars location */
     tCollisionState collision_state; /**< collision state ; Simu V3 only  */
-    tdble   localPressure;	         /**< Environment pressure at cars location */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;          /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
     tdble       steerTqCenter;       /**< torques on steering wheel for force feedback, this is the centering torque, linear with steering angle */
@@ -496,7 +496,8 @@ typedef struct
 #define _gear           priv.gear
 #define _gearNext       priv.gearNext
 #define _debug          priv.debug
-#define _airtemp        priv.air_temp
+#define _airtemp        priv.localairTemperature
+#define _airPressure    priv.localairPressure
 #define _skid           priv.skid
 #define _reaction       priv.reaction
 #define _dammage        priv.dammage
