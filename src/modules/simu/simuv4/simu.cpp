@@ -268,7 +268,7 @@ SimReConfig(tCarElt *carElt)
     }
 
     carElt->setup.reqRepair.desired_value = 0.0;
-    carElt->priv.air_temp = Tair;
+    carElt->_airtemp = Tair;
 
     if (carElt->setup.reqTireset.desired_value > 0.9)
     {
@@ -280,8 +280,6 @@ SimReConfig(tCarElt *carElt)
                 car->wheel[i].Ttire = car->wheel[i].Tinit;
             else
                 car->wheel[i].Ttire = car->wheel[i].Topt;
-
-            carElt->priv.air_temp = car->wheel[i].Ttire;
         }
     }
 
@@ -681,6 +679,8 @@ SimUpdate(tSituation *s, double deltaTime)
         carElt->_fuel = car->fuel;
         carElt->priv.collision |= car->collision;
         carElt->_dammage = car->dammage;
+        carElt->_airtemp = Tair;
+        carElt->_airPressure = SimAirPressure;
 
         carElt->_steerTqCenter = -car->ctrl->steer;
         carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
@@ -810,9 +810,10 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
     carElt->_fuel = car->fuel;
     carElt->priv.collision |= car->collision;
     carElt->_dammage = car->dammage;
+    carElt->_airtemp = Tair;
+    carElt->_airPressure = SimAirPressure;
 
     carElt->_steerTqCenter = -car->ctrl->steer;
     carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
-
 }
 
