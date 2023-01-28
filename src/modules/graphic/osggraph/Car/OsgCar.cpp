@@ -823,69 +823,65 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
 
             if (this->nDRM > 14)
             {
-                if((steerangle > 0.0f) && (steerangle < 0.03f))
+                if ((steerangle >= -0.03f) && (steerangle <= 0.03f))
                     this->DRMSelector->setSingleChildOn(0);
-                else if((steerangle > 0.03f) && (steerangle < 0.07f))
+                else if ((steerangle > 0.03f) && (steerangle <= 0.07f))
                     this->DRMSelector->setSingleChildOn(1);
-                else if((steerangle > 0.07f) && (steerangle < 0.13f))
+                else if ((steerangle > 0.07f) && (steerangle <= 0.13f))
                     this->DRMSelector->setSingleChildOn(2);
-                else if((steerangle > 0.13f) && (steerangle < 0.21f))
+                else if ((steerangle > 0.13f) && (steerangle <= 0.21f))
                     this->DRMSelector->setSingleChildOn(3);
-                else if((steerangle > 0.21f) && (steerangle < 0.30f))
+                else if ((steerangle > 0.21f) && (steerangle <= 0.30f))
                     this->DRMSelector->setSingleChildOn(4);
-                else if((steerangle > 0.30f) && (steerangle < 0.45f))
+                else if ((steerangle > 0.30f) && (steerangle <= 0.45f))
                     this->DRMSelector->setSingleChildOn(5);
-                else if((steerangle > 0.45f) && (steerangle < 0.70f))
+                else if ((steerangle > 0.45f) && (steerangle <= 0.70f))
                     this->DRMSelector->setSingleChildOn(6);
-                else if(steerangle > 0.70f)
+                else if (steerangle > 0.70f)
                     this->DRMSelector->setSingleChildOn(7);
-                else if((steerangle < 0.03f) && (steerangle > -0.07f))
+                else if ((steerangle < -0.03f) && (steerangle >= -0.07f))
                     this->DRMSelector->setSingleChildOn(8);
-                else if((steerangle < -0.07f) && (steerangle > -0.13f))
+                else if ((steerangle < -0.07f) && (steerangle >= -0.13f))
                     this->DRMSelector->setSingleChildOn(9);
-                else if((steerangle < -0.13f) && (steerangle > -0.21f))
+                else if ((steerangle < -0.13f) && (steerangle >= -0.21f))
                     this->DRMSelector->setSingleChildOn(10);
-                else if((steerangle < -0.21f) && (steerangle > -0.30f))
+                else if ((steerangle < -0.21f) && (steerangle >= -0.30f))
                     this->DRMSelector->setSingleChildOn(11);
-                else if((steerangle < -0.30f) && (steerangle > -0.45f))
+                else if ((steerangle < -0.30f) && (steerangle >= -0.45f))
                     this->DRMSelector->setSingleChildOn(12);
-                else if((steerangle < -0.45f) && (steerangle > -0.70f))
+                else if ((steerangle < -0.45f) && (steerangle >= -0.70f))
                     this->DRMSelector->setSingleChildOn(13);
-                else if(steerangle < -0.70f)
+                else if (steerangle < -0.70f)
                     this->DRMSelector->setSingleChildOn(14);
-                else
-                    this->DRMSelector->setSingleChildOn(0);
             }
             else
             {
-                if((steerangle > 0.0f) && (steerangle < 0.03f))
+                if ((steerangle >= -0.03f) && (steerangle <= 0.03f))
                     this->DRMSelector->setSingleChildOn(0);
-                else if((steerangle > 0.03f) && (steerangle < 0.07f))
+                else if ((steerangle > 0.03f) && (steerangle <= 0.07f))
                     this->DRMSelector->setSingleChildOn(1);
-                else if((steerangle > 0.07f) && (steerangle < 0.13f))
+                else if ((steerangle > 0.07f) && (steerangle <= 0.13f))
                     this->DRMSelector->setSingleChildOn(2);
-                else if((steerangle > 0.13f) && (steerangle < 0.21f))
+                else if ((steerangle > 0.13f) && (steerangle <= 0.21f))
                     this->DRMSelector->setSingleChildOn(3);
-                else if((steerangle > 0.21f) && (steerangle < 0.30f))
+                else if ((steerangle > 0.21f) && (steerangle <= 0.30f))
                     this->DRMSelector->setSingleChildOn(4);
-                else if((steerangle > 0.30f) && (steerangle < 0.45f))
+                else if ((steerangle > 0.30f) && (steerangle <= 0.45f))
                     this->DRMSelector->setSingleChildOn(5);
-                else if((steerangle > 0.45f))
+                else if ((steerangle > 0.45f))
                     this->DRMSelector->setSingleChildOn(6);
-                else if((steerangle < 0.03f) && (steerangle > -0.07f))
+                else if ((steerangle < -0.03f) && (steerangle >= -0.07f))
                     this->DRMSelector->setSingleChildOn(7);
-                else if((steerangle < -0.07f) && (steerangle > -0.13f))
+                else if ((steerangle < -0.07f) && (steerangle >= -0.13f))
                     this->DRMSelector->setSingleChildOn(8);
-                else if((steerangle < -0.13f) && (steerangle > -0.21f))
+                else if ((steerangle < -0.13f) && (steerangle >= -0.21f))
                     this->DRMSelector->setSingleChildOn(9);
-                else if((steerangle < -0.21f) && (steerangle > -0.30f))
+                else if ((steerangle < -0.21f) && (steerangle >= -0.30f))
                     this->DRMSelector->setSingleChildOn(10);
-                else if((steerangle < -0.30f) && (steerangle > -0.45f))
+                else if ((steerangle < -0.30f) && (steerangle >= -0.45f))
                     this->DRMSelector->setSingleChildOn(11);
-                else if((steerangle < -0.45f))
+                else if ((steerangle < -0.45f))
                     this->DRMSelector->setSingleChildOn(12);
-                else
-                    this->DRMSelector->setSingleChildOn(0);
             }
         }
     }
