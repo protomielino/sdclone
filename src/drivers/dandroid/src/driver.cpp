@@ -2296,33 +2296,31 @@ void TDriver::increaseSpeedFactor(int sect, double inc)
 
 void TDriver::getBrakedistfactor()
 {
-    double factor = (1.0 - (mPit.tyreCondition()+ 0.01));
-    LogDANDROID.debug(" # brake factor = %.3f\n", factor);
-    mBrakedistfactor = mSect[mSector].brakedistfactor + factor;
+    mBrakedistfactor = mSect[mSector].brakedistfactor;
     if (mCatchedRaceLine && mDrvPath == PATH_O)
     {
-        mBrakedistfactor *= 1.0 /* factor*/;
+        mBrakedistfactor *= 1.0;
     }
     else if (mCatchedRaceLine)
     {
         if (mTargetOnCurveInside)
         {
-            mBrakedistfactor *= 1.0 /* factor*/;
+            mBrakedistfactor *= 1.0;
         }
         else
         {
-            mBrakedistfactor *= 2.0 /* factor*/;
+            mBrakedistfactor *= 2.0;
         }
     }
     else
     {
         if (mTargetOnCurveInside)
         {
-            mBrakedistfactor *= 1.5 /* factor*/;
+            mBrakedistfactor *= 1.5;
         }
         else
         {
-            mBrakedistfactor *= 2.5 /* factor*/;
+            mBrakedistfactor *= 2.5;
         }
     }
 
