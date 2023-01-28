@@ -242,7 +242,7 @@ public:
                                double myDirX, double myDirY, const PtInfo& oppPi );
     void			ProcessMyCar(const Situation* s, const TeamInfo* pTeamInfo,
                                   const CarElt* myCar, const Sit& mySit,
-                                  const Driver &me, double myMaxAccX, int idx );
+                                  const Driver &me, double myMaxAccX, int idx, double speed, double racetime);
 
     static bool compareSitRelPos( const Opponent* a, const Opponent* b ) { return a->m_info.sit.relPos < b->m_info.sit.relPos; }
 

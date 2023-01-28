@@ -81,7 +81,7 @@ void	Opponent::UpdateSit(
     const TeamInfo*		pTeamInfo,
     double				myDirX,
     double				myDirY,
-    const PtInfo&		oppPi )
+    const PtInfo&		oppPi)
 {
     CarElt*	oCar = m_path.GetCar();
 //	if( (oCar->pub.state & (RM_CAR_STATE_NO_SIMU | RM_CAR_STATE_OUT)) )
@@ -209,7 +209,9 @@ void	Opponent::ProcessMyCar(
     const Sit&			mySit,
     const Driver&		me,
     double				myMaxAccX,
-    int					idx )
+    int					idx,
+    double              speed,
+    double              racetime)
 {
     CarElt*	oCar = m_path.GetCar();
 
@@ -236,14 +238,14 @@ void	Opponent::ProcessMyCar(
     m_info.flags |= oSit.rdPY < 0 ? F_LEFT : F_RIGHT;
     m_info.flags |= oSit.offs < 0 ? F_TRK_LEFT : F_TRK_RIGHT;
 
-    if( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < 50 && s->currentTime < 20.0))
+    if( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < 50 && s->currentTime < racetime))
     {
         m_info.flags |= F_DANGEROUS;
         m_info.dangerousLatchTime = 2.0;
         LogSHADOW.debug( "danger (%s) angle=%6.1f  relx=%6.1f  relvx=%6.1f  roppavga=%6.1f  roppa=%6.1f\n",
                 oCar->_name, oSit.tYaw * 180 / PI, oSit.rdPX, oSit.rdVX, oSit.ragAX, oSit.rAX );
     }
-    else if ( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < 10 && s->currentTime > 20.0))
+    else if ( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < speed && s->currentTime > racetime))
     {
         m_info.flags |= F_DANGEROUS;
         m_info.dangerousLatchTime = 2.0;

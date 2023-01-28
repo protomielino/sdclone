@@ -375,6 +375,8 @@ private:
         int					PIT_START_BUF_SEGS;
         int					SPDC_NORMAL;
         int					SPDC_TRAFFIC;
+        double              OPPONENT_SPEED;
+        double              RACETIME_LIMIT;
         double				ACC_MAX_SPIN_SPEED;
         double				DEC_MAX_SPIN_SPEED;
         double				STEER_K_ACC;
@@ -414,6 +416,8 @@ private:
             QUAD_SMOOTH_ITERS = 0;
             SPDC_NORMAL = 5;
             SPDC_TRAFFIC = 0;
+            OPPONENT_SPEED = 10;
+            RACETIME_LIMIT = 20;
             ACC_MAX_SPIN_SPEED = 3.5;
             DEC_MAX_SPIN_SPEED = 2;
             STEER_K_ACC = 0;

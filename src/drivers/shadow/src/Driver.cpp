@@ -64,6 +64,8 @@ using namespace std;
 #define PRV_AVOID_WIDTH				"avoid width"
 #define PRV_SPDC_NORMAL				"spd ctrl normal"
 #define PRV_SPDC_TRAFFIC			"spd ctrl traffic"
+#define PRV_OPPONENT_SPEED          "opponent speed"
+#define PRV_RACETIME_LIMIT          "racetime limit"
 #define PRV_STAY_TOGETHER			"stay together"
 #define PRV_PIT_ENTRY_OFFS			"pit entry offset"
 #define PRV_PIT_EXIT_OFFS			"pit exit offset"
@@ -485,6 +487,8 @@ void	Driver::InitTrack(
         m_priv[p].QUAD_SMOOTH_ITERS = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_QUAD_SMOOTH_ITERS, 0, (float)m_priv[p].QUAD_SMOOTH_ITERS) + 0.5f);
         m_priv[p].SPDC_NORMAL = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_SPDC_NORMAL, 0, (float)m_priv[p].SPDC_NORMAL));
         m_priv[p].SPDC_TRAFFIC = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_SPDC_TRAFFIC, 0, (float)m_priv[p].SPDC_TRAFFIC));
+        m_priv[p].OPPONENT_SPEED = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_OPPONENT_SPEED, 0, (float)m_priv[p].OPPONENT_SPEED));
+        m_priv[p].RACETIME_LIMIT = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_RACETIME_LIMIT, 0, (float)m_priv[p].RACETIME_LIMIT));
         m_priv[p].ACC_MAX_SPIN_SPEED = SafeParmGetNum(hCarParm, sect.c_str(), PRV_ACC_MAX_SPIN_SPEED, 0, m_priv[p].ACC_MAX_SPIN_SPEED);
         m_priv[p].DEC_MAX_SPIN_SPEED = SafeParmGetNum(hCarParm, sect.c_str(), PRV_DEC_MAX_SPIN_SPEED, 0, m_priv[p].DEC_MAX_SPIN_SPEED);
         m_priv[p].AVOID_WIDTH = SafeParmGetNum(hCarParm, sect.c_str(), PRV_AVOID_WIDTH, 0, m_priv[p].AVOID_WIDTH);
@@ -3001,7 +3005,8 @@ void	Driver::AvoidOtherCars(
     for( int i = 0; i < m_nCars; i++ )
     {
         m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this,
-                               m_maxAccel.CalcY(car->_speed_x), i );
+                               m_maxAccel.CalcY(car->_speed_x), i, m_priv[PATH_NORMAL].OPPONENT_SPEED,
+                               m_priv[PATH_NORMAL].RACETIME_LIMIT);
     }
 
     // accumulate all the collision the flags...
