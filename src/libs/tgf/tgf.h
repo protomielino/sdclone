@@ -79,6 +79,7 @@ const double PI_3 = PI/3; /**< PI/3 =  60 deg */
 const double PI_4 = PI/4; /**< PI/4 =  45 deg */
 const double PI_6 = PI/6; /**< PI/6 =  30 deg */
 const tdble G = 9.80665f; /**< m/s/s */
+const double ZEROC = 273.15; /**< 0 degrees Celsius in Kelvin */
 
 /* conversion */
 #define RADS2RPM(x) ((x)*9.549296585)		/**< Radian/s to RPM conversion */
@@ -89,6 +90,8 @@ const tdble G = 9.80665f; /**< m/s/s */
 #define FLOAT_DEG2RAD(x)  ((x)*(float)(PI/180.0))/**< Degree to radian conversion */
 #define FEET2M(x)   ((x)*0.304801)		/**< Feet to meter conversion */
 #define SIGN(x)     ((x) < 0 ? -1.0 : 1.0)	/**< Sign of the expression */
+#define C2K(x)      ((x) + ZEROC)		/**< Celsius to Kelvin conversion */
+#define K2C(x)      ((x) - ZEROC)		/**< Kelvin to Celsius conversion */
 
 /** Angle normalization between 0 and 2 * PI */
 #define NORM0_2PI(x) 				\

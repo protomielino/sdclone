@@ -2146,6 +2146,7 @@ evalUnit (char *unit, tdble *dest, int invert)
     if (strcmp(unit, "s") == 0) return;
     if (strcmp(unit, "rad") == 0) return;
     if (strcmp(unit, "Pa") == 0) return;
+    if (strcmp(unit, "K") == 0) return;
 
     // Other non-SI units that are considered as SI ones (backward compatibility with TORCS).
     if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) return;
@@ -2188,6 +2189,9 @@ evalUnit (char *unit, tdble *dest, int invert)
 	coeff = 1000.0f; /* N */
     } else if (strcmp(unit, "cc") == 0) {
 	coeff = 0.001f; /* l */
+    } else if (strcmp(unit, "C") == 0) {
+	*dest -= ZEROC; /* Celsius */
+	return;
     }
 
     if (invert) {
@@ -2218,6 +2222,7 @@ evalUnit (char *unit, tdble *dest, int invert)
 			<li><b>deg</b> converted to <b>rad</b></li>
 			<li><b>rpm</b> or <b>RPM</b> converted to <b>rad/s</b></li>
 			<li><b>percent</b> or <b>%</b> divided by <b>100</b></li>
+			<li><b>C</b> converted to <b>K</b></li>
 	     </ul>
 	     <br>All other units are considered SI, and thus not converted (coef=1)
     @see	GfParmSI2Unit
