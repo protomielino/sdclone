@@ -2190,7 +2190,10 @@ evalUnit (char *unit, tdble *dest, int invert)
     } else if (strcmp(unit, "cc") == 0) {
 	coeff = 0.001f; /* l */
     } else if (strcmp(unit, "C") == 0) {
-	*dest -= ZEROC; /* Celsius */
+		if (invert)
+			*dest += ZEROC; /* Celsius */
+		else
+			*dest -= ZEROC; /* Celsius */
 	return;
     }
 
