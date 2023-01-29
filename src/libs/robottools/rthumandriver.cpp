@@ -525,7 +525,7 @@ void HumanDriver::init_track(int index,
         carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
     }//if curCars
 
-    snprintf(sstring, sizeof(sstring), "%s/drivers/human/car.xml", GfLocalDir());
+    snprintf(sstring, sizeof(sstring), "%sdrivers/human/car.xml", GfLocalDir());
     *carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
     snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());

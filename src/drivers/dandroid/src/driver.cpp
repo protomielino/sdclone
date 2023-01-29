@@ -2730,7 +2730,7 @@ double TDriver::getFuel(double dist)
 void TDriver::writeSectorSpeeds()
 {
     char dirname[256];
-    sprintf(dirname, "%s/drivers/%s/%s/learned/", GetLocalDir(), MyBotName, mCarType.c_str());
+    sprintf(dirname, "%sdrivers/%s/%s/learned/", GetLocalDir(), MyBotName, mCarType.c_str());
 #ifdef DANDROID_TORCS
     if (GfCreateDir(strdup(dirname)) == GF_DIR_CREATED) {
 #else
