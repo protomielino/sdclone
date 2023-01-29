@@ -1367,8 +1367,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         //temps string only do this for middle temps?
         temp.str("");
         //internally the tire temp is in KELVIN
-        int tireTempInCelsius = currCar->_tyreT_mid(i)- 273.15;
-        temp << tireTempInCelsius << " C";
+        temp << K2C(currCar->_tyreT_mid(i)) << " C";
 
         std::ostringstream tireNameText;
         tireNameText << "tire-" << tireName.str().c_str()  << "temps";

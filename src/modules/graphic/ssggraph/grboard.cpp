@@ -613,15 +613,15 @@ cGrBoard::grDispGGraph()
   if (GFlag == 3)
   {
       char buf[BUFSIZE];
-      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(0) - 273.15);
+      snprintf(buf, sizeof(buf), "T: %3.2f", K2C(car_->_tyreT_mid(0)));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 + 5.0);
-      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(1) - 273.15);
+      snprintf(buf, sizeof(buf), "T: %3.2f", K2C(car_->_tyreT_mid(1)));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 + 5.0);
-      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(2) - 273.15);
+      snprintf(buf, sizeof(buf), "T: %3.2f", K2C(car_->_tyreT_mid(2)));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 15.0);
-      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(3) - 273.15);
+      snprintf(buf, sizeof(buf), "T: %3.2f", K2C(car_->_tyreT_mid(3)));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 - 15.0);
-      snprintf(buf, sizeof(buf), "Air Temperature: %3.2f", car_->_airtemp - 273.15);
+      snprintf(buf, sizeof(buf), "Air Temperature: %3.2f", K2C(car_->_airtemp));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 65.0);
   }
 }
