@@ -43,8 +43,8 @@ tdble SimWater = 0;
 tdble SimTimeOfDay = 0;
 int SimClouds = 0;
 
-double Tair = 273.15;
-tdble Ttrack = 220.0;
+double Tair = C2K(20.0);
+tdble Ttrack = C2K(30.0);
 
 float SimAirPressure = 101300.0f;
 float SimAirDensity = 1.290f;

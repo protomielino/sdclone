@@ -36,7 +36,7 @@ void SimAtmospherePreConfig(tTrack *track)
     SimRain = track->local.rain * 1e-9;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
-    Tair = track->local.airtemperature + 273.15f;
+    Tair = C2K(track->local.airtemperature);
     SimAirPressure = track->local.airpressure;
     SimAirDensity = track->local.airdensity;
 
@@ -152,12 +152,12 @@ void SimAtmosphereUpdate(tSituation *s)
     if ((timeofday > startDay) && (timeofday < endDay))
     {
         Tair = Tair + simDegree;
-        GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
+        GfLogDebug("Tair update = %.7f\n", K2C(Tair));
     }
     else
     {
         Tair = Tair - simDegree;
-        GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
+        GfLogDebug("Tair update = %.7f\n", K2C(Tair));
     }
     // TODO: get this later form the situation, weather simulation.
     //car->localTemperature = 273.15f + 20.0f;

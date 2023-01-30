@@ -30,7 +30,7 @@ void Tires::init(const tCarElt* car)
     mCar = car;
     mDistWhenNew = 0;
     mWear = 0.0;
-    mHotTemp = 273.15 + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
+    mHotTemp = ZEROC + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
     mMuScale = GfParmGetNum(mCar->_carHandle, "private", "mu scale", (char*)NULL, 1.0);
 }
 
