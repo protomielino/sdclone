@@ -558,6 +558,9 @@ void SimWheelUpdateForce(tCar *car, int index)
         //air cooling
         wheel->Ttire -= wheel->aircoolm * (1 + wheel->speedcoolm * v) * (wheel->Ttire - (Tair + 30)) * SimDeltaTime;
 
+        if (wheel->Ttire < wheel->Tinit)
+            wheel->Ttire = wheel->Tinit;
+
         //tire wear
         if(wheel->treadDepth > 0.0)
         {
