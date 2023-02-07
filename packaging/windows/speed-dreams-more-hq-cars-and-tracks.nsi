@@ -201,6 +201,20 @@ Section -Cars
   ; SetOutPath "$INSTDIR\data\cars\models\mp1-vicente"
   ; File /r "${BUILD_INST_DIR}\data\cars\models\mp1-vicente\*.*"
 
+  ; HQ / AI driven MPA11 car models
+  SetOutPath "$INSTDIR\data\cars\models\mpa11-murasama"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa11-murasama\*.*"
+
+    ; HQ / AI driven MPA12 car models
+  SetOutPath "$INSTDIR\data\cars\models\mpa12-deckard"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa12-deckard\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa12-murasama"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa12-murasama\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa12-spirit"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa12-spirit\*.*"
+
 SectionEnd
 
 Section -Tracks
