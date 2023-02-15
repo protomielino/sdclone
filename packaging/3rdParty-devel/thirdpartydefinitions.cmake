@@ -35,11 +35,11 @@
 
 
 # SDL2
-set(SDL2_VERSION 2.26.2)
+set(SDL2_VERSION 2.26.3)
 set(SDL2_PROJECT SDL2-${SDL2_VERSION})
 set(SDL2_FILE ${SDL2_PROJECT}.tar.gz)
 set(SDL2_URL https://www.libsdl.org/release/${SDL2_FILE})
-set(SDL2_HASH SHA256=95d39bc3de037fbdfa722623737340648de4f180a601b0afad27645d150b99e0)
+set(SDL2_HASH SHA256=c661205a553b7d252425f4b751ff13209e5e020b876bbfa1598494af61790057)
 
 set(SDL2_LEGACY_VERSION 2.24.2)
 set(SDL2_LEGACY_PROJECT SDL2-${SDL2_LEGACY_VERSION})
@@ -48,21 +48,21 @@ set(SDL2_LEGACY_URL https://www.libsdl.org/release/${SDL2_LEGACY_FILE})
 set(SDL2_LEGACY_HASH SHA256=b35ef0a802b09d90ed3add0dcac0e95820804202914f5bb7b0feb710f1a1329f)
 
 # SDL2_MIXER
-set(SDL2_MIXER_VERSION 2.6.2)
+set(SDL2_MIXER_VERSION 2.6.3)
 set(SDL2_MIXER_PROJECT SDL2_mixer-${SDL2_MIXER_VERSION})
 set(SDL2_MIXER_FILE ${SDL2_MIXER_PROJECT}.tar.gz)
 #set(SDL2_MIXER_URL https://www.libsdl.org/projects/SDL_mixer/release/${SDL2_MIXER_FILE})
 
 set(SDL2_MIXER_URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-${SDL2_MIXER_VERSION}/${SDL2_MIXER_FILE})
 #https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.1/SDL2_mixer-2.6.1.tar.gz
-set(SDL2_MIXER_HASH SHA256=8cdea810366decba3c33d32b8071bccd1c309b2499a54946d92b48e6922aa371)
+set(SDL2_MIXER_HASH SHA256=7a6ba86a478648ce617e3a5e9277181bc67f7ce9876605eea6affd4a0d6eea8f)
 
 # OpenAL-soft
-set(OPENAL_PROJECT_VERSION 1.22.2)
+set(OPENAL_PROJECT_VERSION 1.23.0)
 set(OPENAL_PROJECT openal-soft-${OPENAL_PROJECT_VERSION})
 set(OPENAL_FILE ${OPENAL_PROJECT}.tar.bz2)
 set(OPENAL_URL https://www.openal-soft.org/openal-releases/${OPENAL_FILE})
-set(OPENAL_HASH SHA256=ae94cc95cda76b7cc6e92e38c2531af82148e76d3d88ce996e2928a1ea7c3d20)
+set(OPENAL_HASH SHA256=057dcf96c3cdfcf40159800a93f57740fe79c2956f76247bee10e436b6657183)
 
 message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2019 and CMAKE_SYSTEM_VERSION >= 10")
 set(OPENAL_C11_VERSION 1.19.1)
@@ -167,12 +167,12 @@ set(PNG_HASH SHA256=af4fb7f260f839919e5958e5ab01a275d4fe436d45442a36ee62f73e5beb
 
 # freetype
 message(STATUS "Note special path handling (version in path) AND hard-coded 'freetype2'")
-set(FREETYPE_VERSION 2.12.1)
+set(FREETYPE_VERSION 2.13.0)
 set(FREETYPE_PROJECT freetype-${FREETYPE_VERSION})
 string(REPLACE "." "" FREETYPE_TAG ${FREETYPE_VERSION})
 set(FREETYPE_FILE ft${FREETYPE_TAG}.zip)
 set(FREETYPE_URL https://sourceforge.net/projects/freetype/files/freetype2/${FREETYPE_VERSION}/${FREETYPE_FILE}/download)
-set(FREETYPE_HASH SHA256=a32bf78834279203ed726ac26b82ee6c570b5d346eaecaf1b79eec722fe7482d)
+set(FREETYPE_HASH SHA256=cdccdad1e70f6f362d7180148c63bacf8f266046edf9d40cb85e9f4bc56eb8e8)
 
 message(STATUS "Note special path handling (version in path) AND hard-coded 'freetype2'")
 set(FREETYPE_LEGACY_VERSION 2.10.4)
@@ -182,13 +182,13 @@ set(FREETYPE_LEGACY_URL https://sourceforge.net/projects/freetype/files/freetype
 set(FREETYPE_LEGACY_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
 
 # curl
-set(CURL_VERSION 7.87.0)
+set(CURL_VERSION 7.88.0)
 string(REPLACE "." "_" CURL_TAG ${CURL_VERSION})
 set(CURL_PROJECT curl-${CURL_VERSION})
 set(CURL_FILE ${CURL_PROJECT}.tar.bz2)
 #set(CURL_URL https://curl.se/download/${CURL_FILE})
 set(CURL_URL https://github.com/curl/curl/releases/download/curl-${CURL_TAG}/${CURL_FILE})
-set(CURL_HASH SHA256=5d6e128761b7110946d1276aff6f0f266f2b726f5e619f7e0a057a474155f307)
+set(CURL_HASH SHA256=c81f439ed02442f6a9b95836dfb3a98e0c477610ca7b2f4d5aa1fc329543d33f)
 
 # osg
 set(OSG_VERSION 3.6.5)
