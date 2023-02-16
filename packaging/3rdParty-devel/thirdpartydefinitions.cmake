@@ -115,8 +115,8 @@ set(FREESOLID_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708
 set(ENET_VERSION 1.3.17)
 set(ENET_PROJECT enet-${ENET_VERSION})
 set(ENET_FILE ${ENET_PROJECT}.tar.gz)
-set(ENET_URL http://enet.bespin.org/download/${ENET_FILE})
-set(ENET_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574dcedc)
+set(ENET_URL https://github.com/lsalzman/enet/archive/refs/tags/v${ENET_VERSION}.tar.gz)
+set(ENET_HASH SHA256=1e0b4bc0b7127a2d779dd7928f0b31830f5b3dcb7ec9588c5de70033e8d2434a)
 
 # ogg
 set(OGG_VERSION 1.3.5)
