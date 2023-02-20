@@ -44,6 +44,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -579,6 +581,35 @@ public class TerrainProperties extends PropertyPanel
 
 			add(getObjectMapButton(), null);
 			add(getObjectTablePanel(objectMap), null);
+
+			objectMapTextField.getDocument().addDocumentListener(new DocumentListener()
+			{
+				public void changedUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+				public void removeUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+				public void insertUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+
+				public void changed()
+				{
+					// update table with new data
+					try
+					{
+						getDataFromImage(Editor.getProperties().getPath() + sep + objectMapTextField.getText());
+						objectTablePanel.dataChanged();
+					}
+					catch (IOException ex)
+					{
+					}
+				}
+			});
 		}
 
 		/**
