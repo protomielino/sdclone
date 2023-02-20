@@ -27,6 +27,10 @@
 # (hashtag) starts a comment
 cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 
+IF(POLICY CMP0135)
+   CMAKE_POLICY(SET CMP0135 NEW)
+ENDIF(POLICY CMP0135)
+
 project(3rdParty VERSION 2.3.0)
 
 include(ExternalProject)
