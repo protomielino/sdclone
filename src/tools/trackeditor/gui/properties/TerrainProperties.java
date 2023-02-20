@@ -685,7 +685,14 @@ public class TerrainProperties extends PropertyPanel
 			{
 				ObjShapeObject object = objectMap.getObjects().get(i);
 
-				data.add(new Data(new String(object.getName()), object.getRGB(), object.getImageX(), object.getImageY()));
+				String name = getEditorFrame().getObjectColorName(object.getRGB());
+
+				if (name == null)
+				{
+					name = new String("Unknown");
+				}
+
+				data.add(new Data(name, object.getRGB(), object.getImageX(), object.getImageY()));
 			}
     	}
 
