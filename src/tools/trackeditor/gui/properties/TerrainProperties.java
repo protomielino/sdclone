@@ -891,6 +891,7 @@ public class TerrainProperties extends PropertyPanel
 		        scrollPane = new JScrollPane(table);
 		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
 		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
+		        table.setAutoCreateRowSorter(true); 
 
 		        Set<String> names = getEditorFrame().getObjectColorNames();
 
