@@ -172,6 +172,14 @@ IF(WIN32)
     SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
         Delete \\\"${SHORTCUT_TARGET}\\\"
         ")
+    IF(OPTION_TRACKEDITOR)
+       set(CPACK_NSIS_CREATE_ICONS_EXTRA
+          "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SD2 TrackEditor.lnk' '$INSTDIR\\\\bin\\\\sd2-trackeditor.jar' '' '' 0 SW_SHOWNORMAL '' 'Track Editor' " )
+
+          set(CPACK_NSIS_DELETE_ICONS_EXTRA
+             "Delete '$SMPROGRAMS\\\\$START_MENU\\\\SD2 TrackEditor.lnk'" )
+    ENDIF(OPTION_TRACKEDITOR)
+
 
     # Source package specific settings.
     LIST(APPEND CPACK_SOURCE_IGNORE_FILES 
