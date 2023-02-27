@@ -478,6 +478,11 @@ public class CheckDialog extends JDialog
 				else
 				{
 					colors.addAll(objectMap.getColors());
+					
+					if (objectMap.getImageWidth() != 1024)
+					{
+						textArea.append("Terrain Generation object map " + objectMapName + " file " + objectMapFile + " image width must be 1024 but found " + objectMap.getImageWidth() + "\n");
+					}
 				}
 			}
 		}
