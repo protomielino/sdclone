@@ -20,17 +20,27 @@
  */
 package gui.properties;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
@@ -248,6 +258,7 @@ public class ObjectProperties extends PropertyPanel
 		private JLabel				scaleMaxLabel			= new JLabel();
 		private JTextField			scaleMaxTextField		= new JTextField();		
 		private JButton				objectButton			= null;
+		private JButton				colorButton				= null;
 		
 		private double				lastScale				= 1.0;
 		private double				lastScaleMin			= 0.5;
@@ -330,7 +341,84 @@ public class ObjectProperties extends PropertyPanel
 			else
 			{
 				add(getObjectButton(), null);
+				add(getColorButton(object), null);
 			}
+			setColorTextFieldColor(new Color(object.getColor()));
+			colorTextField.getDocument().addDocumentListener(new DocumentListener()
+			{
+				public void changedUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+				public void removeUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+				public void insertUpdate(DocumentEvent ev)
+				{
+					changed();
+				}
+
+				public void changed()
+				{
+					try
+					{
+						int rgb = Integer.decode(colorTextField.getText());
+						Color color = new Color(rgb);
+						colorTextField.setBackground(color);
+						if ((color.getRed()*0.299 + color.getGreen()*0.587 + color.getBlue()*0.114) > 186)
+						{
+							colorTextField.setForeground(Color.BLACK);
+						}
+						else
+						{
+							colorTextField.setForeground(Color.WHITE);
+						}
+					}
+					catch (Exception ex)
+					{
+					}
+				}
+			});
+			colorTextField.addKeyListener(new KeyAdapter()
+			{
+				public void keyTyped(KeyEvent e)
+				{
+					String text = colorTextField.getText();
+					char c = e.getKeyChar();
+
+					// check length
+					if (text.length() >= 8)
+					{
+						e.consume();
+						return;
+					}
+
+					// check is starts with '0'
+					if (text.length() == 0 && c != '0')
+					{
+						e.consume();
+						return;
+					}
+
+					// check for valid use of 'x'
+					if (text.length() == 1)
+					{
+						if (!(c == 'x' || c == 'X'))
+						{
+							e.consume();
+						}
+						return;
+					}
+
+					// check for valid hex digit
+					if (!(Character.isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
+					{
+						e.consume();
+						return;
+					}
+				}
+			});
 		}
 
 		public JComboBox<String> getOrientationTypeComboBox()
@@ -465,6 +553,109 @@ public class ObjectProperties extends PropertyPanel
 					fileName = fileName.substring(index + 1);
 				objectTextField.setText(fileName);
 			}
+		}
+
+		class MyColorTracker implements ActionListener
+		{
+			JColorChooser chooser;
+			Color color;
+
+			public MyColorTracker(JColorChooser c)
+			{
+				chooser = c;
+			}
+
+			public void actionPerformed(ActionEvent e)
+			{
+				color = chooser.getColor();
+			}
+
+			public Color getColor()
+			{
+				return color;
+			}
+		}
+
+		/**
+		 * This method initializes colorButton
+		 *
+		 * @return javax.swing.JButton
+		 */
+		private JButton getColorButton(TrackObject object)
+		{
+			if (colorButton == null)
+			{
+				colorButton = new JButton();
+				colorButton.setBounds(420, 63, 80, 25);
+				colorButton.setText("Browse");
+				colorButton.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						JColorChooser colorChooser = new JColorChooser(getColorTextFieldColor());
+
+						// remove all panels except "RGB"
+						AbstractColorChooserPanel[] panels = colorChooser.getChooserPanels();
+						for (AbstractColorChooserPanel panel : panels)
+						{
+							if (!panel.getDisplayName().equals("RGB"))
+							{
+								colorChooser.removeChooserPanel(panel);
+							}
+							else
+							{
+								panel.setColorTransparencySelectionEnabled(false);
+							}
+						}
+
+						MyColorTracker ok = new MyColorTracker(colorChooser);
+						JDialog dialog = JColorChooser.createDialog(null, "Choose a color", true, colorChooser, ok, null);
+						dialog.setVisible(true);
+
+						Color newColor = ok.getColor();
+						if (newColor != null)
+						{
+							setColorTextFieldColor(newColor);
+						}
+					}
+				});
+			}
+			return colorButton;
+		}
+
+		private Color getColorTextFieldColor()
+		{
+			int rgb = 0;
+			try
+			{
+				rgb = Integer.decode(colorTextField.getText());
+			}
+			catch (Exception e)
+			{
+			}
+			return new Color(rgb);
+		}
+
+		private void setColorTextFieldColor(Color color)
+		{
+			if (color == null)
+			{
+				colorTextField.setBackground(Color.WHITE);
+				colorTextField.setForeground(Color.BLACK);
+				colorTextField.setText(null);
+				return;
+			}
+
+			colorTextField.setBackground(color);
+			if ((color.getRed()*0.299 + color.getGreen()*0.587 + color.getBlue()*0.114) > 186)
+			{
+				colorTextField.setForeground(Color.BLACK);
+			}
+			else
+			{
+				colorTextField.setForeground(Color.WHITE);
+			}
+			colorTextField.setText(toHexString(color.getRGB() & 0x00FFFFFF));
 		}
 	}
 
