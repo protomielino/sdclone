@@ -247,9 +247,9 @@ public class PitProperties extends PropertyPanel
 	{
 		if (indicatorComboBox == null)
 		{
-			String[] items = {"none", "no", "yes"};
+			String[] items = {"none", "0  normal_pit_indicator.ac", "1  pit_indicator.ac"};
 			indicatorComboBox = new JComboBox<String>(items);
-			indicatorComboBox.setBounds(120, 307, 125, 23);
+			indicatorComboBox.setBounds(120, 307, 175, 23);
 			int indicator = getEditorFrame().getTrackData().getMainTrack().getPits().getIndicator();
 			if (indicator == Integer.MAX_VALUE)
 				indicator = 0;
