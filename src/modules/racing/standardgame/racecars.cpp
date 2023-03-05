@@ -91,13 +91,13 @@ ReCarsUpdateCarPitTime(tCarElt *car)
             car->_penaltyTime = 0.0f;
             RePhysicsEngine().reconfigureCar(car);
 
-            for (i=0; i<4; i++)
+            /*for (i=0; i<4; i++)
             {
                 car->_tyreCondition(i) = 1.01f;
                 car->_tyreT_in(i)  = car->_airtemp;
                 car->_tyreT_mid(i) = car->_airtemp;
                 car->_tyreT_out(i) = car->_airtemp;
-            }
+            }*/
 
             GfLogInfo("%s in repair pit stop for %.1f s (refueling by %.1f l, repairing by %d).\n",
                       car->_name, info->totalPitTime, car->_pitFuel, car->_pitRepair);
