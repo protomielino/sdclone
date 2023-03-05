@@ -315,8 +315,8 @@ void Pit::update()
 
     if(mMyCar->HASTYC)
     {
-        pittyres = (mMyCar->tires()->TyreTreadDepth() < 10.00 && remaininglaps  > 5.0);
-        LogUSR.debug(" # Tyre depth = %.2f Pit Tyres change = %i\n", mMyCar->tires()->TyreTreadDepth(), pittyres);
+        pittyres = (((mMyCar->tires()->TyreTreadDepth() < 10.00) && remaininglaps  > 5.0) || (mMyCar->tires()->distLeft() / mTrack->length) < pitfuel);
+        LogUSR.info(" # Tyre depth = %.2f Pit Tyres change = %i\n", mMyCar->tires()->TyreTreadDepth(), pittyres);
     }
     else
     {
@@ -332,6 +332,7 @@ void Pit::update()
         else if (pitfuel || pitdamage || pittyres)
         {
             setPitstop(true);
+            LogUSR.info(" # pit update !\n");
         }
         else if (pitForPenalty())
         {
@@ -475,7 +476,7 @@ double Pit::calcRefuel()
     double tiresdist = mMyCar->tires()->distLeft() - 1000.0;
     double stintdist = stintfuel * (mTrack->length / mAvgFuelPerLap);
 
-    if (tiresdist < stintdist || (mMyCar->tires()->TyreTreadDepth() > 25.0 - ((double)mCar->_remainingLaps / 10)))
+    if (tiresdist > stintdist /*|| (mMyCar->tires()->TyreTreadDepth() < 25.0 - ((double)mCar->_remainingLaps / 10))*/)
     {
         mTireChange = false;
     }
@@ -485,10 +486,11 @@ double Pit::calcRefuel()
     }
 
     // Print infos
-    LogUSR.debug("USR Fuel pitstops %i\n", fuelpitstops);
-    LogUSR.debug("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
-    LogUSR.debug("USR Tire pitstops %i\n", tirespitstops);
-    LogUSR.debug("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
+    LogUSR.info("USR Fuel pitstops %i\n", fuelpitstops);
+    LogUSR.info("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
+    LogUSR.info("USR Tire pitstops %i\n", tirespitstops);
+    LogUSR.info("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
+    LogUSR.info("USR Tire distance %.7f\n", mMyCar->tires()->distLeft());
 
     return stintfuel - mCar->_fuel;
 }
@@ -533,10 +535,12 @@ void Pit::pitCommand()
         if (mTireChange)
         {
             mCar->pitcmd.tireChange = (tCarPitCmd::TireChange) 1;
+            LogUSR.info(" # USR tire change !!!\n");
         }
         else
         {
             mCar->pitcmd.tireChange = (tCarPitCmd::TireChange) 0;
+            LogUSR.info(" # USR NO tire change !!!\n");
         }
 
         mCar->pitcmd.stopType = RM_PIT_REPAIR;

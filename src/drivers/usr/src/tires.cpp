@@ -29,7 +29,7 @@ void Tires::init(const tCarElt* car)
 {
     mCar = car;
     mDistWhenNew = 0;
-    mWear = 0.0;
+    mWear = 100.0;
     mHotTemp = ZEROC + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
     mMuScale = GfParmGetNum(mCar->_carHandle, "private", "mu scale", (char*)NULL, 1.0);
 }
@@ -37,24 +37,22 @@ void Tires::init(const tCarElt* car)
 void Tires::update()
 {
     // Get tire wear
-   /* mWear = 0.0;
-    double currGrain = 0.0, minWear = 100.0;
-    for (int i = 0; i < 4; i++) {
-        if (mCar->priv.wheel[i].currentWear > mWear)
+   // mWear = 0.0;
+    double minWear = 10.0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (mCar->priv.wheel[i].treadDepth < mWear)
         {
-            mWear = mCar->priv.wheel[i].currentWear;
+            mWear = mCar->priv.wheel[i].treadDepth;
         }
 
-        if (mCar->priv.wheel[i].currentWear < minWear)
-            minWear = mCar->priv.wheel[i].currentWear;
-
-        currGrain += mCar->priv.wheel[i].currentGraining;
+        if (mCar->priv.wheel[i].treadDepth < minWear)
+            minWear = mCar->priv.wheel[i].treadDepth;
     }
 
-    mAvgGrain = currGrain / 4;
-
     // Check if tires were changed
-    if (mWear < 0.001)
+    if (mWear < 99.99)
     {
         mDistWhenNew = mCar->_distRaced;
     }
@@ -66,9 +64,8 @@ void Tires::update()
         mAvgWearPerMeter = mWear / distused;
     }
 
-    double wearuntilchange = 1.0 - mWear;
-    //mDistLeft = wearuntilchange / mAvgWearPerMeter;
-    mDistLeft = (minWear >= 0.9 && mAvgGrain > 0.75 ? 0.0 : 100000.0);*/
+    double wearuntilchange = 100.0 - mWear;
+    mDistLeft = wearuntilchange / mAvgWearPerMeter;
 
     mGripFactor = updateGripFactor();
 }
