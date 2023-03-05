@@ -270,7 +270,7 @@ SimReConfig(tCarElt *carElt)
     carElt->setup.reqRepair.desired_value = 0.0;
     carElt->_airtemp = Tair;
 
-    if (carElt->setup.reqTireset.desired_value > 0.9)
+    if (carElt->pitcmd.tireChange == tCarPitCmd::ALL)
     {
         for(i=0; i<4; i++)
         {
