@@ -58,7 +58,6 @@ ReCarsUpdateCarPitTime(tCarElt *car)
     tSituation *s = ReInfo->s;
     tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
     tCarPenalty *penalty;
-    int i;
 
     // GfLogDebug("ReCarsUpdateCarPitTime(%s) : typ=%d, fuel=%f, rep=%d\n",
     // 		   car->_name, car->_pitStopType, car->_pitFuel, car->_pitRepair);
