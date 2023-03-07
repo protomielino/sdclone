@@ -794,6 +794,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				this.getRadiusEndSlider().setEnabled(true);
 				this.getArcSlider().setEnabled(true);
 				this.getLengthSlider().setEnabled(false);
+				this.getLengthSlider().setValue(curve.getLength());
 				getGroupButton().setEnabled(true);
 				getGroupButton().setSelected(curve.getType());
 
@@ -1004,7 +1005,13 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		double length = shape.getLength();
 		view.redrawCircuit();
+		double newLength = shape.getLength();
+		if (length != newLength)
+		{
+			getLengthSlider().setValue(newLength);
+		}
 		editorFrame.documentIsModified = true;
 		dirty = true;
 	}

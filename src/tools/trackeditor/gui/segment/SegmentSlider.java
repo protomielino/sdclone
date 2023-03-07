@@ -22,6 +22,7 @@ package gui.segment;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
 import java.util.Vector;
 
 import javax.swing.JCheckBox;
@@ -42,24 +43,25 @@ import utils.SegmentSliderLayout;
 public class SegmentSlider extends JPanel
 {
 	private Vector<SliderListener>	sliderListeners	= new Vector<SliderListener>();
-	private JLabel		sectionLabel	= null;
-	private JTextField	textField		= null;
-	private JLabel		attLabel		= null;
-	private JSlider		slider			= null;
-	private JCheckBox	checkBox		= null;
-	private boolean		enabled			= true;
-	private boolean		optional		= false;
+	private JLabel			sectionLabel	= null;
+	private JTextField		textField		= null;
+	private JLabel			attLabel		= null;
+	private JSlider			slider			= null;
+	private JCheckBox		checkBox		= null;
+	private boolean			enabled			= true;
+	private boolean			optional		= false;
 
-	private String		section;
-	private String		attr;
-	private double		min;
-	private double		max;
-	private double		extent;
-	private double		tickSpacing;
-	private double		realToTextCoeff;
-	private String		method;
-	private Object		parent;
-	private double		value;
+	private String			section;
+	private String			attr;
+	private double			min;
+	private double			max;
+	private double			extent;
+	private double			tickSpacing;
+	private double			realToTextCoeff;
+	private String			method;
+	private Object			parent;
+	private double			value;
+	private NumberFormat	nf;
 
 	//private Segment shape;
 
@@ -78,6 +80,11 @@ public class SegmentSlider extends JPanel
 	 */
 	private void initialize()
 	{
+		nf = NumberFormat.getNumberInstance();
+		nf.setMaximumFractionDigits(3);
+		nf.setMinimumFractionDigits(1);
+		nf.setGroupingUsed(false);
+
 		attLabel = new JLabel();
 		sectionLabel = new JLabel();
 		this.setLayout(new SegmentSliderLayout());
@@ -348,12 +355,15 @@ public class SegmentSlider extends JPanel
 				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getSlider().getMaximum());
 				getSlider().setMaximum(newMaximum);
 			}
-			getTextField().setText(value + "");
-			getTextField().setEnabled(true);
-			getSlider().setValue((int) value);
-			getSlider().setEnabled(true);
-			if (this.optional)
-				checkBox.setSelected(true);
+			getTextField().setText(nf.format(value));
+			if (isEnabled())
+			{
+				getTextField().setEnabled(true);
+				getSlider().setValue((int) value);
+				getSlider().setEnabled(true);
+				if (this.optional)
+					checkBox.setSelected(true);
+			}
 		}
 	}
 
@@ -366,9 +376,9 @@ public class SegmentSlider extends JPanel
 		{
 			textValue = Double.parseDouble(getTextField().getText());
 		}
-		if (textValue != value)
+		if (Math.abs(textValue - value) >= 0.001)
 		{
-			getTextField().setText(value + "");
+			getTextField().setText(nf.format(value));
 		}
 		valueChanged();
 	}
@@ -447,7 +457,7 @@ public class SegmentSlider extends JPanel
 				}
 				if (oldValue != value)
 				{
-					getTextField().setText(value + "");
+					getTextField().setText(nf.format(value));
 					getTextField().setEnabled(true);
 					getSlider().setValue((int) value);
 					getSlider().setEnabled(true);
