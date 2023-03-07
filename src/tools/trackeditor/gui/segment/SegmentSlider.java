@@ -115,7 +115,7 @@ public class SegmentSlider extends JPanel
 		if (textField == null)
 		{
 			textField = new JTextField();
-			textField.setHorizontalAlignment(JTextField.RIGHT);
+			textField.setHorizontalAlignment(JTextField.LEFT);			
 		}
 		return textField;
 	}
@@ -356,6 +356,7 @@ public class SegmentSlider extends JPanel
 				getSlider().setMaximum(newMaximum);
 			}
 			getTextField().setText(nf.format(value));
+			getTextField().setCaretPosition(0);
 			if (isEnabled())
 			{
 				getTextField().setEnabled(true);
@@ -379,6 +380,7 @@ public class SegmentSlider extends JPanel
 		if (Math.abs(textValue - value) >= 0.001)
 		{
 			getTextField().setText(nf.format(value));
+			getTextField().setCaretPosition(0);
 		}
 		valueChanged();
 	}
@@ -458,6 +460,7 @@ public class SegmentSlider extends JPanel
 				if (oldValue != value)
 				{
 					getTextField().setText(nf.format(value));
+					getTextField().setCaretPosition(0);
 					getTextField().setEnabled(true);
 					getSlider().setValue((int) value);
 					getSlider().setEnabled(true);
