@@ -285,6 +285,12 @@ Section -Tracks
   SetOverwrite on
 
   ; Lower quality / work-in-progress tracks
+  SetOutPath "$INSTDIR\data\tracks\circuit\braga"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\braga\*.*"
+
+  SetOutPath "$INSTDIR\data\tracks\circuit\dijon"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\dijon\*.*"
+
   SetOutPath "$INSTDIR\data\tracks\circuit\goldstone-sand"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\goldstone-sand\*.*"
 
