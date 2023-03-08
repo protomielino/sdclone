@@ -272,8 +272,10 @@ SimReConfig(tCarElt *carElt)
 
     if (carElt->pitcmd.tireChange == tCarPitCmd::ALL)
     {
+        GfLogInfo(" # Simu pit tires change !n");
         for(i=0; i<4; i++)
         {
+            GfLogInfo(" #Simu Reinitialize tires !\n");
             car->wheel[i].treadDepth = 1.01f;
 
             if (car->features & FEAT_TIRETEMPDEG)

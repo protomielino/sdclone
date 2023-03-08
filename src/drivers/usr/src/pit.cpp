@@ -315,7 +315,7 @@ void Pit::update()
 
     if(mMyCar->HASTYC)
     {
-        pittyres = (((mMyCar->tires()->TyreTreadDepth() < 10.00) && remaininglaps  > 5.0) || (mMyCar->tires()->distLeft() / mTrack->length) < pitfuel);
+        pittyres = (mMyCar->tires()->TyreTreadDepth() < 10.00 && remaininglaps  > 5.0);
         LogUSR.debug(" # Tyre depth = %.2f Pit Tyres change = %i\n", mMyCar->tires()->TyreTreadDepth(), pittyres);
     }
     else
@@ -476,7 +476,7 @@ double Pit::calcRefuel()
     double tiresdist = mMyCar->tires()->distLeft() - 1000.0;
     double stintdist = stintfuel * (mTrack->length / mAvgFuelPerLap);
 
-    if (tiresdist > stintdist /*|| (mMyCar->tires()->TyreTreadDepth() < 25.0 - ((double)mCar->_remainingLaps / 10))*/)
+    if (tiresdist < stintdist || (mMyCar->tires()->TyreTreadDepth() > 25.0 - ((double)mCar->_remainingLaps / 10)))
     {
         mTireChange = false;
     }
@@ -534,12 +534,12 @@ void Pit::pitCommand()
 
         if (mTireChange)
         {
-            mCar->pitcmd.tireChange = (tCarPitCmd::TireChange) 1;
+            mCar->pitcmd.tireChange = (tCarPitCmd::ALL);
             LogUSR.debug(" # USR tire change !!!\n");
         }
         else
         {
-            mCar->pitcmd.tireChange = (tCarPitCmd::TireChange) 0;
+            mCar->pitcmd.tireChange = (tCarPitCmd::NONE);
             LogUSR.debug(" # USR NO tire change !!!\n");
         }
 

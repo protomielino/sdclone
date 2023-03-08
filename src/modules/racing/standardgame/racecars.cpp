@@ -70,9 +70,10 @@ ReCarsUpdateCarPitTime(tCarElt *car)
                     (tdble)(fabs((double)(car->_pitRepair))) * ReInfo->raceRules.damageRepairFactor + car->_penaltyTime;
 
             // Add time for tire change
-            if (car->pitcmd.tireChange == tCarPitCmd::ALL && car->info.skillLevel == PRO && ReInfo->raceRules.tireFactor > 0.0f)
+            if (car->pitcmd.tireChange == tCarPitCmd::ALL /*&& car->info.skillLevel == PRO*/ && ReInfo->raceRules.tireFactor > 0.0f)
             {
                 info->totalPitTime += ReInfo->raceRules.allTiresChangeTime;
+                GfLogInfo("# RaceCars pit tires change time = %.2f\n", ReInfo->raceRules.allTiresChangeTime);
             }
 
             if (ReInfo->s->raceInfo.type == RM_TYPE_PRACTICE || ReInfo->s->raceInfo.type == RM_TYPE_QUALIF)
