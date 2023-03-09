@@ -180,6 +180,17 @@ public class SurfaceProperties extends PropertyPanel
 				{
 					if (surfaceCopy != null)
 					{
+						if (getTabbedPane().getSelectedIndex() == -1)
+						{
+							String name = "surface1";
+							Surface surface = new Surface();
+
+							surface.setName(name);
+
+							tabbedPane.addTab(name, null, new SurfacePanel(surface), null);
+							tabbedPane.setSelectedIndex(0);						
+						}
+						
 						setPanelFromSurface(surfaceCopy, (SurfacePanel) getTabbedPane().getSelectedComponent());
 					}
 				}

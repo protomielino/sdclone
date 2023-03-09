@@ -191,6 +191,17 @@ public class ObjectProperties extends PropertyPanel
 				{
 					if (objectCopy != null)
 					{
+						if (getTabbedPane().getSelectedIndex() == -1)
+						{
+							String name = "object1";
+							TrackObject object = new TrackObject();
+
+							object.setName(name);
+
+							tabbedPane.addTab(name, null, new ObjectPanel(object), null);
+							tabbedPane.setSelectedIndex(0);
+						}
+							
 						setPanelFromObject(objectCopy, (ObjectPanel) getTabbedPane().getSelectedComponent());
 					}
 				}
