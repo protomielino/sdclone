@@ -548,7 +548,16 @@ public class XmlWriter
 			addContent(el, "comment", camera.getComment());
 			addContent(el, "segment", camera.getSegment());
 			addContent(el, "to right", null, camera.getToRight());
-			addContent(el, "to start", "deg", camera.getToStart());
+			// units can be meters for straights or degrees for curves
+			Segment segment = editorFrame.getSegment(camera.getSegment());
+			if (segment != null && !segment.getType().equals("str"))
+			{
+				addContent(el, "to start", "deg", camera.getToStart());
+			}
+			else
+			{
+				addContent(el, "to start", null, camera.getToStart());
+			}
 			addContent(el, "height", null, camera.getHeight());
 			addContent(el, "fov start", camera.getFovStart());
 			addContent(el, "fov end", camera.getFovEnd());

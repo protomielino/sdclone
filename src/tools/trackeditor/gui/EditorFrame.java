@@ -3016,4 +3016,9 @@ public class EditorFrame extends JFrame
 
 		return 0;
 	}
+
+	public Segment getSegment(String name)
+	{
+		return trackData.getSegments().getSegment(name);
+	}
 }

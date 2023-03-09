@@ -195,4 +195,17 @@ public class SegmentVector extends Vector<Segment>
 			
 		return valid;
 	}
+
+	public Segment getSegment(String name)
+	{
+		for (Segment segment : this)
+		{
+			if (segment.getName().equals(name))
+			{
+				return segment;
+			}
+		}
+		return null;
+	}
+
 }

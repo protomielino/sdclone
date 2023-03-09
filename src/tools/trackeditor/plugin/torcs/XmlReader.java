@@ -288,7 +288,8 @@ public class XmlReader
             cam.setComment(getAttrStrValue(camera, "comment"));
             cam.setSegment(getAttrStrValue(camera, "segment"));
             cam.setToRight(getAttrNumValue(camera, "to right"));
-            cam.setToStart(getAttrNumValue(camera, "to start", "deg"));
+            // units can be meters for straights or degrees for curves
+            cam.setToStart(getAttrNumValue(camera, "to start"));
             cam.setHeight(getAttrNumValue(camera, "height"));
             cam.setFovStart(getAttrStrValue(camera, "fov start"));
             cam.setFovEnd(getAttrStrValue(camera, "fov end"));
