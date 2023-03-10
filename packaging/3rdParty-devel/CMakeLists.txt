@@ -31,7 +31,7 @@ IF(POLICY CMP0135)
    CMAKE_POLICY(SET CMP0135 NEW)
 ENDIF(POLICY CMP0135)
 
-project(3rdParty VERSION 2.4.0)
+project(3rdParty VERSION 2.3.0)
 
 include(ExternalProject)
 include(CMakeDependentOption)
