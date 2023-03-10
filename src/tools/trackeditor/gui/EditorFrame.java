@@ -1225,6 +1225,8 @@ public class EditorFrame extends JFrame
 			setRecentFilesMax(preferencesDialog.getRecentFilesMax());
 			readDefaultSurfaces();
 			readDefaultObjects();
+			if (view.segmentParamDialog != null)
+				view.segmentParamDialog.refresh();
 		}
 	}
 	
@@ -2106,6 +2108,9 @@ public class EditorFrame extends JFrame
 		{
 			PropertiesDialog properties = new PropertiesDialog(this);
 			properties.setVisible(true);
+			if (view.segmentParamDialog != null)
+				view.segmentParamDialog.refresh();
+
 			refresh();
 		} else
 		{

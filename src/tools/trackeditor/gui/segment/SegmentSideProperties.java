@@ -62,7 +62,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-road1", "b-road1-l2", "b-road1-l2p", "concrete", "concrete2", "concrete3", "b-asphalt", "b-asphalt-l1",
 			"b-asphalt-l1p", "asphalt2-lines", "asphalt2-l-left", "asphalt2-l-right", "asphalt2-l-both", "barrier",
 			"barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
-	private Vector<String>		borderSurfaceVector		= new Vector<String>(Arrays.asList(borderSurfaceItems));
+	private Vector<String>		borderSurfaceVector		= new Vector<String>();
 	private String[]			sideSurfaceItems		=
 														{"grass", "grass3", "grass5", "grass6", "grass7", "gravel",
 			"sand3", "sand", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both", "asphalt-pits",
@@ -73,7 +73,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2", "b-asphalt-grass7", "b-asphalt-grass7-l1",
 			"b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 			"barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
-	private Vector<String>		sideSurfaceVector		= new Vector<String>(Arrays.asList(sideSurfaceItems));
+	private Vector<String>		sideSurfaceVector		= new Vector<String>();
 	private String[]			barrierStyleItems		= {"none", "no barrier", "wall", "fence"};
 	private String[]			barrierSurfaceItems		=
 														{"barrier", "barrier2", "barrier-turn", "barrier-grille",
@@ -85,7 +85,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-road1-grass6", "b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2",
 			"b-asphalt-grass7", "b-asphalt-grass7-l1", "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3",
 			"b-asphalt-sand3-l1", "grass", "grass3", "grass5", "grass6", "grass7", "gravel", "sand3", "sand"};
-	private Vector<String>		barrierSurfaceVector	= new Vector<String>(Arrays.asList(barrierSurfaceItems));
+	private Vector<String>		barrierSurfaceVector	= new Vector<String>();
 
 	public JPanel				panel					= null;
 	private JLabel				borderLabel				= null;
@@ -119,9 +119,9 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		this.parent = parent;
 		
 		// add new surfaces from Surfaces
-		addDefaultSurfaces(sideSurfaceVector);
-		addDefaultSurfaces(borderSurfaceVector);
-		addDefaultSurfaces(barrierSurfaceVector);
+		addDefaultSurfaces(sideSurfaceVector, sideSurfaceItems);
+		addDefaultSurfaces(borderSurfaceVector, borderSurfaceItems);
+		addDefaultSurfaces(barrierSurfaceVector, barrierSurfaceItems);
 		
 		setSide(side);
 		initialize();
@@ -145,8 +145,46 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		this.add(titleLabel, null);
 	}
 
-	private void addDefaultSurfaces(Vector<String> surfaceVector)
+	public void refresh()
 	{
+		sideSurfaceVector.clear();
+		addDefaultSurfaces(sideSurfaceVector, sideSurfaceItems);
+		panel.remove(sideSurfaceComboBox);
+		sideSurfaceComboBox = null;
+		panel.add(getSideSurfaceComboBox(), null);
+
+		borderSurfaceVector.clear();
+		addDefaultSurfaces(borderSurfaceVector, borderSurfaceItems);
+		panel.remove(borderSurfaceComboBox);
+		borderSurfaceComboBox = null;
+		panel.add(getBorderSurfaceComboBox(), null);
+
+		barrierSurfaceVector.clear();
+		addDefaultSurfaces(barrierSurfaceVector, barrierSurfaceItems);
+		panel.remove(barrierSurfaceComboBox);
+		barrierSurfaceComboBox = null;
+		panel.add(getBarrierSurfaceComboBox(), null);
+	}
+
+	private void addDefaultSurfaces(Vector<String> surfaceVector, String[] fallback)
+	{
+		// use the default surfaces if available
+		Vector<Surface> defaultSurfaces = parent.editorFrame.getDefaultSurfaces();
+
+		if (defaultSurfaces.isEmpty())
+		{
+			// add the ones found
+			surfaceVector.addAll(Arrays.asList(fallback));
+		}
+		else
+		{
+			// add the ones that should be there
+	        for (int i = 0; i < defaultSurfaces.size(); i++)
+	        {
+	        	surfaceVector.add(defaultSurfaces.get(i).getName());
+	        }
+		}
+
         Vector<Surface> surfaces = parent.editorFrame.getTrackData().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
         {

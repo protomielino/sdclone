@@ -111,7 +111,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
      "b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2", "b-asphalt-grass7",
      "b-asphalt-grass7-l1", "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1",
      "barrier", "barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
-	private Vector<String>			roadSurfaceVector			= new Vector<String>(Arrays.asList(roadSurfaceItems));
+	private Vector<String>			roadSurfaceVector			= new Vector<String>();
 
 	/**
 	 *
@@ -133,7 +133,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			this.editorFrame = editorFrame;
 
 			// add new surfaces from Surfaces
-			addDefaultSurfaces(roadSurfaceVector);
+			addDefaultSurfaces(roadSurfaceVector, roadSurfaceItems);
 			
 			setShape(shape);
 
@@ -146,8 +146,37 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		}
 	}
 
-	private void addDefaultSurfaces(Vector<String> surfaceVector)
+	public void refresh()
 	{
+		roadSurfaceVector.clear();
+		addDefaultSurfaces(roadSurfaceVector, roadSurfaceItems);
+		centerPanel.remove(surfaceComboBox);
+		surfaceComboBox = null;
+		centerPanel.add(getSurfaceComboBox(), null);
+
+		rightPanel.refresh();
+		leftPanel.refresh();
+	}
+
+	private void addDefaultSurfaces(Vector<String> surfaceVector, String[] fallback)
+	{
+		// use the default surfaces if available
+		Vector<Surface> defaultSurfaces = editorFrame.getDefaultSurfaces();
+
+		if (defaultSurfaces.isEmpty())
+		{
+			// add the ones found
+			surfaceVector.addAll(Arrays.asList(fallback));
+		}
+		else
+		{
+			// add the ones that should be there
+	        for (int i = 0; i < defaultSurfaces.size(); i++)
+	        {
+	        	surfaceVector.add(defaultSurfaces.get(i).getName());
+	        }
+		}
+
         Vector<Surface> surfaces = editorFrame.getTrackData().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
         {
@@ -1022,6 +1051,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (e.getID() == WindowEvent.WINDOW_CLOSING)
 		{
 			exit();
+			view.segmentParamDialog = null;
 		}
 	}
 
