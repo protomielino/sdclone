@@ -781,6 +781,10 @@ public class XmlWriter
 		addContent(element, "time of day", "hour", editorFrame.getTrackData().getLocalInfo().getTimeOfDay());
 		addContent(element, "sun ascension", "deg", editorFrame.getTrackData().getLocalInfo().getSunAscension());
 		addContent(element, "altitude", "m", editorFrame.getTrackData().getLocalInfo().getAltitude());
+		addContent(element, "latitude", "deg", editorFrame.getTrackData().getLocalInfo().getLatitude());
+		addContent(element, "longitude", "deg", editorFrame.getTrackData().getLocalInfo().getLongitude());
+		addContent(element, "climat", null, editorFrame.getTrackData().getLocalInfo().getClimat());
+		addContent(element, "precipitation", null, editorFrame.getTrackData().getLocalInfo().getPrecipitation());
 
 		return element;
 	}

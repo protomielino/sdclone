@@ -49,6 +49,14 @@ public class LocalInfoProperties extends PropertyPanel
 	private JTextField	sunAscensionTextField			= new JTextField();
 	private JLabel		altitudeLabel					= new JLabel();
 	private JTextField	altitudeTextField				= new JTextField();
+	private JLabel		latitudeLabel					= new JLabel();
+	private JTextField	latitudeTextField				= new JTextField();
+	private JLabel		longitudeLabel					= new JLabel();
+	private JTextField	longitudeTextField				= new JTextField();
+	private JLabel		climatLabel						= new JLabel();
+	private JTextField	climatTextField					= new JTextField();
+	private JLabel		precipitationLabel				= new JLabel();
+	private JTextField	precipitationTextField			= new JTextField();
 
 	/**
 	 *
@@ -77,6 +85,10 @@ public class LocalInfoProperties extends PropertyPanel
 		addLabel(this, 5, timeOfDayLabel, "Time Of Day", 150);
 		addLabel(this, 6, sunAscensionLabel, "Sun Ascension", 150);
 		addLabel(this, 7, altitudeLabel, "Altitude", 150);
+		addLabel(this, 8, latitudeLabel, "Latitude", 150);
+		addLabel(this, 9, longitudeLabel, "Longitude", 150);
+		addLabel(this, 10, climatLabel, "Climate", 150);
+		addLabel(this, 11, precipitationLabel, "Precipitation", 150);
 
 		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 125);
 		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 125);
@@ -86,6 +98,10 @@ public class LocalInfoProperties extends PropertyPanel
 		addTextField(this, 5, timeOfDayTextField, getEditorFrame().getTrackData().getLocalInfo().getTimeOfDay(), 170, 125);
 		addTextField(this, 6, sunAscensionTextField, getEditorFrame().getTrackData().getLocalInfo().getSunAscension(), 170, 125);
 		addTextField(this, 7, altitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getAltitude(), 170, 125);
+		addTextField(this, 8, latitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getLatitude(), 170, 125);
+		addTextField(this, 9, longitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getLongitude(), 170, 125);
+		addTextField(this, 10, climatTextField, getEditorFrame().getTrackData().getLocalInfo().getClimat(), 170, 125);
+		addTextField(this, 11, precipitationTextField, getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), 170, 125);
 	}
 
 	/**
@@ -95,6 +111,7 @@ public class LocalInfoProperties extends PropertyPanel
 	{
 		MutableString stringResult = new MutableString();
 		MutableDouble doubleResult = new MutableDouble();
+		MutableInteger integerResult = new MutableInteger();
 
 		if (isDifferent(stationTextField.getText(),
 			getEditorFrame().getTrackData().getLocalInfo().getStation(), stringResult))
@@ -149,6 +166,34 @@ public class LocalInfoProperties extends PropertyPanel
 			getEditorFrame().getTrackData().getLocalInfo().getAltitude(), doubleResult))
 		{
 			getEditorFrame().getTrackData().getLocalInfo().setAltitude(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(latitudeTextField.getText(),
+			getEditorFrame().getTrackData().getLocalInfo().getLatitude(), doubleResult))
+		{
+			getEditorFrame().getTrackData().getLocalInfo().setLatitude(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(longitudeTextField.getText(),
+			getEditorFrame().getTrackData().getLocalInfo().getLongitude(), doubleResult))
+		{
+			getEditorFrame().getTrackData().getLocalInfo().setLongitude(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(climatTextField.getText(),
+			getEditorFrame().getTrackData().getLocalInfo().getClimat(), integerResult))
+		{
+			getEditorFrame().getTrackData().getLocalInfo().setClimat(integerResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(precipitationTextField.getText(),
+			getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), doubleResult))
+		{
+			getEditorFrame().getTrackData().getLocalInfo().setPrecipitation(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 	}

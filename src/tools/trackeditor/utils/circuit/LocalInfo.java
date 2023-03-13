@@ -10,6 +10,10 @@ public class LocalInfo {
 	private double timeOfDay				= Double.NaN;
 	private double sunAscension				= Double.NaN;
 	private double altitude					= Double.NaN;
+	private double latitude					= Double.NaN;
+	private double longitude				= Double.NaN;
+	private int    climat					= Integer.MAX_VALUE;
+	private double precipitation			= Double.NaN;
 
 	public String getStation() {
 		return station;
@@ -59,6 +63,30 @@ public class LocalInfo {
 	public void setAltitude(double altitude) {
 		this.altitude = altitude;
 	}
+	public double getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+	public double getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+	public int getClimat() {
+		return climat;
+	}
+	public void setClimat(int climat) {
+		this.climat = climat;
+	}
+	public double getPrecipitation() {
+		return precipitation;
+	}
+	public void setPrecipitation(double precipitation) {
+		this.precipitation = precipitation;
+	}
 
 	public void dump(String indent)
     {
@@ -71,5 +99,9 @@ public class LocalInfo {
 		System.out.println(indent + "  timeOfDay             : " + timeOfDay);
 		System.out.println(indent + "  sunAscension          : " + sunAscension);
 		System.out.println(indent + "  altitude              : " + altitude);
+		System.out.println(indent + "  latitude              : " + latitude);
+		System.out.println(indent + "  longitude             : " + longitude);
+		System.out.println(indent + "  climat                : " + climat);
+		System.out.println(indent + "  precipitation         : " + precipitation);
     }
 }

@@ -419,6 +419,10 @@ public class XmlReader
         data.setTimeOfDay(getAttrNumValue(element, "time of day", "hour"));
         data.setSunAscension(getAttrNumValue(element, "sun ascension", "deg"));
         data.setAltitude(getAttrNumValue(element, "altitude", "m"));
+        data.setLatitude(getAttrNumValue(element, "latitude", "deg"));
+        data.setLongitude(getAttrNumValue(element, "longitude", "deg"));
+        data.setClimat(getAttrIntValue(element, "climat"));
+        data.setPrecipitation(getAttrNumValue(element, "precipitation"));
 
         editorFrame.getTrackData().setLocalInfo(data);
     }
