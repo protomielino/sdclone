@@ -79,7 +79,7 @@ Section -Drivers
   ; Robots binaries
   SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
-  
+
   SetOutPath "$INSTDIR\lib\drivers\simplix_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_trb1\*.*"
 
@@ -99,7 +99,7 @@ Section -Drivers
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
   File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
-  
+
   SetOutPath "$INSTDIR\data\drivers\simplix_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_trb1\*.*"
 
@@ -224,6 +224,9 @@ Section -Tracks
   ; HQ (2) circuits
   SetOutPath "$INSTDIR\data\tracks\circuit\aalborg"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\aalborg\*.*"
+
+  SetOutPath "$INSTDIR\data\tracks\circuit\kurpfalzring"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\kurpfalzring\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\circuit\migrants"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\migrants\*.*"
