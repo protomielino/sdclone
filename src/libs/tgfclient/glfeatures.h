@@ -28,7 +28,7 @@
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #  include <OpenGL/glu.h>
-//#  include <OpenGL/glext.h>
+#  include <OpenGL/glext.h>
 #else //__APPLE__
 #  include <GL/gl.h>
 #  include <GL/glu.h>

@@ -436,16 +436,16 @@ double Pit::tyreCondition()
 
 double Pit::tyreTreadDepthFront()
 {
-    double Right = (car->_tyreTreadDepth(0) - car->_tyreCritTreadDepth(0));
-    double Left = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
+    double Right = (car->_tyreTreadDepth(0));
+    double Left = (car->_tyreTreadDepth(1));
 
     return 100 * MIN(Right, Left);
 }
 
 double Pit::tyreTreadDepthRear()
 {
-    double Right = (car->_tyreTreadDepth(2) - car->_tyreCritTreadDepth(2));
-    double Left = (car->_tyreTreadDepth(3) - car->_tyreCritTreadDepth(3));
+    double Right = (car->_tyreTreadDepth(2));
+    double Left = (car->_tyreTreadDepth(3));
 
     return 100 * MIN(Right, Left);
 }

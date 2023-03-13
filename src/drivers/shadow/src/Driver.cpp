@@ -172,6 +172,7 @@ Driver::Driver(int index) :	INDEX(index),
       m_stuck(NOT_STUCK),
       m_stuckTime(0),
       m_RandomSeed(0),
+      m_Rain(0),
       m_maxAccel(0, 150, 30, 1),
       m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
       m_lastB(0),
@@ -404,6 +405,7 @@ void	Driver::InitTrack(
 
     MyTrack::SideMod	sideMod[N_PATHS];
     string sect;
+
     for( int p = 0; p < N_PATHS; p++ )
     {
         switch( p )
@@ -422,6 +424,42 @@ void	Driver::InitTrack(
         {
             m_priv[p] = m_priv[PATH_NORMAL];
             m_cm[p]   = m_cm[PATH_NORMAL];
+        }
+
+        bool compound = m_cm[PATH_NORMAL].HASCOMPOUNDS;
+
+        if (compound)
+        {
+            tdble temp = pTrack->local.airtemperature;
+
+            if (temp < 13.0 || pS->_totLaps * (double)pTrack->length < 57800.0)
+            {
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 0);
+                LogSHADOW.info("Compounds choice SOFT !!!\n");
+            }
+            else if (temp < 25.0 || pS->_totLaps * (double)pTrack->length < 171000.0)
+            {
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 1);
+                LogSHADOW.info("Compounds choice MEDIUM !!!\n");
+            }
+            else
+            {
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 2);
+                LogSHADOW.info("Compounds choice HARD !!!\n");
+            }
+
+            int rain = pTrack->local.rain;
+
+            if (rain > 0 && rain < 3)
+            {
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 3);
+                LogSHADOW.info("Compounds choice WET !!!\n");
+            }
+            else if (rain > 2)
+            {
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 4);
+                LogSHADOW.info("Compounds choice EXTREM WET !!!\n");
+            }
         }
 
         m_cm[p].FLAGS = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_CARMODEL_FLAGS, NULL, (tdble)m_cm[PATH_NORMAL].FLAGS);
@@ -581,7 +619,7 @@ void	Driver::InitTrack(
     GfParmSetNum(hCarParm, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble)fuel);
 
     m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
-                                m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER, m_cm[PATH_NORMAL].HASTYC );
+                                m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER, m_cm[PATH_NORMAL].HASTYC, m_cm[PATH_NORMAL].HASCOMPOUNDS, m_Rain );
 
     m_Strategy.SetTyreLimits( m_priv[PATH_NORMAL].PIT_TIRE_WARN, m_priv[PATH_NORMAL].PIT_TIRE_DANGER);
 
@@ -3494,6 +3532,8 @@ void Driver::Meteorology(tTrack *t)
 //--------------------------------------------------------------------------*
 int Driver::GetWeather(tTrack *t)
 {
+    m_Rain = t->local.water;
+
     return (t->local.rain << 4) + t->local.water;
 };
 

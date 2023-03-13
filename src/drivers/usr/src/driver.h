@@ -199,6 +199,7 @@ private:
     bool   rain;
     double rainintensity;
     unsigned int weathercode;            // Track specific weather
+    int    mRain;
 
     double driver_aggression;
     double SkillGlobal;

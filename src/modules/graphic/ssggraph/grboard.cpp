@@ -64,6 +64,7 @@ const char strCDiffCMSB[] = "C Coa Max Slip";
 const char strFuel[] = "Fuel";
 const char strRepair[] = "Repair";
 const char strTireSet[] = "New tires";
+const char strTireCompounds[] = "Compounds";
 const char strFrontWing[] = "Front wing";
 const char strRearWing[] = "Rear wing";
 const char strPenalty[] = "Next pit type";
@@ -2074,9 +2075,12 @@ cGrBoard::grDispDashboard()
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
     }
-  } else {
+  }
+  else
+  {
     item = &(car_->_dashboardRequest[car_->_dashboardActiveItem - car_->_dashboardInstantNb]);
-    switch (item->type) {
+    switch (item->type)
+    {
       case DI_FUEL:
         buf1 = strFuel;
         snprintf(buf2, sizeof(buf2), "%.1f l", item->setup->desired_value);
@@ -2085,17 +2089,42 @@ cGrBoard::grDispDashboard()
       case DI_REPAIR:
         buf1 =strRepair;
         snprintf(buf2, sizeof(buf2), "%.0f", item->setup->desired_value);
-        snprintf(buf3, sizeof(buf3), "%d", car_->_dammage);
+        snprintf(buf3, sizeof(buf3), "%d", car_->priv.wheel);
         break;
       case DI_TYRE_SET:
         buf1 = strTireSet;
-        if (item->setup->desired_value > 0.9) {
+        if (item->setup->desired_value > 0.9)
+        {
           snprintf(buf2, sizeof(buf2), "%s", "YES");
         } else {
           snprintf(buf2, sizeof(buf2), "%s", "NO");
         }
         snprintf(buf3, sizeof(buf3), "%s", "");
         break;
+      case DI_COMPOUND_SET:
+      buf1 = strTireCompounds;
+      if (item->setup->desired_value == 10)
+      {
+        snprintf(buf2, sizeof(buf2), "%s", "SOFT");
+      }
+      else if (item->setup->desired_value == 11)
+      {
+        snprintf(buf2, sizeof(buf2), "%s", "MEDIUM");
+      }
+      else if (item->setup->desired_value == 12)
+      {
+        snprintf(buf2, sizeof(buf2), "%s", "HARD");
+      }
+      else if (item->setup->desired_value == 13)
+      {
+        snprintf(buf2, sizeof(buf2), "%s", "WET");
+      }
+      else if (item->setup->desired_value == 14)
+      {
+        snprintf(buf2, sizeof(buf2), "%s", "EXT WET");
+      }
+      snprintf(buf3, sizeof(buf3), "%d", item->setup->value);
+      break;
       case DI_FRONT_WING_ANGLE:
         buf1 = strFrontWing;
         snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));

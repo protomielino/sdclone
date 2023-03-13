@@ -191,9 +191,9 @@ typedef struct
     double*		curSplitTime;
     double		lastLapTime;
     double		curTime;
-    int                 trackPositionCount; /** number of track positions */
-    float* bestLapTimeAtTrackPosition; /** here we will store for the best laptime the current laptime for each meter of track */
-    float* currLapTimeAtTrackPosition; /** here we will store for the current laptime the current laptime for each meter of track */
+    int         trackPositionCount; /** number of track positions */
+    float*      bestLapTimeAtTrackPosition; /** here we will store for the best laptime the current laptime for each meter of track */
+    float*      currLapTimeAtTrackPosition; /** here we will store for the current laptime the current laptime for each meter of track */
     tdble		topSpeed;
     tdble		currentMinSpeedForLap;	// Min speed on current lap, reset on start line crossing
     int			laps;
@@ -322,25 +322,27 @@ typedef struct {
 
 /** Dynamic wheel information */
 typedef struct {
-  tPosd	        relPos;			                /**< position relative to GC */
-  tdble	        spinVel;		                /**< spin velocity rad/s */
-  tdble	        brakeTemp;		                /**< brake temperature from 0 (cool) to 1.0 (hot) */
-  int		    state;			                    /**< wheel state */
-  tTrackSeg	    *seg;			                    /**< Track segment where the wheel is */
-  tdble         rollRes;                        /**< rolling resistance, useful for sound */
-  tdble         temp_in, temp_mid, temp_out;    /**< tire temperature inside, middle and outside of tread */
-  tdble         temp_opt;                       /**< optimal tire temperature */
-  tdble         condition;      	            /**< tire condition, between 0 and 1 */
-  tdble         treadDepth;     	            /**< tread depth, between 0 and 1 */
-  tdble         critTreadDepth; 	            /**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
-  tdble         slipNorm; 		                /**< normalized slip, the variable of Magic Formula */
-  tdble         slipOpt;		                /**< the value of slipNorm giving maximal grip */
-  tdble         slipSide;
-  tdble         slipAccel;
-  tdble         Fx;
-  tdble         Fy;
-  tdble         Fz;
-  tdble         effectiveMu;
+    tPosd	      relPos;			                /**< position relative to GC */
+    tdble	      spinVel;		                /**< spin velocity rad/s */
+    tdble	      brakeTemp;		                /**< brake temperature from 0 (cool) to 1.0 (hot) */
+    int		      state;			                    /**< wheel state */
+    tTrackSeg	  *seg;			                    /**< Track segment where the wheel is */
+    tdble         rollRes;                        /**< rolling resistance, useful for sound */
+    tdble         temp_in, temp_mid, temp_out;    /**< tire temperature inside, middle and outside of tread */
+    tdble         temp_opt;                       /**< optimal tire temperature */
+    tdble         condition;      	            /**< tire condition, between 0 and 1 */
+    tdble         treadDepth;     	            /**< tread depth, between 0 and 1 */
+    tdble         slipNorm; 		                /**< normalized slip, the variable of Magic Formula */
+    tdble         slipOpt;		                /**< the value of slipNorm giving maximal grip */
+    tdble         slipSide;
+    tdble         slipAccel;
+    tdble         Fx;
+    tdble         Fy;
+    tdble         Fz;
+    tdble         effectiveMu;
+    tdble         currentPressure;		        // current tire pressure considering temperature
+    tdble         currentWear;			        // [0..1], 1 means totally worn (tread thickness 0)
+    tdble         currentGraining;		        // [0..1], 1 means totally grained
 } tWheelState;
 /* structure access */
 #define _ride(i)                priv.wheel[i].relPos.z
@@ -360,16 +362,15 @@ typedef struct {
 #define _tyreT_opt(i)           priv.wheel[i].temp_opt
 #define _tyreCondition(i)       priv.wheel[i].condition
 #define _tyreTreadDepth(i)      priv.wheel[i].treadDepth
-#define _tyreCritTreadDepth(i)  priv.wheel[i].critTreadDepth
 #define _tyreEffMu(i)           priv.wheel[i].effectiveMu
 
 #define MAX_GEARS	10	/* including reverse and neutral */
 
 typedef struct tCollisionState_
 {
-  int    collision_count;
-  sgVec3 pos;
-  sgVec3 force;
+    int    collision_count;
+    sgVec3 pos;
+    sgVec3 force;
 } tCollisionState;
 /* structure access */
 #define _collCount	priv.collision_state.collision_count
@@ -406,26 +407,27 @@ typedef struct
 /* constants for type: */
 #define	DI_NONE					-1
 /* types for dashboardInstant */
-#define DI_BRAKE_REPARTITION			0
-#define DI_FRONT_ANTIROLLBAR			1
-#define DI_REAR_ANTIROLLBAR			2
+#define DI_BRAKE_REPARTITION			    0
+#define DI_FRONT_ANTIROLLBAR			    1
+#define DI_REAR_ANTIROLLBAR			        2
 #define DI_FRONT_DIFF_MAX_SLIP_BIAS 		3
 #define DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS	4
-#define DI_REAR_DIFF_MAX_SLIP_BIAS		5
+#define DI_REAR_DIFF_MAX_SLIP_BIAS		    5
 #define DI_REAR_DIFF_COAST_MAX_SLIP_BIAS	6
 #define DI_CENTRAL_DIFF_MAX_SLIP_BIAS		7
 #define DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS	8
 /* number of instant types */
-#define NR_DI_INSTANT				9
+#define NR_DI_INSTANT			9
 /* types for dashboardRequest */
 #define DI_FUEL					32
 #define DI_REPAIR				33
 #define DI_TYRE_SET				34
-#define DI_FRONT_WING_ANGLE			35
-#define DI_REAR_WING_ANGLE			36
+#define DI_FRONT_WING_ANGLE		35
+#define DI_REAR_WING_ANGLE		36
+#define DI_COMPOUND_SET         37
 #define DI_PENALTY				40
 /* number of request types */
-#define NR_DI_REQUEST				6
+#define NR_DI_REQUEST			7
 
 /** Data known only by the driver */
 typedef struct
@@ -461,8 +463,8 @@ typedef struct
     t3Dd	collpos;                /**< Collision position, useful for sound ; Simu V2 only */
     int		dammage;
     int		debug;
-    tdble   localairTemperature;     /** < air temperature in race */
-    tdble   localairPressure;        /**< Environment pressure at cars location */
+    tdble   localTemperature;     /** < air temperature in race */
+    tdble   localPressure;        /**< Environment pressure at cars location */
     tCollisionState collision_state; /**< collision state ; Simu V3 only  */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;          /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
@@ -496,8 +498,8 @@ typedef struct
 #define _gear           priv.gear
 #define _gearNext       priv.gearNext
 #define _debug          priv.debug
-#define _airtemp        priv.localairTemperature
-#define _airPressure    priv.localairPressure
+#define _airtemp        priv.localTemperature
+#define _airPressure    priv.localPressure
 #define _skid           priv.skid
 #define _reaction       priv.reaction
 #define _dammage        priv.dammage
@@ -597,6 +599,8 @@ typedef struct
 {
     tCarSetupItem FRWeightRep, FRLWeightRep, RRLWeightRep;
     tCarSetupItem fuel;
+    tCarSetupItem tireSet;
+    tCarSetupItem tireCompound;
     tCarSetupItem wingAngle[2];
     tCarSetupItem revsLimiter;
     tCarSetupItem gearRatio[MAX_GEARS];
@@ -616,7 +620,7 @@ typedef struct
     tCarSetupItem suspCourse[4], suspPacker[4];
     tCarSetupItem suspFastBump[4], suspSlowBump[4], suspBumpLvel[4];
     tCarSetupItem suspFastRebound[4], suspSlowRebound[4], suspReboundLvel[4];
-    tCarSetupItem reqRepair, reqTireset, reqPenalty; //used for pit stop repair, tire set and stop & go request
+    tCarSetupItem reqRepair, reqTireset, reqTirecompound, reqPenalty; //used for pit stop repair, tire set and stop & go request
 } tCarSetup;
 
 /** Command issued by the car during pit stop */
@@ -631,6 +635,8 @@ typedef struct CarPitCmd
 
     enum TireChange { NONE = 0, ALL = 1};
     TireChange tireChange;
+    enum TireSetChange { SOFT = 0, MEDIUM = 1, HARD = 2, WET = 3, EXTREM_WET = 4};
+    TireSetChange tiresetChange;
 } tCarPitCmd;
 /* structure access */
 #define _pitFuel	pitcmd.fuel
@@ -656,7 +662,6 @@ typedef struct CarElt
 } tCarElt;
 
 /* Sections in XML description files */
-
 #define SECT_SIMU_SETTINGS			"Simulation Options"
 #define SECT_CAR					"Car"
 #define SECT_FRNT					"Front"
@@ -702,6 +707,8 @@ typedef struct CarElt
 #define SECT_GROBJECTS              "Graphic Objects"
 #define SECT_EXHAUST                "Exhaust"
 #define SECT_LIGHT                  "Light"
+#define SECT_TIRESET                "Tires Set"
+#define SECT_COMPOUNDS              "Compounds"
 #define SECT_FEATURES               "Features"
 
 /* Parameter names */
@@ -726,37 +733,39 @@ typedef struct CarElt
 #define PRM_EFFICIENCY		"efficiency"
 #define PRM_TYPE			"type"
 #define PRM_SIZE			"size"
+#define PRM_COMPOUNDS_SET   "compound set"
 
 /* Tires */
 #define PRM_MU				"mu"
 #define PRM_RIMDIAM			"rim diameter"
-#define PRM_TIREWIDTH			"tire width"
-#define PRM_TIREHEIGHT			"tire height"
-#define PRM_TIRERATIO			"tire height-width ratio"
-#define PRM_RIDEHEIGHT			"ride height"
-#define PRM_ROLLINGRESIST		"rolling resistance"
+#define PRM_TIREWIDTH		"tire width"
+#define PRM_TIREHEIGHT		"tire height"
+#define PRM_TIRERATIO		"tire height-width ratio"
+#define PRM_RIDEHEIGHT		"ride height"
+#define PRM_ROLLINGRESIST	"rolling resistance"
 #define PRM_TOE				"toe"
 #define PRM_CAMBER			"camber"
 #define PRM_CA				"stiffness"
 #define PRM_RFACTOR			"dynamic friction"
 #define PRM_EFACTOR			"elasticity factor"
-#define PRM_PRESSURE			"pressure"
-#define PRM_LOADFMAX			"load factor max"
-#define PRM_LOADFMIN			"load factor min"
+#define PRM_PRESSURE		"pressure"
+#define PRM_LOADFMAX		"load factor max"
+#define PRM_LOADFMIN		"load factor min"
 #define PRM_OPLOAD			"operating load"
-#define PRM_ALIGNTQFACTOR		"aligning torque factor"
+#define PRM_TREADTHICKNESS	"tread thickness"
+#define PRM_RIMMASS		    "rim mass"
+#define PRM_HYSTERESIS	    "hysteresis"
+#define PRM_ALIGNTQFACTOR	"aligning torque factor"
 #define PRM_OPTTEMP			"optimal temperature"
-#define PRM_INITTEMP			"initial temperature"
-#define PRM_COLDMUFACTOR		"cold mu factor"
-#define PRM_HEATINGMULT			"heating multiplier"
-#define PRM_AIRCOOLINGMULT		"air cooling multiplier"
-#define PRM_SPEEDCOOLINGMULT	        "speed cooling multiplier"
-#define PRM_WEARRATE			"wear rate multiplier"
-#define PRM_FALLOFFTREADDEPTH	        "falloff tread depth"
-#define PRM_FALLOFFGRIPMULT		"falloff grip multiplier"
-#define PRM_REMAININGGRIPMULT	        "remaining grip multiplier"
-#define PRM_IDEALTEMP	                "ideal temperature"
-#define PRM_WEAR		        "wear"
+#define PRM_INITTEMP		"initial temperature"
+#define PRM_WEAR		    "wear"
+
+/* Compounds */
+#define SECT_SOFT            "soft"
+#define SECT_MEDIUM          "medium"
+#define SECT_HARD            "hard"
+#define SECT_WET             "wet"
+#define SECT_EXTREM_WET      "extrem wet"
 
 #define PRM_SPR				"spring"
 #define PRM_SUSPCOURSE		"suspension course"
@@ -1006,10 +1015,10 @@ typedef enum
 
 // Collision constants.
 #define SEM_COLLISION			0x01
-#define SEM_COLLISION_XYSCENE	        0x02
+#define SEM_COLLISION_XYSCENE	0x02
 #define SEM_COLLISION_CAR		0x04
 #define SEM_COLLISION_Z			0x08
-#define SEM_COLLISION_Z_CRASH	        0x10
+#define SEM_COLLISION_Z_CRASH	0x10
 
 /* features */
 #define PRM_AEROTOCG            "shifting aero coordinates"
@@ -1017,6 +1026,7 @@ typedef enum
 #define PRM_REALGEARCHANGE      "realistic gear change"
 #define PRM_REVLIMIT            "realistic rev limiter"
 #define PRM_TIRETEMPDEG         "tire temperature and degradation"
+#define PRM_TIRECOMPOUNDS       "tire compounds"
 #define PRM_FIXEDWHEELFORCE     "fixed wheel force"
 #define PRM_TCLINSIMU           "enable tcl"
 #define PRM_ABSINSIMU           "enable abs"
@@ -1039,5 +1049,6 @@ typedef enum
 #define FEAT_ABSINSIMU              0x80        //ABS simulation with 500 Hz at single wheels
 #define FEAT_ESPINSIMU              0x100       //ESP simulation with 500 Hz at single wheels
 #define FEAT_LIMITEDGROUNDEFFECT    0x200       //Limit for Clift is enabled
+#define FEAT_COMPOUNDS              0x400       //Tire compounds
 
 #endif /* __CARV1_H__ */

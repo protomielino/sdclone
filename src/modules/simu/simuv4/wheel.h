@@ -65,8 +65,9 @@ typedef struct
     tdble	tireSpringRate;
     tdble  	radius;
     tdble  	mu;
+    tdble   muC[5];     /* mu for compounds */
     tdble  	I;       	/* I = inertial moment of the wheel */
-    tdble  	curI;       	/* Current inertia for the wheel (including transmission) */
+    tdble  	curI;       /* Current inertia for the wheel (including transmission) */
     tdble	mfC;		/* Magic Formula C coeff */
     tdble	mfB;		/* Magic Formula B coeff */
     tdble	mfE;		/* Magic Formula E coeff */
@@ -81,16 +82,34 @@ typedef struct
 
     tdble   Ttire;      /* tire temperature in K */
     tdble   Topt;       /* optimal temperature in K, where mu maximal */
+    tdble   ToptC[5];   /* optimal temperature in k for compounds */
     tdble   Tinit;      /* initial tire temperature, right after pit or at start */
-    tdble   muTmult;    /* mu = mumax * (1 - muTmult*(T-Topt)^2) */
-    tdble   heatingm;   /* heating multiplier */
-    tdble   aircoolm;   /* air cooling multiplier */
-    tdble   speedcoolm; /* how aircoolm increases with speed */
-    tdble   wearrate; /* degradation multiplier */
+    tdble   TinitC[5];  /* initial tire temperature for compounds */
     tdble   treadDepth; /* tread depth, between 0 and 1 */
-    tdble   critTreadDepth; /* critical tread depth, when grip falls off suddenly */
-    tdble   muTDmult[2]; /* mu is multiplied by muTDmult[i]*treadDepth+muTDoffset[i] */
-    tdble   muTDoffset[2];
+
+    // Additional parameters for the tire wear model
+    tdble treadMass;				// Initial mass of the tread
+    tdble baseMass;					// Mass of the tire minus the tread
+    tdble treadThinkness;			// Thinkness of the initial tread (brand new tire)
+    tdble tireGasMass;				// Mass of the gas in the tire (constant)
+    tdble tireConvectionSurface;	// Surface area regarding the convection model
+    tdble initialTemperature;		// Initial temperature of the tire (initial pressure, p0/T0=constant)
+    tdble hysteresisFactor;			// Factor to adjust the hysteresis (model fitting), usually close to 1.0.
+    tdble hysteresisFactorC[5];     // Factor to adjust the hysteresis for compounds
+    tdble wearFactor;				// Factor to adjust the wear (model fitting), usually close to 1.0.
+    tdble wearFactorC[5];               // Factor to adjust the wear for compounds
+
+    // Dynamic Tire properties (temp, wear, etc.)
+    tdble currentPressure;			// current tire pressure considering temperature
+    tdble currentTemperature;		// current temperature
+    double currentWear;				// [0..1], 1 means totally worn (tread thickness 0)
+    tdble currentGraining;			// [0..1], 1 means totally grained
+    tdble currentGripFactor;		// [0..1], 1 means best grip
+
+    tdble tireSlip;					// Slip of the tire from tire model calculation
+    tdble tireZForce;				// Force on tire
+
+    int   tireSet;
 
     tDynAxis	in;
     tDynAxis	feedBack;

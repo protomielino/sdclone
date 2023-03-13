@@ -33,7 +33,7 @@ class Pit
 {
 public:
     Pit();
-    void   init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin);
+    void   init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin, int rain);
     void   update();
     double dist();
     void   pitCommand();
@@ -88,6 +88,7 @@ private:
     double mTiresChangeTime;
     int    mPitDamage;
     double mPitGripFactor;
+    int    mRain;
 
     const int mMaxDamage;
     const int mMaxDamageDist;

@@ -65,6 +65,7 @@ extern void SimWheelConfig(tCar *car, int index);
 extern void SimWheelReConfig(tCar *car, int index);
 extern void SimWheelUpdateRide(tCar *car, int index);
 extern void SimWheelUpdateForce(tCar *car, int index);
+extern void SimWheelUpdateTire(tCar *car, int index);
 extern void SimWheelUpdateRotation(tCar *car);
 extern void SimUpdateFreeWheels(tCar *car, int axlenb);
 

@@ -238,7 +238,7 @@ void	Opponent::ProcessMyCar(
     m_info.flags |= oSit.rdPY < 0 ? F_LEFT : F_RIGHT;
     m_info.flags |= oSit.offs < 0 ? F_TRK_LEFT : F_TRK_RIGHT;
 
-    if( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < 50 && s->currentTime < racetime))
+    if( fabs(oSit.tYaw) > 45 * PI / 180 || (oSit.spd < 30 && s->currentTime < racetime))
     {
         m_info.flags |= F_DANGEROUS;
         m_info.dangerousLatchTime = 2.0;

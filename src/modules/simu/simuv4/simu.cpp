@@ -42,9 +42,10 @@ tdble SimRain = 0;
 tdble SimWater = 0;
 tdble SimTimeOfDay = 0;
 int SimClouds = 0;
+int lastCompoundSet = 0;
 
-double Tair = C2K(20.0);
-tdble Ttrack = C2K(30.0);
+double Tair = 273.15;
+tdble Ttrack = 220.0;
 
 float SimAirPressure = 101300.0f;
 float SimAirDensity = 1.290f;
@@ -55,7 +56,6 @@ static int SimNbCars = 0;
 
 #define MEANNB 0
 #define MEANW  1
-
 
 /*
  * Check the input control from robots
@@ -272,16 +272,32 @@ SimReConfig(tCarElt *carElt)
 
     if (carElt->pitcmd.tireChange == tCarPitCmd::ALL)
     {
-        GfLogInfo(" # Simu pit tires change !n");
         for(i=0; i<4; i++)
         {
-            GfLogInfo(" #Simu Reinitialize tires !\n");
+            GfLogInfo("# Reset Tyre in simu !\n");
             car->wheel[i].treadDepth = 1.01f;
+            car->wheel[i].currentWear = 0.0;
+            car->wheel[i].currentGraining = 0.0;
+            car->wheel[i].currentGripFactor = 1.0;
 
             if (car->features & FEAT_TIRETEMPDEG)
                 car->wheel[i].Ttire = car->wheel[i].Tinit;
             else
                 car->wheel[i].Ttire = car->wheel[i].Topt;
+
+            if(car->features & FEAT_COMPOUNDS && carElt->pitcmd.tiresetChange)
+            {
+                car->wheel[i].tireSet = carElt->pitcmd.tiresetChange;
+                GfLogInfo("# Tireset value = %d\n", car->wheel[i].tireSet);
+                //setupCompound->value = wheel->tireSet;
+                //setupCompound->changed = false;
+                car->wheel[i].mu = car->wheel[i].muC[car->wheel[i].tireSet];
+                car->wheel[i].Topt = car->wheel[i].ToptC[car->wheel[i].tireSet];
+                car->wheel[i].hysteresisFactor = car->wheel[i].hysteresisFactorC[car->wheel[i].tireSet];
+                car->wheel[i].wearFactor = car->wheel[i].wearFactorC[car->wheel[i].tireSet];
+                GfLogInfo("# SimuV4 tire compound changed mu = %.3f - hysteresis = %.2f - wear factor = %.7f\n", car->wheel[i].mu,
+                          car->wheel[i].hysteresisFactor, car->wheel[i].wearFactor);
+            }
         }
     }
 
@@ -686,7 +702,6 @@ SimUpdate(tSituation *s, double deltaTime)
 
         carElt->_steerTqCenter = -car->ctrl->steer;
         carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
-
     }
 }
 
@@ -818,4 +833,3 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
     carElt->_steerTqCenter = -car->ctrl->steer;
     carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
 }
-

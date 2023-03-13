@@ -40,6 +40,8 @@ Strategy::Strategy( const MyTrack& track, const PitPath& pitPath ):
       m_warnTyreLimit(0.3),
       m_dangerTyreLimit(0.03),
       m_HasTYC(false),
+      m_HasTPC(false),
+      m_Rain(0),
       m_state(PIT_NONE),
       m_lastFuel(0),
       m_totalFuel(0),
@@ -53,11 +55,13 @@ Strategy::~Strategy()
 {
 }
 
-void	Strategy::SetDamageLimits( int warnDamageLimit, int dangerDamageLimit, bool tyc )
+void	Strategy::SetDamageLimits( int warnDamageLimit, int dangerDamageLimit, bool tyc, bool tpc, int rain)
 {
     m_warnDamageLimit	= warnDamageLimit;
     m_dangerDamageLimit	= dangerDamageLimit;
     m_HasTYC = tyc;
+    m_HasTPC = tpc;
+    m_Rain = rain;
 }
 
 void	Strategy::SetTyreLimits( double warnTireLimit, double dangerTireLimit )
@@ -344,6 +348,37 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
 
                 if(m_HasTYC)
                     pCar->pitcmd.tireChange	= tyreWear < 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+
+                if (m_HasTPC)
+                {
+                    int	remainingLaps = pCar->race.remainingLaps + 1;
+
+                    if (remainingLaps <= 10 && m_Rain < 2)
+                    {
+                        pCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                        LogSHADOW.info("Change Tire SOFT !\n");
+                    }
+                    else if (remainingLaps <= 25 && m_Rain < 2)
+                    {
+                        pCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        LogSHADOW.info("Change Tire MEDIUM !\n");
+                    }
+                    else if(m_Rain < 2)
+                    {
+                        pCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                        LogSHADOW.info("Change Tire HARD !\n");
+                    }
+                    else if (m_Rain < 3)
+                    {
+                        pCar->pitcmd.tiresetChange = tCarPitCmd::WET;
+                        LogSHADOW.info("Change Tire WET !\n");
+                    }
+                    else
+                    {
+                        pCar->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
+                        LogSHADOW.info("Change Tire EXTREM WET !\n");
+                    }
+                }
             }
 
             LogSHADOW.debug( "****** PIT  fuel %g  repair %d  twear %0.4f  tchg 0x%x\n",

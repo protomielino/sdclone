@@ -84,6 +84,7 @@ CarModel::CarModel()
     ENGINE_REV_LIMIT(8500 * 2 * PI / 60),
     ENGINE_MAX_REVS(10000 * 2 * PI / 60),
     HASTYC(false),
+    HASCOMPOUNDS(false),
     HASABS(false),
     HASESP(false),
     HASTCL(false)
@@ -179,6 +180,16 @@ void    CarModel::configCar( void* hCar )
     else
       LogSHADOW.info("#Car has TYC no\n");
 
+    enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_TIRECOMPOUNDS, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASCOMPOUNDS = true;
+      LogSHADOW.info("#Car has Tire Compound yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has Tire Compound no\n");
+
     enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
 
     if (strcmp(enabling, VAL_YES) == 0)
@@ -254,6 +265,53 @@ void    CarModel::configCar( void* hCar )
     TYRE_MU_R = MN(GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_MU, NULL, 1.0),
                    GfParmGetNum(hCar, SECT_REARLFTWHEEL, PRM_MU, NULL, 1.0));
     TYRE_MU   = MN(TYRE_MU_R, TYRE_MU_R);
+
+    if (HASCOMPOUNDS)
+    {
+        char path[256];
+        int TIRE = GfParmGetNum(hCar, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 1);
+
+        switch (TIRE)
+        {
+        case 0:
+            sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+            TYRE_MU_F = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+            TYRE_MU_R = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            TYRE_MU = MN(TYRE_MU_R, TYRE_MU_R);
+            break;
+        case 1:
+            sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+            TYRE_MU_F = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+            TYRE_MU_R = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            TYRE_MU = MN(TYRE_MU_R, TYRE_MU_R);
+            break;
+        default:
+        case 2:
+            sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+            TYRE_MU_F = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+            TYRE_MU_R = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            TYRE_MU = MN(TYRE_MU_R, TYRE_MU_R);
+            break;
+        case 3:
+            sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+            TYRE_MU_F = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+            TYRE_MU_R = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            TYRE_MU = MN(TYRE_MU_R, TYRE_MU_R);
+            break;
+        case 4:
+            sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+            TYRE_MU_F = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+            TYRE_MU_R = GfParmGetNum(hCar, path, PRM_MU, (char*)NULL, TYRE_MU_F);
+            TYRE_MU = MN(TYRE_MU_R, TYRE_MU_R);
+            break;
+        }
+    }
+
     LogSHADOW.info( "Tyre MU Front %g   Tyre MU Rear %g   Tyre MU %g\n", TYRE_MU_F, TYRE_MU_R, TYRE_MU );
 
     F_AXLE_X  = GfParmGetNum(hCar, SECT_FRNTAXLE, PRM_XPOS, NULL, 0);

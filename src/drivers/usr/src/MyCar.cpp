@@ -26,6 +26,7 @@ extern GfLogger* PLogUSR;
 
 MyCar::MyCar() :
     HASTYC(false),
+    HASCPD(false),
     HASABS(false),
     HASESP(false),
     HASTCL(false),
@@ -87,6 +88,16 @@ void MyCar::readConstSpecs(void* CarHandle)
     }
     else
       LogUSR.info("#Car has TYC no\n");
+
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_TIRECOMPOUNDS, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASCPD = true;
+      LogUSR.info("#Car has Compounds yes\n");
+    }
+    else
+      LogUSR.info("#Car has Compounds no\n");
 
     enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
 

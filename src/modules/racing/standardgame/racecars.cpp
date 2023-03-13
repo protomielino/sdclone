@@ -73,7 +73,7 @@ ReCarsUpdateCarPitTime(tCarElt *car)
             if (car->pitcmd.tireChange == tCarPitCmd::ALL /*&& car->info.skillLevel == PRO*/ && ReInfo->raceRules.tireFactor > 0.0f)
             {
                 info->totalPitTime += ReInfo->raceRules.allTiresChangeTime;
-                GfLogInfo("# RaceCars pit tires change time = %.2f\n", ReInfo->raceRules.allTiresChangeTime);
+                GfLogInfo("# RaceCars pit tires change time = %.2f\n", ReInfo->raceRules.tireFactor);
             }
 
             if (ReInfo->s->raceInfo.type == RM_TYPE_PRACTICE || ReInfo->s->raceInfo.type == RM_TYPE_QUALIF)
@@ -90,14 +90,6 @@ ReCarsUpdateCarPitTime(tCarElt *car)
             car->_scheduledEventTime = s->currentTime + info->totalPitTime;
             car->_penaltyTime = 0.0f;
             RePhysicsEngine().reconfigureCar(car);
-
-            /*for (i=0; i<4; i++)
-            {
-                car->_tyreCondition(i) = 1.01f;
-                car->_tyreT_in(i)  = car->_airtemp;
-                car->_tyreT_mid(i) = car->_airtemp;
-                car->_tyreT_out(i) = car->_airtemp;
-            }*/
 
             GfLogInfo("%s in repair pit stop for %.1f s (refueling by %.1f l, repairing by %d).\n",
                       car->_name, info->totalPitTime, car->_pitFuel, car->_pitRepair);

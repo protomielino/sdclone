@@ -525,7 +525,7 @@ void HumanDriver::init_track(int index,
         carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
     }//if curCars
 
-    snprintf(sstring, sizeof(sstring), "%sdrivers/human/car.xml", GfLocalDir());
+    snprintf(sstring, sizeof(sstring), "%s/drivers/human/car.xml", GfLocalDir());
     *carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
     snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
@@ -710,10 +710,10 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
     case ARCADE:
     case SEMI_ROOKIE:
     case ROOKIE: // Rookie
-        HCtx[idx]->maxClutchTime *= 2;
+        HCtx[idx]->maxClutchTime *= 1.4;
         break;
     case AMATEUR: // Amateur
-        HCtx[idx]->maxClutchTime *= 1.6;
+        HCtx[idx]->maxClutchTime *= 1.3;
         break;
     case SEMI_PRO: // Semi-Pro
         HCtx[idx]->maxClutchTime *= 1.2;
@@ -975,8 +975,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
         GfOut("Gridbox Initial Gear %d\n", preGear);
     }
-
-
 
     if ((cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_ABS].val])
             || (cmd[CMD_ABS].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_ABS].val])
@@ -1348,7 +1346,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
         }
     }
 
-
     switch (cmd[CMD_BRAKE].type) {
     case GFCTRL_TYPE_JOY_AXIS:
         brake = joyInfo->ax[cmd[CMD_BRAKE].val];
@@ -1578,7 +1575,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
             car->_brakeCmd = MIN(brake1, MIN(brake2, brake3));
         }
     }
-
 
     if (HCtx[idx]->paramAsr)
     {
@@ -2099,15 +2095,39 @@ int HumanDriver::pit_cmd(int index, tCarElt* car, tSituation *s)
 
         if (car->setup.reqTireset.desired_value > 0)
         {
-            GfLogDebug("~ player tyre change asked = %.0f", car->setup.reqTireset.desired_value);
+            GfLogInfo("~ player tyre change asked = %.0f", car->setup.reqTireset.desired_value);
             car->pitcmd.tireChange = (tCarPitCmd::TireChange::ALL);
+
+            switch((int)car->setup.reqTirecompound.desired_value)
+            {
+            case 0:
+                car->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                break;
+            case 1:
+                car->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                break;
+            case 2:
+                car->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                break;
+            case 3:
+                car->pitcmd.tiresetChange = tCarPitCmd::WET;
+                break;
+            case 4:
+                car->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
+                break;
+            default:
+                car->pitcmd.tiresetChange = tCarPitCmd::HARD;
+            }
         }
     }
 
-    if (HCtx[idx]) {
+    if (HCtx[idx])
+    {
         const tControlCmd *cmd = HCtx[idx]->cmdControl;
-        for (int i = 0; i < NbCmdControl; i++) {
-            if (cmd[i].type == GFCTRL_TYPE_KEYBOARD) {
+        for (int i = 0; i < NbCmdControl; i++)
+        {
+            if (cmd[i].type == GFCTRL_TYPE_KEYBOARD)
+            {
                 const int key = lookUpKeyMap(cmd[i].val);
                 keyInfo[key].state = GFUI_KEY_UP;
                 keyInfo[key].edgeDn = 0;
@@ -2128,7 +2148,8 @@ int HumanDriver::pit_cmd(int index, tCarElt* car, tSituation *s)
 // fill in as much fuel as required for the whole race,
 // or if the tank is too small, fill the tank completely.
 static void SetFuelAtRaceStart(tTrack* track, void *carHandle, void **carParmHandle,
-        tSituation *s, int idx) {
+        tSituation *s, int idx)
+{
     tdble fuel_requested;
     const tdble initial_fuel = GfParmGetNum(*carParmHandle, SECT_CAR,
             PRM_FUEL, NULL, 0.0f);
@@ -2339,8 +2360,6 @@ void HumanDriver::human_prefs(const int robot_index, int player_index)
        cmdCtrl[CMD_GEAR_N].type = GFCTRL_TYPE_NOT_AFFECTED;
        cmdCtrl[CMD_GEAR_1].type = GFCTRL_TYPE_NOT_AFFECTED;
     }
-
-
 }
 
 HumanDriver::HumanDriver(const char *robotname)

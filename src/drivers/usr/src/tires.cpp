@@ -29,15 +29,13 @@ void Tires::init(const tCarElt* car)
 {
     mCar = car;
     mDistWhenNew = 0;
-    mWear = 100.0;
-    mHotTemp = ZEROC + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
+    mWear = 0.0;
+    mHotTemp = 273.15 + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
     mMuScale = GfParmGetNum(mCar->_carHandle, "private", "mu scale", (char*)NULL, 1.0);
 }
 
 void Tires::update()
 {
-    // Get tire wear
-   // mWear = 0.0;
     double minWear = 10.0;
 
     for (int i = 0; i < 4; i++)
@@ -107,16 +105,16 @@ double Tires::TyreCondition() const
 
 double Tires::TyreTreadDepthFront() const
 {
-    double Right = (mCar->_tyreTreadDepth(0) - mCar->_tyreCritTreadDepth(0));
-    double Left = (mCar->_tyreTreadDepth(1) - mCar->_tyreCritTreadDepth(1));
+    double Right = mCar->_tyreTreadDepth(0);
+    double Left = mCar->_tyreTreadDepth(1);
 
     return 100 * MIN(Right,Left);
 }
 
 double Tires::TyreTreadDepthRear() const
 {
-    double Right = (mCar->_tyreTreadDepth(2) - mCar->_tyreCritTreadDepth(2));
-    double Left = (mCar->_tyreTreadDepth(3) - mCar->_tyreCritTreadDepth(3));
+    double Right = mCar->_tyreTreadDepth(2);
+    double Left = mCar->_tyreTreadDepth(3);
 
     return 100 * MIN(Right,Left);
 }

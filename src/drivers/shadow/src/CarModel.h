@@ -176,6 +176,7 @@ public:
     std::vector<double> ACCF_FROM_SPEED; // cached table for fast acceleration force calculation from speed.
 
     bool    HASTYC;
+    bool    HASCOMPOUNDS;
     bool    HASABS;
     bool    HASESP;
     bool    HASTCL;

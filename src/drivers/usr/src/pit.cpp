@@ -38,7 +38,7 @@ Pit::Pit() :
 {
 }
 
-void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin)
+void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin, int rain)
 {
     // Get tires change time
     //void* handle = NULL;
@@ -66,6 +66,8 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
     {
         mPitGripFactor = 0.80;
     }
+
+    mRain = rain;
 
     mEntryMargin = pitentrymargin;
     mTrack = track;
@@ -332,7 +334,6 @@ void Pit::update()
         else if (pitfuel || pitdamage || pittyres)
         {
             setPitstop(true);
-            LogUSR.debug(" # pit update !\n");
         }
         else if (pitForPenalty())
         {
@@ -486,11 +487,10 @@ double Pit::calcRefuel()
     }
 
     // Print infos
-    LogUSR.debug("USR Fuel pitstops %i\n", fuelpitstops);
-    LogUSR.debug("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
-    LogUSR.debug("USR Tire pitstops %i\n", tirespitstops);
-    LogUSR.debug("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
-    LogUSR.debug("USR Tire distance %.7f\n", mMyCar->tires()->distLeft());
+    LogUSR.info("USR Fuel pitstops %i\n", fuelpitstops);
+    LogUSR.info("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
+    LogUSR.info("USR Tire pitstops %i\n", tirespitstops);
+    LogUSR.info("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
 
     return stintfuel - mCar->_fuel;
 }
@@ -534,13 +534,43 @@ void Pit::pitCommand()
 
         if (mTireChange)
         {
-            mCar->pitcmd.tireChange = (tCarPitCmd::ALL);
-            LogUSR.debug(" # USR tire change !!!\n");
+            mCar->pitcmd.tireChange = (tCarPitCmd::TireChange::ALL);
+
+            if(mMyCar->HASCPD)
+            {
+                    int	remainingLaps = mCar->race.remainingLaps + 1;
+
+                    if (remainingLaps <= 10 && mRain < 2)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                        LogUSR.info("Change Tire SOFT !\n");
+                    }
+                    else if (remainingLaps <= 25 && mRain < 2)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        LogUSR.info("Change Tire MEDIUM !\n");
+                    }
+                    else if(mRain < 2)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                        LogUSR.info("Change Tire HARD !\n");
+                    }
+                    else if (mRain < 3)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::WET;
+                        LogUSR.info("Change Tire WET !\n");
+                    }
+                    else
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
+                        LogUSR.info("Change Tire EXTREM WET !\n");
+                    }
+            }
         }
         else
         {
-            mCar->pitcmd.tireChange = (tCarPitCmd::NONE);
-            LogUSR.debug(" # USR NO tire change !!!\n");
+            mCar->pitcmd.tireChange = (tCarPitCmd::TireChange::NONE);
+            LogUSR.info(" #USR no tyre changes !!!\n");
         }
 
         mCar->pitcmd.stopType = RM_PIT_REPAIR;

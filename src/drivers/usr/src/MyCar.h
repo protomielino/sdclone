@@ -89,6 +89,7 @@ public:
   double mToMiddle;
 
   bool    HASTYC;
+  bool    HASCPD;
   bool    HASABS;
   bool    HASESP;
   bool    HASTCL;

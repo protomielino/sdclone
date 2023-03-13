@@ -45,10 +45,12 @@
 
 Driver::Driver(int index) :
     INDEX(index),
-    driver_aggression(0.0),
+    mRain(0),
+    driver_aggression(1.0),
     mGarage(false),
     mFrontCollMargin(6.0),
     mOvtMargin(2.0)
+
 {
     // Names assigned in constructor for VS 2013 compatibility
     mFlagNames.push_back("STATE_CHANGE");
@@ -171,6 +173,42 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     param.setNum(SECT_CAR, PRM_FUEL, startfuel);
 
+    bool compound = mCar.HASCPD;
+
+    if (compound)
+    {
+        tdble temp = track->local.airtemperature;
+
+        if (temp < 13.0 || situation->_totLaps * (double)track->length < 57800.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 0);
+            LogUSR.info("Compounds choice SOFT !!!\n");
+        }
+        else if (temp < 25.0 || situation->_totLaps * (double)track->length < 171000.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
+            LogUSR.info("Compounds choice MEDIUM !!!\n");
+        }
+        else
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            LogUSR.info("Compounds choice HARD !!!\n");
+        }
+
+        mRain = track->local.rain;
+
+        if (mRain > 0 && mRain < 3)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
+            LogUSR.info("Compounds choice WET !!!\n");
+        }
+        else if (mRain > 2)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 4);
+            LogUSR.info("Compounds choice EXTREM WET !!!\n");
+        }
+    }
+
     // load the global skill level, range 0 - 10
     void *skillHandle = GfParmReadFileLocal("config/raceman/extra/skill.xml", GFPARM_RMODE_REREAD);
 
@@ -222,7 +260,7 @@ void Driver::NewRace(tCarElt* car, tSituation* situation)
 
     TeamInfo(car, mSituation);
     mCar.init(car, &mTrack);
-    mPit.init(mTrack.torcsTrack(), situation, &mCar, mPitDamage, mPitGripFactor, mPitEntryMargin);
+    mPit.init(mTrack.torcsTrack(), situation, &mCar, mPitDamage, mPitGripFactor, mPitEntryMargin, mRain);
 
     // Create paths
     mPath.clear();

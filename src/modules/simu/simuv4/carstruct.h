@@ -45,7 +45,7 @@ typedef struct
     tAxle		axle[2];
     tWheel		wheel[4];
     tSteer		steer;
-    tBrakeSyst		brkSyst;
+    tBrakeSyst	brkSyst;
     tAero		aero;
     tWing		wing[2];
     tTransmission	transmission;	/* includes clutch, gearbox and driveshaft */

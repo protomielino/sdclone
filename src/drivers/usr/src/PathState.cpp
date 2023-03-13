@@ -91,6 +91,7 @@ void PathState::calcMaxSpeed()
     double speed;
     double nextspeed = mSeedLimit;
     double mass = mCar->mass();
+
     for (int i = 0; i < mNSEG; i++)
     {
         // Go through the path backwards

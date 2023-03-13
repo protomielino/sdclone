@@ -416,7 +416,7 @@ private:
             QUAD_SMOOTH_ITERS = 0;
             SPDC_NORMAL = 5;
             SPDC_TRAFFIC = 0;
-            OPPONENT_SPEED = 10;
+            OPPONENT_SPEED = 15;
             RACETIME_LIMIT = 20;
             ACC_MAX_SPIN_SPEED = 3.5;
             DEC_MAX_SPIN_SPEED = 2;
@@ -488,6 +488,7 @@ private:
     StuckAction		m_stuck;
     double			m_stuckTime;
     unsigned int    m_RandomSeed;           // seed of generator
+    int             m_Rain;
 
     LearnedGraph	m_maxAccel;
 //	LearnedGraph	m_maxDecel;
