@@ -1,6 +1,6 @@
 /***************************************************************************
                     tgf.h -- Interface file for The Gaming Framework
-                             -------------------                                         
+                             -------------------
     created              : Fri Aug 13 22:32:14 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
@@ -16,8 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    	The Gaming Framework API.
+/** @file
+        The Gaming Framework API.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -66,14 +66,15 @@ typedef float tdble;
 
 #define FREEZ(x) do {				\
     if (x) {					\
-	free(x);				\
-	x = 0;					\
+    free(x);				\
+    x = 0;					\
     }						\
 } while (0)
 
 #define freez FREEZ
 
 const double PI = 3.14159265358979323846;  /**< PI */
+const double PI2 = 6.28318530717958647692; /**< 2*PI */
 const double PI_2 = PI/2; /**< PI/2 =  90 deg */
 const double PI_3 = PI/3; /**< PI/3 =  60 deg */
 const double PI_4 = PI/4; /**< PI/4 =  45 deg */
@@ -96,29 +97,29 @@ const double ZEROC = 273.15; /**< 0 degrees Celsius in Kelvin */
 /** Angle normalization between 0 and 2 * PI */
 #define NORM0_2PI(x) 				\
 do {						\
-	while ((x) > 2*PI) { (x) -= 2*PI; }	\
-	while ((x) < 0) { (x) += 2*PI; } 	\
+    while ((x) > 2*PI) { (x) -= 2*PI; }	\
+    while ((x) < 0) { (x) += 2*PI; } 	\
 } while (0)
 
 /** Angle normalization between 0 and 2 * PI */
 #define FLOAT_NORM0_2PI(x) 				\
 do {						\
-	while ((x) > (tdble)(2*PI)) { (x) -= (tdble) (2*PI); }	\
-	while ((x) < 0) { (x) += (tdble)(2*PI); } 	\
+    while ((x) > (tdble)(2*PI)) { (x) -= (tdble) (2*PI); }	\
+    while ((x) < 0) { (x) += (tdble)(2*PI); } 	\
 } while (0)
 
 /** Angle normalization between -PI and PI */
 #define NORM_PI_PI(x) 				\
 do {						\
-	while ((x) > PI) { (x) -= 2*PI; }	\
-	while ((x) < -PI) { (x) += 2*PI; } 	\
+    while ((x) > PI) { (x) -= 2*PI; }	\
+    while ((x) < -PI) { (x) += 2*PI; } 	\
 } while (0)
 
 /** Angle normalization between -PI and PI */
 #define FLOAT_NORM_PI_PI(x) 				\
 do {						\
-	while ((x) > PI) { (x) -= (tdble) (2*PI); }	\
-	while ((x) < -PI) { (x) += (tdble) (2*PI); } 	\
+    while ((x) > PI) { (x) -= (tdble) (2*PI); }	\
+    while ((x) < -PI) { (x) += (tdble) (2*PI); } 	\
 } while (0)
 
 
@@ -198,9 +199,9 @@ typedef tMemoryPoolItem* tMemoryPool;
 
 typedef struct MemoryPoolItem
 {
-	struct MemoryPoolItem *prev;
-	struct MemoryPoolItem *next;
-	tMemoryPool *pool; /* NULL if not the first item, pointer to the pool otherwise */
+    struct MemoryPoolItem *prev;
+    struct MemoryPoolItem *next;
+    tMemoryPool *pool; /* NULL if not the first item, pointer to the pool otherwise */
 } tMemoryPoolItem;
 
 typedef tMemoryPoolItem* tMemoryPool;
@@ -230,23 +231,23 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 //#define __DEBUG_MEMORYMANAGER__
 #if defined(__DEBUG_MEMORYMANAGER__)
 // Use new Memory Manager ...
-	#if defined(WIN32)
-	// Windows ...
-		#if defined(__MINGW32__)
-		// MinGW ...
-			#define ExternC extern "C"
-		// ... MinGW
-		#else
-		// VC++ ...
-			#define ExternC
-		// ... VC++
-		#endif
-	// ... Windows
-	#else
-	// Linux ...
+    #if defined(WIN32)
+    // Windows ...
+        #if defined(__MINGW32__)
+        // MinGW ...
+            #define ExternC extern "C"
+        // ... MinGW
+        #else
+        // VC++ ...
+            #define ExternC
+        // ... VC++
+        #endif
+    // ... Windows
+    #else
+    // Linux ...
 
-	// ... Linux
-	#endif
+    // ... Linux
+    #endif
 //============================================================================*
 
 //============================================================================*
@@ -254,49 +255,49 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 //----------------------------------------------------------------------------*
 #if defined(WIN32)
 // Windows ...
-	#if defined(__MINGW32__)
-	// MinGW ...
-	#define malloc(x) _tgf_win_malloc((x))
-	#define calloc(x,y) _tgf_win_calloc((x),(y))
-	#define realloc(x,y) _tgf_win_realloc((x),(y))
-	#define free(x) _tgf_win_free((x))
-	#define doaccept() GfMemoryManagerDoAccept()
-	#define dofree() GfMemoryManagerDoFree()
-	#ifdef strdup
-	#undef strdup
-	#endif
-	#define strdup(x) _tgf_win_strdup((x))
-	#define _strdup(x) _tgf_win_strdup((x))
-	// ... MinGW
-	#else
-	// VC++ ...
-	#define malloc _tgf_win_malloc
-	#define calloc _tgf_win_calloc
-	#define realloc _tgf_win_realloc
-	#define free _tgf_win_free
-	#define doaccept() GfMemoryManagerDoAccept()
-	#define dofree() GfMemoryManagerDoFree()
-	#ifdef strdup
-	#undef strdup
-	#endif
-	#define strdup _tgf_win_strdup
-	#define _strdup _tgf_win_strdup
-	// ... VC++
+    #if defined(__MINGW32__)
+    // MinGW ...
+    #define malloc(x) _tgf_win_malloc((x))
+    #define calloc(x,y) _tgf_win_calloc((x),(y))
+    #define realloc(x,y) _tgf_win_realloc((x),(y))
+    #define free(x) _tgf_win_free((x))
+    #define doaccept() GfMemoryManagerDoAccept()
+    #define dofree() GfMemoryManagerDoFree()
+    #ifdef strdup
+    #undef strdup
+    #endif
+    #define strdup(x) _tgf_win_strdup((x))
+    #define _strdup(x) _tgf_win_strdup((x))
+    // ... MinGW
+    #else
+    // VC++ ...
+    #define malloc _tgf_win_malloc
+    #define calloc _tgf_win_calloc
+    #define realloc _tgf_win_realloc
+    #define free _tgf_win_free
+    #define doaccept() GfMemoryManagerDoAccept()
+    #define dofree() GfMemoryManagerDoFree()
+    #ifdef strdup
+    #undef strdup
+    #endif
+    #define strdup _tgf_win_strdup
+    #define _strdup _tgf_win_strdup
+    // ... VC++
 #endif
 // ... Windows
 #else
 // Linux ...
-	#define malloc(x) _tgf_win_malloc((x))
-	#define calloc(x,y) _tgf_win_calloc((x),(y))
-	#define realloc(x,y) _tgf_win_realloc((x),(y))
-	#define free(x) _tgf_win_free((x))
-	#define doaccept() GfMemoryManagerDoAccept()
-	#define dofree() GfMemoryManagerDoFree()
-	#ifdef strdup
-	#undef strdup
-	#endif
-	#define strdup(x) _tgf_win_strdup((x))
-	#define _strdup(x) _tgf_win_strdup((x))
+    #define malloc(x) _tgf_win_malloc((x))
+    #define calloc(x,y) _tgf_win_calloc((x),(y))
+    #define realloc(x,y) _tgf_win_realloc((x),(y))
+    #define free(x) _tgf_win_free((x))
+    #define doaccept() GfMemoryManagerDoAccept()
+    #define dofree() GfMemoryManagerDoFree()
+    #ifdef strdup
+    #undef strdup
+    #endif
+    #define strdup(x) _tgf_win_strdup((x))
+    #define _strdup(x) _tgf_win_strdup((x))
 // ... Linux
 #endif
 //============================================================================*
@@ -341,10 +342,10 @@ TGF_API int GfModFreeInfoList(tModList **modlist);
  * Directory management *
  ************************/
 
-/** List of files for a Directory 
+/** List of files for a Directory
     @see	GfDirGetList
 */
-typedef struct FList 
+typedef struct FList
 {
     struct FList	*next;		/**< Next entry */
     struct FList	*prev;		/**< Previous entry */
@@ -476,7 +477,7 @@ TGF_API char* GfParmGetCurFormula(void *hanlde, char const *path, char const *ke
 /* set formula */
 TGF_API int GfParmSetFormula(void* hanlde, char const *path, char const *key, char const *formula);
 TGF_API int GfParmSetCurFormula(void* hanlde, char const *path, char const *key, char const *formula);
- 
+
 /* clean all the parameters of a set */
 TGF_API void GfParmClean(void *handle);
 /* clean the parms and release the handle without updating the file */
@@ -586,94 +587,94 @@ class TGF_API GfLogger
 {
  public:
 
-	//! Trace level / criticity : enum or integer if > eDebug.
-	enum { eFatal = 0, eError, eWarning, eInfo, eTrace, eDebug };
+    //! Trace level / criticity : enum or integer if > eDebug.
+    enum { eFatal = 0, eError, eWarning, eInfo, eTrace, eDebug };
 
-	//! Destructor.
-	virtual ~GfLogger();
+    //! Destructor.
+    virtual ~GfLogger();
 
-	//! Name.
-	const std::string& name() const;
+    //! Name.
+    const std::string& name() const;
 
-	//! Criticity level threshold (ascending level means descending criticity).
-	int levelThreshold() const;
-	void setLevelThreshold(int nLevel);
+    //! Criticity level threshold (ascending level means descending criticity).
+    int levelThreshold() const;
+    void setLevelThreshold(int nLevel);
 
-	//! Output lines header columns selection (order not customisable, only there or not).
-	enum { eNone=0, eTime=0x01, eLogger=0x02, eLevel=0x04, eAll=eTime|eLogger|eLevel };
-	unsigned headerColumns() const;
-	void setHeaderColumns(unsigned bfHdrCols);
+    //! Output lines header columns selection (order not customisable, only there or not).
+    enum { eNone=0, eTime=0x01, eLogger=0x02, eLevel=0x04, eAll=eTime|eLogger|eLevel };
+    unsigned headerColumns() const;
+    void setHeaderColumns(unsigned bfHdrCols);
 
-	//! Output stream.
-	FILE* stream() const;
-	void setStream(FILE* pFile, bool bLogFileChange=true);
-	void setStream(const std::string& strPathname); // "stdout" or "stderr" also supported.
-	
-	//! Tracing functions (name gives the trace level / criticity).
-	void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
+    //! Output stream.
+    FILE* stream() const;
+    void setStream(FILE* pFile, bool bLogFileChange=true);
+    void setStream(const std::string& strPathname); // "stdout" or "stderr" also supported.
+
+    //! Tracing functions (name gives the trace level / criticity).
+    void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
 #ifdef TRACE_OUT
-	void error(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
-	void warning(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
-	void info(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
-	void trace(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
-	void debug(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+    void error(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+    void warning(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+    void info(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+    void trace(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+    void debug(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
 #else // TRACE_OUT
-	// The compiler should simply skip calls to these ...
-	inline void error(const char *pszFmt, ...) {};
-	inline void warning(const char *pszFmt, ...) {};
-	inline void info(const char *pszFmt, ...) {};
-	inline void trace(const char *pszFmt, ...) {};
-	inline void debug(const char *pszFmt, ...) {};
+    // The compiler should simply skip calls to these ...
+    inline void error(const char *pszFmt, ...) {};
+    inline void warning(const char *pszFmt, ...) {};
+    inline void info(const char *pszFmt, ...) {};
+    inline void trace(const char *pszFmt, ...) {};
+    inline void debug(const char *pszFmt, ...) {};
 #endif // TRACE_OUT
 
-	//! Generic tracing function (you must specify the level, enum or integer if > eDebug).
+    //! Generic tracing function (you must specify the level, enum or integer if > eDebug).
 #ifdef TRACE_OUT
-	void message(int nLevel, const char *pszFmt, ...) PRINTF_FORMAT(3, 4);
+    void message(int nLevel, const char *pszFmt, ...) PRINTF_FORMAT(3, 4);
 #else // TRACE_OUT
-	// The compiler should simply skip calls to this ...
-	inline void message(int nLevel, const char *pszFmt, ...) {};
+    // The compiler should simply skip calls to this ...
+    inline void message(int nLevel, const char *pszFmt, ...) {};
 #endif // TRACE_OUT
 
-	//! Instance getter (you can't readily instanciate loggers).
-	static GfLogger* instance(const std::string& name);
-	
-	//! Boot the logging system (only 1 logger set up : GfLogDefault, and with default settings).
-	static void boot(bool bWithLogging = true);
-	
-	//! Complete logging system initialisation (create and / or configure all loggers from XML settings).
-	static void setup();
-	
- protected:
+    //! Instance getter (you can't readily instanciate loggers).
+    static GfLogger* instance(const std::string& name);
 
-	//! Constructors (protected in order to forbid direct instanciation).
-	GfLogger(); // Forced default constructor, to prevent the compiler to make it public.
-	GfLogger(const std::string& strName, FILE* pFile = stderr,
-			 int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
-	GfLogger(const std::string& strName, const std::string& strFilename,
-			 int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
+    //! Boot the logging system (only 1 logger set up : GfLogDefault, and with default settings).
+    static void boot(bool bWithLogging = true);
 
-	// Output a line header with required columns, if not level-filtered out.
-	void putLineHeader(int nLevel);
+    //! Complete logging system initialisation (create and / or configure all loggers from XML settings).
+    static void setup();
 
  protected:
 
-	//! The logger name / id.
-	std::string _strName;
-	
-	//! The header columns to output in the target stream.
-	unsigned _bfHdrCols;
+    //! Constructors (protected in order to forbid direct instanciation).
+    GfLogger(); // Forced default constructor, to prevent the compiler to make it public.
+    GfLogger(const std::string& strName, FILE* pFile = stderr,
+             int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
+    GfLogger(const std::string& strName, const std::string& strFilename,
+             int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
 
-	//! The target output stream.
-	FILE* _pStream;
+    // Output a line header with required columns, if not level-filtered out.
+    void putLineHeader(int nLevel);
 
-	//! The trace level threshold (less critical traces are not logged).
-	int _nLvlThresh;
-	
-	//! Flag indicating if the last logged line ended with a new-line.
-	bool _bNeedsHeader;
-	
-	//! Flag indicating if output is enabled (for all loggers).
-	static bool _bOutputEnabled;
+ protected:
+
+    //! The logger name / id.
+    std::string _strName;
+
+    //! The header columns to output in the target stream.
+    unsigned _bfHdrCols;
+
+    //! The target output stream.
+    FILE* _pStream;
+
+    //! The trace level threshold (less critical traces are not logged).
+    int _nLvlThresh;
+
+    //! Flag indicating if the last logged line ended with a new-line.
+    bool _bNeedsHeader;
+
+    //! Flag indicating if output is enabled (for all loggers).
+    static bool _bOutputEnabled;
 };
 
 // The logging system run-time settings file (in GfLocalDir()).
@@ -720,7 +721,7 @@ TGF_API extern GfLogger* GfPLogDefault;
 #define GfTrace GfLogTrace
 
 
-/******************* 
+/*******************
  * Time  Interface *
  *******************/
 TGF_API double GfTimeClock(void);
@@ -735,10 +736,10 @@ TGF_API int GfNearestPow2(int x);
 /* Mean values */
 #define GF_MEAN_MAX_VAL	5
 
-typedef struct 
+typedef struct
 {
-	int		curNum;
-	tdble	val[GF_MEAN_MAX_VAL+1];
+    int		curNum;
+    tdble	val[GF_MEAN_MAX_VAL+1];
 } tMeanVal;
 
 TGF_API tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
@@ -831,16 +832,16 @@ TGF_API void GfFileSetup();
     @ingroup tailq */
 #define GF_TAILQ_HEAD(name, type)					\
 typedef struct name {							\
-	type *tqh_first;	/* first element */			\
-	type **tqh_last;	/* addr of last next element */		\
+    type *tqh_first;	/* first element */			\
+    type **tqh_last;	/* addr of last next element */		\
 } t ## name
 
 /** Entry in structure
     @ingroup tailq */
 #define GF_TAILQ_ENTRY(type)						\
 struct {								\
-	type *tqe_next;	/* next element */				\
-	type **tqe_prev;	/* address of previous next element */	\
+    type *tqe_next;	/* next element */				\
+    type **tqe_prev;	/* address of previous next element */	\
 }
 
 /** First element of a TAILQ
@@ -855,11 +856,11 @@ struct {								\
 /** Last element of a TAILQ
     @ingroup tailq */
 #define GF_TAILQ_LAST(head, headname) 					\
-	(*(((struct headname *)((head)->tqh_last))->tqh_last))
+    (*(((struct headname *)((head)->tqh_last))->tqh_last))
 /** Previous element of a TAILQ
     @ingroup tailq */
 #define GF_TAILQ_PREV(elm, headname, field) 				\
-	(*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
+    (*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
 
 /*
  * Tail queue functions.
@@ -867,8 +868,8 @@ struct {								\
 /** Head initialization (Mandatory)
     @ingroup tailq */
 #define	GF_TAILQ_INIT(head) do {					\
-	(head)->tqh_first = NULL;					\
-	(head)->tqh_last = &(head)->tqh_first;				\
+    (head)->tqh_first = NULL;					\
+    (head)->tqh_last = &(head)->tqh_first;				\
 } while (0)
 
 /** Entry initialization (optionnal if inserted)
@@ -881,54 +882,54 @@ struct {								\
 /** Insert an element at the head
     @ingroup tailq */
 #define GF_TAILQ_INSERT_HEAD(head, elm, field) do {			\
-	if (((elm)->field.tqe_next = (head)->tqh_first) != NULL)	\
-		(head)->tqh_first->field.tqe_prev =			\
-		    &(elm)->field.tqe_next;				\
-	else								\
-		(head)->tqh_last = &(elm)->field.tqe_next;		\
-	(head)->tqh_first = (elm);					\
-	(elm)->field.tqe_prev = &(head)->tqh_first;			\
+    if (((elm)->field.tqe_next = (head)->tqh_first) != NULL)	\
+        (head)->tqh_first->field.tqe_prev =			\
+            &(elm)->field.tqe_next;				\
+    else								\
+        (head)->tqh_last = &(elm)->field.tqe_next;		\
+    (head)->tqh_first = (elm);					\
+    (elm)->field.tqe_prev = &(head)->tqh_first;			\
 } while (0)
 
 /** Insert an element at the tail
     @ingroup tailq */
 #define GF_TAILQ_INSERT_TAIL(head, elm, field) do {			\
-	(elm)->field.tqe_next = NULL;					\
-	(elm)->field.tqe_prev = (head)->tqh_last;			\
-	*(head)->tqh_last = (elm);					\
-	(head)->tqh_last = &(elm)->field.tqe_next;			\
+    (elm)->field.tqe_next = NULL;					\
+    (elm)->field.tqe_prev = (head)->tqh_last;			\
+    *(head)->tqh_last = (elm);					\
+    (head)->tqh_last = &(elm)->field.tqe_next;			\
 } while (0)
 
 /** Insert an element after another element
     @ingroup tailq */
 #define GF_TAILQ_INSERT_AFTER(head, listelm, elm, field) do {		\
-	if (((elm)->field.tqe_next = (listelm)->field.tqe_next) != NULL)\
-		(elm)->field.tqe_next->field.tqe_prev = 		\
-		    &(elm)->field.tqe_next;				\
-	else								\
-		(head)->tqh_last = &(elm)->field.tqe_next;		\
-	(listelm)->field.tqe_next = (elm);				\
-	(elm)->field.tqe_prev = &(listelm)->field.tqe_next;		\
+    if (((elm)->field.tqe_next = (listelm)->field.tqe_next) != NULL)\
+        (elm)->field.tqe_next->field.tqe_prev = 		\
+            &(elm)->field.tqe_next;				\
+    else								\
+        (head)->tqh_last = &(elm)->field.tqe_next;		\
+    (listelm)->field.tqe_next = (elm);				\
+    (elm)->field.tqe_prev = &(listelm)->field.tqe_next;		\
 } while (0)
 
 /** Insert an element before another element
     @ingroup tailq */
 #define	GF_TAILQ_INSERT_BEFORE(listelm, elm, field) do {		\
-	(elm)->field.tqe_prev = (listelm)->field.tqe_prev;		\
-	(elm)->field.tqe_next = (listelm);				\
-	*(listelm)->field.tqe_prev = (elm);				\
-	(listelm)->field.tqe_prev = &(elm)->field.tqe_next;		\
+    (elm)->field.tqe_prev = (listelm)->field.tqe_prev;		\
+    (elm)->field.tqe_next = (listelm);				\
+    *(listelm)->field.tqe_prev = (elm);				\
+    (listelm)->field.tqe_prev = &(elm)->field.tqe_next;		\
 } while (0)
 
 /** Remove an element
     @ingroup tailq */
 #define GF_TAILQ_REMOVE(head, elm, field) do {				\
-	if (((elm)->field.tqe_next) != NULL)				\
-		(elm)->field.tqe_next->field.tqe_prev = 		\
-		    (elm)->field.tqe_prev;				\
-	else								\
-		(head)->tqh_last = (elm)->field.tqe_prev;		\
-	*(elm)->field.tqe_prev = (elm)->field.tqe_next;			\
+    if (((elm)->field.tqe_next) != NULL)				\
+        (elm)->field.tqe_next->field.tqe_prev = 		\
+            (elm)->field.tqe_prev;				\
+    else								\
+        (head)->tqh_last = (elm)->field.tqe_prev;		\
+    *(elm)->field.tqe_prev = (elm)->field.tqe_next;			\
 } while (0)
 
 
@@ -966,14 +967,14 @@ TGF_API void GfProfPrintReport();
 #ifdef SCHEDULE_SPY
 
 TGF_API void GfSchedConfigureEventLog(const char* pszSpyName, const char* pszLogName,
-									  unsigned nMaxEvents, double dIgnoreDelay);
+                                      unsigned nMaxEvents, double dIgnoreDelay);
 TGF_API void GfSchedBeginSession(const char* pszSpyName);
 TGF_API void GfSchedBeginEvent(const char* pszSpyName, const char* pszLogName);
 TGF_API void GfSchedEndEvent(const char* pszSpyName, const char* pszLogName);
 TGF_API void GfSchedEndSession(const char* pszSpyName);
 TGF_API void GfSchedPrintReport(const char* pszSpyName, const char* pszFileName,
-								double fTimeResolution,
-								double fDurationUnit, double fDurationResolution);
+                                double fTimeResolution,
+                                double fDurationUnit, double fDurationResolution);
 
 #else // SCHEDULE_SPY
 
@@ -983,7 +984,7 @@ TGF_API void GfSchedPrintReport(const char* pszSpyName, const char* pszFileName,
 #define GfSchedEndEvent(pszSpyName, pszLogName)
 #define GfSchedEndSession(pszSpyName)
 #define GfSchedPrintReport(pszSpyName, pszFileName, \
-						   fTimeResolution, fDurationUnit, fDurationResolution)
+                           fTimeResolution, fDurationUnit, fDurationResolution)
 
 #endif // SCHEDULE_SPY
 

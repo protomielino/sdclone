@@ -1610,7 +1610,7 @@ void ReWebMetar::density()
     else
         tas = 12334;
 
-    _density = ((1 - ( 0.3783 * relhumidity * tas) / pressure) * pressure) / (287.058 * C2K(temp)) / 100;
+    _density = ((1 - ( 0.3783 * relhumidity * tas) / pressure) * pressure) / (287.058 * (temp + 273.15)) / 100;
     GfLogDebug("Density = %.3f - relative humidity = %.3f\n", _density, relhumidity);
 }
 

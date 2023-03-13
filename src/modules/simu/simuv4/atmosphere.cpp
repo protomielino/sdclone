@@ -22,7 +22,7 @@
 #include "sim.h"
 
 //static int SimClouds = 0;
-static double simDegree = 0.000000023;  // Value 1 degree celsius / 24 hours
+static double simDegree = 0.00000009;  // Value 1 degree celsius / 12 hours
 static int    simuMonth = 1;
 static double startDay  = 0.0;
 static double endDay    = 0.0;
@@ -36,7 +36,7 @@ void SimAtmospherePreConfig(tTrack *track)
     SimRain = track->local.rain * 1e-9;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
-    Tair = C2K(track->local.airtemperature);
+    Tair = track->local.airtemperature + 273.15f;
     SimAirPressure = track->local.airpressure;
     SimAirDensity = track->local.airdensity;
 
@@ -52,7 +52,7 @@ void SimAtmospherePreConfig(tTrack *track)
     switch(simuMonth)
     {
     case 1:
-        simDegree *= 2.0;
+        simDegree *= 1.0;
         startDay = 28872.0;
         endDay = 63372.0;
         break;
@@ -77,37 +77,37 @@ void SimAtmospherePreConfig(tTrack *track)
         endDay = 79344.0;
         break;
     case 6:
-        simDegree *= 9.0;
+        simDegree *= 10.0;
         startDay = 18144.0;
         endDay = 80568.0;
         break;
     case 7:
-        simDegree *= 10.0;
+        simDegree *= 12.0;
         startDay = 18792.0;
         endDay = 80244.0;
         break;
     case 8:
-        simDegree *= 12.0;
+        simDegree *= 15.0;
         startDay = 21888.0;
         endDay = 77040.0;
         break;
     case 9:
-        simDegree *= 11.0;
+        simDegree *= 10.0;
         startDay = 23580.0;
         endDay = 73224.0;
         break;
     case 10:
-        simDegree *= 8.5;
+        simDegree *= 6.5;
         startDay = 26604.0;
         endDay = 69552.0;
         break;
     case 11:
-        simDegree *= 5.5;
+        simDegree *= 3.5;
         startDay = 26100.0;
         endDay = 62784.0;
         break;
     case 12:
-        simDegree *= 3.0;
+        simDegree *= 1.5;
         startDay = 28800.0;
         endDay = 62316.0;
         break;
@@ -123,7 +123,7 @@ void SimAtmospherePreConfig(tTrack *track)
 
 void SimAtmosphereConfig(tTrack *track)
 {
-    if (SimTimeOfDay < 21000 && SimTimeOfDay > 68400)
+    /*if (SimTimeOfDay < 21000 && SimTimeOfDay > 68400)
         Tair -= 6.75;
     else if (SimTimeOfDay > 6.00 * 60 * 60 && SimTimeOfDay < 10 * 60 * 60)
         Tair += 5.75;
@@ -142,7 +142,7 @@ void SimAtmosphereConfig(tTrack *track)
     else if (SimClouds == 4 )
         Tair -= 3.05;
     else
-        Tair -= 5.75;
+        Tair -= 5.75;*/
 }
 
 void SimAtmosphereUpdate(tSituation *s)
@@ -152,14 +152,11 @@ void SimAtmosphereUpdate(tSituation *s)
     if ((timeofday > startDay) && (timeofday < endDay))
     {
         Tair = Tair + simDegree;
-        GfLogDebug("Tair update = %.7f\n", K2C(Tair));
+        //GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
     }
     else
     {
         Tair = Tair - simDegree;
-        GfLogDebug("Tair update = %.7f\n", K2C(Tair));
+        //GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
     }
-    // TODO: get this later form the situation, weather simulation.
-    //car->localTemperature = 273.15f + 20.0f;
-    //car->localPressure = 101300.0f;
 }

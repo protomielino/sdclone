@@ -321,6 +321,7 @@ typedef struct RmInfo
 #define RM_ATTR_SESSIONTIME	"sessiontime"
 #define RM_ATTR_CLOUDS	    "clouds"
 #define RM_ATTR_RAIN        "rain"
+#define RM_ATTR_SEASON      "season"
 #define RM_ATTR_TIME_OF_DAY	"time of day"
 #define RM_ATTR_WEATHER     "weather"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
@@ -357,6 +358,7 @@ typedef struct RmInfo
 #define RM_VAL_CONFCLOUDCOVER  "cloud cover"
 #define RM_VAL_CONFRAINFALL	   "rain fall"
 #define RM_VAL_CONFWEATHER     "weather"
+#define RM_VAL_CONFSEASON      "season"
 
 #define RM_CONF_RACE_LEN	0x0001
 #define RM_CONF_DISP_MODE	0x0002
@@ -364,6 +366,7 @@ typedef struct RmInfo
 #define RM_CONF_CLOUD_COVER	0x0008
 #define RM_CONF_RAIN_FALL	0x0010
 #define RM_CONF_WEATHER     0x0016
+#define RM_CONF_SEASON      0x0100
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
 #define RM_VAL_LAST_RACE_ORDER	"last race"
@@ -418,7 +421,6 @@ typedef struct RmInfo
 #define RM_VAL_CLOUDS_BROKEN    "broken"
 #define RM_VAL_CLOUDS_FULL	    "full cover"
 #define RM_VAL_CLOUDS_RANDOM	"random"
-#define RM_VAL_CLOUDS_REAL	    "real"
 #define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_CIRRUS, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_CUMULUS, RM_VAL_CLOUDS_SCARCE, RM_VAL_CLOUDS_BROKEN, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
 
 #define RM_VAL_RAIN_NONE	"none"
@@ -426,18 +428,22 @@ typedef struct RmInfo
 #define RM_VAL_RAIN_MEDIUM	"medium"
 #define RM_VAL_RAIN_HEAVY	"heavy"
 #define RM_VAL_RAIN_RANDOM	"random"
-#define RM_VAL_RAIN_REAL	"real"
 #define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
 
+#define RM_VAL_SPRING           "spring"
+#define RM_VAL_SUMMER           "summer"
+#define RM_VAL_AUTUMN           "autumn"
+#define RM_VAL_WINTER           "winter"
+#define RM_VAL_NOW              "now"
+#define RM_VALS_SEASONS { RM_VAL_SPRING, RM_VAL_SUMMER, RM_VAL_AUTUMN, RM_VAL_WINTER, RM_VAL_NOW }
+
 #define RM_VAL_WEATHER_CONFIG   "config"
-#define RM_VAL_WEATHER_RECORDED "recorded"
 #define RM_VAL_WEATHER_REAL     "real"
-#define RM_VALS_WEATHER { RM_VAL_WEATHER_CONFIG, RM_VAL_WEATHER_RECORDED, RM_VAL_WEATHER_REAL }
+#define RM_VALS_WEATHER { RM_VAL_WEATHER_CONFIG, RM_VAL_WEATHER_REAL }
 
 /* Movie capture */
 
 #define RM_SECT_MOVIE_CAPTURE	"Movie Capture"
-
 #define RM_ATT_CAPTURE_ENABLE	"enable capture"
 #define RM_ATT_CAPTURE_FPS	"fps"
 #define RM_ATT_CAPTURE_OUT_DIR	"output directory"

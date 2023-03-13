@@ -28,7 +28,6 @@
 
 #include <tgf.h>
 
-
 #include <raceman.h>
 #include <track.h>
 #include <tracks.h>
@@ -52,15 +51,56 @@ static ReWebMetar           *webMetar = NULL;
 #include <portability.h>
 
 // Local functions.
-static void reTrackDump(const tTrack *track, int verbose);
-static void reTrackInitTimeOfDay(void);
-static void reTrackInitWeather(void);
-static void reTrackInitWeatherValues(void);
+static void   reTrackDump(const tTrack *track, int verbose);
+static void   reTrackInitTimeOfDay(void);
+static void   reTrackInitWeather(void);
+static void   reTrackInitWeatherValues(void);
 
-static void reTrackInitRealWeather(void);
-static void reTrackInitSimuWeather(void);
+static void   reTrackInitRealWeather(void);
 
-static void reTrackUpdatePhysics(void);
+static void   reTrackUpdatePhysics(void);
+static void   reTrackUpdatePrecipitation(void);
+static void   reTrackUpdateWind(void);
+static void   reTrackUpdatePressure(void);
+static void   reTrackSetOcean(void);
+static void   reTrackSetTropical(void);
+static void   reTrackSetDry(void);
+static void   reTrackSetTemperate(void);
+static void   reTrackSetContinetal(void);
+static void   reTrackSetPolar(void);
+
+static double reTrackLinear(double val, double min, double max);
+static double reTrackTriangular(double val, double min, double max);
+static double reTrackSinusoidal(double val, double min, double max);
+static double reTrackEven(double val, double min, double max);
+static double reTrackLongLow(double val, double min, double max);
+static double reTrackLongHigh(double val, double min, double max);
+static double reTrackMonsoonal(double val, double min, double max);
+
+static int    code   = 0;
+static int    rain   = 0;
+static int    season = 0;
+static int    month  = 0;
+static int    yday   = 0;
+static int    north  = 0;
+static int    timeofday = 0;
+static int    hour = 0;
+
+static double latitude = 0.0;
+static double longitude = 0.0;
+static double temperature = 0.0;
+static double temperature_mean = 0.0;
+static double temperature_water = 0.0;
+static double humidity = 0.0;
+static double precipitation_annual = 0.0;
+static double precipitation = 0.0;
+static double elevation = 0.0;
+static double wind_dir = 0.0;
+static double wind_speed = 0.0;
+static double pressure = 0.0;
+static double clouds = 0.0;
+//static double clouds1 = 0.0;
+//static double clouds2 = 0.0;
 
 /** Initialize the track for a race manager.
     @return <tt>0 ... </tt>Ok<br>
@@ -98,10 +138,9 @@ ReTrackInit(void)
 
     if (!pszWeather)
          pszWeather = GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_WEATHER, RM_VAL_WEATHER_CONFIG);
+
     if (!strcmp(pszWeather, RM_VAL_WEATHER_REAL))
         reTrackInitRealWeather();
-    else if (!strcmp(pszWeather, RM_VAL_WEATHER_RECORDED))
-        reTrackInitSimuWeather();
     else
         reTrackInitWeather();
 
@@ -222,7 +261,7 @@ reTrackInitTimeOfDay(void)
 
     // Load time of day settings for the session
     // (defaults to  "All sesions" one, or else "afternoon").
-    int timeofday = RM_IND_TIME_AFTERNOON;
+    timeofday = RM_IND_TIME_AFTERNOON;
     const char* pszTimeOfDay =
         GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_TIME_OF_DAY, 0);
     if (!pszTimeOfDay)
@@ -240,27 +279,33 @@ reTrackInitTimeOfDay(void)
     {
         case RM_IND_TIME_DAWN:
             trackLocal->timeofday = 6 * 3600 + 13 * 60 + 20; // 06:13:20
+            hour = 6;
             break;
 
         case RM_IND_TIME_MORNING:
             trackLocal->timeofday = 10 * 3600 + 0 * 60 + 0; // 10:00:00
+            hour = 10;
             break;
 
         case RM_IND_TIME_NOON:
         case RM_IND_TIME_24HR:
             trackLocal->timeofday = 12 * 3600 + 0 * 60 + 0; // 12:00:00
+            hour = 12;
             break;
 
         case RM_IND_TIME_AFTERNOON:
             trackLocal->timeofday = 15 * 3600 + 0 * 60 + 0; // 15:00:00
+            hour = 15;
             break;
 
         case RM_IND_TIME_DUSK:
             trackLocal->timeofday = 17 * 3600 + 46 * 60 + 40; // 17:46:40
+            hour = 18;
             break;
 
         case RM_IND_TIME_NIGHT:
             trackLocal->timeofday = 0 * 3600 + 0 * 60 + 0; // Midnight = 00:00:00
+            hour = 0;
             break;
         case RM_IND_TIME_REAL:
         case RM_IND_TIME_NOW:
@@ -268,6 +313,7 @@ reTrackInitTimeOfDay(void)
             time_t t = time(0);
             struct tm *ptm = localtime(&t);
             trackLocal->timeofday = ptm->tm_hour * 3600.0f + ptm->tm_min * 60.0f + ptm->tm_sec;
+            hour = ptm->tm_hour;
             GfLogDebug("  Now time of day\n");
             break;
         }
@@ -279,17 +325,19 @@ reTrackInitTimeOfDay(void)
 
         case RM_IND_TIME_RANDOM:
             trackLocal->timeofday = (tdble)(rand() % (24*60*60));
+            hour = 12;
             break;
 
         default:
             trackLocal->timeofday = 15 * 3600 + 0 * 60 + 0; // 15:00:00
             trackLocal->timeofdayindex = RM_IND_TIME_AFTERNOON;
+            hour = 15;
             GfLogError("Unsupported value %d for user timeofday (assuming 15:00)\n",
                        timeofday);
             break;
-
     }//switch timeofday
 
+    //hour = (hour / 24) *2.5;
 }
 
 // Initialize track weather info from race settings
@@ -302,7 +350,28 @@ reTrackInitWeather(void)
     static const char *RainValues[] = RM_VALS_RAIN;
     static const int NRainValues = sizeof(RainValues) / sizeof(const char*);
 
+    static const char* SeasonsValues[] = RM_VALS_SEASONS;
+    static const int NSeasonsValues = sizeof(SeasonsValues) / sizeof (const char*);
+
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
+
+    // Load season for the session
+    // (defaults to  "All sesions" one, or else "none").
+    season = TR_SEASON_NOW;
+
+    const char* pszSeasons =
+        GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_SEASON, 0);
+
+    if (!pszSeasons)
+        pszSeasons =
+            GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_SEASON, RM_VAL_NOW);
+
+    for (int i = 0; i < NSeasonsValues; i++)
+        if (!strcmp(pszSeasons, SeasonsValues[i]))
+        {
+            season = i;
+            break;
+        }
 
     // Load cloud cover settings for the session
     // (defaults to  "All sesions" one, or else "none").
@@ -312,6 +381,7 @@ reTrackInitWeather(void)
     if (!pszClouds)
         pszClouds =
             GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
+
     for (int i = 0; i < NCloudsValues; i++)
         if (!strcmp(pszClouds, CloudsValues[i]))
         {
@@ -321,7 +391,8 @@ reTrackInitWeather(void)
 
     // Load rain fall (and track dry/wet conditions) settings for the session
     // if feature supported (defaults to  "All sesions" one, or else "none").
-    int rain = TR_RAIN_NONE;
+    rain = TR_RAIN_NONE;
+
     if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
     {
         const char* pszRain =
@@ -339,62 +410,15 @@ reTrackInitWeather(void)
 
     // Take care of the random case for rain falls and ground water.
     const bool bRandomRain = (rain == TR_RAIN_RANDOM);
+
     if (bRandomRain)
     {
         // Force random clouds, in case there is no rain at the end.
         clouds = TR_CLOUDS_RANDOM;
-
-        // Random rain (if random[0,1] < trackLocal->anyrainlkhood, then it rains).
-        const tdble randDraw = (tdble)(rand()/(double)RAND_MAX);
-
-        GfLogTrace("Rain likelyhoods : overall=%.2f, little=%.2f, medium=%.2f\n",
-                   trackLocal->anyrainlkhood, trackLocal->littlerainlkhood,
-                   trackLocal->mediumrainlkhood);
-        GfLogDebug("Overall rain random draw = %.2f,\n", randDraw);
-        if (randDraw < trackLocal->anyrainlkhood)
-        {
-            // Now, let's determine how much it rains :
-            // if random[0,1] < little rain likelyhood => rain = little rain
-            const tdble randDraw2 = (tdble)(rand()/(double)RAND_MAX);
-            GfLogDebug("Specific rain random draw = %.2f,\n", randDraw2);
-            if (randDraw2 < trackLocal->littlerainlkhood)
-                rain = TR_RAIN_LITTLE;
-            // else if random[0,1] < medium + little rain likelyhood => rain = medium rain
-            else if (randDraw2 <  trackLocal->littlerainlkhood + trackLocal->mediumrainlkhood)
-                rain = TR_RAIN_MEDIUM;
-            // otherwise, random[0,1] >= medium + little rain likelyhood => rain = Heavy rain
-            else
-                rain = TR_RAIN_HEAVY;
-        }
-        else
-        {
-            // No Rain.
-            rain = TR_RAIN_NONE;
-        }
     }
 
-    // Take care of the random case for clouds cover.
-    const bool bRandomClouds = (clouds == TR_CLOUDS_RANDOM);
-    if (bRandomClouds)
-    {
-        if (rain != TR_RAIN_NONE)
-        {
-            // If any rain level, heavy clouds.
-            clouds = TR_CLOUDS_FULL;
-        }
-        else
-        {
-            // Really random clouds.
-            clouds = rand() % (TR_CLOUDS_FULL);
-        }
-    }
-
-    // Ground water = rain for the moment (might change in the future).
+     // Ground water = rain for the moment (might change in the future).
     const int water = rain;
-
-    GfLogInfo("Weather : Using %s rain (%d) and ground water (%d) + %s clouds (%d) settings\n",
-              bRandomRain ? "random" : "user defined", rain, water,
-              bRandomClouds ? "random" : "user defined", clouds);
 
     // Update track local info.
     trackLocal->rain = rain;
@@ -410,7 +434,8 @@ reTrackInitWeather(void)
     trackLocal->windspeed = (tdble)(rand() % 100);
     trackLocal->winddir = (tdble)(rand() % 359);
     trackLocal->relativehumidity = 65.0f;
-    trackLocal->visibility = (tdble)(rand() % 12000);
+    trackLocal->visibility = 10000.0;
+    trackLocal->season = season;
     trackLocal->config = 2;
 
     reTrackInitWeatherValues();
@@ -418,22 +443,22 @@ reTrackInitWeather(void)
     if ((trackLocal->visibility < 300) && (rain < 1))
         trackLocal->visibility = 300;
 
-    GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
-    GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
-    GfLogDebug("Wind direction = %.3f\n", trackLocal->winddir);
-    GfLogDebug("Air Temperature = %.3f\n", trackLocal->airtemperature);
-    GfLogDebug("Dew point = %.3f\n", trackLocal->dewp);
-    GfLogDebug("Air pressure = %.3f\n", trackLocal->airpressure);
-    GfLogDebug("Rain = %i\n", trackLocal->rain);
-    GfLogDebug("Snow = %i\n", trackLocal->snow);
-    GfLogDebug("Hail = %i\n", trackLocal->hail);
-    GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
+    GfLogInfo("Visibility = %.3f\n", trackLocal->visibility);
+    GfLogInfo("Wind Speed = %.3f\n", trackLocal->windspeed);
+    GfLogInfo("Wind direction = %.3f\n", trackLocal->winddir);
+    GfLogInfo("Air Temperature = %.3f\n", trackLocal->airtemperature);
+    GfLogInfo("Dew point = %.3f\n", trackLocal->dewp);
+    GfLogInfo("Air pressure = %.3f\n", trackLocal->airpressure);
+    GfLogInfo("Rain = %i\n", trackLocal->rain);
+    GfLogInfo("Snow = %i\n", trackLocal->snow);
+    GfLogInfo("Hail = %i\n", trackLocal->hail);
+    GfLogInfo("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
     // Update track physics from computed local info.
     ReTrackUpdate();
 }
 
-// Initialize Air temperature
+// Initialize weather simu
 void
 reTrackInitWeatherValues(void)
 {
@@ -446,62 +471,118 @@ reTrackInitWeatherValues(void)
 #else
     gmtime_r(&now_sec, &now);
 #endif
-    int month = now.tm_mon + 1;
-    tdble temp = 0.0;
+    month = now.tm_mon + 1;
+    yday = now.tm_yday;
 
-    switch (month)
+    int season = trackLocal->season;
+    latitude = trackLocal->latitude;
+    longitude = trackLocal->longitude;
+    code = trackLocal->climat;
+    precipitation_annual = trackLocal->precipitation;
+
+    temperature = trackLocal->airtemperature;
+    clouds = trackLocal->clouds;
+
+    GfLogInfo("# RaceTrack Init Weather latitude = %.2f - longitude = %.2f\n", latitude, longitude);
+
+    north = latitude >= 0.0 ? 1.0 : -1.0; // hemisphere
+
+    if (north > 0.0)
     {
-    case 1:
-        temp = (tdble)(rand() % 10);
-        temp -= 10.0;
-        break;
-    case 2:
-        temp = (tdble)(rand() % 15);
-        temp -= 10.0;
-        break;
-    case 3:
-        temp = (tdble)(rand() % 18);
-        temp -= 8.0;
-        break;
-    case 4:
-        temp = (tdble)(rand() % 19);
-        temp -= 5.0;
-        break;
-    case 5:
-        temp = (tdble)(rand() % 22);
-        temp -= 4.0;
-        break;
-    case 6:
-        temp = (tdble)(rand() % 25);
-        temp -= 3.0;
-        break;
-    case 7:
-        temp = (tdble)(rand() % 30);
-        temp-= 3.0;
-        break;
-    case 8:
-        temp = (tdble)(rand() % 35);
-        temp -= 3.0;
-        break;
-    case 9:
-        temp = (tdble)(rand() % 30);
-        break;
-    case 10:
-        temp = (tdble)(rand() % 25);
-        break;
-    case 11:
-        temp = (tdble)(rand() % 20);
-        temp -= 5.0;
-        break;
-    case 12:
-        temp = (tdble)(rand() % 15);
-        temp -= 10.0;
-        break;
-    default:
-        temp = (tdble)(rand() % 25);
+        if (season < 4)
+        {
+            switch (season)
+            {
+            case 0:
+                month = 5;
+                yday = 130;
+                break;
+            default:
+            case 1:
+                month = 8;
+                yday = 222;
+                break;
+            case 2:
+                month = 11;
+                yday = 314;
+                break;
+            case 3:
+                month = 2;
+                yday = 41;
+                break;
+            }
+        }
+    }
+    else
+    {
+        if (season < 4)
+        {
+            switch (season)
+            {
+            case 0:
+                month = 11;
+                yday = 314;
+                break;
+            default:
+            case 1:
+                month = 2;
+                yday = 41;
+                break;
+            case 2:
+                month = 5;
+                yday = 130;
+                break;
+            case 3:
+                month = 8;
+                yday = 222;
+                break;
+            }
+        }
     }
 
-    trackLocal->airtemperature = temp;
+    GfLogInfo(" # Track Init Config weather month = %i - day = %i\n",month, yday);
+
+    // convert from color shades to koppen-classicfication
+     precipitation_annual = precipitation_annual + 9000.0;
+     elevation = 9700 * trackLocal->altitude;
+
+     if (code == 0)
+         reTrackSetOcean();
+     else if (code < 5)
+         reTrackSetTropical();
+     else if (code < 9)
+         reTrackSetDry();
+     else if (code < 18)
+         reTrackSetTemperate();
+     else if (code < 30)
+         reTrackSetContinetal();
+     else if (code < 32)
+         reTrackSetPolar();
+     else
+         reTrackSetOcean();
+
+     reTrackUpdatePrecipitation();
+     reTrackUpdateWind();
+     reTrackUpdatePressure();
+
+     // Update track local info.
+     trackLocal->rain = rain;
+     trackLocal->hail = 0;
+     trackLocal->snow = 0;
+     trackLocal->clouds = (int)clouds;
+     trackLocal->cloud_altitude = 5500.0 * 0.3048;
+     trackLocal->water = rain;
+     trackLocal->airtemperature = temperature;
+     trackLocal->dewp = 5.0f;
+     //trackLocal->airpressure = pressure;
+     trackLocal->airpressure = 101300;
+     trackLocal->airdensity = 1.219f;
+     trackLocal->windspeed = wind_speed;
+     trackLocal->winddir = wind_dir;
+     trackLocal->relativehumidity = humidity;
+     trackLocal->visibility = 10000.0;
+     trackLocal->season = season;
+     trackLocal->config = 2;
 }
 
 // Initialize track weather info from race settings
@@ -519,7 +600,7 @@ reTrackInitRealWeather(void)
     bool w = webMetar->ReWebMetarFtp(url);
 
     if (w == false)
-        reTrackInitSimuWeather();
+        reTrackInitWeatherValues();
     else
     {
         char buffer[1024];
@@ -699,256 +780,21 @@ reTrackInitRealWeather(void)
 
         trackLocal->config = 0;
 
-        GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
-        GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
-        GfLogDebug("Wind direction = %.3f\n", trackLocal->winddir);
-        GfLogDebug("Air Temperature = %.3f\n", trackLocal->airtemperature);
-        GfLogDebug("Dew point = %.3f\n", trackLocal->dewp);
-        GfLogDebug("Air pressure = %.3f\n", trackLocal->airpressure);
-        GfLogDebug("Air Density = %.3f\n", trackLocal->airdensity);
-        GfLogDebug("Rain = %i\n", trackLocal->rain);
-        GfLogDebug("Snow = %i\n", trackLocal->snow);
-        GfLogDebug("Hail = %i\n", trackLocal->hail);
-        GfLogDebug("Water track = %d\n", trackLocal->water);
-        GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
+        GfLogInfo("Visibility = %.3f\n", trackLocal->visibility);
+        GfLogInfo("Wind Speed = %.3f\n", trackLocal->windspeed);
+        GfLogInfo("Wind direction = %.3f\n", trackLocal->winddir);
+        GfLogInfo("Air Temperature = %.3f\n", trackLocal->airtemperature);
+        GfLogInfo("Dew point = %.3f\n", trackLocal->dewp);
+        GfLogInfo("Air pressure = %.3f\n", trackLocal->airpressure);
+        GfLogInfo("Air Density = %.3f\n", trackLocal->airdensity);
+        GfLogInfo("Rain = %i\n", trackLocal->rain);
+        GfLogInfo("Snow = %i\n", trackLocal->snow);
+        GfLogInfo("Hail = %i\n", trackLocal->hail);
+        GfLogInfo("Water track = %d\n", trackLocal->water);
+        GfLogInfo("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
         ReTrackUpdate();
     }
-}
-
-// Initialize track weather info from race settings
-void
-reTrackInitSimuWeather(void)
-{
-    webMetar = new ReWebMetar;
-    tTrackLocalInfo *trackLocal = &ReInfo->track->local;
-
-    struct tm now;
-    time_t now_sec = time(0);
-#ifdef _WIN32
-    now = *gmtime(&now_sec);
-#else
-    gmtime_r(&now_sec, &now);
-#endif
-
-    std::ostringstream weatherfile;
-    weatherfile << GfDataDir() << "data/weather/" << trackLocal->station << "/"
-                << std::setw(2) << std::setfill('0') << std::right << now.tm_mday << "-"
-                << std::setw(2) << std::setfill('0') << std::right << (now.tm_mon + 1) << ".txt";
-
-    GfLogDebug("Path file weather : %s\n", weatherfile.str().c_str());
-
-    std::ifstream file(weatherfile.str().c_str());
-
-    if (!file.is_open())
-    {
-        GfLogError("Failed to open %s\n", weatherfile.str().c_str());
-        int clouds = TR_CLOUDS_NONE;
-        int rain = TR_RAIN_NONE;
-        // Really random clouds.
-        clouds = rand() % (TR_CLOUDS_FULL);
-
-        // Update track local info.
-        trackLocal->rain = rain;
-        trackLocal->hail = 0;
-        trackLocal->snow = 0;
-        trackLocal->clouds = clouds;
-        trackLocal->cloud_altitude = 5500.0 * 0.3048;
-        trackLocal->water = rain;
-        trackLocal->airtemperature = 15.0f;
-        trackLocal->dewp = 5.0f;
-        trackLocal->airpressure = 101300;
-        trackLocal->airdensity = 1.219f;
-        trackLocal->windspeed = (tdble)(rand() % 100);
-        trackLocal->winddir = (tdble)(rand() % 359);
-        trackLocal->relativehumidity = 65.0f;
-        trackLocal->visibility = (tdble)(rand() % 12000);
-
-        reTrackInitWeatherValues();
-
-        if ((trackLocal->visibility < 300) && (rain < 1))
-            trackLocal->visibility = 300;
-
-        trackLocal->config = 1;
-
-        ReTrackUpdate();
-
-        return;
-    }
-
-    // compter le nombre de lignes
-    int count = 0;
-    std::string line;
-    std::string weather;
-    while (true)
-    {
-        getline(file, line);
-        //GfLogInfo("Line = %s\n", line.c_str());
-
-        if (file.eof())
-        {
-            break;
-        }
-
-        weather += line;
-        ++count;
-    }
-
-    file.close();
-    GfLogDebug("Contenu weather.txt = %s\n", weather.c_str());
-
-    webMetar->ReWebMetarLoad(weather);
-
-    if (webMetar->getCAVOK())
-    {
-        if (webMetar->getVisibility_m() == WebMetarNaN)
-            webMetarVisibility.set(12000.0);
-
-        if (webMetar->getCloudNumber() > 0)
-        {
-            trackLocal->clouds = 0;
-            trackLocal->altitude = (tdble)(5500 * 0.3048);
-            //_clouds.push_back(cl);
-        }
-    }
-
-    // visibility
-    tdble _wind_range_from = 0.0;
-    tdble _wind_range_to = 0.0;
-    tdble d = (tdble)(webMetar->getVisibility_m());
-    GfLogDebug("WebMetar Visibility in racetrack = %.3f\n", webMetar->getVisibility_m());
-
-    if (d < 0.0)
-        d = 12000.0;
-
-    if (d == WebMetarNaN )
-        d = 10000.0;
-
-    if (webMetarVisibility.getModifier() == ReWebMetarVisibility::GREATER_THAN)
-        d += 2000.0;// * sg_random();
-
-    if(d > 15000)
-        d = 12000.0;
-
-    if (d < 350)
-        d = 350.0;
-
-    trackLocal->visibility = d;
-
-    // wind
-    if (webMetar->getWindDir() == -1)
-    {
-        if (webMetar->getWindRangeTo() == -1)
-        {
-            trackLocal->winddir = 0.0;
-            _wind_range_from = 0.0;
-            _wind_range_to = 359.0;
-        }
-        else
-        {
-            trackLocal->winddir = (_wind_range_from + _wind_range_to) / 2;
-        }
-    }
-    else if (webMetar->getWindRangeFrom() == -1)
-    {
-        _wind_range_from = _wind_range_to = trackLocal->winddir;
-    }
-
-    if (webMetar->getWindSpeed_kmh() == WebMetarNaN)
-        trackLocal->windspeed = 0.0;
-    else
-        trackLocal->windspeed = (tdble)(webMetar->getWindSpeed_kmh());
-
-    // clouds
-    int cn = webMetar->getCloudNumber();
-
-    if(cn > 0)
-    {
-        for (int i = 0; i < cn; i++)
-        {
-            switch (i)
-            {
-            case 0:
-                trackLocal->clouds = webMetar->getCloud1();
-                trackLocal->cloud_altitude = webMetar->getAltitude1();
-                GfLogDebug("Clouds 1 = %i - Alitude cloud 1 = %.3f\n", trackLocal->clouds, trackLocal->cloud_altitude);
-                break;
-            case 1:
-                trackLocal->clouds2 = webMetar->getCloud2();
-                trackLocal->cloud_altitude2 = webMetar->getAltitude2();
-                GfLogDebug("Clouds 2 = %i - Alitude cloud 2 = %.3f\n", trackLocal->clouds2, trackLocal->cloud_altitude2);
-                break;
-            case 3:
-                trackLocal->clouds3 = webMetar->getCloud3();
-                trackLocal->cloud_altitude3 = webMetar->getAltitude3();
-                GfLogDebug("Clouds 3 = %i - Alitude cloud 3 = %.3f\n", trackLocal->clouds3, trackLocal->cloud_altitude3);
-                break;
-            }
-        }
-    }
-
-    // temperature/pressure
-    if (webMetar->getTemperature_C() == WebMetarNaN)
-        trackLocal->airtemperature = 15.0f;
-    else
-        trackLocal->airtemperature = (tdble)(webMetar->getTemperature_C());
-
-    if (webMetar->getDewpoint_C() == WebMetarNaN)
-        trackLocal->dewp = 0.0;
-    else
-        trackLocal->dewp = (tdble)(webMetar->getDewpoint_C());
-
-    if (webMetar->getPressure_hPa() == WebMetarNaN)
-        trackLocal->airpressure = (tdble)(30.0 * 3386.388640341);
-    else
-        trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
-
-    trackLocal->airpressure = (tdble)(trackLocal->airpressure * 100);
-
-    if (webMetar->getDensity_C() == WebMetarNaN)
-        trackLocal->airdensity = 1.219f;
-    else
-        trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
-
-    if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
-    {
-        trackLocal->rain = webMetar->getRain();
-        trackLocal->water = trackLocal->rain;
-
-        trackLocal->snow = webMetar->getSnow();
-
-        if (trackLocal->snow > 0)
-            trackLocal->water = trackLocal->snow;
-
-        trackLocal->hail = webMetar->getHail();
-
-        if (trackLocal->hail > 0)
-            trackLocal->water = trackLocal->hail;
-
-        trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
-    }
-    else
-    {
-        trackLocal->rain = TR_RAIN_NONE;
-        trackLocal->snow = TR_RAIN_NONE;
-        trackLocal->hail = TR_RAIN_NONE;
-        trackLocal->relativehumidity = TR_RAIN_NONE;
-    }
-
-    GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
-    GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
-    GfLogDebug("Wind direction = %.3f\n", trackLocal->winddir);
-    GfLogDebug("Air Temperature = %.3f\n", trackLocal->airtemperature);
-    GfLogDebug("Dew point = %.3f\n", trackLocal->dewp);
-    GfLogDebug("Air pressure = %.3f\n", trackLocal->airpressure);
-    GfLogDebug("Air Density = %.3f\n", trackLocal->airdensity);
-    GfLogDebug("Rain = %i\n", trackLocal->rain);
-    GfLogDebug("Snow = %i\n", trackLocal->snow);
-    GfLogDebug("Hail = %i\n", trackLocal->hail);
-    GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
-    GfLogDebug("Water track = %d\n", trackLocal->water);
-
-    ReTrackUpdate();
 }
 
 // Update track info ...
@@ -998,6 +844,657 @@ reTrackUpdatePhysics(void)
         curSurf = curSurf->next;
 
     } while ( curSurf );
+}
+
+double reTrackLinear(double val, double min, double max)
+{
+    double diff = max - min;
+    GfLogInfo("### val = %.2f - min = %.2f - max = %.2f - diff = %.2f - Return Linear = %.2f\n",
+              val, min, max, diff, min+(val*diff));
+    return min + (val*diff);
+
+}
+
+double reTrackTriangular(double val, double min, double max)
+{
+    double diff = max-min;
+    val = 1.0 - fabs(-1.0 + (2.0*val / 180.0));
+
+    GfLogInfo("### val = %.2f - min = %.2f - max = %.2f - diff = %.2f - Return Triangular = %.2f\n",
+        val, min, max, diff, min + (val * diff));
+    return min + (val*diff);
+}
+
+double reTrackSinusoidal(double val, double min, double max)
+{
+    double diff = max-min;
+    GfLogInfo(" val = %.2f - min = %.2f - max = %.2f - return sinusoidal = %.5f\n",
+              val, min, max, min + (diff *(0.5 - (0.5 * cos(3.14159265359 * (val / 180 ))))));
+
+    return min + (diff *(0.5 - (0.5 * cos(3.14159265359 * (val / 180 )))));
+}
+
+double reTrackEven(double val, double min, double max)
+{
+    double diff = max-min;
+    GfLogInfo(" val = %.2f - min = %.2f - max = %.2f - return Even  = %.5f\n",
+        val, min, max, min + diff * (0.5 - 0.6366 * atan(cos(val / 180.0))));
+    return min + diff*(0.5 - 0.6366*atan(cos(val / 180.0)));
+}
+
+double reTrackLongLow(double val, double min, double max)
+{
+    double diff = max-min;
+    GfLogInfo(" val = %.2f - min = %.2f - max = %.2f - return Long Low  = %.5f\n",
+        val, min, max, min + diff * (0.5 - 0.5 * cos(2.145 * val / 180.0)));
+
+    return min + diff*(0.5 - 0.5*cos(2.145*val / 180.0));
+}
+
+double reTrackLongHigh(double val, double min, double max)
+{
+    double diff = max-min;
+    GfLogInfo(" val = %.2f - min = %.2f - max = %.2f - Diff = %.2f - return Long High  = %.5f\n",
+        val, min, max, diff, max - diff * (0.5 - 0.5 * cos(2.14503 - (2.14503 * (val / 180.0)))));
+    return max - diff*(0.5 - 0.5*cos(2.14503 - (2.14503*(val / 180.0))));
+}
+
+double reTrackMonsoonal(double val, double min, double max)
+{
+    double diff = max-min;
+    val = 2.0* PI2 * (1.0 - val);
+    GfLogInfo(" val = %.2f - min = %.2f - max = %.2f - return Monsoonal = %.5f\n",
+        val, min, max, min + diff * cos(atan((val * val) / 180.0)));
+    return min + diff * cos(atan(val * val));
+}
+
+void  reTrackUpdatePrecipitation(void)
+{
+    double h = humidity + (yday / 20);
+    if (clouds == TR_CLOUDS_RANDOM)
+    {
+        if (h <= 65.00)
+            clouds = 0.0;
+        else if (h >65.00 && h < 75.00)
+            clouds = 1.0;
+        else if (h > 75.00 && h <= 80.00)
+            clouds = 2.0;
+        else if (h > 80.00 && h <= 85.00)
+            clouds = 3.0;
+        else if (h > 85.00 && h <= 90.00)
+            clouds = 4.0;
+        else if (h > 90.00 && h <= 95.00)
+            clouds = 6.0;
+        else
+            clouds = 7.0;
+    }
+
+    if (precipitation < 60.0)
+    {
+         precipitation = 0.0;
+    }
+    else
+     {
+         precipitation -= 60.0;
+
+         if (precipitation < 60.0)
+         {
+             precipitation = 0.0;
+         }
+         else if (precipitation > 80.0 && precipitation <= 100)
+         {
+             precipitation = 1.0;
+         }
+         else if (precipitation > 100.00 && precipitation <= 120.00)
+         {
+             precipitation = 2.0;
+             clouds = 7.0;
+         }
+         else
+         {
+             precipitation = 3.0;
+             clouds = 7.0;
+         }
+     }
+
+    if (rain > 3)
+        rain = (int)precipitation;
+
+    GfLogInfo(" ### Update precipitation : Precipitation =%.2f - Rain = %i - Clouds = %.2f - H = %.2f - Humidity = %.2f\n",
+              precipitation, rain, clouds, h, humidity);
+
+}
+
+void reTrackUpdateWind(void)
+{
+    if (latitude > 60.0)
+    {
+       double val = 1.0 - (latitude - 60.0) / 30.0;
+       wind_dir = reTrackLinear(val, 0.0, 90.0);
+       GfLogInfo("Wind direction > 60 = %.2f\n", wind_dir);
+
+       if (code == 0)
+           wind_speed = reTrackLinear(val, 6.0, 10.0);
+       else
+           wind_speed = 0.0;
+    }
+    else if (latitude > 30.0)
+    {
+       double val = (latitude - 30.0) / 30.0;
+       wind_dir = reTrackLinear(val, 180.0, 270.0);
+       GfLogInfo("Wind direction > 30 = %.2f\n", wind_dir);
+
+       if (code == 0)
+           wind_speed = reTrackLinear(val, 5.0, 10.0);
+
+       else
+       {
+           wind_speed = reTrackLinear(1.0 - val, 3.0, 120.0);
+           wind_speed = reTrackSinusoidal((month-1) * 30, 3.0, wind_speed);
+           GfLogInfo("Wind Speed > 30 = %.2f\n", wind_speed);
+       }
+    }
+    else if (latitude > 0)
+    {
+      double val = 1.0 - latitude / 30.0;
+      wind_dir = reTrackLinear(val, 0.0, 90.0);
+      GfLogInfo("Wind direction > 0 = %.2f - Code = %i\n", wind_dir, code);
+
+      if (code == 0)
+          wind_speed = reTrackTriangular(val, 5.0, 7.0);
+      else
+      {
+          wind_speed = reTrackTriangular(fabs(val - 0.5), 3.0, 5.0);
+          wind_speed = reTrackSinusoidal((month-1) *30, 3.0, wind_speed);
+          GfLogInfo("Wind direction > 0 = %.2f\n", wind_dir);
+      }
+    }
+    else if (latitude > -30.0)
+    {
+      double val = -latitude / 30.0;
+      wind_dir = reTrackLinear(val, 90.0, 180.0);
+      GfLogInfo("Wind direction = %.2fn", wind_dir);
+
+      if (code == 0)
+              wind_speed = reTrackTriangular(val, 5.0, 7.0);
+      else
+          wind_speed = reTrackTriangular(fabs(val - 0.5), 3.0, 5.0);
+    }
+    else if (latitude > -60.0)
+    {
+       double val = 1.0 - (latitude + 30.0) / 30.0;
+       wind_dir =  reTrackLinear(val, -90.0, 0.0);
+       GfLogInfo("Wind direction = %.2fn", wind_dir);
+
+       if (code == 0)
+           wind_speed = reTrackLinear(val, 5.0, 10.0);
+       else
+           wind_speed = reTrackLinear(1.0 - val, 3.0, 6.0);
+    }
+    else
+    {
+       double val = (latitude + 60.0) / 30.0;
+       wind_dir = reTrackLinear(val, 90.0, 180.0);
+       GfLogInfo("Wind direction = %.2fn", wind_dir);
+
+       if (code == 0)
+           wind_speed = reTrackLinear(1.0 - val, 5.0, 120.0);
+       else
+           wind_speed = 0.0;
+    }
+
+    if (wind_dir < 0.0)
+        wind_dir += 360.0;
+}
+
+void reTrackUpdatePressure(void)
+{
+    // saturation vapor pressure for water, Jianhua Huang:
+    double Tc = temperature ? temperature : 1e-9;
+    double Psat = exp(34.494 - 4924.99 / (Tc + 237.1)) / pow(Tc + 105.0, 1.57);
+
+    // vapor pressure of water
+    double Pv = 0.01 * humidity * Psat;
+
+    // pressure at elevation
+    static const double R0 = 8.314462618;
+    static const double P0 = 101325.0;
+    static const double T0 = 288.15;
+    static const double L = 0.0065;
+    static const double M = 0.0289654;
+
+    double h = elevation / 1000.0;
+    double g = 9.80665;
+    double P = P0 * pow(1.0 - L * h / T0, g * M / (L * R0));
+
+    // partial pressure of dry air
+    double Pd = P - Pv;
+
+    // air pressure
+    pressure = (0.01 * (Pd + Psat) * 10);
+}
+
+void reTrackSetOcean(void)
+{
+    // temperature based on latitude, season and time of day
+    // the equator
+    double temp_equator_night = reTrackTriangular(month, 17.5, 22.5);
+    double temp_equator_day = reTrackTriangular(month, 27.5, 32.5);
+    double temp_equator_mean = reTrackLinear(hour, temp_equator_night, temp_equator_day);
+    double temp_equator = reTrackLinear(3.0 * hour, temp_equator_night, temp_equator_day);
+    double temp_sw_Am = reTrackTriangular(yday, 22.0, 27.5);
+
+    // the poles
+    double temp_pole_night = reTrackSinusoidal(month, -30.0, 0.0);
+    double temp_pole_day = reTrackSinusoidal(month, -22.5, 4.0);
+    double temp_pole_mean = reTrackLinear(hour, temp_pole_night, temp_pole_day);
+    double temp_pole = reTrackLinear(3.0 * hour, temp_pole_night, temp_pole_day);
+    double temp_sw_ET = reTrackLongLow(2.0 * month, -27.5, -3.5);
+
+    // interpolate based on the viewers latitude
+    double fact_lat = pow(fabs(latitude) / 90.0, 2.5);
+    double ifact_lat = 1.0 - fact_lat;
+
+    temperature =  reTrackLinear(ifact_lat, temp_pole, temp_equator);
+    temperature_mean = reTrackLinear(ifact_lat, temp_pole_mean, temp_equator_mean);
+    temperature_water =  reTrackLinear(ifact_lat, temp_sw_ET, temp_sw_Am);
+
+    // high relative humidity around the equator and poles
+    humidity =  reTrackTriangular(fabs(fact_lat-0.5), 70.0, 87.0);
+
+    precipitation_annual = 990.0;
+    precipitation = 100.0 - (precipitation_annual / 25.0);
+
+    GfLogInfo("## OCEAN temperature = %.2f - humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
+}
+
+// https://en.wikipedia.org/wiki/Tropical_rainforest_climate
+// https://en.wikipedia.org/wiki/Tropical_monsoon_climate
+void reTrackSetTropical(void)
+{
+    double m = (month - 1) * 30;
+    double m2 = fmod(fabs(((month * 2) + 52) * (0.5 /24) - 0.1875), 1.0);
+    double h = fmod(fabs(((hour + 18) * (0.5 / 24)) - 0.1875), 1.0);
+    h = (h > 0.5) ? 2.0 - (2.0 * h) : 2.0 * h;
+
+    double hmin = reTrackSinusoidal(m, 0.0, 0.36);
+    double hmax = reTrackSinusoidal(m, 0.86, 1.0);
+    humidity = reTrackLinear(h, hmin, hmax);
+
+    // wind speed based on latitude (0.0 - 15 degrees)
+    double fact_lat = std::max(abs(latitude), 15.0) / 15.0;
+    wind_speed = 3.0 * fact_lat * fact_lat;
+
+    double temp_water = temperature_water;
+    double temp_night = temperature;
+    double temp_day = temperature;
+
+    switch(code)
+    {
+    case 1: // Af: equatorial, fully humid
+        temp_night = reTrackTriangular(m2, 20.0, 22.5);
+        temp_day = reTrackTriangular(m2, 29.5, 32.5);
+        temp_water = reTrackTriangular(m2, 25.0, 27.5);
+        precipitation = reTrackSinusoidal(m, 150.0, 280.0);
+        humidity = reTrackTriangular(humidity, 75.0, 85.0);
+        break;
+    case 2: // Am: equatorial, monsoonal
+        temp_night = reTrackTriangular(m2, 17.5, 22.5);
+        temp_day = reTrackTriangular(m2, 27.5, 32.5);
+        temp_water = reTrackTriangular(m2, 22.0, 27.5);
+        precipitation = reTrackLinear(m2, 45.0, 340.0);
+        humidity = reTrackTriangular(humidity, 75.0, 85.0);
+        wind_speed *= 2.0* precipitation / 340.0;
+        break;
+    case 3: // As: equatorial, summer dry
+        temp_night = reTrackLongHigh(m2, 15.0, 22.5);
+        temp_day = reTrackTriangular(m2, 27.5, 35.0);
+        temp_water = reTrackTriangular(m2, 21.5, 26.5);
+        precipitation = reTrackSinusoidal(m, 35.0, 150.0);
+        humidity = reTrackTriangular(humidity, 60.0, 80.0);
+        wind_speed *= 2.0 * precipitation / 150.0;
+        break;
+    case 4: // Aw: equatorial, winter dry
+        temp_night = reTrackLongHigh(m2, 15.0, 22.5);
+        temp_day = reTrackTriangular(m2, 27.5, 35.0);
+        temp_water = reTrackTriangular(m2, 21.5, 28.5);
+        precipitation = reTrackSinusoidal(m, 10.0, 230.0);
+        humidity = reTrackTriangular(humidity, 60.0, 80.0);
+        wind_speed *= 2.0 * precipitation / 230.0;
+        break;
+    default:
+        break;
+    }
+
+    temperature = reTrackLinear(h, temp_night, temp_day);
+    temperature_mean =  reTrackLinear(h, temp_night, temp_day);
+    temperature_water = temp_water;
+
+    GfLogInfo("## TROPICAL Temperature = %.2f - Humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
+}
+
+// https://en.wikipedia.org/wiki/Desert_climate
+// https://en.wikipedia.org/wiki/Semi-arid_climate
+void reTrackSetDry(void)
+{
+    double m = (month - 1) * 30;
+    double m2 = fmod(fabs(((month * 2) + 52) * (0.5 /24) - 0.1875), 1.0);
+    double h = fmod(fabs(((hour + 18) *(0.5/24)) - 0.1875), 1.0);
+    h = (h > 0.5)  ? 2.0 - (2.0 * h) : 2.0 * h;
+
+    double hmin = reTrackSinusoidal(m, 0.0, 0.36);
+    double hmax = reTrackSinusoidal(m, 0.86, 1.0);
+    humidity = reTrackLinear(h, hmin, hmax);
+
+    double temp_water = temperature_water;
+    double temp_night = temperature;
+    double temp_day = temperature;
+    //double precipitation = precipitation;
+    double relative_humidity = humidity;
+
+    switch(code)
+    {
+    case 5: // BSh: arid, steppe, hot arid
+        temp_night = reTrackLongHigh(m2, 10.0, 22.0);
+        temp_day = reTrackTriangular(m2, 27.5, 35.0);
+        temp_water = reTrackTriangular(m2, 18.5, 28.5);
+        precipitation = reTrackLongLow(m2, 8.0, 117.0);
+        relative_humidity = reTrackTriangular(humidity, 20.0, 30.0);
+        break;
+    case 6: // BSk: arid, steppe, cold arid
+        temp_night = reTrackSinusoidal(m, -14.0, 12.0);
+        temp_day = reTrackSinusoidal(m, 0.0, 30.0);
+        temp_water = reTrackSinusoidal(2.0 * m, 5.0, 25.5);
+        precipitation = reTrackSinusoidal(m, 15.0, 34.0);
+        relative_humidity = reTrackSinusoidal(humidity, 48.0, 67.0);
+        break;
+    case 7: // BWh: arid, desert, hot arid
+        temp_night = reTrackSinusoidal(m, 7.5, 22.0);
+        temp_day = reTrackEven(m2, 22.5, 37.5);
+        temp_water = reTrackEven(m2, 15.5, 33.5);
+        precipitation = reTrackMonsoonal(m2, 3.0, 18.0);
+        relative_humidity = reTrackMonsoonal(humidity, 25.0, 55.0);
+        break;
+    case 8: // BWk: arid, desert, cold arid
+        temp_night = reTrackSinusoidal(m, -15.0, 15.0);
+        temp_day = reTrackSinusoidal(m, -2.0, 30.0);
+        temp_water = reTrackSinusoidal(2.0 * m, 4.0, 26.5);
+        precipitation = reTrackLinear(m2, 4.0, 14.0);
+        relative_humidity = reTrackLinear(humidity, 45.0, 61.0);
+        break;
+    default:
+        break;
+    }
+
+    temperature = reTrackLinear(h, temp_night, temp_day);
+    temperature_mean = reTrackLinear(h, temp_night, temp_day);
+    temperature_water = temp_water;
+
+    humidity = relative_humidity;
+
+    GfLogInfo("## DRY Temperature = %.2f - Humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
+}
+
+void reTrackSetTemperate(void)
+{
+    double m = (month - 1) * 30;
+    double m2 = fmod(fabs(((month * 2) + 52) * (0.5 /24) - 0.1875), 1.0);
+    double h = fmod(fabs(((hour + 18) *(0.5/24)) - 0.1875), 1.0);
+    h = (h > 0.5)  ? 2.0 - (2.0 * h) : 2.0 * h;
+
+    double hmin = reTrackSinusoidal(m, 0.0, 0.36);
+    double hmax = reTrackSinusoidal(m, 0.86, 1.0);
+    humidity = reTrackLinear(h, hmin, hmax);
+    GfLogInfo("# Month = %i - hour = %i - raceTrack config humidity = %.2f - hmin = %.2f - hmax = %.2f\n",
+              month, hour, humidity, hmin, hmax);
+
+    double temp_water = temperature_water;
+    double temp_night = temperature;
+    double temp_day = temperature;
+    double relative_humidity = humidity;
+
+    switch(code)
+    {
+    case 9: // Cfa: warm temperature, fully humid hot summer
+        temp_night = reTrackSinusoidal(m, -8.0, 22.0);
+        temp_day = reTrackSinusoidal(m, 3.0, 35.0);
+        temp_water = reTrackSinusoidal(m, 8.0, 28.5);
+        precipitation = reTrackSinusoidal(m + 210, 50.0, 140.0);
+        relative_humidity = reTrackSinusoidal(humidity, 65.0, 95.0);
+        GfLogInfo("# temperature night = %.2f - temperature day = %.2f\n", temp_night, temp_day);
+        break;
+    case 10: // Cfb: warm temperature, fully humid, warm summer
+        temp_night = reTrackSinusoidal(m, -3.0, 10.0);
+        temp_day = reTrackSinusoidal(m, 5.0, 25.0);
+        temp_water = reTrackSinusoidal(m, 3.0, 20.5);
+        precipitation = reTrackLinear(m2, 65.0, 140.0);
+        relative_humidity = reTrackSinusoidal(humidity, 68.0, 90.0);
+        break;
+    case 11: // Cfc: warm temperature, fully humid, cool summer
+        temp_night = reTrackLongLow(m, -3.0, 8.0);
+        temp_day = reTrackLongLow(m, 2.0, 14.0);
+        temp_water = reTrackLongLow(m, 3.0, 11.5);
+        precipitation = reTrackLinear(m / 180, 90.0, 200.0);
+        relative_humidity = reTrackLongLow(humidity, 70.0, 85.0);
+        break;
+    case 12: // Csa: warm temperature, summer dry, hot summer
+        temp_night = reTrackSinusoidal(m, 2.0, 16.0);
+        temp_day = reTrackSinusoidal(m, 12.0, 33.0);
+        temp_water = reTrackSinusoidal(m, 10.0, 27.5);
+        precipitation = reTrackLinear(m, 25.0, 70.0);
+        relative_humidity = reTrackSinusoidal(humidity, 58.0, 72.0);
+        break;
+    case 13: // Csb: warm temperature, summer dry, warm summer
+        temp_night = reTrackSinusoidal( m, -4.0, 10.0);
+        temp_day = reTrackSinusoidal(m, 6.0, 27.0);
+        temp_water = reTrackSinusoidal(m, 4.0, 21.5);
+        precipitation = reTrackLinear(m, 25.0, 120.0);
+        relative_humidity = reTrackLinear(humidity, 50.0, 72.0);
+        break;
+    case 14: // Csc: warm temperature, summer dry, cool summer
+        temp_night = reTrackSinusoidal(m, -4.0, 5.0);
+        temp_day = reTrackSinusoidal(m, 5.0, 16.0);
+        temp_water = reTrackSinusoidal(m, 3.0, 14.5);
+        precipitation = reTrackSinusoidal(m, 60.0, 95.0);
+        relative_humidity = reTrackSinusoidal(humidity, 55.0, 75.0);
+        break;
+    case 15: // Cwa: warm temperature, winter dry, hot summer
+        temp_night = reTrackEven(m, 4.0, 20.0);
+        temp_day = reTrackLongLow(m, 15.0, 30.0);
+        temp_water = reTrackLongLow(2.0 * m, 7.0, 24.5);
+        precipitation = reTrackLongLow(m, 10.0, 320.0);
+        relative_humidity = reTrackSinusoidal(humidity, 60.0, 79.0);
+        break;
+    case 16: // Cwb: warm temperature, winter dry, warm summer
+        temp_night = reTrackEven(m, 1.0, 13.0);
+        temp_day = reTrackLongLow(m, 15.0, 27.0);
+        temp_water = reTrackEven(m, 5.0, 22.5);
+        precipitation = reTrackLongLow(m, 10.0, 250.0);
+        relative_humidity = reTrackSinusoidal(humidity, 58.0, 72.0);
+        break;
+    case 17: // Cwc: warm temperature, winter dry, cool summer
+        temp_night = reTrackLongLow(m, -9.0, 6.0);
+        temp_day = reTrackLongHigh(m, 6.0, 17.0);
+        temp_water = reTrackLongHigh(m, 8.0, 15.5);
+        precipitation = reTrackLongLow(m, 5.0, 200.0);
+        relative_humidity = reTrackLongHigh(humidity, 50.0, 58.0);
+        break;
+    default:
+        break;
+    }
+
+    temperature = reTrackLinear( h, temp_night, temp_day);
+    temperature_mean = reTrackLinear(h, temp_night, temp_day);
+    temperature_water = temp_water;
+    humidity =  relative_humidity;
+
+    GfLogInfo("## TEMPERATE Temperature = %.2f - Humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
+}
+
+// https://en.wikipedia.org/wiki/Continental_climate
+void reTrackSetContinetal(void)
+{
+    double m = (month - 1) * 30;
+    double m2 = fmod(fabs(((month * 2) + 52) * (0.5 /24) - 0.1875), 1.0);
+    double h = fmod(fabs(((hour + 18) *(0.5/24)) - 0.1875), 1.0);
+    h = (h > 0.5)  ? 2.0 - (2.0 * h) : 2.0 * h;
+
+    double hmin = reTrackSinusoidal(m, 0.0, 0.36);
+    double hmax = reTrackSinusoidal(m, 0.86, 1.0);
+    humidity = reTrackLinear(h, hmin, hmax);
+
+    double temp_water = temperature_water;
+    double temp_day = temperature;
+    double temp_night = temperature;
+    double relative_humidity = humidity;
+
+    switch(code)
+    {
+    case 18: // Dfa: snow, fully humid, hot summer
+        temp_night = reTrackSinusoidal(m, 0, 13.0);
+        temp_day = reTrackSinusoidal(m, -5.0, 30.0);
+        temp_water = reTrackSinusoidal(m, 0.0, 26.5);
+        precipitation = reTrackLinear(m2, 30.0, 70.0);
+        relative_humidity = reTrackSinusoidal(humidity, 68.0, 72.0);
+        break;
+    case 19: // Dfb: snow, fully humid, warm summer, warm summer
+        temp_night = reTrackSinusoidal(m, -17.5, 10.0);
+        temp_day = reTrackSinusoidal(m, -7.5, 25.0);
+        temp_water = reTrackSinusoidal(m, -2.0, 22.5);
+        precipitation = reTrackLinear(m2, 30.0, 70.0);
+        relative_humidity = reTrackSinusoidal(humidity, 69.0, 81.0);
+        break;
+    case 20: // Dfc: snow, fully humid, cool summer, cool summer
+        temp_night = reTrackSinusoidal(m, -30.0, 4.0);
+        temp_day = reTrackSinusoidal(m, -20.0, 15.0);
+        temp_water = reTrackSinusoidal(m, -10.0, 12.5);
+        precipitation = reTrackLinear(m2, 22.0, 68.0);
+        relative_humidity = reTrackSinusoidal(humidity, 70.0, 88.0);
+        wind_speed = 3.0;
+        break;
+    case 21: // Dfd: snow, fully humid, extremely continetal
+        temp_night = reTrackSinusoidal(m, -45.0, 4.0);
+        temp_day = reTrackSinusoidal(m, -35.0, 10.0);
+        temp_water = reTrackSinusoidal(m, -15.0, 8.5);
+        precipitation = reTrackLongLow(m2, 7.5, 45.0);
+        relative_humidity = reTrackSinusoidal(humidity, 80.0, 90.0);
+        break;
+    case 22: // Dsa: snow, summer dry, hot summer
+        temp_night = reTrackSinusoidal(m, -10.0, 10.0);
+        temp_day = reTrackSinusoidal(m, 0.0, 30.0);
+        temp_water = reTrackSinusoidal(m, 4.0, 24.5);
+        precipitation = reTrackLongHigh(m2, 5.0, 65.0);
+        relative_humidity = reTrackSinusoidal(humidity, 48.0, 58.08);
+        break;
+    case 23: // Dsb: snow, summer dry, warm summer
+        temp_night = reTrackSinusoidal(m, -15.0, 6.0);
+        temp_day = reTrackSinusoidal(m, -4.0, 25.0);
+        temp_water = reTrackSinusoidal(m, 0.0, 19.5);
+        precipitation = reTrackLongHigh(m2, 12.0, 65.0);
+        relative_humidity = reTrackSinusoidal(humidity, 50.0, 68.0);
+        break;
+    case 24: // Dsc: snow, summer dry, cool summer
+        temp_night = reTrackSinusoidal(m, -27.5, 2.0);
+        temp_day = reTrackSinusoidal(m, -4.0, 15.0);
+        temp_water = reTrackSinusoidal(m, 0.0, 12.5);
+        precipitation = reTrackLongLow(m2, 32.5, 45.0);
+        relative_humidity = reTrackSinusoidal(humidity, 50.0, 60.0);
+        break;
+    case 25: // Dsd: snow, summer dry, extremely continetal
+        temp_night = reTrackSinusoidal(m, -11.5, -6.5);
+        temp_day = reTrackSinusoidal(m, 14.0, 27.0);
+        temp_water = reTrackSinusoidal(m, 8.0, 20.5);
+        precipitation = reTrackLongLow(m2, 5.0, 90.0);
+        relative_humidity = reTrackSinusoidal(humidity, 48.0, 62.0);
+        break;
+    case 26: // Dwa: snow, winter dry, hot summer
+        temp_night = reTrackSinusoidal(m, -18.0, 16.5);
+        temp_day = reTrackSinusoidal(m, -5.0, 25.0);
+        temp_water = reTrackSinusoidal(m, 0.0, 23.5);
+        precipitation = reTrackLongLow(m2, 5.0, 180.0);
+        relative_humidity = reTrackSinusoidal(humidity, 60.0, 68.0);
+        break;
+    case 27: // Dwb: snow, winter dry, warm summer
+        temp_night = reTrackSinusoidal(m, -28.0, 10.0);
+        temp_day = reTrackSinusoidal(m, -12.5, 22.5);
+        temp_water = reTrackSinusoidal(m, -5.0, 18.5);
+        precipitation = reTrackLongLow(m2, 10.0, 140.0);
+        relative_humidity = reTrackSinusoidal(humidity, 60.0, 72.0);
+        break;
+    case 28: // Dwc: snow, winter dry, cool summer
+        temp_night = reTrackSinusoidal(m, -33.0, 5.0);
+        temp_day = reTrackSinusoidal(m, -20.0, 20.0);
+        temp_water = reTrackSinusoidal(m, -10.0, 16.5);
+        precipitation = reTrackLongLow(m2, 10.0, 110.0);
+        relative_humidity = reTrackSinusoidal(humidity, 60.0, 78.0);
+        break;
+    case 29: // Dwd: snow, winter dry, extremely continetal
+        temp_night = reTrackSinusoidal(m, -57.5, 0.0);
+        temp_day = reTrackSinusoidal(m, -43.0, 15.0);
+        temp_water = reTrackSinusoidal(m, -28.0, 11.5);
+        precipitation = reTrackSinusoidal(m, 8.0, 63.0);
+        relative_humidity = 80.0;
+        break;
+    default:
+        break;
+    }
+
+    temperature = reTrackLinear(h, temp_night, temp_day);
+    temperature_mean = reTrackLinear(h, temp_night, temp_day);
+    temperature_water = temp_water;
+
+    humidity = relative_humidity;
+    GfLogInfo("## CONTINENTAL Temperature = %.2f - Humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
+}
+
+void reTrackSetPolar(void)
+{
+    double m = (month - 1) * 30;
+    double m2 = fmod(fabs(((month * 2) + 52) * (0.5 /24) - 0.1875), 1.0);
+    double h = fmod(fabs(((hour + 18) *(0.5/24)) - 0.1875), 1.0);
+    h = (h > 0.5)  ? 2.0 - (2.0 * h) : 2.0 * h;
+
+    double hmin = reTrackSinusoidal(m, 0.0, 0.36);
+    double hmax = reTrackSinusoidal(m, 0.86, 1.0);
+    humidity = reTrackLinear(h, hmin, hmax);
+    GfLogInfo("# Month = %i - hour = %i - raceTrack config humidity = %.2f - hmin = %.2f - hmax = %.2f\n",
+              month, hour, humidity, hmin, hmax);
+
+    // polar climate also occurs high in the mountains
+    double temp_water = temperature_water;
+    double temp_day = temperature;
+    double temp_night = temperature;
+    //double precipitation = precipitation;
+    double relative_humidity = humidity;
+
+    switch(code)
+    {
+    case 30: // EF: polar frost
+        temp_night = reTrackLongLow(m2, -35.0, -6.0);
+        temp_day = reTrackLongLow(m2, -32.5, 0.0);
+        temp_water = reTrackLongLow(m2, -27.5, -3.5);
+        precipitation = reTrackLinear(m2, 50.0, 80.0);
+        relative_humidity = reTrackLongLow(humidity, 65.0, 75.0);
+        wind_speed = 5.5;
+        break;
+    case 31: // ET: polar tundra
+        temp_night = reTrackSinusoidal(m, -30.0, 0.0);
+        temp_day = reTrackSinusoidal(m, -22.5, 8.0);
+        temp_water = reTrackSinusoidal(m, -15.0, 5.0);
+        precipitation = reTrackSinusoidal(m, 15.0, 45.0);
+        relative_humidity = reTrackSinusoidal(humidity, 60.0, 88.0);
+        wind_speed = 4.0;
+        break;
+    default:
+        break;
+    }
+
+    temperature = reTrackLinear(h, temp_night, temp_day);
+    temperature_mean = reTrackLinear(h, temp_night, temp_day);
+    temperature_water = temp_water;
+
+    humidity = relative_humidity;
+    GfLogInfo("## POLAR Temperature = %.2f - Humidity = %.2f - Precipitation = %.2f\n", temperature, humidity, precipitation);
 }
 
 /** Shutdown the track for a race manager.

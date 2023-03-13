@@ -43,14 +43,14 @@
 
 #include "racescreens.h"
 
-
 // Constants.
 static const int NDisplayModeNumber = 2;
-static const char *DispModeValues[NDisplayModeNumber] = { RM_VAL_INVISIBLE, RM_VAL_VISIBLE};
-static const char *TimeOfDayValues[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
-static const char* CloudsValues[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
-static const char *RainValues[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
+static const char *DispModeValues[NDisplayModeNumber]        = { RM_VAL_INVISIBLE, RM_VAL_VISIBLE};
+static const char *TimeOfDayValues[GfRace::nTimeSpecNumber]  = RM_VALS_TIME;
+static const char* CloudsValues[GfRace::nCloudsSpecNumber]   = RM_VALS_CLOUDS;
+static const char *RainValues[GfRace::nRainSpecNumber]       = RM_VALS_RAIN;
 static const char *WeatherValues[GfRace::nWeatherSpecNumber] = RM_VALS_WEATHER;
+static const char *SeasonsValues[GfRace::nSeasonSpecNumber]  = RM_VALS_SEASONS;
 
 // Global variables.
 static void		*ScrHandle;
@@ -65,6 +65,7 @@ static int		rmrpCloudsEditId, rmrpCloudsLeftArrowId, rmrpCloudsRightArrowId;
 static int		rmrpTimeOfDayEditId;
 static int		rmrpRainEditId, rmrpRainLeftArrowId, rmrpRainRightArrowId;
 static int      rmrpWeatherEditId;
+static int      rmrpSeasonEditId, rmrpSeasonLeftArrowId, rmrpSeasonRightArrowId;
 
 // Race params
 static unsigned rmrpConfMask;
@@ -76,12 +77,12 @@ static GfRace::ECloudsSpec		rmrpClouds;
 static GfRace::ETimeOfDaySpec	rmrpTimeOfDay;
 static GfRace::ERainSpec		rmrpRain;
 static GfRace::EWeatherSpec     rmrpWeather;
+static GfRace::ESeasonSpec      rmrpSeason;
 
 static int		rmrpFeatures;
 static bool     rmrpSessionIsRace;
 static int      rmrpFallbackDistance;
 static int      rmrpExtraLaps;
-
 
 static void
 rmrpDeactivate(void *screen)
@@ -246,8 +247,6 @@ rmChangeTimeOfDay(void *vp)
     GfuiLabelSetText(ScrHandle, rmrpTimeOfDayEditId, TimeOfDayValues[rmrpTimeOfDay]);
 }
 
-static void rmChangeRain(void *vp);
-
 static void
 rmChangeClouds(void *vp)
 {
@@ -256,6 +255,16 @@ rmChangeClouds(void *vp)
             (GfRace::ECloudsSpec)
             ((rmrpClouds + GfRace::nCloudsSpecNumber + delta) % GfRace::nCloudsSpecNumber);
     GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
+}
+
+static void
+rmChangeSeason(void *vp)
+{
+    const long delta = (int)(long)vp;
+    rmrpSeason =
+            (GfRace::ESeasonSpec)
+            ((rmrpSeason + GfRace::nSeasonSpecNumber + delta) % GfRace::nSeasonSpecNumber);
+    GfuiLabelSetText(ScrHandle, rmrpSeasonEditId, SeasonsValues[rmrpSeason]);
 }
 
 static void
@@ -270,7 +279,7 @@ rmChangeWeather(void *vp)
         // Make clouds state compatible if needed.
         int cloudsComboEnabled = GFUI_ENABLE;
 
-        if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
+        if (rmrpWeather == GfRace::eWeatherReal) // Random rain => Random clouds.
         {
             cloudsComboEnabled = GFUI_DISABLE;
             rmrpClouds = GfRace::eCloudsRandom;
@@ -291,7 +300,7 @@ rmChangeWeather(void *vp)
     {
         int rainComboEnabled = GFUI_ENABLE;
 
-        if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
+        if (rmrpWeather == GfRace::eWeatherReal) // Random rain => Random clouds.
         {
             rainComboEnabled = GFUI_DISABLE;
             rmrpRain = GfRace::eRainRandom;
@@ -306,6 +315,26 @@ rmChangeWeather(void *vp)
         // Show / hide clouds combo arrow buttons (any rain => no sky choice).
         GfuiEnable(ScrHandle, rmrpRainLeftArrowId, rainComboEnabled);
         GfuiEnable(ScrHandle, rmrpRainRightArrowId, rainComboEnabled);
+    }
+
+    if (rmrpConfMask & RM_CONF_SEASON)
+    {
+        int SeasonComboEnabled = GFUI_ENABLE;
+
+        if (rmrpWeather == GfRace::eWeatherReal)
+        {
+            SeasonComboEnabled = GFUI_DISABLE;
+            rmrpSeason = GfRace::eSeasonNow;
+        }
+        else if (rmrpWeather == GfRace::eWeatherConfig)
+        {
+            SeasonComboEnabled = GFUI_ENABLE;
+            //rmrpRain = GfRace::eRainNone;
+        }
+
+        GfuiLabelSetText(ScrHandle, rmrpSeasonEditId, SeasonsValues[rmrpSeason]);
+        GfuiEnable(ScrHandle, rmrpSeasonLeftArrowId, SeasonComboEnabled);
+        GfuiEnable(ScrHandle, rmrpSeasonRightArrowId, SeasonComboEnabled);
     }
 }
 
@@ -393,6 +422,11 @@ rmrpValidate(void * /* dummy */)
             pRaceSessionParams->eWeatherSpec = (GfRace::EWeatherSpec)rmrpWeather;
         }
 
+        if (rmrpConfMask & RM_CONF_SEASON)
+        {
+            pRaceSessionParams->eSeasonSpec = (GfRace::ESeasonSpec)rmrpSeason;
+        }
+
         if (rmrpConfMask & RM_CONF_DISP_MODE)
         {
             pRaceSessionParams->bfDisplayMode = rmrpDispMode;
@@ -453,6 +487,13 @@ RmRaceParamsMenu(void *vrp)
     {
         GfLogTrace("Will not configure Rain Fall as some drivers don't support wet track\n");
         rmrpConfMask &= ~RM_CONF_RAIN_FALL;
+    }
+
+    if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_SEASON))
+    {
+        GfLogTrace("Will not configure Season as Sky Dome is disabled\n");
+        rmrpSeason = GfRace::eSeasonSummer;
+        rmrpConfMask &= ~RM_CONF_SEASON;
     }
 
     if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_WEATHER))
@@ -648,6 +689,29 @@ RmRaceParamsMenu(void *vrp)
         GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
 
         rmChangeRain(0); // Make cloud cover settings compatible if needed.
+    }
+
+    // Create and initialize Weather combo box (2 arrow buttons and a variable label).
+    if (rmrpConfMask & RM_CONF_SEASON)
+    {
+        if (pRaceSessionParams->eSeasonSpec == GfRace::nSeasonSpecNumber)
+            rmrpSeason = GfRace::eSeasonSummer; // Default value.
+        else
+            rmrpSeason = pRaceSessionParams->eSeasonSpec;
+
+        // Create Season label.
+        GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "seasonlabel");
+
+        // Create and initialize Season combo-box-like control.
+        rmrpSeasonLeftArrowId = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "seasonleftarrow",
+                                    (void*)-1, rmChangeSeason);
+        rmrpSeasonRightArrowId = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "seasonrightarrow",
+                                    (void*)1, rmChangeSeason);
+
+        rmrpSeasonEditId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "seasonedit");
+        GfuiLabelSetText(ScrHandle, rmrpSeasonEditId, SeasonsValues[rmrpSeason]);
+
+        rmChangeSeason(0);
     }
 
     // Create and initialize Weather combo box (2 arrow buttons and a variable label).

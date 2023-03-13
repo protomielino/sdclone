@@ -73,6 +73,7 @@ public:
     enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
                      nRainSpecNumber }; // Last = invalid value = nb of valid ones.
     enum EWeatherSpec { eWeatherConfig, eWeatherRecorded, eWeatherReal, nWeatherSpecNumber };
+    enum ESeasonSpec { eSeasonSpring, eSeasonSummer, eSeasonAutumn, eSeasonWinter, eSeasonNow, nSeasonSpecNumber };
     class Parameters
     {
       public:
@@ -81,10 +82,12 @@ public:
         int nDistance; // km
         int nDuration; // s
         unsigned bfDisplayMode;
+
         ETimeOfDaySpec eTimeOfDaySpec;
         ECloudsSpec    eCloudsSpec;
         ERainSpec      eRainSpec;
         EWeatherSpec   eWeatherSpec;
+        ESeasonSpec    eSeasonSpec;
     };
 
     Parameters* getParameters(const std::string& strSessionName) const;

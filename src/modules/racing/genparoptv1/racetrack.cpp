@@ -317,34 +317,6 @@ reTrackInitWeather(void)
     {
         // Force random clouds, in case there is no rain at the end.
         clouds = TR_CLOUDS_RANDOM;
-
-        // Random rain (if random[0,1] < trackLocal->anyrainlkhood, then it rains).
-        const tdble randDraw = (tdble)(rand()/(double)RAND_MAX);
-
-        GfLogTrace("Rain likelyhoods : overall=%.2f, little=%.2f, medium=%.2f\n",
-                   trackLocal->anyrainlkhood, trackLocal->littlerainlkhood,
-                   trackLocal->mediumrainlkhood);
-        GfLogDebug("Overall rain random draw = %.2f,\n", randDraw);
-        if (randDraw < trackLocal->anyrainlkhood)
-        {
-            // Now, let's determine how much it rains :
-            // if random[0,1] < little rain likelyhood => rain = little rain
-            const tdble randDraw2 = (tdble)(rand()/(double)RAND_MAX);
-            GfLogDebug("Specific rain random draw = %.2f,\n", randDraw2);
-            if (randDraw2 < trackLocal->littlerainlkhood)
-                rain = TR_RAIN_LITTLE;
-            // else if random[0,1] < medium + little rain likelyhood => rain = medium rain
-            else if (randDraw2 <  trackLocal->littlerainlkhood + trackLocal->mediumrainlkhood)
-                rain = TR_RAIN_MEDIUM;
-            // otherwise, random[0,1] >= medium + little rain likelyhood => rain = Heavy rain
-            else
-                rain = TR_RAIN_HEAVY;
-        }
-        else
-        {
-            // No Rain.
-            rain = TR_RAIN_NONE;
-        }
     }
 
     // Take care of the random case for clouds cover.

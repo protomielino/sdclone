@@ -145,20 +145,20 @@ GetTrackHeader(void *TrackHandle) {
 
     // Read Local Info section
     tTrackLocalInfo *local = &theTrack->local;
-    local->station = GfParmGetStr(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_STATION, "LFPG");
-    local->timezone = (int)GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEZONE, (char*)NULL, 0);
-    local->anyrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_ANYRAINLKHD, (char*)NULL, 0);
-    local->littlerainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LITTLERAINLKHD, (char*)NULL, 0);
-    local->mediumrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_MEDIUMRAINLKHD, (char*)NULL, 0);
-    local->timeofday = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (tdble)(15 * 3600 + 0 * 60 + 0)); // 15:00:00
-    local->sunascension = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_SUN_ASCENSION, (char*)NULL, 0.0f);
-    local->altitude = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_ALTITUDE, (char*)NULL, 1);
+    local->station          = GfParmGetStr(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_STATION, "LFPG");
+    local->timeofday        = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (tdble)(15 * 3600 + 0 * 60 + 0)); // 15:00:00
+    local->sunascension     = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_SUN_ASCENSION, (char*)NULL, 0.0f);
+    local->altitude         = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_ALTITUDE, (char*)NULL, 1.0);
+    local->latitude         = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LATITUDE, (char*)NULL, 49.00972222222222);
+    local->longitude        = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LONGITUDE, (char*)NULL, 2.5477777777777777);
+    local->climat           = (int)GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_CLIMAT, (char*)NULL, 9);
+    local->precipitation    = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_PRECIPITATION, (char*)NULL, 750.0);
 
     // Read Graphic section
     tTrackGraphicInfo *graphic = &theTrack->graphic;
     graphic->model3d = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_3DDESC, 0);
     graphic->background = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BKGRND, "background.png");
-    graphic->bgtype = (int)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGTYPE, (char*)NULL, 0.0);
+    graphic->bgtype = (int)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGTYPE, (char*)NULL, 0);
 
     graphic->bgColor[0] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_R, (char*)NULL, 0.0f);
     graphic->bgColor[1] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_G, (char*)NULL, 0.0f);

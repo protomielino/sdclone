@@ -40,6 +40,7 @@ static const char* TimeOfDaySpecNames[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
 static const char* CloudsSpecNames[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
 static const char* RainSpecNames[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
 static const char* WeatherSpecNames[GfRace::nWeatherSpecNumber] = RM_VALS_WEATHER;
+static const char* SeasonSpecNames[GfRace::nSeasonSpecNumber] = RM_VALS_SEASONS;
 
 
 // Private data for GfRace
@@ -225,6 +226,8 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
                 pSessionParams->bfOptions |= RM_CONF_CLOUD_COVER;
             else if (strOption == RM_VAL_CONFRAINFALL)
                 pSessionParams->bfOptions |= RM_CONF_RAIN_FALL;
+            else if (strOption == RM_VAL_CONFSEASON)
+                pSessionParams->bfOptions |= RM_CONF_SEASON;
             else if (strOption == RM_VAL_CONFWEATHER)
                 pSessionParams->bfOptions |= RM_CONF_WEATHER;
         }
@@ -306,6 +309,16 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
             if (strRainSpec == RainSpecNames[i])
             {
                 pSessionParams->eRainSpec = (ERainSpec)i;
+                break;
+            }
+
+        const std::string strSeasonSpec =
+            GfParmGetStr(hparmRaceMan, pszSessionName, RM_ATTR_SEASON, "");
+        pSessionParams->eSeasonSpec = nSeasonSpecNumber;
+        for (int i = 0; i < nSeasonSpecNumber; i++)
+            if (strSeasonSpec == SeasonSpecNames[i])
+            {
+                pSessionParams->eSeasonSpec = (ESeasonSpec)i;
                 break;
             }
 
@@ -601,6 +614,12 @@ void GfRace::store()
                          RainSpecNames[pSessionParams->eRainSpec]);
         else
             GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_RAIN);
+
+        if (pSessionParams->eSeasonSpec != nSeasonSpecNumber)
+            GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_SEASON,
+                         SeasonSpecNames[pSessionParams->eSeasonSpec]);
+        else
+            GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_SEASON);
 
         if (pSessionParams->eWeatherSpec != nWeatherSpecNumber)
             GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_WEATHER,
