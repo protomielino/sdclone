@@ -62,11 +62,11 @@ public class XmlWriter
 		this.editorFrame = editorFrame;
 	}
 	
-	public void writeXml(String fileName) throws FileNotFoundException, IOException, SecurityException
+	public void writeXml(String fileName, String trackName) throws FileNotFoundException, IOException, SecurityException
 	{
 		Document doc = new Document();
 
-		getXml(doc);
+		getXml(doc, trackName);
 		writeToFile(fileName, doc);
 	}
 
@@ -74,10 +74,10 @@ public class XmlWriter
 	 * @param segments
 	 * @return
 	 */
-	private synchronized void getXml(Document doc)
+	private synchronized void getXml(Document doc, String trackName)
 	{
 		Comment com;
-		Element root = getRoot();
+		Element root = getRoot(trackName);
 
 		DocType type = new DocType("params", "../../../src/libs/tgf/params.dtd");
 		String entity = "<!--  general definitions for tracks  -->\n";
@@ -114,9 +114,9 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized Element getRoot()
+	private synchronized Element getRoot(String trackName)
 	{
-		Attribute name = new Attribute("name", "test");
+		Attribute name = new Attribute("name", trackName);
 		Attribute val = new Attribute("type", "param");
 		Attribute mode = new Attribute("mode", "mw");
 

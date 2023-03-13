@@ -2551,7 +2551,7 @@ public class EditorFrame extends JFrame
 		
 		try
 		{
-			xmlWriter.writeXml(fileName);
+			xmlWriter.writeXml(fileName, trackName);
 		}
 		catch (Exception e)
 		{
