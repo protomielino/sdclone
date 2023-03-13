@@ -22,10 +22,14 @@ package gui.properties;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -514,7 +519,7 @@ public class TerrainProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 366, 510, 355);
 
-			Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
+			Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
 
 			for (int i = 0; i < objectMaps.size(); i++)
 	        {
@@ -527,12 +532,13 @@ public class TerrainProperties extends PropertyPanel
 
 	private class ObjectMapPanel extends JPanel
 	{
-		private JLabel				nameLabel			= new JLabel();
-		private JTextField 			nameTextField		= new JTextField();
-		private JLabel				objectMapLabel		= new JLabel();
-		private JTextField			objectMapTextField	= new JTextField();
-		private JButton				objectMapButton		= null;
-		private ObjectTablePanel	objectTablePanel	= null;
+		private JLabel				nameLabel				= new JLabel();
+		private JTextField 			nameTextField			= new JTextField();
+		private JLabel				objectMapLabel			= new JLabel();
+		private JTextField			objectMapTextField		= new JTextField();
+		private JButton				objectMapCreateButton 	= null;
+		private JButton				objectMapButton			= null;
+		private ObjectTablePanel	objectTablePanel		= null;
 
         public class Data
         {
@@ -579,8 +585,11 @@ public class TerrainProperties extends PropertyPanel
 			addTextField(this, 0, nameTextField, objectMap.getName(), 130, 100);
 			addTextField(this, 1, objectMapTextField, objectMap.getObjectMap(), 130, 285);
 
+			add(getObjectMapCreateButton(), null);
 			add(getObjectMapButton(), null);
 			add(getObjectTablePanel(objectMap), null);
+
+			objectMapCreateButton.setEnabled(objectMap.getObjectMap() == null || objectMap.getObjectMap().isEmpty());
 
 			objectMapTextField.getDocument().addDocumentListener(new DocumentListener()
 			{
@@ -610,6 +619,80 @@ public class TerrainProperties extends PropertyPanel
 					}
 				}
 			});
+		}
+
+ 		/**
+		 * This method initializes objectMapCreateButton
+		 *
+		 * @return javax.swing.JButton
+		 */
+		private JButton getObjectMapCreateButton()
+		{
+			if (objectMapCreateButton == null)
+			{
+				objectMapCreateButton = new JButton();
+				objectMapCreateButton.setBounds(420, 6, 80, 25);
+				objectMapCreateButton.setText("Create");
+				objectMapCreateButton.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent ev)
+					{
+						try
+						{
+							objectMapCreateFile();
+						}
+						catch (IOException ex)
+						{
+						}
+					}
+				});
+			}
+			return objectMapCreateButton;
+		}
+
+		protected void objectMapCreateFile() throws IOException
+		{
+			int index = tabbedPane.getSelectedIndex() + 1;
+			
+			Path filename = Paths.get(Editor.getProperties().getPath() + sep + "object-map" + index + ".png");
+
+			if (filename.toFile().exists())
+			{
+				String[] options = {"Overwrite", "Use Existing", "Cancel"};
+				
+				int option = JOptionPane.showOptionDialog(this, filename.getFileName().toString() + " already exists!",
+						"Create Object Map", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+				
+				if (option == 1)
+				{
+					objectMapTextField.setText(filename.getFileName().toString());
+					
+					getDataFromImage(filename.toString());
+					objectTablePanel.dataChanged();
+					return;
+				}
+				else if (option == 2)
+				{
+					return;
+				}
+			}
+			
+			Rectangle2D.Double boundingRectangle = getEditorFrame().getBoundingRectangle();
+			
+			int imageWidth = 1024;
+			int imageHeight = (int)(1024 * (boundingRectangle.height / boundingRectangle.width));
+			BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphic = image.createGraphics();
+			graphic.setColor(new Color(0x00000000));
+			graphic.fillRect(0, 0, imageWidth, imageHeight);
+		
+			graphic.dispose();
+			ImageIO.write(image, "png", new File(filename.toString()));
+
+			objectMapTextField.setText(filename.getFileName().toString());
+			
+			getDataFromImage(filename.toString());
+			objectTablePanel.dataChanged();
 		}
 
 		/**
@@ -695,7 +778,6 @@ public class TerrainProperties extends PropertyPanel
 						if (rgb != 0x0)
 						{
 							String name = getEditorFrame().getObjectColorName(rgb);
-
 							if (name == null)
 							{
 								name = new String("Unknown");
@@ -751,13 +833,13 @@ public class TerrainProperties extends PropertyPanel
 		    		Color color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 		    		label.setBackground(color);
 		    		if ((color.getRed()*0.299 + color.getGreen()*0.587 + color.getBlue()*0.114) > 186)
-				{
+		    		{
 			        	label.setForeground(Color.BLACK);
-				}
+		    		}
 		    		else
 		    		{
 			        	label.setForeground(Color.WHITE);
-				}
+		    		}
 		    	}
 		        else
 		        {
@@ -771,14 +853,16 @@ public class TerrainProperties extends PropertyPanel
 
 		class ObjectTableModel extends AbstractTableModel
 	    {
-	        private final String[] columnNames = { null, "Name", "Color", "X", "Y" };
-	        private final Class<?>[] columnClass = new Class[]
+	        private final String[] 		columnNames = { null, "Name", "Color", "X", "Y" };
+	        private final Class<?>[] 	columnClass = new Class[]
 	        {
 	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class
 	        };
+			private ObjectMap 			objectMap = null;
 
 	        ObjectTableModel(ObjectMap objectMap)
 			{
+	        	this.objectMap = objectMap;
 	        	getDataFromObjectMap(objectMap);
 	        }
 
@@ -804,12 +888,10 @@ public class TerrainProperties extends PropertyPanel
 
 	        public boolean isCellEditable(int row, int columnIndex)
 	        {
-	        	/*
 	        	if (columnIndex == 1 || columnIndex == 3 || columnIndex == 4)
 	        	{
 	        		return true;
 	        	}
-	        	*/
 	        	return false;
 	        }
 
@@ -842,7 +924,15 @@ public class TerrainProperties extends PropertyPanel
 				case 1:
 					datum.name = (String) value;
 			        fireTableCellUpdated(rowIndex, columnIndex);
-			        datum.color = getEditorFrame().getObjectColor(datum.name);
+			        	
+			        if (value.equals("Unknown"))
+			        {
+			        	datum.color = objectMap.getObjects().get(rowIndex).getRGB();
+			        }
+			        else
+			        {
+			        	datum.color = getEditorFrame().getObjectColor(datum.name);			        
+			        }
 			        fireTableCellUpdated(rowIndex, columnIndex + 1);
 			        break;
 				case 3:
@@ -868,7 +958,9 @@ public class TerrainProperties extends PropertyPanel
 				comboBox.addItem(it.next());
 			}
 
-	    	nameColumn.setCellEditor(new DefaultCellEditor(comboBox));
+			comboBox.addItem("Unknown");
+
+			nameColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
 	    	//Set up tool tips for the name cells.
 	    	DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
@@ -1007,7 +1099,7 @@ public class TerrainProperties extends PropertyPanel
 			getEditorFrame().documentIsModified = true;
 		}
 
-		Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
+		Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
 		int minCount = Math.min(objectMaps.size(), tabbedPane.getTabCount());
 		if (objectMaps.size() != tabbedPane.getTabCount())
 		{

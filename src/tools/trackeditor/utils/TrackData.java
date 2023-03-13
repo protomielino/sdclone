@@ -27,9 +27,11 @@ import utils.circuit.Graphic;
 import utils.circuit.Header;
 import utils.circuit.LocalInfo;
 import utils.circuit.MainTrack;
+import utils.circuit.ObjectMap;
 import utils.circuit.Sector;
 import utils.circuit.StartingGrid;
 import utils.circuit.Surface;
+import utils.circuit.TerrainGeneration;
 import utils.circuit.TrackLight;
 import utils.circuit.TrackObject;
 
@@ -222,4 +224,14 @@ public final class TrackData
 	{
 		this.sectors = sectors;
 	}
+	
+	public TerrainGeneration getTerrainGeneration()
+	{
+		return getGraphic().getTerrainGeneration();
+	}	
+	
+	public Vector<ObjectMap> getObjectMaps()
+	{
+		return getGraphic().getTerrainGeneration().getObjectMaps();
+	}	
 }

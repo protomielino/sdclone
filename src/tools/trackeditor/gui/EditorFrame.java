@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -77,9 +78,12 @@ import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.Curve;
 import utils.circuit.MainTrack;
+import utils.circuit.ObjShapeObject;
+import utils.circuit.ObjectMap;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
+import utils.circuit.TerrainGeneration;
 import utils.circuit.TrackObject;
 import utils.undo.Undo;
 
@@ -235,6 +239,25 @@ public class EditorFrame extends JFrame
 	
 	private String				originalTitle						= null;
 	
+	private int 				currentObjectMap					= -1;
+	private int					currentObjectColor					= 0;
+
+	public int getCurrentObjectMap() {
+		return currentObjectMap;
+	}
+
+	public void setCurrentObjectMap(int currentObjectMap) {
+		this.currentObjectMap = currentObjectMap;
+	}
+
+	public int getCurrentObjectColor() {
+		return currentObjectColor;
+	}
+
+	public void setCurrentObjectColor(int currentObjectColor) {
+		this.currentObjectColor = currentObjectColor;
+	}
+
 	public class NewProjectInfo
 	{
 		public String	name;
@@ -246,6 +269,11 @@ public class EditorFrame extends JFrame
 		public String	email;
 		public String	copyright;
 		public String	description;
+	}
+	
+	public Rectangle2D.Double getBoundingRectangle()
+	{
+		return view.getBoundingRectangle();
 	}
 	
 	public TrackData getTrackData()
@@ -2767,6 +2795,18 @@ public class EditorFrame extends JFrame
 			XmlReader xmlReader = new XmlReader(this);
 			
 			xmlReader.readXml(file.getAbsolutePath());
+			
+			Vector<ObjectMap> objectMaps = trackData.getObjectMaps();
+			for (int i = 0; i < objectMaps.size(); i++)
+		 	{
+				Vector<ObjShapeObject> objects = objectMaps.get(i).getObjects();
+
+				for (int j = 0; j < objects.size(); j++)
+				{
+					objects.get(j).setName(getObjectColorName(objects.get(j).getRGB()));
+				}
+		 	}			
+			
 		}
 		catch (Exception e)
 		{
@@ -2871,7 +2911,7 @@ public class EditorFrame extends JFrame
 		preferences.putInt("CheckDialogY", getProject().getCheckDialogY());
 		preferences.putInt("CheckDialogWidth", getProject().getCheckDialogWidth());
 		preferences.putInt("CheckDialogHeight", getProject().getCheckDialogHeight());
-
+		
 		System.exit(0);
 	}
 
@@ -3025,5 +3065,15 @@ public class EditorFrame extends JFrame
 	public Segment getSegment(String name)
 	{
 		return trackData.getSegments().getSegment(name);
+	}
+	
+	public TerrainGeneration getTerrainGeneration()
+	{
+		return trackData.getTerrainGeneration();
+	}
+	
+	public Vector<ObjectMap> getObjectMaps()
+	{
+		return trackData.getObjectMaps();
 	}
 }

@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -438,7 +440,7 @@ public class CheckDialog extends JDialog
 		}
 
 		// get colors from image files
-		Vector<ObjectMap>	objectMaps = trackData.getGraphic().getTerrainGeneration().getObjectMaps();
+		Vector<ObjectMap>	objectMaps = trackData.getObjectMaps();
 		Set<Integer>		colors = new HashSet<Integer>();
 
 		for (int i = 0; i < objectMaps.size(); i++)
@@ -574,6 +576,57 @@ public class CheckDialog extends JDialog
 				if (pixels.contains(new Point(pixel.x + 1, pixel.y)) || pixels.contains(new Point(pixel.x, pixel.y + 1)))
 				{
 					textArea.append("Adjacent pixels for object color " + String.format("0x%06X", color) + " found at " + pixel.x + ", " + pixel.y + "\n");
+				}
+			}
+		}
+
+		//check for objects outside terrain boundary
+		SegmentVector track = editorFrame.getTrackData().getSegments();
+		int size = track.size();
+		Rectangle2D.Double boundingRectangle = null;
+
+		for(int i = 0; i < size; i++)
+		{
+			Rectangle2D.Double r = track.get(i).getBounds();
+
+			if (boundingRectangle == null)
+				boundingRectangle = r;
+			else
+				boundingRectangle.add(r);
+		}
+		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+		if (Double.isNaN(border))
+		{
+			border = 0;
+		}
+		Rectangle2D.Double terrainRectangle = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
+				 													 boundingRectangle.getMinY() - border,
+				 													 boundingRectangle.getWidth() + (border * 2),
+				 													 boundingRectangle.getHeight() + (border * 2));
+
+		for (int i = 0; i < objectMaps.size(); i++)
+		{
+			ObjectMap objectMap = objectMaps.get(i);
+			Vector<ObjShapeObject> objects = objectMap.getObjects();
+			double widthScale = terrainRectangle.getWidth() / objectMap.getImageWidth();
+			double heightScale = terrainRectangle.getHeight() / objectMap.getImageHeight();
+
+			for (int j = 0; j < objects.size(); j++)
+			{
+				ObjShapeObject object = objects.get(j);
+				Point2D.Double location = object.getTrackLocation();
+
+				if (location == null)
+				{
+					double worldX = terrainRectangle.getMinX() + (object.getImageX() * widthScale);
+					double worldY = terrainRectangle.getMinY() + ((objectMap.getImageHeight() - object.getImageY()) * heightScale);
+
+					location = new Point2D.Double(worldX, worldY);
+				}
+
+				if (!terrainRectangle.contains(location))
+				{
+					textArea.append("Object Map " + objectMaps.get(i).getName() + " Object " + object.getName() + " outside terrain boundary\n");
 				}
 			}
 		}

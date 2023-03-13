@@ -16,13 +16,22 @@ public class ObjShapeObject extends Segment
 	private int					imageY;
 	
 	// shape info
-	private Point2D.Double		location;
+	private Point2D.Double		location 	= new Point2D.Double(0, 0);
 	private double				width		= defaultSize;
 	private double				height		= defaultSize;
 	
 	public ObjShapeObject(int rgb, int imageX, int imageY)
 	{
 		super("object");
+		this.rgb = rgb & 0x00ffffff;
+		this.color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+		this.imageX = imageX;
+		this.imageY = imageY;
+	}
+			
+	public ObjShapeObject(String name, int rgb, int imageX, int imageY)
+	{
+		super(name, "object");
 		this.rgb = rgb & 0x00ffffff;
 		this.color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 		this.imageX = imageX;
@@ -63,7 +72,13 @@ public class ObjShapeObject extends Segment
 		this.imageY = imageY;
 	}
 
-	public Point2D.Double getLocation() {
+	public void setImageXY(int x, int y)
+	{
+		imageX = x;
+		imageY = y;
+	}
+	
+	public Point2D.Double getTrackLocation() {
 		return location;
 	}
 
@@ -71,9 +86,15 @@ public class ObjShapeObject extends Segment
 		this.location = location;
 	}
 
+	public void setTrackLocation(double x, double y) {
+		location.x = x;
+		location.y = y;
+	}
+
 	public void calcShape(Point2D.Double location)
 	{
-		this.location = location;
+		this.location.x = location.x;
+		this.location.y = location.y;
 		
 		if (points == null)
 		{
@@ -97,5 +118,19 @@ public class ObjShapeObject extends Segment
 
 		points[3].x = this.location.getX() - width / 2;
 		points[3].y = this.location.getY() + height / 2;
+	}
+	
+	public void dump(String indent)
+	{
+		super.dump(indent);
+		
+		System.out.println(indent + "  ObjShapeObject");	
+		System.out.println(indent + "    rgb         : " + String.format("0x%06X", rgb));
+		System.out.println(indent + "    color       : " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue());
+		System.out.println(indent + "    imageX      : " + imageX);
+		System.out.println(indent + "    imageY      : " + imageY);
+		System.out.println(indent + "    location    : " + location.x + ", " + location.y);
+		System.out.println(indent + "    width       : " + width);
+		System.out.println(indent + "    height      : " + height);
 	}
 }

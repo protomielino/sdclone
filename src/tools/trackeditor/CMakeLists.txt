@@ -36,6 +36,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/NewProjectDialog.java
          gui/PreferencesDialog.java
          gui/TrackgenPanel.java
+         gui/TrackObjectDialog.java
          gui/properties/CameraProperties.java
          gui/properties/EnvMapProperties.java
          gui/properties/GeneralProperties.java
@@ -112,9 +113,15 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/TrackObject.java
          utils/circuit/TurnMarks.java
          utils/circuit/XmlObjPits.java
+         utils/undo/ObjectMapObject.java
          utils/undo/Undo.java
+         utils/undo/UndoAddObject.java
          utils/undo/UndoAddSegment.java
+         utils/undo/UndoDeleteObject.java
+         utils/undo/UndoDeleteAllObjects.java
          utils/undo/UndoDeleteSegment.java
+         utils/undo/UndoEditAllObjects.java
+         utils/undo/UndoEditObject.java
          utils/undo/UndoInterface.java
          utils/undo/UndoSegmentChange.java
          utils/undo/UndoSplitSegment.java)

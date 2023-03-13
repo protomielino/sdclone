@@ -906,7 +906,7 @@ public class XmlWriter
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Object Maps"));
 
-		Vector<ObjectMap> objMaps = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
+		Vector<ObjectMap> objMaps = editorFrame.getObjectMaps();
 
 		for (int i = 0; i < objMaps.size(); i++)
 		{

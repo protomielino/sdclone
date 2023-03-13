@@ -104,6 +104,13 @@ public class Segment implements Cloneable
 		setProperties();
 	}
 
+	public Segment(String name, String type)
+	{
+		this.name = name;
+		this.type = type;
+		setProperties();
+	}
+
 	/**
 	 * @return Returns the left.
 	 */
@@ -208,6 +215,9 @@ public class Segment implements Cloneable
 	
 	public boolean contains(Point2D.Double point)
 	{
+		if (points == null)
+			return false;
+		
 		for (int i = 0; i < points.length; i += 4)
 		{
 			int count = 0;

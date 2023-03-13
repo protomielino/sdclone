@@ -54,14 +54,50 @@ public class ObjectMap
 	public void addObject(ObjShapeObject object)
 	{
 		objects.add(object);
+		colors.add(object.getRGB());
 		changed = true;
 	}
 
-	public void removeObject(ObjShapeObject object)
+	public void addObjectAt(ObjShapeObject object, int index)
 	{
-		objects.remove(object);
+		objects.insertElementAt(object, index);
+		colors.add(object.getRGB());
 		changed = true;
 	}
+
+	public void setObjectAt(int index, ObjShapeObject object)
+	{
+		objects.set(index, object);
+		colors.add(object.getRGB());
+		changed = true;
+	}
+
+	public boolean removeObject(ObjShapeObject object)
+	{
+		if (objects.remove(object))
+		{
+			changed = true;
+			return true;
+		}
+		return false;
+	}
+	
+	public int getObjectIndex(ObjShapeObject object)
+	{
+		int index = objects.indexOf(object);
+		
+		return index;
+	}
+	
+	public boolean hasObject(ObjShapeObject object)
+	{
+		return getObjectIndex(object) != -1;
+	}
+	
+	public void addColor(int color)
+	{
+		colors.add(color);
+	}	
 
 	public Set<Integer> getColors() {
 		return colors;
@@ -173,5 +209,5 @@ public class ObjectMap
 			ObjShapeObject object = objects.get(i);
 			System.out.println(indent + "    " + String.format("0x%06X", object.getRGB()) + " " + object.getImageX() + " " + object.getImageY());
 		}
-    }	
+    }
 }
