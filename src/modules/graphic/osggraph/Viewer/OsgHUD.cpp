@@ -770,8 +770,8 @@ void SDHUD::CreateHUD(int scrH, int scrW)
     camera->setAllowEventFocus(false);
 
     //calculate optimal hud scale (choose the minor scale from the vertical and horizontal scale)
-    float scaleH = (float)scrH/1024;
-    float scaleW = (float)scrW/1280;
+    float scaleH = (float)scrH/1024;//640:larghezza
+    float scaleW = (float)scrW/1280;//480:altezza
 
     if(scaleH < scaleW){
         hudScale = scaleH;
@@ -1469,7 +1469,10 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		//GfLogInfo("\nOSGHUD button:"); //default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
 		//GfLogInfo("%i", mouse->button[0]); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
 
-GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X, (int)mouse->Y);
+//GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X, (int)mouse->Y);
+//GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X* hudScreenW /640, (int)mouse->Y * hudScreenH /480);
+//1280-640:larghezza
+//1024-480:altezza
 
 		//mouse started to be pressed
 		if (prevMouseButtonState == 0  && mouse->button[0] == 1){
@@ -2503,12 +2506,12 @@ void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 
 			//GfLogInfo("Checking: %s\n", widgetPath.c_str());
 
-
+			//leggo la posizione dal file
 			std::string positionRefObj =        GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObj", "" );
 			std::string positionRefObjPoint =   GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObjPoint", "tl" );
 			std::string positionMyPoint =       GfParmGetStr (paramHandle, widgetPath.c_str(),"position-myPoint", "tl" );
-			float positionVerticalModifier =    GfParmGetNum (paramHandle, widgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
-			float positionHorizontalModifier =  GfParmGetNum (paramHandle, widgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+			float positionVerticalModifier =    GfParmGetNum (paramHandle, widgetPath.c_str(),"position-verticalModifier", "",0 );
+			float positionHorizontalModifier =  GfParmGetNum (paramHandle, widgetPath.c_str(),"position-horizontalModifier", "",0 );
 			
 			if ( positionRefObj.find("screen") == 0 ){
 				
@@ -2543,18 +2546,49 @@ void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 //				/loat newPositionVerticalModifier = positionVerticalModifier + (mouseTotalDragY);
 //				float newPositionHorizontalModifier = positionHorizontalModifier + (mouseTotalDragX); 
 
+				//convert the modification to the resolution used in the config file
+				float modifierVertical = ((float)mouseTotalDragY / (float)hudScreenH * 1024);
+				float modifierHorizontal = ((float)mouseTotalDragX / (float)hudScreenW * 1280);
 
-				float newPositionVerticalModifier = positionVerticalModifier + (mouseTotalDragY /hudScale);
-				float newPositionHorizontalModifier = positionHorizontalModifier + (mouseTotalDragX /hudScale); 
-
-
-
-//				GfLogInfo("Modified Vertical by: %f\n", newPositionVerticalModifier);
-//				GfLogInfo("Modified Horizontal by: %f\n", newPositionHorizontalModifier);
-
-
-
+				// I still dont completely understand the math or the reasons for this, but "it works"
+				float horizontalScale = (((float)hudScreenW / (float)hudScreenH) / (1280.00/1024.00));
 				
+				modifierHorizontal = modifierHorizontal * horizontalScale;
+/*
+				if (positionRefObjPoint.find('c') == 1){
+					GfLogInfo("Adjusting horizontal");
+					modifierHorizontal = modifierHorizontal /2;
+				}
+*/
+//				modifierHorizontal = modifierHorizontal / hudScale;
+
+
+				float newPositionVerticalModifier = positionVerticalModifier + modifierVertical;
+				float newPositionHorizontalModifier = positionHorizontalModifier + modifierHorizontal;
+
+/*
+				GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X* hudScreenW /640, (int)mouse->Y * hudScreenH /480);
+				GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X* hudScreenW /640, (int)mouse->Y * hudScreenH /480);
+*/
+				GfLogInfo("OSGHUD: Hud Scale is: %f\n", hudScale);
+
+				GfLogInfo("Resolution: %f %f\n", (float)hudScreenW, (float)hudScreenH);
+				GfLogInfo("Horizontal Scale: %f\n", horizontalScale);
+
+				GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
+
+				GfLogInfo("Original Vertical was: %f\n", positionVerticalModifier);
+				GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
+
+				GfLogInfo("Mouse drag was Vertical: %f\n", (float)mouseTotalDragY);
+				GfLogInfo("Mouse drag was Horizontal: %f\n", (float)mouseTotalDragX);
+
+				GfLogInfo("Modifier Vertical by: %f\n", modifierVertical);
+				GfLogInfo("Modifier Horizontal by: %f\n", modifierHorizontal);
+
+				GfLogInfo("Modified Vertical is: %f\n", newPositionVerticalModifier);
+				GfLogInfo("Modified Horizontal is: %f\n", newPositionHorizontalModifier);
+
 /*
 				if ( hudTextElements.find(widgetName) != hudTextElements.end() )
 				{
@@ -2707,10 +2741,8 @@ void SDHUD::ToggleHUDeditmode()
 	hudEditModeEnabled = !hudEditModeEnabled;
 	GfLogInfo("OSGHUD editmode toggled to %i \n", hudEditModeEnabled);
 
-
 	if (hudEditModeEnabled){
 		//we are entering edithud mode
-		
 		//force all widgets to be visible, even if disabled
 		setWidgetsGroupsVisibilityForcedON();
 		//make the edithud widget visible
@@ -2718,7 +2750,6 @@ void SDHUD::ToggleHUDeditmode()
 		hudWidgets["mouseWidget"]->setNodeMask(1);
 	}else{
 		//we are going back to normal game mode
-
 		//restore normal widgets visibility (visible if enabled or invisible if disabled)
 		setWidgetsGroupsVisibilityNormal();
 		//hide the edithud widget
