@@ -69,7 +69,19 @@ static const osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
 static const osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
 static const osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 
-
+//mouse
+int prevMouseButtonState = 0;
+int mouseStartDragX = 0;
+int mouseStartDragY = 0;
+int mouseTotalDragX = 0;
+int mouseTotalDragY= 0;
+int mouseDragX = 0;
+int mouseDragY = 0;
+int mousePrevPosX = 0;
+int mousePrevPosY = 0;
+int hudScreenH = 0;
+int hudScreenW = 0;
+//std::string prevSelectedWidgetGroup="";
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
 static void split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
@@ -141,7 +153,7 @@ OSGPLOT::OSGPLOT(
     osgTitle->setColor(color);
 
     std::string fontFileUrl = "/vera/Vera.ttf";
-    std::string fontsMainDirectory = GfDataDir();
+    std::string fontsMainDirectory = GetDataDir();
     fontsMainDirectory = fontsMainDirectory+"data/fonts";
     fontFileUrl = fontsMainDirectory+fontFileUrl;
     osgTitle->setFont(fontFileUrl);
@@ -736,6 +748,8 @@ SDHUD::SDHUD() :
 
 void SDHUD::CreateHUD(int scrH, int scrW)
 {
+	hudScreenH = scrH;
+	hudScreenW = scrW;
     // create a camera to set up the projection and model view matrices, and the subgraph to draw in the HUD
     camera = new osg::Camera;
 
@@ -1092,7 +1106,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     float carFuel = (float)((float)currCar->_fuel / (float)currCar->_tank);
 
     //update fuel bar
-    changeImageSize(hudImgElements["fuel-icon-empty"], 1.0-carFuel, "top", hudScale);
+    //changeImageSize(hudImgElements["fuel-icon-empty"], 1.0-carFuel, "top", hudScale);//not needed anymore we can just overwrite the off image with the on image
     changeImageSize(hudImgElements["fuel-icon-full"], carFuel, "bottom", hudScale);
 
 
@@ -1145,14 +1159,14 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 //damage
     float carDamage = (float)((currCar->_dammage) / (float)s->_maxDammage);
-    changeImageSize(hudImgElements["engine-icon"], 1.0-carDamage, "top", hudScale);
+    //changeImageSize(hudImgElements["engine-icon"], 1.0-carDamage, "top", hudScale);//not needed anymore we can just overwrite the off image with the on image
     changeImageSize(hudImgElements["engine-icon-damaged"], carDamage, "bottom", hudScale);
 
 
 //rpm
     float rpmWidth = 1.0 / currCar->_enginerpmMax * currCar->_enginerpm;
+    //changeImageSize(hudImgElements["rpm-off"], 1.0-rpmWidth, "right", hudScale);//not needed anymore we can just overwrite the off image with the on image
     changeImageSize(hudImgElements["rpm-on"], rpmWidth, "left", hudScale);
-    changeImageSize(hudImgElements["rpm-off"], 1.0-rpmWidth, "right", hudScale);
 
 // dash items
     std::string &description = strEmpty;
@@ -1399,7 +1413,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     changeImagePosition(
         hudImgElements["gforces-dot"],
         gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 3.5 * 1,//horizontal
-        gforcegraphbb.yMin()+position.y()-(currCar->_DynGC.acc.x * 3.5),//vertical
+        gforcegraphbb.yMin()+position.y()-currCar->_DynGC.acc.x * 3.5,//vertical
         hudScale
     );
 
@@ -1409,7 +1423,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     hudTextElements["debug-info"]->setText(temp.str());
 
 // delta best
-
     if (currCar->_bestLapTime != 0){
 		float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
 
@@ -1444,6 +1457,379 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
 		changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
 	}
+	
+
+	
+//edithud
+//		std::string targetWidgetGroup = "widgets/tiresWidget"; 
+//		std::string targetWidgetGroup = ""; 
+
+	    tMouseInfo	*mouse;
+		mouse = GfuiMouseInfo();
+		//GfLogInfo("\nOSGHUD button:"); //default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
+		//GfLogInfo("%i", mouse->button[0]); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
+
+GfLogInfo("OSGHUD:SD MOUSE: %i, %i \n", (int)mouse->X, (int)mouse->Y);
+
+		//mouse started to be pressed
+		if (prevMouseButtonState == 0  && mouse->button[0] == 1){
+			mouseStartDragX = mouse->X;
+			mouseStartDragY = mouse->Y;
+			prevMouseButtonState = 1;
+			
+			
+			//get the toggle bonding box and detect clicks on it
+			osg::BoundingBox toggleOnOffBB = hudImgElements["edithud-toggleoff"]->getBoundingBox();
+			float mousePosX = mouse->X * hudScreenW /640;
+			float mousePosY = mouse->Y * hudScreenH /480;
+			if (mousePosX >= toggleOnOffBB.xMin() && mousePosX <= toggleOnOffBB.xMax()
+			&& mousePosY >= toggleOnOffBB.yMin() && mousePosY <= toggleOnOffBB.yMax()){
+				GfLogInfo("Clicked toggle\n");
+				//toggle the widget enabled/disabled status
+				ToggleHUDwidget(selectedWidgetGroup);
+				hudWidgets[selectedWidgetGroup.c_str()]->setNodeMask(1);
+
+				if(hudImgElements["edithud-toggleon"]->getNodeMask()==0){
+					hudImgElements["edithud-toggleoff"]->setNodeMask(0);
+					hudImgElements["edithud-toggleon"]->setNodeMask(1);
+					GfLogInfo("OSGHUD: done");
+				}else{
+					hudImgElements["edithud-toggleoff"]->setNodeMask(1);
+					hudImgElements["edithud-toggleon"]->setNodeMask(0);
+				}
+			}
+			
+			
+			//check mouse widgets collisions
+			//open the osghud config file file
+			void *paramHandle2 = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+			//cicle throught each element of the widgetGroup
+			if (GfParmListSeekFirst(paramHandle2, "widgets") == 0)
+			{
+				do
+				{
+					std::string widgetGroupName = GfParmListGetCurEltName(paramHandle2,"widgets");
+					if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+						continue;
+					}
+					if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+						continue;
+					}
+
+					bool collision = isMouseOverWidgetGroup(widgetGroupName);
+						//GfLogInfo("OSGHUD: %i :  %s \n", collision, widgetGroupName.c_str());
+					if (collision == true){
+						GfLogInfo("OSGHUD: mouse collision with:  %s \n", widgetGroupName.c_str());
+						//targetWidgetGroup = "widgets/"+widgetGroupName;
+						//prevSelectedWidgetGroup = widgetGroupName;
+						selectWidgetGroupByName(widgetGroupName);
+					}
+					
+				} while (GfParmListSeekNext(paramHandle2, "widgets") == 0);
+			}
+			//release the config file
+			GfParmReleaseHandle(paramHandle2);
+		}
+		//mouse stopped to be pressed
+		if (prevMouseButtonState == 1  && mouse->button[0] == 0){
+			mouseTotalDragX = (mouse->X - mouseStartDragX) * (float)hudScreenW /640;
+			mouseTotalDragY = (mouse->Y - mouseStartDragY) * (float)hudScreenH /480;
+			mouseStartDragX = 0;
+			mouseStartDragY = 0;
+			prevMouseButtonState = 0;
+			GfLogInfo("Mouse was dragged for x:%i y:%i \n", mouseDragX, mouseDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
+			GfLogInfo("Mouse total drag x:%i y:%i \n", mouseTotalDragX, mouseTotalDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
+
+			if (!selectedWidgetGroup.empty()){
+				saveWidgetGroupPosition(selectedWidgetGroup);
+			}
+
+
+//			prevSelectedWidgetGroup ="";
+		}else{
+			mouseDragX = 0;
+			mouseDragY = 0;
+		}
+
+		if (mouse->button[0] == 1){
+			mouseDragX =  (mouse->X - mousePrevPosX);
+			mouseDragY =  (mouse->Y - mousePrevPosY);
+		}
+		mousePrevPosX = mouse->X;
+		mousePrevPosY = mouse->Y;
+
+
+		//move it to the correct position
+        float newScale = 1.0;
+        float moveX = 0.0;
+        float moveY = 0.0;
+        //move mode
+        if (true){
+			moveX = (float)mouseDragX * (float)hudScreenW /640;
+			moveY = (float)mouseDragY * (float)hudScreenH /480;
+		}
+        //scale mode
+        if (true){
+		
+		}
+
+/*
+if (!prevSelectedWidgetGroup.empty()){
+	targetWidgetGroup = "widgets/"+prevSelectedWidgetGroup;
+}else {
+	targetWidgetGroup = "";
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+//start doing hud things
+		//sposto il widget vero e proprio /*todo, do this for each single widgetElement of the widget group*/      
+		//get the widget bounding box of the hud we want to edit
+/*
+		osg::BoundingBox editedwidgetBB = hudImgElements["gforces-graph"]->getBoundingBox();
+		changeImagePosition(
+			hudImgElements["gforces-graph"],
+			editedwidgetBB.xMin()+moveX,
+			editedwidgetBB.yMin()+moveY,
+			hudScale
+		);
+*/
+
+//		std::string widgetGroupName = "widgets/gforceWidget";
+		std::string selectedWidgetGroupPath = "widgets/" + selectedWidgetGroup;
+
+
+
+		//start
+		//move the widget
+		//open the osghud config file file
+		void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+		//cicle throught each element of the widgetGroup
+		if (GfParmListSeekFirst(paramHandle, selectedWidgetGroupPath.c_str()) == 0)
+		{
+			do
+			{
+				std::string widgetName = GfParmListGetCurEltName(paramHandle,selectedWidgetGroupPath.c_str());
+				
+				if ( hudTextElements.find(widgetName) != hudTextElements.end() )
+				{
+					osg::BoundingBox editedwidgetBB = hudTextElements[widgetName.c_str()]->getBoundingBox();
+					osg::Vec3 textPosition = hudTextElements[widgetName.c_str()]->getPosition();
+					textPosition[0]=textPosition[0]+moveX;
+					textPosition[1]=textPosition[1]+moveY;
+					hudTextElements[widgetName.c_str()]->setPosition(textPosition);
+				}
+				else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
+				{
+					//widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
+					osg::BoundingBox editedwidgetBB = hudImgElements[widgetName.c_str()]->getBoundingBox();
+					changeImagePosition(
+						hudImgElements[widgetName.c_str()],
+						editedwidgetBB.xMin()+moveX,
+						editedwidgetBB.yMin()+moveY,
+						hudScale
+					);
+				}
+
+				else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+				{
+					//widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
+				}
+
+				else
+				{
+					//GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+					//osg::BoundingBox screenBB;
+					//screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+					//screenBB.expandBy(osg::Vec3(hudScreenW,hudScreenH,0.0f));
+					//widgetBoundingBox = screenBB;
+				}
+			} while (GfParmListSeekNext(paramHandle, selectedWidgetGroupPath.c_str()) == 0);
+		}
+		
+		//release the config file
+		GfParmReleaseHandle(paramHandle);
+		//end
+
+
+
+//mouse
+			changeImagePosition(
+				hudImgElements["mouse-normal"],
+				mouse->X * (float)hudScreenW /640,
+				(mouse->Y * (float)hudScreenH /480)-(128*hudScale),/*todo*/
+				hudScale
+			);
+
+
+
+
+if (selectedWidgetGroup.empty()){
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+		//get the new widgetGroup bounding box
+		osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(selectedWidgetGroup);
+/*
+GfLogInfo("OSGHUD: boundingbox: %s\n", selectedWidgetGroup.c_str());
+GfLogInfo("OSGHUD: boundingbox: xmin %f\n", targetWidgetGroupBoundingBox.xMin());
+GfLogInfo("OSGHUD: boundingbox: ymin %f\n", targetWidgetGroupBoundingBox.yMin());
+GfLogInfo("OSGHUD: boundingbox: xmax %f\n", targetWidgetGroupBoundingBox.xMax());
+GfLogInfo("OSGHUD: boundingbox: ymax %f\n", targetWidgetGroupBoundingBox.yMax());
+*/
+
+
+
+
+
+
+
+		/*
+ * how vertices are arranged:
+ *      3_______2
+ *      |       |
+ *    y |       |
+ *      |       |
+ *      0_______1
+ *          x
+ *
+ * [vertices(0-3)][0]=x
+ * [vertices(0-3)][1]=y
+* */
+
+
+
+
+		//resize the edithudWidget to match the size of targetWidgetGroup
+        //create the vertices for the image geometry and assign them
+
+		//move the background
+		osg::Vec3Array* vertices = new osg::Vec3Array;
+		float depth = 0.0f-0.1f;
+		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMin(),depth)); //bottom left
+		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMax(),depth)); //bottom right
+		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMax(),depth)); //top right
+		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMin(),depth)); //topleft
+		vertices->dirty();
+
+		hudImgElements["edithud-background"]->setVertexArray(vertices);
+		hudImgElements["edithud-background"]->setUseDisplayList(false);
+
+		//move all the other pieces of the edithudWidget
+		osg::Vec3Array* targetVertices = dynamic_cast<osg::Vec3Array*>(hudImgElements["edithud-background"]->getVertexArray());
+		std::vector<std::string> edithudWidgets;
+		std::string currWidget;
+		//edithudWidgets.push_back("edithud-background");
+		edithudWidgets.push_back("edithud-titlebar");
+		edithudWidgets.push_back("edithud-dragicon");
+		edithudWidgets.push_back("edithud-resizeicon");
+		edithudWidgets.push_back("edithud-toggleoff");
+		edithudWidgets.push_back("edithud-toggleon");
+		edithudWidgets.push_back("edithud-titletext");
+				
+		for (size_t i = 0; i < edithudWidgets.size(); ++i){
+
+			//find the referenceObj pointer and then get his bounding box
+			/*todo add moving for text elements etc*/
+			if ( hudTextElements.find(edithudWidgets[i]) != hudTextElements.end() )
+			{
+				/*
+				//osg::BoundingBox editedwidgetBB = hudTextElements[widgetName.c_str()]->getBoundingBox();
+				osg::Vec3 textPosition = hudTextElements[edithudWidgets[i].c_str()]->getPosition();
+				textPosition[0]=textPosition[0]+moveX;
+				textPosition[1]=textPosition[1]+moveY;
+				hudTextElements[edithudWidgets[i].c_str()]->setPosition(textPosition);
+				*/
+				recalculateTextWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
+			}
+			else if ( hudImgElements.find(edithudWidgets[i]) != hudImgElements.end() )
+			{
+				recalculateImageWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
+			}
+//			else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+//			{
+//			}
+/*
+			currWidget = edithudWidgets[i];
+			GfLogInfo("OSGHUD: --- %s --- \n", currWidget.c_str());
+
+			osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(hudImgElements[currWidget]->getVertexArray());
+
+			float diffX = (*targetVertices)[0].x() - (*vertices)[0].x();
+			float diffY = (*targetVertices)[0].y() - (*vertices)[0].y();
+
+//			GfLogInfo("OSGHUD: --- %f --- %f ---\n", diffX, diffY);
+
+
+//
+			//update x
+			(*vertices)[0][0] = (*vertices)[0].x()+diffX;
+			(*vertices)[1][0] = (*vertices)[1].x()+diffX;
+			(*vertices)[2][0] = (*vertices)[2].x()+diffX;
+			(*vertices)[3][0] = (*vertices)[3].x()+diffX;
+			//update y
+			(*vertices)[0][1] = (*vertices)[0].y()+diffY;
+			(*vertices)[1][1] = (*vertices)[1].y()+diffY;
+			(*vertices)[2][1] = (*vertices)[2].y()+diffY;
+//			(*vertices)[3][1] = (*vertices)[3].y()+diffY;
+
+
+			//update x
+			(*vertices)[0][0] = (*vertices)[0].x()+moveX;
+			(*vertices)[1][0] = (*vertices)[1].x()+moveX;
+			(*vertices)[2][0] = (*vertices)[2].x()+moveX;
+			(*vertices)[3][0] = (*vertices)[3].x()+moveX;
+			//update y
+			(*vertices)[0][1] = (*vertices)[0].y()+moveY;
+			(*vertices)[1][1] = (*vertices)[1].y()+moveY;
+			(*vertices)[2][1] = (*vertices)[2].y()+moveY;
+			(*vertices)[3][1] = (*vertices)[3].y()+moveY;
+
+
+
+			vertices->dirty();
+			hudImgElements[currWidget]->setVertexArray(vertices);
+			hudImgElements[currWidget]->setUseDisplayList(false);
+*/
+
+
+	
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void SDHUD::ToggleHUD()
@@ -1459,7 +1845,7 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["driverinputWidget"] =  (int)hudWidgets["driverinputWidget"]->getNodeMask();
         hudElementsVisibilityStatus["driverinput-wheel"] =  (int)hudImgRotableElements["driverinput-wheel"]->getNodeMask();
         hudElementsVisibilityStatus["textFPSWidget"] =      (int)hudWidgets["textFPSWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["tiresWidget"] =         (int)hudWidgets["tiresWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["tiresWidget"] =        (int)hudWidgets["tiresWidget"]->getNodeMask();
         hudElementsVisibilityStatus["gforceWidget"] =       (int)hudWidgets["gforceWidget"]->getNodeMask();
         hudElementsVisibilityStatus["dashitemsWidget"] =    (int)hudWidgets["dashitemsWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphFPSWidget"] =     (int)hudWidgets["graphFPSWidget"]->getNodeMask();
@@ -1510,16 +1896,20 @@ void SDHUD::ToggleHUD()
 
 void SDHUD::ToggleHUDwidget(const std::string &widget)
 {
-    hudWidgets[widget]->setNodeMask(1 - hudWidgets[widget]->getNodeMask());
-
-    //save the current status in the config file
+	//read the previous status from the config file
     std::string path = "widgets/" + widget;
     std::string attribute = "enabled";
-    int value = hudWidgets[widget]->getNodeMask();
-
-    //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+	int widgetEnabled = GfParmGetNum (paramHandle, path.c_str(), attribute.c_str(), "",0);
+
+	//reverse the value
+	widgetEnabled = !widgetEnabled;
+	
+	//apply to the current screen
+    hudWidgets[widget]->setNodeMask(widgetEnabled);
+
+	//save the value back in the config file
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)widgetEnabled);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
 
@@ -1608,18 +1998,18 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                         if (type == "text" )
                         {
                             //read data into local variables
-                            const std::string &elementId =     subSectionName;
-                            std::string textStr =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
-                            std::string fontFileUrl =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
-                            std::string colorString =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
-                            float fontSize =             GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * hudScale;
-                            std::string textAlign =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"textAlign", "" );
+                            const std::string &elementId = subSectionName;
+                            std::string textStr =          GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
+                            std::string fontFileUrl =      GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
+                            std::string colorString =      GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
+                            float fontSize =               GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * hudScale;
+                            std::string textAlign =        GfParmGetStr (paramHandle, subSectionPath.c_str(),"textAlign", "" );
 
-                            std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
-                            std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
-                            std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
-                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+                            std::string positionRefObj =       GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =  GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =      GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =   GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier = GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             GfLogDebug("OSGHUD: Generate text object: %s \n", elementId.c_str());
 
@@ -1634,7 +2024,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             //set the font
                             {
-                                std::string fontsMainDirectory = GfDataDir();
+                                std::string fontsMainDirectory = GetDataDir();
                                 fontsMainDirectory = fontsMainDirectory+"data/fonts";
                                 fontFileUrl = fontsMainDirectory+fontFileUrl;
                                 text->setFont(fontFileUrl);
@@ -1660,26 +2050,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             text->setText(textStr);
 
                             //set the position
-                            //find the referenceObj pointer and then get his bounding box
-                            osg::BoundingBox refObjBb;
-
-                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
-                            {
-                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
-                            }
-                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
-                            {
-                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
-                            }
-                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
-                            {
-                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
-                            }
-                            else
-                            {
-                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                                refObjBb = screenBB;
-                            }
+                            //find the referenceObj bounding box
+                            osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
 
                             //calculate the positioning
                             osg::Vec3 position = calculatePosition(text->getBoundingBox(),positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
@@ -1705,19 +2077,21 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                  CREATE OSG IMAGE
                                ============================*/
                             //read data into local variables
-                            const std::string &elementId =             subSectionName;
-                            std::string url =                         GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
+                            const std::string &elementId =      subSectionName;
+                            std::string url =                   GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
 
-                            std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
-                            std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
-                            std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
-                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+                            std::string positionRefObj =        GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =   GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =       GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =    GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier =  GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
 
+GfLogInfo("%s\n", subSectionPath.c_str());
+
                             //start preparing the image
-                            std::string filename = GfDataDir();
+                            std::string filename = GetDataDir();
                             filename = filename+url;
 
                             //get the bounding box
@@ -1745,25 +2119,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             hudImgElements[elementId] =  geom;
 
                             //set the position
-                            //find the referenceObj pointer and then get his bounding box
-                            osg::BoundingBox refObjBb;
-                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
-                            {
-                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
-                            }
-                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
-                            {
-                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
-                            }
-                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
-                            {
-                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
-                            }
-                            else
-                            {
-                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                                refObjBb = screenBB;
-                            }
+                            //find the referenceObj bounding box
+                            osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
 
                             //get object bounding box
                             osg::BoundingBox myObjBb;
@@ -1780,10 +2137,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //create the vertices for the image geometry and assign them
                             osg::Vec3Array* vertices = new osg::Vec3Array;
                             float depth = 0.0f-0.1f;
-                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom,depth)); //bottom left
-                            vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom,depth)); //bottom right
-                            vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom+imgHeight     ,depth)); //top right
-                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight     ,depth)); //topleft
+                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom           ,depth)); //bottom left
+                            vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom           ,depth)); //bottom right
+                            vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom+imgHeight ,depth)); //top right
+                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight ,depth)); //topleft
                             geom->setVertexArray(vertices);
 
                             // texture the geometry and apply material
@@ -1916,27 +2273,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
 
                             //calculate position
-                            //find the referenceObj pointer and then get his bounding box
-                            osg::BoundingBox refObjBb;
-                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
-                            {
-                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
-                            }
-                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
-                            {
-                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
-                            }
-
-                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
-                            {
-                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
-                            }
-
-                            else
-                            {
-                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                                refObjBb = screenBB;
-                            }
+                            //find the referenceObj bounding box
+                            osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
                             
                             //calculate our bounding box
                             osg::BoundingBox plotBB;
@@ -1979,6 +2317,414 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
     //return the hud object
     return (*osgGroupHud).asGroup();
+}
+
+osg::BoundingBox SDHUD::getBoundigBoxFromWidgetName(std::string widgetName)
+{
+	//find the referenceObj pointer and then get his bounding box
+	osg::BoundingBox widgetBoundingBox;
+	if ( hudTextElements.find(widgetName) != hudTextElements.end() )
+	{
+		widgetBoundingBox = hudTextElements[widgetName]->getBoundingBox();
+	}
+	else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
+	{
+		widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
+	}
+
+	else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+	{
+		//widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
+	}
+
+	else
+	{
+		GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+		osg::BoundingBox screenBB;
+		screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+		screenBB.expandBy(osg::Vec3(hudScreenW,hudScreenH,0.0f));
+		widgetBoundingBox = screenBB;
+	}
+	return widgetBoundingBox;
+}
+
+osg::BoundingBox SDHUD::getBoundigBoxFromWidgetGroupName(std::string widgetGroupName)
+{
+	osg::BoundingBox widgetGroupBoundingBox;
+	std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
+
+	//open the osghud config file file
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+	//cicle throught each element of the widgetGroup
+	if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
+	{
+		do
+		{
+			std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
+			
+			//get the bounding box of the single widget
+			osg::BoundingBox widgetBoundingBox = getBoundigBoxFromWidgetName(widgetsName);
+			
+			//add the single widget bounding box to the widgetgroup bounding box
+			widgetGroupBoundingBox.expandBy(widgetBoundingBox);
+		} while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
+	}
+	
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
+	
+	return widgetGroupBoundingBox;
+}
+void SDHUD::recalculateImageWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale)
+{
+
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+	std::string imageWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
+	osg::Geometry* imageWidget = hudImgElements[widgetName];
+	
+	
+	std::string positionRefObj =        GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObj", "" );
+	std::string positionRefObjPoint =   GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObjPoint", "tl" );
+	std::string positionMyPoint =       GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-myPoint", "tl" );
+	float positionVerticalModifier =    GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+	float positionHorizontalModifier =  GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+	
+	/*
+	GfLogInfo("-------------------------------\n");
+	GfLogInfo("%s\n", imageWidgetPath.c_str());
+	GfLogInfo("%s\n", widgetName.c_str());
+	GfLogInfo("%s\n", positionMyPoint.c_str());
+	GfLogInfo("%s\n", positionRefObj.c_str());
+	GfLogInfo("%s\n", positionRefObjPoint.c_str());
+	GfLogInfo("-------------------------------\n");
+	*/
+	
+	osg::TextureRectangle* texture;
+
+	//get the texture data of this object
+	texture = dynamic_cast<osg::TextureRectangle*>(imageWidget->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
+
+	//get the image from the texture data
+	osg::Image* img;
+	img = texture->getImage();
+
+	//get image dimensions
+	float imgWidth = img->s() * hudScale;
+	float imgHeight = img->t() * hudScale;
+	
+
+	GfParmReleaseHandle(paramHandle);
+
+	//set the position
+	osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+
+	//get object bounding box
+	osg::BoundingBox myObjBb = imageWidget->getBoundingBox();
+
+	//calculate the positioning
+	osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+
+	//asign the position
+	float positionLeft =   position.x();
+	float positionBottom = position.y();
+	//float positionLeft =   100.0;
+	//float positionBottom = 100.0;
+
+
+	//create the vertices for the image geometry and assign them
+	osg::Vec3Array* vertices = new osg::Vec3Array;
+	float depth = 0.0f-0.1f;
+
+	vertices->push_back(osg::Vec3( positionLeft            ,positionBottom           ,depth)); //bottom left
+	vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom           ,depth)); //bottom right
+	vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom+imgHeight ,depth)); //top right
+	vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight ,depth)); //topleft
+	vertices->dirty();
+	imageWidget->setVertexArray(vertices);
+	imageWidget->setUseDisplayList(false);
+}
+
+void SDHUD::recalculateTextWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale)
+{
+
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+	std::string textWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
+	osgText::Text* textWidget = hudTextElements[widgetName];
+	
+	
+	std::string positionRefObj =        GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObj", "" );
+	std::string positionRefObjPoint =   GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObjPoint", "tl" );
+	std::string positionMyPoint =       GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-myPoint", "tl" );
+	float positionVerticalModifier =    GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+	float positionHorizontalModifier =  GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+	
+	/*
+	GfLogInfo("-------------------------------\n");
+	GfLogInfo("%s\n", imageWidgetPath.c_str());
+	GfLogInfo("%s\n", widgetName.c_str());
+	GfLogInfo("%s\n", positionMyPoint.c_str());
+	GfLogInfo("%s\n", positionRefObj.c_str());
+	GfLogInfo("%s\n", positionRefObjPoint.c_str());
+	GfLogInfo("-------------------------------\n");
+	*/
+	
+	GfParmReleaseHandle(paramHandle);
+
+	//set the position
+	osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+
+	//get object bounding box
+	osg::BoundingBox myObjBb = textWidget->getBoundingBox();
+
+	//calculate the positioning
+	osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+
+    textWidget->setPosition(position);
+}
+
+void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
+{
+	GfLogInfo("Saving position: %s\n", widgetGroupName.c_str());
+
+
+	std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
+
+	//open the osghud config file file
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+	//cicle throught each element of the widgetGroup
+	if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
+	{
+		do
+		{
+			std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
+			std::string widgetPath = widgetGroupNamePath +"/"+ widgetsName;
+
+			//GfLogInfo("Checking: %s\n", widgetPath.c_str());
+
+
+			std::string positionRefObj =        GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObj", "" );
+			std::string positionRefObjPoint =   GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObjPoint", "tl" );
+			std::string positionMyPoint =       GfParmGetStr (paramHandle, widgetPath.c_str(),"position-myPoint", "tl" );
+			float positionVerticalModifier =    GfParmGetNum (paramHandle, widgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+			float positionHorizontalModifier =  GfParmGetNum (paramHandle, widgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+			
+			if ( positionRefObj.find("screen") == 0 ){
+				
+				//GfLogInfo("this has a screen reference: %s\n", widgetPath.c_str());
+				
+				//get current position (bounding box)
+				osg::BoundingBox myObjBb = getBoundigBoxFromWidgetName(widgetsName);
+				
+				//get the screen bounding box
+//				osg::BoundingBox screenBB;
+//				screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+//				screenBB.expandBy(osg::Vec3(hudScreenW,hudScreenH,0.0f));
+//				osg::BoundingBox refObjBb = screenBB;
+				
+				//calculate the original positioning
+//				osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, /*positionVerticalModifier*/0, /*positionHorizontalModifier*/0);
+
+				//callculate the differencies bettwwen the TL of initial and current positions
+				
+//				//float newPositionVerticalModifier = myObjBb.yMax() - position.y();
+//				//float newPositionHorizontalModifier = myObjBb.xMin() - position.x(); 
+
+//				float newPositionVerticalModifier = myObjBb.yMax()/hudScreenH*1024/hudScale;
+//				float newPositionHorizontalModifier = myObjBb.xMin()/hudScreenW*1280/hudScale; 
+
+				//float newPositionVerticalModifier = myObjBb.yMax()/hudScreenH*1024;
+				//float newPositionHorizontalModifier = myObjBb.xMin()/hudScreenW*1280; 
+
+				//float newPositionVerticalModifier = positionVerticalModifier + (mouseTotalDragX/hudScale);
+				//float newPositionHorizontalModifier = positionHorizontalModifier + (mouseTotalDragY/hudScale); 
+//this works at  1024x1080
+//				/loat newPositionVerticalModifier = positionVerticalModifier + (mouseTotalDragY);
+//				float newPositionHorizontalModifier = positionHorizontalModifier + (mouseTotalDragX); 
+
+
+				float newPositionVerticalModifier = positionVerticalModifier + (mouseTotalDragY /hudScale);
+				float newPositionHorizontalModifier = positionHorizontalModifier + (mouseTotalDragX /hudScale); 
+
+
+
+//				GfLogInfo("Modified Vertical by: %f\n", newPositionVerticalModifier);
+//				GfLogInfo("Modified Horizontal by: %f\n", newPositionHorizontalModifier);
+
+
+
+				
+/*
+				if ( hudTextElements.find(widgetName) != hudTextElements.end() )
+				{
+//					hudTextElements
+				}
+				else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
+				{
+				}
+
+				else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+				{
+
+				}
+*/
+				//update save the position in the xml file
+				
+				//save the value back in the config file
+				GfParmSetStr (paramHandle, widgetPath.c_str(), "position-refObjPoint", positionRefObjPoint.c_str() );
+				GfParmSetStr (paramHandle, widgetPath.c_str(), "position-myPoint", positionMyPoint.c_str() );
+				GfParmSetNum (paramHandle, widgetPath.c_str(), "position-verticalModifier", NULL, (int)newPositionVerticalModifier);
+				GfParmSetNum (paramHandle, widgetPath.c_str(), "position-horizontalModifier", NULL, (int)newPositionHorizontalModifier);
+				GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+				
+			}
+			
+		} while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
+	}
+	
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
+
+/*
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+	std::string textWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
+	osgText::Text* textWidget = hudTextElements[widgetName];
+	
+	
+	std::string positionRefObj =        GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObj", "" );
+	std::string positionRefObjPoint =   GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObjPoint", "tl" );
+	std::string positionMyPoint =       GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-myPoint", "tl" );
+	float positionVerticalModifier =    GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+	float positionHorizontalModifier =  GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+	
+	GfParmReleaseHandle(paramHandle);
+
+	//set the position
+	osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+
+	//get object bounding box
+	osg::BoundingBox myObjBb = textWidget->getBoundingBox();
+
+	//calculate the positioning
+	osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+
+    textWidget->setPosition(position);
+*/
+}
+
+
+
+bool SDHUD::isMouseOverWidgetGroup (std::string widgetGroupName)
+{
+    tMouseInfo	*mouse;
+	mouse = GfuiMouseInfo();
+//	widgetGroupName = "widgets/"+widgetGroupName;
+	osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(widgetGroupName);
+
+	float mousePosX = mouse->X * hudScreenW /640;
+	float mousePosY = mouse->Y * hudScreenH /480;
+/*
+		GfLogInfo("----------------%s\n", widgetGroupName.c_str());
+		GfLogInfo("mouse %f:%f\n", mousePosX,mousePosY);
+		GfLogInfo("x %f:%f\n", targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.xMax());
+		GfLogInfo("y %f:%f\n", targetWidgetGroupBoundingBox.yMin(),targetWidgetGroupBoundingBox.yMax());
+*/
+	if (mousePosX >= targetWidgetGroupBoundingBox.xMin() && mousePosX <= targetWidgetGroupBoundingBox.xMax()
+	&& mousePosY >= targetWidgetGroupBoundingBox.yMin() && mousePosY <= targetWidgetGroupBoundingBox.yMax()){
+		return true;
+	}else{
+		return false;
+	}
+}
+void SDHUD::selectWidgetGroupByName(std::string widgetGroupName)
+{
+	//remember the selection
+	selectedWidgetGroup = widgetGroupName;
+	std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
+	
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+	int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
+
+	//set the edithud title according to the selection
+	hudTextElements["edithud-titletext"]->setText(widgetGroupName);
+	hudImgElements["edithud-toggleoff"]->setNodeMask(!widgetEnabled);
+	hudImgElements["edithud-toggleon"]->setNodeMask(widgetEnabled);
+}
+void SDHUD::setWidgetsGroupsVisibilityForcedON()
+{
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+	//cicle throught each element of the widgetGroup
+	if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
+	{
+		do
+		{
+			std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
+			if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+				continue;
+			}
+			if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+				continue;
+			}
+			//hudElementsVisibilityStatus["boardWidget"] =
+			hudWidgets[widgetGroupName]->setNodeMask(1);
+			
+		} while (GfParmListSeekNext(paramHandle, "widgets") == 0);
+	}
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
+}
+void SDHUD::setWidgetsGroupsVisibilityNormal()
+{
+	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+	//cicle throught each element of the widgetGroup
+	if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
+	{
+		do
+		{
+			std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
+			if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+				continue;
+			}
+			if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+				continue;
+			}
+			std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
+			int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
+			hudWidgets[widgetGroupName]->setNodeMask(widgetEnabled);
+			
+		} while (GfParmListSeekNext(paramHandle, "widgets") == 0);
+	}
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
+}
+
+void SDHUD::ToggleHUDeditmode()
+{
+	//toggle the edit mode status
+	hudEditModeEnabled = !hudEditModeEnabled;
+	GfLogInfo("OSGHUD editmode toggled to %i \n", hudEditModeEnabled);
+
+
+	if (hudEditModeEnabled){
+		//we are entering edithud mode
+		
+		//force all widgets to be visible, even if disabled
+		setWidgetsGroupsVisibilityForcedON();
+		//make the edithud widget visible
+		hudWidgets["edithudWidget"]->setNodeMask(1);
+		hudWidgets["mouseWidget"]->setNodeMask(1);
+	}else{
+		//we are going back to normal game mode
+
+		//restore normal widgets visibility (visible if enabled or invisible if disabled)
+		setWidgetsGroupsVisibilityNormal();
+		//hide the edithud widget
+		hudWidgets["edithudWidget"]->setNodeMask(0);
+		hudWidgets["mouseWidget"]->setNodeMask(0);
+	}
 }
 
 SDHUD::~SDHUD()

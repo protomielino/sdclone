@@ -59,6 +59,7 @@ public:
     void toggleHUDwidgets(const std::string &widgets);
 
     void toggleHUDdriverinput();
+    void toggleHUDeditmode();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

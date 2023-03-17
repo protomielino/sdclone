@@ -250,6 +250,11 @@ void SDScreens::toggleHUDdriverinput()
     hud.ToggleHUDdriverinput();
 }
 
+void SDScreens::toggleHUDeditmode()
+{
+    hud.ToggleHUDeditmode();
+}
+
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
 {
     //TODO : multi-screen support of this feature

@@ -156,6 +156,11 @@ void SDToggleHUDdriverinput(void *vp)
     screens->toggleHUDdriverinput();
 }
 
+void SDToggleHUDeditmode(void *vp)
+{
+    screens->toggleHUDeditmode();
+}
+
 /*Driver position change*/
 void SDMoveSeatUpDown(void *move)
 {
@@ -254,6 +259,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '5', GFUIM_CTRL, "Toggle HUD graphSpeedWidget",  (void*)"graphSpeedWidget",  SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
     GfuiAddKey(screen, '6', GFUIM_CTRL, "Toggle HUD graphFFBWidget",    (void*)"graphFFBWidget",    SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
     GfuiAddKey(screen, '7', GFUIM_CTRL, "Toggle HUD graphInputsWidget", (void*)"graphInputsWidget", SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '8', GFUIM_CTRL, "Toggle HUD edit mode",         (void*)1,                   SDToggleHUDeditmode, NULL, GFUI_HELP_RIGHT);
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
@@ -261,6 +267,8 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);
     GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);*/
     GfuiAddKey(screen, '9',            "Mirror",            (void*)0, SDSwitchMirror, NULL);
+
+
     //GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
     GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
