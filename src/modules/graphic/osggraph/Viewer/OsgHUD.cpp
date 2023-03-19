@@ -1914,6 +1914,9 @@ void SDHUD::ToggleHUDwidget(const std::string &widget)
 	//save the value back in the config file
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)widgetEnabled);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
 }
 
 void SDHUD::ToggleHUDwidgets(const std::string &widgets)
@@ -2684,6 +2687,9 @@ void SDHUD::selectWidgetGroupByName(std::string widgetGroupName)
 	hudTextElements["edithud-titletext"]->setText(widgetGroupName);
 	hudImgElements["edithud-toggleoff"]->setNodeMask(!widgetEnabled);
 	hudImgElements["edithud-toggleon"]->setNodeMask(widgetEnabled);
+
+	//release the config file
+	GfParmReleaseHandle(paramHandle);
 }
 void SDHUD::setWidgetsGroupsVisibilityForcedON()
 {
