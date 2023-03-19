@@ -2499,8 +2499,10 @@ void SDHUD::ToggleHUDeditmode()
 		//we are going back to normal game mode
 		//restore normal widgets visibility (visible if enabled or invisible if disabled)
 		setWidgetsGroupsVisibilityNormal();
-		//display the mouse pointer
+		//hide the mouse pointer
 		hudWidgets["mouseWidget"]->setNodeMask(0);
+		//hide the edithud widget
+		hudWidgets["edithudWidget"]->setNodeMask(0);
 	}
 }
 
