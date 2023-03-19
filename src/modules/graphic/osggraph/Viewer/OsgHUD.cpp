@@ -1214,13 +1214,15 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         hudTextElements["dash-items-type"]->setText(description);
         hudTextElements["dash-items-value1"]->setColor(colorRed);
         hudTextElements["dash-items-value1"]->setText(temp.str());
-        hudTextElements["dash-items-value2"]->setText(std::string());
+        hudTextElements["dash-items-value2"]->setText(std::string(" "));
     }
     else
     {
         const tDashboardItem *item = &(currCar->_dashboardRequest[currCar->_dashboardActiveItem - currCar->_dashboardInstantNb]);
         std::ostringstream value1;
         std::ostringstream value2;
+        value1 << " ";
+        value2 << " ";
         switch (item->type)
         {
         case DI_FUEL:
