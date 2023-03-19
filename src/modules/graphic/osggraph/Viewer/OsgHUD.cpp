@@ -1462,6 +1462,13 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 	
 //edithud
 	if (hudEditModeEnabled){
+		//if there is some widgetGroup selected display the edithud and relative controls around it else keep it hidden
+		if (!selectedWidgetGroup.empty()){
+			hudWidgets["edithudWidget"]->setNodeMask(1);
+		}else{
+			hudWidgets["edithudWidget"]->setNodeMask(0);
+		}
+		
 		tMouseInfo	*mouse;
 		mouse = GfuiMouseInfo();
 		
@@ -2486,15 +2493,13 @@ void SDHUD::ToggleHUDeditmode()
 		//we are entering edithud mode
 		//force all widgets to be visible, even if disabled
 		setWidgetsGroupsVisibilityForcedON();
-		//make the edithud widget visible
-		hudWidgets["edithudWidget"]->setNodeMask(1);
+		//display the mouse pointer
 		hudWidgets["mouseWidget"]->setNodeMask(1);
 	}else{
 		//we are going back to normal game mode
 		//restore normal widgets visibility (visible if enabled or invisible if disabled)
 		setWidgetsGroupsVisibilityNormal();
-		//hide the edithud widget
-		hudWidgets["edithudWidget"]->setNodeMask(0);
+		//display the mouse pointer
 		hudWidgets["mouseWidget"]->setNodeMask(0);
 	}
 }
