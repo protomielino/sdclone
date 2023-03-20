@@ -1612,11 +1612,11 @@ void SDCarCamMirror::adaptScreenSize()
     // mirror width adjusted to fit board size
     // int boardW = screen->getBoardWidth();
 
-    int boardW =100;
+    int boardW =70;
     mx = vpx + vpw / 2 - (vpw * boardW /400);
-    my = vpy +  5 * vph / 6 - vph / 10;
+    my = ( vpy +  5.3 * vph / 6 ) - ( vph / 10 );
     mw = vpw * boardW /200;
-    mh = vph / 6;
+    mh = vph / 10;
 
     aspectRatio = float(mw) / mh;
 
