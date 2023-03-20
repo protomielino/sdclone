@@ -7,7 +7,7 @@
 find_path(GLM_INCLUDE_DIR glm/glm.hpp)
 
 
-# handle the QUIETLY and REQUIRED arguments and set OGG_FOUND to TRUE if
+# handle the QUIETLY and REQUIRED arguments and set GLM_FOUND to TRUE if
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GLM DEFAULT_MSG GLM_INCLUDE_DIR)
