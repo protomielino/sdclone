@@ -2103,27 +2103,27 @@ cGrBoard::grDispDashboard()
         break;
       case DI_COMPOUND_SET:
       buf1 = strTireCompounds;
-      if (item->setup->desired_value == 10)
+      if (item->setup->desired_value == 0)
       {
         snprintf(buf2, sizeof(buf2), "%s", "SOFT");
       }
-      else if (item->setup->desired_value == 11)
+      else if (item->setup->desired_value == 1)
       {
         snprintf(buf2, sizeof(buf2), "%s", "MEDIUM");
       }
-      else if (item->setup->desired_value == 12)
+      else if (item->setup->desired_value == 2)
       {
         snprintf(buf2, sizeof(buf2), "%s", "HARD");
       }
-      else if (item->setup->desired_value == 13)
+      else if (item->setup->desired_value == 3)
       {
         snprintf(buf2, sizeof(buf2), "%s", "WET");
       }
-      else if (item->setup->desired_value == 14)
+      else if (item->setup->desired_value == 4)
       {
         snprintf(buf2, sizeof(buf2), "%s", "EXT WET");
       }
-      snprintf(buf3, sizeof(buf3), "%d", item->setup->value);
+      snprintf(buf3, sizeof(buf3), "%.0f", item->setup->value);
       break;
       case DI_FRONT_WING_ANGLE:
         buf1 = strFrontWing;
