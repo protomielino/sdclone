@@ -72,7 +72,7 @@ public:
                        eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
     enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
                      nRainSpecNumber }; // Last = invalid value = nb of valid ones.
-    enum EWeatherSpec { eWeatherConfig, eWeatherRecorded, eWeatherReal, nWeatherSpecNumber };
+    enum EWeatherSpec { eWeatherConfig, eWeatherReal, nWeatherSpecNumber };
     enum ESeasonSpec { eSeasonSpring, eSeasonSummer, eSeasonAutumn, eSeasonWinter, eSeasonNow, nSeasonSpecNumber };
     class Parameters
     {

@@ -279,7 +279,7 @@ rmChangeWeather(void *vp)
         // Make clouds state compatible if needed.
         int cloudsComboEnabled = GFUI_ENABLE;
 
-        if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
+        if (rmrpWeather == GfRace::eWeatherReal) // Random rain => Random clouds.
         {
             cloudsComboEnabled = GFUI_DISABLE;
             rmrpClouds = GfRace::eCloudsRandom;
@@ -300,7 +300,7 @@ rmChangeWeather(void *vp)
     {
         int rainComboEnabled = GFUI_ENABLE;
 
-        if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
+        if (rmrpWeather == GfRace::eWeatherReal) // Random rain => Random clouds.
         {
             rainComboEnabled = GFUI_DISABLE;
             rmrpRain = GfRace::eRainRandom;
@@ -321,7 +321,7 @@ rmChangeWeather(void *vp)
     {
         int SeasonComboEnabled = GFUI_ENABLE;
 
-        if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal))
+        if (rmrpWeather == GfRace::eWeatherReal)
         {
             SeasonComboEnabled = GFUI_DISABLE;
             rmrpSeason = GfRace::eSeasonNow;
