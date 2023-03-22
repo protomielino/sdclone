@@ -1281,14 +1281,14 @@ void reTrackSetTemperate(void)
         temp_night = reTrackSinusoidal(m, 2.0, 16.0);
         temp_day = reTrackSinusoidal(m, 12.0, 33.0);
         temp_water = reTrackSinusoidal(m, 10.0, 27.5);
-        precipitation = reTrackLinear(m, 25.0, 70.0);
+        precipitation = reTrackLinear(m2 + 0.60, 25.0, 70.0);
         relative_humidity = reTrackSinusoidal(humidity, 58.0, 72.0);
         break;
     case 13: // Csb: warm temperature, summer dry, warm summer
         temp_night = reTrackSinusoidal( m, -4.0, 10.0);
         temp_day = reTrackSinusoidal(m, 6.0, 27.0);
         temp_water = reTrackSinusoidal(m, 4.0, 21.5);
-        precipitation = reTrackLinear(m, 25.0, 120.0);
+        precipitation = reTrackLinear(m2 + 0.60 , 25.0, 120.0);
         relative_humidity = reTrackLinear(humidity, 50.0, 72.0);
         break;
     case 14: // Csc: warm temperature, summer dry, cool summer
