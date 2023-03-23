@@ -342,6 +342,7 @@ private:
     double mOVT_FRONTMARGIN;
     double mSTARTCLUTCHRATE;
     bool   mHASTYC;
+    bool   mHASCPD;
     bool   mHASABS;
     bool   mHASTCL;
     bool   mHASESP;

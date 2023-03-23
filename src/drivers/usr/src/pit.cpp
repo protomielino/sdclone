@@ -491,6 +491,8 @@ double Pit::calcRefuel()
     LogUSR.info("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
     LogUSR.info("USR Tire pitstops %i\n", tirespitstops);
     LogUSR.info("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
+    LogUSR.info("USR Tire distance = %.2f - Tire Laps = %.2f\n", mMyCar->tires()->TyreTreadDepth() / mCar->_remainingLaps * mTrack->length,
+                mMyCar->tires()->distLeft() / mTrack->length);
 
     return stintfuel - mCar->_fuel;
 }

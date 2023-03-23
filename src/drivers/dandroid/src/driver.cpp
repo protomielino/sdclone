@@ -93,6 +93,7 @@ TDriver::TDriver(int index)
     mGarage = false;
     mWatchdogCount = 0;
     mHASTYC = false;
+    mHASCPD = false;
     mCurveAheadFromStart = 0.0;
     mPathChangeTime = 0.0;
     initVars();
@@ -146,6 +147,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         mHASESP = false;
         mHASTCL = false;
         mHASTYC = false;
+        mHASCPD = false;
     }
     else
     {
@@ -236,6 +238,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
     mOpponents.init(mTrack, Situation, Car);
     mPit.init(mTrack, Situation, Car, mPITDAMAGE, mPITENTRYMARGIN);
     mPit.setTYC(mHASTYC);
+    mPit.setCPD(mHASCPD);
 
     // File with speed factors
     mNewFile = false;
@@ -1779,6 +1782,16 @@ void TDriver::readConstSpecs(PCarHandle CarHandle)
     }
     else
       LogDANDROID.info("#Car has TYC no\n");
+
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_TIRECOMPOUNDS, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      mHASCPD = true;
+      LogDANDROID.info("#Car has Compound yes\n");
+    }
+    else
+      LogDANDROID.info("#Car has Compound no\n");
 
     enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
 

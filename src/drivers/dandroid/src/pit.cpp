@@ -42,6 +42,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     SPEED_LIMIT_MARGIN = 0.1;       // [m/s] savety margin
     MIN_WEAR = 0.4;
     HASTYC = false;
+    HASCPD = false;
     track = t;
     car = c;
     teamcar = NULL;
@@ -490,7 +491,7 @@ void Pit::pitCommand()
         car->_pitRepair = getRepair();
         lastpitfuel = getFuel();
         car->_pitFuel = (tdble) lastpitfuel;
-        car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+        car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::NONE : tCarPitCmd::ALL;
         setPitstop(false);
     }
 }

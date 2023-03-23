@@ -73,6 +73,7 @@ public:
     double tyreTreadDepth();
     double avgWearPerMeter() { return avgwearpermeter; }
     void   setTYC(bool tyc) { HASTYC = tyc; }
+    void   setCPD(bool cpd) { HASCPD = cpd; }
     void   pitCommand();
 public:
     PTrack         track;
@@ -108,7 +109,9 @@ public:
     double         ENTRY_MARGIN;
     double         SPEED_LIMIT_MARGIN;
     double         MIN_WEAR;
-    double         HASTYC;
+    bool           HASTYC;
+    bool           HASCPD;
+
 };
 
 #endif // _PIT_H_
