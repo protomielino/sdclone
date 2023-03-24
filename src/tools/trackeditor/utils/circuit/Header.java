@@ -4,8 +4,8 @@ public class Header {
 	private String	name		= null;
 	private String	category	= "road";
 	private String	subcategory	= null;
-	private int	version			= 4;
-	private int skyVersion		= Integer.MAX_VALUE;
+	private int		version		= 4;
+	private int		skyVersion	= Integer.MAX_VALUE;
 	private String	author		= null;
 	private String	email		= null;
 	private String	copyright	= null;

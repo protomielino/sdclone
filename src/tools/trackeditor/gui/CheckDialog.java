@@ -99,6 +99,7 @@ public class CheckDialog extends JDialog
 	    		checkGraphic();
 	    		checkPits();
 	    		checkTrack();
+	    		checkHeader();
 
 	    		textArea.append("Checking complete!");
 	    	}
@@ -145,6 +146,17 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append("Segment " + curve.getName() + " Distance to barrier: " + endWidth + " greater than end radius: " + curve.getRadiusEnd() + "\n");
 				}
+			}
+		}
+	}
+	
+	public void checkHeader()
+	{
+		if (trackData.getHeader().getSubcategory() != null)
+		{
+			if (!"speedway".equals(trackData.getHeader().getCategory()))
+			{
+				textArea.append("Subcategory " + trackData.getHeader().getSubcategory() + " should only be used with the speedway category\n");
 			}
 		}
 	}
