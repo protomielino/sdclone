@@ -56,7 +56,8 @@ public class GeneralProperties extends PropertyPanel
 	private JLabel				descriptionLabel		= new JLabel();
 	private JTextField			descriptionTextField	= new JTextField();
 
-	private final String sep = System.getProperty("file.separator");
+	private String				lastSubcategory			= null;
+	private final String 		sep						= System.getProperty("file.separator");
 
 	/**
 	 *
@@ -111,6 +112,29 @@ public class GeneralProperties extends PropertyPanel
 			categoryComboBox = new JComboBox<String>(items);
 			categoryComboBox.setBounds(130, 37, 125, 23);
 			categoryComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getCategory());
+			categoryComboBox.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					if ("speedway".equals(categoryComboBox.getSelectedItem()))
+					{
+						if (lastSubcategory != null)
+						{
+							subcategoryComboBox.setSelectedItem(lastSubcategory);
+						}
+						else
+						{
+							subcategoryComboBox.setSelectedItem("none");
+						}
+						subcategoryComboBox.setEnabled(true);
+					}
+					else
+					{
+						subcategoryComboBox.setEnabled(false);
+						subcategoryComboBox.setSelectedItem("none");
+					}
+				}
+			});
 		}
 		return categoryComboBox;
 	}
@@ -131,6 +155,18 @@ public class GeneralProperties extends PropertyPanel
 			if (subcategory == null)
 				subcategory = "none";
 			subcategoryComboBox.setSelectedItem(subcategory);
+			lastSubcategory = new String(subcategory);
+			subcategoryComboBox.setEnabled("speedway".equals(getEditorFrame().getTrackData().getHeader().getCategory()));
+			subcategoryComboBox.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					if (subcategoryComboBox.isEnabled())
+					{
+						lastSubcategory = new String(subcategoryComboBox.getSelectedItem().toString());
+					}
+				}
+			});
 		}
 		return subcategoryComboBox;
 	}

@@ -201,7 +201,16 @@ public class NewProjectDialog extends JDialog
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-
+					if ("speedway".equals(trackCategoryComboBox.getSelectedItem()))
+					{
+						trackSubcategoryComboBox.setSelectedItem("none");
+						trackSubcategoryComboBox.setEnabled(true);
+					}
+					else
+					{
+						trackSubcategoryComboBox.setSelectedItem("none");
+						trackSubcategoryComboBox.setEnabled(false);
+					}
 				}
 			});
 		}
@@ -219,6 +228,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"none", "short", "long"};
 			trackSubcategoryComboBox = new JComboBox<String>(items);
+			trackSubcategoryComboBox.setEnabled(false);
 			trackSubcategoryComboBox.setSelectedItem("none");
 			trackSubcategoryComboBox.setBounds(145, 64, 170, 23);
 			trackSubcategoryComboBox.addActionListener(new java.awt.event.ActionListener()
