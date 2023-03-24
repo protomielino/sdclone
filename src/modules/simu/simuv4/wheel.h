@@ -65,7 +65,7 @@ typedef struct
     tdble	tireSpringRate;
     tdble  	radius;
     tdble  	mu;
-    tdble   muC[5];     /* mu for compounds */
+    tdble   muC[6];     /* mu for compounds */
     tdble  	I;       	/* I = inertial moment of the wheel */
     tdble  	curI;       /* Current inertia for the wheel (including transmission) */
     tdble	mfC;		/* Magic Formula C coeff */
@@ -82,9 +82,9 @@ typedef struct
 
     tdble   Ttire;      /* tire temperature in K */
     tdble   Topt;       /* optimal temperature in K, where mu maximal */
-    tdble   ToptC[5];   /* optimal temperature in k for compounds */
+    tdble   ToptC[6];   /* optimal temperature in k for compounds */
     tdble   Tinit;      /* initial tire temperature, right after pit or at start */
-    tdble   TinitC[5];  /* initial tire temperature for compounds */
+    tdble   TinitC[6];  /* initial tire temperature for compounds */
     tdble   treadDepth; /* tread depth, between 0 and 1 */
 
     // Additional parameters for the tire wear model
@@ -95,9 +95,9 @@ typedef struct
     tdble tireConvectionSurface;	// Surface area regarding the convection model
     tdble initialTemperature;		// Initial temperature of the tire (initial pressure, p0/T0=constant)
     tdble hysteresisFactor;			// Factor to adjust the hysteresis (model fitting), usually close to 1.0.
-    tdble hysteresisFactorC[5];     // Factor to adjust the hysteresis for compounds
+    tdble hysteresisFactorC[6];     // Factor to adjust the hysteresis for compounds
     tdble wearFactor;				// Factor to adjust the wear (model fitting), usually close to 1.0.
-    tdble wearFactorC[5];               // Factor to adjust the wear for compounds
+    tdble wearFactorC[6];               // Factor to adjust the wear for compounds
 
     // Dynamic Tire properties (temp, wear, etc.)
     tdble currentPressure;			// current tire pressure considering temperature

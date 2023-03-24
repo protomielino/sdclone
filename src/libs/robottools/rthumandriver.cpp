@@ -2101,23 +2101,23 @@ int HumanDriver::pit_cmd(int index, tCarElt* car, tSituation *s)
             GfLogInfo("~ player tyre compound asked = %.0f\n", car->setup.reqTirecompound.desired_value);
             switch((int)car->setup.reqTirecompound.desired_value)
             {
-            case 0:
+            case 1:
                 car->pitcmd.tiresetChange = tCarPitCmd::SOFT;
                 GfLogInfo("~ player tyre compound asked = SOFT\n");
                 break;
-            case 1:
+            case 2:
                 car->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
                 GfLogInfo("~ player tyre compound asked = MEDIUM\n");
                 break;
-            case 2:
+            case 3:
                 car->pitcmd.tiresetChange = tCarPitCmd::HARD;
                 GfLogInfo("~ player tyre compound asked = HARD\n");
                 break;
-            case 3:
+            case 4:
                 car->pitcmd.tiresetChange = tCarPitCmd::WET;
                 GfLogInfo("~ player tyre compound asked = WET\n");
                 break;
-            case 4:
+            case 5:
                 car->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
                 GfLogInfo("~ player tyre compound asked = EXTREM WET\n");
                 break;

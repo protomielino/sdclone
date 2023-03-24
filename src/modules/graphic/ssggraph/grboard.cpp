@@ -2102,29 +2102,32 @@ cGrBoard::grDispDashboard()
         snprintf(buf3, sizeof(buf3), "%s", "");
         break;
       case DI_COMPOUND_SET:
-      buf1 = strTireCompounds;
-      if (item->setup->desired_value == 0)
-      {
-        snprintf(buf2, sizeof(buf2), "%s", "SOFT");
-      }
-      else if (item->setup->desired_value == 1)
-      {
-        snprintf(buf2, sizeof(buf2), "%s", "MEDIUM");
-      }
-      else if (item->setup->desired_value == 2)
-      {
-        snprintf(buf2, sizeof(buf2), "%s", "HARD");
-      }
-      else if (item->setup->desired_value == 3)
-      {
-        snprintf(buf2, sizeof(buf2), "%s", "WET");
-      }
-      else if (item->setup->desired_value == 4)
-      {
-        snprintf(buf2, sizeof(buf2), "%s", "EXT WET");
-      }
-      snprintf(buf3, sizeof(buf3), "%s", "");
-      break;
+        buf1 = strTireCompounds;
+        //if (item->setup->desired_value > 0)
+        {
+            if(item->setup->desired_value == 1)
+            {
+                snprintf(buf2, sizeof(buf2), "%s", "SOFT");
+            }
+            else if (item->setup->desired_value == 2)
+            {
+                snprintf(buf2, sizeof(buf2), "%s", "MEDIUM");
+            }
+            else if (item->setup->desired_value == 3)
+            {
+                snprintf(buf2, sizeof(buf2), "%s", "HARD");
+            }
+            else if (item->setup->desired_value == 4)
+            {
+                snprintf(buf2, sizeof(buf2), "%s", "WET");
+            }
+            else if (item->setup->desired_value == 5)
+            {
+                snprintf(buf2, sizeof(buf2), "%s", "EXT WET");
+            }
+        }
+        snprintf(buf3, sizeof(buf3), "%s", "");
+        break;
       case DI_FRONT_WING_ANGLE:
         buf1 = strFrontWing;
         snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));

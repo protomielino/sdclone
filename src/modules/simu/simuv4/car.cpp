@@ -390,10 +390,10 @@ SimCarConfig(tCar *car)
     setup->reqTireset.stepsize = 1.0;
     setup->reqTireset.changed = false;
 
-    setup->reqTirecompound.min = 0;
-    setup->reqTirecompound.max = 4;
-    setup->reqTirecompound.value = 2;
-    setup->reqTirecompound.desired_value = 2;
+    setup->reqTirecompound.min = 1;
+    setup->reqTirecompound.max = 5;
+    setup->reqTirecompound.value = 3;
+    setup->reqTirecompound.desired_value = 3;
     setup->reqTirecompound.stepsize = 1;
     setup->reqTirecompound.changed = false;
 

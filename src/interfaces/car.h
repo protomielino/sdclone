@@ -635,7 +635,7 @@ typedef struct CarPitCmd
 
     enum TireChange { NONE = 0, ALL = 1};
     TireChange tireChange;
-    enum TireSetChange { SOFT = 0, MEDIUM = 1, HARD = 2, WET = 3, EXTREM_WET = 4};
+    enum TireSetChange { NON_CHANGE = 0, SOFT = 1, MEDIUM = 2, HARD = 3, WET = 4, EXTREM_WET = 5};
     TireSetChange tiresetChange;
 } tCarPitCmd;
 /* structure access */

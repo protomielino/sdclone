@@ -434,17 +434,17 @@ void	Driver::InitTrack(
 
             if (temp < 13.0 || pS->_totLaps * (double)pTrack->length < 57800.0)
             {
-                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 0);
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 1);
                 LogSHADOW.info("Compounds choice SOFT !!!\n");
             }
             else if (temp < 25.0 || pS->_totLaps * (double)pTrack->length < 171000.0)
             {
-                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 1);
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 2);
                 LogSHADOW.info("Compounds choice MEDIUM !!!\n");
             }
             else
             {
-                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 2);
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 3);
                 LogSHADOW.info("Compounds choice HARD !!!\n");
             }
 
@@ -452,12 +452,12 @@ void	Driver::InitTrack(
 
             if (rain > 0 && rain < 3)
             {
-                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 3);
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 4);
                 LogSHADOW.info("Compounds choice WET !!!\n");
             }
             else if (rain > 2)
             {
-                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 4);
+                GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 5);
                 LogSHADOW.info("Compounds choice EXTREM WET !!!\n");
             }
         }

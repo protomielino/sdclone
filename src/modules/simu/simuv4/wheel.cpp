@@ -61,7 +61,7 @@ void SimWheelConfig(tCar *car, int index)
     setupOpLoad->changed = true;
     setupOpLoad->stepsize = 100;
 
-    setupCompound->desired_value = setupCompound->min = setupCompound->max = 4;
+    setupCompound->desired_value = setupCompound->min = setupCompound->max = 5;
     GfParmGetNumWithLimits(hdle, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, &(setupCompound->desired_value), &(setupCompound->min), &(setupCompound->max));
     setupCompound->changed = true;
     setupCompound->stepsize = 1;
@@ -75,24 +75,24 @@ void SimWheelConfig(tCar *car, int index)
     if (car->features & FEAT_COMPOUNDS)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
-        wheel->hysteresisFactorC[0] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[0] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
-
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->hysteresisFactorC[1] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
         wheel->wearFactorC[1] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->hysteresisFactorC[2] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
         wheel->wearFactorC[2] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
         wheel->hysteresisFactorC[3] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
         wheel->wearFactorC[3] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
         wheel->hysteresisFactorC[4] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
         wheel->wearFactorC[4] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        wheel->hysteresisFactorC[5] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+        wheel->wearFactorC[5] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
     }
 
     rimdiam               = GfParmGetNum(hdle, WheelSect[index], PRM_RIMDIAM, (char*)NULL, 0.33f);
@@ -104,21 +104,21 @@ void SimWheelConfig(tCar *car, int index)
     if (car->features & FEAT_COMPOUNDS)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
-        wheel->muC[0] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->muC[1] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->muC[2] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
         wheel->muC[3] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
         wheel->muC[4] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
         GfLogInfo("# Simu MU compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
-                  wheel->muC[0], wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4]);
+                  wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]);
     }
 
     wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
@@ -179,26 +179,26 @@ void SimWheelConfig(tCar *car, int index)
     if (car->features & FEAT_COMPOUNDS)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
-        wheel->TinitC[0] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
-        wheel->ToptC[0] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
-
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->TinitC[1] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
         wheel->ToptC[1] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->TinitC[2] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
         wheel->ToptC[2] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
         wheel->TinitC[3] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
         wheel->ToptC[3] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
         wheel->TinitC[4] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
         wheel->ToptC[4] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
+
+        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+        wheel->TinitC[5] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
+        wheel->ToptC[5] = GfParmGetNum(hdle, path, PRM_OPTTEMP, (char*)NULL, wheel->Topt);
         GfLogInfo("# Simu Optimal temperature compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
-                  wheel->ToptC[0] -273.15, wheel->ToptC[1] - 273.15, wheel->ToptC[2] - 273.15, wheel->ToptC[3] - 273.15, wheel->ToptC[4] - 273.15);
+                  wheel->ToptC[1] -273.15, wheel->ToptC[2] - 273.15, wheel->ToptC[3] - 273.15, wheel->ToptC[4] - 273.15, wheel->ToptC[5] - 273.15);
 
         wheel->Tinit = wheel->TinitC[wheel->tireSet];
         wheel->Topt = wheel->ToptC[wheel->tireSet];

@@ -181,17 +181,17 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
         if (temp < 13.0 || situation->_totLaps * (double)track->length < 57800.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 0);
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
             LogUSR.info("Compounds choice SOFT !!!\n");
         }
         else if (temp < 25.0 || situation->_totLaps * (double)track->length < 171000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
             LogUSR.info("Compounds choice MEDIUM !!!\n");
         }
         else
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
             LogUSR.info("Compounds choice HARD !!!\n");
         }
 
@@ -199,12 +199,12 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
         if (mRain > 0 && mRain < 3)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 4);
             LogUSR.info("Compounds choice WET !!!\n");
         }
         else if (mRain > 2)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 4);
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 5);
             LogUSR.info("Compounds choice EXTREM WET !!!\n");
         }
     }
