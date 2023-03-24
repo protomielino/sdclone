@@ -2123,7 +2123,7 @@ cGrBoard::grDispDashboard()
       {
         snprintf(buf2, sizeof(buf2), "%s", "EXT WET");
       }
-      snprintf(buf3, sizeof(buf3), "%.0f", item->setup->value);
+      snprintf(buf3, sizeof(buf3), "%s", "");
       break;
       case DI_FRONT_WING_ANGLE:
         buf1 = strFrontWing;

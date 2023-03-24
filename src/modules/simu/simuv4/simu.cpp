@@ -288,7 +288,7 @@ SimReConfig(tCarElt *carElt)
             if(car->features & FEAT_COMPOUNDS && carElt->pitcmd.tiresetChange)
             {
                 car->wheel[i].tireSet = carElt->pitcmd.tiresetChange;
-                GfLogInfo("# Tireset value = %d\n", car->wheel[i].tireSet);
+                GfLogInfo("# Tireset value simu = %d\n", car->wheel[i].tireSet);
                 //setupCompound->value = wheel->tireSet;
                 //setupCompound->changed = false;
                 car->wheel[i].mu = car->wheel[i].muC[car->wheel[i].tireSet];
