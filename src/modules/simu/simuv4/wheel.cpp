@@ -93,6 +93,16 @@ void SimWheelConfig(tCar *car, int index)
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
         wheel->hysteresisFactorC[5] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
         wheel->wearFactorC[5] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+
+        if (SimRain < 1)
+        {
+            wheel->hysteresisFactorC[4] *= 1.5;
+            wheel->hysteresisFactorC[5] *= 2.0;
+            wheel->wearFactorC[4] *= 3.5;
+            wheel->wearFactorC[4] *= 3.5;
+            GfLogInfo("# Simu wear factor compound with no rain wet = %.4f - extreme wet = %.4f\n",
+                                  wheel->wearFactorC[4], wheel->wearFactorC[5]);
+        }
     }
 
     rimdiam               = GfParmGetNum(hdle, WheelSect[index], PRM_RIMDIAM, (char*)NULL, 0.33f);
@@ -119,6 +129,15 @@ void SimWheelConfig(tCar *car, int index)
         wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
         GfLogInfo("# Simu MU compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
                   wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]);
+
+        if(SimRain < 1)
+        {
+            wheel->muC[4] -= 0.2;
+            wheel->muC[5] -= 0.3;
+            GfLogInfo("# Simu MU compound with no rain wet = %.3f - extreme wet = %.3f\n",
+                      wheel->muC[4], wheel->muC[5]);
+        }
+    }
     }
 
     wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
