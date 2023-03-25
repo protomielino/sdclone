@@ -794,6 +794,8 @@ reTrackInitRealWeather(void)
         GfLogInfo("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
         ReTrackUpdate();
+        delete webMetar;
+        webMetar = NULL;
     }
 }
 

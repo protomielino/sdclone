@@ -280,11 +280,6 @@ SimReConfig(tCarElt *carElt)
             car->wheel[i].currentGraining = 0.0;
             car->wheel[i].currentGripFactor = 1.0;
 
-            if (car->features & FEAT_TIRETEMPDEG)
-                car->wheel[i].Ttire = car->wheel[i].Tinit;
-            else
-                car->wheel[i].Ttire = car->wheel[i].Topt;
-
             if(car->features & FEAT_COMPOUNDS && carElt->pitcmd.tiresetChange)
             {
                 car->wheel[i].tireSet = carElt->pitcmd.tiresetChange;
@@ -295,9 +290,15 @@ SimReConfig(tCarElt *carElt)
                 car->wheel[i].Topt = car->wheel[i].ToptC[car->wheel[i].tireSet];
                 car->wheel[i].hysteresisFactor = car->wheel[i].hysteresisFactorC[car->wheel[i].tireSet];
                 car->wheel[i].wearFactor = car->wheel[i].wearFactorC[car->wheel[i].tireSet];
+                car->carElt->_tyreT_opt(i) = car->wheel[i].Topt;
                 GfLogInfo("# SimuV4 tire compound changed mu = %.3f - hysteresis = %.2f - wear factor = %.7f\n", car->wheel[i].mu,
                           car->wheel[i].hysteresisFactor, car->wheel[i].wearFactor);
             }
+
+            if (car->features & FEAT_TIRETEMPDEG)
+                car->wheel[i].Ttire = car->wheel[i].Tinit;
+            else
+                car->wheel[i].Ttire = car->wheel[i].Topt;
         }
     }
 
@@ -698,6 +699,7 @@ SimUpdate(tSituation *s, double deltaTime)
         carElt->priv.collision |= car->collision;
         carElt->_dammage = car->dammage;
         carElt->_airtemp = Tair;
+        //GfLogInfo(" # SimuV4 air temperature = %.8f\n", K2C(carElt->_airtemp));
         carElt->_airPressure = SimAirPressure;
 
         carElt->_steerTqCenter = -car->ctrl->steer;
