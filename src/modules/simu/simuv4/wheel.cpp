@@ -138,7 +138,6 @@ void SimWheelConfig(tCar *car, int index)
                       wheel->muC[4], wheel->muC[5]);
         }
     }
-    }
 
     wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
     //BUG: the next line should go after SimBrakeConfig to have an effect
