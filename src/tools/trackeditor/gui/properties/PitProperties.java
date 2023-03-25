@@ -546,7 +546,7 @@ public class PitProperties extends PropertyPanel
 			if (surfaceComboBox == null)
 			{
 				surfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-				surfaceComboBox.setBounds(130, 10, 180, 23);
+				surfaceComboBox.setBounds(130, 10, 200, 23);
 			}
 			return surfaceComboBox;
 		}

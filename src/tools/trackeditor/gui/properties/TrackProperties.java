@@ -216,7 +216,7 @@ public class TrackProperties extends PropertyPanel
 			String newSurface = getEditorFrame().getTrackData().getMainTrack().getSurface();
 			addSurface(roadSurfaceVector, newSurface);			
 			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
-			surfaceComboBox.setBounds(150, 37, 180, 23);						
+			surfaceComboBox.setBounds(150, 37, 200, 23);
 			surfaceComboBox.setSelectedItem(newSurface);
 		}
 		return surfaceComboBox;
@@ -349,7 +349,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(sideSurfaceVector, side.getSideSurface());
 				sideSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-				sideSurfaceComboBox.setBounds(150, 64, 180, 23);
+				sideSurfaceComboBox.setBounds(150, 64, 200, 23);
 				sideSurfaceComboBox.setSelectedItem(side.getSideSurface());
 				sideSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -405,7 +405,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(borderSurfaceVector, side.getBorderSurface());
 				borderSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), borderSurfaceVector);
-				borderSurfaceComboBox.setBounds(150, 172, 180, 23);
+				borderSurfaceComboBox.setBounds(150, 172, 200, 23);
 				borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 				borderSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -460,7 +460,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(barrierSurfaceVector, side.getBarrierSurface());
 				barrierSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), barrierSurfaceVector);
-				barrierSurfaceComboBox.setBounds(150, 280, 180, 23);
+				barrierSurfaceComboBox.setBounds(150, 280, 200, 23);
 				barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
 				barrierSurfaceComboBox.addActionListener(new ActionListener()
 				{

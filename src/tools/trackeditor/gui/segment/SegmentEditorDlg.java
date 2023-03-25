@@ -779,7 +779,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (surfaceComboBox == null)
 		{
 			surfaceComboBox = new SurfaceComboBox(editorFrame, roadSurfaceVector);
-			surfaceComboBox.setBounds(75, 33, 180, 23);
+			surfaceComboBox.setBounds(75, 33, 200, 23);
 			surfaceComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)

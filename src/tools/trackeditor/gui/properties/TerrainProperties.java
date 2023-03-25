@@ -214,7 +214,7 @@ public class TerrainProperties extends PropertyPanel
 			String surface = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface();
 			addSurface(roadSurfaceVector, surface);
 			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
-			surfaceComboBox.setBounds(140, 307, 180, 23);
+			surfaceComboBox.setBounds(140, 307, 200, 23);
 			surfaceComboBox.setSelectedItem(surface);
 		}
 		return surfaceComboBox;
@@ -231,7 +231,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			String[] items = {"none", "yes", "no"};
 			reliefBorderComboBox = new JComboBox<String>(items);
-			reliefBorderComboBox.setBounds(140, 280, 180, 23);
+			reliefBorderComboBox.setBounds(140, 280, 125, 23);
 		}
 		return reliefBorderComboBox;
 	}
