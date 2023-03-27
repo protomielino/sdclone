@@ -99,7 +99,7 @@ void SimWheelConfig(tCar *car, int index)
             wheel->hysteresisFactorC[4] *= 1.5;
             wheel->hysteresisFactorC[5] *= 2.0;
             wheel->wearFactorC[4] *= 3.5;
-            wheel->wearFactorC[4] *= 3.5;
+            wheel->wearFactorC[5] *= 3.5;
             GfLogInfo("# Simu wear factor compound with no rain wet = %.4f - extreme wet = %.4f\n",
                                   wheel->wearFactorC[4], wheel->wearFactorC[5]);
         }
