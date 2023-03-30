@@ -386,10 +386,30 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
     }
 }
 
+// Static object and shape list.
+// TODO: Dynamic implementation.
+static DtShapeRef fixedobjects[100];
+// Id to the next free slot in fixedobjects.
+static size_t fixedid;
+
+static bool isFixedObject(DtObjectRef obj)
+{
+    for (size_t i = 0; i < fixedid; i++)
+    {
+        if (obj == &(fixedobjects[i]))
+            return true;
+    }
+    return false;
+}
+
 // Collision response for walls.
 // TODO: Separate common code with car-car collision response.
 static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObjectRef obj2, const DtCollData *collData)
 {
+    // ignore wall with wall collision
+    if (isFixedObject(obj1) && isFixedObject(obj2))
+            return;
+
     tCar* car;		// The car colliding with the wall.
     float nsign;	// Normal direction correction for collision plane.
     sgVec2 p;		// Cars collision point delivered by solid.
@@ -422,11 +442,6 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
     sgSubVec2(r, p, (const float*)&(car->statGC));
 
     tCarElt *carElt = car->carElt;
-
-    if (carElt == nullptr)
-        GfFatal("SimCarWallCollideResponse: car->carElt (null)\n");
-    else if (carElt->index < 0 || carElt->index > 100)
-        GfFatal("SimCarWallCollideResponse: carElt->index (%d)\n", carElt->index);
 
     sgVec2 vp;		// Speed of car collision point in global frame of reference.
     sgVec2 rg;		// raduis oriented in global coordinates, still relative to CG (rotated aroung CG).
@@ -541,12 +556,6 @@ void SimCollideRemoveCar(tCar *car, int nbcars)
         SimCarTable[i].shape = NULL;
     }
 }
-
-// Static object and shape list.
-// TODO: Dynamic implementation.
-static DtShapeRef fixedobjects[100];
-// Id to the next free slot in fixedobjects.
-static size_t fixedid;
 
 void SimCarCollideShutdown(int nbcars)
 {
