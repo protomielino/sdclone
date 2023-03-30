@@ -425,6 +425,8 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
 
     if (carElt == nullptr)
         GfFatal("SimCarWallCollideResponse: car->carElt (null)\n");
+    else if (carElt->index < 0 || carElt->index > 100)
+        GfFatal("SimCarWallCollideResponse: carElt->index (%d)\n", carElt->index);
 
     sgVec2 vp;		// Speed of car collision point in global frame of reference.
     sgVec2 rg;		// raduis oriented in global coordinates, still relative to CG (rotated aroung CG).
