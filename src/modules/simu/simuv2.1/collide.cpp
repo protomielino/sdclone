@@ -345,10 +345,31 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 }
 
 
+// Static object and shape list.
+// TODO: Dynamic implementation.
+static DtShapeRef fixedobjects[100];
+// Id to the next free slot in fixedobjects.
+static size_t fixedid;
+
+
+static bool isFixedObject(DtObjectRef obj)
+{
+	for (size_t i = 0; i < fixedid; i++)
+	{
+		if (obj == &(fixedobjects[i]))
+			return true;
+	}
+	return false;
+}
+
 // Collision response for walls.
 // TODO: Separate common code with car-car collision response.
 static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObjectRef obj2, const DtCollData *collData)
 {
+	// ignore wall with wall collision
+	if (isFixedObject(obj1) && isFixedObject(obj2))
+		return;
+
 	tCar* car;		// The car colliding with the wall.
 	float nsign;	// Normal direction correction for collision plane.
 	sgVec2 p;		// Cars collision point delivered by solid.
@@ -482,18 +503,9 @@ void SimCollideRemoveCar(tCar *car, int nbcars)
 }
 
 
-// Static object and shape list.
-// TODO: Dynamic implementation.
-static DtShapeRef fixedobjects[100];
-// Id to the next free slot in fixedobjects.
-static unsigned int fixedid;
-
-
 void SimCarCollideShutdown(int nbcars)
 {
-	int i;
-
-	for (i = 0; i < nbcars; i++) {
+	for (int i = 0; i < nbcars; i++) {
 		// Check if car has not been removed already (wrecked).
 		if (SimCarTable[i].shape != NULL) {
 			dtDeleteObject(&(SimCarTable[i]));
@@ -501,8 +513,7 @@ void SimCarCollideShutdown(int nbcars)
 		}
 	}
 
-	unsigned int j;
-	for (j = 0; j < fixedid; j++) {
+	for (size_t j = 0; j < fixedid; j++) {
 		dtClearObjectResponse(&fixedobjects[j]);
 		dtDeleteObject(&fixedobjects[j]);
 		dtDeleteShape(fixedobjects[j]);
@@ -547,6 +558,15 @@ static tTrackSeg *getFirstWallStart(tTrackSeg *start, int side)
 }
 
 
+static tdble distance(const t3Dd &p1, const t3Dd &p2)
+{
+	tdble dx = p1.x - p2.x;
+	tdble dy = p1.y - p2.y;
+	tdble dz = p1.z - p2.z;
+
+	return sqrt(dx * dx + dy * dy + dz * dz);
+}
+
 // Create the left walls, start must point to a segment with a wall on the left and a leading
 // non wall segment.
 // FIXME: Does not work for a closed ring "by design".
@@ -577,8 +597,8 @@ void buildWalls(tTrackSeg *start, int side) {
 
 			// Close the start with a ploygon?
 			if (p == NULL || p->style != TR_WALL ||
-				(fabs(p->vertex[TR_EL].x - svl.x) > weps) ||
-				(fabs(p->vertex[TR_ER].x - svr.x) > weps) ||
+				(distance(p->vertex[TR_EL], svl) > weps) ||
+				(distance(p->vertex[TR_ER], svr) > weps) ||
 				(fabs(h - p->height) > weps) ||
 				fixedid == 0)
 			{
@@ -638,8 +658,8 @@ void buildWalls(tTrackSeg *start, int side) {
 
 			// Close the end with a ploygon?
 			if (n == NULL || n->style != TR_WALL ||
-				(fabs(n->vertex[TR_SL].x - evl.x) > weps) ||
-				(fabs(n->vertex[TR_SR].x - evr.x) > weps) ||
+				(distance(n->vertex[TR_SL], evl) > weps) ||
+				(distance(n->vertex[TR_SR], evr) > weps) ||
 				(fabs(h - n->height) > weps))
 			{
 				if (close == true) {
@@ -704,8 +724,7 @@ SimCarCollideInit(tTrack *track)
 		buildWalls(firstleft, TR_SIDE_LFT);
 		buildWalls(firstright, TR_SIDE_RGT);
 
-		unsigned int i;
-		for (i = 0; i < fixedid; i++) {
+		for (size_t i = 0; i < fixedid; i++) {
 			dtCreateObject(&fixedobjects[i], fixedobjects[i]);
 			dtSetObjectResponse(&fixedobjects[i], SimCarWallCollideResponse, DT_SMART_RESPONSE, &fixedobjects[i]);
 		}
