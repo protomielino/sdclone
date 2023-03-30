@@ -5,9 +5,14 @@ SET(SOLID_SOURCES Transform.cpp Convex.cpp Box.cpp Cone.cpp Cylinder.cpp
                   Complex.cpp BBoxTree.cpp Endpoint.cpp Object.cpp
                   Response.cpp RespTable.cpp C-api.cpp)
 
+SET(SOLID_HEADERS Transform.h Convex.h Box.h Cone.h Cylinder.h
+                  Sphere.h Simplex.h Polygon.h Polyhedron.h
+                  Complex.h BBoxTree.h Endpoint.h Object.h
+                  Response.h RespTable.h)
+
 INCLUDE_DIRECTORIES(BEFORE ../include)
 
-SD_ADD_LIBRARY(solid STATIC ${SOLID_SOURCES})
+SD_ADD_LIBRARY(solid STATIC ${SOLID_SOURCES} ${SOLID_HEADERS})
 
 IF(UNIX)
 	SET_TARGET_PROPERTIES(solid PROPERTIES COMPILE_FLAGS -fPIC)
