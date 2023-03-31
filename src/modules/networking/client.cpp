@@ -276,11 +276,7 @@ void NetClient::SetDriverReady(bool bReady)
     {
         GfLogFatal("SetDriverReady: packed buffer error\n");
     }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SetDriverReady: packed data length=%Iu\n", msg.length());
-#else
     GfLogTrace("SetDriverReady: packed data length=%zu\n", msg.length());
-#endif
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
             msg.length(), 
@@ -340,12 +336,7 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
     {
         GfLogFatal("SendDriverInfoPacket: packed buffer error\n");
     }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendDriverInfoPacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("SendDriverInfoPacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("SendDriverInfoPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
             msg.length(), 
@@ -374,12 +365,7 @@ void NetClient::SendReadyToStartPacket()
     {
         GfLogFatal("SendReadyToStartPacket: packed buffer error\n");
     }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendReadyToStartPacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("SendReadyToStartPacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("SendReadyToStartPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
             msg.length(), 
@@ -404,12 +390,7 @@ void NetClient::SendServerTimeRequest()
     {
         GfLogFatal("SendServerTimeRequest: packed buffer error\n");
     }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendServerTimeRequest: packed data length=%Iu\n",
-#else
-    GfLogTrace("SendServerTimeRequest: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("SendServerTimeRequest: packed data length=%zu\n", msg.length());
 
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
@@ -437,12 +418,7 @@ void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
     //double time = GfTimeClock();
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadStartTimePacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadStartTimePacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadStartTimePacket: packed data length=%zu\n", msg.length());
 
     try
     {
@@ -590,11 +566,7 @@ void NetClient::ReadPacket(ENetEvent event)
         break;
     default:
         assert(false);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-        GfLogDebug ("A packet of length %Iu containing %s was received from %s on channel %d.\n",
-#else
         GfLogDebug ("A packet of length %zu containing %s was received from %s on channel %d.\n",
-#endif
                 event.packet -> dataLength,
                 event.packet -> data,
                 (char*)event.peer -> data,
@@ -692,11 +664,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
     int rsize;
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadAllDriverReadyPacket: packed data length=%Iu\n",
-#else
     GfLogTrace("ReadAllDriverReadyPacket: packed data length=%zu\n",
-#endif
             msg.length());
 
     try
@@ -724,11 +692,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
 {
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadFinishTimePacket: packed data length=%Iu\n",
-#else
     GfLogTrace("ReadFinishTimePacket: packed data length=%zu\n",
-#endif
             msg.length());
 
     try
@@ -756,12 +720,7 @@ void NetClient::ReadTimePacket(ENetPacket *pPacket)
     double time = 0;
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadTimePacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadTimePacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadTimePacket: packed data length=%zu\n", msg.length());
 
     try
     {
@@ -787,12 +746,7 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
     memset(file, 0, sizeof file);
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadFilePacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadFilePacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadFilePacket: packed data length=%zu\n", msg.length());
 
     try
     {

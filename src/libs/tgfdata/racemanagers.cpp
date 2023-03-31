@@ -195,11 +195,7 @@ std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const std::s
 
 void GfRaceManagers::print(bool bVerbose) const
 {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("Race managers : %Iu types, %Iu race managers\n",
-#else
     GfLogTrace("Race managers : %zu types, %zu race managers\n",
-#endif
                _pPrivate->vecTypes.size(), _pPrivate->vecRaceMans.size());
     std::vector<std::string>::const_iterator itType;
     for (itType = _pPrivate->vecTypes.begin();

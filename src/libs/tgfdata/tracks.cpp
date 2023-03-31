@@ -429,11 +429,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
 	
 void GfTracks::print(bool bVerbose) const
 {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-	GfLogTrace("Track base : %Iu categories, %Iu tracks\n",
-#else
 	GfLogTrace("Track base : %zu categories, %zu tracks\n",
-#endif
 			   _pPrivate->vecCatIds.size(), _pPrivate->vecTracks.size());
 	std::vector<std::string>::const_iterator itCatId;
 	for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); ++itCatId)

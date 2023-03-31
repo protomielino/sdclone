@@ -372,11 +372,7 @@ void CarSetupMenu::loadSettings()
         {
             std::string strSection = sections[i];
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-            GfLogDebug("section %Iu: %s\n", i, strSection.c_str());
-#else
             GfLogDebug("section %zu: %s\n", i, strSection.c_str());
-#endif
 
             size_t page = GfParmGetNum(hparmItems, strSection.c_str(), "page", "", 0);
             size_t index = GfParmGetNum(hparmItems, strSection.c_str(), "index", "", 0);
@@ -386,11 +382,7 @@ void CarSetupMenu::loadSettings()
 
             if (index >= ITEMS_PER_PAGE)
             {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-                GfLogError("Invalid index %Iu\n", index);
-#else
                 GfLogError("Invalid index %zu\n", index);
-#endif
                 continue;
             }
 
@@ -422,15 +414,9 @@ void CarSetupMenu::loadSettings()
                 else
                     att.value = att.defaultValue;
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-                GfLogDebug("section: \"%s\" param: \"%s\" units: \"%s\" label: \"%s\" page: %Iu "
-                           "index: %Iu precision: %d labelId: %d editId: %d defaultLabelId: %d "
-                           "exists: %d min: %f default %f max: %f value: %f\n",
-#else
                 GfLogDebug("section: \"%s\" param: \"%s\" units: \"%s\" label: \"%s\" page: %zu "
                            "index: %zu precision: %d labelId: %d editId: %d defaultLabelId: %d "
                            "exists: %d min: %f default %f max: %f value: %f\n",
-#endif
                            att.section.c_str(), att.param.c_str(), att.units.c_str(),
                            att.label.c_str(), page, index, att.precision, att.labelId, att.editId,
                            att.defaultLabelId, att.exists, att.minValue, att.defaultValue, att.maxValue, att.value);
@@ -447,15 +433,9 @@ void CarSetupMenu::loadSettings()
                 else
                     att.strValue = att.defaultStrValue;
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-                GfLogDebug("section: \"%s\" param: \"%s\" label: \"%s\" page: %Iu "
-                           "index: %Iu labelId: %d comboId: %d defaultLabelId: %d "
-                           "exists: %d, in: %Iu default: \"%s\" value: \"%s\"\n",
-#else
                 GfLogDebug("section: \"%s\" param: \"%s\" label: \"%s\" page: %zu "
                            "index: %zu labelId: %d comboId: %d defaultLabelId: %d "
                            "exists: %d, in: %zu default: \"%s\" value: \"%s\"\n",
-#endif
                            att.section.c_str(), att.param.c_str(), att.label.c_str(),
                            page, index, att.labelId, att.comboId, att.defaultLabelId,
                            att.exists, att.in.size(), att.defaultStrValue.c_str(),

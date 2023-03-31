@@ -99,11 +99,7 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
             // Truncate unicodes above GF_MAX_KEYCODE (no need for more).
             keyUnicode = (unsigned short)(unicode & GF_MAX_KEYCODE);
             _mapUnicodes[keyId] = (unsigned short)keyUnicode;
-#if defined(_MSC_VER) && _MSC_VER < 1800
-            GfLogDebug("translateKeySym(c=%X, m=%X, u=%X) : '%c', id=%X, ucode=%X (nk=%Iu)\n",
-#else
             GfLogDebug("translateKeySym(c=%X, m=%X, u=%X) : '%c', id=%X, ucode=%X (nk=%zu)\n",
-#endif
                    code, modifier, unicode, // Truncate high bits for MSVC 2010 bugs.
                    (keyUnicode > 0 && keyUnicode < 128 && isprint(keyUnicode & 0x7F))
                    ? (char)(keyUnicode & 0x7F) : ' ',

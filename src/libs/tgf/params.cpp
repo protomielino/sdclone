@@ -203,11 +203,7 @@ getFullName (const char *sectionName, const char *paramName)
 
     fullName = (char *) malloc (strlen (sectionName) + strlen (paramName) + 2);
     if (!fullName) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-        GfLogError ("getFullName: malloc (%03Iu) failed", strlen (sectionName) + strlen (paramName) + 2);
-#else //_MSC_VER
         GfLogError ("getFullName: malloc (%zu) failed", strlen (sectionName) + strlen (paramName) + 2);
-#endif //_MSC_VER
         return NULL;
     }
     sprintf (fullName, "%s/%s", sectionName, paramName);
@@ -335,11 +331,7 @@ addParam (struct parmHeader *conf, struct section *section, const char *paramNam
 
     param = (struct param *) calloc (1, sizeof (struct param));
     if (!param) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-        GfLogError ("addParam: calloc (1, %03Iu) failed\n", sizeof (struct param));
-#else //_MSC_VER
         GfLogError ("addParam: calloc (1, %zu) failed\n", sizeof (struct param));
-#endif //_MSC_VER
         goto bailout;
     }
 
@@ -459,11 +451,7 @@ addSection (struct parmHeader *conf, const char *sectionName)
 
     section = (struct section *) calloc (1, sizeof (struct section));
     if (!section) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-        GfLogError ("addSection: calloc (1, 03Iu) failed\n", sizeof (struct section));
-#else //_MSC_VER
         GfLogError ("addSection: calloc (1, %zu) failed\n", sizeof (struct section));
-#endif //_MSC_VER
         return NULL;
     }
 
@@ -529,11 +517,7 @@ createParmHeader (const char *file)
 
     conf = (struct parmHeader *) calloc (1, sizeof (struct parmHeader));
     if (!conf) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("createParmHeader: calloc (1, %03Iu) failed\n", sizeof (struct parmHeader));
-#else //_MSC_VER
     GfLogError ("createParmHeader: calloc (1, %zu) failed\n", sizeof (struct parmHeader));
-#endif //_MSC_VER
     return NULL;
     }
 
@@ -541,11 +525,7 @@ createParmHeader (const char *file)
 
     conf->rootSection = (struct section *) calloc (1, sizeof (struct section));
     if (!conf->rootSection) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("createParmHeader: calloc (1, %03Iu) failed\n", sizeof (struct section));
-#else //_MSC_VER
     GfLogError ("createParmHeader: calloc (1, %zu) failed\n", sizeof (struct section));
-#endif //_MSC_VER
     goto bailout;
     }
     GF_TAILQ_INIT (&(conf->rootSection->paramList));
@@ -1213,11 +1193,7 @@ GfParmReadBuf (char *buffer)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("GfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
-#else //_MSC_VER
     GfLogError ("GfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
-#endif //_MSC_VER
     goto bailout;
     }
 
@@ -1318,17 +1294,10 @@ GfParmReadFile (const char *file, int mode, bool neededFile, bool trace)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-        if (TraceLoggersAvailable)
-            GfLogError ("GfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
-        else
-            fprintf(stderr,"GfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
-#else //_MSC_VER
         if (TraceLoggersAvailable)
             GfLogError ("GfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
         else
             fprintf(stderr,"GfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
-#endif //_MSC_VER
     goto bailout;
     }
 
@@ -2600,11 +2569,7 @@ GfParmListRemoveElt (void *handle, const char *path, const char *key)
     }
     fullName = (char *) malloc (strlen (path) + strlen (key) + 2);
     if (!fullName) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("GfParmListRemoveElt: malloc (%lu) failed\n", strlen (path) + strlen (key) + 2);
-#else
     GfLogError ("GfParmListRemoveElt: malloc (%zu) failed\n", strlen (path) + strlen (key) + 2);
-#endif
     return -1;
     }
     sprintf (fullName, "%s/%s", path, key);
@@ -2648,11 +2613,7 @@ GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const c
     // Build new element full name.
     newFullName = (char *) malloc (strlen (path) + strlen (newKey) + 2);
     if (!newFullName) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("GfParmListRenameElt: malloc (%lu) failed\n", strlen (path) + strlen (newKey) + 2);
-#else
     GfLogError ("GfParmListRenameElt: malloc (%zu) failed\n", strlen (path) + strlen (newKey) + 2);
-#endif
     return -1;
     }
     sprintf (newFullName, "%s/%s", path, newKey);
@@ -2667,11 +2628,7 @@ GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const c
     // Check if no other element has same fullname in the list.
     oldFullName = (char *) malloc (strlen (path) + strlen (oldKey) + 2);
     if (!oldFullName) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("GfParmListRenameElt: malloc (%lu) failed", strlen (path) + strlen (oldKey) + 2);
-#else
     GfLogError ("GfParmListRenameElt: malloc (%zu) failed", strlen (path) + strlen (oldKey) + 2);
-#endif
     return -1;
     }
     sprintf (oldFullName, "%s/%s", path, oldKey);
@@ -4626,11 +4583,7 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     /* Handle creation */
     parmHandleOut = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandleOut) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogError ("GfParmMergeHandles: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
-#else //_MSC_VER
     GfLogError ("GfParmMergeHandles: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
-#endif //_MSC_VER
     parmReleaseHeader (confOut);
     return NULL;
     }

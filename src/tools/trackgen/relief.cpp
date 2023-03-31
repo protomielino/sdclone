@@ -91,11 +91,7 @@ void LoadRelief(tTrack *track, void *TrackHandle, const std::string &reliefFile)
 
     Root = ssgLoadAC(reliefFile.c_str());
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    printf("Relief: %Iu interior, %Iu exterior\n", InteriorList.size(), ExteriorList.size());
-#else
     printf("Relief: %zu interior, %zu exterior\n", InteriorList.size(), ExteriorList.size());
-#endif
 }
 
 static void countRec(ssgEntity *e, int *nb_vert, int *nb_seg)

@@ -449,11 +449,7 @@ void NetNetwork::SendLapStatusPacket(tCarElt *pCar)
         GfLogFatal("SendLapStatusPacket: packed buffer error\n");
     }
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendLapStatusPacket: packed data length=%Iu\n", msg.length());
-#else
     GfLogTrace("SendLapStatusPacket: packed data length=%zu\n", msg.length());
-#endif
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -525,11 +521,7 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
         GfLogFatal("SendCarStatusPacket: packed buffer error\n");
     }
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendCarStatusPacket: packed data length=%Iu\n", msg.length());
-#else
     GfLogTrace("SendCarStatusPacket: packed data length=%zu\n", msg.length());
-#endif
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -620,11 +612,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
     {
         GfLogFatal("SendCarControlsPacket: packed buffer error\n");
     }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("SendCarControlsPacket: packed data length=%Iu\n",
-#else
     GfLogTrace("SendCarControlsPacket: packed data length=%zu\n",
-#endif
             msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
@@ -637,12 +625,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
 void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 {
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadLapStatusPacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadLapStatusPacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadLapStatusPacket: packed data length=%zu\n", msg.length());
 
     LapStatus lstatus;
     lstatus.startRank = 0; // Avoid compiler warnings
@@ -681,12 +664,7 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
 {
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadCarStatusPacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadCarStatusPacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadCarStatusPacket: packed data length=%zu\n", msg.length());
 
     double packettime;
     int iNumCars;
@@ -760,12 +738,7 @@ void NetNetwork::GetHostSettings(std::string &strCarCat,bool &bCollisions)
 void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
 {
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-#if defined(_MSC_VER) && _MSC_VER < 1800
-    GfLogTrace("ReadCarControlsPacket: packed data length=%Iu\n",
-#else
-    GfLogTrace("ReadCarControlsPacket: packed data length=%zu\n",
-#endif
-            msg.length());
+    GfLogTrace("ReadCarControlsPacket: packed data length=%zu\n", msg.length());
 
     double packettime;
     int iNumCars;
