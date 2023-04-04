@@ -211,3 +211,10 @@ set(GLM_PROJECT glm-${GLM_VERSION})
 set(GLM_FILE ${GLM_PROJECT}.zip)
 set(GLM_URL https://github.com/g-truc/glm/releases/download/${GLM_VERSION}/${GLM_FILE})
 set(GLM_HASH SHA256=37e2a3d62ea3322e43593c34bae29f57e3e251ea89f4067506c94043769ade4c)
+
+# TinyGLTF 
+set(TINYGLTF_VERSION 2.8.5)
+set(TINYGLTF_PROJECT TinyGLTF-${TINYGLTF_VERSION})
+set(TINYGLTF_FILE ${TINYGLTF_PROJECT}.tar.gz)
+set(TINYGLTF_URL https://github.com/syoyo/tinygltf/archive/refs/tags/v${TINYGLTF_VERSION}.tar.gz)
+set(TINYGLTF_HASH SHA256=c2deafb54d987e97636334055fa689b8186ee8aa5e4769914ffd2775be20b51a)
