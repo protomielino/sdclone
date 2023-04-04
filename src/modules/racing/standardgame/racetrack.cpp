@@ -1125,7 +1125,7 @@ void reTrackSetTropical(void)
     humidity = reTrackLinear(h, hmin, hmax);
 
     // wind speed based on latitude (0.0 - 15 degrees)
-    double fact_lat = std::max(abs(latitude), 15.0) / 15.0;
+    double fact_lat = std::max(fabs(latitude), 15.0) / 15.0;
     wind_speed = 3.0 * fact_lat * fact_lat;
 
     double temp_water = temperature_water;
