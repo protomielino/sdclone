@@ -343,5 +343,25 @@ MACRO(CHECK_LIBRARIES)
 
 	ENDIF(OPTION_3RDPARTY_SQLITE3)
 
+	# GLM
+	Find_Package(GLM)
+
+	IF(GLM_FOUND)
+		SET(HAVE_GLM 1)
+		MESSAGE(STATUS "Looking for library GLM - found")
+	ELSE(GLM_FOUND)
+		MESSAGE(STATUS "Looking for library GLM - NOT found")
+	ENDIF(GLM_FOUND)
+
+	# TinyGLTF
+	Find_Package(TinyGLTF)
+
+	IF(TINYGLTF_FOUND)
+		SET(HAVE_TINYGLTF 1)
+		MESSAGE(STATUS "Looking for library TinyGLTF - found")
+	ELSE(TINYGLTF_FOUND)
+		MESSAGE(STATUS "Looking for library TinyGLTF - NOT found")
+	ENDIF(TINYGLTF_FOUND)
+
 ENDMACRO(CHECK_LIBRARIES)
 
