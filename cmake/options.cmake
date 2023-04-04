@@ -80,6 +80,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
 
+    SET(OPTION_TINYGLTF false CACHE BOOL "Use tinygltf library")
+
     SET(OPTION_WEBSERVER true CACHE BOOL "Build with WebServer functionality")
 
     SET(OPTION_CLIENT_SERVER false CACHE BOOL "Build with Client/Server network architecture")
