@@ -149,6 +149,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
             gui/icons/Open24.gif
             gui/icons/Properties24.gif
             gui/icons/Redo24.gif
+            gui/icons/Relief24.gif
             gui/icons/Save24.gif
             gui/icons/Search24.gif
             gui/icons/Straight24.gif
