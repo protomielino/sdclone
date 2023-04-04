@@ -80,6 +80,7 @@ import utils.circuit.Curve;
 import utils.circuit.MainTrack;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
+import utils.circuit.Reliefs;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
@@ -111,6 +112,7 @@ public class EditorFrame extends JFrame
 	ShowArrowsAction			showArrowsAction					= null;
 	ShowBackgroundAction		showBackgroundAction				= null;
 	ShowObjectsAction			showObjectsAction					= null;
+	ShowReliefsAction			showReliefsAction					= null;
 	MoveAction					moveAction							= null;
 	SubdivideAction 			subdivideAction						= null;
 	HelpAction					helpAction							= null;
@@ -181,12 +183,14 @@ public class EditorFrame extends JFrame
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
 	private JMenuItem			showObjectsMenuItem					= null;
+	private JMenuItem			showReliefsMenuItem					= null;
 	private JMenuItem			defaultSurfacesItem					= null;
 	private JMenuItem			defaultObjectsItem					= null;
 	private JToggleButton		moveButton							= null;
 	private JToggleButton		showArrowsButton					= null;
 	private JToggleButton		showBackgroundButton				= null;
 	private JToggleButton		showObjectsButton					= null;
+	private JToggleButton		showReliefsButton					= null;
 	private JButton				newButton							= null;
 	//private DeltaPanel			deltaPanel							= null;
 
@@ -797,6 +801,7 @@ public class EditorFrame extends JFrame
 		viewMenu.add(getShowArrowsMenuItem());
 		viewMenu.add(getShowBackgroundMenuItem());
 		viewMenu.add(getShowObjectsMenuItem());
+		viewMenu.add(getShowReliefsMenuItem());
 		viewMenu.add(menuItemShoStartPoint);
 		viewMenu.add(menuItemAddBackground);
 		viewMenu.addSeparator();
@@ -1162,6 +1167,22 @@ public class EditorFrame extends JFrame
 			showObjectsMenuItem.setIcon(null);
 		}
 		return showObjectsMenuItem;
+	}
+
+	/**
+	 * This method initializes showReliefsMenuItem
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getShowReliefsMenuItem()
+	{
+		if (showReliefsMenuItem == null)
+		{
+			showReliefsMenuItem = new JMenuItem();
+			showReliefsMenuItem.setAction(showReliefsAction);
+			showReliefsMenuItem.setIcon(null);
+		}
+		return showReliefsMenuItem;
 	}
 
 	private JMenuItem getDefaultSurfacesMenuItem()
@@ -1743,6 +1764,24 @@ public class EditorFrame extends JFrame
 		return showObjectsButton;
 	}
 	/**
+	 * This method initializes showReliefsButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JToggleButton getShowReliefsButton()
+	{
+		if (showReliefsButton == null)
+		{
+			showReliefsButton = new JToggleButton();
+			showReliefsButton.setAction(showReliefsAction);
+			if (showReliefsButton.getIcon() != null)
+			{
+				showReliefsButton.setText("");
+			}
+		}
+		return showReliefsButton;
+	}
+	/**
 	 * This method initializes newButton
 	 *
 	 * @return javax.swing.JButton
@@ -2075,6 +2114,13 @@ public class EditorFrame extends JFrame
 		view.invalidate();
 		view.repaint();
 	}
+
+	void toggleButtonShowReliefs_actionPerformed(ActionEvent e)
+	{
+		view.setShowReliefs(getShowReliefsButton().isSelected());
+		view.invalidate();
+		view.repaint();
+	}
 	/**
 	 * This method initializes jToolBar
 	 *
@@ -2104,6 +2150,7 @@ public class EditorFrame extends JFrame
 			jToolBar.add(getShowArrowsButton());
 			jToolBar.add(getShowBackgroundButton());
 			jToolBar.add(getShowObjectsButton());
+			jToolBar.add(getShowReliefsButton());
 			jToolBar.add(getCalculateDeltaButton());
 			jToolBar.add(getCheckButton());
 			jToolBar.add(getFinishLineToggleButton());
@@ -2186,6 +2233,7 @@ public class EditorFrame extends JFrame
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
 		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"), "Show background image.", KeyEvent.VK_S);
 		showObjectsAction = new ShowObjectsAction("Show objects", createNavigationIcon("Object24"), "Show objects.", KeyEvent.VK_S);
+		showReliefsAction = new ShowReliefsAction("Show reliefs", createNavigationIcon("Relief24"), "Show reliefs.", KeyEvent.VK_S);
 		checkAction = new CheckAction("Check", createNavigationIcon("Check24"), "Check.", KeyEvent.VK_S);
 		finishLineAction = new FinishLineAction("Finish Line", createNavigationIcon("Finish24"), "Finish Line.", KeyEvent.VK_S);
 		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
@@ -2453,6 +2501,27 @@ public class EditorFrame extends JFrame
 				return;
 			}
 			toggleButtonShowObjects_actionPerformed(e);
+		}
+	}
+	public class ShowReliefsAction extends AbstractAction
+	{
+		public ShowReliefsAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			if (trackData == null)
+			{
+				if (showReliefsButton.isSelected())
+					showReliefsButton.setSelected(false);
+
+				message("No track", "Nothing to show.");
+				return;
+			}
+			toggleButtonShowReliefs_actionPerformed(e);
 		}
 	}
 	public class HelpAction extends AbstractAction
@@ -3075,5 +3144,10 @@ public class EditorFrame extends JFrame
 	public Vector<ObjectMap> getObjectMaps()
 	{
 		return trackData.getObjectMaps();
+	}
+	
+	public Reliefs getReliefs()
+	{
+		return trackData.getReliefs();
 	}
 }

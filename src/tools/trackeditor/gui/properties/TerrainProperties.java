@@ -59,6 +59,7 @@ import javax.swing.table.TableColumn;
 import gui.EditorFrame;
 import utils.Editor;
 import utils.SurfaceComboBox;
+import utils.ac3d.Ac3dException;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Surface;
@@ -1074,7 +1075,19 @@ public class TerrainProperties extends PropertyPanel
 		if (isDifferent(reliefFileTextField.getText(),
 			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), stringResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefFile(stringResult.getValue());
+			try
+			{
+				getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefFile(stringResult.getValue());
+			}
+			catch (IOException e)
+			{				
+			}
+			catch (Ac3dException e)
+			{				
+			}
+			catch (Exception e)
+			{				
+			}
 			getEditorFrame().documentIsModified = true;
 		}
 

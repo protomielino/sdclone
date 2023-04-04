@@ -97,9 +97,11 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/MainTrack.java
          utils/circuit/ObjShapeHandle.java
          utils/circuit/ObjShapeObject.java
+         utils/circuit/ObjShapeRelief.java
          utils/circuit/ObjShapeTerrain.java
          utils/circuit/ObjectMap.java
          utils/circuit/Pits.java
+         utils/circuit/Reliefs.java
          utils/circuit/Sector.java
          utils/circuit/Segment.java
          utils/circuit/SegmentListener.java

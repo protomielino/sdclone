@@ -17,7 +17,7 @@ public class Ac3dMaterial
 
 	public Ac3dMaterial(String name)
 	{
-		versionC = true;
+		versionC = false;
 
 		this.name = name;
 	}
@@ -83,7 +83,7 @@ public class Ac3dMaterial
 		}
 		else
 		{
-			file.write("MATERIAL " + name +
+			file.write("MATERIAL \"" + name + "\"" +
 				" rgb " + rgb[0] + " " + rgb[1] + " " + rgb[2] +
 				"  amb " + amb[0] + " " + amb[1] + " " + amb[2] +
 				"  emis " + emis[0] + " " + emis[1] + " " + emis[2] +

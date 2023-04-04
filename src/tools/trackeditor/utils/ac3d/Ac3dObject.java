@@ -25,7 +25,91 @@ public class Ac3dObject
 	private Vector<Ac3dSurface>	surfaces	= new Vector<Ac3dSurface>();
 	private Vector<Ac3dObject>	kids		= new Vector<Ac3dObject>();
 
-	Ac3dObject(String type, int linenum)
+	public class Matrix
+	{
+		public double[][] data = new double[4][4];
+		
+		public Matrix()
+		{
+			data[0][0] = 1; data[0][1] = 0; data[0][2] = 0; data[0][3] = 0;
+			data[1][0] = 0; data[1][1] = 1; data[1][2] = 0; data[1][3] = 0;
+			data[2][0] = 0; data[2][1] = 0; data[2][2] = 1; data[2][3] = 0;
+			data[3][0] = 0; data[3][1] = 0; data[3][2] = 0; data[3][3] = 1;
+		}
+
+		public Matrix(double m0,  double m1,  double m2,  double m3,
+					  double m4,  double m5,  double m6,  double m7,
+					  double m8,  double m9,  double m10, double m11,
+					  double m12, double m13, double m14, double m15)
+		{
+			data[0][0] = m0;  data[0][1] = m1;  data[0][2] = m2;  data[0][3] = m3;
+			data[1][0] = m4;  data[1][1] = m5;  data[1][2] = m6;  data[1][3] = m7;
+			data[2][0] = m8;  data[2][1] = m9;  data[2][2] = m10; data[2][3] = m11;
+			data[3][0] = m12; data[3][1] = m13; data[3][2] = m14; data[3][3] = m15;
+		}
+
+		public void setLoc(double[] loc)
+		{
+			data[3][0] = loc[0]; data[3][1] = loc[1]; data[3][2] = loc[2];
+		}
+
+		public void setRot(double[] rot)
+		{
+			data[0][0] = rot[0]; data[0][1] = rot[1]; data[0][2] = rot[2];
+			data[1][0] = rot[3]; data[1][1] = rot[4]; data[1][2] = rot[5];
+			data[2][0] = rot[6]; data[2][1] = rot[7]; data[2][2] = rot[8];
+		}
+
+		public void transformPoint(double[] point)
+		{
+		    double t0 = point[0];
+		    double t1 = point[1];
+		    double t2 = point[2];
+
+		    point[0] = t0 * data[0][0] + t1 * data[1][0] + t2 * data[2][0] + data[3][0];
+		    point[1] = t0 * data[0][1] + t1 * data[1][1] + t2 * data[2][1] + data[3][1];
+		    point[2] = t0 * data[0][2] + t1 * data[1][2] + t2 * data[2][2] + data[3][2];
+		}
+
+		public Matrix multiply(Matrix matrix)
+		{
+		    Matrix dst = new Matrix();
+
+		    for (int i = 0; i < 4; i++)
+		    {
+		        dst.data[0][i] = matrix.data[0][0] * data[0][i] +
+		        				 matrix.data[0][1] * data[1][i] +
+		        				 matrix.data[0][2] * data[2][i] +
+		        				 matrix.data[0][3] * data[3][i];
+
+		        dst.data[1][i] = matrix.data[1][0] * data[0][i] +
+		        				 matrix.data[1][1] * data[1][i] +
+		        				 matrix.data[1][2] * data[2][i] +
+		        				 matrix.data[1][3] * data[3][i];
+
+		        dst.data[2][i] = matrix.data[2][0] * data[0][i] +
+		        				 matrix.data[2][1] * data[1][i] +
+		        				 matrix.data[2][2] * data[2][i] +
+		        				 matrix.data[2][3] * data[3][i];
+
+		        dst.data[3][i] = matrix.data[3][0] * data[0][i] +
+		        				 matrix.data[3][1] * data[1][i] +
+		        				 matrix.data[3][2] * data[2][i] +
+		        				 matrix.data[3][3] * data[3][i];
+		    }
+		    return dst;
+		}
+
+		public void dump()
+		{
+			System.out.println(data[0][0] + " " + data[0][1] + " " + data[0][2] + " " + data[0][3] + "\n" +
+							   data[1][0] + " " + data[1][1] + " " + data[1][2] + " " + data[1][3] + "\n" +
+							   data[2][0] + " " + data[2][1] + " " + data[2][2] + " " + data[2][3] + "\n" +
+							   data[3][0] + " " + data[3][1] + " " + data[3][2] + " " + data[3][3] + "\n");
+		}
+	}
+
+	public Ac3dObject(String type, int linenum)
 	{
 		this.type = type;
 		this.linenum = linenum;
@@ -37,12 +121,12 @@ public class Ac3dObject
 
 		if (name != null && !name.isEmpty())
 		{
-			file.write("name " + name + "\n");
+			file.write("name \"" + name + "\"\n");
 		}
 
 		if (texture != null && !texture.isEmpty())
 		{
-			file.write("texture " + texture + "\n");
+			file.write("texture \"" + texture + "\"\n");
 		}
 
 		if (texrep != null && texrep.length == 2)
@@ -382,5 +466,47 @@ public class Ac3dObject
 	public void setLinenum(int linenum)
 	{
 		this.linenum = linenum;
+	}
+	
+	public void flatten()
+	{
+		transform(new Matrix(1.0, 0.0, 0.0, 0.0,
+							 0.0, 1.0, 0.0, 0.0,
+							 0.0, 0.0, 1.0, 0.0,
+							 0.0, 0.0, 0.0, 1.0));
+	}
+
+	public void transform(Matrix matrix)
+	{
+		Matrix	thisMatrix = new Matrix();
+
+		if (loc != null)
+		{
+			thisMatrix.setLoc(loc);
+			loc = null;
+		}
+
+		if (rot != null)
+		{
+			thisMatrix.setRot(rot);
+			rot = null;
+		}
+
+		Matrix newMatrix = thisMatrix.multiply(matrix);
+
+		if ("poly".equals(type))
+		{
+			for (int i = 0; i < vertices.size(); i++)
+			{
+				newMatrix.transformPoint(vertices.elementAt(i));
+			}
+		}
+		else
+		{
+			for (int i = 0; i < kids.size(); i++)
+			{
+				kids.get(i).transform(newMatrix);
+			}
+		}
 	}
 }

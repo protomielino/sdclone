@@ -23,6 +23,8 @@ package plugin.torcs;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -41,6 +43,7 @@ import org.xml.sax.InputSource;
 import gui.EditorFrame;
 import utils.Editor;
 import utils.SegmentVector;
+import utils.ac3d.Ac3dException;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
@@ -589,7 +592,32 @@ public class XmlReader
 	        data.getTerrainGeneration().setMinimumAltitude(getAttrNumValue(terrain, "minimum altitude", "m"));
 	        data.getTerrainGeneration().setGroupSize(getAttrNumValue(terrain, "group size", "m"));
 	        data.getTerrainGeneration().setElevationMap(getAttrStrValue(terrain, "elevation map"));
-	        data.getTerrainGeneration().setReliefFile(getAttrStrValue(terrain, "relief file"));
+
+	        String reliefFile = getAttrStrValue(terrain, "relief file");
+	        if (reliefFile != null)
+	        {
+	    		Path path = Paths.get(reliefFile);
+	        	try
+	        	{
+	        		data.getTerrainGeneration().getReliefs().setFileName(reliefFile);
+	    		}
+	    		catch (IOException e)
+	    		{
+	        		String msg = path.getFileName() + " : Can't read input file!";
+	            	JOptionPane.showMessageDialog(editorFrame, msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+	    		}
+	    		catch (Ac3dException e)
+	    		{
+	        		String msg = path.getFileName() + " : " + e.getLocalizedMessage();
+	            	JOptionPane.showMessageDialog(editorFrame, msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+	    		}
+	    		catch (Exception e)
+	    		{
+	        		String msg = path.getFileName() + " : " + e.getLocalizedMessage();
+	            	JOptionPane.showMessageDialog(editorFrame, msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+	    		}
+	        }
+
 	        data.getTerrainGeneration().setReliefBorder(getAttrStrValue(terrain, "relief border"));
 	        data.getTerrainGeneration().setSurface(getAttrStrValue(terrain, "surface"));
 	        data.getTerrainGeneration().setRandomSeed(getAttrIntValue(terrain, "random seed"));

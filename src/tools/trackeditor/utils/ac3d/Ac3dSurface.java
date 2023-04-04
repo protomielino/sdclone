@@ -50,7 +50,14 @@ public class Ac3dSurface
 	
 	public void setPolygon()
 	{
-		surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_POLYGON;
+		if (surf == null)
+		{
+			surf = SURFACE_TYPE_POLYGON;
+		}
+		else
+		{
+			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_POLYGON;
+		}
 	}
 	
 	public boolean isClosedLine()
@@ -60,7 +67,14 @@ public class Ac3dSurface
 	
 	public void setClosedLine()
 	{
-		surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_CLOSED_LINE;
+		if (surf == null)
+		{
+			surf = SURFACE_TYPE_CLOSED_LINE;
+		}
+		else
+		{
+			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_CLOSED_LINE;
+		}
 	}
 	
 	public boolean isLine()
@@ -70,7 +84,14 @@ public class Ac3dSurface
 
 	public void setLine()
 	{
-		surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_LINE;
+		if (surf == null)
+		{
+			surf = SURFACE_TYPE_LINE;
+		}
+		else
+		{
+			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_LINE;
+		}
 	}
 
 	public boolean isFlatShaded()
@@ -80,7 +101,14 @@ public class Ac3dSurface
 	
 	public void setFlatShaded()
 	{
-		surf = (surf & ~SHADED_MASK) | SHADED_FLAT;
+		if (surf == null)
+		{
+			surf = SHADED_FLAT;
+		}
+		else
+		{
+			surf = (surf & ~SHADED_MASK) | SHADED_FLAT;
+		}
 	}
 
 	public boolean isSmoothShaded()
@@ -90,7 +118,14 @@ public class Ac3dSurface
 	
 	public void setSmoothShaded()
 	{
-		surf = (surf & ~SHADED_MASK) | SHADED_SMOOTH;
+		if (surf == null)
+		{
+			surf = SHADED_SMOOTH;
+		}
+		else
+		{
+			surf = (surf & ~SHADED_MASK) | SHADED_SMOOTH;
+		}
 	}
 
 	public boolean isSingleSided()
@@ -100,7 +135,14 @@ public class Ac3dSurface
 	
 	public void setSingleSided()
 	{
-		surf = (surf & ~SIDED_MASK) | SIDED_ONE;
+		if (surf == null)
+		{
+			surf = SIDED_ONE;
+		}
+		else
+		{
+			surf = (surf & ~SIDED_MASK) | SIDED_ONE;
+		}
 	}
 
 	public boolean isDoubleSided()
@@ -110,7 +152,14 @@ public class Ac3dSurface
 	
 	public void setDoubleSided()
 	{
-		surf = (surf & ~SIDED_MASK) | SIDED_TWO;
+		if (surf == null)
+		{
+			surf = SIDED_TWO;
+		}
+		else
+		{
+			surf = (surf & ~SIDED_MASK) | SIDED_TWO;
+		}
 	}
 	
 	public void write(FileWriter file) throws IOException

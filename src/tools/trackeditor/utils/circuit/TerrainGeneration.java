@@ -1,5 +1,6 @@
 package utils.circuit;
 
+import java.io.IOException;
 import java.util.Vector;
 
 public class TerrainGeneration
@@ -27,7 +28,7 @@ public class TerrainGeneration
 	private double				minimumAltitude				= Double.NaN;
 	private double				groupSize					= Double.NaN;
 	private String				elevationMap				= null;
-	private String				reliefFile					= null;
+	private Reliefs				reliefs						= new Reliefs();
 	private String				reliefBorder				= null;
 	private String				surface						= null;
 	private int					randomSeed					= Integer.MAX_VALUE;
@@ -173,15 +174,23 @@ public class TerrainGeneration
 	 */
 	public String getReliefFile()
 	{
-		return reliefFile;
+		return reliefs.getFileName();
 	}
 	/**
 	 * @param reliefFile
 	 *            The reliefFile to set.
 	 */
-	public void setReliefFile(String reliefFile)
+	public void setReliefFile(String reliefFile) throws Exception, IOException
 	{
-		this.reliefFile = reliefFile;
+		this.reliefs.setFileName(reliefFile);
+	}
+	public Reliefs getReliefs()
+	{
+		return reliefs;
+	}
+	public void setReliefs(Reliefs reliefs)
+	{
+		this.reliefs = reliefs;
 	}
 	/**
 	 * @return Returns the surface.
@@ -237,7 +246,7 @@ public class TerrainGeneration
 		System.out.println(indent + "  minimumAltitude : " + minimumAltitude);
 		System.out.println(indent + "  groupSize       : " + groupSize);
 		System.out.println(indent + "  elevationMap    : " + elevationMap);
-		System.out.println(indent + "  reliefFile      : " + reliefFile);
+		reliefs.dump(indent + "  ");
 		System.out.println(indent + "  reliefBorder    : " + reliefBorder);
 		System.out.println(indent + "  surface         : " + surface);
 		System.out.println(indent + "  random seed     : " + randomSeed);

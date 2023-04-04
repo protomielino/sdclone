@@ -28,6 +28,7 @@ import utils.circuit.Header;
 import utils.circuit.LocalInfo;
 import utils.circuit.MainTrack;
 import utils.circuit.ObjectMap;
+import utils.circuit.Reliefs;
 import utils.circuit.Sector;
 import utils.circuit.StartingGrid;
 import utils.circuit.Surface;
@@ -233,5 +234,10 @@ public final class TrackData
 	public Vector<ObjectMap> getObjectMaps()
 	{
 		return getGraphic().getTerrainGeneration().getObjectMaps();
-	}	
+	}
+
+	public Reliefs getReliefs()
+	{
+		return getGraphic().getTerrainGeneration().getReliefs();
+	}
 }

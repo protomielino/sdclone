@@ -47,8 +47,10 @@ import utils.SegmentVector;
 import utils.circuit.Curve;
 import utils.circuit.ObjShapeHandle;
 import utils.circuit.ObjShapeObject;
+import utils.circuit.ObjShapeRelief;
 import utils.circuit.ObjShapeTerrain;
 import utils.circuit.ObjectMap;
+import utils.circuit.Reliefs;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.XmlObjPits;
@@ -123,6 +125,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** offset between mouse click position and object position */
 	private Point2D.Double		objectOffset					= new Point2D.Double();
 	
+	private ObjShapeRelief		reliefShape						= null;
+	private int					reliefPointIndex				= 0;
+	private boolean				showReliefs						= false;
+	private boolean				reliefDragging					= false;
+	private Point2D.Double		reliefOffset					= new Point2D.Double();
+
 	/** mouse pressed point, in meters */
 	Point2D.Double				clickPoint						= new Point2D.Double(0, 0);
 	/** mouse current point, in meters */
@@ -156,6 +164,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	static public final int		STATE_SUBDIVIDE					= 7;
 	static public final int		STATE_FINISH_LINE				= 8;
 //	static public final int		STATE_SHOW_OBJECTS				= 9;
+//	static public final int		STATE_SHOW_RELIEFSS				= 10;
 
 	/** arrow showing state */
 	public boolean				showArrows						= false;
@@ -649,6 +658,20 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				screenToReal(e, real);
 				objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
 			}
+			else if (obj != null && obj.getType() == "relief")
+			{
+/*
+				reliefDragging = true;
+				reliefShape = (ObjShapeRelief) obj;
+				//Undo.add(new UndoEditRelief(findObjectMap(objectShape), reliefShape));
+
+				Point2D.Double real = new Point2D.Double(0, 0);
+				screenToReal(e, real);
+				reliefPointIndex = reliefShape.getPointIndex(real);
+				Point2D.Double point = reliefShape.getPoint2D(real);
+				reliefOffset.setLocation(point.x - real.x, point.y - real.y);
+*/
+			}
 			else
 			{
 				Point2D.Double tmp = new Point2D.Double(imgOffsetStart.getX(),imgOffsetStart.getY());
@@ -712,6 +735,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							if (selectedShape.getType().equals("object"))
 							{
 								objectSelected((ObjShapeObject)selectedShape, e);
+							}
+							else if (selectedShape.getType().equals("relief"))
+							{
+								//reliefSelected((ObjShapeRelief)selectedShape, e);
 							}
 							else
 							{
@@ -797,6 +824,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			objectDragging = false;
 			objectShape = null;
 		}
+		else if (e.getButton() == MouseEvent.BUTTON3 && reliefDragging)
+		{
+			reliefDragging = false;
+			reliefShape = null;
+			reliefPointIndex = -1;
+		}
 	}
 
 	/** input events management */
@@ -831,6 +864,20 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				
 				editorFrame.documentIsModified = true;
 				objectMap.setChanged(true);
+				invalidate();
+				repaint();
+			}
+			else if (reliefShape != null && reliefDragging == true)
+			{
+				Point2D.Double real = new Point2D.Double();
+				screenToReal(e, real);
+				
+				real.x = real.x + reliefOffset.x;
+				real.y = real.y + reliefOffset.y;
+
+				reliefShape.setPoint2D(reliefPointIndex, real, boundingRectangle);
+				editorFrame.documentIsModified = true;
+				editorFrame.getReliefs().setChanged(true);
 				invalidate();
 				repaint();
 			}
@@ -1223,6 +1270,30 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			ex.printStackTrace();
 		}
 
+		if (showReliefs)
+		{
+			Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+
+			for (int i = 0; i < reliefs.size(); i++)
+			{
+				ObjShapeRelief relief = reliefs.get(i);
+
+				try
+				{
+					if (Class.forName("utils.circuit.ObjShapeRelief").isAssignableFrom(relief.getClass())
+							&& relief.contains(mousePoint))
+					{
+						// relief found !
+						return relief;
+					}
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+		}
+
 		if (showObjects)
 		{
 			Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
@@ -1476,6 +1547,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					}
 				}
 			}
+
+			if (showReliefs)
+			{
+				g.setColor(Color.blue);
+				Reliefs reliefs = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs();
+				for (int j = 0; j < reliefs.getReliefs().size(); j++)
+				{
+					ObjShapeRelief relief = reliefs.getReliefs().get(j);
+
+					relief.draw(g, affineTransform);
+				}
+			}
 		}
 	}
 
@@ -1709,6 +1792,16 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 	}
 	}
 
+	public void setReliefs(Reliefs reliefs)
+	{
+		for (int i = 0; i < reliefs.getReliefs().size(); i++)
+	 	{
+			ObjShapeRelief relief = reliefs.getReliefs().get(i);
+
+			relief.calcShape(boundingRectangle);
+	 	}
+	}
+
 	/**
 	 * @return Returns the showObjects.
 	 */
@@ -1726,6 +1819,25 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			setObjects(editorFrame.getObjectMaps());
 			editorFrame.setCurrentObjectMap(0);
+		}
+	}
+
+	/**
+	 * @return Returns the showReliefs.
+	 */
+	public boolean isShowReliefs()
+	{
+		return showReliefs;
+	}
+	/**
+	 * @param showReliefs The showObjects to set.
+	 */
+	public void setShowReliefs(boolean showReliefs)
+	{
+		this.showReliefs = showReliefs;
+		if (showReliefs && editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs().getReliefs().size() > 0)
+		{
+			setReliefs(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs());
 		}
 	}
 
@@ -1815,6 +1927,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			setObjects(editorFrame.getObjectMaps());
 		}
 
+		if (showReliefs)
+		{
+			setReliefs(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs());
+		}
+
 //		 zoom
 		setZoomFactor(zoomFactor);
 	}
@@ -1832,6 +1949,115 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			segmentParamDialog = new SegmentEditorDlg(this, editorFrame, "", false, shape);
 			segmentParamDialog.addWindowListener(this);
 		}
+	}
+
+	private void reliefSelected(ObjShapeRelief shape, MouseEvent me)
+	{
+		class EditPointAction extends AbstractAction
+		{
+			public EditPointAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Edit Relief Point", JOptionPane.INFORMATION_MESSAGE);
+				selectedShape = null;
+				invalidate();
+				repaint();
+			}
+		}
+
+		EditPointAction editPointAction = new EditPointAction("Edit Relief Point", null, "Edit relief point.");
+
+		class EditReliefAction extends AbstractAction
+		{
+			public EditReliefAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Edit Relief", JOptionPane.INFORMATION_MESSAGE);
+				selectedShape = null;
+				invalidate();
+				repaint();
+			}
+		}
+
+		EditReliefAction editReliefAction = new EditReliefAction("Edit Relief", null, "Edit relief.");
+
+		class DeletePointAction extends AbstractAction
+		{
+			public DeletePointAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Delete Relief Point", JOptionPane.INFORMATION_MESSAGE);
+				selectedShape = null;
+				invalidate();
+				repaint();
+			}
+		}
+
+		DeletePointAction deletePointAction = new DeletePointAction("Delete Relief Point", null, "Delete relief point.");
+
+		class DeleteReliefAction extends AbstractAction
+		{
+			public DeleteReliefAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Delete Relief", JOptionPane.INFORMATION_MESSAGE);
+				selectedShape = null;
+				invalidate();
+				repaint();
+			}
+		}
+
+		DeleteReliefAction deleteReliefAction = new DeleteReliefAction("Delete Relief", null, "Delete relief.");
+
+		JPopupMenu menu = new JPopupMenu();
+		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
+		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
+		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
+		JMenuItem itemDeleteRelief = new JMenuItem("Delete Relief");
+
+	    itemEditPoint.setAction(editPointAction);
+	    itemEditRelief.setAction(editReliefAction);
+	    itemDeletePoint.setAction(deletePointAction);
+	    itemDeleteRelief.setAction(deleteReliefAction);
+
+	    menu.add(itemEditPoint);
+	    menu.add(itemEditRelief);
+	    menu.add(itemDeletePoint);
+	    menu.add(itemDeleteRelief);
+
+	    menu.addPopupMenuListener(new PopupMenuListener()
+	    {
+	        public void popupMenuCanceled(final PopupMenuEvent e)
+	        {
+	    		selectedShape = null;
+	    		invalidate();
+	    		repaint();
+	        }
+	        public void popupMenuWillBecomeInvisible(final PopupMenuEvent e)
+	        {
+	        }
+	        public void popupMenuWillBecomeVisible(final PopupMenuEvent e)
+	        {	        	
+	        }
+	    });
+
+	    menu.show(me.getComponent(), me.getX(), me.getY());
 	}
 
 	private void objectSelected(ObjShapeObject shape, MouseEvent me)
