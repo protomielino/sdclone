@@ -60,6 +60,7 @@ import utils.undo.UndoAddObject;
 import utils.undo.UndoAddSegment;
 import utils.undo.UndoDeleteAllObjects;
 import utils.undo.UndoDeleteObject;
+import utils.undo.UndoDeleteRelief;
 import utils.undo.UndoDeleteSegment;
 import utils.undo.UndoEditAllObjects;
 import utils.undo.UndoEditObject;
@@ -737,7 +738,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							}
 							else if (selectedShape.getType().equals("relief"))
 							{
-								//reliefSelected((ObjShapeRelief)selectedShape, e);
+								reliefSelected((ObjShapeRelief)selectedShape, e);
 							}
 							else
 							{
@@ -1952,6 +1953,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	private void reliefSelected(ObjShapeRelief shape, MouseEvent me)
 	{
+/*
 		class EditPointAction extends AbstractAction
 		{
 			public EditPointAction(String text, ImageIcon icon, String desc)
@@ -2005,7 +2007,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 
 		DeletePointAction deletePointAction = new DeletePointAction("Delete Relief Point", null, "Delete relief point.");
-
+*/
 		class DeleteReliefAction extends AbstractAction
 		{
 			public DeleteReliefAction(String text, ImageIcon icon, String desc)
@@ -2015,29 +2017,38 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
-				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Delete Relief", JOptionPane.INFORMATION_MESSAGE);
-				selectedShape = null;
-				invalidate();
-				repaint();
+				Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+				int index = reliefs.indexOf(shape);
+					
+				if (index != -1)
+				{
+					Undo.add(new UndoDeleteRelief(reliefs, shape));
+					reliefs.remove(shape);
+					selectedShape = null;
+					invalidate();
+					repaint();
+					editorFrame.documentIsModified = true;
+					return;
+				}
 			}
 		}
 
 		DeleteReliefAction deleteReliefAction = new DeleteReliefAction("Delete Relief", null, "Delete relief.");
 
 		JPopupMenu menu = new JPopupMenu();
-		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
-		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
-		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
+//		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
+//		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
+//		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
 		JMenuItem itemDeleteRelief = new JMenuItem("Delete Relief");
 
-	    itemEditPoint.setAction(editPointAction);
-	    itemEditRelief.setAction(editReliefAction);
-	    itemDeletePoint.setAction(deletePointAction);
+//	    itemEditPoint.setAction(editPointAction);
+//	    itemEditRelief.setAction(editReliefAction);
+//	    itemDeletePoint.setAction(deletePointAction);
 	    itemDeleteRelief.setAction(deleteReliefAction);
 
-	    menu.add(itemEditPoint);
-	    menu.add(itemEditRelief);
-	    menu.add(itemDeletePoint);
+//	    menu.add(itemEditPoint);
+//	    menu.add(itemEditRelief);
+//	    menu.add(itemDeletePoint);
 	    menu.add(itemDeleteRelief);
 
 	    menu.addPopupMenuListener(new PopupMenuListener()

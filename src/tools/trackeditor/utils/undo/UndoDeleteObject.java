@@ -13,9 +13,9 @@ public class UndoDeleteObject implements UndoInterface
 	public UndoDeleteObject(ObjectMap objectMap, ObjShapeObject object)
 	{
 		this.objectMap = objectMap;
-		this.undo = object;
-		this.redo = null;
-		this.index = objectMap.getObjectIndex(undo);
+		undo = object;
+		redo = null;
+		index = objectMap.getObjectIndex(undo);
 	}
 
 	public void undo()
