@@ -72,6 +72,11 @@ public class ObjectMap
 		changed = true;
 	}
 
+	public ObjShapeObject getObjectAt(int index)
+	{
+		return objects.get(index);
+	}
+
 	public boolean removeObject(ObjShapeObject object)
 	{
 		if (objects.remove(object))

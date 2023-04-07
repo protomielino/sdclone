@@ -45,8 +45,8 @@ public class UndoAddSegment implements UndoInterface
 	public UndoAddSegment(EditorFrame editorFrame, Segment segment)
 	{
 		data = editorFrame.getTrackData().getSegments();
-		this.undo = segment;
-		this.redo = null;
+		undo = segment;
+		redo = null;
 
 		if (!data.validateLinks())
 		{

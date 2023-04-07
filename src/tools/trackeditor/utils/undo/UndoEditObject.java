@@ -2,6 +2,7 @@ package utils.undo;
 
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
+import utils.circuit.Segment;
 
 public class UndoEditObject  implements UndoInterface
 {
@@ -13,19 +14,19 @@ public class UndoEditObject  implements UndoInterface
 	public UndoEditObject(ObjectMap objectMap, ObjShapeObject object)
 	{
 		this.objectMap = objectMap;
+		index = objectMap.getObjectIndex(object);
 		clone = (ObjShapeObject) object.clone();
-		this.original = object;
+		original = object;
 	}
 
 	public void undo()
 	{
-		index = objectMap.getObjectIndex(original);
-		objectMap.setObjectAt(index, clone);
+		original = (ObjShapeObject) objectMap.getObjectAt(index).clone();
+		objectMap.getObjectAt(index).set(clone);
 	}
 
 	public void redo()
 	{
-		index = objectMap.getObjectIndex(clone);
-		objectMap.setObjectAt(index, original);
+		objectMap.getObjectAt(index).set(original);
 	}
 }

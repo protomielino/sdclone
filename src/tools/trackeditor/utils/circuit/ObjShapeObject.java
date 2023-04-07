@@ -37,7 +37,34 @@ public class ObjShapeObject extends Segment
 		this.imageX = imageX;
 		this.imageY = imageY;
 	}
-			
+
+	@Override
+	public void set(Segment segment)
+	{
+		super.set(segment);
+		ObjShapeObject object = (ObjShapeObject) segment;
+		rgb = object.rgb;
+		color = new Color(object.color.getRGB());
+		imageX = object.imageX;
+		imageY = object.imageY;
+		location = new Point2D.Double(object.location.x, object.location.y);
+		width = object.width;
+		height = object.height;
+	}
+
+	public Object clone()
+	{
+		ObjShapeObject object = (ObjShapeObject) super.clone();
+		object.rgb = this.rgb;
+		object.color = new Color(this.color.getRGB());
+		object.imageX = this.imageX;
+		object.imageY = this.imageY;
+		object.location = (Point2D.Double) this.location.clone();
+		object.width = this.width;
+		object.height = this.height;
+		return object;
+	}
+
 	public int getRGB() {
 		return rgb;
 	}

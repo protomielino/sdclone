@@ -13,8 +13,8 @@ public class UndoAddObject implements UndoInterface
 	public UndoAddObject(ObjectMap objectMap, ObjShapeObject object)
 	{
 		this.objectMap = objectMap;
-		this.undo = object;
-		this.redo = null;
+		undo = object;
+		redo = null;
 	}
 	
 	public void undo()
