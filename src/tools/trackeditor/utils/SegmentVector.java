@@ -28,7 +28,9 @@ public class SegmentVector extends Vector<Segment>
 		segment.nextShape = current.nextShape;
 		segment.previousShape = current.previousShape;
 
-		return super.set(index,  segment);
+		current.set(segment);
+
+		return current;
 	}
 
     public synchronized boolean add(Segment segment)
@@ -207,5 +209,4 @@ public class SegmentVector extends Vector<Segment>
 		}
 		return null;
 	}
-
 }

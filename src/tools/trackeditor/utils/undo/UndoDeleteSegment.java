@@ -33,21 +33,26 @@ import utils.circuit.Segment;
  */
 public class UndoDeleteSegment implements UndoInterface
 {
-	private EditorFrame	editorFrame;
-	private Segment 	undo;
-	private Segment 	redo;
-	private int 		pos;
+	private SegmentVector	data;
+	private Segment 		undo;
+	private Segment 		redo;
+	private int 			pos;
 
 	/**
 	 * 
 	 */
 	public UndoDeleteSegment(EditorFrame editorFrame, Segment segment)
 	{
-		this.editorFrame = editorFrame;
-		this.undo = segment;
-		this.redo = null;
-		SegmentVector data = editorFrame.getTrackData().getSegments();
+		data = editorFrame.getTrackData().getSegments();
+		undo = segment;
+		redo = null;
 		pos = data.indexOf(undo);
+
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoDeleteSegment");
+			data.dumpLinks();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +60,6 @@ public class UndoDeleteSegment implements UndoInterface
 	 */
 	public void undo()
 	{
-		SegmentVector data = editorFrame.getTrackData().getSegments();	
 		if (undo.getType() == "str")
 		{
 			int count = Editor.getProperties().getStraightNameCount() + 1;
@@ -69,6 +73,12 @@ public class UndoDeleteSegment implements UndoInterface
 		data.insertElementAt(undo,pos);
 		redo = undo;
 		undo = null;
+
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoDeleteSegment");
+			data.dumpLinks();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +86,6 @@ public class UndoDeleteSegment implements UndoInterface
 	 */
 	public void redo()
 	{
-		SegmentVector data = editorFrame.getTrackData().getSegments();
 		pos = data.indexOf(redo);
 		if (redo.getType() == "str")
 		{
@@ -91,5 +100,11 @@ public class UndoDeleteSegment implements UndoInterface
 		data.remove(redo);
 		undo = redo;
 		redo = null;
+
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoDeleteSegment");
+			data.dumpLinks();
+		}
 	}
 }

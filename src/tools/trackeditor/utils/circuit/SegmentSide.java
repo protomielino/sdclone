@@ -119,6 +119,26 @@ public class SegmentSide implements Cloneable
 
 	}
 
+	public void set(SegmentSide side)
+	{
+		barrierHeight = side.barrierHeight;
+		barrierStyle = side.barrierStyle;
+		barrierSurface = side.barrierSurface;
+		barrierWidth = side.barrierWidth;
+		borderHeight = side.borderHeight;
+		borderStyle = side.borderStyle;
+		borderSurface = side.borderSurface;
+		borderWidth = side.borderWidth;
+		sideBankingType = side.sideBankingType;
+		sideEndWidth = side.sideEndWidth;
+		sideStartWidth = side.sideStartWidth;
+		sideSurface = side.sideSurface;
+//		s.sideListeners = (Vector<SegmentSideListener>) this.sideListeners.clone();
+		hasSide = side.hasSide;
+		hasBorder = side.hasBorder;
+		hasBarrier = side.hasBarrier;
+	}
+
 	/**
 	 */
 	public void setNewTrackDefaults()

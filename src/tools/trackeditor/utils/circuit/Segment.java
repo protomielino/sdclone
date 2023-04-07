@@ -111,6 +111,33 @@ public class Segment implements Cloneable
 		setProperties();
 	}
 
+	public void set(Segment segment)
+	{
+		left.set(segment.left);
+		right.set(segment.right);
+		name = segment.name;
+		type = segment.type;
+		comment = segment.comment;
+		length = segment.length;
+		surface = segment.surface;
+		heightStartLeft = segment.heightStartLeft;
+		heightStartRight = segment.heightStartRight;
+		heightEndLeft = segment.heightEndLeft;
+		heightEndRight = segment.heightEndRight;
+		grade = segment.grade;
+		bankingStart = segment.bankingStart;
+		bankingEnd = segment.bankingEnd;
+		profil = segment.profil;
+		profilSteps = segment.profilSteps;
+		profilStepsLength = segment.profilStepsLength;
+		profilStartTangent = segment.profilStartTangent;
+		profilEndTangent = segment.profilEndTangent;
+		profilStartTangentLeft = segment.profilStartTangentLeft;
+		profilEndTangentLeft = segment.profilEndTangentLeft;
+		profilStartTangentRight = segment.profilStartTangentRight;
+		profilEndTangentRight = segment.profilEndTangentRight;
+	}
+
 	/**
 	 * @return Returns the left.
 	 */

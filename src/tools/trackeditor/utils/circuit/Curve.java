@@ -56,6 +56,16 @@ public class Curve extends Segment
 		this.previousShape = prev;
 	}
 
+	@Override
+	public void set(Segment segment)
+	{
+		super.set(segment);
+		Curve curve = (Curve) segment;
+		arcDeg = curve.arcDeg;
+		radiusStart = curve.radiusStart;
+		radiusEnd = curve.radiusEnd;
+	}
+
 	public Segment copyTo(Segment _shape)
 	{
 		super.copyTo(_shape);

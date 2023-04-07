@@ -46,6 +46,13 @@ public class Straight extends Segment
 		this.previousShape = prev;
 	}
 
+	@Override
+	public void set(Segment segment)
+	{
+		super.set(segment);
+		Straight straight = (Straight) segment;
+	}
+
 	public void calcShape(EditorFrame editorFrame) throws Exception
 	{
 		double currentX = Editor.getProperties().getCurrentX();

@@ -32,22 +32,21 @@ import utils.circuit.Segment;
  */
 public class UndoSegmentChange implements UndoInterface
 {
-	private EditorFrame	editorFrame;
-	private Segment 	original;
-	private Segment 	clone;
-	private int 	pos;
-
+	private SegmentVector	data;
+	private Segment 		original;
+	private Segment 		clone;
+	private int 			pos;
 
 	/**
 	 * 
 	 */
 	public UndoSegmentChange(EditorFrame editorFrame, Segment segment)
 	{
-		this.editorFrame = editorFrame;
+		data = editorFrame.getTrackData().getSegments();
 		clone = (Segment) segment.clone();
-		this.original = segment;
+		original = segment;
+		pos = data.indexOf(original);
 
-		SegmentVector data = editorFrame.getTrackData().getSegments();
 		if (!data.validateLinks())
 		{
 			System.out.println("UndoSegmentChange");
@@ -60,17 +59,13 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void undo()
 	{
-		SegmentVector data = editorFrame.getTrackData().getSegments();
-		if (data != null)
-		{
-			pos = data.indexOf(original);
-			data.set(pos,clone);
+		original = (Segment) data.get(pos).clone();
+		data.set(pos,clone);
 
-			if (!data.validateLinks())
-			{
-				System.out.println("UndoSegmentChange.undo");
-				data.dumpLinks();
-			}
+		if (!data.validateLinks())
+		{
+			System.out.println("UndoSegmentChange.undo");
+			data.dumpLinks();
 		}
 	}
 
@@ -79,8 +74,6 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void redo()
 	{
-		SegmentVector data = editorFrame.getTrackData().getSegments();
-		pos = data.indexOf(clone);
 		data.set(pos,original);
 
 		if (!data.validateLinks())
