@@ -63,6 +63,7 @@ import utils.undo.UndoDeleteObject;
 import utils.undo.UndoDeleteSegment;
 import utils.undo.UndoEditAllObjects;
 import utils.undo.UndoEditObject;
+import utils.undo.UndoEditRelief;
 import utils.undo.UndoSegmentChange;
 import utils.undo.UndoSplitSegment;
 
@@ -660,17 +661,15 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			else if (obj != null && obj.getType() == "relief")
 			{
-/*
 				reliefDragging = true;
 				reliefShape = (ObjShapeRelief) obj;
-				//Undo.add(new UndoEditRelief(findObjectMap(objectShape), reliefShape));
+				Undo.add(new UndoEditRelief(editorFrame.getReliefs().getReliefs(), reliefShape));
 
 				Point2D.Double real = new Point2D.Double(0, 0);
 				screenToReal(e, real);
 				reliefPointIndex = reliefShape.getPointIndex(real);
 				Point2D.Double point = reliefShape.getPoint2D(real);
 				reliefOffset.setLocation(point.x - real.x, point.y - real.y);
-*/
 			}
 			else
 			{

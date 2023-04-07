@@ -84,7 +84,7 @@ public class Reliefs
 						continue;
 					}
 
-					ObjShapeRelief.Type type = data.equals("interior") ? ObjShapeRelief.Type.Interior : ObjShapeRelief.Type.Exterior;
+					ObjShapeRelief.ReliefType type = data.equals("interior") ? ObjShapeRelief.ReliefType.Interior : ObjShapeRelief.ReliefType.Exterior;
 
 					for (int j = 0; j < object.getSurfaces().size(); j++)
 					{

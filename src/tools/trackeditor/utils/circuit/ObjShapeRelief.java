@@ -12,28 +12,55 @@ public class ObjShapeRelief extends Segment
 	private static int			POINT_RADIUS	= 4;
 	private static int			POINT_DIAMETER	= POINT_RADIUS * 2;
 
-	public enum Type {	Interior, Exterior };
+	public enum ReliefType { Interior, Exterior };
 	public enum LineType { Polygon, Polyline };
 
-	private Type				type;
+	private ReliefType			reliefType;
 	private LineType			lineType;
 	private Vector<double[]>	vertices = new Vector<double[]>();
 
-	public ObjShapeRelief(Type type, LineType lineType, Vector<double[]> vertices)
+	public ObjShapeRelief(ReliefType reliefType, LineType lineType, Vector<double[]> vertices)
 	{
 		super("relief");
-		this.type = type;
+		this.reliefType = reliefType;
 		this.lineType = lineType;
 		this.vertices = vertices;
 	}
 
+	@Override
+	public void set(Segment segment)
+	{
+		super.set(segment);
+		ObjShapeRelief relief = (ObjShapeRelief) segment;
+		reliefType = relief.reliefType;
+		lineType = relief.lineType;
+		vertices = new Vector<double[]>();
+		for (int i = 0; i < relief.vertices.size(); i++)
+		{
+			vertices.add(new double[] { relief.vertices.get(i)[0], relief.vertices.get(i)[1], relief.vertices.get(i)[2] } );
+		}
+	}
+
+	public Object clone()
+	{
+		ObjShapeRelief relief = (ObjShapeRelief) super.clone();
+		relief.reliefType = this.reliefType;
+		relief.lineType = this.lineType;
+		relief.vertices = new Vector<double[]>();
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			relief.vertices.add(new double[] { vertices.get(i)[0], vertices.get(i)[1], vertices.get(i)[2] } );
+		}
+		return relief;
+	}
+
 	public boolean isInterior()
 	{
-		return type == Type.Interior;
+		return reliefType == ReliefType.Interior;
 	}
 	public boolean isExterior()
 	{
-		return type == Type.Exterior;
+		return reliefType == ReliefType.Exterior;
 	}
 	public boolean isPolygon()
 	{
@@ -191,7 +218,7 @@ public class ObjShapeRelief extends Segment
 		super.dump(indent);
 
 		System.out.println(indent + "  ObjShapeRelief");	
-		System.out.println(indent + "    type        : " + (isInterior() ? "Interior" : "Exterior"));
+		System.out.println(indent + "    reliefType  : " + (isInterior() ? "Interior" : "Exterior"));
 		System.out.println(indent + "    lineType    : " + (isPolyline() ? "Polyline" : "Polygon"));
 		System.out.println(indent + "    vertices    : " + vertices.size());
 		for (int i = 0; i < vertices.size(); i++)

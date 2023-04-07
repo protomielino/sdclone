@@ -124,6 +124,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/undo/UndoDeleteSegment.java
          utils/undo/UndoEditAllObjects.java
          utils/undo/UndoEditObject.java
+         utils/undo/UndoEditRelief.java
          utils/undo/UndoInterface.java
          utils/undo/UndoSegmentChange.java
          utils/undo/UndoSplitSegment.java)

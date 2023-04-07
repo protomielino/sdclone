@@ -2,7 +2,6 @@ package utils.undo;
 
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
-import utils.circuit.Segment;
 
 public class UndoEditObject  implements UndoInterface
 {
