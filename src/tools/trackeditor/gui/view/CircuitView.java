@@ -1989,7 +1989,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 
 		EditReliefAction editReliefAction = new EditReliefAction("Edit Relief", null, "Edit relief.");
-
+*/
 		class DeletePointAction extends AbstractAction
 		{
 			public DeletePointAction(String text, ImageIcon icon, String desc)
@@ -1999,15 +1999,25 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
-				JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Delete Relief Point", JOptionPane.INFORMATION_MESSAGE);
-				selectedShape = null;
-				invalidate();
-				repaint();
+				Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+				int index = reliefs.indexOf(shape);
+
+				if (index != -1)
+				{
+					Undo.add(new UndoEditRelief(reliefs, shape));
+					reliefs.get(index).deletePoint2D(mousePoint);
+					reliefs.get(index).calcShape(boundingRectangle);
+					selectedShape = null;
+					invalidate();
+					repaint();
+					editorFrame.documentIsModified = true;
+					return;
+				}
 			}
 		}
 
 		DeletePointAction deletePointAction = new DeletePointAction("Delete Relief Point", null, "Delete relief point.");
-*/
+
 		class DeleteReliefAction extends AbstractAction
 		{
 			public DeleteReliefAction(String text, ImageIcon icon, String desc)
@@ -2038,17 +2048,17 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		JPopupMenu menu = new JPopupMenu();
 //		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
 //		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
-//		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
+		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
 		JMenuItem itemDeleteRelief = new JMenuItem("Delete Relief");
 
 //	    itemEditPoint.setAction(editPointAction);
 //	    itemEditRelief.setAction(editReliefAction);
-//	    itemDeletePoint.setAction(deletePointAction);
+	    itemDeletePoint.setAction(deletePointAction);
 	    itemDeleteRelief.setAction(deleteReliefAction);
 
 //	    menu.add(itemEditPoint);
 //	    menu.add(itemEditRelief);
-//	    menu.add(itemDeletePoint);
+	    menu.add(itemDeletePoint);
 	    menu.add(itemDeleteRelief);
 
 	    menu.addPopupMenuListener(new PopupMenuListener()

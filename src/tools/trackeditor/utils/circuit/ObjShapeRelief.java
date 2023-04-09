@@ -44,8 +44,8 @@ public class ObjShapeRelief extends Segment
 	public Object clone()
 	{
 		ObjShapeRelief relief = (ObjShapeRelief) super.clone();
-		relief.reliefType = this.reliefType;
-		relief.lineType = this.lineType;
+		relief.reliefType = reliefType;
+		relief.lineType = lineType;
 		relief.vertices = new Vector<double[]>();
 		for (int i = 0; i < vertices.size(); i++)
 		{
@@ -180,6 +180,25 @@ public class ObjShapeRelief extends Segment
 		}
 
 		return null;
+	}
+
+	public boolean deletePoint2D(Point2D.Double point)
+	{
+		if (points == null)
+			return false;
+
+		for (int i = 0; i < points.length; i++)
+		{
+			if (points[i].distance(point) <= POINT_RADIUS)
+			{
+				points = null;
+				trPoints = null;
+				vertices.remove(i);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void setPoint2D(int index, Point2D.Double point, Rectangle2D.Double boundingRectangle)

@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.Vector;
 
 import gui.EditorFrame;
@@ -136,6 +137,12 @@ public class Segment implements Cloneable
 		profilEndTangentLeft = segment.profilEndTangentLeft;
 		profilStartTangentRight = segment.profilStartTangentRight;
 		profilEndTangentRight = segment.profilEndTangentRight;
+		points = Arrays.copyOf(segment.points, segment.points.length);
+		trPoints = Arrays.copyOf(segment.trPoints, segment.trPoints.length);
+		xToDraw = Arrays.copyOf(segment.xToDraw, segment.xToDraw.length);
+		yToDraw = Arrays.copyOf(segment.yToDraw, segment.yToDraw.length);
+		dx = segment.dx;
+		dy = segment.dy;
 	}
 
 	/**
@@ -727,7 +734,12 @@ public class Segment implements Cloneable
 			s.profilEndTangentLeft = this.profilEndTangentLeft;
 			s.profilStartTangentRight = this.profilStartTangentRight;
 			s.profilEndTangentRight = this.profilEndTangentRight;
-
+			s.points = Arrays.copyOf(points, points.length);
+			s.trPoints = Arrays.copyOf(trPoints, trPoints.length);
+			s.xToDraw = xToDraw.clone();
+			s.yToDraw = yToDraw.clone();
+			s.dx = dx;
+			s.dy = dy;
 		} catch (CloneNotSupportedException e)
 		{
 			// TODO Auto-generated catch block
@@ -1621,5 +1633,55 @@ public class Segment implements Cloneable
 		System.out.println(indent + "  name          : " + name);
 		System.out.println(indent + "  type          : " + type);
 		System.out.println(indent + "  count         : " + count);
+		if (points != null)
+		{
+			System.out.println(indent + "  points        : " + points.length);
+			for (int i = 0; i < points.length; i++)
+			{
+				System.out.println(indent + "    points[" + i + "] " + points[i].x + ", " + points[i].y);
+			}
+		}
+		else
+		{
+			System.out.println(indent + "  points        : null");
+		}
+		if (trPoints != null)
+		{
+			System.out.println(indent + "  trPoints      : " + trPoints.length);
+			for (int i = 0; i < trPoints.length; i++)
+			{
+				System.out.println(indent + "    trPoints[" + i + "] " + trPoints[i].x + ", " + trPoints[i].y);
+			}
+		}
+		else
+		{
+			System.out.println(indent + "  trPoints      : null");
+		}
+		if (xToDraw != null)
+		{
+			System.out.println(indent + "  xToDraw      : " + xToDraw.length);
+			for (int i = 0; i < xToDraw.length; i++)
+			{
+				System.out.println(indent + "    xToDraw[" + i + "] " + xToDraw[i]);
+			}
+		}
+		else
+		{
+			System.out.println(indent + "  xToDraw      : null");
+		}
+		if (yToDraw != null)
+		{
+			System.out.println(indent + "  yToDraw      : " + yToDraw.length);
+			for (int i = 0; i < yToDraw.length; i++)
+			{
+				System.out.println(indent + "    yToDraw[" + i + "] " + yToDraw[i]);
+			}
+		}
+		else
+		{
+			System.out.println(indent + "  yToDraw      : null");
+		}
+		System.out.println(indent + "  dx           : " + dx);
+		System.out.println(indent + "  dy           : " + dy);
 	}
 }
