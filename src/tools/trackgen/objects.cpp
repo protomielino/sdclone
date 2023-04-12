@@ -39,10 +39,10 @@
 #include <track.h>
 #include <portability.h>
 
+#include "ac3d.h"
 #include "trackgen.h"
 #include "util.h"
 #include "elevation.h"
-#include "ac3d.h"
 #include "objects.h"
 
 struct group
@@ -361,104 +361,100 @@ struct saveTriangle
 };
 
 static bool
-ssgSaveLeaf (ssgLeaf* vt, FILE *save_fd)
+ssgSaveLeaf(ssgLeaf *vt, Ac3d &ac3d)
 {
     int i;
-    static sgVec3       *vlist;
+    static sgVec3 *vlist;
     static saveTriangle *tlist;
 
     int num_verts = vt->getNumVertices();
-    int num_tris  = vt->getNumTriangles();
+    int num_tris = vt->getNumTriangles();
 
     vlist = new sgVec3[num_verts];
     tlist = new saveTriangle[num_tris];
 
     for (i = 0; i < num_verts; i++)
     {
-        sgCopyVec3 (vlist[i], vt->getVertex (i));
+        sgCopyVec3(vlist[i], vt->getVertex(i));
     }
 
     for (i = 0; i < num_tris; i++)
     {
         short vv0, vv1, vv2;
 
-        vt->getTriangle (i, &vv0, &vv1, &vv2);
+        vt->getTriangle(i, &vv0, &vv1, &vv2);
 
         tlist[i].v[0] = vv0;
         tlist[i].v[1] = vv1;
         tlist[i].v[2] = vv2;
 
-        sgCopyVec2 (tlist[i].t[0], vt->getTexCoord (vv0));
-        sgCopyVec2 (tlist[i].t[1], vt->getTexCoord (vv1));
-        sgCopyVec2 (tlist[i].t[2], vt->getTexCoord (vv2));
+        sgCopyVec2(tlist[i].t[0], vt->getTexCoord(vv0));
+        sgCopyVec2(tlist[i].t[1], vt->getTexCoord(vv1));
+        sgCopyVec2(tlist[i].t[2], vt->getTexCoord(vv2));
     }
 
-    fprintf (save_fd, "OBJECT poly\n");
     char buf[32];
     sprintf(buf, "obj%d", ObjUniqId++);
-    fprintf (save_fd, "name \"%s\"\n", buf);
 
-    ssgState* st = vt->getState ();
+    Ac3d::Object object;
+    object.type = "poly";
+    object.name = buf;
+    ssgState *st = vt->getState();
 
-    if (st && st->isAKindOf (ssgTypeSimpleState()))
+    if (st && st->isAKindOf(ssgTypeSimpleState()))
     {
-        ssgSimpleState* ss = (ssgSimpleState*) vt->getState ();
+        ssgSimpleState *ss = (ssgSimpleState *)vt->getState();
 
-        if (ss->isEnabled (GL_TEXTURE_2D))
+        if (ss->isEnabled(GL_TEXTURE_2D))
         {
-            const char* tfname = ss->getTextureFilename ();
+            const char *tfname = ss->getTextureFilename();
 
             if ((tfname != nullptr) && (tfname[0] != 0))
             {
                 if (writeTextureWithoutPath)
                 {
-                    char *s = strrchr ((char *)tfname, '\\');
+                    char *s = strrchr((char *)tfname, '\\');
 
                     if (s == nullptr)
                     {
-                        s = strrchr ((char *)tfname, '/');
+                        s = strrchr((char *)tfname, '/');
                     }
 
                     if (s == nullptr)
                     {
-                        fprintf (save_fd, "texture \"%s\"\n", tfname);
+                        object.texture = tfname;
                     }
                     else
                     {
-                        fprintf (save_fd, "texture \"%s\"\n", ++s);
+                        object.texture = ++s;
                     }
                 }
                 else
                 {
-                    fprintf (save_fd, "texture \"%s\"\n", tfname);
+                    object.texture = tfname;
                 }
             }
         }
     }
 
-    fprintf (save_fd, "numvert %d\n", num_verts);
-
     for (i = 0; i < num_verts; i++)
     {
-        fprintf (save_fd, "%g %g %g\n", vlist[i][0],vlist[i][2],-vlist[i][1]);
+        object.vertices.emplace_back(vlist[i][0], vlist[i][2], -vlist[i][1]);
     }
-
-    fprintf (save_fd, "numsurf %d\n", num_tris);
 
     for (i = 0; i < num_tris; i++)
     {
-        fprintf (save_fd, "SURF 0x30\n");
-        fprintf (save_fd, "mat 0\n");
-        fprintf (save_fd, "refs 3\n");
-        fprintf (save_fd, "%d %g %g\n",
-                 tlist[i].v[0],tlist[i].t[0][0],tlist[i].t[0][1]);
-        fprintf (save_fd, "%d %g %g\n",
-                 tlist[i].v[1],tlist[i].t[1][0],tlist[i].t[1][1]);
-        fprintf (save_fd, "%d %g %g\n",
-                 tlist[i].v[2],tlist[i].t[2][0],tlist[i].t[2][1]);
+        Ac3d::Surface   surface;
+        surface.surf = 0x30;
+        surface.mat = 0;
+        surface.refs.emplace_back(tlist[i].v[0], tlist[i].t[0][0], tlist[i].t[0][1]);
+        surface.refs.emplace_back(tlist[i].v[1], tlist[i].t[1][0], tlist[i].t[1][1]);
+        surface.refs.emplace_back(tlist[i].v[2], tlist[i].t[2][0], tlist[i].t[2][1]);
+
+        object.surfaces.push_back(surface);
     }
 
-    fprintf (save_fd, "kids 0\n");
+    ac3d.addObject(object);
 
     delete[] vlist;
     delete[] tlist;
@@ -467,32 +463,42 @@ ssgSaveLeaf (ssgLeaf* vt, FILE *save_fd)
 }
 
 static bool
-ssgSaveACInner (ssgEntity *ent, FILE *save_fd)
+ssgSaveACInner(ssgEntity *ent, Ac3d &ac3d)
 {
     /* WARNING - RECURSIVE! */
 
-    if (ent->isAKindOf (ssgTypeBranch()))
+    if (ent->isAKindOf(ssgTypeBranch()))
     {
-        ssgBranch *br = (ssgBranch *) ent;
+        ssgBranch *br = (ssgBranch *)ent;
         char buf[32];
         sprintf(buf, "objg%d", ObjUniqId++);
-        Ac3dGroup (save_fd, buf, ent->getNumKids());
 
-        for (int i = 0; i < br->getNumKids (); i++)
+        Ac3d::Object object;
+        object.type = "group";
+        object.name = buf;
+        ac3d.addObject(object);
+
+        for (int i = 0; i < br->getNumKids(); i++)
         {
-            if (! ssgSaveACInner(br->getKid (i), save_fd))
+            if (!ssgSaveACInner(br->getKid(i), ac3d))
             {
                 return false;
             }
         }
 
+        ac3d.stack.pop();
+
         return true;
     }
     else if (ent->isAKindOf(ssgTypeLeaf()))
     {
-        ssgLeaf* vt = (ssgLeaf *)ent;
+        ssgLeaf *vt = (ssgLeaf *)ent;
 
-        return ssgSaveLeaf(vt, save_fd);
+        bool status = ssgSaveLeaf(vt, ac3d);
+
+        ac3d.stack.pop();
+
+        return status;
     }
 
     return false;
@@ -570,7 +576,7 @@ Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot, std::
 
 
 void
-GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd, const std::string &meshFile, const std::string &outputFile)
+GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile)
 {
     ssgLoaderOptionsEx	options;
     int			width, height;
@@ -656,13 +662,14 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-        FILE *curFd = Ac3dOpen(objectFile, 1);
-        ssgSaveACInner(GroupRoot, curFd);
-        Ac3dClose(curFd);
+        Ac3d    ac3d;
+        ac3d.addDefaultMaterial();
+        ssgSaveACInner(GroupRoot, ac3d);
+        ac3d.writeFile(objectFile);
 
-        if (save_fd)
+        if (all)
         {
-            ssgSaveACInner(GroupRoot, save_fd);
+            ssgSaveACInner(GroupRoot, allAc3d);
         }
 
         delete Root;

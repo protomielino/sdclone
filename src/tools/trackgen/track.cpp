@@ -3057,58 +3057,62 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     return 0;
 } // InitScene
 
-static void saveObject(FILE *curFd, int nb, int start, char *texture, char *name, int surfType)
+static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name, int surfType)
 {
-    int i, index;
+    Ac3d::Object object;
+    object.type = "poly";
+    object.name = name;
+    object.texture = texture;
 
-    fprintf(curFd, "OBJECT poly\n");
-    fprintf(curFd, "name \"%s\"\n", name);
-    fprintf(curFd, "texture \"%s\"\n", texture);
-    fprintf(curFd, "numvert %d\n", nb);
-
-    for (i = 0; i < nb; i++)
+    for (int i = 0; i < nb; i++)
     {
-        index = 3 * (start + i);
-        fprintf(curFd, "%f %f %f\n", trackvertices[index], trackvertices[index + 2], -trackvertices[index + 1]);
+        int index = 3 * (start + i);
+        object.vertices.emplace_back(trackvertices[index], trackvertices[index + 2], -trackvertices[index + 1]);
     }
 
-    fprintf(curFd, "numsurf %d\n", nb - 2);
-    fprintf(curFd, "SURF 0x%02x\n", surfType);
-    fprintf(curFd, "mat 0\n");
-    fprintf(curFd, "refs 3\n");
-    fprintf(curFd, "%d %f %f\n", 0, tracktexcoord[2 * start], tracktexcoord[2 * start + 1]);
-    fprintf(curFd, "%d %f %f\n", 1, tracktexcoord[2 * (start + 1)], tracktexcoord[2 * (start + 1) + 1]);
-    fprintf(curFd, "%d %f %f\n", 2, tracktexcoord[2 * (start + 2)], tracktexcoord[2 * (start + 2) + 1]);
+    Ac3d::Surface   surface;
+    surface.surf = surfType;
+    surface.mat = 0;
+    surface.refs.emplace_back(0, tracktexcoord[2 * start], tracktexcoord[2 * start + 1]);
+    surface.refs.emplace_back(1, tracktexcoord[2 * (start + 1)], tracktexcoord[2 * (start + 1) + 1]);
+    surface.refs.emplace_back(2, tracktexcoord[2 * (start + 2)], tracktexcoord[2 * (start + 2) + 1]);
+
+    object.surfaces.push_back(surface);
 
     /* triangle strip conversion to triangles */
-    for (i = 2; i < nb - 1; i++)
+    for (int i = 2; i < nb - 1; i++)
     {
-        fprintf(curFd, "SURF 0x%02x\n", surfType);
-        fprintf(curFd, "mat 0\n");
-        fprintf(curFd, "refs 3\n");
+        surface.surf = surfType;
+        surface.mat = 0;
+        surface.refs.clear();
+
         if ((i % 2) == 0)
         {
-            index = i;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            int index = i;
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
             index = i - 1;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
             index = i + 1;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
         }
         else
         {
-            index = i - 1;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            int index = i - 1;
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
             index = i;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
             index = i + 1;
-            fprintf(curFd, "%d %f %f\n", index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
         }
+
+        object.surfaces.push_back(surface);
     }
-    fprintf(curFd, "kids 0\n");
+
+    ac3d.addObject(object);
+    ac3d.stack.pop();
 }
 
-static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
+static void SaveMainTrack(Ac3d &ac3d, bool bump, bool raceline)
 {
     tDispElt *aDispElt;
     char buf[256];
@@ -3120,7 +3124,12 @@ static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
         {
             aDispElt = Groups[i].dispList;
             sprintf(buf, "TKMN%d", i);
-            Ac3dGroup(curFd, buf, Groups[i].nb);
+
+            Ac3d::Object object;
+            object.type = "group";
+            object.name = buf;
+            ac3d.addObject(object);
+
             do
             {
                 aDispElt = aDispElt->next;
@@ -3128,7 +3137,7 @@ static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
                 {
                     sprintf(buf, "%s%d", aDispElt->name, aDispElt->id);
 
-                     // skip bad display lists
+                    // skip bad display lists
                     if (aDispElt->nb > 0 && aDispElt->nb < 3)
                     {
                         GfLogWarning("Bug: Display list %s has %d vertices!\n", buf, aDispElt->nb);
@@ -3137,18 +3146,20 @@ static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
 
                     if (bump)
                     {
-                        saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
+                        saveObject(ac3d, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
                     }
                     else if (raceline)
                     {
-                        saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->nameraceline, buf, aDispElt->surfType);
+                        saveObject(ac3d, aDispElt->nb, aDispElt->start, aDispElt->texture->nameraceline, buf, aDispElt->surfType);
                     }
                     else
                     {
-                        saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->name, buf, aDispElt->surfType);
+                        saveObject(ac3d, aDispElt->nb, aDispElt->start, aDispElt->texture->name, buf, aDispElt->surfType);
                     }
                 }
             } while (aDispElt != Groups[i].dispList);
+
+            ac3d.stack.pop();
         }
     }
 }
@@ -3176,7 +3187,7 @@ void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline, 
     @param	AllFd	fd of the merged file
     @return	none
 */
-void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline, bool bridge)
+void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, Ac3d &allAc3d, bool all, bool bump, bool raceline, bool bridge)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
@@ -3185,15 +3196,23 @@ void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile,
 
     if (!outFile.empty())
     {
-        FILE *curFd = Ac3dOpen(outFile, 1);
-        Ac3dGroup(curFd, "track", ActiveGroups);
-        SaveMainTrack(curFd, bump, raceline);
-        Ac3dClose(curFd);
+        Ac3d    ac3d;
+        ac3d.addDefaultMaterial();
+        Ac3d::Object object;
+        object.type = "group";
+        object.name = "track";
+        ac3d.addObject(object);
+        SaveMainTrack(ac3d, bump, raceline);
+        ac3d.writeFile(outFile);
     }
 
-    if (AllFd)
+    if (all)
     {
-        Ac3dGroup(AllFd, "track", ActiveGroups);
-        SaveMainTrack(AllFd, bump, raceline);
+        Ac3d::Object object;
+        object.type = "group";
+        object.name = "track";
+        allAc3d.addObject(object);
+        SaveMainTrack(allAc3d, bump, raceline);
+        allAc3d.stack.pop();
     }
 }

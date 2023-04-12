@@ -39,10 +39,6 @@
 #include <getopt.h>
 #endif
 
-#include <plib/ul.h>
-#include <plib/ssg.h>
-#include <SDL.h>
-
 #ifdef WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
@@ -322,14 +318,17 @@ int Application::generate()
     std::string OutputFileName(buf2);
 
     // Number of groups for the complete track.
-    FILE *outfd = NULL;
+    Ac3d allAc3d;
+    allAc3d.addDefaultMaterial();
+    bool all = false;
+
     if (TrackOnly) {
         // Track.
         if (!Bump && !Raceline)
-            outfd = Ac3dOpen(OutputFileName + ".ac", 1);
+            all = true;
     } else if (MergeAll) {
         // track + terrain + objects.
-        outfd = Ac3dOpen(OutputFileName + ".ac", 2 + GetObjectsNb(TrackHandle));
+        all = true;
     }
 
     // Main Track.
@@ -345,7 +344,7 @@ int Application::generate()
     sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
     std::string OutTrackName(buf2);
 
-    GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline, Bridge);
+    GenerateTrack(Track, TrackHandle, OutTrackName, allAc3d, all, Bump, Raceline, Bridge);
 
     if (TrackOnly) {
         GfParmReleaseHandle(CfgHandle);
@@ -356,16 +355,17 @@ int Application::generate()
     // Terrain.
     if (MergeTerrain && !MergeAll) {
         /* terrain + objects  */
-        outfd = Ac3dOpen(OutputFileName + ".ac", 1 + GetObjectsNb(TrackHandle));
+        all = true;
     }
 
     std::string OutMeshName(OutputFileName + "-msh.ac");
 
-    GenerateTerrain(Track, TrackHandle, OutMeshName, outfd, DoSaveElevation, UseBorder);
+    GenerateTerrain(Track, TrackHandle, OutMeshName, allAc3d, all, DoSaveElevation, UseBorder);
 
     if (DoSaveElevation != -1) {
-        if (outfd) {
-            Ac3dClose(outfd);
+        if (all) {
+            //Ac3dClose(outfd);
+            allAc3d.writeFile(OutputFileName + ".ac");
         }
         switch (DoSaveElevation) {
             case 0:
@@ -398,9 +398,9 @@ int Application::generate()
         return EXIT_SUCCESS;
     }
 
-    GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName, OutputFileName);
+    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutputFileName);
 
-    Ac3dClose(outfd);
+    allAc3d.writeFile(OutputFileName + ".ac");
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);
 

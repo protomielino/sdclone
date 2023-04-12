@@ -26,7 +26,7 @@
 #ifndef _EASYMESH_H_
 #define _EASYMESH_H_
 
-void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation, bool useBorder);
+void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, Ac3d &allAc3d, bool all, int noElevation, bool useBorder);
 int getPointCount();
 void addPoint(double x, double y, double z, double F, int mark);
 void addSegment(int n0, int n1, int mark);

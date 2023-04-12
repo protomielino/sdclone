@@ -39,6 +39,7 @@
 #include <track.h>
 #include <robottools.h>
 #include <portability.h>
+#include "ac3d.h"
 #include "trackgen.h"
 #include "util.h"
 
@@ -338,7 +339,7 @@ getTerrainAngle(ssgBranch *root, float x, float y)
 
     invmat[3][0] = -x;
     invmat[3][1] = -y;
-    invmat[3][2] =  0.0f         ;
+    invmat[3][2] =  0.0f;
 
     test_vec [0] = 0.0f;
     test_vec [1] = 0.0f;

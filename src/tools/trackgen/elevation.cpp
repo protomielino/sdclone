@@ -38,6 +38,7 @@
 #include <track.h>
 #include <portability.h>
 
+#include "ac3d.h"
 #include "trackgen.h"
 #include "util.h"
 #include "elevation.h"

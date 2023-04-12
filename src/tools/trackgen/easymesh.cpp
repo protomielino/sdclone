@@ -2013,43 +2013,49 @@ static void groups(void)
 }
 /*-groups--------------------------------------------------------------------*/
 
-static void draw_ac(FILE *ac_file, const char *name)
+static void draw_ac(Ac3d &ac3d, const char *name)
 {
-    int i, j, k;
-    struct group *curGrp;
+    Ac3d::Object objectGroup("group", name);
 
-    Ac3dGroup(ac_file, name, ActiveGroups);
+    ac3d.addObject(objectGroup);
 
-    for (i = 0; i < GroupNb; i++)
+    for (int i = 0; i < GroupNb; i++)
     {
-        curGrp = &(Groups[i]);
+        struct group *curGrp = &(Groups[i]);
         if (curGrp->nbsurf == 0)
         {
             continue;
         }
 
-        fprintf(ac_file, "OBJECT poly\n");
-        fprintf(ac_file, "name \"%s%d\"\n", name, i);
-        fprintf(ac_file, "texture \"%s\"\n", TexName);
-        fprintf(ac_file, "numvert %d\n", curGrp->nbvtx);
-        for (j = 0; j < curGrp->nbvtx; j++)
+        Ac3d::Object object;
+        object.type = "poly";
+        object.name = std::string(name) + std::to_string(i);
+        object.texture = TexName;
+
+        for (int j = 0; j < curGrp->nbvtx; j++)
         {
-            fprintf(ac_file, "%g %g %g\n", curGrp->vertices[j].x, curGrp->vertices[j].z, -curGrp->vertices[j].y);
+            object.vertices.emplace_back(curGrp->vertices[j].x, curGrp->vertices[j].z, -curGrp->vertices[j].y);
         }
-        fprintf(ac_file, "numsurf %d\n", curGrp->nbsurf);
-        for (j = 0; j < curGrp->nbsurf; j++)
+
+        for (int j = 0; j < curGrp->nbsurf; j++)
         {
-            fprintf(ac_file, "SURF 0x10\n");
-            fprintf(ac_file, "mat 0\n");
-            fprintf(ac_file, "refs 3\n");
-            for (k = 0; k < 3; k++)
+            Ac3d::Surface   surface;
+            surface.surf = 0x10;
+            surface.mat = 0;
+
+            for (int k = 0; k < 3; k++)
             {
-                fprintf(ac_file, "%d %f %f\n", curGrp->surfaces[j].ref[k].vtxidx, curGrp->surfaces[j].ref[k].u,
-                        curGrp->surfaces[j].ref[k].v);
+                surface.refs.emplace_back(curGrp->surfaces[j].ref[k].vtxidx,
+                                          curGrp->surfaces[j].ref[k].u,
+                                          curGrp->surfaces[j].ref[k].v);
             }
+            object.surfaces.push_back(surface);
         }
-        fprintf(ac_file, "kids 0\n");
+
+        ac3d.addObject(object);
+        ac3d.stack.pop();
     }
+    ac3d.stack.pop();
 }
 /*-draw_ac--------------------------------------------------------------------*/
 
@@ -2478,11 +2484,10 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
     generate_mesh();
 }
 
-void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation,
+void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, Ac3d &allAc3d, bool all, int noElevation,
                      bool useBorder)
 {
     const char *mat;
-    FILE *curFd = NULL;
 
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, 10.0);
     GfOut("Track step: %.2f\n", TrackStep);
@@ -2534,41 +2539,48 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
         }
     }
 
+    // FILE *curFd = NULL;
+    bool hasCur = false;
+    Ac3d curAc3d;
+    curAc3d.addDefaultMaterial();
+
     if (!outfile.empty())
     {
         // Attempt to fix AC3D (the application) segfault on opening the msh file.
         // curFd = Ac3dOpen(outfile, 2);
-        curFd = Ac3dOpen(outfile, 1);
+        //curFd = Ac3dOpen(outfile, 1);
+        hasCur = true;
     }
 
     if (GetTrackOrientation(track) == CLOCKWISE)
     {
         GenerateMesh(track, true /* right */, true /* reverse */, false /* interior */, useBorder);
         GenerateMesh(track, false /* left */, false /* normal */, true /* exterior */, useBorder);
-        if (curFd)
+        if (hasCur)
         {
-            draw_ac(curFd, "TERR");
+            draw_ac(curAc3d, "TERR");
         }
-        if (AllFd)
+        if (all)
         {
-            draw_ac(AllFd, "TERR");
+            draw_ac(allAc3d, "TERR");
         }
     }
     else
     {
         GenerateMesh(track, false /* left */, false /* normal */, false /* interior */, useBorder);
         GenerateMesh(track, true /* right */, true /* reverse */, true /* exterior */, useBorder);
-        if (curFd)
+        if (hasCur)
         {
-            draw_ac(curFd, "TERR");
+            draw_ac(curAc3d, "TERR");
         }
-        if (AllFd)
+        if (all)
         {
-            draw_ac(AllFd, "TERR");
+            draw_ac(allAc3d, "TERR");
         }
     }
-    if (curFd)
+    if (hasCur)
     {
-        Ac3dClose(curFd);
+        //Ac3dClose(curFd);
+        curAc3d.writeFile(outfile);
     }
 }

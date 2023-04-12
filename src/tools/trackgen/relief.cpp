@@ -40,6 +40,7 @@
 #include <tgfclient.h>
 #include <track.h>
 
+#include "ac3d.h"
 #include "easymesh.h"
 #include "trackgen.h"
 #include "relief.h"
