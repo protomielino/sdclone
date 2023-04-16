@@ -31,7 +31,9 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	}
 	road_ride_sound=NULL;
 	grass_ride_sound=NULL;
-	grass_skid_sound=NULL;
+	curb_ride_sound =NULL;
+	dirt_ride_sound = NULL;
+	dirt_skid_sound = NULL;
 	metal_skid_sound=NULL;
 	axle_sound=NULL;
 	turbo_sound=NULL;
@@ -54,10 +56,18 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	grass.snd=NULL;
 	grass.max_vol=0.0f;
 	grass.id=0;
-	grass_skid.schar=NULL;
-	grass_skid.snd=NULL;
-	grass_skid.max_vol=0.0f;
-	grass_skid.id=0;
+	curb.schar=NULL;
+	curb.snd=NULL;
+	curb.max_vol=0.0f;
+	curb.id=0;
+	dirt.schar = NULL;
+	dirt.snd = NULL;
+	dirt.max_vol = 0.0f;
+	dirt.id = 0;
+	dirt_skid.schar = NULL;
+	dirt_skid.snd = NULL;
+	dirt_skid.max_vol = 0.0f;
+	dirt_skid.id = 0;
 	metal_skid.schar=NULL;
 	metal_skid.snd=NULL;
 	metal_skid.max_vol=0.0f;
@@ -153,10 +163,20 @@ void SoundInterface::setGrassRideSound (const char* sound_name)
 	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
 	grass_ride_sound = sound;
 }
-void SoundInterface::setGrassSkidSound (const char* sound_name)
+void SoundInterface::setCurbRideSound(const char* sound_name)
 {
 	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
-	grass_skid_sound = sound;
+	curb_ride_sound = sound;
+}
+void SoundInterface::setDirtRideSound(const char* sound_name)
+{
+	Sound* sound = addSample(sound_name, ACTIVE_VOLUME | ACTIVE_PITCH, true);
+	dirt_ride_sound = sound;
+}
+void SoundInterface::setDirtSkidSound(const char* sound_name)
+{
+	Sound* sound = addSample(sound_name, ACTIVE_VOLUME | ACTIVE_PITCH, true);
+	dirt_skid_sound = sound;
 }
 void SoundInterface::setMetalSkidSound (const char* sound_name)
 {

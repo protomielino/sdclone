@@ -140,8 +140,10 @@ void grInitSound(tSituation* s, int ncars)
 	
 	sound_interface->setSkidSound("data/sound/skid_tyres.wav");
 	sound_interface->setRoadRideSound("data/sound/road-ride.wav");
-	sound_interface->setGrassRideSound("data/sound/out_of_road.wav");
-	sound_interface->setGrassSkidSound("data/sound/out_of_road-3.wav");
+	sound_interface->setGrassRideSound("data/sound/grass_ride.wav");
+	sound_interface->setCurbRideSound("data/sound/curb_ride.wav");
+	sound_interface->setDirtRideSound("data/sound/dirt_ride.wav");
+	sound_interface->setDirtSkidSound("data/sound/dirt_skid.wav");
 	sound_interface->setMetalSkidSound("data/sound/skid_metal.wav");
 	sound_interface->setAxleSound("data/sound/axle.wav");
 	sound_interface->setTurboSound("data/sound/turbo1.wav");

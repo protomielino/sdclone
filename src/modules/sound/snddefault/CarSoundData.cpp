@@ -38,10 +38,14 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     turbo.f = 0.0f;
     engine_backfire.a=0.0f;
     engine_backfire.f = 0.0f;
-    grass_skid.a = 0.0f;
-    grass_skid.f = 0.0f;
+    curb.a = 0.0f;
+    curb.f = 0.0f;
     grass.a = 0.0f;
     grass.f = 0.0f;
+    dirt_skid.a = 0.0f;
+    dirt_skid.f = 0.0f;
+    dirt.a = 0.0f;
+    dirt.f = 0.0f;
     road.a = 0.0f;
     road.f = 0.0f;
     skid_metal.a = 0.0f;
@@ -235,10 +239,14 @@ void CarSoundData::calculateBackfireSound (tCarElt* car)
 
 void CarSoundData::calculateTyreSound(tCarElt* car)
 {
-    grass_skid.a = 0.0;
-    grass_skid.f = 1.0f;
+    curb.a = 0.0;
+    curb.f = 1.0f;
     grass.a = 0.0;
     grass.f = 1.0f;
+    dirt_skid.a = 0.0;
+    dirt_skid.f = 1.0f;
+    dirt.a = 0.0;
+    dirt.f = 1.0f;
     road.a = 0.0;
     road.f = 0.0f;
     float car_speed2 = car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y;
@@ -311,6 +319,13 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
             out_of_road = true;
         }
 
+        bool on_curb = false;
+        if ( (s) && strstr(s, "curb") )
+        {
+           on_curb = true;
+           //printf("On curb wheel %d\n", i);
+        }
+
         wheel[i].skid.a = 0.0f;
         wheel[i].skid.f = 1.0f;
 
@@ -319,9 +334,17 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
             float wind_noise = 1.0f;
             float road_noise = 0.25f;
             tmpvol = tmpvol*(wind_noise + ride*road_noise);
-            if (road.a < tmpvol) {
-                road.a = tmpvol;
-                road.f = tmppitch;
+            if (on_curb) {
+               if (curb.a < tmpvol) {
+                  curb.a = tmpvol;
+                  curb.f = tmppitch;
+                  //printf("wheel %d curb vol %f \n", i, curb.a);
+               }
+            } else {
+               if (road.a < tmpvol) {
+                  road.a = tmpvol;
+                  road.f = tmppitch;
+               }
             }
 
             if (car->_skid[i] > 0.05f) {
@@ -340,13 +363,31 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
 
             tmpvol = (0.5f+0.2f*tanh(0.5f*roughness))*tmpvol * ride;
 
-            if (grass.a < tmpvol) {
-                grass.a = tmpvol;
-                grass.f = tmppitch;
-            }
-            if (grass_skid.a < car->_skid[i]) {
-                grass_skid.a = (float) car->_skid[i];
-                grass_skid.f = 1.0f;
+            if ((s)
+                &&
+                ((strstr(s, "sand"))
+                    || (strstr(s, "dirt"))
+                    || (strstr(s, "gravel")))) {
+                if (dirt.a < tmpvol) {
+                    dirt.a = tmpvol;
+                    dirt.f = tmppitch;
+                }
+                if (dirt_skid.a < car->_skid[i]) {
+                    dirt_skid.a = (float)car->_skid[i];
+                    dirt_skid.f = 1.0f;
+                }
+                //printf("wheel %d roughness %f dirt vol %f dirt_skid vol %f\n", i, roughness, dirt.a, dirt_skid.a);
+            } else {
+                if (grass.a < tmpvol) {
+                    grass.a = tmpvol;
+                    grass.f = tmppitch;
+                }/*
+                if (grass_skid.a < car->_skid[i]) {
+                    grass_skid.a = (float)car->_skid[i];
+                    grass_skid.f = 1.0f;
+                }
+                */
+                //printf("wheel %d roughness %f grass vol %f \n", i, roughness, grass.a);
             }
         }
 

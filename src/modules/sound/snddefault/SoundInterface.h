@@ -69,8 +69,10 @@ class SoundInterface {
 	int curCrashSnd; ///< holds current crash sound used - the sound cycles
 	Sound* skid_sound[4]; ///< set of skid sounds, one per tyre
 	Sound* road_ride_sound; ///< rolling on normal road
-	Sound* grass_ride_sound; ///< rolling on dirt/grass
-	Sound* grass_skid_sound; ///< skidding on dirt/grass
+	Sound* grass_ride_sound; ///< rolling on grass
+	Sound* curb_ride_sound; ///< riding on curb
+	Sound* dirt_ride_sound; ///< rolling on dirt/gravel
+	Sound* dirt_skid_sound; ///< skidding on dirt/gravel
 	Sound* metal_skid_sound; ///< metal skidding on metal 
 	Sound* axle_sound; ///< axle/gear spinning sound
 	Sound* turbo_sound; ///< turbo spinning sound
@@ -87,7 +89,9 @@ class SoundInterface {
 	/// The following are mappings for sound prioritisation
 	QueueSoundMap road; 
 	QueueSoundMap grass; 
-	QueueSoundMap grass_skid;
+	QueueSoundMap curb;
+	QueueSoundMap dirt;
+	QueueSoundMap dirt_skid;
 	QueueSoundMap metal_skid;
 	QueueSoundMap backfire_loop;
 	QueueSoundMap turbo;
@@ -126,7 +130,10 @@ class SoundInterface {
 	void setSkidSound (const char* sound_name);
 	void setRoadRideSound (const char* sound_name);
 	void setGrassRideSound (const char* sound_name);
-	void setGrassSkidSound (const char* sound_name);
+	//void setGrassSkidSound (const char* sound_name);
+	void setCurbRideSound(const char* sound_name);
+	void setDirtRideSound(const char* sound_name);
+	void setDirtSkidSound(const char* sound_name);
 	void setMetalSkidSound (const char* sound_name);
 	void setAxleSound (const char* sound_name);
 	void setTurboSound (const char* sound_name);

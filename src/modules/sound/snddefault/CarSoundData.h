@@ -59,8 +59,10 @@ public:
 	QSoundChar turbo;
 	QSoundChar axle;
 	QSoundChar engine_backfire;
-	QSoundChar grass_skid;
+	QSoundChar curb;
 	QSoundChar grass;
+	QSoundChar dirt_skid;
+	QSoundChar dirt;
 	QSoundChar road;
 	QSoundChar skid_metal;
 	int prev_gear;

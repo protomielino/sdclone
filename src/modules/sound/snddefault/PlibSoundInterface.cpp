@@ -33,7 +33,9 @@ PlibSoundInterface::PlibSoundInterface(float sampling_rate, int n_channels) : So
 
 	// initialise mappings
 	grass.schar = &CarSoundData::grass;
-	grass_skid.schar = &CarSoundData::grass_skid;
+	curb.schar = &CarSoundData::curb;
+	dirt.schar = &CarSoundData::dirt;
+	dirt_skid.schar = &CarSoundData::dirt_skid;
 	road.schar = &CarSoundData::road;
 	metal_skid.schar = &CarSoundData::drag_collision;
 	backfire_loop.schar = &CarSoundData::engine_backfire;
@@ -151,9 +153,17 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 	sortSingleQueue (car_sound_data, &grass, n_cars);
 	setMaxSoundCar (car_sound_data, &grass);
 
-	grass_skid.snd = grass_skid_sound;
-	sortSingleQueue (car_sound_data, &grass_skid, n_cars);
-	setMaxSoundCar (car_sound_data, &grass_skid);
+	curb.snd = curb_ride_sound;
+	sortSingleQueue (car_sound_data, &curb, n_cars);
+	setMaxSoundCar (car_sound_data, &curb);
+
+	dirt.snd = dirt_ride_sound;
+	sortSingleQueue(car_sound_data, &dirt, n_cars);
+	setMaxSoundCar(car_sound_data, &dirt);
+
+	dirt_skid.snd = dirt_skid_sound;
+	sortSingleQueue(car_sound_data, &dirt_skid, n_cars);
+	setMaxSoundCar(car_sound_data, &dirt_skid);
 
 	metal_skid.snd = metal_skid_sound;
 	sortSingleQueue (car_sound_data, &metal_skid, n_cars);
