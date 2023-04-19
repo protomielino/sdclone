@@ -2146,6 +2146,8 @@ evalUnit (char *unit, tdble *dest, int invert)
     coeff = 6894.76f; /* Pa */
     } else if ((strcmp(unit, "mph") == 0) || (strcmp(unit, "MPH") == 0)) {
     coeff = 0.44704f; /* m/s */
+    } else if ((strcmp(unit, "kph") == 0) || (strcmp(unit, "KPH") == 0)) {
+        coeff = 0.277778f; /* m/s */
     } else if (strcmp(unit, "MPa") == 0) {
     coeff = 1000000.0; /* Pa */
     } else if ((strcmp(unit, "h") == 0) || (strcmp(unit, "hour") == 0) || (strcmp(unit, "hours") == 0)) {
