@@ -1,5 +1,7 @@
 package utils.circuit;
 
+import utils.DoubleValue;
+
 public class Pits {
 	private String				side				= null;
 	private String				entry				= null;
@@ -12,9 +14,9 @@ public class Pits {
 	private double				width				= Double.NaN;
 	private double				length				= Double.NaN;
 	private int					style				= Integer.MAX_VALUE;
-	private int					indicator			= Integer.MAX_VALUE;
-	private double				speedLimit			= Double.NaN;
-
+	private int					indicator			= Integer.MAX_VALUE;	
+	private DoubleValue			speedLimit			= null;
+	
 	/**
 	 * @return Returns the side.
 	 */
@@ -210,17 +212,63 @@ public class Pits {
 	/**
 	 * @return Returns the speedLimit.
 	 */
-	public double getSpeedLimit()
+	public DoubleValue getSpeedLimit()
 	{
 		return speedLimit;
 	}
+
 	/**
 	 * @param speedLimit
 	 *            The speedLimit to set.
 	 */
-	public void setSpeedLimit(double speedLimit)
+	public void setSpeedLimit(DoubleValue speedLimit)
 	{
 		this.speedLimit = speedLimit;
+	}
+
+	public double getSpeedLimitValue()
+	{
+		if (speedLimit == null)
+		{
+			return Double.NaN;
+		}
+		return speedLimit.value;
+	}
+
+	public void setSpeedLimitValue(double speedLimit)
+	{
+		if (this.speedLimit == null)
+		{
+			if (Double.isNaN(speedLimit))
+			{
+				return;
+			}
+			this.speedLimit = new DoubleValue();
+		}
+		this.speedLimit.value = speedLimit;
+	}
+
+	public String getSpeedLimitUnits()
+	{
+		if (speedLimit == null)
+		{
+			return null;
+		}
+		return speedLimit.units;
+	}
+
+	public void setSpeedLimitUnits(String units)
+	{
+		if (this.speedLimit == null)
+		{
+			if (units == null)
+			{
+				return;
+			}
+			
+			this.speedLimit = new DoubleValue();
+		}		
+		this.speedLimit.units = units;
 	}
 
 	public void dump(String indent)
@@ -238,6 +286,6 @@ public class Pits {
 		System.out.println(indent + "  length         : " + length);
 		System.out.println(indent + "  style          : " + style);
 		System.out.println(indent + "  indicator      : " + indicator);
-		System.out.println(indent + "  speedLimit     : " + speedLimit);
+		System.out.println(indent + "  speedLimit     : " + speedLimit == null ? "null" : speedLimit.value + " " + (speedLimit.units != null ? speedLimit.units : ""));
     }
 }

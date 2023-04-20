@@ -73,6 +73,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          plugin/torcs/XmlReader.java
          plugin/torcs/XmlWriter.java
          utils/CustomFileFilter.java
+         utils/DoubleValue.java
          utils/Editor.java
          utils/EditorPoint.java
          utils/GroupButtonLayout.java

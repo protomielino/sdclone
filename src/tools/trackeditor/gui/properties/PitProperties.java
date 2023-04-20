@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.DoubleValue;
 import utils.SegmentVector;
 import utils.SurfaceComboBox;
 import utils.circuit.Pits;
@@ -92,6 +93,8 @@ public class PitProperties extends PropertyPanel
 	private JComboBox<String>	indicatorComboBox		= null;
 	private JLabel				speedLimitLabel			= new JLabel();
 	private JTextField			speedLimitTextField		= new JTextField();
+	private JLabel				speedLimitUnitsLabel	= new JLabel();
+	private JComboBox<String>	speedLimitUnitsComboBox	= null;
 	private JCheckBox 			generatePitsCheckBox 	= null;
 	private JLabel 				generatePitsLabel 		= new JLabel();
 	private JTabbedPane			tabbedPane				= null;
@@ -150,7 +153,7 @@ public class PitProperties extends PropertyPanel
 		add(getStyleComboBox(), null);
 		add(getSideComboBox(), null);
 
-		Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
+		Pits pits = getEditorFrame().getPits();
 
 		addTextField(this, 2, entryTextField, pits.getEntry(), 120, 125);
 		addTextField(this, 3, startTextField, pits.getStart(), 120, 125);
@@ -164,7 +167,9 @@ public class PitProperties extends PropertyPanel
 
 		add(getIndicatorComboBox(), null);
 
-		addTextField(this, 12, speedLimitTextField, pits.getSpeedLimit(), 120, 125);
+		addTextField(this, 12, speedLimitTextField, pits.getSpeedLimitValue(), 120, 125);
+		add(getSpeedLimitUnitsLabel(), null);
+		add(getSpeedLimitUnitsComboBox(), null);
 
 		add(getGeneratePitsCheckBox(), null);
 		add(getTabbedPane(), null);		
@@ -208,7 +213,7 @@ public class PitProperties extends PropertyPanel
 			String[] items = {"none", "no pits", "on track side", "on separate path", "no building"};
 			styleComboBox = new JComboBox<String>(items);
 			styleComboBox.setBounds(120, 10, 125, 23);
-			int style = getEditorFrame().getTrackData().getMainTrack().getPits().getStyle();
+			int style = getEditorFrame().getPits().getStyle();
 			if (style == Integer.MAX_VALUE)
 				style = 0;
 			else
@@ -230,7 +235,7 @@ public class PitProperties extends PropertyPanel
 			String[] items = {"none", "right", "left"};
 			sideComboBox = new JComboBox<String>(items);
 			sideComboBox.setBounds(120, 37, 125, 23);
-			String side = getEditorFrame().getTrackData().getMainTrack().getPits().getSide();
+			String side = getEditorFrame().getPits().getSide();
 			if (side == null || side.isEmpty())
 				side = "none";
 			sideComboBox.setSelectedItem(side);
@@ -250,7 +255,7 @@ public class PitProperties extends PropertyPanel
 			String[] items = {"none", "0  normal_pit_indicator.ac", "1  pit_indicator.ac"};
 			indicatorComboBox = new JComboBox<String>(items);
 			indicatorComboBox.setBounds(120, 307, 175, 23);
-			int indicator = getEditorFrame().getTrackData().getMainTrack().getPits().getIndicator();
+			int indicator = getEditorFrame().getPits().getIndicator();
 			if (indicator == Integer.MAX_VALUE)
 				indicator = 0;
 			else
@@ -258,6 +263,54 @@ public class PitProperties extends PropertyPanel
 			indicatorComboBox.setSelectedIndex(indicator);
 		}
 		return indicatorComboBox;
+	}
+
+	/**
+	 * This method initializes speedLimitUnitsComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JLabel getSpeedLimitUnitsLabel()
+	{
+		speedLimitUnitsLabel.setText("Units");;
+		speedLimitUnitsLabel.setBounds(260, 334, 40, 23);
+
+		return speedLimitUnitsLabel;
+	}
+
+	/**
+	 * This method initializes speedLimitUnitsComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox<String> getSpeedLimitUnitsComboBox()
+	{
+		if (speedLimitUnitsComboBox == null)
+		{
+			String[] items = {"none", "meters per second", "kilometers per hour", "miles per hour"};
+			speedLimitUnitsComboBox = new JComboBox<String>(items);
+			speedLimitUnitsComboBox.setBounds(300, 334, 140, 23);
+			DoubleValue speedLimit = getEditorFrame().getPits().getSpeedLimit();
+			int indicator = -1;
+
+			if (speedLimit == null || speedLimit.units == null || speedLimit.value == Double.NaN)
+				indicator = 0;
+			else if (speedLimit.units.equals("m") || speedLimit.units.equalsIgnoreCase("mps"))
+				indicator = 1;
+			else if (speedLimit.units.equalsIgnoreCase("kph"))
+				indicator = 2;
+			else if (speedLimit.units.equalsIgnoreCase("mph"))
+				indicator = 3;
+			speedLimitUnitsComboBox.setSelectedIndex(indicator);
+			speedLimitUnitsComboBox.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					// Should we convert the speed limit to the new units?
+				}
+			});
+		}
+		return speedLimitUnitsComboBox;
 	}
 
  	/**
@@ -286,7 +339,7 @@ public class PitProperties extends PropertyPanel
 	{
 		if (generatePitsCheckBox.isSelected())
 		{
-			Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
+			Pits pits = getEditorFrame().getPits();
 			SegmentVector data = getEditorFrame().getTrackData().getSegments();
 			Segment pitEntry = null;
 			Segment pitStart = null;
@@ -638,18 +691,18 @@ public class PitProperties extends PropertyPanel
 	public void exit()
 	{
 		int index = getStyleComboBox().getSelectedIndex();
-		int style = getEditorFrame().getTrackData().getMainTrack().getPits().getStyle();
+		int style = getEditorFrame().getPits().getStyle();
 		if (index == 0)
 		{
 			if (style != Integer.MAX_VALUE)
 			{
-				getEditorFrame().getTrackData().getMainTrack().getPits().setStyle(Integer.MAX_VALUE);
+				getEditorFrame().getPits().setStyle(Integer.MAX_VALUE);
 				getEditorFrame().documentIsModified = true;
 			}
 		}
 		else if (style == Integer.MAX_VALUE || style != index - 1)
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setStyle(index - 1);
+			getEditorFrame().getPits().setStyle(index - 1);
 			getEditorFrame().documentIsModified = true;
 		}
 
@@ -658,95 +711,112 @@ public class PitProperties extends PropertyPanel
 		MutableInteger integerResult = new MutableInteger();
 
 		if (isDifferent((String) getSideComboBox().getSelectedItem(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getSide(), stringResult))
+			getEditorFrame().getPits().getSide(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setSide(stringResult.getValue());
+			getEditorFrame().getPits().setSide(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(entryTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getEntry(), stringResult))
+			getEditorFrame().getPits().getEntry(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setEntry(stringResult.getValue());
+			getEditorFrame().getPits().setEntry(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(startTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getStart(), stringResult))
+			getEditorFrame().getPits().getStart(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setStart(stringResult.getValue());
+			getEditorFrame().getPits().setStart(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(startBuildingsTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getStartBuildings(), stringResult))
+			getEditorFrame().getPits().getStartBuildings(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setStartBuildings(stringResult.getValue());
+			getEditorFrame().getPits().setStartBuildings(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(stopBuildingsTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getStopBuildings(), stringResult))
+			getEditorFrame().getPits().getStopBuildings(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setStopBuildings(stringResult.getValue());
+			getEditorFrame().getPits().setStopBuildings(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(maxPitsTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getMaxPits(), integerResult))
+			getEditorFrame().getPits().getMaxPits(), integerResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setMaxPits(integerResult.getValue());
+			getEditorFrame().getPits().setMaxPits(integerResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(endTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getEnd(), stringResult))
+			getEditorFrame().getPits().getEnd(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setEnd(stringResult.getValue());
+			getEditorFrame().getPits().setEnd(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(exitTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getExit(), stringResult))
+			getEditorFrame().getPits().getExit(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setExit(stringResult.getValue());
+			getEditorFrame().getPits().setExit(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(widthTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getWidth(), doubleResult))
+			getEditorFrame().getPits().getWidth(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setWidth(doubleResult.getValue());
+			getEditorFrame().getPits().setWidth(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(lengthTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getLength(), doubleResult))
+			getEditorFrame().getPits().getLength(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setLength(doubleResult.getValue());
+			getEditorFrame().getPits().setLength(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		index = getIndicatorComboBox().getSelectedIndex();
-		int indicator = getEditorFrame().getTrackData().getMainTrack().getPits().getIndicator();
+		int indicator = getEditorFrame().getPits().getIndicator();
 		if (index == 0)
 		{
 			if (indicator != Integer.MAX_VALUE)
 			{
-				getEditorFrame().getTrackData().getMainTrack().getPits().setIndicator(Integer.MAX_VALUE);
+				getEditorFrame().getPits().setIndicator(Integer.MAX_VALUE);
 				getEditorFrame().documentIsModified = true;
 			}
 		}
 		else if (indicator == Integer.MAX_VALUE || indicator != index - 1)
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setIndicator(index - 1);
+			getEditorFrame().getPits().setIndicator(index - 1);
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(speedLimitTextField.getText(),
-			getEditorFrame().getTrackData().getMainTrack().getPits().getSpeedLimit(), doubleResult))
+			getEditorFrame().getPits().getSpeedLimitValue(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().getPits().setSpeedLimit(doubleResult.getValue());
+			getEditorFrame().getPits().setSpeedLimitValue(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		index = getSpeedLimitUnitsComboBox().getSelectedIndex();
+		String	units = getEditorFrame().getPits().getSpeedLimitUnits();
+		String[] items = {null, "m", "kph", "mph"};
+		if (index == 0)
+		{
+			if (units != null)
+			{
+				getEditorFrame().getPits().setSpeedLimitUnits(null);
+				getEditorFrame().documentIsModified = true;
+			}
+		}
+		else if (index != -1 && !items[index].equalsIgnoreCase(units))
+		{
+			getEditorFrame().getPits().setSpeedLimitUnits(items[index]);
 			getEditorFrame().documentIsModified = true;
 		}
 
@@ -762,7 +832,7 @@ public class PitProperties extends PropertyPanel
 	 */
 	private void createPits()
 	{
-		Pits pits = getEditorFrame().getTrackData().getMainTrack().getPits();
+		Pits pits = getEditorFrame().getPits();
 		SegmentVector data = getEditorFrame().getTrackData().getSegments();
 		Segment pitEntry = null;
 		Segment pitStart = null;

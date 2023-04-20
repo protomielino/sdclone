@@ -80,6 +80,7 @@ import utils.circuit.Curve;
 import utils.circuit.MainTrack;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
+import utils.circuit.Pits;
 import utils.circuit.Reliefs;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
@@ -3149,5 +3150,10 @@ public class EditorFrame extends JFrame
 	public Reliefs getReliefs()
 	{
 		return trackData.getReliefs();
+	}
+	
+	public Pits getPits()
+	{
+		return trackData.getMainTrack().getPits();
 	}
 }

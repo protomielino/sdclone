@@ -41,6 +41,7 @@ import org.jdom.input.SAXHandler;
 import org.xml.sax.InputSource;
 
 import gui.EditorFrame;
+import utils.DoubleValue;
 import utils.Editor;
 import utils.SegmentVector;
 import utils.ac3d.Ac3dException;
@@ -729,7 +730,7 @@ public class XmlReader
         editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length", "m"));
         editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width", "m"));
         editorFrame.getTrackData().getMainTrack().getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
-        editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(pits, "speed limit"));
+        editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumUnitsValue(pits, "speed limit"));
     }
 
     /**
@@ -764,7 +765,7 @@ public class XmlReader
        editorFrame.getTrackData().getMainTrack().getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
        editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
        editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
-       editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(mainTrack, "speed limit"));
+       editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumUnitsValue(mainTrack, "speed limit"));
    }
 
     private void setSideV3(Element seg, SegmentSide part, String sPart)
@@ -1094,6 +1095,34 @@ public class XmlReader
         return out;
     }
 
+    public synchronized DoubleValue getAttrNumUnitsValue(Element element, String name)
+    {
+        double out = Double.NaN;
+        Element e = getChildWithName(element, name);
+        if (e != null)
+        {
+            if (e.getName().equals("attnum"))
+            {
+                try
+                {
+                    out = Double.parseDouble(e.getAttributeValue("val"));
+                }
+                catch (NumberFormatException exception)
+                {
+                	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+                	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                if (!Double.isNaN(out))
+                {
+                	return new DoubleValue(out, e.getAttributeValue("unit"));
+                }
+            }
+        }
+
+        return null;
+    }
+
     public synchronized double getAttrNumValue(Element element, String name, String expectedUnit)
     {
         double out = Double.NaN;
@@ -1143,6 +1172,22 @@ public class XmlReader
                 			else if (expectedUnit.equals("s") && (actualUnit.equals("hour") || actualUnit.equals("hours")))
                 			{
                 				out = out * 3600.0;
+                			}
+                			else if (expectedUnit.equalsIgnoreCase("mph") && actualUnit.equals("m"))
+                	    	{
+                	    		out = out * 0.44704;
+                	        }
+                			else if (expectedUnit.equalsIgnoreCase("mph") && actualUnit.equalsIgnoreCase("kph"))
+                			{
+                				out = out * 1.60934;
+                			}
+                			else if (expectedUnit.equalsIgnoreCase("kph") && actualUnit.equals("m"))
+                			{
+                	            out = out * 0.277778;
+                			}
+                			else if (expectedUnit.equalsIgnoreCase("kph") && actualUnit.equalsIgnoreCase("mph"))
+                			{
+                				out = out * 0.621371;
                 			}
                 			else
                 			{

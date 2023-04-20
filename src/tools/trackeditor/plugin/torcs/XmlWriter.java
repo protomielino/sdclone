@@ -33,6 +33,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 
 import gui.EditorFrame;
+import utils.DoubleValue;
 import utils.Editor;
 import utils.SegmentVector;
 import utils.circuit.Camera;
@@ -200,7 +201,7 @@ public class XmlWriter
 		addContent(pits, "length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
 		addContent(pits, "width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
 		addContent(pits, "pit indicator", null, editorFrame.getTrackData().getMainTrack().getPits().getIndicator());
-		addContent(pits, "speed limit", "m", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "speed limit", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
 
 		return pits;
 	}
@@ -232,7 +233,7 @@ public class XmlWriter
 		addContent(pits, "pit exit", editorFrame.getTrackData().getMainTrack().getPits().getExit());
 		addContent(pits, "pit length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
 		addContent(pits, "pit width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
-		addContent(pits, "speed limit", "m", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "speed limit", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
 	}
 
 	/**
@@ -994,6 +995,14 @@ public class XmlWriter
 		if (!Double.isNaN(value))
 		{
 			section.addContent(attnumElement(attribute, units, value + ""));
+		}
+	}
+
+	private synchronized void addContent(Element section, String attribute, DoubleValue value)
+	{
+		if (value != null && !Double.isNaN(value.value))
+		{
+			section.addContent(attnumElement(attribute, value.units, value.value + ""));
 		}
 	}
 
