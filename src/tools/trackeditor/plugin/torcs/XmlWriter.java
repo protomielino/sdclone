@@ -189,19 +189,19 @@ public class XmlWriter
 		Element pits = new Element("section");
 		pits.setAttribute(new Attribute("name", "Pits"));
 
-		addContent(pits, "pit style", null, editorFrame.getTrackData().getMainTrack().getPits().getStyle());
-		addContent(pits, "side", editorFrame.getTrackData().getMainTrack().getPits().getSide());
-		addContent(pits, "entry", editorFrame.getTrackData().getMainTrack().getPits().getEntry());
-		addContent(pits, "start", editorFrame.getTrackData().getMainTrack().getPits().getStart());
-		addContent(pits, "start buildings", editorFrame.getTrackData().getMainTrack().getPits().getStartBuildings());
-		addContent(pits, "stop buildings", editorFrame.getTrackData().getMainTrack().getPits().getStopBuildings());
-		addContent(pits, "max pits", null, editorFrame.getTrackData().getMainTrack().getPits().getMaxPits());
-		addContent(pits, "end", editorFrame.getTrackData().getMainTrack().getPits().getEnd());
-		addContent(pits, "exit", editorFrame.getTrackData().getMainTrack().getPits().getExit());
-		addContent(pits, "length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
-		addContent(pits, "width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
-		addContent(pits, "pit indicator", null, editorFrame.getTrackData().getMainTrack().getPits().getIndicator());
-		addContent(pits, "speed limit", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "pit style", null, editorFrame.getPits().getStyle());
+		addContent(pits, "side", editorFrame.getPits().getSide());
+		addContent(pits, "entry", editorFrame.getPits().getEntry());
+		addContent(pits, "start", editorFrame.getPits().getStart());
+		addContent(pits, "start buildings", editorFrame.getPits().getStartBuildings());
+		addContent(pits, "stop buildings", editorFrame.getPits().getStopBuildings());
+		addContent(pits, "max pits", null, editorFrame.getPits().getMaxPits());
+		addContent(pits, "end", editorFrame.getPits().getEnd());
+		addContent(pits, "exit", editorFrame.getPits().getExit());
+		addContent(pits, "length", "m", editorFrame.getPits().getLength());
+		addContent(pits, "width", "m", editorFrame.getPits().getWidth());
+		addContent(pits, "pit indicator", null, editorFrame.getPits().getIndicator());
+		addContent(pits, "speed limit", editorFrame.getPits().getSpeedLimit());
 
 		return pits;
 	}
@@ -211,29 +211,29 @@ public class XmlWriter
 	 */
 	private synchronized void getPitsV3(Element pits)
 	{
-		if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 0)
+		if (editorFrame.getPits().getStyle() == 0)
 		{
 			addContent(pits, "pit type", "no pits");
 		}
-		else if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 1)
+		else if (editorFrame.getPits().getStyle() == 1)
 		{
 			addContent(pits, "pit type", "track side");
 		}
-		else if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == 2)
+		else if (editorFrame.getPits().getStyle() == 2)
 		{
 			addContent(pits, "pit type", "seperate path");
 		}
 
-		addContent(pits, "pit side", editorFrame.getTrackData().getMainTrack().getPits().getSide());
-		addContent(pits, "pit entry", editorFrame.getTrackData().getMainTrack().getPits().getEntry());
-		addContent(pits, "pit start", editorFrame.getTrackData().getMainTrack().getPits().getStart());
-		addContent(pits, "start buildings", editorFrame.getTrackData().getMainTrack().getPits().getStartBuildings());
-		addContent(pits, "stop buildings", editorFrame.getTrackData().getMainTrack().getPits().getStopBuildings());
-		addContent(pits, "pit end", editorFrame.getTrackData().getMainTrack().getPits().getEnd());
-		addContent(pits, "pit exit", editorFrame.getTrackData().getMainTrack().getPits().getExit());
-		addContent(pits, "pit length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
-		addContent(pits, "pit width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
-		addContent(pits, "speed limit", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "pit side", editorFrame.getPits().getSide());
+		addContent(pits, "pit entry", editorFrame.getPits().getEntry());
+		addContent(pits, "pit start", editorFrame.getPits().getStart());
+		addContent(pits, "start buildings", editorFrame.getPits().getStartBuildings());
+		addContent(pits, "stop buildings", editorFrame.getPits().getStopBuildings());
+		addContent(pits, "pit end", editorFrame.getPits().getEnd());
+		addContent(pits, "pit exit", editorFrame.getPits().getExit());
+		addContent(pits, "pit length", "m", editorFrame.getPits().getLength());
+		addContent(pits, "pit width", "m", editorFrame.getPits().getWidth());
+		addContent(pits, "speed limit", editorFrame.getPits().getSpeedLimit());
 	}
 
 	/**

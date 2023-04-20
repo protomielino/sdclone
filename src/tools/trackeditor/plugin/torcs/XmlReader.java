@@ -696,9 +696,9 @@ public class XmlReader
         if (pits == null)
             return;
 
-        editorFrame.getTrackData().getMainTrack().getPits().setStyle(getAttrIntValue(pits, "pit style"));
+        editorFrame.getPits().setStyle(getAttrIntValue(pits, "pit style"));
         // try alternate representation used by some TORCS tracks
-        if (editorFrame.getTrackData().getMainTrack().getPits().getStyle() == Integer.MAX_VALUE)
+        if (editorFrame.getPits().getStyle() == Integer.MAX_VALUE)
         {
         	String pitStyle = getAttrStrValue(pits, "type");
         	
@@ -706,31 +706,31 @@ public class XmlReader
             {
          	   if (pitStyle.equals("no pit"))
          	   {
-                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(0);
+                    editorFrame.getPits().setStyle(0);
          	   }
          	   else if (pitStyle.equals("track side"))
          	   {
-                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(1);
+                    editorFrame.getPits().setStyle(1);
          	   }
          	   else if (pitStyle.equals("seperate path"))
          	   {
-                    editorFrame.getTrackData().getMainTrack().getPits().setStyle(2);
+                    editorFrame.getPits().setStyle(2);
          	   }
             }
         }
 
-        editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(pits, "side"));
-        editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(pits, "entry"));
-        editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(pits, "start"));
-        editorFrame.getTrackData().getMainTrack().getPits().setStartBuildings(getAttrStrValue(pits, "start buildings"));
-        editorFrame.getTrackData().getMainTrack().getPits().setStopBuildings(getAttrStrValue(pits, "stop buildings"));
-        editorFrame.getTrackData().getMainTrack().getPits().setMaxPits(getAttrIntValue(pits, "max pits"));
-        editorFrame.getTrackData().getMainTrack().getPits().setEnd(getAttrStrValue(pits, "end"));
-        editorFrame.getTrackData().getMainTrack().getPits().setExit(getAttrStrValue(pits, "exit"));
-        editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length", "m"));
-        editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width", "m"));
-        editorFrame.getTrackData().getMainTrack().getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
-        editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumUnitsValue(pits, "speed limit"));
+        editorFrame.getPits().setSide(getAttrStrValue(pits, "side"));
+        editorFrame.getPits().setEntry(getAttrStrValue(pits, "entry"));
+        editorFrame.getPits().setStart(getAttrStrValue(pits, "start"));
+        editorFrame.getPits().setStartBuildings(getAttrStrValue(pits, "start buildings"));
+        editorFrame.getPits().setStopBuildings(getAttrStrValue(pits, "stop buildings"));
+        editorFrame.getPits().setMaxPits(getAttrIntValue(pits, "max pits"));
+        editorFrame.getPits().setEnd(getAttrStrValue(pits, "end"));
+        editorFrame.getPits().setExit(getAttrStrValue(pits, "exit"));
+        editorFrame.getPits().setLength(getAttrNumValue(pits, "length", "m"));
+        editorFrame.getPits().setWidth(getAttrNumValue(pits, "width", "m"));
+        editorFrame.getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
+        editorFrame.getPits().setSpeedLimit(getAttrNumUnitsValue(pits, "speed limit"));
     }
 
     /**
@@ -744,28 +744,28 @@ public class XmlReader
        {
     	   if (pitStyle.equals("no pit"))
     	   {
-               editorFrame.getTrackData().getMainTrack().getPits().setStyle(0);
+               editorFrame.getPits().setStyle(0);
     	   }
     	   else if (pitStyle.equals("track side"))
     	   {
-               editorFrame.getTrackData().getMainTrack().getPits().setStyle(1);
+               editorFrame.getPits().setStyle(1);
     	   }
     	   else if (pitStyle.equals("seperate path"))
     	   {
-               editorFrame.getTrackData().getMainTrack().getPits().setStyle(2);
+               editorFrame.getPits().setStyle(2);
     	   }
        }
 
-       editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(mainTrack, "pit side"));
-       editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(mainTrack, "pit entry"));
-       editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(mainTrack, "pit start"));
-       editorFrame.getTrackData().getMainTrack().getPits().setStartBuildings(getAttrStrValue(mainTrack, "start buildings"));
-       editorFrame.getTrackData().getMainTrack().getPits().setStopBuildings(getAttrStrValue(mainTrack, "stop buildings"));
-       editorFrame.getTrackData().getMainTrack().getPits().setEnd(getAttrStrValue(mainTrack, "pit end"));
-       editorFrame.getTrackData().getMainTrack().getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
-       editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
-       editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
-       editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumUnitsValue(mainTrack, "speed limit"));
+       editorFrame.getPits().setSide(getAttrStrValue(mainTrack, "pit side"));
+       editorFrame.getPits().setEntry(getAttrStrValue(mainTrack, "pit entry"));
+       editorFrame.getPits().setStart(getAttrStrValue(mainTrack, "pit start"));
+       editorFrame.getPits().setStartBuildings(getAttrStrValue(mainTrack, "start buildings"));
+       editorFrame.getPits().setStopBuildings(getAttrStrValue(mainTrack, "stop buildings"));
+       editorFrame.getPits().setEnd(getAttrStrValue(mainTrack, "pit end"));
+       editorFrame.getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
+       editorFrame.getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
+       editorFrame.getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
+       editorFrame.getPits().setSpeedLimit(getAttrNumUnitsValue(mainTrack, "speed limit"));
    }
 
     private void setSideV3(Element seg, SegmentSide part, String sPart)
