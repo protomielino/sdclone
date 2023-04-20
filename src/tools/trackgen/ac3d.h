@@ -30,14 +30,42 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <list>
 #include <fstream>
-#include <v3_t.h>
-
-typedef v3t<double> v3d;
 
 struct Ac3d
 {
-    typedef std::array<double, 3> Color;
+    struct v3d : public std::array<double, 3>
+    {
+        v3d()
+        {
+            at(0) = 0;
+            at(1) = 0;
+            at(2) = 0;
+        }
+        v3d(double x, double y, double z)
+        {
+            at(0) = x;
+            at(1) = y;
+            at(2) = z;
+        }
+    };
+
+    struct Color : public std::array<double, 3>
+    {
+        Color()
+        {
+            at(0) = 0;
+            at(1) = 0;
+            at(2) = 0;
+        }
+        void set(double r, double g, double b)
+        {
+            at(0) = r;
+            at(1) = g;
+            at(2) = b;
+        }
+    };
 
     class Exception : public std::exception
     {
@@ -45,7 +73,7 @@ struct Ac3d
         const char *message;
 
     public:
-        Exception(const char *msg) : message(msg)
+        explicit Exception(const char *msg) : message(msg)
         {
         }
         const char *what()
@@ -61,23 +89,23 @@ struct Ac3d
         Color       amb;
         Color       emis;
         Color       spec;
-        int         shi;
-        double      trans;
+        int         shi = 0;
+        double      trans = 0;
         std::string	data;
 
         Material() = default;
-
-        Material(const std::vector<std::string> &tokens);
+        explicit Material(const std::vector<std::string> &tokens);
         Material(std::ifstream &fin, const std::string &name);
         void write(std::ofstream &fout, bool versionC) const;
+        bool same(const Material &material) const;
     };
 
     struct Surface
     {
         struct Ref
         {
-            int                     index;
-            std::array<double,2>    coord;
+            int                     index = 0;
+            std::array<double, 2>   coord{ 0, 0 };
 
             Ref() = default;
             Ref(int index, double u, double v) : index(index), coord{ u, v } { }
@@ -88,7 +116,7 @@ struct Ac3d
         std::vector<Ref>    refs;
 
         Surface() = default;
-        Surface(std::ifstream &fin);
+        explicit Surface(std::ifstream &fin);
         void write(std::ofstream &fout) const;
     };
 
@@ -97,7 +125,7 @@ struct Ac3d
     public:
         bool initialized = false;
     };
-    class v3 : public std::array<double, 3>
+    class v3 : public v3d
     {
     public:
         bool initialized = false;
@@ -114,6 +142,28 @@ struct Ac3d
 
         operator T() const { return value; }
         T operator = (T i) { value = i; return value; }
+    };
+
+    class Matrix : public std::array<std::array<double, 4>, 4>
+    {
+    public:
+        Matrix();
+        Matrix(double m0, double m1, double m2, double m3,
+               double m4, double m5, double m6, double m7,
+               double m8, double m9, double m10, double m11,
+               double m12, double m13, double m14, double m15);
+        void setLocation(const v3 &location);
+        void setLocation(double x, double y, double z);
+        void setRotation(const std::array<double, 9> &rotation);
+        void setScale(double scale);
+        void makeIdentity();
+        void makeLocation(const v3 &location);
+        void makeLocation(double x, double y, double z);
+        void makeRotation(const std::array<double, 9> &rotation);
+        void makeScale(double scale);
+        void transformPoint(v3d &point) const;
+        void transformNormal(v3d &normal) const;
+        Matrix multiply(const Matrix &matrix);
     };
 
     struct Object
@@ -134,7 +184,7 @@ struct Ac3d
         bool				    folded = false;
         std::vector<v3d>        vertices;
         std::vector<Surface>    surfaces;
-        std::vector<Object>     kids;
+        std::list<Object>       kids;
 
         Object() = default;
 
@@ -142,9 +192,10 @@ struct Ac3d
         {
         }
 
-        Object(std::ifstream &fin);
+        explicit Object(std::ifstream &fin);
         void parse(std::ifstream &fin, const std::string &objType);
         void write(std::ofstream &fout) const;
+        void transform(const Matrix &matrix);
     };
 
     bool                    versionC = false;
@@ -157,6 +208,8 @@ struct Ac3d
     void addDefaultMaterial();
     void readFile(const std::string &fileName);
     void writeFile(const std::string &fileName) const;
+    void flattenGeometry();
+    void transform(const Matrix &matrix);
 };
 
 #endif /* _AC3D_H_ */

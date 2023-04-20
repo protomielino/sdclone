@@ -87,9 +87,9 @@ Ac3d::Material::Material(std::ifstream &fin, const std::string &name) : name(nam
         }
         else if (tokens.at(0) == "emis")
         {
-            emis[0] = std::stod(tokens.at(1));;
-            emis[1] = std::stod(tokens.at(2));;
-            emis[2] = std::stod(tokens.at(3));;
+            emis[0] = std::stod(tokens.at(1));
+            emis[1] = std::stod(tokens.at(2));
+            emis[2] = std::stod(tokens.at(3));
         }
         else if (tokens.at(0) == "spec")
         {
@@ -141,6 +141,16 @@ void Ac3d::Material::write(std::ofstream &fout, bool versionC) const
     }
 }
 
+bool Ac3d::Material::same(const Material &material) const
+{
+    return rgb == material.rgb &&
+           amb == material.amb &&
+           emis == material.emis &&
+           spec == material.spec &&
+           shi == material.shi &&
+           trans == material.trans;
+}
+
 Ac3d::Surface::Surface(std::ifstream &fin)
 {
     std::string line;
@@ -157,7 +167,7 @@ Ac3d::Surface::Surface(std::ifstream &fin)
         if (tokens.empty())
             continue;
         if (tokens.at(0) == "SURF")
-            surf = std::stoi(tokens.at(1));
+            surf = std::stoi(tokens.at(1), nullptr, 16);
         else if (tokens.at(0) == "mat")
             mat = std::stoi(tokens.at(1));
         else if (tokens.at(0) == "refs")
@@ -384,7 +394,7 @@ void Ac3d::Object::write(std::ofstream &fout) const
     {
         fout << "numvert " << vertices.size() << std::endl;
         for (const auto &vertex : vertices)
-            fout << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
+            fout << vertex[0] << " " << vertex[1] << " " << vertex[2] << std::endl;
     }
     if (!surfaces.empty())
     {
@@ -395,6 +405,192 @@ void Ac3d::Object::write(std::ofstream &fout) const
     fout << "kids " << kids.size() << std::endl;
     for (const auto &kid : kids)
         kid.write(fout);
+}
+
+void Ac3d::Object::transform(const Matrix &matrix)
+{
+    Matrix thisMatrix;
+
+    if (loc.initialized)
+    {
+        thisMatrix.setLocation(loc);
+        loc.initialized = false;
+    }
+    loc[0] = 0;
+    loc[1] = 0;
+    loc[2] = 0;
+
+    if (rot.initialized)
+    {
+        thisMatrix.setRotation(rot);
+        rot.initialized = false;
+    }
+
+    rot[0] = 1; rot[1] = 0; rot[2] = 0;
+    rot[3] = 0; rot[4] = 1; rot[5] = 0;
+    rot[6] = 0; rot[7] = 0; rot[8] = 1;
+
+    const Matrix newMatrix = thisMatrix.multiply(matrix);
+
+    if (type == "poly")
+    {
+        for (auto &vertex : vertices)
+            newMatrix.transformPoint(vertex);
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.transform(newMatrix);
+    }
+}
+
+Ac3d::Matrix::Matrix()
+{
+    makeIdentity();
+}
+
+Ac3d::Matrix::Matrix(double m0, double m1, double m2, double m3,
+                     double m4, double m5, double m6, double m7,
+                     double m8, double m9, double m10, double m11,
+                     double m12, double m13, double m14, double m15)
+{
+    (*this)[0][0] = m0;  (*this)[0][1] = m1;  (*this)[0][2] = m2;  (*this)[0][3] = m3;
+    (*this)[1][0] = m4;  (*this)[1][1] = m5;  (*this)[1][2] = m6;  (*this)[1][3] = m7;
+    (*this)[2][0] = m8;  (*this)[2][1] = m9;  (*this)[2][2] = m10; (*this)[2][3] = m11;
+    (*this)[3][0] = m12; (*this)[3][1] = m13; (*this)[3][2] = m14; (*this)[3][3] = m15;
+}
+
+void Ac3d::Matrix::setLocation(const v3 &location)
+{
+    (*this)[3][0] = location[0];
+    (*this)[3][1] = location[1];
+    (*this)[3][2] = location[2];
+}
+
+void Ac3d::Matrix::setLocation(double x, double y, double z)
+{
+    (*this)[3][0] = x;
+    (*this)[3][1] = y;
+    (*this)[3][2] = z;
+}
+
+void Ac3d::Matrix::setRotation(const std::array<double, 9> &rotation)
+{
+    (*this)[0][0] = rotation[0]; (*this)[0][1] = rotation[1]; (*this)[0][2] = rotation[2];
+    (*this)[1][0] = rotation[3]; (*this)[1][1] = rotation[4]; (*this)[1][2] = rotation[5];
+    (*this)[2][0] = rotation[6]; (*this)[2][1] = rotation[7]; (*this)[2][2] = rotation[8];
+}
+
+void Ac3d::Matrix::setScale(double scale)
+{
+    (*this)[0][0] = scale;
+    (*this)[1][1] = scale;
+    (*this)[2][2] = scale;
+    (*this)[3][2] = 1;
+}
+
+void Ac3d::Matrix::makeIdentity()
+{
+    (*this)[0][0] = 1; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
+    (*this)[1][0] = 0; (*this)[1][1] = 1; (*this)[1][2] = 0; (*this)[1][3] = 0;
+    (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = 1; (*this)[2][3] = 0;
+    (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
+}
+
+void Ac3d::Matrix::makeLocation(const v3 &location)
+{
+    (*this)[0][0] = 1; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
+    (*this)[1][0] = 0; (*this)[1][1] = 1; (*this)[1][2] = 0; (*this)[1][3] = 0;
+    (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = 1; (*this)[2][3] = 0;
+    (*this)[3][0] = location[0];
+    (*this)[3][1] = location[1];
+    (*this)[3][2] = location[2];
+    (*this)[3][3] = 1;
+}
+
+void Ac3d::Matrix::makeLocation(double x, double y, double z)
+{
+    (*this)[0][0] = 1; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
+    (*this)[1][0] = 0; (*this)[1][1] = 1; (*this)[1][2] = 0; (*this)[1][3] = 0;
+    (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = 1; (*this)[2][3] = 0;
+    (*this)[3][0] = x; (*this)[3][1] = y; (*this)[3][2] = z; (*this)[3][3] = 1;
+}
+
+void Ac3d::Matrix::makeRotation(const std::array<double, 9> &rotation)
+{
+    (*this)[0][0] = rotation[0]; (*this)[0][1] = rotation[1]; (*this)[0][2] = rotation[2]; (*this)[0][3] = 0;
+    (*this)[1][0] = rotation[3]; (*this)[1][1] = rotation[4]; (*this)[1][2] = rotation[5]; (*this)[1][3] = 0;
+    (*this)[2][0] = rotation[6]; (*this)[2][1] = rotation[7]; (*this)[2][2] = rotation[8]; (*this)[2][3] = 0;
+    (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
+
+}
+
+void Ac3d::Matrix::makeScale(double scale)
+{
+    (*this)[0][0] = scale; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
+    (*this)[1][0] = 0; (*this)[1][1] = scale; (*this)[1][2] = 0; (*this)[1][3] = 0;
+    (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = scale; (*this)[2][3] = 0;
+    (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
+}
+
+void Ac3d::Matrix::transformPoint(v3d &point) const
+{
+    v3d dst;
+
+    const double t0 = point[0];
+    const double t1 = point[1];
+    const double t2 = point[2];
+
+    dst[0] = t0 * (*this)[0][0] + t1 * (*this)[1][0] + t2 * (*this)[2][0] + (*this)[3][0];
+    dst[1] = t0 * (*this)[0][1] + t1 * (*this)[1][1] + t2 * (*this)[2][1] + (*this)[3][1];
+    dst[2] = t0 * (*this)[0][2] + t1 * (*this)[1][2] + t2 * (*this)[2][2] + (*this)[3][2];
+
+    point = dst;
+}
+
+void Ac3d::Matrix::transformNormal(v3d &normal) const
+{
+    v3d dst;
+
+    const double t0 = normal[0];
+    const double t1 = normal[1];
+    const double t2 = normal[2];
+
+    dst[0] = t0 * (*this)[0][0] + t1 * (*this)[1][0] + t2 * (*this)[2][0];
+    dst[1] = t0 * (*this)[0][1] + t1 * (*this)[1][1] + t2 * (*this)[2][1];
+    dst[2] = t0 * (*this)[0][2] + t1 * (*this)[1][2] + t2 * (*this)[2][2];
+
+    normal = dst;
+}
+
+Ac3d::Matrix Ac3d::Matrix::multiply(const Matrix &matrix)
+{
+    Matrix result;
+
+    for (int j = 0; j < 4; j++)
+    {
+        result[0][j] = matrix[0][0] * (*this)[0][j] +
+                       matrix[0][1] * (*this)[1][j] +
+                       matrix[0][2] * (*this)[2][j] +
+                       matrix[0][3] * (*this)[3][j];
+
+        result[1][j] = matrix[1][0] * (*this)[0][j] +
+                       matrix[1][1] * (*this)[1][j] +
+                       matrix[1][2] * (*this)[2][j] +
+                       matrix[1][3] * (*this)[3][j];
+
+        result[2][j] = matrix[2][0] * (*this)[0][j] +
+                       matrix[2][1] * (*this)[1][j] +
+                       matrix[2][2] * (*this)[2][j] +
+                       matrix[2][3] * (*this)[3][j];
+
+        result[3][j] = matrix[3][0] * (*this)[0][j] +
+                       matrix[3][1] * (*this)[1][j] +
+                       matrix[3][2] * (*this)[2][j] +
+                       matrix[3][3] * (*this)[3][j];
+    }
+
+    return result;
 }
 
 Ac3d::Ac3d()
@@ -414,10 +610,10 @@ void Ac3d::addDefaultMaterial()
     Ac3d::Material mat;
 
     mat.name = "\"\"";
-    mat.rgb = { 0.4, 0.4, 0.4 };
-    mat.amb = { 0.8, 0.8, 0.8 };
-    mat.emis = { 0.4, 0.4, 0.4 };
-    mat.spec = { 0.5, 0.5, 0.5 };
+    mat.rgb.set(0.4, 0.4, 0.4);
+    mat.amb.set(0.8, 0.8, 0.8);
+    mat.emis.set(0.4, 0.4, 0.4);
+    mat.spec.set(0.5, 0.5, 0.5);
     mat.shi = 50;
     mat.trans = 0;
 
@@ -487,4 +683,16 @@ void Ac3d::writeFile(const std::string &fileName) const
         material.write(fout, versionC);
 
     root.write(fout);
+}
+
+void Ac3d::transform(const Matrix &matrix)
+{
+    root.transform(matrix);
+}
+
+void Ac3d::flattenGeometry()
+{
+    const Matrix matrix;
+
+    transform(matrix);
 }
