@@ -876,7 +876,7 @@ public class XmlWriter
 		addContent(element, "elevation map", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getElevationMap());
 		addContent(element, "relief file", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefFile());
 
-		if (editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs().getChanged())
+		if (editorFrame.getReliefs().getChanged())
 		{
 			try
 			{

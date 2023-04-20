@@ -1551,7 +1551,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			if (showReliefs)
 			{
 				g.setColor(Color.blue);
-				Reliefs reliefs = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs();
+				Reliefs reliefs = editorFrame.getReliefs();
 				for (int j = 0; j < reliefs.getReliefs().size(); j++)
 				{
 					ObjShapeRelief relief = reliefs.getReliefs().get(j);
@@ -1835,9 +1835,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void setShowReliefs(boolean showReliefs)
 	{
 		this.showReliefs = showReliefs;
-		if (showReliefs && editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs().getReliefs().size() > 0)
+		if (showReliefs && editorFrame.getReliefs().getReliefs().size() > 0)
 		{
-			setReliefs(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs());
+			setReliefs(editorFrame.getReliefs());
 		}
 	}
 
@@ -1929,7 +1929,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		if (showReliefs)
 		{
-			setReliefs(editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefs());
+			setReliefs(editorFrame.getReliefs());
 		}
 
 //		 zoom
