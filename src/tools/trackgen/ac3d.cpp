@@ -29,6 +29,7 @@
 #include <iterator>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 Ac3d::Material::Material(const std::vector<std::string> &tokens)
 {
