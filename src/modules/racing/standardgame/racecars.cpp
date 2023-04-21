@@ -917,12 +917,12 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
     if (distFromStartLine < 0)
     {
         distFromStartLine = 0;
-        GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
+        //GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
     }
     else if (distFromStartLine>= car->_trackPositionCount)
     {
         distFromStartLine = car->_trackPositionCount - 1;
-        GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
+        //GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
     }
     car->_currLapTimeAtTrackPosition[distFromStartLine] = (float)car->_curLapTime;
 }

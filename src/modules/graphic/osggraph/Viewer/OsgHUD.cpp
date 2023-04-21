@@ -85,6 +85,8 @@ int hudScreenW = 0;
 //edithud
 bool hudEditModeEnabled = false;
 
+float tempVal = 0.0f;
+
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
 static void split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
@@ -96,6 +98,13 @@ static void split(const std::string &s, char delim, std::vector<std::string> &el
     {
         elems.push_back(item);
     }
+}
+
+double getCathetusTwoLength(double cateto1, double angoloVertice1) {
+    double angoloVertice2 = 45 - angoloVertice1;
+    double ipotenusa = cateto1 / cos(angoloVertice1 * M_PI / 180);
+    double cateto2 = ipotenusa * tan(angoloVertice2 * M_PI / 180);
+    return cateto2;
 }
 
 static std::vector<std::string> split(const std::string &s, char delim)
@@ -671,6 +680,364 @@ void SDHUD::changeImageSize(osg::Geometry *geom,
     }
 }
 
+void SDHUD::changeImageVertex(osg::Geometry *geom,
+                            float fromAngle,
+                            float toAngle,
+                            float currValue,
+                            float newPosX,
+                            float newPosY,
+                            float hudScale)
+                            
+{
+	GfLogInfo("pos %f %f\n", newPosX, newPosY);
+    osg::TextureRectangle* texture;
+
+    //get the texture data of this object
+    texture = dynamic_cast<osg::TextureRectangle*>(geom->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
+
+    //get the image from the texture data
+    osg::Image* img;
+    img = texture->getImage();
+
+    //get image dimensions
+	float width = img->s();
+	float height = img->t();
+	
+	//rerieve to start modifing vertex and UVs
+	osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
+	osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geom->getTexCoordArray(0));
+	
+	//determine the start and end triangle
+	int startTriangle = ceil((fromAngle+0.0001)/45.0)-1;
+	int endTriangle = ceil((toAngle)/45.0)-1;
+	
+	if(startTriangle < 0){
+		startTriangle = startTriangle + 8;
+	}
+	
+	//determine the range of angle we will be using to cover 100% of the value
+	float angleRange = 0.0f;
+	if(fromAngle > toAngle){
+		angleRange = (360-fromAngle)+toAngle;
+	}else{
+		angleRange = toAngle-fromAngle;
+	}
+	
+	//what angle we need to add to the start angle to reach the current value angle
+	float currValueAngle = angleRange*currValue;
+	
+	//determine the angle we can use for the first triangle (in case the start is not at his 0 angle)
+	float startTriangleStartAngle = std::fmod( fromAngle, 45.0f );
+	float startTriangleAngleCapacity = 45.0f - std::fmod( fromAngle, 45.0f );
+	
+	//determine the angle we can use for final triangle (in case the start is not at his 0 angle)
+	float finalTriangleAngleCapacity = std::fmod( toAngle , 45.0f );
+	
+	//determine how many triangles we will need to process
+	int trianglesNeeded = ceil((currValueAngle - startTriangleAngleCapacity) / 45)+1;
+	
+	//determine what will be the last triangle given the current value
+	int currValueLastTriangle = ((startTriangle + trianglesNeeded) % 8 ) - 1;
+	if(currValueLastTriangle < 0){
+		currValueLastTriangle = currValueLastTriangle + 8;
+	}
+	
+	//determine a modifier for the triangle index that we will use in the next for cicle, so that we will start processing from the start to the final triangle
+	//despite the starting triangle being greater than the final triangle
+	int indexModifier = 0;
+	if(startTriangle <= endTriangle){
+		indexModifier = 0;
+	}else{
+		indexModifier = startTriangle;
+	}
+	
+	float angleRangeToBeUsed = currValueAngle;
+	
+	for (int triangle = 0; triangle <= 7; triangle++) {
+		int triangleIdx = triangle + indexModifier;
+		if(triangleIdx > 7){
+			triangleIdx = triangleIdx - 8;
+		}
+		float newAngle=0.0;
+		
+		//se è il primo triangolo e ci sta tutto il valore uso il valore necessario
+		if(triangleIdx == startTriangle){
+			if(angleRangeToBeUsed <= startTriangleAngleCapacity){
+				newAngle = angleRangeToBeUsed;
+				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+			}else{
+				newAngle = startTriangleAngleCapacity;
+				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+			}
+			//if it's the first triangle the initial start angle may not be the local 0 so 
+			//we need to add to the startingPointAngle to the desidered value
+			//we will fix this when calculating vertex 2
+		}
+
+		//vale per tutti gli altri angoli (se è zero resta zero, se è maggiore di 45 uso 45)
+		if( 
+			(startTriangle <= endTriangle )  && (triangleIdx > startTriangle)
+			|| (startTriangle > endTriangle )  && (triangleIdx > startTriangle || triangleIdx <= endTriangle)
+		){
+			if(angleRangeToBeUsed <= 45.0){
+				newAngle = angleRangeToBeUsed;
+				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+			}else{
+				newAngle = 45.0;
+				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+			}
+		}
+
+		/*
+		GfLogDebug("TriangleIndex %i  (%i)", triangleIdx, triangle);
+		GfLogDebug("   CurrValueAngle %f\n", currValueAngle);
+		GfLogDebug("   Angoli richiesti %i \n",trianglesNeeded);
+		GfLogDebug("   Triangle index (Start/End) %i ## %i\n", startTriangle, currValueLastTriangle);
+		GfLogDebug("   Angle to be used %f \n",angleRangeToBeUsed);
+		GfLogDebug("   My angle %f \n",newAngle );
+		GfLogDebug("   Start Triangle start angle %f \n",startTriangleStartAngle );
+		*/
+		
+		for (int vertex = 0;vertex <= 2; vertex++ ){
+			int vertexIndex= (triangleIdx*3)+vertex;
+			float CathetusTwoLength = 0.0;
+			float newX = 0.0;
+			float newY = 0.0;
+
+			//GfLogDebug("VertexIndex %i \n", vertexIndex);
+			/*----------------------------------------------------------------------------------------------------------------------------*/
+			//for all vertex start by restoring their original status
+			
+			if (vertex == 0){
+				newX = 0.5f;
+				newY = 0.5f;
+			}
+			if (vertex == 1){
+				switch (triangleIdx) {
+					case 0:
+						newX = 0.0;
+						newY = 0.5;
+						break;
+					case 2:
+						newX = 0.5;
+						newY = 1.0;
+						break;
+					case 4:
+						newX = 1.0;
+						newY = 0.5;
+						break;
+					case 6:
+						newX = 0.5;
+						newY = 0.0;
+						break;
+					//------------------------------------------------------------------------------
+					case 1:
+						newX = 0.0;
+						newY = 1.0;
+						break;
+					case 3:
+						newX = 1.0;
+						newY = 1.0;
+						break;
+					case 5:
+						newX = 1.0;
+						newY = 0.0;
+						break;
+					case 7:
+						newX = 0.0;
+						newY = 0.0;
+						break;
+					default:
+						break;
+				}
+			}
+			
+			if (vertex == 2){
+				switch (triangleIdx) {
+					case 0:
+						newX = 0.0;
+						newY = 1.0;
+						break;
+					case 2:
+						newX = 1.0;
+						newY = 1.0;
+						break;
+					case 4:
+						newX = 1.0;
+						newY = 0.0;
+						break;
+					case 6:
+						newX = 0.0;
+						newY = 0.0;
+						break;
+					 //------------------------------------------------------------- 
+					case 1:
+						newX = 0.5;
+						newY = 1.0;
+						break;
+					case 3:
+						newX = 1.0;
+						newY = 0.5;
+						break;
+					case 5:
+						newX = 0.5;
+						newY = 0.0;
+						break;
+					case 7:
+						newX = 0.0;
+						newY = 0.5;
+						break;
+					default:
+						break;
+				}
+			}
+			(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+			(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+			//update uvs
+			(*texcoords)[vertexIndex][0] = newX;
+			(*texcoords)[vertexIndex][1] = newY;
+			/*----------------------------------------------------------------------------------------------------------------------------*/
+
+			//now adjust what is needed: 
+			//for start triangle we need to update the second vertice
+			//for end triangle we need to update the third vertice
+			//for hidden triangles we just hide everything
+
+			//start triangle
+			if (triangleIdx == startTriangle && vertex ==1){
+				switch (triangleIdx) {
+					case 0:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 0.0;
+						newY = 1.0 - CathetusTwoLength;
+						break;
+					case 2:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 1.0-CathetusTwoLength;
+						newY = 1.0;
+						break;
+					case 4:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 1.0;
+						newY = CathetusTwoLength;
+						break;
+					case 6:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = CathetusTwoLength;
+						newY = 0.0;
+						break;
+					//------------------------------------------------------------------------------
+					case 1:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 0.5-CathetusTwoLength;
+						newY = 1.0;
+						break;             
+					case 3:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 1.0;
+						newY = 0.5+CathetusTwoLength;
+						break;
+					case 5:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 0.5+CathetusTwoLength;
+						newY = 0.0;
+						break;
+					case 7:
+						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+						newX = 0.0;
+						newY = 0.5-CathetusTwoLength;
+						break;
+					default:
+						break;
+				}
+				//update vertices
+				(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+				(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+				//update uvs
+				(*texcoords)[vertexIndex][0]= newX;
+				(*texcoords)[vertexIndex][1]= newY;
+			}
+
+			//end triangle
+			if (triangleIdx == currValueLastTriangle && vertex == 2){
+				//we need to fix a special case in case the first triangle is also the last triangle
+				//in this case we want the startingAngle to be added to the desiredValueAngle
+				if (triangleIdx == startTriangle){
+					newAngle = newAngle + startTriangleStartAngle;
+				}
+				
+				switch (triangleIdx) {
+					case 0:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 0.0;
+						newY = 0.5+CathetusTwoLength;
+						break;
+					case 2:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 0.5+CathetusTwoLength;
+						newY = 1.0;
+						break;
+					case 4:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 1.0;
+						newY = 0.5-CathetusTwoLength;
+						break;
+					case 6:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 0.5-CathetusTwoLength;
+						newY = 0.0;
+						break;
+					 //------------------------------------------------------------- 
+					case 1:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = CathetusTwoLength;
+						newY = 1.0;
+						break;
+					case 3:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 1.0;
+						newY = 1.0-CathetusTwoLength;
+						break;
+					case 5:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 1.0-CathetusTwoLength;
+						newY = 0.0;
+						break;
+					case 7:
+						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+						newX = 0.0;
+						newY = CathetusTwoLength;
+						break;
+					default:
+						break;
+				}
+				(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+				(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+				//update uvs
+				(*texcoords)[vertexIndex][0]= newX;
+				(*texcoords)[vertexIndex][1]= newY;
+			}
+
+			//if hidden triangle
+			if( newAngle <= 0.0 ){
+				newX = 0.0f;
+				newY = 0.0f;
+				(*vertices)[vertexIndex][0] = newX * width * hudScale; //imgWidth; //x
+				(*vertices)[vertexIndex][1] = newY * height * hudScale; //imgHeight; //y
+				//update uvs
+				(*texcoords)[vertexIndex][0]= newX;
+				(*texcoords)[vertexIndex][1]= newY;
+			}
+		}
+	}
+    //adapt the geometry
+	vertices->dirty();
+	geom->setVertexArray(vertices);
+    //adapt the texture
+    geom->setTexCoordArray(0,texcoords);
+}
+
+
 void SDHUD::changeImagePosition(osg::Geometry *geom,
                                 float newX,
                                 float newY,
@@ -693,19 +1060,6 @@ void SDHUD::changeImagePosition(osg::Geometry *geom,
     {
         //osg::Vec3Array* vertices = new osg::Vec3Array;
         osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
-
-        /*
-         * how vertices are arranged:
-         *      3_______2
-         *      |       |
-         *    y |       |
-         *      |       |
-         *      0_______1
-         *          x
-         *
-         * [vertices(0-3)][0]=x
-         * [vertices(0-3)][1]=y
-        * */
 
         //change the position
         (*vertices)[0][0] = newX;
@@ -1426,10 +1780,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     if (currCar->_bestLapTime != 0){
 		float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
 
-    GfLogDebug("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
-
-    GfLogDebug("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
-
+		GfLogDebug("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+		GfLogDebug("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
 
 		if(deltabest > 0){//we are slower
 			float scale = 0.0f;
@@ -1457,9 +1809,41 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
 		changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
 	}
-	
 
-	
+//tachometer
+		osg::BoundingBox newtachobb =hudImgElements["tachometer"]->getBoundingBox();
+        //let the final 15% be redline
+        float redLinePercent = 0.15f; //15%
+        float whiteLinePercent = 1.0f-redLinePercent; //85%
+        float rpmVal1 = 0.0f;
+        float rpmVal2 = 0.0f;
+        float startAngle = 291.0f;
+        float endAngle = 180.0f;
+		float totalAngleRange = 0.0f;
+		float endOfWhiteLineAngle = 0.0f;
+
+        if(startAngle < endAngle){
+			totalAngleRange = endAngle - startAngle;
+			endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) + startAngle;
+		}else{
+			totalAngleRange = (360.0f - startAngle) + endAngle;
+			endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) - (360.0f - startAngle);
+			if(endOfWhiteLineAngle < 0){
+				endOfWhiteLineAngle = endOfWhiteLineAngle + 360.0f;
+			}
+		}
+       
+        if(currCar->_enginerpm <= (currCar->_enginerpmRedLine * whiteLinePercent)){
+			rpmVal1 = currCar->_enginerpm / (currCar->_enginerpmRedLine * whiteLinePercent);
+			rpmVal2 = 0.0;
+		}else{
+			rpmVal1 = 1.0;
+			rpmVal2 = (currCar->_enginerpm - (currCar->_enginerpmRedLine * whiteLinePercent)) / (currCar->_enginerpmRedLine * redLinePercent);
+		}
+
+		changeImageVertex(hudImgVertexElements["newtacho-rpmon"], startAngle, endOfWhiteLineAngle, rpmVal1, newtachobb.xMin(), newtachobb.yMin(), hudScale);
+		changeImageVertex(hudImgVertexElements["newtacho-rpmonred"], endOfWhiteLineAngle, endAngle, rpmVal2, newtachobb.xMin(), newtachobb.yMin(), hudScale);
+
 //edithud
 	if (hudEditModeEnabled){
 		//if there is some widgetGroup selected display the edithud and relative controls around it else keep it hidden
@@ -1714,6 +2098,7 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["racelapsWidget"] =     (int)hudWidgets["racelapsWidget"]->getNodeMask();
         hudElementsVisibilityStatus["laptimeWidget"] =      (int)hudWidgets["laptimeWidget"]->getNodeMask();
         hudElementsVisibilityStatus["carinfoWidget"] =      (int)hudWidgets["carinfoWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["newtacho-rpmon"]=      (int)hudImgVertexElements["newtacho-rpmon"]->getNodeMask();
         hudElementsVisibilityStatus["carstatusWidget"] =    (int)hudWidgets["carstatusWidget"]->getNodeMask();
         hudElementsVisibilityStatus["driverinputWidget"] =  (int)hudWidgets["driverinputWidget"]->getNodeMask();
         hudElementsVisibilityStatus["driverinput-wheel"] =  (int)hudImgRotableElements["driverinput-wheel"]->getNodeMask();
@@ -1732,6 +2117,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["racelapsWidget"]->setNodeMask(0);
         hudWidgets["laptimeWidget"]->setNodeMask(0);
         hudWidgets["carinfoWidget"]->setNodeMask(0);
+        hudImgVertexElements["newtacho-rpmon"]->setNodeMask(0);
         hudWidgets["carstatusWidget"]->setNodeMask(0);
         hudWidgets["driverinputWidget"]->setNodeMask(0);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
@@ -1751,6 +2137,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["racelapsWidget"]->setNodeMask(hudElementsVisibilityStatus["racelapsWidget"]);
         hudWidgets["laptimeWidget"]->setNodeMask(hudElementsVisibilityStatus["laptimeWidget"]);
         hudWidgets["carinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["carinfoWidget"]);
+        hudImgVertexElements["newtacho-rpmon"]->setNodeMask(hudElementsVisibilityStatus["newtacho-rpmon"]);
         hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
         hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
@@ -1835,6 +2222,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
         {
             widgetsSectionName = GfParmListGetCurEltName(paramHandle, mainSection.c_str());
             widgetsSectionPath = mainSection + "/" + widgetsSectionName;
+			GfLogDebug("OSGHUD: Generating hud: %s \n", widgetsSectionName.c_str());
 
             osg::ref_ptr<osg::Geode> geode = new osg::Geode;
             geode->setName(widgetsSectionName);
@@ -2085,6 +2473,199 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                     hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
                                 }
                             }
+                        }
+                        else if( type == "imagevertex")
+                        {
+                            /* ============================
+                                 CREATE OSG IMAGEVERTEX
+                               ============================*/
+                            //read data into local variables
+                            const std::string &elementId =      subSectionName;
+                            std::string url =                   GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
+                            std::string positionRefObj =        GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =   GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =       GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =    GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier =  GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+
+                            GfLogDebug("OSGHUD: Generate imagevertex object: %s \n", elementId.c_str());
+                            
+							osg::ref_ptr<osg::Geode>      myGeode = new osg::Geode;
+							osg::ref_ptr<osg::Geometry>   myGeometry = new osg::Geometry;
+							osg::ref_ptr<osg::Vec3Array>  myVertices = new osg::Vec3Array;
+							osg::ref_ptr<osg::Vec3Array>  myNormals = new osg::Vec3Array;
+							osg::ref_ptr<osg::Vec2Array>  myTexCoords = new osg::Vec2Array; //(UV)
+
+							//start preparing the image
+							std::string myFilename = GetDataDir();
+							//std::string myUrl = "data/img/osg-hud/tachometerv2-on.png";
+							//myFilename.append(myUrl);
+							myFilename.append(url);
+							//check that the image file exist
+							if (!GfFileExists(myFilename.c_str()))
+							{
+								GfLogError ("OSGHUD: Specified image file does not exist: %s.\n", myFilename.c_str());
+							}
+
+							// setup texture
+							osg::Image* myImg = osgDB::readImageFile(myFilename);
+							osg::TextureRectangle* myTexture = new osg::TextureRectangle;
+							myTexture->setImage(myImg);
+							//get image size
+							//get image dimensions
+							float width = myImg->s();
+							float height = myImg->t();
+
+
+                            //set the position
+                            //find the referenceObj bounding box
+                            osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+
+                            //get object bounding box
+                            osg::BoundingBox myObjBb;
+                            myObjBb.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+                            myObjBb.expandBy(osg::Vec3(width,height,0.0f));
+
+                            //calculate the positioning
+                            osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+
+                            //asign the position
+                            float positionLeft =   position.x();
+                            float positionBottom = position.y();
+
+							//vertices
+							//triangle 1
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+							//triangle 2
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+							//triangle 3
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2  
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+							//triangle 4
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
+							//triangle 5
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+							//triangle 6
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+							//triangle 7
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+							//triangle 8
+							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2  
+							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
+
+							myGeometry->setVertexArray  ( myVertices  );
+
+							//UV's
+							//triangle 1
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //2
+							myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //3
+							//triangle 2
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //2
+							myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //3
+							//triangle 3
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //2  
+							myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //3
+							//triangle 4
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //2
+							myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //3
+							//triangle 5
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //2
+							myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //3
+							//triangle 6
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //2
+							myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //3
+							//triangle 7
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //2
+							myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //3
+							//triangle 8
+							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+							myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //2  
+							myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //3
+
+							myGeometry->setTexCoordArray( 0, myTexCoords );
+
+							// calculate normals
+							osg::Vec3Array* normals = new osg::Vec3Array(8);
+							(*normals)[0].set(0.0f,-1.0f,0.0f);
+							(*normals)[1].set(0.0f,-1.0f,0.0f);
+							(*normals)[2].set(0.0f,-1.0f,0.0f);
+							(*normals)[3].set(0.0f,-1.0f,0.0f);
+							(*normals)[4].set(0.0f,-1.0f,0.0f);
+							(*normals)[5].set(0.0f,-1.0f,0.0f);
+							(*normals)[6].set(0.0f,-1.0f,0.0f);
+							(*normals)[7].set(0.0f,-1.0f,0.0f);
+							myGeometry->setNormalArray(normals);
+							myGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+
+							// assign colors
+							osg::Vec4Array* colors = new osg::Vec4Array(8);
+							(*colors)[0].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[1].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[2].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[3].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[4].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[5].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[6].set(1.0f,1.0f,1.0f,1.0f);
+							(*colors)[7].set(1.0f,1.0f,1.0f,1.0f);
+							myGeometry->setColorArray(colors);
+							myGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+
+							// draw the vertices as quads
+							myGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, myVertices->size()));
+
+							// disable display list so our modified tex coordinates show up
+							myGeometry->setUseDisplayList(false);
+
+							// setup stateset
+							osg::StateSet* myState = myGeometry->getOrCreateStateSet();
+							myState->setTextureAttributeAndModes(0, myTexture, osg::StateAttribute::ON);
+
+							//Conversely, disable write depth cache,
+							//Make objects behind transparent polygons visible
+							//OSG draws transparent polygons first, then draws opaque polygons
+							osg :: Depth * myImgDepth = new osg :: Depth;
+							myImgDepth-> setWriteMask (false);
+							myState-> setAttributeAndModes (myImgDepth, osg :: StateAttribute :: ON);
+
+							// setup material
+							osg::TexMat* myTexmat = new osg::TexMat;
+							myTexmat->setScaleByTextureRectangleSize(true);
+							myState->setTextureAttributeAndModes(0, myTexmat, osg::StateAttribute::ON);
+
+							//enable gl_blending (for texture transparency)
+							myState->setMode(GL_BLEND, osg::StateAttribute::ON);
+							osg::BlendFunc* myBlend = new osg::BlendFunc;
+							myBlend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_DST_ALPHA);
+
+							// turn off lighting (light always on)
+							myState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+							//myGeode->setName("mytachograph");
+							myGeode->addDrawable( myGeometry );
+							osgGroupWidgets->addChild(myGeode);
+                            hudImgVertexElements[elementId] =  myGeometry;
                         }
                         else if( type == "graph")
                         {

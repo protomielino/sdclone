@@ -125,6 +125,7 @@ class SDHUD
         osg::ref_ptr <osg::Group> osgGroupHud;
         std::map<std::string,osg::Geode* > hudWidgets;
         std::map<std::string,osg::Geometry* > hudImgElements;
+        std::map<std::string,osg::Geometry* > hudImgVertexElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
         std::map<std::string,OSGPLOT* > hudGraphElements;
 
@@ -149,6 +150,13 @@ class SDHUD
                                         float newY,
                                         float hudScale);
         static void changeImageAlpha(osg::Geometry *geom, float newAlpha);
+        static void changeImageVertex(osg::Geometry *geom,
+                                        float angleFrom,
+                                        float angleTo,
+                                        float currValue,
+                                        float newX,
+                                        float newY,
+                                        float hudScale);
         osg::BoundingBox getBoundigBoxFromWidgetName(std::string widgetName);
 		osg::BoundingBox getBoundigBoxFromWidgetGroupName(std::string widgetGroupName);
         void recalculateImageWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale);
