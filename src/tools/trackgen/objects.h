@@ -27,7 +27,6 @@
 #define _OBJECTS_H_
 
 extern void GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile);
-extern int GetObjectsNb(void *TrackHandle);
 
 #endif /* _OBJECTS_H_ */ 
 

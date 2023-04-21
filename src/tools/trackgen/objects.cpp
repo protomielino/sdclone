@@ -45,11 +45,11 @@
 #include "elevation.h"
 #include "objects.h"
 
-static float		GroupSize;
-static float		XGroupOffset;
-static float		YGroupOffset;
-static int		XGroupNb;
-static int		ObjUniqId = 0;
+static float    GroupSize;
+static float    XGroupOffset;
+static float    YGroupOffset;
+static int      XGroupNb;
+static int      ObjUniqId = 0;
 
 struct objdef
 {
@@ -70,15 +70,7 @@ struct objdef
     std::string     fileName;
 };
 
-std::vector<objdef> objects;
-
-int
-GetObjectsNb(void *TrackHandle)
-{
-    static const char *section = TRK_SECT_TERRAIN "/" TRK_SECT_OBJMAP;
-
-    return GfParmGetEltNb(TrackHandle, section);
-}
+static std::vector<objdef> objects;
 
 static void
 ApplyTransform(sgMat4 m, ssgBase *node)

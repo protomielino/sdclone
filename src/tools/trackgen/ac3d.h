@@ -155,12 +155,16 @@ struct Ac3d
         void setLocation(const v3 &location);
         void setLocation(double x, double y, double z);
         void setRotation(const std::array<double, 9> &rotation);
+        void setRotation(double x, double y, double z);
         void setScale(double scale);
+        void setScale(double x, double y, double z);
         void makeIdentity();
         void makeLocation(const v3 &location);
         void makeLocation(double x, double y, double z);
         void makeRotation(const std::array<double, 9> &rotation);
+        void makeRotation(double x, double y, double z);
         void makeScale(double scale);
+        void makeScale(double x, double y, double z);
         void transformPoint(v3d &point) const;
         void transformNormal(v3d &normal) const;
         Matrix multiply(const Matrix &matrix);

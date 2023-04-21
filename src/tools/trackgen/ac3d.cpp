@@ -481,11 +481,88 @@ void Ac3d::Matrix::setRotation(const std::array<double, 9> &rotation)
     (*this)[2][0] = rotation[6]; (*this)[2][1] = rotation[7]; (*this)[2][2] = rotation[8];
 }
 
+const double PI = 3.14159265358979323846;
+
+void Ac3d::Matrix::setRotation(double x, double y, double z)
+{
+    double cx, sx, cy, sy, cz, sz, szsy, czsy, szcy;
+
+    if (x == 0)
+    {
+        cx = 1;
+        sx = 0;
+    }
+    else
+    {
+        const double ax = x * PI / 180.0;
+        sx = sin(ax);
+        cx = cos(ax);
+    }
+
+    if (y == 0)
+    {
+        cy = 1;
+        sy = 0;
+    }
+    else
+    {
+        const double ay = y * PI / 180.0;
+        sy = sin(ay);
+        cy = cos(ay);
+    }
+
+    if (z == 0)
+    {
+        cz = 1;
+        sz = 0;
+        szsy = 0;
+        szcy = 0;
+        czsy = sy;
+    }
+    else
+    {
+        const double az = z * PI / 180.0;
+        sz = sin(az);
+        cz = cos(az);
+        szsy = sz * sy;
+        czsy = cz * sy;
+        szcy = sz * cy;
+    }
+
+    (*this)[0][0] = cx * cz - sx * szsy;
+    (*this)[1][0] = -sx * cy;
+    (*this)[2][0] = sz * cx + sx * czsy;
+    (*this)[3][0] = 0;
+
+    (*this)[0][1] = cz * sx + szsy * cx;
+    (*this)[1][1] = cx * cy;
+    (*this)[2][1] = sz * sx - czsy * cx;
+    (*this)[3][1] = 0;
+
+    (*this)[0][2] = -szcy;
+    (*this)[1][2] = sy;
+    (*this)[2][2] = cz * cy;
+    (*this)[3][2] = 0;
+
+    (*this)[0][3] = 0;
+    (*this)[1][3] = 0;
+    (*this)[2][3] = 0;
+    (*this)[3][3] = 1;
+}
+
 void Ac3d::Matrix::setScale(double scale)
 {
     (*this)[0][0] = scale;
     (*this)[1][1] = scale;
     (*this)[2][2] = scale;
+    (*this)[3][2] = 1;
+}
+
+void Ac3d::Matrix::setScale(double x, double y, double z)
+{
+    (*this)[0][0] = x;
+    (*this)[1][1] = y;
+    (*this)[2][2] = z;
     (*this)[3][2] = 1;
 }
 
@@ -525,11 +602,25 @@ void Ac3d::Matrix::makeRotation(const std::array<double, 9> &rotation)
 
 }
 
+void Ac3d::Matrix::makeRotation(double x, double y, double z)
+{
+    makeIdentity();
+    setRotation(x, y, z);
+}
+
 void Ac3d::Matrix::makeScale(double scale)
 {
     (*this)[0][0] = scale; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
     (*this)[1][0] = 0; (*this)[1][1] = scale; (*this)[1][2] = 0; (*this)[1][3] = 0;
     (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = scale; (*this)[2][3] = 0;
+    (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
+}
+
+void Ac3d::Matrix::makeScale(double x, double y, double z)
+{
+    (*this)[0][0] = x; (*this)[0][1] = 0; (*this)[0][2] = 0; (*this)[0][3] = 0;
+    (*this)[1][0] = 0; (*this)[1][1] = y; (*this)[1][2] = 0; (*this)[1][3] = 0;
+    (*this)[2][0] = 0; (*this)[2][1] = 0; (*this)[2][2] = z; (*this)[2][3] = 0;
     (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
 }
 
