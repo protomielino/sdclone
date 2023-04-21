@@ -45,36 +45,32 @@
 #include "elevation.h"
 #include "objects.h"
 
-struct group
-{
-    ssgBranch	*br;
-};
-
 static float		GroupSize;
 static float		XGroupOffset;
 static float		YGroupOffset;
 static int		XGroupNb;
 static int		ObjUniqId = 0;
 
-
-typedef struct objdef
+struct objdef
 {
-    GF_TAILQ_ENTRY(objdef)	link;
-    bool			random, trackOriented, terrainOriented, borderOriented;
-    unsigned int	color;
-    ssgEntity		*obj;
-    tdble		deltaHeight;
-    tdble		deltaVert;
-    float 		distance;
-    bool        scaleRandom, scaleFixed;
-    tdble       scale;
-    tdble       scaleMin;
-    tdble       scaleMax;
-    const char  *filename;
-} tobjdef;
+    bool            random = false;
+    bool            trackOriented = false;
+    bool            terrainOriented = false;
+    bool            borderOriented = false;
+    unsigned int    color = 0;
+    ssgEntity       *obj = nullptr;
+    tdble           deltaHeight = 0;
+    tdble           deltaVert = 0;
+    float           distance = 0;
+    bool            scaleRandom = false;
+    bool            scaleFixed = false;
+    tdble           scale = 0;
+    tdble           scaleMin = 0;
+    tdble           scaleMax = 0;
+    std::string     fileName;
+};
 
-GF_TAILQ_HEAD(objlist, objdef);
-tobjlist objhead;
+std::vector<objdef> objects;
 
 int
 GetObjectsNb(void *TrackHandle)
@@ -128,8 +124,6 @@ InitObjects(tTrack *track, void *TrackHandle)
 
     ssgSetCurrentOptions ( &options ) ;
 
-    GF_TAILQ_INIT(&objhead);
-
     std::string inputPath(track->filename);
     inputPath.resize(inputPath.find_last_of("/"));
 
@@ -142,9 +136,11 @@ InitObjects(tTrack *track, void *TrackHandle)
     int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
 
+    objects.resize(objnb);
+
     for (int i = 0; i < objnb; i++)
     {
-        objdef	*curObj = (struct objdef *)calloc(1, sizeof(struct objdef));
+        objdef	*curObj = &objects[objnb - 1 - i];
         curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
         const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, nullptr);
 
@@ -163,7 +159,7 @@ InitObjects(tTrack *track, void *TrackHandle)
             exit(1);
         }
 
-        curObj->filename = strdup(filename);
+        curObj->fileName = filename;
 
         ssgFlatten(curObj->obj);
 
@@ -229,7 +225,6 @@ InitObjects(tTrack *track, void *TrackHandle)
             curObj->borderOriented = false;
         }
 
-        GF_TAILQ_INSERT_HEAD(&objhead, curObj, link);
         GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
     }
 }
@@ -256,8 +251,9 @@ AddToRoot(ssgRoot *Root, ssgEntity *node)
 static void
 AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root, unsigned int clr, tdble x, tdble y)
 {
-    for (struct objdef *curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link))
+    for (size_t i = 0; i < objects.size(); i++)
     {
+        objdef *curObj = &objects[i];
         if (clr == curObj->color)
         {
             sgMat4		m;
@@ -327,7 +323,7 @@ AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root,
                     z = getHOT(reinterpret_cast<ssgBranch*>(TrackRoot), x, y);
                     if (z == -1000000.0f)
                     {
-                        printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj->filename, x, y, z);
+                        printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj->fileName.c_str(), x, y, z);
                         return;
                     }
                 }
@@ -338,7 +334,7 @@ AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root,
                 }
             }
 
-            printf("placing object %s: x: %g y: %g z: %g \n", curObj->filename, x, y, z);
+            printf("placing object %s: x: %g y: %g z: %g \n", curObj->fileName.c_str(), x, y, z);
             sgMakeRotMat4(m, angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0  - dv * rand() / (RAND_MAX + 1.0));
             ApplyTransform(m, obj);
 
