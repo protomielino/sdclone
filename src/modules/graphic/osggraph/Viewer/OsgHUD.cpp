@@ -1675,67 +1675,54 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 tireName << "";
         }
         
-        for (int h = 0; h < 3; h++) { //for each part of the tire (in-mid-out)
-            float currentTemp = 0;
-            std::string tirePartName;
-            switch(h) {
-                case 0:
-                    tirePartName = "in";
-                    currentTemp = currCar->_tyreT_in(i);
-                break;
-                case 1:
-                    tirePartName = "mid";
-                    currentTemp = currCar->_tyreT_mid(i);
-                break;
-                case 2:
-                    tirePartName = "out";
-                    currentTemp = currCar->_tyreT_out(i);
-                break;
-                default:
-                    tirePartName = "";
-            }
-            
-            std::ostringstream tireNameCold;
-            std::ostringstream tireNameOptimal;
-            std::ostringstream tireNameHot;
-            
-            tireNameCold << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-cold";
-            tireNameOptimal << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-optimal";
-            tireNameHot << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-hot";
+		float currentTemp = 0;
+		std::string tirePartName;
 
-            float optimalAlpha = 0.0f;
-            float hotAlpha = 0.0f;
+		currentTemp = currCar->_tyreT_out(i);
+		
+		std::ostringstream tireNameCold;
+		std::ostringstream tireNameOptimal;
+		std::ostringstream tireNameHot;
+		
+		tireNameCold << "tire-" << tireName.str().c_str() << "-cold";
+		tireNameOptimal << "tire-" << tireName.str().c_str() << "-optimal";
+		tireNameHot << "tire-" << tireName.str().c_str() << "-hot";
 
-            float tempOptimal = currCar->_tyreT_opt(i);
-            float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
-            float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
+		float optimalAlpha = 0.0f;
+		float hotAlpha = 0.0f;
 
+		float tempOptimal = currCar->_tyreT_opt(i);
+		float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
+		float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
 
-            changeImageAlpha(hudImgElements[tireNameCold.str().c_str()], 1.0f);
-            optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
-            if (optimalAlpha > 1.0f){
-                optimalAlpha = 1.0f;
-            }
-            if (optimalAlpha < 0.0f){
-                optimalAlpha = 0.0f;
-            }
-            changeImageAlpha(hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
-            
-            
-            hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
-            if (hotAlpha > 1.0f){
-                hotAlpha = 1.0f;
-            }
-            if (hotAlpha < 0.0f){
-                hotAlpha = 0.0f;
-            }
+		//update the cold part
+		changeImageAlpha(hudImgElements[tireNameCold.str().c_str()], 1.0f);
+		
+		//update the optimal part
+		optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
+		if (optimalAlpha > 1.0f){
+			optimalAlpha = 1.0f;
+		}
+		if (optimalAlpha < 0.0f){
+			optimalAlpha = 0.0f;
+		}
+		changeImageAlpha(hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
+		
+		//update the hot part
+		hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
+		if (hotAlpha > 1.0f){
+			hotAlpha = 1.0f;
+		}
+		if (hotAlpha < 0.0f){
+			hotAlpha = 0.0f;
+		}
 
-            changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
-        }
+		changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
+
         //temps string ( we consider only the middle temp of the tire)
         temp.str("");
         //internally the tire temp is in KELVIN so we convert it to Centrigrade
-        temp << K2C(currCar->_tyreT_mid(i)) << " C";
+        temp << K2C(currCar->_tyreT_mid(i)) << " °C";
 
         std::ostringstream tireNameText;
         tireNameText << "tire-" << tireName.str().c_str()  << "temps";
@@ -1744,11 +1731,12 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
 // tire wear
+	/*
     changeImageSize(hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
     changeImageSize(hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
     changeImageSize(hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
     changeImageSize(hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
-
+	*/
 //tire slip
     float slip = 0.0f;
     slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
@@ -2301,6 +2289,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 text->setAlignment(osgText::Text::RIGHT_BOTTOM_BASE_LINE );
                             }
+							else if (textAlign=="CENTER_BOTTOM")
+							{
+								text->setAlignment(osgText::Text::CENTER_BOTTOM_BASE_LINE );
+							}
 
                             //set the text string
                             text->setText(textStr);
