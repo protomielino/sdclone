@@ -1510,6 +1510,15 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     temp << (int)(currCar->_speed_x * 3.6);
     hudTextElements["speed-number"]->setText(temp.str());
 
+	//set speed unit
+	temp.str("");
+	temp << "kph"; //mph
+	hudTextElements["speed-number-unit"]->setText(temp.str());
+
+//rpm number
+    temp.str("");
+    temp << (int) currCar->_enginerpm;
+    hudTextElements["rpm-number"]->setText(temp.str());
 
 //damage
     float carDamage = (float)((currCar->_dammage) / (float)s->_maxDammage);
