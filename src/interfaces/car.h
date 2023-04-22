@@ -363,6 +363,7 @@ typedef struct {
 #define _tyreCondition(i)       priv.wheel[i].condition
 #define _tyreTreadDepth(i)      priv.wheel[i].treadDepth
 #define _tyreEffMu(i)           priv.wheel[i].effectiveMu
+#define _tyreCurrentPressure(i)     priv.wheel[i].currentPressure
 
 #define MAX_GEARS	10	/* including reverse and neutral */
 

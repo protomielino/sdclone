@@ -1660,16 +1660,16 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         std::ostringstream tireName;
         switch(i) {
             case 0:
-                tireName << "fr-";
+                tireName << "fr";
             break;
             case 1:
-                tireName << "fl-";
+                tireName << "fl";
             break;
             case 2:
-                tireName << "rr-";
+                tireName << "rr";
             break;
             case 3:
-                tireName <<  "rl-";
+                tireName <<  "rl";
             break;
             default:
                 tireName << "";
@@ -1716,27 +1716,60 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		if (hotAlpha < 0.0f){
 			hotAlpha = 0.0f;
 		}
-
 		changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
 
-        //temps string ( we consider only the middle temp of the tire)
+        //temps string
         temp.str("");
-        //internally the tire temp is in KELVIN so we convert it to Centrigrade
-        temp << K2C(currCar->_tyreT_mid(i)) << " °C";
-
+        //set the current tire temp (internally the tire temp is in KELVIN so we convert it to Centrigrade)
+        temp << K2C(currCar->_tyreT_mid(i));
         std::ostringstream tireNameText;
-        tireNameText << "tire-" << tireName.str().c_str()  << "temps";
+        tireNameText << "tire-" << tireName.str().c_str()  << "-temps";
         hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+
+        //set the temperature unit
+        temp.str("");
+        temp << "C";
+        tireNameText.str("");
+        tireNameText << "tire-" << tireName.str().c_str()  << "-temps-unit";
+        hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+
+        //pressures string
+        temp.str("");
+        tireNameText.str("");
+        //set the current tire temp (internally the tire temp is in KPA *1000 so we wanto to convert it ot PSI)
+        temp << currCar->_tyreCurrentPressure(i) * 0.145038 / 1000;
+        //temp << "25.8";
+        tireNameText << "tire-" << tireName.str().c_str()  << "-pressures";
+        hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+
+        //set the temperature unit
+        temp.str("");
+        temp << "PSI";
+        tireNameText.str("");
+        tireNameText << "tire-" << tireName.str().c_str()  << "-pressures-unit";
+        hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+
+
+
     
     }
 
 // tire wear
-	/*
-    changeImageSize(hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
-    changeImageSize(hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
-    changeImageSize(hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
-    changeImageSize(hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
-	*/
+    changeImageSize(hudImgElements["tire-fr-cold"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-fr-optimal"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-fr-hot"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
+
+    changeImageSize(hudImgElements["tire-fl-cold"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-fl-optimal"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-fl-hot"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
+
+    changeImageSize(hudImgElements["tire-rr-cold"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-rr-optimal"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-rr-hot"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
+
+    changeImageSize(hudImgElements["tire-rl-cold"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-rl-optimal"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-rl-hot"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
 //tire slip
     float slip = 0.0f;
     slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
