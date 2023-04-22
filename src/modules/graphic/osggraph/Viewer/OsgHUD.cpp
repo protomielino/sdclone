@@ -1662,8 +1662,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     prevSteerAngle = angle;
     
 // tires temps
-
-
     for (int i = 0; i < 4; i++) { //for each tires
         
         std::ostringstream tireName;
@@ -1757,11 +1755,27 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         tireNameText.str("");
         tireNameText << "tire-" << tireName.str().c_str()  << "-pressures-unit";
         hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+        
+        
+        //set brake temps
+		float brakeTemp = currCar->_brakeTemp(i);
+
+        tireNameText.str("");
+        tireNameText << "brake-" << tireName.str().c_str()  << "-cold";	
+		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], 1.0);
+
+        tireNameText.str("");
+        tireNameText << "brake-" << tireName.str().c_str()  << "-optimal";
+		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], (brakeTemp*2));
+		
+        tireNameText.str("");
+        tireNameText << "brake-" << tireName.str().c_str()  << "-hot";
+		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], ((brakeTemp-0.5)*2));
 
 
-
-    
     }
+
+
 
 // tire wear
     changeImageSize(hudImgElements["tire-fr-cold"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
