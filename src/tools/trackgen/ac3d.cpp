@@ -31,6 +31,32 @@
 #include <iomanip>
 #include <cmath>
 
+//------------------------------------- V3d -----------------------------------
+
+Ac3d::V3d Ac3d::V3d::operator + (const V3d &other) const
+{
+    return V3d((*this)[0] + other[0], (*this)[1] + other[1], (*this)[2] + other[2]);
+}
+
+Ac3d::V3d Ac3d::V3d::operator - (const V3d &other) const
+{
+    return V3d((*this)[0] - other[0], (*this)[1] - other[1], (*this)[2] - other[2]);
+}
+
+Ac3d::V3d Ac3d::V3d::operator/(double scalar) const
+{
+    return V3d((*this)[0] / scalar, (*this)[1] / scalar, (*this)[2] / scalar);
+}
+
+double Ac3d::V3d::length() const
+{
+    return sqrt((*this)[0] * (*this)[0] + (*this)[1] * (*this)[1] + (*this)[2] * (*this)[2]);
+}
+
+//----------------------------------- Color -----------------------------------
+
+//---------------------------------- Material ---------------------------------
+
 Ac3d::Material::Material(const std::vector<std::string> &tokens)
 {
     if (tokens.size() != 22)
@@ -152,6 +178,8 @@ bool Ac3d::Material::same(const Material &material) const
            trans == material.trans;
 }
 
+//-------------------------------- Surface ------------------------------------
+
 Ac3d::Surface::Surface(std::ifstream &fin)
 {
     std::string line;
@@ -208,242 +236,7 @@ void Ac3d::Surface::write(std::ofstream &fout) const
         fout << ref.index << " " << ref.coord[0] << " " << ref.coord[1] << std::endl;
 }
 
-Ac3d::Object::Object(std::ifstream &fin)
-{
-    std::string line;
-
-    while (std::getline(fin, line))
-    {
-        std::vector<std::string> tokens;
-        std::istringstream       iss(line);
-
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
-
-        if (tokens.empty())
-            continue;
-        if (tokens.at(0) == "OBJECT")
-            parse(fin, tokens.at(1));
-        else
-            throw Exception("Invalid AC3D file");
-    }
-}
-
-void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
-{
-    type = objType;
-
-    std::string line;
-
-    while (std::getline(fin, line))
-    {
-        std::vector<std::string> tokens;
-        std::istringstream       iss(line);
-
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
-
-        if (tokens.empty())
-            continue;
-        if (tokens.at(0) == "name")
-            name = tokens.at(1);
-        else if (tokens.at(0) == "data")
-        {
-            const size_t length = std::stoi(tokens.at(1));
-            std::string text;
-            while (getline(fin, text))
-            {
-                data += text;
-                if (data.size() >= length)
-                    break;
-            }
-        }
-        else if (tokens.at(0) == "texture")
-        {
-            texture = tokens.at(1);
-        }
-        else if (tokens.at(0) == "texrep")
-        {
-            texrep.initialized = true;
-            texrep[0] = std::stod(tokens.at(1));
-            texrep[1] = std::stod(tokens.at(2));
-        }
-        else if (tokens.at(0) == "texoff")
-        {
-            texoff.initialized = true;
-            texoff[0] = std::stod(tokens.at(1));
-            texoff[1] = std::stod(tokens.at(2));
-        }
-        else if (tokens.at(0) == "subdiv")
-        {
-            subdiv.initalized = true;
-            subdiv = std::stoi(tokens.at(1));
-        }
-        else if (tokens.at(0) == "crease")
-        {
-            crease.initalized = true;
-            crease = std::stod(tokens.at(1));
-        }
-        else if (tokens.at(0) == "rot")
-        {
-            rot.initialized = true;
-            for (size_t i = 0; i < 9; i++)
-                rot[i] = std::stod(tokens[i + 1]);
-        }
-        else if (tokens.at(0) == "loc")
-        {
-            loc.initialized = true;
-            loc[0] = std::stod(tokens.at(1));
-            loc[1] = std::stod(tokens.at(2));
-            loc[2] = std::stod(tokens.at(3));
-        }
-        else if (tokens.at(0) == "url")
-            url = tokens.at(1);
-        else if (tokens.at(0) == "hidden")
-            hidden = true;
-        else if (tokens.at(0) == "locked")
-            locked = true;
-        else if (tokens.at(0) == "folded")
-            folded = true;
-        else if (tokens.at(0) == "numvert")
-        {
-            const int numvert = std::stoi(tokens.at(1));
-            for (int i = 0; i < numvert; )
-            {
-                tokens.clear();
-                std::getline(fin, line);
-                if (line.empty())
-                    continue;
-
-                std::istringstream       iss1(line);
-
-                std::copy(std::istream_iterator<std::string>(iss1),
-                          std::istream_iterator<std::string>(),
-                          std::back_inserter(tokens));
-
-                vertices.emplace_back(std::stod(tokens.at(0)), std::stod(tokens.at(1)), std::stod(tokens.at(2)));
-                i++;
-            }
-        }
-        else if (tokens.at(0) == "numsurf")
-        {
-            const int numsurf = std::stoi(tokens.at(1));
-            for (int i = 0; i < numsurf; i++)
-                surfaces.emplace_back(fin);
-        }
-        else if (tokens.at(0) == "kids")
-        {
-            const int numKids = std::stoi(tokens.at(1));
-            for (int i = 0; i < numKids; i++)
-                kids.emplace_back(fin);
-        }
-    }
-}
-
-void Ac3d::Object::write(std::ofstream &fout) const
-{
-    fout << "OBJECT " << type << std::endl;
-    if (!name.empty())
-    {
-        if (name[0] != '\"')
-            fout << "name \"" << name << "\"" << std::endl;
-        else
-            fout << "name " << name << std::endl;
-    }
-    if (!data.empty())
-    {
-        fout << "data " << data.length() << std::endl;
-        fout << data << std::endl;
-    }
-    if (!texture.empty())
-    {
-        if (texture[0] != '\"')
-            fout << "texture \"" << texture << "\"" << std::endl;
-        else
-            fout << "texture " << texture << std::endl;
-    }
-    if (texrep.initialized)
-        fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
-    if (texoff.initialized)
-        fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
-    if (subdiv.initalized)
-        fout << "subdiv " << subdiv.value << std::endl;
-    if (crease.initalized)
-        fout << "crease " << crease.value << std::endl;
-    if (rot.initialized)
-    {
-        fout << "rot "
-             << rot[0] << " " << rot[1] << " " << rot[2] << " "
-             << rot[3] << " " << rot[4] << " " << rot[5] << " "
-             << rot[6] << " " << rot[7] << " " << rot[8] << std::endl;
-    }
-    if (loc.initialized)
-    {
-        fout << "loc " << loc[0] << " " << loc[1] << " " << loc[2] << std::endl;
-    }
-    if (!url.empty())
-        fout << "url " << url << std::endl;
-    if (hidden)
-        fout << "hidden" << std::endl;
-    if (locked)
-        fout << "locked" << std::endl;
-    if (folded)
-        fout << "foulded" << std::endl;
-    if (!vertices.empty())
-    {
-        fout << "numvert " << vertices.size() << std::endl;
-        for (const auto &vertex : vertices)
-            fout << vertex[0] << " " << vertex[1] << " " << vertex[2] << std::endl;
-    }
-    if (!surfaces.empty())
-    {
-        fout << "numsurf " << surfaces.size() << std::endl;
-        for (const auto &surface : surfaces)
-            surface.write(fout);
-    }
-    fout << "kids " << kids.size() << std::endl;
-    for (const auto &kid : kids)
-        kid.write(fout);
-}
-
-void Ac3d::Object::transform(const Matrix &matrix)
-{
-    Matrix thisMatrix;
-
-    if (loc.initialized)
-    {
-        thisMatrix.setLocation(loc);
-        loc.initialized = false;
-    }
-    loc[0] = 0;
-    loc[1] = 0;
-    loc[2] = 0;
-
-    if (rot.initialized)
-    {
-        thisMatrix.setRotation(rot);
-        rot.initialized = false;
-    }
-
-    rot[0] = 1; rot[1] = 0; rot[2] = 0;
-    rot[3] = 0; rot[4] = 1; rot[5] = 0;
-    rot[6] = 0; rot[7] = 0; rot[8] = 1;
-
-    const Matrix newMatrix = thisMatrix.multiply(matrix);
-
-    if (type == "poly")
-    {
-        for (auto &vertex : vertices)
-            newMatrix.transformPoint(vertex);
-    }
-    else
-    {
-        for (auto &kid : kids)
-            kid.transform(newMatrix);
-    }
-}
+//--------------------------------- Matrix ------------------------------------
 
 Ac3d::Matrix::Matrix()
 {
@@ -451,9 +244,9 @@ Ac3d::Matrix::Matrix()
 }
 
 Ac3d::Matrix::Matrix(double m0, double m1, double m2, double m3,
-                     double m4, double m5, double m6, double m7,
-                     double m8, double m9, double m10, double m11,
-                     double m12, double m13, double m14, double m15)
+    double m4, double m5, double m6, double m7,
+    double m8, double m9, double m10, double m11,
+    double m12, double m13, double m14, double m15)
 {
     (*this)[0][0] = m0;  (*this)[0][1] = m1;  (*this)[0][2] = m2;  (*this)[0][3] = m3;
     (*this)[1][0] = m4;  (*this)[1][1] = m5;  (*this)[1][2] = m6;  (*this)[1][3] = m7;
@@ -600,7 +393,6 @@ void Ac3d::Matrix::makeRotation(const std::array<double, 9> &rotation)
     (*this)[1][0] = rotation[3]; (*this)[1][1] = rotation[4]; (*this)[1][2] = rotation[5]; (*this)[1][3] = 0;
     (*this)[2][0] = rotation[6]; (*this)[2][1] = rotation[7]; (*this)[2][2] = rotation[8]; (*this)[2][3] = 0;
     (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
-
 }
 
 void Ac3d::Matrix::makeRotation(double x, double y, double z)
@@ -625,9 +417,9 @@ void Ac3d::Matrix::makeScale(double x, double y, double z)
     (*this)[3][0] = 0; (*this)[3][1] = 0; (*this)[3][2] = 0; (*this)[3][3] = 1;
 }
 
-void Ac3d::Matrix::transformPoint(v3d &point) const
+void Ac3d::Matrix::transformPoint(V3d &point) const
 {
-    v3d dst;
+    V3d dst;
 
     const double t0 = point[0];
     const double t1 = point[1];
@@ -640,9 +432,9 @@ void Ac3d::Matrix::transformPoint(v3d &point) const
     point = dst;
 }
 
-void Ac3d::Matrix::transformNormal(v3d &normal) const
+void Ac3d::Matrix::transformNormal(V3d &normal) const
 {
-    v3d dst;
+    V3d dst;
 
     const double t0 = normal[0];
     const double t1 = normal[1];
@@ -659,7 +451,7 @@ Ac3d::Matrix Ac3d::Matrix::multiply(const Matrix &matrix)
 {
     Matrix result;
 
-    for (int j = 0; j < 4; j++)
+    for (size_t j = 0; j < 4; j++)
     {
         result[0][j] = matrix[0][0] * (*this)[0][j] +
                        matrix[0][1] * (*this)[1][j] +
@@ -684,6 +476,331 @@ Ac3d::Matrix Ac3d::Matrix::multiply(const Matrix &matrix)
 
     return result;
 }
+
+//------------------------------- BoundingBox ---------------------------------
+
+void Ac3d::BoundingBox::extend(const V3d &vertex)
+{
+    for (size_t i = 0; i < 3; i++)
+    {
+        if (vertex[i] > max[i])
+            max[i] = vertex[i];
+        if (vertex[i] < min[i])
+            min[i] = vertex[i];
+    }
+}
+
+//------------------------------- Boundingsphere ------------------------------
+
+void Ac3d::BoundingSphere::extend(const BoundingBox &boundingBox)
+{
+    V3d half = (boundingBox.max - boundingBox.min) / 2;
+    center = boundingBox.min + half;
+    radius = half.length();
+}
+
+//---------------------------------- Object -----------------------------------
+
+Ac3d::Object::Object(std::ifstream &fin)
+{
+    std::string line;
+
+    while (std::getline(fin, line))
+    {
+        std::vector<std::string> tokens;
+        std::istringstream       iss(line);
+
+        std::copy(std::istream_iterator<std::string>(iss),
+                  std::istream_iterator<std::string>(),
+                  std::back_inserter(tokens));
+
+        if (tokens.empty())
+            continue;
+        if (tokens.at(0) == "OBJECT")
+        {
+            parse(fin, tokens.at(1));
+            return;
+        }
+        else
+            throw Exception("Invalid AC3D file");
+    }
+}
+
+void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
+{
+    type = objType;
+
+    std::string line;
+
+    while (std::getline(fin, line))
+    {
+        std::vector<std::string> tokens;
+        std::istringstream       iss(line);
+
+        std::copy(std::istream_iterator<std::string>(iss),
+                  std::istream_iterator<std::string>(),
+                  std::back_inserter(tokens));
+
+        if (tokens.empty())
+            continue;
+        if (tokens.at(0) == "name")
+            name = tokens.at(1);
+        else if (tokens.at(0) == "data")
+        {
+            const size_t length = std::stoi(tokens.at(1));
+            std::string text;
+            while (getline(fin, text))
+            {
+                data += text;
+                if (data.size() >= length)
+                    break;
+            }
+        }
+        else if (tokens.at(0) == "texture")
+        {
+            texture = tokens.at(1);
+        }
+        else if (tokens.at(0) == "texrep")
+        {
+            texrep.initialized = true;
+            texrep[0] = std::stod(tokens.at(1));
+            texrep[1] = std::stod(tokens.at(2));
+        }
+        else if (tokens.at(0) == "texoff")
+        {
+            texoff.initialized = true;
+            texoff[0] = std::stod(tokens.at(1));
+            texoff[1] = std::stod(tokens.at(2));
+        }
+        else if (tokens.at(0) == "subdiv")
+        {
+            subdiv.initalized = true;
+            subdiv = std::stoi(tokens.at(1));
+        }
+        else if (tokens.at(0) == "crease")
+        {
+            crease.initalized = true;
+            crease = std::stod(tokens.at(1));
+        }
+        else if (tokens.at(0) == "rot")
+        {
+            rot.initialized = true;
+            for (size_t i = 0; i < 9; i++)
+                rot[i] = std::stod(tokens[i + 1]);
+        }
+        else if (tokens.at(0) == "loc")
+        {
+            loc.initialized = true;
+            loc[0] = std::stod(tokens.at(1));
+            loc[1] = std::stod(tokens.at(2));
+            loc[2] = std::stod(tokens.at(3));
+        }
+        else if (tokens.at(0) == "url")
+            url = tokens.at(1);
+        else if (tokens.at(0) == "hidden")
+            hidden = true;
+        else if (tokens.at(0) == "locked")
+            locked = true;
+        else if (tokens.at(0) == "folded")
+            folded = true;
+        else if (tokens.at(0) == "numvert")
+        {
+            const int numvert = std::stoi(tokens.at(1));
+            for (int i = 0; i < numvert; )
+            {
+                tokens.clear();
+                std::getline(fin, line);
+                if (line.empty())
+                    continue;
+
+                std::istringstream       iss1(line);
+
+                std::copy(std::istream_iterator<std::string>(iss1),
+                          std::istream_iterator<std::string>(),
+                          std::back_inserter(tokens));
+
+                vertices.emplace_back(std::stod(tokens.at(0)), std::stod(tokens.at(1)), std::stod(tokens.at(2)));
+                i++;
+            }
+        }
+        else if (tokens.at(0) == "numsurf")
+        {
+            const int numsurf = std::stoi(tokens.at(1));
+            for (int i = 0; i < numsurf; i++)
+                surfaces.emplace_back(fin);
+        }
+        else if (tokens.at(0) == "kids")
+        {
+            const int numKids = std::stoi(tokens.at(1));
+            for (int i = 0; i < numKids; i++)
+                kids.emplace_back(fin);
+            return;
+        }
+    }
+}
+
+void Ac3d::Object::write(std::ofstream &fout) const
+{
+    fout << "OBJECT " << type << std::endl;
+    if (!name.empty())
+    {
+        if (name[0] != '\"')
+            fout << "name \"" << name << "\"" << std::endl;
+        else
+            fout << "name " << name << std::endl;
+    }
+    if (!data.empty())
+    {
+        fout << "data " << data.length() << std::endl;
+        fout << data << std::endl;
+    }
+    if (!texture.empty())
+    {
+        if (texture[0] != '\"')
+            fout << "texture \"" << texture << "\"" << std::endl;
+        else
+            fout << "texture " << texture << std::endl;
+    }
+    if (texrep.initialized)
+        fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
+    if (texoff.initialized)
+        fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
+    if (subdiv.initalized)
+        fout << "subdiv " << subdiv.value << std::endl;
+    if (crease.initalized)
+        fout << "crease " << crease.value << std::endl;
+    if (rot.initialized)
+    {
+        fout << "rot "
+             << rot[0] << " " << rot[1] << " " << rot[2] << " "
+             << rot[3] << " " << rot[4] << " " << rot[5] << " "
+             << rot[6] << " " << rot[7] << " " << rot[8] << std::endl;
+    }
+    if (loc.initialized)
+    {
+        fout << "loc " << loc[0] << " " << loc[1] << " " << loc[2] << std::endl;
+    }
+    if (!url.empty())
+        fout << "url " << url << std::endl;
+    if (hidden)
+        fout << "hidden" << std::endl;
+    if (locked)
+        fout << "locked" << std::endl;
+    if (folded)
+        fout << "foulded" << std::endl;
+    if (!vertices.empty())
+    {
+        fout << "numvert " << vertices.size() << std::endl;
+        for (const auto &vertex : vertices)
+            fout << vertex[0] << " " << vertex[1] << " " << vertex[2] << std::endl;
+    }
+    if (!surfaces.empty())
+    {
+        fout << "numsurf " << surfaces.size() << std::endl;
+        for (const auto &surface : surfaces)
+            surface.write(fout);
+    }
+    fout << "kids " << kids.size() << std::endl;
+    for (const auto &kid : kids)
+        kid.write(fout);
+}
+
+void Ac3d::Object::transform(const Matrix &matrix)
+{
+    Matrix thisMatrix;
+
+    if (loc.initialized)
+    {
+        thisMatrix.setLocation(loc);
+        loc.initialized = false;
+    }
+    loc[0] = 0;
+    loc[1] = 0;
+    loc[2] = 0;
+
+    if (rot.initialized)
+    {
+        thisMatrix.setRotation(rot);
+        rot.initialized = false;
+    }
+
+    rot[0] = 1; rot[1] = 0; rot[2] = 0;
+    rot[3] = 0; rot[4] = 1; rot[5] = 0;
+    rot[6] = 0; rot[7] = 0; rot[8] = 1;
+
+    const Matrix newMatrix = thisMatrix.multiply(matrix);
+
+    if (type == "poly")
+    {
+        for (auto &vertex : vertices)
+            newMatrix.transformPoint(vertex);
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.transform(newMatrix);
+    }
+}
+
+void Ac3d::Object::flipAxes(bool in)
+{
+    if (type == "poly")
+    {
+        for (auto &vertex : vertices)
+        {
+            const double y = vertex[1];
+            const double z = vertex[2];
+            if (in)
+            {
+                vertex[1] = -z;
+                vertex[2] = y;
+            }
+            else
+            {
+                vertex[1] = z;
+                vertex[2] = -y;
+            }
+        }
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.flipAxes(in);
+    }
+}
+
+Ac3d::BoundingBox Ac3d::Object::getBoundingBox() const
+{
+    BoundingBox bb;
+
+    for (const auto &vertex : vertices)
+        bb.extend(vertex);
+
+    return bb;
+}
+
+Ac3d::BoundingSphere Ac3d::Object::getBoundingSphere() const
+{
+    BoundingSphere  bs;
+    bs.extend(getBoundingBox());
+    return bs;
+}
+
+void Ac3d::Object::remapMaterials(const std::map<int, int> &materialMap)
+{
+    if (type == "poly")
+    {
+        for (auto &surface : surfaces)
+            surface.mat = materialMap.find(surface.mat)->second;
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.remapMaterials(materialMap);
+    }
+}
+
+//------------------------------------ Ac3d -----------------------------------
 
 Ac3d::Ac3d()
 {
@@ -787,4 +904,50 @@ void Ac3d::flattenGeometry()
     const Matrix matrix;
 
     transform(matrix);
+}
+
+void Ac3d::merge(const Ac3d & ac3d)
+{
+    if (materials.empty())
+    {
+        materials = ac3d.materials;
+
+        for (const auto &kid : ac3d.root.kids)
+            root.kids.push_back(kid);
+
+        return;
+    }
+
+    std::map<int, int> materialMap;
+
+    for (int i = 0; i < ac3d.materials.size(); i++)
+    {
+        bool found = false;
+        for (int j = 0; j < materials.size(); j++)
+        {
+            if (ac3d.materials[i].same(materials[j]))
+            {
+                materialMap[i] = j;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            materialMap[i] = static_cast<int>(materials.size());
+            materials.push_back(ac3d.materials[i]);
+        }
+    }
+
+    for (const auto &kid : ac3d.root.kids)
+    {
+        root.kids.push_back(kid);
+        root.kids.back().remapMaterials(materialMap);
+    }
+}
+
+void Ac3d::flipAxes(bool in)
+{
+    root.flipAxes(in);
 }

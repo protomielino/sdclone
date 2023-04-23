@@ -32,23 +32,30 @@
 #include <vector>
 #include <list>
 #include <fstream>
+#include <limits>
+#include <map>
 
 struct Ac3d
 {
-    struct v3d : public std::array<double, 3>
+    struct V3d : public std::array<double, 3>
     {
-        v3d()
+        V3d()
         {
             at(0) = 0;
             at(1) = 0;
             at(2) = 0;
         }
-        v3d(double x, double y, double z)
+        V3d(double x, double y, double z)
         {
             at(0) = x;
             at(1) = y;
             at(2) = z;
         }
+
+        V3d operator+(const V3d &other) const;
+        V3d operator-(const V3d &other) const;
+        V3d operator/(double scalar) const;
+        double length() const;
     };
 
     struct Color : public std::array<double, 3>
@@ -125,7 +132,7 @@ struct Ac3d
     public:
         bool initialized = false;
     };
-    class v3 : public v3d
+    class v3 : public V3d
     {
     public:
         bool initialized = false;
@@ -165,9 +172,29 @@ struct Ac3d
         void makeRotation(double x, double y, double z);
         void makeScale(double scale);
         void makeScale(double x, double y, double z);
-        void transformPoint(v3d &point) const;
-        void transformNormal(v3d &normal) const;
+        void transformPoint(V3d &point) const;
+        void transformNormal(V3d &normal) const;
         Matrix multiply(const Matrix &matrix);
+    };
+
+    struct BoundingBox
+    {
+        V3d min{ std::numeric_limits<double>::max(),
+                 std::numeric_limits<double>::max(),
+                 std::numeric_limits<double>::max() };
+        V3d max{ -std::numeric_limits<double>::max(),
+                 -std::numeric_limits<double>::max(),
+                 -std::numeric_limits<double>::max() };
+
+        void extend(const V3d &vertex);
+    };
+
+    struct BoundingSphere
+    {
+        V3d     center{ 0, 0, 0 };
+        double  radius = 0;
+
+        void extend(const BoundingBox &boundingBox);
     };
 
     struct Object
@@ -186,20 +213,20 @@ struct Ac3d
         bool				    hidden = false;
         bool				    locked = false;
         bool				    folded = false;
-        std::vector<v3d>        vertices;
+        std::vector<V3d>        vertices;
         std::vector<Surface>    surfaces;
         std::list<Object>       kids;
 
         Object() = default;
-
-        Object(const std::string &type, const std::string &name) : type(type), name(name)
-        {
-        }
-
+        Object(const std::string &type, const std::string &name) : type(type), name(name) { }
         explicit Object(std::ifstream &fin);
         void parse(std::ifstream &fin, const std::string &objType);
         void write(std::ofstream &fout) const;
         void transform(const Matrix &matrix);
+        void flipAxes(bool in);
+        BoundingBox getBoundingBox() const;
+        BoundingSphere getBoundingSphere() const;
+        void remapMaterials(const std::map<int, int> &materialMap);
     };
 
     bool                    versionC = false;
@@ -214,6 +241,8 @@ struct Ac3d
     void writeFile(const std::string &fileName) const;
     void flattenGeometry();
     void transform(const Matrix &matrix);
+    void flipAxes(bool in);
+    void merge(const Ac3d &ac3d);
 };
 
 #endif /* _AC3D_H_ */
