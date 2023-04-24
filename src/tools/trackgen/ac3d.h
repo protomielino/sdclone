@@ -197,6 +197,8 @@ struct Ac3d
         void extend(const BoundingBox &boundingBox);
     };
 
+    typedef std::map<size_t, size_t> MaterialMap;
+
     struct Object
     {
         std::string		        type;
@@ -226,7 +228,7 @@ struct Ac3d
         void flipAxes(bool in);
         BoundingBox getBoundingBox() const;
         BoundingSphere getBoundingSphere() const;
-        void remapMaterials(const std::map<int, int> &materialMap);
+        void remapMaterials(const MaterialMap &materialMap);
     };
 
     bool                    versionC = false;

@@ -494,7 +494,7 @@ void Ac3d::BoundingBox::extend(const V3d &vertex)
 
 void Ac3d::BoundingSphere::extend(const BoundingBox &boundingBox)
 {
-    V3d half = (boundingBox.max - boundingBox.min) / 2;
+    const V3d half = (boundingBox.max - boundingBox.min) / 2;
     center = boundingBox.min + half;
     radius = half.length();
 }
@@ -521,8 +521,8 @@ Ac3d::Object::Object(std::ifstream &fin)
             parse(fin, tokens.at(1));
             return;
         }
-        else
-            throw Exception("Invalid AC3D file");
+        
+        throw Exception("Invalid AC3D file");
     }
 }
 
@@ -786,12 +786,12 @@ Ac3d::BoundingSphere Ac3d::Object::getBoundingSphere() const
     return bs;
 }
 
-void Ac3d::Object::remapMaterials(const std::map<int, int> &materialMap)
+void Ac3d::Object::remapMaterials(const MaterialMap &materialMap)
 {
     if (type == "poly")
     {
         for (auto &surface : surfaces)
-            surface.mat = materialMap.find(surface.mat)->second;
+            surface.mat = static_cast<int>(materialMap.find(surface.mat)->second);
     }
     else
     {
@@ -918,12 +918,12 @@ void Ac3d::merge(const Ac3d & ac3d)
         return;
     }
 
-    std::map<int, int> materialMap;
+    MaterialMap materialMap;
 
-    for (int i = 0; i < ac3d.materials.size(); i++)
+    for (size_t i = 0; i < ac3d.materials.size(); i++)
     {
         bool found = false;
-        for (int j = 0; j < materials.size(); j++)
+        for (size_t j = 0; j < materials.size(); j++)
         {
             if (ac3d.materials[i].same(materials[j]))
             {
