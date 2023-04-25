@@ -55,6 +55,8 @@ struct Ac3d
         V3d operator+(const V3d &other) const;
         V3d operator-(const V3d &other) const;
         V3d operator/(double scalar) const;
+        double dot(const V3d &other) const;
+        V3d cross(const V3d &other) const;
         double length() const;
     };
 
@@ -187,6 +189,8 @@ struct Ac3d
                  -std::numeric_limits<double>::max() };
 
         void extend(const V3d &vertex);
+        void extend(const BoundingBox &boundingBox);
+        bool pointInside(double x, double y) const;
     };
 
     struct BoundingSphere
@@ -216,8 +220,14 @@ struct Ac3d
         bool				    locked = false;
         bool				    folded = false;
         std::vector<V3d>        vertices;
-        std::vector<Surface>    surfaces;
+        std::list<Surface>      surfaces;
         std::list<Object>       kids;
+
+        // not part of AC3D file
+        mutable bool            hasBoundingBox = false;
+        mutable BoundingBox     boundingBox;
+        mutable bool            hasBoundingSphere = false;
+        mutable BoundingSphere  boundingSphere;
 
         Object() = default;
         Object(const std::string &type, const std::string &name) : type(type), name(name) { }
@@ -226,9 +236,12 @@ struct Ac3d
         void write(std::ofstream &fout) const;
         void transform(const Matrix &matrix);
         void flipAxes(bool in);
-        BoundingBox getBoundingBox() const;
-        BoundingSphere getBoundingSphere() const;
+        const BoundingBox &getBoundingBox() const;
+        const BoundingSphere &getBoundingSphere() const;
         void remapMaterials(const MaterialMap &materialMap);
+        void generateTriangles();
+        void getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const;
+        bool pointInside(const Surface &surface, double x, double y, double &z, V3d &normal) const;
     };
 
     bool                    versionC = false;
@@ -244,7 +257,10 @@ struct Ac3d
     void flattenGeometry();
     void transform(const Matrix &matrix);
     void flipAxes(bool in);
+    void generateTriangles();
     void merge(const Ac3d &ac3d);
+    double getTerrainHeight(double x, double y) const;
+    double getTerrainAngle(double x, double y) const;
 };
 
 #endif /* _AC3D_H_ */

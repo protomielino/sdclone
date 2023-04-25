@@ -53,6 +53,18 @@ double Ac3d::V3d::length() const
     return sqrt((*this)[0] * (*this)[0] + (*this)[1] * (*this)[1] + (*this)[2] * (*this)[2]);
 }
 
+double Ac3d::V3d::dot(const V3d &other) const
+{
+    return (*this)[0] * other[0] + (*this)[1] * other[1] + (*this)[2] * other[2];
+}
+
+Ac3d::V3d Ac3d::V3d::cross(const V3d &other) const
+{
+    return V3d{ (*this)[1] * other[2] - (*this)[2] * other[1],
+                (*this)[2] * other[0] - (*this)[0] * other[2],
+                (*this)[0] * other[1] - (*this)[1] * other[0] };
+}
+
 //----------------------------------- Color -----------------------------------
 
 //---------------------------------- Material ---------------------------------
@@ -490,6 +502,22 @@ void Ac3d::BoundingBox::extend(const V3d &vertex)
     }
 }
 
+void Ac3d::BoundingBox::extend(const BoundingBox &boundingBox)
+{
+    for (size_t i = 0; i < 3; i++)
+    {
+        if (boundingBox.max[i] > max[i])
+            max[i] = boundingBox.max[i];
+        if (boundingBox.min[i] < min[i])
+            min[i] = boundingBox.min[i];
+    }
+}
+
+bool Ac3d::BoundingBox::pointInside(double x, double y) const
+{
+    return x <= max[0] && x >= min[0] && y <= max[1] && y >= min[1];
+}
+
 //------------------------------- Boundingsphere ------------------------------
 
 void Ac3d::BoundingSphere::extend(const BoundingBox &boundingBox)
@@ -769,21 +797,36 @@ void Ac3d::Object::flipAxes(bool in)
     }
 }
 
-Ac3d::BoundingBox Ac3d::Object::getBoundingBox() const
+const Ac3d::BoundingBox &Ac3d::Object::getBoundingBox() const
 {
-    BoundingBox bb;
+    if (type == "poly")
+    {
+        if (!hasBoundingBox)
+        {
+            for (const auto &vertex : vertices)
+                boundingBox.extend(vertex);
 
-    for (const auto &vertex : vertices)
-        bb.extend(vertex);
+            hasBoundingBox = true;
+        }
+    }
+    else
+    {
+        for (const auto &kid : kids)
+            boundingBox.extend(kid.getBoundingBox());
+    }
 
-    return bb;
+    return boundingBox;
 }
 
-Ac3d::BoundingSphere Ac3d::Object::getBoundingSphere() const
+const Ac3d::BoundingSphere &Ac3d::Object::getBoundingSphere() const
 {
-    BoundingSphere  bs;
-    bs.extend(getBoundingBox());
-    return bs;
+    if (!hasBoundingSphere)
+    {
+        boundingSphere.extend(getBoundingBox());
+        hasBoundingSphere = true;
+    }
+
+    return boundingSphere;
 }
 
 void Ac3d::Object::remapMaterials(const MaterialMap &materialMap)
@@ -798,6 +841,113 @@ void Ac3d::Object::remapMaterials(const MaterialMap &materialMap)
         for (auto &kid : kids)
             kid.remapMaterials(materialMap);
     }
+}
+
+void Ac3d::Object::generateTriangles()
+{
+    if (type == "poly")
+    {
+        for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end(); ++it)
+        {
+            if (it->refs.size() == 4)
+            {
+                Surface surface;
+                surface.mat = it->mat;
+                surface.surf = it->surf;
+                surface.refs.resize(3);
+                surface.refs[0] = it->refs[0];
+                surface.refs[1] = it->refs[2];
+                surface.refs[2] = it->refs[3];
+                it->refs.resize(3);
+                surfaces.insert(++it, surface);
+            }
+            else if (it->refs.size() != 3)
+            {
+                throw Exception("Not implemented yet");
+            }
+        }
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.generateTriangles();
+    }
+}
+
+void Ac3d::Object::getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const
+{
+    if (getBoundingBox().pointInside(x, y))
+    {
+        if (type == "poly")
+        {
+            for (const auto &surface : surfaces)
+            {
+                double z;
+                V3d n;
+
+                if (pointInside(surface, x, y, z, n))
+                {
+                    if (z > terrainHeight)
+                    {
+                        terrainHeight = z;
+                        normal = n;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (const auto &kid : kids)
+                kid.getTerrainHeight(x, y, terrainHeight, normal);
+        }
+    }
+}
+
+bool Ac3d::Object::pointInside(const Surface &surface, double x, double y, double &z, V3d &normal) const
+{
+    if (surface.refs.size() != 3)
+        return false;
+
+    const double ax = vertices[surface.refs[0].index][0];
+    const double ay = vertices[surface.refs[0].index][1];
+
+    const double as_x = x - ax;
+    const double as_y = y - ay;
+
+    const double bx = vertices[surface.refs[1].index][0];
+    const double by = vertices[surface.refs[1].index][1];
+
+    const bool s_ab = (bx - ax) * as_y - (by - ay) * as_x > 0;
+
+    const double cx = vertices[surface.refs[2].index][0];
+    const double cy = vertices[surface.refs[2].index][1];
+
+    if ((cx - ax) * as_y - (cy - ay) * as_x > 0 == s_ab)
+        return false;
+
+    if ((cx - bx) * (y - by) - (cy - by) * (x - bx) > 0 != s_ab)
+        return false;
+
+    const V3d v1 = vertices[surface.refs[1].index] - vertices[surface.refs[0].index];
+    const V3d v2 = vertices[surface.refs[2].index] - vertices[surface.refs[0].index];
+
+    const V3d n(v1.cross(v2));
+
+    const double d = n.dot(vertices[surface.refs[0].index]);
+
+    const V3d ray(0, 0, 1);
+
+    const double ndr = n.dot(ray);
+
+    if (ndr == 0)
+        return false; // No intersection, the line is parallel to the plane
+
+    const V3d rayOrigin(x, y, 0);
+
+    z = (d - n.dot(rayOrigin)) / ndr;
+    normal = n;
+
+    return true;
 }
 
 //------------------------------------ Ac3d -----------------------------------
@@ -950,4 +1100,33 @@ void Ac3d::merge(const Ac3d & ac3d)
 void Ac3d::flipAxes(bool in)
 {
     root.flipAxes(in);
+}
+
+void Ac3d::generateTriangles()
+{
+    root.generateTriangles();
+}
+
+double Ac3d::getTerrainHeight(double x, double y) const
+{
+    double  terrainHeight = -1000000;
+    V3d     terrainNormal;
+
+    root.getTerrainHeight(x, y, terrainHeight, terrainNormal);
+
+    return terrainHeight;
+}
+
+double Ac3d::getTerrainAngle(double x, double y) const
+{
+    double  terrainHeight = -1000000;
+    V3d     terrainNormal;
+    double  angle = 0;
+
+    root.getTerrainHeight(x, y, terrainHeight, terrainNormal);
+
+    if (terrainHeight != -1000000)
+        angle = 180.0 - atan2(terrainNormal[0], terrainNormal[1]) * 180.0 / PI;
+
+    return angle;
 }
