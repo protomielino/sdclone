@@ -23,6 +23,7 @@ package gui.segment;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.swing.JCheckBox;
@@ -80,7 +81,7 @@ public class SegmentSlider extends JPanel
 	 */
 	private void initialize()
 	{
-		nf = NumberFormat.getNumberInstance();
+		nf = NumberFormat.getNumberInstance(Locale.US);
 		nf.setMaximumFractionDigits(3);
 		nf.setMinimumFractionDigits(1);
 		nf.setGroupingUsed(false);
@@ -116,6 +117,20 @@ public class SegmentSlider extends JPanel
 		{
 			textField = new JTextField();
 			textField.setHorizontalAlignment(JTextField.LEFT);			
+			textField.addKeyListener(new KeyAdapter()
+			{
+				public void keyTyped(KeyEvent e)
+				{
+					char c = e.getKeyChar();
+
+					// check for valid digit or a single decimal point
+					if (!(Character.isDigit(c) || (c == '.' && !textField.getText().contains("."))))
+					{
+						e.consume();
+						return;
+					}
+				}
+			});
 		}
 		return textField;
 	}
@@ -375,7 +390,14 @@ public class SegmentSlider extends JPanel
 		double textValue = 0;
 		if (!getTextField().getText().equals(""))
 		{
-			textValue = Double.parseDouble(getTextField().getText());
+			try
+			{
+				textValue = Double.parseDouble(getTextField().getText());
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		if (Math.abs(textValue - value) >= 0.001)
 		{
@@ -483,21 +505,21 @@ public class SegmentSlider extends JPanel
 
 		public void sliderChanged()
 		{
-			try
+			if (!getTextField().getText().equals(""))
 			{
-				if (!getTextField().getText().equals(""))
+				double tmp1 = getSlider().getValue();
+				try
 				{
-					double tmp1 = getSlider().getValue();
 					double tmp2 = Double.parseDouble(getTextField().getText());
 					if (tmp1 != tmp2 && !(tmp2 >= tmp1 && tmp2 < (tmp1 + 1)))
 					{
 						setValueInternal(getSlider().getValue());
 					}
 				}
-
-			} catch (Exception e)
-			{
-				e.printStackTrace();
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -508,10 +530,16 @@ public class SegmentSlider extends JPanel
 		{
 			if (!getTextField().getText().equals(""))
 			{
-				double tmp = Double.parseDouble(getTextField().getText()) * multCoeff;
-				setValueInternal(tmp);
+				try
+				{
+					double tmp = Double.parseDouble(getTextField().getText()) * multCoeff;
+					setValueInternal(tmp);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"
