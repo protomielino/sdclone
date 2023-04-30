@@ -43,7 +43,6 @@
 #include "forcefeedback.h"
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
-
 #include <sstream>
 #include <iomanip> //setprecision
 
@@ -84,6 +83,11 @@ int hudScreenW = 0;
 
 //edithud
 bool hudEditModeEnabled = false;
+
+
+extern tdble SimTimeOfDay;
+extern int SimClouds;
+extern int SimRain;
 
 float tempVal = 0.0f;
 
@@ -689,7 +693,6 @@ void SDHUD::changeImageVertex(osg::Geometry *geom,
                             float hudScale)
                             
 {
-	GfLogInfo("pos %f %f\n", newPosX, newPosY);
     osg::TextureRectangle* texture;
 
     //get the texture data of this object
@@ -1814,6 +1817,66 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         gforcegraphbb.yMin()+position.y()-currCar->_DynGC.acc.x * 3.5,//vertical
         hudScale
     );
+//track conditions
+	//temperature
+    temp.str("");
+    temp << K2C(currCar->_airtemp);
+    hudTextElements["trackdata-airtemp-data"]->setText(temp.str());
+    temp.str("C");
+    hudTextElements["trackdata-airtemp-unit"]->setText(temp.str());
+
+	//timeof day
+    temp.str("");
+	//todo this may only work with simuV4 ince (SimTimeOfDay is defined there)
+	// a better way to access this value would be "(int)SDTrack->local.timeofday" but we dont have access to track data from here at the moment
+    double timeofday = SimTimeOfDay + s->currentTime;
+
+	int hours = (int)(timeofday/60/60);
+	int minutes = (int)((timeofday - (hours*60*60))/60);
+	int seconds = timeofday - (hours*60*60) - (minutes*60);
+
+	if(hours < 10){
+		temp << "0" << hours << ":";
+	}else{
+		temp << hours << ":";
+	}
+	if(minutes < 10){
+		temp << "0" << minutes << ".";
+	}else{
+		temp << minutes << ":";
+	}
+	if (seconds < 10){
+		temp << "0" << seconds;
+	}else{
+		temp << seconds;
+	}
+    hudTextElements["trackdata-time-data"]->setText(temp.str());
+
+	//SimClouds 0=none, 1=cirrus, 2=few, 3=many, 7=full
+	//SimRain  0=none, 1=little, 2=medium, 3=heavy
+	//disable all, we will enable only the one needed later
+	changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    0.0f);
+	changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 0.0f);
+	changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   0.0f);
+	changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    0.0f);
+
+	//sunny
+	if(SimClouds == 0 && SimRain == 0){
+		changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    1.0f);
+	}
+	//overcast
+	if(SimClouds >= 1 && SimClouds <= 2 && SimRain == 0){
+		changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 1.0f);
+	}
+	//cloudy
+	if(SimClouds > 2 && SimRain == 0){
+		changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   1.0f);
+	}
+	//rainy
+	if(SimRain > 0){
+		changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    1.0f);
+	}
+
 
 // debug info
     temp.str("");
