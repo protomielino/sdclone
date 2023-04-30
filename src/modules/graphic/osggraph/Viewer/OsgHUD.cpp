@@ -1759,23 +1759,24 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         tireNameText << "tire-" << tireName.str().c_str()  << "-pressures-unit";
         hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
         
-        
+        // the brakes section has been commented out both here and in the osghud config file since the current phisics implementation is too unrealistic for this part of the hud to be useful
+        // but please leave this here for when it will be made better in the future
+        /*
         //set brake temps
-		float brakeTemp = currCar->_brakeTemp(i);
+        float brakeTemp = currCar->_brakeTemp(i);
 
         tireNameText.str("");
-        tireNameText << "brake-" << tireName.str().c_str()  << "-cold";	
-		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], 1.0);
+        tireNameText << "brake-" << tireName.str().c_str()  << "-cold";    
+        changeImageAlpha(hudImgElements[tireNameText.str().c_str()], 1.0);
 
         tireNameText.str("");
         tireNameText << "brake-" << tireName.str().c_str()  << "-optimal";
-		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], (brakeTemp*2));
-		
+        changeImageAlpha(hudImgElements[tireNameText.str().c_str()], (brakeTemp*2));
+        
         tireNameText.str("");
         tireNameText << "brake-" << tireName.str().c_str()  << "-hot";
-		changeImageAlpha(hudImgElements[tireNameText.str().c_str()], ((brakeTemp-0.5)*2));
-
-
+        changeImageAlpha(hudImgElements[tireNameText.str().c_str()], ((brakeTemp-0.5)*2));
+        */
     }
 
 
