@@ -48,6 +48,9 @@ SDRender *render = 0;
 SDScreens *screens = 0;
 SDCamera *cam = 0;
 
+int Rain, Clouds = 0;
+tdble TimeOfDay = 0.0f;
+
 SDHUD hud;
 
 /*oid *getOptions()
@@ -343,7 +346,7 @@ int refresh(tSituation *s)
 
     //refresh the hud
     //tCarElt* curCar = screens->getActiveView()->getCurrentCar();
-    hud.Refresh(s, &frameInfo, curCar);
+    hud.Refresh(s, &frameInfo, curCar, Clouds, Rain, TimeOfDay);
 
     return 0;
 }
@@ -387,6 +390,10 @@ int initTrack(tTrack *track)
 
     scenery->LoadScene(track);
     render->Init(track);
+
+    Clouds = track->local.clouds;
+    Rain = track->local.rain;
+    TimeOfDay = track->local.timeofday;
 
     return 0;
 }

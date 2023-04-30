@@ -170,7 +170,7 @@ class SDHUD
 public:
         SDHUD();
         ~SDHUD();
-        
+
         void ToggleHUD();
         void ToggleHUDwidget(const std::string &widget);
         void ToggleHUDwidgets(const std::string &widgets);
@@ -183,7 +183,8 @@ public:
 
         void CreateHUD( int scrH, int scrW);
         void DispDebug(const tSituation *s, const SDFrameInfo* frame);
-        void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar);
+        void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar,
+        				int SimClouds, int SimRain, float SimTimeOfDay);
 
         osg::ref_ptr <osg::Group> generateHudFromXmlFile( int scrH, int scrW);
 
