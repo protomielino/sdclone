@@ -84,7 +84,6 @@ int hudScreenW = 0;
 //edithud
 bool hudEditModeEnabled = false;
 
-
 extern tdble SimTimeOfDay;
 extern int SimClouds;
 extern int SimRain;
@@ -703,339 +702,342 @@ void SDHUD::changeImageVertex(osg::Geometry *geom,
     img = texture->getImage();
 
     //get image dimensions
-	float width = img->s();
-	float height = img->t();
+    float width = img->s();
+    float height = img->t();
 
-	//rerieve to start modifing vertex and UVs
-	osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
-	osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geom->getTexCoordArray(0));
+    //rerieve to start modifing vertex and UVs
+    osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
+    osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geom->getTexCoordArray(0));
 
-	//determine the start and end triangle
-	int startTriangle = ceil((fromAngle+0.0001)/45.0)-1;
-	int endTriangle = ceil((toAngle)/45.0)-1;
+    //determine the start and end triangle
+    int startTriangle = ceil((fromAngle+0.0001)/45.0)-1;
+    int endTriangle = ceil((toAngle)/45.0)-1;
 
-	if(startTriangle < 0){
-		startTriangle = startTriangle + 8;
-	}
+    if(startTriangle < 0){
+        startTriangle = startTriangle + 8;
+    }
 
-	//determine the range of angle we will be using to cover 100% of the value
-	float angleRange = 0.0f;
-	if(fromAngle > toAngle){
-		angleRange = (360-fromAngle)+toAngle;
-	}else{
-		angleRange = toAngle-fromAngle;
-	}
+    //determine the range of angle we will be using to cover 100% of the value
+    float angleRange = 0.0f;
+    if(fromAngle > toAngle){
+        angleRange = (360-fromAngle)+toAngle;
+    }else{
+        angleRange = toAngle-fromAngle;
+    }
 
-	//what angle we need to add to the start angle to reach the current value angle
-	float currValueAngle = angleRange*currValue;
+    //what angle we need to add to the start angle to reach the current value angle
+    float currValueAngle = angleRange*currValue;
 
-	//determine the angle we can use for the first triangle (in case the start is not at his 0 angle)
-	float startTriangleStartAngle = std::fmod( fromAngle, 45.0f );
-	float startTriangleAngleCapacity = 45.0f - std::fmod( fromAngle, 45.0f );
+    //determine the angle we can use for the first triangle (in case the start is not at his 0 angle)
+    float startTriangleStartAngle = std::fmod( fromAngle, 45.0f );
+    float startTriangleAngleCapacity = 45.0f - std::fmod( fromAngle, 45.0f );
 
-	//determine the angle we can use for final triangle (in case the start is not at his 0 angle)
-	float finalTriangleAngleCapacity = std::fmod( toAngle , 45.0f );
+    //determine the angle we can use for final triangle (in case the start is not at his 0 angle)
+    float finalTriangleAngleCapacity = std::fmod( toAngle , 45.0f );
 
-	//determine how many triangles we will need to process
-	int trianglesNeeded = ceil((currValueAngle - startTriangleAngleCapacity) / 45)+1;
+    //determine how many triangles we will need to process
+    int trianglesNeeded = ceil((currValueAngle - startTriangleAngleCapacity) / 45)+1;
 
-	//determine what will be the last triangle given the current value
-	int currValueLastTriangle = ((startTriangle + trianglesNeeded) % 8 ) - 1;
-	if(currValueLastTriangle < 0){
-		currValueLastTriangle = currValueLastTriangle + 8;
-	}
+    //determine what will be the last triangle given the current value
+    int currValueLastTriangle = ((startTriangle + trianglesNeeded) % 8 ) - 1;
+    if(currValueLastTriangle < 0){
+        currValueLastTriangle = currValueLastTriangle + 8;
+    }
 
-	//determine a modifier for the triangle index that we will use in the next for cicle, so that we will start processing from the start to the final triangle
-	//despite the starting triangle being greater than the final triangle
-	int indexModifier = 0;
-	if(startTriangle <= endTriangle){
-		indexModifier = 0;
-	}else{
-		indexModifier = startTriangle;
-	}
+    //determine a modifier for the triangle index that we will use in the next for cicle, so that we will start processing from the start to the final triangle
+    //despite the starting triangle being greater than the final triangle
+    int indexModifier = 0;
+    if(startTriangle <= endTriangle){
+        indexModifier = 0;
+    }else{
+        indexModifier = startTriangle;
+    }
 
-	float angleRangeToBeUsed = currValueAngle;
+    float angleRangeToBeUsed = currValueAngle;
 
-	for (int triangle = 0; triangle <= 7; triangle++) {
-		int triangleIdx = triangle + indexModifier;
-		if(triangleIdx > 7){
-			triangleIdx = triangleIdx - 8;
-		}
-		float newAngle=0.0;
+    for (int triangle = 0; triangle <= 7; triangle++) {
+        int triangleIdx = triangle + indexModifier;
+        if(triangleIdx > 7){
+            triangleIdx = triangleIdx - 8;
+        }
+        float newAngle=0.0;
 
-		//se è il primo triangolo e ci sta tutto il valore uso il valore necessario
-		if(triangleIdx == startTriangle){
-			if(angleRangeToBeUsed <= startTriangleAngleCapacity){
-				newAngle = angleRangeToBeUsed;
-				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
-			}else{
-				newAngle = startTriangleAngleCapacity;
-				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
-			}
-			//if it's the first triangle the initial start angle may not be the local 0 so
-			//we need to add to the startingPointAngle to the desidered value
-			//we will fix this when calculating vertex 2
-		}
+        //se è il primo triangolo e ci sta tutto il valore uso il valore necessario
+        if(triangleIdx == startTriangle){
+            if(angleRangeToBeUsed <= startTriangleAngleCapacity){
+                newAngle = angleRangeToBeUsed;
+                angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+            }else{
+                newAngle = startTriangleAngleCapacity;
+                angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+            }
+            //if it's the first triangle the initial start angle may not be the local 0 so
+            //we need to add to the startingPointAngle to the desidered value
+            //we will fix this when calculating vertex 2
+        }
 
-		//vale per tutti gli altri angoli (se è zero resta zero, se è maggiore di 45 uso 45)
-		if(
-			(startTriangle <= endTriangle )  && (triangleIdx > startTriangle)
-			|| (startTriangle > endTriangle )  && (triangleIdx > startTriangle || triangleIdx <= endTriangle)
-		){
-			if(angleRangeToBeUsed <= 45.0){
-				newAngle = angleRangeToBeUsed;
-				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
-			}else{
-				newAngle = 45.0;
-				angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
-			}
-		}
+        //vale per tutti gli altri angoli (se è zero resta zero, se è maggiore di 45 uso 45)
+        if((startTriangle <= endTriangle ) && (triangleIdx > startTriangle)
+            || (startTriangle > endTriangle )  && (triangleIdx > startTriangle || triangleIdx <= endTriangle))
+        {
+            if(angleRangeToBeUsed <= 45.0)
+            {
+                newAngle = angleRangeToBeUsed;
+                angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+            }
+            else
+            {
+                newAngle = 45.0;
+                angleRangeToBeUsed = angleRangeToBeUsed - newAngle;
+            }
+        }
 
-		/*
-		GfLogDebug("TriangleIndex %i  (%i)", triangleIdx, triangle);
-		GfLogDebug("   CurrValueAngle %f\n", currValueAngle);
-		GfLogDebug("   Angoli richiesti %i \n",trianglesNeeded);
-		GfLogDebug("   Triangle index (Start/End) %i ## %i\n", startTriangle, currValueLastTriangle);
-		GfLogDebug("   Angle to be used %f \n",angleRangeToBeUsed);
-		GfLogDebug("   My angle %f \n",newAngle );
-		GfLogDebug("   Start Triangle start angle %f \n",startTriangleStartAngle );
-		*/
+        /*
+        GfLogDebug("TriangleIndex %i  (%i)", triangleIdx, triangle);
+        GfLogDebug("   CurrValueAngle %f\n", currValueAngle);
+        GfLogDebug("   Angoli richiesti %i \n",trianglesNeeded);
+        GfLogDebug("   Triangle index (Start/End) %i ## %i\n", startTriangle, currValueLastTriangle);
+        GfLogDebug("   Angle to be used %f \n",angleRangeToBeUsed);
+        GfLogDebug("   My angle %f \n",newAngle );
+        GfLogDebug("   Start Triangle start angle %f \n",startTriangleStartAngle );
+        */
 
-		for (int vertex = 0;vertex <= 2; vertex++ ){
-			int vertexIndex= (triangleIdx*3)+vertex;
-			float CathetusTwoLength = 0.0;
-			float newX = 0.0;
-			float newY = 0.0;
+        for (int vertex = 0;vertex <= 2; vertex++ )
+        {
+            int vertexIndex= (triangleIdx*3)+vertex;
+            float CathetusTwoLength = 0.0;
+            float newX = 0.0;
+            float newY = 0.0;
 
-			//GfLogDebug("VertexIndex %i \n", vertexIndex);
-			/*----------------------------------------------------------------------------------------------------------------------------*/
-			//for all vertex start by restoring their original status
+            //GfLogDebug("VertexIndex %i \n", vertexIndex);
+            /*----------------------------------------------------------------------------------------------------------------------------*/
+            //for all vertex start by restoring their original status
 
-			if (vertex == 0){
-				newX = 0.5f;
-				newY = 0.5f;
-			}
-			if (vertex == 1){
-				switch (triangleIdx) {
-					case 0:
-						newX = 0.0;
-						newY = 0.5;
-						break;
-					case 2:
-						newX = 0.5;
-						newY = 1.0;
-						break;
-					case 4:
-						newX = 1.0;
-						newY = 0.5;
-						break;
-					case 6:
-						newX = 0.5;
-						newY = 0.0;
-						break;
-					//------------------------------------------------------------------------------
-					case 1:
-						newX = 0.0;
-						newY = 1.0;
-						break;
-					case 3:
-						newX = 1.0;
-						newY = 1.0;
-						break;
-					case 5:
-						newX = 1.0;
-						newY = 0.0;
-						break;
-					case 7:
-						newX = 0.0;
-						newY = 0.0;
-						break;
-					default:
-						break;
-				}
-			}
+            if (vertex == 0){
+                newX = 0.5f;
+                newY = 0.5f;
+            }
+            if (vertex == 1){
+                switch (triangleIdx) {
+                    case 0:
+                        newX = 0.0;
+                        newY = 0.5;
+                        break;
+                    case 2:
+                        newX = 0.5;
+                        newY = 1.0;
+                        break;
+                    case 4:
+                        newX = 1.0;
+                        newY = 0.5;
+                        break;
+                    case 6:
+                        newX = 0.5;
+                        newY = 0.0;
+                        break;
+                    //------------------------------------------------------------------------------
+                    case 1:
+                        newX = 0.0;
+                        newY = 1.0;
+                        break;
+                    case 3:
+                        newX = 1.0;
+                        newY = 1.0;
+                        break;
+                    case 5:
+                        newX = 1.0;
+                        newY = 0.0;
+                        break;
+                    case 7:
+                        newX = 0.0;
+                        newY = 0.0;
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-			if (vertex == 2){
-				switch (triangleIdx) {
-					case 0:
-						newX = 0.0;
-						newY = 1.0;
-						break;
-					case 2:
-						newX = 1.0;
-						newY = 1.0;
-						break;
-					case 4:
-						newX = 1.0;
-						newY = 0.0;
-						break;
-					case 6:
-						newX = 0.0;
-						newY = 0.0;
-						break;
-					 //-------------------------------------------------------------
-					case 1:
-						newX = 0.5;
-						newY = 1.0;
-						break;
-					case 3:
-						newX = 1.0;
-						newY = 0.5;
-						break;
-					case 5:
-						newX = 0.5;
-						newY = 0.0;
-						break;
-					case 7:
-						newX = 0.0;
-						newY = 0.5;
-						break;
-					default:
-						break;
-				}
-			}
-			(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
-			(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
-			//update uvs
-			(*texcoords)[vertexIndex][0] = newX;
-			(*texcoords)[vertexIndex][1] = newY;
-			/*----------------------------------------------------------------------------------------------------------------------------*/
+            if (vertex == 2){
+                switch (triangleIdx) {
+                    case 0:
+                        newX = 0.0;
+                        newY = 1.0;
+                        break;
+                    case 2:
+                        newX = 1.0;
+                        newY = 1.0;
+                        break;
+                    case 4:
+                        newX = 1.0;
+                        newY = 0.0;
+                        break;
+                    case 6:
+                        newX = 0.0;
+                        newY = 0.0;
+                        break;
+                     //-------------------------------------------------------------
+                    case 1:
+                        newX = 0.5;
+                        newY = 1.0;
+                        break;
+                    case 3:
+                        newX = 1.0;
+                        newY = 0.5;
+                        break;
+                    case 5:
+                        newX = 0.5;
+                        newY = 0.0;
+                        break;
+                    case 7:
+                        newX = 0.0;
+                        newY = 0.5;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            (*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+            (*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+            //update uvs
+            (*texcoords)[vertexIndex][0] = newX;
+            (*texcoords)[vertexIndex][1] = newY;
+            /*----------------------------------------------------------------------------------------------------------------------------*/
 
-			//now adjust what is needed:
-			//for start triangle we need to update the second vertice
-			//for end triangle we need to update the third vertice
-			//for hidden triangles we just hide everything
+            //now adjust what is needed:
+            //for start triangle we need to update the second vertice
+            //for end triangle we need to update the third vertice
+            //for hidden triangles we just hide everything
 
-			//start triangle
-			if (triangleIdx == startTriangle && vertex ==1){
-				switch (triangleIdx) {
-					case 0:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 0.0;
-						newY = 1.0 - CathetusTwoLength;
-						break;
-					case 2:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 1.0-CathetusTwoLength;
-						newY = 1.0;
-						break;
-					case 4:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 1.0;
-						newY = CathetusTwoLength;
-						break;
-					case 6:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = CathetusTwoLength;
-						newY = 0.0;
-						break;
-					//------------------------------------------------------------------------------
-					case 1:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 0.5-CathetusTwoLength;
-						newY = 1.0;
-						break;
-					case 3:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 1.0;
-						newY = 0.5+CathetusTwoLength;
-						break;
-					case 5:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 0.5+CathetusTwoLength;
-						newY = 0.0;
-						break;
-					case 7:
-						CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
-						newX = 0.0;
-						newY = 0.5-CathetusTwoLength;
-						break;
-					default:
-						break;
-				}
-				//update vertices
-				(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
-				(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
-				//update uvs
-				(*texcoords)[vertexIndex][0]= newX;
-				(*texcoords)[vertexIndex][1]= newY;
-			}
+            //start triangle
+            if (triangleIdx == startTriangle && vertex ==1){
+                switch (triangleIdx) {
+                    case 0:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 0.0;
+                        newY = 1.0 - CathetusTwoLength;
+                        break;
+                    case 2:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 1.0-CathetusTwoLength;
+                        newY = 1.0;
+                        break;
+                    case 4:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 1.0;
+                        newY = CathetusTwoLength;
+                        break;
+                    case 6:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = CathetusTwoLength;
+                        newY = 0.0;
+                        break;
+                    //------------------------------------------------------------------------------
+                    case 1:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 0.5-CathetusTwoLength;
+                        newY = 1.0;
+                        break;
+                    case 3:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 1.0;
+                        newY = 0.5+CathetusTwoLength;
+                        break;
+                    case 5:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 0.5+CathetusTwoLength;
+                        newY = 0.0;
+                        break;
+                    case 7:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, startTriangleStartAngle);
+                        newX = 0.0;
+                        newY = 0.5-CathetusTwoLength;
+                        break;
+                    default:
+                        break;
+                }
+                //update vertices
+                (*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+                (*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+                //update uvs
+                (*texcoords)[vertexIndex][0]= newX;
+                (*texcoords)[vertexIndex][1]= newY;
+            }
 
-			//end triangle
-			if (triangleIdx == currValueLastTriangle && vertex == 2){
-				//we need to fix a special case in case the first triangle is also the last triangle
-				//in this case we want the startingAngle to be added to the desiredValueAngle
-				if (triangleIdx == startTriangle){
-					newAngle = newAngle + startTriangleStartAngle;
-				}
+            //end triangle
+            if (triangleIdx == currValueLastTriangle && vertex == 2){
+                //we need to fix a special case in case the first triangle is also the last triangle
+                //in this case we want the startingAngle to be added to the desiredValueAngle
+                if (triangleIdx == startTriangle){
+                    newAngle = newAngle + startTriangleStartAngle;
+                }
 
-				switch (triangleIdx) {
-					case 0:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 0.0;
-						newY = 0.5+CathetusTwoLength;
-						break;
-					case 2:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 0.5+CathetusTwoLength;
-						newY = 1.0;
-						break;
-					case 4:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 1.0;
-						newY = 0.5-CathetusTwoLength;
-						break;
-					case 6:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 0.5-CathetusTwoLength;
-						newY = 0.0;
-						break;
-					 //-------------------------------------------------------------
-					case 1:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = CathetusTwoLength;
-						newY = 1.0;
-						break;
-					case 3:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 1.0;
-						newY = 1.0-CathetusTwoLength;
-						break;
-					case 5:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 1.0-CathetusTwoLength;
-						newY = 0.0;
-						break;
-					case 7:
-						CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
-						newX = 0.0;
-						newY = CathetusTwoLength;
-						break;
-					default:
-						break;
-				}
-				(*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
-				(*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
-				//update uvs
-				(*texcoords)[vertexIndex][0]= newX;
-				(*texcoords)[vertexIndex][1]= newY;
-			}
+                switch (triangleIdx) {
+                    case 0:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 0.0;
+                        newY = 0.5+CathetusTwoLength;
+                        break;
+                    case 2:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 0.5+CathetusTwoLength;
+                        newY = 1.0;
+                        break;
+                    case 4:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 1.0;
+                        newY = 0.5-CathetusTwoLength;
+                        break;
+                    case 6:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 0.5-CathetusTwoLength;
+                        newY = 0.0;
+                        break;
+                     //-------------------------------------------------------------
+                    case 1:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = CathetusTwoLength;
+                        newY = 1.0;
+                        break;
+                    case 3:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 1.0;
+                        newY = 1.0-CathetusTwoLength;
+                        break;
+                    case 5:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 1.0-CathetusTwoLength;
+                        newY = 0.0;
+                        break;
+                    case 7:
+                        CathetusTwoLength = getCathetusTwoLength(0.5, 45.0-newAngle);
+                        newX = 0.0;
+                        newY = CathetusTwoLength;
+                        break;
+                    default:
+                        break;
+                }
+                (*vertices)[vertexIndex][0] = newPosX + newX * width * hudScale; //imgWidth; //x
+                (*vertices)[vertexIndex][1] = newPosY + newY * height * hudScale; //imgHeight; //y
+                //update uvs
+                (*texcoords)[vertexIndex][0]= newX;
+                (*texcoords)[vertexIndex][1]= newY;
+            }
 
-			//if hidden triangle
-			if( newAngle <= 0.0 ){
-				newX = 0.0f;
-				newY = 0.0f;
-				(*vertices)[vertexIndex][0] = newX * width * hudScale; //imgWidth; //x
-				(*vertices)[vertexIndex][1] = newY * height * hudScale; //imgHeight; //y
-				//update uvs
-				(*texcoords)[vertexIndex][0]= newX;
-				(*texcoords)[vertexIndex][1]= newY;
-			}
-		}
-	}
+            //if hidden triangle
+            if( newAngle <= 0.0 ){
+                newX = 0.0f;
+                newY = 0.0f;
+                (*vertices)[vertexIndex][0] = newX * width * hudScale; //imgWidth; //x
+                (*vertices)[vertexIndex][1] = newY * height * hudScale; //imgHeight; //y
+                //update uvs
+                (*texcoords)[vertexIndex][0]= newX;
+                (*texcoords)[vertexIndex][1]= newY;
+            }
+        }
+    }
     //adapt the geometry
-	vertices->dirty();
-	geom->setVertexArray(vertices);
+    vertices->dirty();
+    geom->setVertexArray(vertices);
     //adapt the texture
     geom->setTexCoordArray(0,texcoords);
 }
@@ -1107,8 +1109,8 @@ SDHUD::SDHUD() :
 
 void SDHUD::CreateHUD(int scrH, int scrW)
 {
-	hudScreenH = scrH;
-	hudScreenW = scrW;
+    hudScreenH = scrH;
+    hudScreenW = scrW;
     // create a camera to set up the projection and model view matrices, and the subgraph to draw in the HUD
     camera = new osg::Camera;
 
@@ -1147,13 +1149,12 @@ void SDHUD::CreateHUD(int scrH, int scrW)
 
 }
 
-void
-SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
+void SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
 {
 }  // grDispDebug
 
-        void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar,
-        			 int SimClouds, int SimRain, float SimTimeOfDay);
+void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
+                        const tCarElt *currCar, int SimClouds, int SimRain, float SimTimeOfDay)
 {
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
 
@@ -1513,14 +1514,15 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
     temp << (int)(currCar->_speed_x * 3.6);
     hudTextElements["speed-number"]->setText(temp.str());
 
-	//set speed unit
-	temp.str("");
-	temp << "kph"; //mph
-	hudTextElements["speed-number-unit"]->setText(temp.str());
+    //set speed unit
+    temp.str("");
+    temp << "kph"; //mph
+    hudTextElements["speed-number-unit"]->setText(temp.str());
 
 //rpm number
     temp.str("");
-    temp << (int) currCar->_enginerpm;
+    //convert Radian/s to RPM
+    temp << (int) RADS2RPM(currCar->_enginerpm);
     hudTextElements["rpm-number"]->setText(temp.str());
 
 //damage
@@ -1685,48 +1687,48 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
                 tireName << "";
         }
 
-		float currentTemp = 0;
-		std::string tirePartName;
+        float currentTemp = 0;
+        std::string tirePartName;
 
-		currentTemp = currCar->_tyreT_out(i);
+        currentTemp = currCar->_tyreT_out(i);
 
-		std::ostringstream tireNameCold;
-		std::ostringstream tireNameOptimal;
-		std::ostringstream tireNameHot;
+        std::ostringstream tireNameCold;
+        std::ostringstream tireNameOptimal;
+        std::ostringstream tireNameHot;
 
-		tireNameCold << "tire-" << tireName.str().c_str() << "-cold";
-		tireNameOptimal << "tire-" << tireName.str().c_str() << "-optimal";
-		tireNameHot << "tire-" << tireName.str().c_str() << "-hot";
+        tireNameCold << "tire-" << tireName.str().c_str() << "-cold";
+        tireNameOptimal << "tire-" << tireName.str().c_str() << "-optimal";
+        tireNameHot << "tire-" << tireName.str().c_str() << "-hot";
 
-		float optimalAlpha = 0.0f;
-		float hotAlpha = 0.0f;
+        float optimalAlpha = 0.0f;
+        float hotAlpha = 0.0f;
 
-		float tempOptimal = currCar->_tyreT_opt(i);
-		float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
-		float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
+        float tempOptimal = currCar->_tyreT_opt(i);
+        float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
+        float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
 
-		//update the cold part
-		changeImageAlpha(hudImgElements[tireNameCold.str().c_str()], 1.0f);
+        //update the cold part
+        changeImageAlpha(hudImgElements[tireNameCold.str().c_str()], 1.0f);
 
-		//update the optimal part
-		optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
-		if (optimalAlpha > 1.0f){
-			optimalAlpha = 1.0f;
-		}
-		if (optimalAlpha < 0.0f){
-			optimalAlpha = 0.0f;
-		}
-		changeImageAlpha(hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
+        //update the optimal part
+        optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
+        if (optimalAlpha > 1.0f){
+            optimalAlpha = 1.0f;
+        }
+        if (optimalAlpha < 0.0f){
+            optimalAlpha = 0.0f;
+        }
+        changeImageAlpha(hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
 
-		//update the hot part
-		hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
-		if (hotAlpha > 1.0f){
-			hotAlpha = 1.0f;
-		}
-		if (hotAlpha < 0.0f){
-			hotAlpha = 0.0f;
-		}
-		changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
+        //update the hot part
+        hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
+        if (hotAlpha > 1.0f){
+            hotAlpha = 1.0f;
+        }
+        if (hotAlpha < 0.0f){
+            hotAlpha = 0.0f;
+        }
+        changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
 
         //temps string
         temp.str("");
@@ -1819,64 +1821,64 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
         hudScale
     );
 //track conditions
-	//temperature
+    //temperature
     temp.str("");
     temp << K2C(currCar->_airtemp);
     hudTextElements["trackdata-airtemp-data"]->setText(temp.str());
     temp.str("C");
     hudTextElements["trackdata-airtemp-unit"]->setText(temp.str());
 
-	//timeof day
+    //timeof day
     temp.str("");
-	//todo this may only work with simuV4 ince (SimTimeOfDay is defined there)
-	// a better way to access this value would be "(int)SDTrack->local.timeofday" but we dont have access to track data from here at the moment
+    //todo this may only work with simuV4 ince (SimTimeOfDay is defined there)
+    // a better way to access this value would be "(int)SDTrack->local.timeofday" but we dont have access to track data from here at the moment
     double timeofday = SimTimeOfDay + s->currentTime;
 
-	int hours = (int)(timeofday/60/60);
-	int minutes = (int)((timeofday - (hours*60*60))/60);
-	int seconds = timeofday - (hours*60*60) - (minutes*60);
+    int hours = (int)(timeofday/60/60);
+    int minutes = (int)((timeofday - (hours*60*60))/60);
+    int seconds = timeofday - (hours*60*60) - (minutes*60);
 
-	if(hours < 10){
-		temp << "0" << hours << ":";
-	}else{
-		temp << hours << ":";
-	}
-	if(minutes < 10){
-		temp << "0" << minutes << ".";
-	}else{
-		temp << minutes << ":";
-	}
-	if (seconds < 10){
-		temp << "0" << seconds;
-	}else{
-		temp << seconds;
-	}
+    if(hours < 10){
+        temp << "0" << hours << ":";
+    }else{
+        temp << hours << ":";
+    }
+    if(minutes < 10){
+        temp << "0" << minutes << ".";
+    }else{
+        temp << minutes << ":";
+    }
+    if (seconds < 10){
+        temp << "0" << seconds;
+    }else{
+        temp << seconds;
+    }
     hudTextElements["trackdata-time-data"]->setText(temp.str());
 
-	//SimClouds 0=none, 1=cirrus, 2=few, 3=many, 7=full
-	//SimRain  0=none, 1=little, 2=medium, 3=heavy
-	//disable all, we will enable only the one needed later
-	changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    0.0f);
-	changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 0.0f);
-	changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   0.0f);
-	changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    0.0f);
+    //SimClouds 0=none, 1=cirrus, 2=few, 3=many, 7=full
+    //SimRain  0=none, 1=little, 2=medium, 3=heavy
+    //disable all, we will enable only the one needed later
+    changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    0.0f);
+    changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 0.0f);
+    changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   0.0f);
+    changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    0.0f);
 
-	//sunny
-	if(SimClouds == 0 && SimRain == 0){
-		changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    1.0f);
-	}
-	//overcast
-	if(SimClouds >= 1 && SimClouds <= 2 && SimRain == 0){
-		changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 1.0f);
-	}
-	//cloudy
-	if(SimClouds > 2 && SimRain == 0){
-		changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   1.0f);
-	}
-	//rainy
-	if(SimRain > 0){
-		changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    1.0f);
-	}
+    //sunny
+    if(SimClouds == 0 && SimRain == 0){
+        changeImageAlpha(hudImgElements["trackdata-weathericon-sunny"],    1.0f);
+    }
+    //overcast
+    if(SimClouds >= 1 && SimClouds <= 2 && SimRain == 0){
+        changeImageAlpha(hudImgElements["trackdata-weathericon-overcast"], 1.0f);
+    }
+    //cloudy
+    if(SimClouds > 2 && SimRain == 0){
+        changeImageAlpha(hudImgElements["trackdata-weathericon-cloudy"],   1.0f);
+    }
+    //rainy
+    if(SimRain > 0){
+        changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    1.0f);
+    }
 
 
 // debug info
@@ -1886,40 +1888,40 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
 
 // delta best
     if (currCar->_bestLapTime != 0){
-		float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
+        float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
 
-		GfLogDebug("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
-		GfLogDebug("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+        GfLogDebug("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+        GfLogDebug("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
 
-		if(deltabest > 0){//we are slower
-			float scale = 0.0f;
-			if (deltabest > 10.0f){
-				scale = 1.0f;
-			}else{
-				scale = deltabest/10;
-			}
-			changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
-			changeImageSize(hudImgElements["delta-losing"], scale, "right", hudScale);
-		}else if(deltabest < 0){//we are faster
-			float scale = 0.0f;
-			if (deltabest < -10.0f){
-				scale = 1.0f;
-			}else{
-				scale = -1*deltabest/10;
-			}
-			changeImageSize(hudImgElements["delta-gaining"], scale, "left", hudScale);
-			changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
-		}
-		temp.str("");
-		temp << std::setprecision(3) << deltabest;
-		hudTextElements["delta-time"]->setText(temp.str());
+        if(deltabest > 0){//we are slower
+            float scale = 0.0f;
+            if (deltabest > 10.0f){
+                scale = 1.0f;
+            }else{
+                scale = deltabest/10;
+            }
+            changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
+            changeImageSize(hudImgElements["delta-losing"], scale, "right", hudScale);
+        }else if(deltabest < 0){//we are faster
+            float scale = 0.0f;
+            if (deltabest < -10.0f){
+                scale = 1.0f;
+            }else{
+                scale = -1*deltabest/10;
+            }
+            changeImageSize(hudImgElements["delta-gaining"], scale, "left", hudScale);
+            changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
+        }
+        temp.str("");
+        temp << std::setprecision(3) << deltabest;
+        hudTextElements["delta-time"]->setText(temp.str());
     }else{
-		changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
-		changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
-	}
+        changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
+        changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
+    }
 
 //tachometer
-		osg::BoundingBox newtachobb =hudImgElements["tachometer"]->getBoundingBox();
+        osg::BoundingBox newtachobb =hudImgElements["tachometer"]->getBoundingBox();
         //let the final 15% be redline
         float redLinePercent = 0.15f; //15%
         float whiteLinePercent = 1.0f-redLinePercent; //85%
@@ -1927,274 +1929,274 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
         float rpmVal2 = 0.0f;
         float startAngle = 291.0f;
         float endAngle = 180.0f;
-		float totalAngleRange = 0.0f;
-		float endOfWhiteLineAngle = 0.0f;
+        float totalAngleRange = 0.0f;
+        float endOfWhiteLineAngle = 0.0f;
 
         if(startAngle < endAngle){
-			totalAngleRange = endAngle - startAngle;
-			endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) + startAngle;
-		}else{
-			totalAngleRange = (360.0f - startAngle) + endAngle;
-			endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) - (360.0f - startAngle);
-			if(endOfWhiteLineAngle < 0){
-				endOfWhiteLineAngle = endOfWhiteLineAngle + 360.0f;
-			}
-		}
+            totalAngleRange = endAngle - startAngle;
+            endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) + startAngle;
+        }else{
+            totalAngleRange = (360.0f - startAngle) + endAngle;
+            endOfWhiteLineAngle = (totalAngleRange * whiteLinePercent) - (360.0f - startAngle);
+            if(endOfWhiteLineAngle < 0){
+                endOfWhiteLineAngle = endOfWhiteLineAngle + 360.0f;
+            }
+        }
 
         if(currCar->_enginerpm <= (currCar->_enginerpmRedLine * whiteLinePercent)){
-			rpmVal1 = currCar->_enginerpm / (currCar->_enginerpmRedLine * whiteLinePercent);
-			rpmVal2 = 0.0;
-		}else{
-			rpmVal1 = 1.0;
-			rpmVal2 = (currCar->_enginerpm - (currCar->_enginerpmRedLine * whiteLinePercent)) / (currCar->_enginerpmRedLine * redLinePercent);
-		}
+            rpmVal1 = currCar->_enginerpm / (currCar->_enginerpmRedLine * whiteLinePercent);
+            rpmVal2 = 0.0;
+        }else{
+            rpmVal1 = 1.0;
+            rpmVal2 = (currCar->_enginerpm - (currCar->_enginerpmRedLine * whiteLinePercent)) / (currCar->_enginerpmRedLine * redLinePercent);
+        }
 
-		changeImageVertex(hudImgVertexElements["newtacho-rpmon"], startAngle, endOfWhiteLineAngle, rpmVal1, newtachobb.xMin(), newtachobb.yMin(), hudScale);
-		changeImageVertex(hudImgVertexElements["newtacho-rpmonred"], endOfWhiteLineAngle, endAngle, rpmVal2, newtachobb.xMin(), newtachobb.yMin(), hudScale);
+        changeImageVertex(hudImgVertexElements["newtacho-rpmon"], startAngle, endOfWhiteLineAngle, rpmVal1, newtachobb.xMin(), newtachobb.yMin(), hudScale);
+        changeImageVertex(hudImgVertexElements["newtacho-rpmonred"], endOfWhiteLineAngle, endAngle, rpmVal2, newtachobb.xMin(), newtachobb.yMin(), hudScale);
 
 //edithud
-	if (hudEditModeEnabled){
-		//if there is some widgetGroup selected display the edithud and relative controls around it else keep it hidden
-		if (!selectedWidgetGroup.empty()){
-			hudWidgets["edithudWidget"]->setNodeMask(1);
-		}else{
-			hudWidgets["edithudWidget"]->setNodeMask(0);
-		}
+    if (hudEditModeEnabled){
+        //if there is some widgetGroup selected display the edithud and relative controls around it else keep it hidden
+        if (!selectedWidgetGroup.empty()){
+            hudWidgets["edithudWidget"]->setNodeMask(1);
+        }else{
+            hudWidgets["edithudWidget"]->setNodeMask(0);
+        }
 
-		tMouseInfo	*mouse;
-		mouse = GfuiMouseInfo();
+        tMouseInfo	*mouse;
+        mouse = GfuiMouseInfo();
 
-		//mouse started to be pressed
-		if (prevMouseButtonState == 0  && mouse->button[0] == 1){
-			mouseStartDragX = mouse->X;
-			mouseStartDragY = mouse->Y;
-			prevMouseButtonState = 1;
+        //mouse started to be pressed
+        if (prevMouseButtonState == 0  && mouse->button[0] == 1){
+            mouseStartDragX = mouse->X;
+            mouseStartDragY = mouse->Y;
+            prevMouseButtonState = 1;
 
-			//get the toggle bonding box and detect clicks on it
-			osg::BoundingBox toggleOnOffBB = hudImgElements["edithud-toggleoff"]->getBoundingBox();
-			float mousePosX = mouse->X * hudScreenW /640;
-			float mousePosY = mouse->Y * hudScreenH /480;
-			if (mousePosX >= toggleOnOffBB.xMin() && mousePosX <= toggleOnOffBB.xMax()
-			&& mousePosY >= toggleOnOffBB.yMin() && mousePosY <= toggleOnOffBB.yMax()){
-				GfLogInfo("Clicked toggle\n");
-				//toggle the widget enabled/disabled status
-				ToggleHUDwidget(selectedWidgetGroup);
-				hudWidgets[selectedWidgetGroup.c_str()]->setNodeMask(1);
+            //get the toggle bonding box and detect clicks on it
+            osg::BoundingBox toggleOnOffBB = hudImgElements["edithud-toggleoff"]->getBoundingBox();
+            float mousePosX = mouse->X * hudScreenW /640;
+            float mousePosY = mouse->Y * hudScreenH /480;
+            if (mousePosX >= toggleOnOffBB.xMin() && mousePosX <= toggleOnOffBB.xMax()
+            && mousePosY >= toggleOnOffBB.yMin() && mousePosY <= toggleOnOffBB.yMax()){
+                GfLogInfo("Clicked toggle\n");
+                //toggle the widget enabled/disabled status
+                ToggleHUDwidget(selectedWidgetGroup);
+                hudWidgets[selectedWidgetGroup.c_str()]->setNodeMask(1);
 
-				if(hudImgElements["edithud-toggleon"]->getNodeMask()==0){
-					hudImgElements["edithud-toggleoff"]->setNodeMask(0);
-					hudImgElements["edithud-toggleon"]->setNodeMask(1);
-					GfLogInfo("OSGHUD: done");
-				}else{
-					hudImgElements["edithud-toggleoff"]->setNodeMask(1);
-					hudImgElements["edithud-toggleon"]->setNodeMask(0);
-				}
-			}
-
-
-			//check mouse widgets collisions
-			//open the osghud config file file
-			void *paramHandle2 = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-
-			//cicle throught each element of the widgetGroup
-			if (GfParmListSeekFirst(paramHandle2, "widgets") == 0)
-			{
-				do
-				{
-					std::string widgetGroupName = GfParmListGetCurEltName(paramHandle2,"widgets");
-					if (widgetGroupName.find("edithudWidget")!=std::string::npos){
-						continue;
-					}
-					if (widgetGroupName.find("mouseWidget")!=std::string::npos){
-						continue;
-					}
-
-					bool collision = isMouseOverWidgetGroup(widgetGroupName);
-						//GfLogInfo("OSGHUD: %i :  %s \n", collision, widgetGroupName.c_str());
-					if (collision == true){
-						GfLogInfo("OSGHUD: mouse has clicked on:  %s \n", widgetGroupName.c_str());
-						selectWidgetGroupByName(widgetGroupName);
-					}
-
-				} while (GfParmListSeekNext(paramHandle2, "widgets") == 0);
-			}
-			//release the config file
-			GfParmReleaseHandle(paramHandle2);
-		}
-		//mouse stopped to be pressed
-		if (prevMouseButtonState == 1  && mouse->button[0] == 0){
-			mouseTotalDragX = (mouse->X - mouseStartDragX) * (float)hudScreenW /640;
-			mouseTotalDragY = (mouse->Y - mouseStartDragY) * (float)hudScreenH /480;
-			mouseStartDragX = 0;
-			mouseStartDragY = 0;
-			prevMouseButtonState = 0;
-			GfLogInfo("Mouse was dragged for x:%i y:%i \n", mouseDragX, mouseDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
-			GfLogInfo("Mouse total drag x:%i y:%i \n", mouseTotalDragX, mouseTotalDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
-
-			if (!selectedWidgetGroup.empty()){
-				saveWidgetGroupPosition(selectedWidgetGroup);
-			}
-		}else{
-			mouseDragX = 0;
-			mouseDragY = 0;
-		}
-
-		if (mouse->button[0] == 1){
-			mouseDragX =  (mouse->X - mousePrevPosX);
-			mouseDragY =  (mouse->Y - mousePrevPosY);
-		}
-		mousePrevPosX = mouse->X;
-		mousePrevPosY = mouse->Y;
-
-		//move it to the correct position
-		float newScale = 1.0;
-		float moveX = 0.0;
-		float moveY = 0.0;
-		//move mode
-		if (true){
-			moveX = (float)mouseDragX * (float)hudScreenW /640;
-			moveY = (float)mouseDragY * (float)hudScreenH /480;
-		}
-		//scale mode
-		if (true){
-
-		}
+                if(hudImgElements["edithud-toggleon"]->getNodeMask()==0){
+                    hudImgElements["edithud-toggleoff"]->setNodeMask(0);
+                    hudImgElements["edithud-toggleon"]->setNodeMask(1);
+                    GfLogInfo("OSGHUD: done");
+                }else{
+                    hudImgElements["edithud-toggleoff"]->setNodeMask(1);
+                    hudImgElements["edithud-toggleon"]->setNodeMask(0);
+                }
+            }
 
 
-	//start doing hud things
-		std::string selectedWidgetGroupPath = "widgets/" + selectedWidgetGroup;
+            //check mouse widgets collisions
+            //open the osghud config file file
+            void *paramHandle2 = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
 
-		//start
-		//move the widget
-		//open the osghud config file file
-		void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+            //cicle throught each element of the widgetGroup
+            if (GfParmListSeekFirst(paramHandle2, "widgets") == 0)
+            {
+                do
+                {
+                    std::string widgetGroupName = GfParmListGetCurEltName(paramHandle2,"widgets");
+                    if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+                        continue;
+                    }
+                    if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+                        continue;
+                    }
 
-		//cicle throught each element of the widgetGroup
-		if (GfParmListSeekFirst(paramHandle, selectedWidgetGroupPath.c_str()) == 0)
-		{
-			do
-			{
-				std::string widgetName = GfParmListGetCurEltName(paramHandle,selectedWidgetGroupPath.c_str());
+                    bool collision = isMouseOverWidgetGroup(widgetGroupName);
+                        //GfLogInfo("OSGHUD: %i :  %s \n", collision, widgetGroupName.c_str());
+                    if (collision == true){
+                        GfLogInfo("OSGHUD: mouse has clicked on:  %s \n", widgetGroupName.c_str());
+                        selectWidgetGroupByName(widgetGroupName);
+                    }
 
-				if ( hudTextElements.find(widgetName) != hudTextElements.end() )
-				{
-					osg::BoundingBox editedwidgetBB = hudTextElements[widgetName.c_str()]->getBoundingBox();
-					osg::Vec3 textPosition = hudTextElements[widgetName.c_str()]->getPosition();
-					textPosition[0]=textPosition[0]+moveX;
-					textPosition[1]=textPosition[1]+moveY;
-					hudTextElements[widgetName.c_str()]->setPosition(textPosition);
-				}
-				else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
-				{
-					//widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
-					osg::BoundingBox editedwidgetBB = hudImgElements[widgetName.c_str()]->getBoundingBox();
-					changeImagePosition(
-						hudImgElements[widgetName.c_str()],
-						editedwidgetBB.xMin()+moveX,
-						editedwidgetBB.yMin()+moveY,
-						hudScale
-					);
-				}
+                } while (GfParmListSeekNext(paramHandle2, "widgets") == 0);
+            }
+            //release the config file
+            GfParmReleaseHandle(paramHandle2);
+        }
+        //mouse stopped to be pressed
+        if (prevMouseButtonState == 1  && mouse->button[0] == 0){
+            mouseTotalDragX = (mouse->X - mouseStartDragX) * (float)hudScreenW /640;
+            mouseTotalDragY = (mouse->Y - mouseStartDragY) * (float)hudScreenH /480;
+            mouseStartDragX = 0;
+            mouseStartDragY = 0;
+            prevMouseButtonState = 0;
+            GfLogInfo("Mouse was dragged for x:%i y:%i \n", mouseDragX, mouseDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
+            GfLogInfo("Mouse total drag x:%i y:%i \n", mouseTotalDragX, mouseTotalDragY); //0 left button 1 wheelbutton 2 right button//default mouse resolution is set to be 640x480 (must be scaled to match the actual resolution)
 
-				else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
-				{
-					//todo: I havent figured out how to move these without messing them out
-					//widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
-				}
+            if (!selectedWidgetGroup.empty()){
+                saveWidgetGroupPosition(selectedWidgetGroup);
+            }
+        }else{
+            mouseDragX = 0;
+            mouseDragY = 0;
+        }
 
-				else
-				{
-					GfLogDebug("OSGHUD: This is not a recognized widget type. I dont know what to do with this.");
-				}
-			} while (GfParmListSeekNext(paramHandle, selectedWidgetGroupPath.c_str()) == 0);
-		}
+        if (mouse->button[0] == 1){
+            mouseDragX =  (mouse->X - mousePrevPosX);
+            mouseDragY =  (mouse->Y - mousePrevPosY);
+        }
+        mousePrevPosX = mouse->X;
+        mousePrevPosY = mouse->Y;
 
-		//release the config file
-		GfParmReleaseHandle(paramHandle);
-		//end
+        //move it to the correct position
+        float newScale = 1.0;
+        float moveX = 0.0;
+        float moveY = 0.0;
+        //move mode
+        if (true){
+            moveX = (float)mouseDragX * (float)hudScreenW /640;
+            moveY = (float)mouseDragY * (float)hudScreenH /480;
+        }
+        //scale mode
+        if (true){
+
+        }
 
 
+    //start doing hud things
+        std::string selectedWidgetGroupPath = "widgets/" + selectedWidgetGroup;
 
-		//mouse update the mouse pointer position
-		changeImagePosition(
-			hudImgElements["mouse-normal"],
-			mouse->X * (float)hudScreenW /640,
-			(mouse->Y * (float)hudScreenH /480)-(128*hudScale),/*todo*/
-			hudScale
-		);
+        //start
+        //move the widget
+        //open the osghud config file file
+        void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+
+        //cicle throught each element of the widgetGroup
+        if (GfParmListSeekFirst(paramHandle, selectedWidgetGroupPath.c_str()) == 0)
+        {
+            do
+            {
+                std::string widgetName = GfParmListGetCurEltName(paramHandle,selectedWidgetGroupPath.c_str());
+
+                if ( hudTextElements.find(widgetName) != hudTextElements.end() )
+                {
+                    osg::BoundingBox editedwidgetBB = hudTextElements[widgetName.c_str()]->getBoundingBox();
+                    osg::Vec3 textPosition = hudTextElements[widgetName.c_str()]->getPosition();
+                    textPosition[0]=textPosition[0]+moveX;
+                    textPosition[1]=textPosition[1]+moveY;
+                    hudTextElements[widgetName.c_str()]->setPosition(textPosition);
+                }
+                else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
+                {
+                    //widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
+                    osg::BoundingBox editedwidgetBB = hudImgElements[widgetName.c_str()]->getBoundingBox();
+                    changeImagePosition(
+                        hudImgElements[widgetName.c_str()],
+                        editedwidgetBB.xMin()+moveX,
+                        editedwidgetBB.yMin()+moveY,
+                        hudScale
+                    );
+                }
+
+                else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+                {
+                    //todo: I havent figured out how to move these without messing them out
+                    //widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
+                }
+
+                else
+                {
+                    GfLogDebug("OSGHUD: This is not a recognized widget type. I dont know what to do with this.");
+                }
+            } while (GfParmListSeekNext(paramHandle, selectedWidgetGroupPath.c_str()) == 0);
+        }
+
+        //release the config file
+        GfParmReleaseHandle(paramHandle);
+        //end
 
 
 
-		//if there is no WidgetGroup selected we have nothing to do
-		if (selectedWidgetGroup.empty()){
-			return;
-		}
+        //mouse update the mouse pointer position
+        changeImagePosition(
+            hudImgElements["mouse-normal"],
+            mouse->X * (float)hudScreenW /640,
+            (mouse->Y * (float)hudScreenH /480)-(128*hudScale),/*todo*/
+            hudScale
+        );
 
 
-		//get the new widgetGroup bounding box
-		osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(selectedWidgetGroup);
-		/*
-		GfLogInfo("OSGHUD: boundingbox: %s\n", selectedWidgetGroup.c_str());
-		GfLogInfo("OSGHUD: boundingbox: xmin %f\n", targetWidgetGroupBoundingBox.xMin());
-		GfLogInfo("OSGHUD: boundingbox: ymin %f\n", targetWidgetGroupBoundingBox.yMin());
-		GfLogInfo("OSGHUD: boundingbox: xmax %f\n", targetWidgetGroupBoundingBox.xMax());
-		GfLogInfo("OSGHUD: boundingbox: ymax %f\n", targetWidgetGroupBoundingBox.yMax());
-		*/
 
-		/*
-		 * how vertices are arranged:
-		 *      3_______2
-		 *      |       |
-		 *    y |       |
-		 *      |       |
-		 *      0_______1
-		 *          x
-		 *
-		 * [vertices(0-3)][0]=x
-		 * [vertices(0-3)][1]=y
-		* */
+        //if there is no WidgetGroup selected we have nothing to do
+        if (selectedWidgetGroup.empty()){
+            return;
+        }
 
-		//resize the edithudWidget to match the size of targetWidgetGroup
-		//create the vertices for the image geometry and assign them
 
-		//move the background
-		osg::Vec3Array* vertices = new osg::Vec3Array;
-		float depth = 0.0f-0.1f;
-		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMin(),depth)); //bottom left
-		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMax(),depth)); //bottom right
-		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMax(),depth)); //top right
-		vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMin(),depth)); //topleft
-		vertices->dirty();
+        //get the new widgetGroup bounding box
+        osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(selectedWidgetGroup);
+        /*
+        GfLogInfo("OSGHUD: boundingbox: %s\n", selectedWidgetGroup.c_str());
+        GfLogInfo("OSGHUD: boundingbox: xmin %f\n", targetWidgetGroupBoundingBox.xMin());
+        GfLogInfo("OSGHUD: boundingbox: ymin %f\n", targetWidgetGroupBoundingBox.yMin());
+        GfLogInfo("OSGHUD: boundingbox: xmax %f\n", targetWidgetGroupBoundingBox.xMax());
+        GfLogInfo("OSGHUD: boundingbox: ymax %f\n", targetWidgetGroupBoundingBox.yMax());
+        */
 
-		hudImgElements["edithud-background"]->setVertexArray(vertices);
-		hudImgElements["edithud-background"]->setUseDisplayList(false);
+        /*
+         * how vertices are arranged:
+         *      3_______2
+         *      |       |
+         *    y |       |
+         *      |       |
+         *      0_______1
+         *          x
+         *
+         * [vertices(0-3)][0]=x
+         * [vertices(0-3)][1]=y
+        * */
 
-		//move all the other pieces of the edithudWidget
-		osg::Vec3Array* targetVertices = dynamic_cast<osg::Vec3Array*>(hudImgElements["edithud-background"]->getVertexArray());
-		std::vector<std::string> edithudWidgets;
-		std::string currWidget;
-		//edithudWidgets.push_back("edithud-background");
-		edithudWidgets.push_back("edithud-titlebar");
-		edithudWidgets.push_back("edithud-dragicon");
-		edithudWidgets.push_back("edithud-resizeicon");
-		edithudWidgets.push_back("edithud-toggleoff");
-		edithudWidgets.push_back("edithud-toggleon");
-		edithudWidgets.push_back("edithud-titletext");
+        //resize the edithudWidget to match the size of targetWidgetGroup
+        //create the vertices for the image geometry and assign them
 
-		for (size_t i = 0; i < edithudWidgets.size(); ++i){
-			if ( hudTextElements.find(edithudWidgets[i]) != hudTextElements.end() )
-			{
-				recalculateTextWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
-			}
-			else if ( hudImgElements.find(edithudWidgets[i]) != hudImgElements.end() )
-			{
-				recalculateImageWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
-			}
-	//		else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
-	//		{
-	//		}
-		}
-	}
+        //move the background
+        osg::Vec3Array* vertices = new osg::Vec3Array;
+        float depth = 0.0f-0.1f;
+        vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMin(),depth)); //bottom left
+        vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMin(),targetWidgetGroupBoundingBox.yMax(),depth)); //bottom right
+        vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMax(),depth)); //top right
+        vertices->push_back(osg::Vec3( targetWidgetGroupBoundingBox.xMax(),targetWidgetGroupBoundingBox.yMin(),depth)); //topleft
+        vertices->dirty();
+
+        hudImgElements["edithud-background"]->setVertexArray(vertices);
+        hudImgElements["edithud-background"]->setUseDisplayList(false);
+
+        //move all the other pieces of the edithudWidget
+        osg::Vec3Array* targetVertices = dynamic_cast<osg::Vec3Array*>(hudImgElements["edithud-background"]->getVertexArray());
+        std::vector<std::string> edithudWidgets;
+        std::string currWidget;
+        //edithudWidgets.push_back("edithud-background");
+        edithudWidgets.push_back("edithud-titlebar");
+        edithudWidgets.push_back("edithud-dragicon");
+        edithudWidgets.push_back("edithud-resizeicon");
+        edithudWidgets.push_back("edithud-toggleoff");
+        edithudWidgets.push_back("edithud-toggleon");
+        edithudWidgets.push_back("edithud-titletext");
+
+        for (size_t i = 0; i < edithudWidgets.size(); ++i){
+            if ( hudTextElements.find(edithudWidgets[i]) != hudTextElements.end() )
+            {
+                recalculateTextWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
+            }
+            else if ( hudImgElements.find(edithudWidgets[i]) != hudImgElements.end() )
+            {
+                recalculateImageWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
+            }
+    //		else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+    //		{
+    //		}
+        }
+    }
 }
 
 void SDHUD::ToggleHUD()
@@ -2270,24 +2272,24 @@ void SDHUD::ToggleHUD()
 
 void SDHUD::ToggleHUDwidget(const std::string &widget)
 {
-	//read the previous status from the config file
+    //read the previous status from the config file
     std::string path = "widgets/" + widget;
     std::string attribute = "enabled";
     void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-	int widgetEnabled = GfParmGetNum (paramHandle, path.c_str(), attribute.c_str(), "",0);
+    int widgetEnabled = GfParmGetNum (paramHandle, path.c_str(), attribute.c_str(), "",0);
 
-	//reverse the value
-	widgetEnabled = !widgetEnabled;
+    //reverse the value
+    widgetEnabled = !widgetEnabled;
 
-	//apply to the current screen
+    //apply to the current screen
     hudWidgets[widget]->setNodeMask(widgetEnabled);
 
-	//save the value back in the config file
+    //save the value back in the config file
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)widgetEnabled);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 }
 
 void SDHUD::ToggleHUDwidgets(const std::string &widgets)
@@ -2336,7 +2338,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
         {
             widgetsSectionName = GfParmListGetCurEltName(paramHandle, mainSection.c_str());
             widgetsSectionPath = mainSection + "/" + widgetsSectionName;
-			GfLogDebug("OSGHUD: Generating hud: %s \n", widgetsSectionName.c_str());
+            GfLogDebug("OSGHUD: Generating hud: %s \n", widgetsSectionName.c_str());
 
             osg::ref_ptr<osg::Geode> geode = new osg::Geode;
             geode->setName(widgetsSectionName);
@@ -2415,10 +2417,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 text->setAlignment(osgText::Text::RIGHT_BOTTOM_BASE_LINE );
                             }
-							else if (textAlign=="CENTER_BOTTOM")
-							{
-								text->setAlignment(osgText::Text::CENTER_BOTTOM_BASE_LINE );
-							}
+                            else if (textAlign=="CENTER_BOTTOM")
+                            {
+                                text->setAlignment(osgText::Text::CENTER_BOTTOM_BASE_LINE );
+                            }
 
                             //set the text string
                             text->setText(textStr);
@@ -2608,31 +2610,31 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             GfLogDebug("OSGHUD: Generate imagevertex object: %s \n", elementId.c_str());
 
-							osg::ref_ptr<osg::Geode>      myGeode = new osg::Geode;
-							osg::ref_ptr<osg::Geometry>   myGeometry = new osg::Geometry;
-							osg::ref_ptr<osg::Vec3Array>  myVertices = new osg::Vec3Array;
-							osg::ref_ptr<osg::Vec3Array>  myNormals = new osg::Vec3Array;
-							osg::ref_ptr<osg::Vec2Array>  myTexCoords = new osg::Vec2Array; //(UV)
+                            osg::ref_ptr<osg::Geode>      myGeode = new osg::Geode;
+                            osg::ref_ptr<osg::Geometry>   myGeometry = new osg::Geometry;
+                            osg::ref_ptr<osg::Vec3Array>  myVertices = new osg::Vec3Array;
+                            osg::ref_ptr<osg::Vec3Array>  myNormals = new osg::Vec3Array;
+                            osg::ref_ptr<osg::Vec2Array>  myTexCoords = new osg::Vec2Array; //(UV)
 
-							//start preparing the image
-							std::string myFilename = GetDataDir();
-							//std::string myUrl = "data/img/osg-hud/tachometerv2-on.png";
-							//myFilename.append(myUrl);
-							myFilename.append(url);
-							//check that the image file exist
-							if (!GfFileExists(myFilename.c_str()))
-							{
-								GfLogError ("OSGHUD: Specified image file does not exist: %s.\n", myFilename.c_str());
-							}
+                            //start preparing the image
+                            std::string myFilename = GetDataDir();
+                            //std::string myUrl = "data/img/osg-hud/tachometerv2-on.png";
+                            //myFilename.append(myUrl);
+                            myFilename.append(url);
+                            //check that the image file exist
+                            if (!GfFileExists(myFilename.c_str()))
+                            {
+                                GfLogError ("OSGHUD: Specified image file does not exist: %s.\n", myFilename.c_str());
+                            }
 
-							// setup texture
-							osg::Image* myImg = osgDB::readImageFile(myFilename);
-							osg::TextureRectangle* myTexture = new osg::TextureRectangle;
-							myTexture->setImage(myImg);
-							//get image size
-							//get image dimensions
-							float width = myImg->s();
-							float height = myImg->t();
+                            // setup texture
+                            osg::Image* myImg = osgDB::readImageFile(myFilename);
+                            osg::TextureRectangle* myTexture = new osg::TextureRectangle;
+                            myTexture->setImage(myImg);
+                            //get image size
+                            //get image dimensions
+                            float width = myImg->s();
+                            float height = myImg->t();
 
 
                             //set the position
@@ -2651,138 +2653,138 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             float positionLeft =   position.x();
                             float positionBottom = position.y();
 
-							//vertices
-							//triangle 1
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
-							//triangle 2
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
-							//triangle 3
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
-							//triangle 4
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
-							//triangle 5
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
-							//triangle 6
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
-							//triangle 7
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
-							//triangle 8
-							myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
-							myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
+                            //vertices
+                            //triangle 1
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+                            //triangle 2
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+                            //triangle 3
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //3
+                            //triangle 4
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  1.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
+                            //triangle 5
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+                            //triangle 6
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(1.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+                            //triangle 7
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //3
+                            //triangle 8
+                            myVertices->push_back ( osg::Vec3(0.5*width+positionLeft,  0.5*height+positionBottom,  1.0)); //1
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.0*height+positionBottom,  1.0)); //2
+                            myVertices->push_back ( osg::Vec3(0.0*width+positionLeft,  0.5*height+positionBottom,  1.0)); //3
 
-							myGeometry->setVertexArray  ( myVertices  );
+                            myGeometry->setVertexArray  ( myVertices  );
 
-							//UV's
-							//triangle 1
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //2
-							myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //3
-							//triangle 2
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //2
-							myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //3
-							//triangle 3
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //2
-							myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //3
-							//triangle 4
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //2
-							myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //3
-							//triangle 5
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //2
-							myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //3
-							//triangle 6
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //2
-							myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //3
-							//triangle 7
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //2
-							myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //3
-							//triangle 8
-							myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
-							myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //2
-							myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //3
+                            //UV's
+                            //triangle 1
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //2
+                            myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //3
+                            //triangle 2
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(0.0,  1.0)); //2
+                            myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //3
+                            //triangle 3
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(0.5,  1.0)); //2
+                            myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //3
+                            //triangle 4
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(1.0,  1.0)); //2
+                            myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //3
+                            //triangle 5
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(1.0,  0.5)); //2
+                            myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //3
+                            //triangle 6
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(1.0,  0.0)); //2
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //3
+                            //triangle 7
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.0)); //2
+                            myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //3
+                            //triangle 8
+                            myTexCoords->push_back( osg::Vec2(0.5,  0.5)); //1
+                            myTexCoords->push_back( osg::Vec2(0.0,  0.0)); //2
+                            myTexCoords->push_back( osg::Vec2(0.0,  0.5)); //3
 
-							myGeometry->setTexCoordArray( 0, myTexCoords );
+                            myGeometry->setTexCoordArray( 0, myTexCoords );
 
-							// calculate normals
-							osg::Vec3Array* normals = new osg::Vec3Array(8);
-							(*normals)[0].set(0.0f,-1.0f,0.0f);
-							(*normals)[1].set(0.0f,-1.0f,0.0f);
-							(*normals)[2].set(0.0f,-1.0f,0.0f);
-							(*normals)[3].set(0.0f,-1.0f,0.0f);
-							(*normals)[4].set(0.0f,-1.0f,0.0f);
-							(*normals)[5].set(0.0f,-1.0f,0.0f);
-							(*normals)[6].set(0.0f,-1.0f,0.0f);
-							(*normals)[7].set(0.0f,-1.0f,0.0f);
-							myGeometry->setNormalArray(normals);
-							myGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+                            // calculate normals
+                            osg::Vec3Array* normals = new osg::Vec3Array(8);
+                            (*normals)[0].set(0.0f,-1.0f,0.0f);
+                            (*normals)[1].set(0.0f,-1.0f,0.0f);
+                            (*normals)[2].set(0.0f,-1.0f,0.0f);
+                            (*normals)[3].set(0.0f,-1.0f,0.0f);
+                            (*normals)[4].set(0.0f,-1.0f,0.0f);
+                            (*normals)[5].set(0.0f,-1.0f,0.0f);
+                            (*normals)[6].set(0.0f,-1.0f,0.0f);
+                            (*normals)[7].set(0.0f,-1.0f,0.0f);
+                            myGeometry->setNormalArray(normals);
+                            myGeometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
 
-							// assign colors
-							osg::Vec4Array* colors = new osg::Vec4Array(8);
-							(*colors)[0].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[1].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[2].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[3].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[4].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[5].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[6].set(1.0f,1.0f,1.0f,1.0f);
-							(*colors)[7].set(1.0f,1.0f,1.0f,1.0f);
-							myGeometry->setColorArray(colors);
-							myGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+                            // assign colors
+                            osg::Vec4Array* colors = new osg::Vec4Array(8);
+                            (*colors)[0].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[1].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[2].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[3].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[4].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[5].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[6].set(1.0f,1.0f,1.0f,1.0f);
+                            (*colors)[7].set(1.0f,1.0f,1.0f,1.0f);
+                            myGeometry->setColorArray(colors);
+                            myGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 
-							// draw the vertices as quads
-							myGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, myVertices->size()));
+                            // draw the vertices as quads
+                            myGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, myVertices->size()));
 
-							// disable display list so our modified tex coordinates show up
-							myGeometry->setUseDisplayList(false);
+                            // disable display list so our modified tex coordinates show up
+                            myGeometry->setUseDisplayList(false);
 
-							// setup stateset
-							osg::StateSet* myState = myGeometry->getOrCreateStateSet();
-							myState->setTextureAttributeAndModes(0, myTexture, osg::StateAttribute::ON);
+                            // setup stateset
+                            osg::StateSet* myState = myGeometry->getOrCreateStateSet();
+                            myState->setTextureAttributeAndModes(0, myTexture, osg::StateAttribute::ON);
 
-							//Conversely, disable write depth cache,
-							//Make objects behind transparent polygons visible
-							//OSG draws transparent polygons first, then draws opaque polygons
-							osg :: Depth * myImgDepth = new osg :: Depth;
-							myImgDepth-> setWriteMask (false);
-							myState-> setAttributeAndModes (myImgDepth, osg :: StateAttribute :: ON);
+                            //Conversely, disable write depth cache,
+                            //Make objects behind transparent polygons visible
+                            //OSG draws transparent polygons first, then draws opaque polygons
+                            osg :: Depth * myImgDepth = new osg :: Depth;
+                            myImgDepth-> setWriteMask (false);
+                            myState-> setAttributeAndModes (myImgDepth, osg :: StateAttribute :: ON);
 
-							// setup material
-							osg::TexMat* myTexmat = new osg::TexMat;
-							myTexmat->setScaleByTextureRectangleSize(true);
-							myState->setTextureAttributeAndModes(0, myTexmat, osg::StateAttribute::ON);
+                            // setup material
+                            osg::TexMat* myTexmat = new osg::TexMat;
+                            myTexmat->setScaleByTextureRectangleSize(true);
+                            myState->setTextureAttributeAndModes(0, myTexmat, osg::StateAttribute::ON);
 
-							//enable gl_blending (for texture transparency)
-							myState->setMode(GL_BLEND, osg::StateAttribute::ON);
-							osg::BlendFunc* myBlend = new osg::BlendFunc;
-							myBlend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_DST_ALPHA);
+                            //enable gl_blending (for texture transparency)
+                            myState->setMode(GL_BLEND, osg::StateAttribute::ON);
+                            osg::BlendFunc* myBlend = new osg::BlendFunc;
+                            myBlend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_DST_ALPHA);
 
-							// turn off lighting (light always on)
-							myState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+                            // turn off lighting (light always on)
+                            myState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-							//myGeode->setName("mytachograph");
-							myGeode->addDrawable( myGeometry );
-							osgGroupWidgets->addChild(myGeode);
+                            //myGeode->setName("mytachograph");
+                            myGeode->addDrawable( myGeometry );
+                            osgGroupWidgets->addChild(myGeode);
                             hudImgVertexElements[elementId] =  myGeometry;
                         }
                         else if( type == "graph")
@@ -2886,214 +2888,214 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
 osg::BoundingBox SDHUD::getBoundigBoxFromWidgetName(std::string widgetName)
 {
-	//find the referenceObj pointer and then get his bounding box
-	osg::BoundingBox widgetBoundingBox;
-	if ( hudTextElements.find(widgetName) != hudTextElements.end() )
-	{
-		widgetBoundingBox = hudTextElements[widgetName]->getBoundingBox();
-	}
-	else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
-	{
-		widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
-	}
+    //find the referenceObj pointer and then get his bounding box
+    osg::BoundingBox widgetBoundingBox;
+    if ( hudTextElements.find(widgetName) != hudTextElements.end() )
+    {
+        widgetBoundingBox = hudTextElements[widgetName]->getBoundingBox();
+    }
+    else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
+    {
+        widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
+    }
 
-	else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
-	{
-		//widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
-	}
+    else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+    {
+        //widgetBoundingBox = hudGraphElements[positionRefObj]->getBoundingBox();
+    }
 
-	else
-	{
-		GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-		osg::BoundingBox screenBB;
-		screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
-		screenBB.expandBy(osg::Vec3(hudScreenW,hudScreenH,0.0f));
-		widgetBoundingBox = screenBB;
-	}
-	return widgetBoundingBox;
+    else
+    {
+        GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+        osg::BoundingBox screenBB;
+        screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+        screenBB.expandBy(osg::Vec3(hudScreenW,hudScreenH,0.0f));
+        widgetBoundingBox = screenBB;
+    }
+    return widgetBoundingBox;
 }
 
 osg::BoundingBox SDHUD::getBoundigBoxFromWidgetGroupName(std::string widgetGroupName)
 {
-	osg::BoundingBox widgetGroupBoundingBox;
-	std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
+    osg::BoundingBox widgetGroupBoundingBox;
+    std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
 
-	//open the osghud config file file
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    //open the osghud config file file
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
 
-	//cicle throught each element of the widgetGroup
-	if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
-	{
-		do
-		{
-			std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
+    //cicle throught each element of the widgetGroup
+    if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
+    {
+        do
+        {
+            std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
 
-			//get the bounding box of the single widget
-			osg::BoundingBox widgetBoundingBox = getBoundigBoxFromWidgetName(widgetsName);
+            //get the bounding box of the single widget
+            osg::BoundingBox widgetBoundingBox = getBoundigBoxFromWidgetName(widgetsName);
 
-			//add the single widget bounding box to the widgetgroup bounding box
-			widgetGroupBoundingBox.expandBy(widgetBoundingBox);
-		} while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
-	}
+            //add the single widget bounding box to the widgetgroup bounding box
+            widgetGroupBoundingBox.expandBy(widgetBoundingBox);
+        } while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
+    }
 
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 
-	return widgetGroupBoundingBox;
+    return widgetGroupBoundingBox;
 }
 void SDHUD::recalculateImageWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale)
 {
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-	std::string imageWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
-	osg::Geometry* imageWidget = hudImgElements[widgetName];
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    std::string imageWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
+    osg::Geometry* imageWidget = hudImgElements[widgetName];
 
-	std::string positionRefObj =        GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObj", "" );
-	std::string positionRefObjPoint =   GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObjPoint", "tl" );
-	std::string positionMyPoint =       GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-myPoint", "tl" );
-	float positionVerticalModifier =    GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
-	float positionHorizontalModifier =  GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+    std::string positionRefObj =        GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObj", "" );
+    std::string positionRefObjPoint =   GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-refObjPoint", "tl" );
+    std::string positionMyPoint =       GfParmGetStr (paramHandle, imageWidgetPath.c_str(),"position-myPoint", "tl" );
+    float positionVerticalModifier =    GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+    float positionHorizontalModifier =  GfParmGetNum (paramHandle, imageWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
-	GfParmReleaseHandle(paramHandle);
+    GfParmReleaseHandle(paramHandle);
 
-	osg::TextureRectangle* texture;
+    osg::TextureRectangle* texture;
 
-	//get the texture data of this object
-	texture = dynamic_cast<osg::TextureRectangle*>(imageWidget->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
+    //get the texture data of this object
+    texture = dynamic_cast<osg::TextureRectangle*>(imageWidget->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
 
-	//get the image from the texture data
-	osg::Image* img;
-	img = texture->getImage();
+    //get the image from the texture data
+    osg::Image* img;
+    img = texture->getImage();
 
-	//get image dimensions
-	float imgWidth = img->s() * hudScale;
-	float imgHeight = img->t() * hudScale;
+    //get image dimensions
+    float imgWidth = img->s() * hudScale;
+    float imgHeight = img->t() * hudScale;
 
-	//set the position
-	osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+    //set the position
+    osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
 
-	//get object bounding box
-	osg::BoundingBox myObjBb = imageWidget->getBoundingBox();
+    //get object bounding box
+    osg::BoundingBox myObjBb = imageWidget->getBoundingBox();
 
-	//calculate the positioning
-	osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+    //calculate the positioning
+    osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
 
-	//asign the position
-	float positionLeft =   position.x();
-	float positionBottom = position.y();
+    //asign the position
+    float positionLeft =   position.x();
+    float positionBottom = position.y();
 
-	//create the vertices for the image geometry and assign them
-	osg::Vec3Array* vertices = new osg::Vec3Array;
-	float depth = 0.0f-0.1f;
+    //create the vertices for the image geometry and assign them
+    osg::Vec3Array* vertices = new osg::Vec3Array;
+    float depth = 0.0f-0.1f;
 
-	vertices->push_back(osg::Vec3( positionLeft            ,positionBottom           ,depth)); //bottom left
-	vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom           ,depth)); //bottom right
-	vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom+imgHeight ,depth)); //top right
-	vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight ,depth)); //topleft
-	vertices->dirty();
-	imageWidget->setVertexArray(vertices);
-	imageWidget->setUseDisplayList(false);
+    vertices->push_back(osg::Vec3( positionLeft            ,positionBottom           ,depth)); //bottom left
+    vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom           ,depth)); //bottom right
+    vertices->push_back(osg::Vec3( positionLeft+imgWidth   ,positionBottom+imgHeight ,depth)); //top right
+    vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight ,depth)); //topleft
+    vertices->dirty();
+    imageWidget->setVertexArray(vertices);
+    imageWidget->setUseDisplayList(false);
 }
 
 void SDHUD::recalculateTextWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale)
 {
 
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-	std::string textWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
-	osgText::Text* textWidget = hudTextElements[widgetName];
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    std::string textWidgetPath = "widgets/"+widgetGroupName +"/"+widgetName;
+    osgText::Text* textWidget = hudTextElements[widgetName];
 
 
-	std::string positionRefObj =        GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObj", "" );
-	std::string positionRefObjPoint =   GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObjPoint", "tl" );
-	std::string positionMyPoint =       GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-myPoint", "tl" );
-	float positionVerticalModifier =    GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
-	float positionHorizontalModifier =  GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
+    std::string positionRefObj =        GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObj", "" );
+    std::string positionRefObjPoint =   GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-refObjPoint", "tl" );
+    std::string positionMyPoint =       GfParmGetStr (paramHandle, textWidgetPath.c_str(),"position-myPoint", "tl" );
+    float positionVerticalModifier =    GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+    float positionHorizontalModifier =  GfParmGetNum (paramHandle, textWidgetPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
-	GfParmReleaseHandle(paramHandle);
+    GfParmReleaseHandle(paramHandle);
 
-	//set the position
-	osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
+    //set the position
+    osg::BoundingBox refObjBb = getBoundigBoxFromWidgetName(positionRefObj);
 
-	//get object bounding box
-	osg::BoundingBox myObjBb = textWidget->getBoundingBox();
+    //get object bounding box
+    osg::BoundingBox myObjBb = textWidget->getBoundingBox();
 
-	//calculate the positioning
-	osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+    //calculate the positioning
+    osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
 
     textWidget->setPosition(position);
 }
 
 void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 {
-	GfLogInfo("Saving position: %s\n", widgetGroupName.c_str());
+    GfLogInfo("Saving position: %s\n", widgetGroupName.c_str());
 
-	std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
+    std::string widgetGroupNamePath = "widgets/"+widgetGroupName;
 
-	//open the osghud config file file
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    //open the osghud config file file
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
 
-	//cicle throught each element of the widgetGroup
-	if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
-	{
-		do
-		{
-			std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
-			std::string widgetPath = widgetGroupNamePath +"/"+ widgetsName;
+    //cicle throught each element of the widgetGroup
+    if (GfParmListSeekFirst(paramHandle, widgetGroupNamePath.c_str()) == 0)
+    {
+        do
+        {
+            std::string widgetsName = GfParmListGetCurEltName(paramHandle,widgetGroupNamePath.c_str());
+            std::string widgetPath = widgetGroupNamePath +"/"+ widgetsName;
 
-			//leggo la posizione dal file
-			std::string positionRefObj =        GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObj", "" );
-			std::string positionRefObjPoint =   GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObjPoint", "tl" );
-			std::string positionMyPoint =       GfParmGetStr (paramHandle, widgetPath.c_str(),"position-myPoint", "tl" );
-			float positionVerticalModifier =    GfParmGetNum (paramHandle, widgetPath.c_str(),"position-verticalModifier", "",0 );
-			float positionHorizontalModifier =  GfParmGetNum (paramHandle, widgetPath.c_str(),"position-horizontalModifier", "",0 );
+            //leggo la posizione dal file
+            std::string positionRefObj =        GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObj", "" );
+            std::string positionRefObjPoint =   GfParmGetStr (paramHandle, widgetPath.c_str(),"position-refObjPoint", "tl" );
+            std::string positionMyPoint =       GfParmGetStr (paramHandle, widgetPath.c_str(),"position-myPoint", "tl" );
+            float positionVerticalModifier =    GfParmGetNum (paramHandle, widgetPath.c_str(),"position-verticalModifier", "",0 );
+            float positionHorizontalModifier =  GfParmGetNum (paramHandle, widgetPath.c_str(),"position-horizontalModifier", "",0 );
 
-			if ( positionRefObj.find("screen") == 0 ){
+            if ( positionRefObj.find("screen") == 0 ){
 
-				//get current position (bounding box)
-				osg::BoundingBox myObjBb = getBoundigBoxFromWidgetName(widgetsName);
+                //get current position (bounding box)
+                osg::BoundingBox myObjBb = getBoundigBoxFromWidgetName(widgetsName);
 
-				//convert the modification to the resolution used in the config file
-				float modifierVertical = ((float)mouseTotalDragY / (float)hudScreenH * 1024);
-				float modifierHorizontal = ((float)mouseTotalDragX / (float)hudScreenW * 1280);
+                //convert the modification to the resolution used in the config file
+                float modifierVertical = ((float)mouseTotalDragY / (float)hudScreenH * 1024);
+                float modifierHorizontal = ((float)mouseTotalDragX / (float)hudScreenW * 1280);
 
-				// I still dont completely understand the math or the reasons for this, but "it works"
-				float horizontalScale = (((float)hudScreenW / (float)hudScreenH) / (1280.00/1024.00));
+                // I still dont completely understand the math or the reasons for this, but "it works"
+                float horizontalScale = (((float)hudScreenW / (float)hudScreenH) / (1280.00/1024.00));
 
-				modifierHorizontal = modifierHorizontal * horizontalScale;
+                modifierHorizontal = modifierHorizontal * horizontalScale;
 
-				float newPositionVerticalModifier = positionVerticalModifier + modifierVertical;
-				float newPositionHorizontalModifier = positionHorizontalModifier + modifierHorizontal;
+                float newPositionVerticalModifier = positionVerticalModifier + modifierVertical;
+                float newPositionHorizontalModifier = positionHorizontalModifier + modifierHorizontal;
 
-				GfLogInfo("OSGHUD: Hud Scale is: %f\n", hudScale);
+                GfLogInfo("OSGHUD: Hud Scale is: %f\n", hudScale);
 
-				GfLogInfo("Resolution: %f %f\n", (float)hudScreenW, (float)hudScreenH);
-				GfLogInfo("Horizontal Scale: %f\n", horizontalScale);
+                GfLogInfo("Resolution: %f %f\n", (float)hudScreenW, (float)hudScreenH);
+                GfLogInfo("Horizontal Scale: %f\n", horizontalScale);
 
-				GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
+                GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
 
-				GfLogInfo("Original Vertical was: %f\n", positionVerticalModifier);
-				GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
+                GfLogInfo("Original Vertical was: %f\n", positionVerticalModifier);
+                GfLogInfo("Original Horizontal was: %f\n", positionHorizontalModifier);
 
-				GfLogInfo("Mouse drag was Vertical: %f\n", (float)mouseTotalDragY);
-				GfLogInfo("Mouse drag was Horizontal: %f\n", (float)mouseTotalDragX);
+                GfLogInfo("Mouse drag was Vertical: %f\n", (float)mouseTotalDragY);
+                GfLogInfo("Mouse drag was Horizontal: %f\n", (float)mouseTotalDragX);
 
-				GfLogInfo("Modifier Vertical by: %f\n", modifierVertical);
-				GfLogInfo("Modifier Horizontal by: %f\n", modifierHorizontal);
+                GfLogInfo("Modifier Vertical by: %f\n", modifierVertical);
+                GfLogInfo("Modifier Horizontal by: %f\n", modifierHorizontal);
 
-				GfLogInfo("Modified Vertical is: %f\n", newPositionVerticalModifier);
-				GfLogInfo("Modified Horizontal is: %f\n", newPositionHorizontalModifier);
+                GfLogInfo("Modified Vertical is: %f\n", newPositionVerticalModifier);
+                GfLogInfo("Modified Horizontal is: %f\n", newPositionHorizontalModifier);
 
-				//save the value back in the config file
-				GfParmSetStr (paramHandle, widgetPath.c_str(), "position-refObjPoint", positionRefObjPoint.c_str() );
-				GfParmSetStr (paramHandle, widgetPath.c_str(), "position-myPoint", positionMyPoint.c_str() );
-				GfParmSetNum (paramHandle, widgetPath.c_str(), "position-verticalModifier", NULL, (int)newPositionVerticalModifier);
-				GfParmSetNum (paramHandle, widgetPath.c_str(), "position-horizontalModifier", NULL, (int)newPositionHorizontalModifier);
-				GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-			}
-		} while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
-	}
+                //save the value back in the config file
+                GfParmSetStr (paramHandle, widgetPath.c_str(), "position-refObjPoint", positionRefObjPoint.c_str() );
+                GfParmSetStr (paramHandle, widgetPath.c_str(), "position-myPoint", positionMyPoint.c_str() );
+                GfParmSetNum (paramHandle, widgetPath.c_str(), "position-verticalModifier", NULL, (int)newPositionVerticalModifier);
+                GfParmSetNum (paramHandle, widgetPath.c_str(), "position-horizontalModifier", NULL, (int)newPositionHorizontalModifier);
+                GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+            }
+        } while (GfParmListSeekNext(paramHandle, widgetGroupNamePath.c_str()) == 0);
+    }
 
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 }
 
 
@@ -3101,108 +3103,108 @@ void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 bool SDHUD::isMouseOverWidgetGroup (std::string widgetGroupName)
 {
     tMouseInfo	*mouse;
-	mouse = GfuiMouseInfo();
+    mouse = GfuiMouseInfo();
 //	widgetGroupName = "widgets/"+widgetGroupName;
-	osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(widgetGroupName);
+    osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(widgetGroupName);
 
-	float mousePosX = mouse->X * hudScreenW /640;
-	float mousePosY = mouse->Y * hudScreenH /480;
+    float mousePosX = mouse->X * hudScreenW /640;
+    float mousePosY = mouse->Y * hudScreenH /480;
 
-	if (mousePosX >= targetWidgetGroupBoundingBox.xMin() && mousePosX <= targetWidgetGroupBoundingBox.xMax()
-	&& mousePosY >= targetWidgetGroupBoundingBox.yMin() && mousePosY <= targetWidgetGroupBoundingBox.yMax()){
-		return true;
-	}else{
-		return false;
-	}
+    if (mousePosX >= targetWidgetGroupBoundingBox.xMin() && mousePosX <= targetWidgetGroupBoundingBox.xMax()
+    && mousePosY >= targetWidgetGroupBoundingBox.yMin() && mousePosY <= targetWidgetGroupBoundingBox.yMax()){
+        return true;
+    }else{
+        return false;
+    }
 }
 void SDHUD::selectWidgetGroupByName(std::string widgetGroupName)
 {
-	//remember the selection
-	selectedWidgetGroup = widgetGroupName;
-	std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
+    //remember the selection
+    selectedWidgetGroup = widgetGroupName;
+    std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
 
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
-	int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
 
-	//set the edithud title according to the selection
-	hudTextElements["edithud-titletext"]->setText(widgetGroupName);
-	hudImgElements["edithud-toggleoff"]->setNodeMask(!widgetEnabled);
-	hudImgElements["edithud-toggleon"]->setNodeMask(widgetEnabled);
+    //set the edithud title according to the selection
+    hudTextElements["edithud-titletext"]->setText(widgetGroupName);
+    hudImgElements["edithud-toggleoff"]->setNodeMask(!widgetEnabled);
+    hudImgElements["edithud-toggleon"]->setNodeMask(widgetEnabled);
 
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 }
 void SDHUD::setWidgetsGroupsVisibilityForcedON()
 {
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
 
-	//cicle throught each element of the widgetGroup
-	if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
-	{
-		do
-		{
-			std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
-			if (widgetGroupName.find("edithudWidget")!=std::string::npos){
-				continue;
-			}
-			if (widgetGroupName.find("mouseWidget")!=std::string::npos){
-				continue;
-			}
-			//hudElementsVisibilityStatus["boardWidget"] =
-			hudWidgets[widgetGroupName]->setNodeMask(1);
+    //cicle throught each element of the widgetGroup
+    if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
+    {
+        do
+        {
+            std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
+            if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+                continue;
+            }
+            if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+                continue;
+            }
+            //hudElementsVisibilityStatus["boardWidget"] =
+            hudWidgets[widgetGroupName]->setNodeMask(1);
 
-		} while (GfParmListSeekNext(paramHandle, "widgets") == 0);
-	}
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+        } while (GfParmListSeekNext(paramHandle, "widgets") == 0);
+    }
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 }
 void SDHUD::setWidgetsGroupsVisibilityNormal()
 {
-	void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFileLocal("config/osghudconfig.xml", GFPARM_RMODE_STD);
 
-	//cicle throught each element of the widgetGroup
-	if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
-	{
-		do
-		{
-			std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
-			if (widgetGroupName.find("edithudWidget")!=std::string::npos){
-				continue;
-			}
-			if (widgetGroupName.find("mouseWidget")!=std::string::npos){
-				continue;
-			}
-			std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
-			int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
-			hudWidgets[widgetGroupName]->setNodeMask(widgetEnabled);
+    //cicle throught each element of the widgetGroup
+    if (GfParmListSeekFirst(paramHandle, "widgets") == 0)
+    {
+        do
+        {
+            std::string widgetGroupName = GfParmListGetCurEltName(paramHandle,"widgets");
+            if (widgetGroupName.find("edithudWidget")!=std::string::npos){
+                continue;
+            }
+            if (widgetGroupName.find("mouseWidget")!=std::string::npos){
+                continue;
+            }
+            std::string selectedWidgetGroupPath = "widgets/"+widgetGroupName;
+            int widgetEnabled = GfParmGetNum (paramHandle, selectedWidgetGroupPath.c_str(), "enabled", "",0);
+            hudWidgets[widgetGroupName]->setNodeMask(widgetEnabled);
 
-		} while (GfParmListSeekNext(paramHandle, "widgets") == 0);
-	}
-	//release the config file
-	GfParmReleaseHandle(paramHandle);
+        } while (GfParmListSeekNext(paramHandle, "widgets") == 0);
+    }
+    //release the config file
+    GfParmReleaseHandle(paramHandle);
 }
 
 void SDHUD::ToggleHUDeditmode()
 {
-	//toggle the edit mode status
-	hudEditModeEnabled = !hudEditModeEnabled;
-	GfLogInfo("OSGHUD editmode toggled to %i \n", hudEditModeEnabled);
+    //toggle the edit mode status
+    hudEditModeEnabled = !hudEditModeEnabled;
+    GfLogInfo("OSGHUD editmode toggled to %i \n", hudEditModeEnabled);
 
-	if (hudEditModeEnabled){
-		//we are entering edithud mode
-		//force all widgets to be visible, even if disabled
-		setWidgetsGroupsVisibilityForcedON();
-		//display the mouse pointer
-		hudWidgets["mouseWidget"]->setNodeMask(1);
-	}else{
-		//we are going back to normal game mode
-		//restore normal widgets visibility (visible if enabled or invisible if disabled)
-		setWidgetsGroupsVisibilityNormal();
-		//hide the mouse pointer
-		hudWidgets["mouseWidget"]->setNodeMask(0);
-		//hide the edithud widget
-		hudWidgets["edithudWidget"]->setNodeMask(0);
-	}
+    if (hudEditModeEnabled){
+        //we are entering edithud mode
+        //force all widgets to be visible, even if disabled
+        setWidgetsGroupsVisibilityForcedON();
+        //display the mouse pointer
+        hudWidgets["mouseWidget"]->setNodeMask(1);
+    }else{
+        //we are going back to normal game mode
+        //restore normal widgets visibility (visible if enabled or invisible if disabled)
+        setWidgetsGroupsVisibilityNormal();
+        //hide the mouse pointer
+        hudWidgets["mouseWidget"]->setNodeMask(0);
+        //hide the edithud widget
+        hudWidgets["edithudWidget"]->setNodeMask(0);
+    }
 }
 
 SDHUD::~SDHUD()

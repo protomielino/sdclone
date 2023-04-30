@@ -66,10 +66,10 @@ private:
             dataPoints->push_back(osg::Vec3(x, y, z));
         }
         void recalculateDrawnPoint(float currentTime, float positionX, float positionY, float width, float height);
-    	void clearDataPoints()
-    	{
-    	    dataPoints->clear();
-    	}
+        void clearDataPoints()
+        {
+            dataPoints->clear();
+        }
     };
 
 public:
@@ -158,14 +158,14 @@ class SDHUD
                                         float newY,
                                         float hudScale);
         osg::BoundingBox getBoundigBoxFromWidgetName(std::string widgetName);
-		osg::BoundingBox getBoundigBoxFromWidgetGroupName(std::string widgetGroupName);
+        osg::BoundingBox getBoundigBoxFromWidgetGroupName(std::string widgetGroupName);
         void recalculateImageWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale);
-		void recalculateTextWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale);
+        void recalculateTextWidgetPosition(std::string widgetGroupName, std::string widgetName, float hudScale);
         bool isMouseOverWidgetGroup (std::string widgetGroupName);
-		void selectWidgetGroupByName(std::string widgetGroupName);
-		void setWidgetsGroupsVisibilityForcedON();
-		void setWidgetsGroupsVisibilityNormal();
-		void saveWidgetGroupPosition(std::string widgetGroupName);
+        void selectWidgetGroupByName(std::string widgetGroupName);
+        void setWidgetsGroupsVisibilityForcedON();
+        void setWidgetsGroupsVisibilityNormal();
+        void saveWidgetGroupPosition(std::string widgetGroupName);
 
 public:
         SDHUD();
@@ -184,7 +184,7 @@ public:
         void CreateHUD( int scrH, int scrW);
         void DispDebug(const tSituation *s, const SDFrameInfo* frame);
         void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar,
-        				int SimClouds, int SimRain, float SimTimeOfDay);
+                     int SimClouds, int SimRain, float SimTimeOfDay);
 
         osg::ref_ptr <osg::Group> generateHudFromXmlFile( int scrH, int scrW);
 
