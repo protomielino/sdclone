@@ -1520,7 +1520,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 //rpm number
     temp.str("");
-    temp << (int) currCar->_enginerpm;
+    //convert Radian/s to RPM
+    temp << (int) RADS2RPM(currCar->_enginerpm);
     hudTextElements["rpm-number"]->setText(temp.str());
 
 //damage
