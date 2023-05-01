@@ -730,7 +730,7 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     }
     fout << "kids " << kids.size() << std::endl;
     for (const auto &kid : kids)
-        kid.write(fout, false);
+        kid.write(fout, all);
 }
 
 void Ac3d::Object::transform(const Matrix &matrix)
