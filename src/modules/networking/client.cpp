@@ -20,6 +20,7 @@ version              : $Id$
 #include <portability.h>
 
 #include <SDL.h>
+#include <iostream>
 
 #include "network.h"
 #include "robotxml.h"
@@ -35,6 +36,10 @@ NetClient::NetClient()
     m_pClient = NULL;
     m_pHost = NULL;
     m_eClientAccepted = PROCESSINGCLIENT;
+
+    std::string path = GfLocalDir();
+    path += "drivers/networkhuman/networkhuman.xml";
+    remove(path.c_str());
 }
 
 
@@ -133,13 +138,13 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 
 #if (ENET_VERSION >= 0x010300)
     m_pClient = enet_host_create (NULL /* create a client host */,
-            MAXNETWORKPLAYERS, 
+            MAXNETWORKPLAYERS,
             2, /*channel limit*/
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #else
     m_pClient = enet_host_create (NULL /* create a client host */,
-            MAXNETWORKPLAYERS, 
+            MAXNETWORKPLAYERS,
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #endif
@@ -159,13 +164,13 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 
 #if (ENET_VERSION >= 0x010300)
     m_pHost = enet_host_create (&caddress /* create a peer host */,
-            MAXNETWORKPLAYERS, 
+            MAXNETWORKPLAYERS,
             2, /*channel limit*/
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #else
     m_pHost = enet_host_create (&caddress /* create a peer host */,
-            MAXNETWORKPLAYERS, 
+            MAXNETWORKPLAYERS,
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #endif
@@ -233,7 +238,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
     m_eClientAccepted = PROCESSINGCLIENT;
     SendDriverInfoPacket(pDriver);
 
-    //Wait for server to accept or reject 
+    //Wait for server to accept or reject
     GfLogInfo ("Sent local driver info to the network server : waiting ...\n");
     while(m_eClientAccepted == PROCESSINGCLIENT)
         SDL_Delay(50);
@@ -278,8 +283,8 @@ void NetClient::SetDriverReady(bool bReady)
     }
     GfLogTrace("SetDriverReady: packed data length=%zu\n", msg.length());
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
@@ -338,8 +343,8 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
     }
     GfLogTrace("SendDriverInfoPacket: packed data length=%zu\n", msg.length());
 
-    ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket * pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
@@ -367,8 +372,8 @@ void NetClient::SendReadyToStartPacket()
     }
     GfLogTrace("SendReadyToStartPacket: packed data length=%zu\n", msg.length());
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket))
@@ -378,7 +383,7 @@ void NetClient::SendReadyToStartPacket()
 
 void NetClient::SendServerTimeRequest()
 {
-    m_packetsendtime = GfTimeClock(); 
+    m_packetsendtime = GfTimeClock();
 
     PackedBuffer msg;
 
@@ -393,8 +398,8 @@ void NetClient::SendServerTimeRequest()
     GfLogTrace("SendServerTimeRequest: packed data length=%zu\n", msg.length());
 
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_UNSEQUENCED);
 
     if (enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket))
@@ -465,7 +470,7 @@ bool NetClient::listenHost(ENetHost * pHost)
             char hostName[256];
             enet_address_get_host_ip (&event.peer->address,hostName,256);
 
-            GfLogTrace ("A new client connected from %s\n",hostName); 
+            GfLogTrace ("A new client connected from %s\n",hostName);
 
             /* Store any relevant client information here. */
             event.peer -> data = (void*)"Client information";
@@ -478,7 +483,7 @@ bool NetClient::listenHost(ENetHost * pHost)
             //        event.packet -> data,
             //        event.peer -> data,
             //        event.channelID);
-            ReadPacket(event);        
+            ReadPacket(event);
             bHasPacket = true;
             break;
 
@@ -739,7 +744,7 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
 {
     short len;
     size_t writeSize;
-    char file[255];
+    char file[1024];
     unsigned int filesize = 0;
     char *filedata = 0;
 
@@ -765,7 +770,7 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
         GfLogFatal("ReadFilePacket: packed buffer error\n");
     }
 
-    char filepath[255];
+    char filepath[1024];
     snprintf(filepath, sizeof filepath, "%s%s", GfLocalDir(), file);
 
     FILE *pFile = fopen(filepath,"w+b");
@@ -782,10 +787,10 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
     delete [] filedata;
 }
 
-void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
+void NetClient::BroadcastPacket(ENetPacket *pPacket, enet_uint8 channel)
 {
-    ENetPacket * pHostPacket = enet_packet_create (pPacket->data, 
-            pPacket->dataLength, 
+    ENetPacket * pHostPacket = enet_packet_create (pPacket->data,
+            pPacket->dataLength,
             pPacket->flags);
 
     //Send to connected clients
@@ -802,9 +807,9 @@ void NetClient::SetCarInfo(const char *pszName)
     std::vector<NetDriver> vecDrivers;
 
     RobotXml robotxml;
-    robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
+    robotxml.ReadRobotDrivers(NETWORKROBOT, vecDrivers);
 
-    for (unsigned int i=0;i<vecDrivers.size();i++)
+    for (unsigned int i=0; i<vecDrivers.size(); i++)
     {
         if (vecDrivers[i].name == m_strDriverName)
         {
@@ -820,9 +825,9 @@ void NetClient::ConnectToClients()
     std::vector<NetDriver> vecDrivers;
 
     RobotXml robotxml;
-    robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
+    robotxml.ReadRobotDrivers(NETWORKROBOT, vecDrivers);
 
-    for(unsigned int i=0;i<vecDrivers.size();i++)
+    for(unsigned int i=0; i<vecDrivers.size(); i++)
     {
         ConnectToDriver(vecDrivers[i]);
     }
@@ -836,4 +841,3 @@ void NetClient::SetLocalDrivers()
     m_setLocalDrivers.insert(m_driverIdx-1);
     GfLogTrace("Adding Human start rank: %i\n",m_driverIdx-1);
 }
-

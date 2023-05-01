@@ -134,8 +134,8 @@ void NetNetwork::RaceInit(tSituation *s)
     m_timePhysics = 0.0;
     m_currentTime = 0.0;
 
-
     m_mapRanks.clear();
+
     for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
@@ -158,9 +158,7 @@ void NetNetwork::RaceDone()
     m_timePhysics = -2.0;
 
     m_mapRanks.clear();
-
 }
-
 
 int NetNetwork::GetDriverStartRank(int idx)
 {
@@ -171,7 +169,6 @@ int NetNetwork::GetDriverStartRank(int idx)
 }
 
 //============================================================
-
 NetDriver::NetDriver()
 {
     //Initialize values
@@ -182,13 +179,13 @@ NetDriver::NetDriver()
     memset(author,0,sizeof(author));
     racenumber = 1;
     memset(skilllevel,0,sizeof(skilllevel));
-    red = 1.0;
+    red   = 1.0;
     green = 1.0;
-    blue = 1.0;
+    blue  = 1.0;
     hostPort = 0;
     client = false;
-    memset(module,0,sizeof(module));
-    memset(type,0,sizeof(type));
+    memset(module, 0, sizeof(module));
+    memset(type, 0, sizeof(type));
 }
 
 bool NetworkInit();
@@ -207,10 +204,9 @@ NetNetwork *NetGetNetwork()
     return NULL;
 }
 
-
-int NetNetwork::GetCarIndex(int startRank,tSituation *s)
+int NetNetwork::GetCarIndex(int startRank, tSituation *s)
 {
-    for (int i=0;i<s->_ncars;i++)
+    for (int i=0; i<s->_ncars; i++)
     {
         if (startRank == s->cars[i]->info.startRank)
             return i;
@@ -261,7 +257,7 @@ int NetNetwork::GetNetworkHumanIdx()
 
     void *params = GfParmReadFileLocal("drivers/networkhuman/networkhuman.xml", GFPARM_RMODE_REREAD);
     assert(params);
-    char path2[256];
+    char path2[1024];
 
     int i=0;
     const char *pName;
@@ -269,8 +265,9 @@ int NetNetwork::GetNetworkHumanIdx()
     {
         i++;
         sprintf(path2, "Robots/index/%d",i);
-        pName = GfParmGetStr(params, path2, "name",NULL);
-        if (pName && strcmp(m_strDriverName.c_str(),pName)==0)
+        pName = GfParmGetStr(params, path2, "name", NULL);
+
+        if (pName && strcmp(m_strDriverName.c_str(), pName)== 0)
         {
             idx = i;
             break;
@@ -327,10 +324,10 @@ bool NetNetwork::FinishRace(double time)
     double finishTime = pNData->m_finishTime;
     UnlockNetworkData();
 
-    if (finishTime<=0.0)
+    if (finishTime <= 0.0)
         return false;
 
-    if (time<finishTime)
+    if (time < finishTime)
         return false;
 
     GfLogInfo("Finishing network race\n");
@@ -348,7 +345,7 @@ void NetNetwork::UnlockNetworkData()
     m_NetworkData.Unlock();
 }
 
-void NetNetwork::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
+void NetNetwork::BroadcastPacket(ENetPacket *pPacket, enet_uint8 channel)
 {
 }
 
@@ -359,16 +356,18 @@ int	NetNetwork::GetDriverIdx()
 
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile, GFPARM_RMODE_STD);
     assert(params);
 
     int nDriverIdx = -1;
 
     const int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
-    for (int i=1;i<=nCars;i++)
+
+    for (int i=1; i<=nCars; i++)
     {
         NetDriver driver;
         ReadDriverData(driver,i,params);
+
         if (driver.idx == nhidx && strcmp(NETWORKROBOT,driver.module) == 0)
         {
             nDriverIdx = i;
@@ -397,7 +396,7 @@ void NetNetwork::ReadDriverData(NetDriver &driver,int index, void *params)
 
 void NetNetwork::WriteDriverData(NetDriver driver,int index,void *params)
 {
-    char path2[256];
+    char path2[1024];
     sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
     GfParmSetStr(params, path2, RM_ATTR_MODULE, driver.module);
     GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, (tdble)driver.idx);
@@ -410,23 +409,22 @@ std::string NetNetwork::GetNetworkDriverName()
 
 bool NetNetwork::SetCurrentDriver()
 {
-
-    void *params = GfParmReadFileLocal("config/graph.xml",GFPARM_RMODE_REREAD);
+    void *params = GfParmReadFileLocal("config/graph.xml", GFPARM_RMODE_REREAD);
     assert(params);
 
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
     std::string strDriver = GetNetworkDriverName();
-    if (strDriver =="")
+
+    if (strDriver == "")
         return false;
 
-    char path[255];
+    char path[1024];
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, 0);
     GfParmSetStr(params, path, GR_ATT_CUR_DRV, strDriver.c_str());
 
     //Save our changes
     GfParmWriteFileLocal("config/graph.xml", params, pName);
-
     GfParmReleaseHandle(params);
 
     return true;
@@ -452,26 +450,24 @@ void NetNetwork::SendLapStatusPacket(tCarElt *pCar)
     GfLogTrace("SendLapStatusPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(),
-            msg.length(),
-            ENET_PACKET_FLAG_RELIABLE);
+            msg.length(), ENET_PACKET_FLAG_RELIABLE);
 
     BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
-
-void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
+void NetNetwork::SendCarStatusPacket(tSituation *s, bool bForce)
 {
     if (s->currentTime<0.0)
         return;
 
     //Clock error fix it
-    if (s->currentTime<m_sendCarDataTime)
+    if (s->currentTime < m_sendCarDataTime)
     {
-        m_sendCarDataTime=s->currentTime-CAR_DATA_UPDATE;
+        m_sendCarDataTime = s->currentTime - CAR_DATA_UPDATE;
     }
 
     //Send carinfo packet when enough time has passed(CAR_DATA_UPDATE)
-    if (((m_sendCarDataTime+CAR_DATA_UPDATE)>s->currentTime)&&(!bForce))
+    if (((m_sendCarDataTime + CAR_DATA_UPDATE) > s->currentTime)&&(!bForce))
     {
         return;
     }
@@ -479,22 +475,19 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
     std::vector<tCarElt *> local;
     double time = 0.0;
 
-
     //Pack controls values to reduce data size of packet
     for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
         //Only transmit local drivers to other clients
-        if (m_setLocalDrivers.find(pCar->info.startRank)!=m_setLocalDrivers.end())
+        if (m_setLocalDrivers.find(pCar->info.startRank)!= m_setLocalDrivers.end())
         {
             local.push_back(pCar);
         }
-
     }
 
     time = s->currentTime;
     m_sendCarDataTime = s->currentTime;
-
 
     int iNumCars = local.size();
 
@@ -505,10 +498,12 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
         msg.pack_ubyte(CARSTATUS_PACKET);
         msg.pack_double(time);
         msg.pack_int(iNumCars);
-        for (int i=0;i<iNumCars;i++)
+
+        for (int i = 0; i < iNumCars; i++)
         {
             GfLogTrace("Sending car info: %s,startRank=%i\n",
                     local[i]->info.name, local[i]->info.startRank);
+
             msg.pack_float(local[i]->race.topSpeed);
             msg.pack_int(local[i]->pub.state);
             msg.pack_int(local[i]->info.startRank);
@@ -524,11 +519,9 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
     GfLogTrace("SendCarStatusPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
-            msg.length(),
-            ENET_PACKET_FLAG_RELIABLE);
+            msg.length(), ENET_PACKET_FLAG_RELIABLE);
 
-    BroadcastPacket(pPacket,RELIABLECHANNEL);
-
+    BroadcastPacket(pPacket, RELIABLECHANNEL);
 }
 
 void NetNetwork::SendCarControlsPacket(tSituation *s)
@@ -537,33 +530,34 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
         return;
 
     //Clock error fix it
-    if (s->currentTime<m_sendCtrlTime)
+    if (s->currentTime < m_sendCtrlTime)
     {
-        m_sendCtrlTime=s->currentTime-CAR_CONTROL_UPDATE;
+        m_sendCtrlTime = s->currentTime - CAR_CONTROL_UPDATE;
     }
 
     SendCarStatusPacket(s,false);
 
     //Send carinfo packet when enough time has passed(CAR_CONTROL_UPDATE)
-    if ((m_sendCtrlTime+CAR_CONTROL_UPDATE)>s->currentTime)
+    if ((m_sendCtrlTime + CAR_CONTROL_UPDATE) > s->currentTime)
     {
         return;
     }
 
-    std::vector<tCarElt *> local;
+    std::vector<tCarElt*> local;
     double time = 0.0;
 
     //Pack controls values to reduce data size of packet
     for (int i = 0; i < s->raceInfo.ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
+
         //Only transmit local drivers to other clients
-        if (m_setLocalDrivers.find(pCar->info.startRank)!=m_setLocalDrivers.end())
+        if (m_setLocalDrivers.find(pCar->info.startRank) != m_setLocalDrivers.end())
         {
             local.push_back(pCar);
         }
-
     }
+
     time = s->currentTime;
 
     m_sendCtrlTime = s->currentTime;
@@ -577,6 +571,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
         msg.pack_ubyte(CARCONTROLS_PACKET);
         msg.pack_double(time);
         msg.pack_int(iNumCars);
+
         for (int i = 0; i < iNumCars; i++)
         {
             msg.pack_int(local[i]->ctrl.gear);
@@ -616,8 +611,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
             msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
-            msg.length(),
-            ENET_PACKET_FLAG_UNSEQUENCED);
+            msg.length(), ENET_PACKET_FLAG_UNSEQUENCED);
 
     BroadcastPacket(pPacket,UNRELIABLECHANNEL);
 }
@@ -645,7 +639,8 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 
     NetMutexData *pNData = LockNetworkData();
     bool bFound = false;
-    for (unsigned int i = 0; i<pNData->m_vecLapStatus.size(); i++)
+
+    for (unsigned int i = 0; i < pNData->m_vecLapStatus.size(); i++)
     {
         if (pNData->m_vecLapStatus[i].startRank == lstatus.startRank)
         {
@@ -659,7 +654,6 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 
     UnlockNetworkData();
 }
-
 
 void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
 {
@@ -678,7 +672,7 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
         NetMutexData *pNData = LockNetworkData();
 
         //Car conrols values (steering,brake,gas,and etc
-        for (int i=0;i<iNumCars;i++)
+        for (int i = 0; i < iNumCars; i++)
         {
             CarStatus status;
 
@@ -691,7 +685,7 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
             status.time = packettime;
 
             bool bFound = false;
-            for (size_t j=0;j<pNData->m_vecCarStatus.size();j++)
+            for (size_t j = 0; j < pNData->m_vecCarStatus.size(); j++)
             {
                 if (pNData->m_vecCarStatus[j].startRank == status.startRank)
                 {
@@ -722,14 +716,14 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
     }
 }
 
-void NetNetwork::GetHostSettings(std::string &strCarCat,bool &bCollisions)
+void NetNetwork::GetHostSettings(std::string &strCarCat, bool &bCollisions)
 {
     assert(m_strRaceXMLFile!="");
 
     void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
 
-    strCarCat = GfParmGetStr(params, RM_SECT_HEADER,RM_ATTR_CAR_CATEGORY,"All");
+    strCarCat = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_CAR_CATEGORY, "All");
 
     //TODO
     bCollisions = true;
@@ -752,7 +746,7 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
         NetMutexData *pNData = LockNetworkData();
 
         //Car conrols values (steering,brake,gas,and etc
-        for (int i=0;i<iNumCars;i++)
+        for (int i = 0; i < iNumCars; i++)
         {
             CarControlsData ctrl;
 
@@ -787,7 +781,8 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
             ctrl.time = packettime;
 
             bool bFound = false;
-            for (size_t j=0;j<pNData->m_vecCarCtrls.size();j++)
+
+            for (size_t j = 0; j < pNData->m_vecCarCtrls.size(); j++)
             {
                 if (pNData->m_vecCarCtrls[j].startRank == ctrl.startRank)
                 {
@@ -817,7 +812,6 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
 }
 
 //==========================================================
-
 Uint32 network_callbackfunc(Uint32 interval, void *param)
 {
     if (NetGetNetwork())
@@ -841,7 +835,7 @@ bool RemoveNetworkTimer()
 bool AddNetworkTimer()
 {
     //Create a timer callback to listen to the network
-    g_timerId = SDL_AddTimer(40, network_callbackfunc,0);
+    g_timerId = SDL_AddTimer(40, network_callbackfunc, 0);
 
     return true;
 }
@@ -868,6 +862,7 @@ void NetSetServer(bool bStatus)
         return;
 
     g_bServer = bStatus;
+
     if (g_bServer)
         AddNetworkTimer();
     else
@@ -880,6 +875,7 @@ void NetSetClient(bool bStatus)
         return;
 
     g_bClient = bStatus;
+
     if (g_bClient)
         AddNetworkTimer();
     else
@@ -895,16 +891,15 @@ bool NetIsClient()
     return g_bClient;
 }
 
-
 void NetworkListen()
 {
     if (NetGetNetwork())
         NetGetNetwork()->listen();
 }
 
-bool AddressMatch(ENetAddress &a1,ENetAddress &a2)
+bool AddressMatch(ENetAddress &a1, ENetAddress &a2)
 {
-    if ((a1.host == a2.host)&&(a1.port == a2.port))
+    if ((a1.host == a2.host) && (a1.port == a2.port))
         return true;
 
     return false;

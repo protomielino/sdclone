@@ -46,71 +46,71 @@ version              : $Id$
 #include <enet/enet.h>
 #endif
 
-#define MAXNETWORKPLAYERS 16
+#define MAXNETWORKPLAYERS      16
 //Port used for network play
-#define SPEEDDREAMSPORT 28500
+#define SPEEDDREAMSPORT     28500
 #define SPEEDDREAMSPEERPORT 28501
 
-#define UNRELIABLECHANNEL 0
-#define RELIABLECHANNEL 1
+#define UNRELIABLECHANNEL       0
+#define RELIABLECHANNEL         1
 
 #define NETWORKROBOT "networkhuman"
-#define HUMANROBOT "human"
+#define HUMANROBOT   "human"
 //Network update rates
-#define CAR_CONTROL_UPDATE 0.1
-#define CAR_DATA_UPDATE 5.0
-#define RACESTARTDELEAY 3.0
-#define FINISHDELAY 10.0
+#define CAR_CONTROL_UPDATE    0.1
+#define CAR_DATA_UPDATE       5.0
+#define RACESTARTDELEAY       3.0
+#define FINISHDELAY          10.0
 
 //Packet definitions
-#define CHAT_PACKET 1
-#define PLAYERINFO_PACKET 2
-#define RACEINFOCHANGE_PACKET 3
-#define PREPARETORACE_PACKET 4
-#define CLIENTREADYTOSTART_PACKET 5
-#define RACESTARTTIME_PACKET 6
-#define CARCONTROLS_PACKET 7
-#define FILE_PACKET 8
-#define SERVER_TIME_SYNC_PACKET 9
+#define CHAT_PACKET                 1
+#define PLAYERINFO_PACKET           2
+#define RACEINFOCHANGE_PACKET       3
+#define PREPARETORACE_PACKET        4
+#define CLIENTREADYTOSTART_PACKET   5
+#define RACESTARTTIME_PACKET        6
+#define CARCONTROLS_PACKET          7
+#define FILE_PACKET                 8
+#define SERVER_TIME_SYNC_PACKET     9
 #define SERVER_TIME_REQUEST_PACKET 10
-#define WEATHERCHANGE_PACKET 11
-#define CARSTATUS_PACKET 12
-#define LAPSTATUS_PACKET 13
-#define FINISHTIME_PACKET 14
-#define DRIVERREADY_PACKET 15
-#define ALLDRIVERREADY_PACKET 16
-#define PLAYERREJECTED_PACKET 17
-#define PLAYERACCEPTED_PACKET 18
+#define WEATHERCHANGE_PACKET       11
+#define CARSTATUS_PACKET           12
+#define LAPSTATUS_PACKET           13
+#define FINISHTIME_PACKET          14
+#define DRIVERREADY_PACKET         15
+#define ALLDRIVERREADY_PACKET      16
+#define PLAYERREJECTED_PACKET      17
+#define PLAYERACCEPTED_PACKET      18
 
 #include <track.h>
 #include <raceman.h>
 
-enum EnumClientAccepted { PROCESSINGCLIENT,CLIENTREJECTED,CLIENTACCEPTED };
+enum EnumClientAccepted { PROCESSINGCLIENT, CLIENTREJECTED, CLIENTACCEPTED };
 
-//Use a structure to pass as a network ENetPacket sent 
+//Use a structure to pass as a network ENetPacket sent
 //Packed / Compressed to reduce internet bandwidth requirements
 struct CarControlsPacked
 {
     unsigned char	startRank;
-    tDynPt	DynGCg;		/* GC global data */
+    tDynPt	        DynGCg;	   /* GC global data */
 
-    short steering;//Fixed point between -2,2
-    short throttle;//Fixed point between -2,2
-    short brake;//Fixed point between -2,2
-    short clutch;//Fixed point between -2,2
-    unsigned char gear;
+    short           steering;  //Fixed point between -2,2
+    short           throttle;  //Fixed point between -2,2
+    short           brake;     //Fixed point between -2,2
+    short           clutch;    //Fixed point between -2,2
+    unsigned char   gear;
 };
 
 //Uncompressed car controls pack
 struct CarControlsData
 {
-    int startRank;
+    int    startRank;
     tDynPt DynGCg;		/* GC global data */
-    float steering;
-    float throttle;
-    float brake;
-    float clutch;
-    int gear;
+    float  steering;
+    float  throttle;
+    float  brake;
+    float  clutch;
+    int    gear;
     double time;
 };
 
@@ -119,53 +119,53 @@ struct LapStatus
 {
     double bestLapTime;
     double bestSplitTime;
-    int laps;
-    int startRank;
+    int    laps;
+    int    startRank;
 };
 
 struct CarStatus
 {
-    float topSpeed;
-    int state;
+    float  topSpeed;
+    int    state;
     double time;
-    float fuel;
-    int dammage;
-    int startRank;
+    float  fuel;
+    int    dammage;
+    int    startRank;
 };
 
 struct CarStatusPacked
 {
-    float topSpeed;
-    short state;
-    float fuel;
-    int dammage;
+    float         topSpeed;
+    short         state;
+    float         fuel;
+    int           dammage;
     unsigned char startRank;
 };
 
 
-//Holds driver values 
+//Holds driver values
 class NETWORKING_API NetDriver
 {
 public:
     NetDriver();
     ~NetDriver() {}
-    ENetAddress address;
+    ENetAddress    address;
     unsigned short hostPort;
 
-    int idx;
-    char name[64];
-	char sname[64];
-    char cname[4];
-    char car[64];
-    char team[64];
-    char author[64];
-    int racenumber;
-    char skilllevel[64];
-    float red,green,blue;
-    char module[64];
-    char type[64];
-    bool client;
-    bool active;
+    int   idx;
+    char  name[64];
+    char  sname[64];
+    char  cname[4];
+    char  car[64];
+    char  team[64];
+    char  author[64];
+    int   racenumber;
+    char  skilllevel[64];
+    float red, green, blue;
+    char  module[64];
+    char  type[64];
+    bool  client;
+    bool  active;
 };
 
 //Holds car setup values
@@ -187,16 +187,16 @@ public:
     void Unlock();
     void Init();
 
-    SDL_mutex *m_networkMutex;
+    SDL_mutex                    *m_networkMutex;
     std::vector<CarControlsData> m_vecCarCtrls;
-    std::vector<CarStatus> m_vecCarStatus;
-    std::vector<LapStatus> m_vecLapStatus;
-    std::vector<bool> m_vecReadyStatus;
-    double m_finishTime;
+    std::vector<CarStatus>       m_vecCarStatus;
+    std::vector<LapStatus>       m_vecLapStatus;
+    std::vector<bool>            m_vecReadyStatus;
+    double                       m_finishTime;
 };
 
 //Put data here that is read by the network thread and the main thread
-class NETWORKING_API NetServerMutexData 
+class NETWORKING_API NetServerMutexData
 {
 public:
     void Init();
@@ -206,7 +206,7 @@ public:
     void Lock();
     void Unlock();
 
-    SDL_mutex *m_networkMutex;
+    SDL_mutex              *m_networkMutex;
     std::vector<NetDriver> m_vecNetworkPlayers;
 };
 
@@ -218,12 +218,12 @@ public:
     virtual ~NetNetwork();
 
     void SetCurrentTime(double time) {m_currentTime = time;}
-    bool IsServerMode(); 
-    bool IsClientMode(); 
+    bool IsServerMode();
+    bool IsClientMode();
     bool SetCurrentDriver();
-    int GetNetworkHumanIdx();
+    int  GetNetworkHumanIdx();
     int	 GetDriverIdx();
-    int GetCarIndex(int startRank,tSituation *s);
+    int  GetCarIndex(int startRank,tSituation *s);
     virtual void ReadLapStatusPacket(ENetPacket *pPacket);
     virtual void SendCarControlsPacket(tSituation *s);
     virtual void SendCarStatusPacket(tSituation *s,bool bForce);
@@ -235,57 +235,56 @@ public:
 
     virtual void RaceInit(tSituation *s);
     virtual void RaceDone();
-    int GetDriverStartRank(int idx);
+    int          GetDriverStartRank(int idx);
 
     virtual bool listen(){ return false;};
 
     virtual void Disconnect() {};
     virtual void ResetNetwork() {};
 
-    void ReadCarControlsPacket(ENetPacket *pPacket);
-    void ReadCarStatusPacket(ENetPacket *pPacket);
-    void PackCarControl(tCarCtrl *pCtrl,int &size,char *&pBuffer);
-    void UnPackCarControl(tCarCtrl *&pCtrl,int size,char *pBuffer);
-    bool PrepareToRace(){return m_bPrepareToRace;}
-    void SetRaceInfoChanged(bool bStatus);
-    void SetRefreshDisplay(bool bStatus);
-    bool GetRefreshDisplay() {return m_bRefreshDisplay;}
-    bool GetRaceInfoChanged(){return m_bRaceInfoChanged;};
-    double GetRaceStartTime(){return m_racestarttime;}
-    std::string GetNetworkDriverName();
-    void SetRaceXMLFile(char const *pXMLFile);
-    void ReadDriverData(NetDriver &player,int index,void *param);
-    void WriteDriverData(NetDriver player,int index,void *param);
-    int GetPlayerCarIndex(tSituation *s);
+    void         ReadCarControlsPacket(ENetPacket *pPacket);
+    void         ReadCarStatusPacket(ENetPacket *pPacket);
+    void         PackCarControl(tCarCtrl *pCtrl,int &size,char *&pBuffer);
+    void         UnPackCarControl(tCarCtrl *&pCtrl,int size,char *pBuffer);
+    bool         PrepareToRace(){return m_bPrepareToRace;}
+    void         SetRaceInfoChanged(bool bStatus);
+    void         SetRefreshDisplay(bool bStatus);
+    bool         GetRefreshDisplay() {return m_bRefreshDisplay;}
+    bool         GetRaceInfoChanged(){return m_bRaceInfoChanged;};
+    double       GetRaceStartTime(){return m_racestarttime;}
+    std::string  GetNetworkDriverName();
+    void         SetRaceXMLFile(char const *pXMLFile);
+    void         ReadDriverData(NetDriver &player,int index,void *param);
+    void         WriteDriverData(NetDriver player,int index,void *param);
+    int          GetPlayerCarIndex(tSituation *s);
 
-    void ClearLocalDrivers();
+    void         ClearLocalDrivers();
 
-    void SetDriverName(char *pName);
-    const char *GetDriverName();
+    void         SetDriverName(char *pName);
+    const char   *GetDriverName();
     virtual void SetLocalDrivers();
-    void GetHostSettings(std::string &strCarCat,bool &bCollisions);
+    void         GetHostSettings(std::string &strCarCat,bool &bCollisions);
     virtual void SetCarInfo(const char *pszName);
 
     virtual bool FinishRace(double time) ;
 
-    NetMutexData * LockNetworkData() ;
-    void UnlockNetworkData();
+    NetMutexData *LockNetworkData() ;
+    void         UnlockNetworkData();
 
 protected:
     std::string m_strDriverName;
 
-
     ENetHost * m_pHost;
     virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 
-    int m_driverIdx;
-    bool m_bBeginRace;
-    bool m_bRaceInfoChanged;
-    bool m_bRefreshDisplay;
-    double m_racestarttime;	
-    bool m_bPrepareToRace;
-    bool m_bTimeSynced;
-    bool m_bRaceActive;
+    int    m_driverIdx;
+    bool   m_bBeginRace;
+    bool   m_bRaceInfoChanged;
+    bool   m_bRefreshDisplay;
+    double m_racestarttime;
+    bool   m_bPrepareToRace;
+    bool   m_bTimeSynced;
+    bool   m_bRaceActive;
 
     //time when packet was sent or recieved
     double m_activeNetworkTime;
@@ -299,16 +298,13 @@ protected:
 
     NetMutexData m_NetworkData;
 
-
     std::map<int,int>	m_mapRanks;
+    std::set<int>       m_setLocalDrivers;
 
-    std::set<int> m_setLocalDrivers;
-
-    double m_timePhysics;
+    double      m_timePhysics;
 
     std::string m_strClass;
     std::string m_strRaceXMLFile;
-
 };
 
 class NETWORKING_API NetClient: public NetNetwork
@@ -321,42 +317,42 @@ public:
     virtual void ResetNetwork();
     virtual bool IsConnected();
 
-    bool ConnectToServer(const char *pAddress,int port, NetDriver *pDriver);
+    bool         ConnectToServer(const char *pAddress,int port, NetDriver *pDriver);
     virtual bool listen();
 
     //Packets
-    bool SendDriverInfoPacket(NetDriver *pDriver);
+    bool         SendDriverInfoPacket(NetDriver *pDriver);
     virtual void SendDriverReadyPacket(){};
-    void SendReadyToStartPacket();
-    double WaitForRaceStart();
-    void SendServerTimeRequest();
+    void         SendReadyToStartPacket();
+    double       WaitForRaceStart();
+    void         SendServerTimeRequest();
     virtual void SetDriverReady(bool bReady);
 
-    bool TimeSynced(){return m_bTimeSynced;}
-    int  LookUpDriverIdx() { return m_driverIdx;}
-    bool listenHost(ENetHost * pHost);
+    bool         TimeSynced(){return m_bTimeSynced;}
+    int          LookUpDriverIdx() { return m_driverIdx;}
+    bool         listenHost(ENetHost * pHost);
     virtual void SetLocalDrivers();
 
-    void ConnectToClients();
-    void SetCarInfo(const char *pszName);
+    void         ConnectToClients();
+    void         SetCarInfo(const char *pszName);
 
 protected:
     //Packets
-    void ReadRaceSetupPacket(ENetPacket *pPacket);
-    void ReadPrepareToRacePacket(ENetPacket *pPacket);
-    void ReadStartTimePacket(ENetPacket *pPacket);
-    void ReadFilePacket(ENetPacket *pPacket);
-    void ReadPacket(ENetEvent event);
-    void ReadTimePacket(ENetPacket *pPacket);
-    void ReadFinishTimePacket(ENetPacket *pPacket);
-    void ReadAllDriverReadyPacket(ENetPacket *pPacket);
-    void ReadWeatherPacket(ENetPacket *pPacket);
-    void ReadPlayerRejectedPacket(ENetPacket *pPacket);
-    void ReadPlayerAcceptedPacket(ENetPacket *pPacket);
+    void         ReadRaceSetupPacket(ENetPacket *pPacket);
+    void         ReadPrepareToRacePacket(ENetPacket *pPacket);
+    void         ReadStartTimePacket(ENetPacket *pPacket);
+    void         ReadFilePacket(ENetPacket *pPacket);
+    void         ReadPacket(ENetEvent event);
+    void         ReadTimePacket(ENetPacket *pPacket);
+    void         ReadFinishTimePacket(ENetPacket *pPacket);
+    void         ReadAllDriverReadyPacket(ENetPacket *pPacket);
+    void         ReadWeatherPacket(ENetPacket *pPacket);
+    void         ReadPlayerRejectedPacket(ENetPacket *pPacket);
+    void         ReadPlayerAcceptedPacket(ENetPacket *pPacket);
 
-    void ConnectToDriver(NetDriver driver);
+    void         ConnectToDriver(NetDriver driver);
 
-    virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
+    virtual void BroadcastPacket(ENetPacket *pPacket, enet_uint8 channel);
 
     bool m_bConnected;
 
@@ -368,7 +364,7 @@ protected:
 
     ENetHost * m_pClient;
 
-    ENetPeer *m_pServer;	
+    ENetPeer *m_pServer;
 
 };
 
