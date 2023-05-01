@@ -3203,7 +3203,7 @@ void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile,
         object.name = "track";
         ac3d.addObject(object);
         SaveMainTrack(ac3d, bump, raceline);
-        ac3d.writeFile(outFile);
+        ac3d.writeFile(outFile, false);
     }
 
     if (all)

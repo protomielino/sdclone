@@ -77,6 +77,7 @@ class Application : public GfApplication
     int DoSaveElevation;
     bool Bridge;
     bool DumpTrack;
+    bool MultipleMaterials;
     std::string TrackXMLFilePath;   // Full path to track XML input file to read from (mainly for unittests)
     std::string TrackACFilePath;    // Full path to track AC output file to write into (mainly for unittests)
 
@@ -97,7 +98,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.5.2.1", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.6.0.0", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -109,6 +110,7 @@ Application::Application()
 , DoSaveElevation(-1)
 , Bridge(true)
 , DumpTrack(false)
+, MultipleMaterials(false)
 {
 }
 
@@ -133,9 +135,10 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("dt", "dumptrack", /* bHasValue = */ false);
     registerOption("i", "inpath", /* bHasValue = */ true);
     registerOption("o", "outpath", /* bHasValue = */ true);
+    registerOption("m", "materials", /* bHasValue = */ false);
 
     // Help on specific options.
-    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge]");
+    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge] [-m|--materials]");
     addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
     addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]] [-dt|--dumptrack]");
     addOptionsHelpSyntaxLine("[-i xml_path] [-o ac_path]");
@@ -157,8 +160,8 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     addOptionsHelpExplainLine("  3: track only");
     addOptionsHelpExplainLine("  4: track elevations with height steps");
     addOptionsHelpExplainLine("<#hs> : nb of height steps for 4th elevation file [30]");
+    addOptionsHelpExplainLine("materials : mulitple materials");
     addOptionsHelpExplainLine("dumptrack : dump track segments to file name.dump");
-
 }
 
 // Parse the command line options.
@@ -237,6 +240,10 @@ bool Application::parseOptions()
         else if (itOpt->strLongName == "outpath")
         {
             TrackACFilePath = itOpt->strValue;
+        }
+        else if (itOpt->strLongName == "materials")
+        {
+            MultipleMaterials = true;
         }
     }
 
@@ -365,7 +372,7 @@ int Application::generate()
     if (DoSaveElevation != -1) {
         if (all) {
             //Ac3dClose(outfd);
-            allAc3d.writeFile(OutputFileName + ".ac");
+            allAc3d.writeFile(OutputFileName + ".ac", false);
         }
         switch (DoSaveElevation) {
             case 0:
@@ -398,9 +405,9 @@ int Application::generate()
         return EXIT_SUCCESS;
     }
 
-    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutputFileName);
+    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutputFileName, MultipleMaterials);
 
-    allAc3d.writeFile(OutputFileName + ".ac");
+    allAc3d.writeFile(OutputFileName + ".ac", false);
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);
 

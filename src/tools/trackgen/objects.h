@@ -26,7 +26,7 @@
 #ifndef _OBJECTS_H_
 #define _OBJECTS_H_
 
-extern void GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile);
+extern void GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile, bool multipleMaterials);
 
 #endif /* _OBJECTS_H_ */ 
 

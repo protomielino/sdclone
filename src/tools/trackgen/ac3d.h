@@ -85,7 +85,7 @@ struct Ac3d
         explicit Exception(const char *msg) : message(msg)
         {
         }
-        const char *what()
+        const char *what() const
         {
             return message;
         }
@@ -233,7 +233,7 @@ struct Ac3d
         Object(const std::string &type, const std::string &name) : type(type), name(name) { }
         explicit Object(std::ifstream &fin);
         void parse(std::ifstream &fin, const std::string &objType);
-        void write(std::ofstream &fout) const;
+        void write(std::ofstream &fout, bool all) const;
         void transform(const Matrix &matrix);
         void flipAxes(bool in);
         const BoundingBox &getBoundingBox() const;
@@ -253,12 +253,12 @@ struct Ac3d
     void addObject(Object &object);
     void addDefaultMaterial();
     void readFile(const std::string &fileName);
-    void writeFile(const std::string &fileName) const;
+    void writeFile(const std::string &fileName, bool all) const;
     void flattenGeometry();
     void transform(const Matrix &matrix);
     void flipAxes(bool in);
     void generateTriangles();
-    void merge(const Ac3d &ac3d);
+    void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;
 };

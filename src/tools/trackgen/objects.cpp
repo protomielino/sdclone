@@ -33,23 +33,23 @@
 #include <unistd.h>
 #endif
 #include <cmath>
-#include <plib/ssg.h>
 
 #include <tgfclient.h>
 #include <track.h>
 #include <portability.h>
 
 #include "ac3d.h"
-#include "trackgen.h"
 #include "util.h"
-#include "elevation.h"
 #include "objects.h"
 
-static float    GroupSize;
-static float    XGroupOffset;
-static float    YGroupOffset;
-static int      XGroupNb;
-static int      ObjUniqId = 0;
+namespace
+{
+
+float    GroupSize = 0;
+float    XGroupOffset = 0;
+float    YGroupOffset = 0;
+int      XGroupNb = 0;
+int      ObjUniqId = 0;
 
 struct objdef
 {
@@ -58,7 +58,7 @@ struct objdef
     bool            terrainOriented = false;
     bool            borderOriented = false;
     unsigned int    color = 0;
-    ssgEntity       *obj = nullptr;
+    Ac3d            ac3d;
     tdble           deltaHeight = 0;
     tdble           deltaVert = 0;
     float           distance = 0;
@@ -70,69 +70,29 @@ struct objdef
     std::string     fileName;
 };
 
-static std::vector<objdef> objects;
+std::vector<objdef> objects;
 
-static void
-ApplyTransform(sgMat4 m, ssgBase *node)
-{
-    if (node->isAKindOf(ssgTypeLeaf()))
-    {
-        ((ssgLeaf *)node)->transform(m);
-    }
-    else if (node->isAKindOf(ssgTypeBranch()))
-    {
-        ssgBranch *br = (ssgBranch *)node;
-
-        for (int i = 0; i < br->getNumKids(); i++)
-        {
-            ApplyTransform(m, br->getKid(i));
-        }
-    }
-}
-
-static void sgMakeScaleMat4(sgMat4 dst, const SGfloat scale)
-{
-    sgSetVec4(dst[0], scale,   SG_ZERO, SG_ZERO, SG_ZERO);
-    sgSetVec4(dst[1], SG_ZERO, scale,   SG_ZERO, SG_ZERO);
-    sgSetVec4(dst[2], SG_ZERO, SG_ZERO, scale,   SG_ZERO);
-    sgSetVec4(dst[3], SG_ZERO, SG_ZERO, SG_ZERO, SG_ONE);
-}
-
-static void scaleObject(ssgEntity *obj, tdble scale)
-{
-    sgMat4 m;
-    sgMakeScaleMat4(m, scale);
-    ApplyTransform(m, obj);
-}
-
-static void
+void
 InitObjects(tTrack *track, void *TrackHandle)
 {
-    ssgLoaderOptionsEx	options ;
-
     ObjUniqId = 0;
 
     srand((unsigned int)GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SEED, nullptr, 1));
 
-    ssgSetCurrentOptions ( &options ) ;
-
     std::string inputPath(track->filename);
-    inputPath.resize(inputPath.find_last_of("/"));
+    inputPath.resize(inputPath.find_last_of('/'));
 
-    std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
+    const std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
     ssgModelPath("");   // using our own search
 
-    std::string texturePath(modelPath + ";" + GfDataDir() + "data/textures");
-    ssgTexturePath(texturePath.c_str());
- 
-    int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
+    const int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
 
     objects.resize(objnb);
 
     for (int i = 0; i < objnb; i++)
     {
-        objdef	*curObj = &objects[objnb - 1 - i];
+        objdef	*curObj = &objects[objnb - 1 - i]; // iterate backwards to match old behaviour
         curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
         const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, nullptr);
 
@@ -144,18 +104,22 @@ InitObjects(tTrack *track, void *TrackHandle)
 
         char filename[1024];
         GetFilename(objName, modelPath.c_str(), filename, sizeof(filename));
-        curObj->obj = ssgLoadAC(filename);
+        curObj->fileName = filename;
 
-        if (!curObj->obj)
+        try
         {
+            curObj->ac3d.readFile(curObj->fileName);
+            curObj->ac3d.generateTriangles();   // convert quads to triangles
+            curObj->ac3d.flattenGeometry();
+            curObj->ac3d.flipAxes(true);        // convert to track coordinate system
+        }
+        catch (const Ac3d::Exception &e)
+        {
+            GfOut("Reading object %s: %s\n", curObj->fileName.c_str(), e.what());
             exit(1);
         }
 
-        curObj->fileName = filename;
-
-        ssgFlatten(curObj->obj);
-
-        std::string scaleType = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_TYPE, "");
+        const std::string scaleType = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_TYPE, "");
         if (scaleType == "random")
         {
             curObj->scaleFixed = false;
@@ -184,9 +148,9 @@ InitObjects(tTrack *track, void *TrackHandle)
         else
         {
             curObj->random = false;
-            sgMat4 m;
-            sgMakeRotMat4(m, GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0), 0.0, 0.0);
-            ApplyTransform(m, curObj->obj);
+            Ac3d::Matrix m1;
+            m1.makeRotation(GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0), 0.0, 0.0);
+            curObj->ac3d.transform(m1);
         }
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "track") == 0)
@@ -221,338 +185,163 @@ InitObjects(tTrack *track, void *TrackHandle)
     }
 }
 
-/* Prune the group tree */
-static void
-AddToRoot(ssgRoot *Root, ssgEntity *node)
+void
+AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigned int clr, tdble x, tdble y, bool multipleMaterials)
 {
-    if (node->isAKindOf(ssgTypeLeaf()))
+    for (auto &curObj : objects)
     {
-        Root->addKid(node);
-    }
-    else if (node->isAKindOf(ssgTypeBranch()))
-    {
-        ssgBranch *br = (ssgBranch *)node;
-
-        for (int i = 0; i < br->getNumKids(); i++)
+        if (clr == curObj.color)
         {
-            AddToRoot(Root, br->getKid(i));
-        }
-    }
-}
+            Ac3d::Matrix    m;
+            tdble           dv = 0;
+            tdble           angle = 0;
+            float           z = 0;
 
-static void
-AddObject(tTrack *track, void *TrackHandle, ssgEntity *TrackRoot, ssgRoot *Root, unsigned int clr, tdble x, tdble y)
-{
-    for (size_t i = 0; i < objects.size(); i++)
-    {
-        objdef *curObj = &objects[i];
-        if (clr == curObj->color)
-        {
-            sgMat4		m;
-            tdble		dv=0, angle=0;
-            float       z=0;
-            float       xNeu, yNeu, zNeu;
+            Ac3d obj(curObj.ac3d);
 
-            ssgEntity *obj = (ssgEntity*)curObj->obj->clone(SSG_CLONE_RECURSIVE | SSG_CLONE_GEOMETRY | SSG_CLONE_STATE);
-
-            if (curObj->random)
+            if (curObj.random)
             {
                 /* random rotations */
-                /* 		sgMakeCoordMat4 (m, 0.0, 0.0, curObj->deltaHeight * rand() / (RAND_MAX + 1.0), 0.0, 0.0, 0.0); */
+                /* 		sgMakeCoordMat4 (m, 0.0, 0.0, curObj.deltaHeight * rand() / (RAND_MAX + 1.0), 0.0, 0.0, 0.0); */
                 /* 		ApplyTransform (m, obj); */
-                dv = curObj->deltaVert;
+                dv = curObj.deltaVert;
                 angle = 360.0 * rand() / (RAND_MAX + 1.0);
             }
 
-            if (curObj->scaleRandom)
+            if (curObj.scaleRandom)
             {
-                tdble random = ((tdble)rand()) / (tdble)RAND_MAX;
+                const tdble random = ((tdble)rand()) / (tdble)RAND_MAX;
 
-                if (curObj->scaleMin > curObj->scaleMax)
-                    std::swap(curObj->scaleMin, curObj->scaleMax);
+                if (curObj.scaleMin > curObj.scaleMax)
+                    std::swap(curObj.scaleMin, curObj.scaleMax);
 
-                tdble scale = (random * (curObj->scaleMax - curObj->scaleMin)) + curObj->scaleMin;
+                const tdble scale = (random * (curObj.scaleMax - curObj.scaleMin)) + curObj.scaleMin;
 
-                scaleObject(obj, scale);
+                m.makeScale(scale);
+                obj.transform(m);
             }
-            else if (curObj->scaleFixed)
+            else if (curObj.scaleFixed)
             {
-                scaleObject(obj, curObj->scale);
-            }
-
-            if (curObj->terrainOriented)
-            {
-                /* NEW: calculate angle for terrain-aligned orientation */
-                if (TrackRoot->isAKindOf(ssgTypeBranch()))
-                    angle = getTerrainAngle(reinterpret_cast<ssgBranch*>(TrackRoot), x, y);
-                else
-                {
-                    GfError("TrackRoot is not an ssgBranch\n");
-                    exit(1);
-                }
+                m.makeScale(curObj.scale);
+                obj.transform(m);
             }
 
-            if (curObj->trackOriented)
+            if (curObj.terrainOriented)
+            {
+                angle = TrackRoot.getTerrainAngle(x, y);
+            }
+
+            if (curObj.trackOriented)
             {
                 /* NEW: calculate angle for track-aligned orientation */
                 angle = getTrackAngle(track, TrackHandle, x, y);
             }
 
-            if (curObj->borderOriented)
+            if (curObj.borderOriented)
             {
                 /* NEW: calculate angle for border-aligned orientation */
-                angle= getBorderAngle(track, TrackHandle, x, y, curObj->distance, &xNeu, &yNeu, &zNeu);
+                float xNeu, yNeu, zNeu;
+                angle = getBorderAngle(track, TrackHandle, x, y, curObj.distance, &xNeu, &yNeu, &zNeu);
                 //noch was mit x und y machen
-                x= xNeu;
-                y= yNeu;
-                z= zNeu;
+                x = xNeu;
+                y = yNeu;
+                z = zNeu;
                 printf("tried to align to border: x: %g y: %g z: %g angle: %g \n", x, y, z, angle);
             }
             else
             {
-                if (TrackRoot->isAKindOf(ssgTypeBranch()))
+                z = TrackRoot.getTerrainHeight(x, y);
+                if (z == -1000000.0f)
                 {
-                    z = getHOT(reinterpret_cast<ssgBranch*>(TrackRoot), x, y);
-                    if (z == -1000000.0f)
-                    {
-                        printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj->fileName.c_str(), x, y, z);
-                        return;
-                    }
-                }
-                else
-                {
-                    GfError("TrackRoot is not an ssgBranch\n");
-                    exit(1);
+                    printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj.fileName.c_str(), x, y, z);
+                    return;
                 }
             }
 
-            printf("placing object %s: x: %g y: %g z: %g \n", curObj->fileName.c_str(), x, y, z);
-            sgMakeRotMat4(m, angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0  - dv * rand() / (RAND_MAX + 1.0));
-            ApplyTransform(m, obj);
+            printf("placing object %s: x: %g y: %g z: %g \n", curObj.fileName.c_str(), x, y, z);
+            m.makeRotation(angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
+            obj.transform(m);
 
-            sgMakeTransMat4(m, x, y, z);
-            ApplyTransform(m, obj);
-            AddToRoot(Root, obj);
+            m.makeLocation(x, y, z);
+            obj.transform(m);
+
+            Root.merge(obj, multipleMaterials);
 
             return;
         }
     }
 }
 
-/* Code extracted from PLIB-ssg */
-static const int writeTextureWithoutPath = TRUE;
-
-struct saveTriangle
-{
-    int    v[3];
-    sgVec2 t[3];
-};
-
-static bool
-ssgSaveLeaf(ssgLeaf *vt, Ac3d &ac3d)
-{
-    int i;
-    static sgVec3 *vlist;
-    static saveTriangle *tlist;
-
-    int num_verts = vt->getNumVertices();
-    int num_tris = vt->getNumTriangles();
-
-    vlist = new sgVec3[num_verts];
-    tlist = new saveTriangle[num_tris];
-
-    for (i = 0; i < num_verts; i++)
-    {
-        sgCopyVec3(vlist[i], vt->getVertex(i));
-    }
-
-    for (i = 0; i < num_tris; i++)
-    {
-        short vv0, vv1, vv2;
-
-        vt->getTriangle(i, &vv0, &vv1, &vv2);
-
-        tlist[i].v[0] = vv0;
-        tlist[i].v[1] = vv1;
-        tlist[i].v[2] = vv2;
-
-        sgCopyVec2(tlist[i].t[0], vt->getTexCoord(vv0));
-        sgCopyVec2(tlist[i].t[1], vt->getTexCoord(vv1));
-        sgCopyVec2(tlist[i].t[2], vt->getTexCoord(vv2));
-    }
-
-    char buf[32];
-    sprintf(buf, "obj%d", ObjUniqId++);
-
-    Ac3d::Object object;
-    object.type = "poly";
-    object.name = buf;
-    ssgState *st = vt->getState();
-
-    if (st && st->isAKindOf(ssgTypeSimpleState()))
-    {
-        ssgSimpleState *ss = (ssgSimpleState *)vt->getState();
-
-        if (ss->isEnabled(GL_TEXTURE_2D))
-        {
-            const char *tfname = ss->getTextureFilename();
-
-            if ((tfname != nullptr) && (tfname[0] != 0))
-            {
-                if (writeTextureWithoutPath)
-                {
-                    char *s = strrchr((char *)tfname, '\\');
-
-                    if (s == nullptr)
-                    {
-                        s = strrchr((char *)tfname, '/');
-                    }
-
-                    if (s == nullptr)
-                    {
-                        object.texture = tfname;
-                    }
-                    else
-                    {
-                        object.texture = ++s;
-                    }
-                }
-                else
-                {
-                    object.texture = tfname;
-                }
-            }
-        }
-    }
-
-    for (i = 0; i < num_verts; i++)
-    {
-        object.vertices.emplace_back(vlist[i][0], vlist[i][2], -vlist[i][1]);
-    }
-
-    for (i = 0; i < num_tris; i++)
-    {
-        Ac3d::Surface   surface;
-        surface.surf = 0x30;
-        surface.mat = 0;
-        surface.refs.emplace_back(tlist[i].v[0], tlist[i].t[0][0], tlist[i].t[0][1]);
-        surface.refs.emplace_back(tlist[i].v[1], tlist[i].t[1][0], tlist[i].t[1][1]);
-        surface.refs.emplace_back(tlist[i].v[2], tlist[i].t[2][0], tlist[i].t[2][1]);
-
-        object.surfaces.push_back(surface);
-    }
-
-    ac3d.addObject(object);
-
-    delete[] vlist;
-    delete[] tlist;
-
-    return true;
-}
-
-static bool
-ssgSaveACInner(ssgEntity *ent, Ac3d &ac3d)
+bool
+ssgSaveACInner(Ac3d::Object *ent, Ac3d &ac3d)
 {
     /* WARNING - RECURSIVE! */
 
-    if (ent->isAKindOf(ssgTypeBranch()))
+    if (ent->type != "poly")
     {
-        ssgBranch *br = (ssgBranch *)ent;
-        char buf[32];
-        sprintf(buf, "objg%d", ObjUniqId++);
+        ent->name = "objg" + std::to_string(ObjUniqId++);
 
-        Ac3d::Object object;
-        object.type = "group";
-        object.name = buf;
-        ac3d.addObject(object);
-
-        for (int i = 0; i < br->getNumKids(); i++)
+        for (auto & kid : ent->kids)
         {
-            if (!ssgSaveACInner(br->getKid(i), ac3d))
+            if (!ssgSaveACInner(&kid, ac3d))
             {
                 return false;
             }
         }
 
-        ac3d.stack.pop();
-
         return true;
     }
-    else if (ent->isAKindOf(ssgTypeLeaf()))
-    {
-        ssgLeaf *vt = (ssgLeaf *)ent;
+    
+    ent->name = "obj" + std::to_string(ObjUniqId++);;
 
-        bool status = ssgSaveLeaf(vt, ac3d);
-
-        ac3d.stack.pop();
-
-        return status;
-    }
-
-    return false;
+    return true;
 }
 
 /* insert one leaf in group */
-static void
-InsertInGroup(ssgLeaf *leaf, ssgRoot* GroupRoot, std::vector<ssgBranch*>& Groups)
+void
+InsertInGroup(Ac3d::Object *leaf, Ac3d::Object *GroupRoot, std::vector<Ac3d::Object *> &Groups)
 {
-    int			grIdx;
-    const float	*center;
-
-    leaf->recalcBSphere();
-    center = leaf->getBSphere()->getCenter();
-
-    grIdx = (int)((center[0] - XGroupOffset) / GroupSize) +
-            XGroupNb * (int)((center[1] - YGroupOffset) / GroupSize);
+    Ac3d::BoundingSphere boundingSphere = leaf->getBoundingSphere();
+    const int grIdx = (int)((boundingSphere.center[0] - XGroupOffset) / GroupSize) +
+        XGroupNb * (int)((boundingSphere.center[1] - YGroupOffset) / GroupSize);
 
     if (Groups[grIdx] == nullptr)
     {
-        Groups[grIdx] = new ssgBranch();
-        GroupRoot->addKid(Groups[grIdx]);
+        GroupRoot->kids.push_back(Ac3d::Object("group", ""));
+        Groups[grIdx] = &GroupRoot->kids.back();
     }
 
-    Groups[grIdx]->addKid(leaf);
+    Groups[grIdx]->kids.push_back(*leaf);
 }
 
 /* insert leaves in groups */
-static void
-InsertInner(ssgEntity *ent, ssgRoot* GroupRoot, std::vector<ssgBranch*>& Groups)
+void
+InsertInner(Ac3d::Object *ent, Ac3d::Object *GroupRoot, std::vector<Ac3d::Object *> &Groups)
 {
     /* WARNING - RECURSIVE! */
 
-    if (ent->isAKindOf (ssgTypeBranch()))
+    if (ent->type != "poly")
     {
-        ssgBranch *br = (ssgBranch *) ent;
-
-        for (int i = 0; i < br->getNumKids (); i++)
-        {
-            InsertInner(br->getKid (i), GroupRoot, Groups);
-        }
+        for (auto & kid : ent->kids)
+            InsertInner(&kid, GroupRoot, Groups);
 
         return;
     }
-    else if (ent->isAKindOf(ssgTypeLeaf()))
-    {
-        ssgLeaf* leaf = (ssgLeaf*)ent;
 
-        InsertInGroup(leaf, GroupRoot, Groups);
-    }
+    InsertInGroup(ent, GroupRoot, Groups);
 }
 
-
-static void
-Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot, std::vector<ssgBranch*> &Groups)
+void
+Group(tTrack *track, void *TrackHandle, Ac3d::Object *Root, Ac3d::Object *GroupRoot, std::vector<Ac3d::Object *> &Groups)
 {
-    tdble	Margin;
-
-    Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
+    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
     GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
     XGroupOffset = track->min.x - Margin;
     YGroupOffset = track->min.y - Margin;
 
     XGroupNb = (int)((track->max.x + Margin - (track->min.x - Margin)) / GroupSize) + 1;
 
-    int GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
+    const int GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
 
     Groups.resize(GroupNb);
 
@@ -560,41 +349,44 @@ Group(tTrack *track, void *TrackHandle, ssgRoot *Root, ssgRoot *GroupRoot, std::
         Groups[i] = nullptr;
 
     InsertInner(Root, GroupRoot, Groups);
+
+    int used = 0;
+    for (size_t i = 0; i < Groups.size(); i++)
+    {
+        if (Groups[i] != nullptr)
+            used++;
+    }
+    printf("%d groups : %d used\n", GroupNb, used);
 }
 
+} // end anonymous namespace
 
 void
-GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile)
+GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &meshFile, const std::string &outputFile, bool multipleMaterials)
 {
-    ssgLoaderOptionsEx	options;
-    int			width, height;
-    tdble		xmin, xmax, ymin, ymax;
-    tdble 		Margin;
-    tdble		kX, kY, dX, dY;
-    unsigned int	clr;
-    int			index;
-
-    ssgSetCurrentOptions(&options);
-
     std::string inputPath(track->filename);
-    inputPath.resize(inputPath.find_last_of("/"));
+    inputPath.resize(inputPath.find_last_of('/'));
 
-    std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
-    ssgModelPath("");   // don't need a search path because meshFile has a full path
-
-    std::string texturePath(modelPath + ";" + GfDataDir() + "data/textures");
-    ssgTexturePath(texturePath.c_str());
-
-    ssgEntity *TrackRoot = ssgLoadAC(meshFile.c_str());
+    Ac3d TrackRoot;
+    try
+    {
+        TrackRoot.readFile(meshFile);
+        TrackRoot.flipAxes(true);       // convert to track coordinate system
+    }
+    catch (const Ac3d::Exception &e)
+    {
+        GfOut("Reading object %s: %s\n", meshFile.c_str(), e.what());
+        exit(1);
+    }
 
     InitObjects(track, TrackHandle);
 
-    Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 0);
+    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 0);
 
-    xmin = track->min.x - Margin;
-    xmax = track->max.x + Margin;
-    ymin = track->min.y - Margin;
-    ymax = track->max.y + Margin;
+    const tdble xmin = track->min.x - Margin;
+    const tdble xmax = track->max.x + Margin;
+    const tdble ymin = track->min.y - Margin;
+    const tdble ymax = track->max.y + Margin;
 
     static const char * section = TRK_SECT_TERRAIN "/" TRK_SECT_OBJMAP;
 
@@ -605,16 +397,17 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
 
     GfParmListSeekFirst(TrackHandle, section);
 
-    index = 0;
+    int index = 0;
     do
     {
-        ssgRoot *Root = new ssgRoot();
+        Ac3d Root;
 
         index++;
         const char *map = GfParmGetCurStr(TrackHandle, section, TRK_ATT_OBJMAP, "");
 
-        std::string imageFile(inputPath + "/" + map);
+        const std::string imageFile(inputPath + "/" + map);
         printf("Processing object map %s\n", imageFile.c_str());
+        int	width, height;
         unsigned char *MapImage = GfTexReadImageFromPNG(imageFile.c_str(), 2.2, &width, &height, 0, 0, false);
 
         if (!MapImage)
@@ -622,47 +415,44 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
             return;
         }
 
-        kX = (xmax - xmin) / width;
-        dX = xmin;
-        kY = (ymax - ymin) / height;
-        dY = ymin;
+        const tdble kX = (xmax - xmin) / width;
+        const tdble dX = xmin;
+        const tdble kY = (ymax - ymin) / height;
+        const tdble dY = ymin;
 
         for (int j = 0; j < height; j++)
         {
             for (int i = 0; i < width; i++)
             {
-                clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
+                const unsigned int clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
 
                 if (clr)
                 {
                     printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
-                    AddObject(track, TrackHandle, TrackRoot, Root, clr, i * kX + dX, j * kY + dY);
+                    AddObject(track, TrackHandle, TrackRoot, Root, clr, i * kX + dX, j * kY + dY, multipleMaterials);
                 }
             }
         }
 
         free(MapImage);
 
-        ssgRoot *GroupRoot = new ssgRoot();
-        std::vector<ssgBranch*> Groups;
+        Ac3d GroupRoot;
+        GroupRoot.materials = Root.materials;
+        Ac3d::Object object("group", "");
+        GroupRoot.addObject(object);
+        std::vector<Ac3d::Object *> Groups;
 
-        Group(track, TrackHandle, Root, GroupRoot, Groups);
+        Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
-        std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-        Ac3d    ac3d;
-        ac3d.addDefaultMaterial();
-        ssgSaveACInner(GroupRoot, ac3d);
-        ac3d.writeFile(objectFile);
+        const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
+        ssgSaveACInner(&GroupRoot.root.kids.front(), GroupRoot);
+        GroupRoot.flipAxes(false); // convert to track coordinate system
+        GroupRoot.writeFile(objectFile, false);
 
         if (all)
         {
-            ssgSaveACInner(GroupRoot, allAc3d);
+             allAc3d.merge(GroupRoot, multipleMaterials);
         }
-
-        delete Root;
-        delete GroupRoot;
     } while (!GfParmListSeekNext(TrackHandle, section));
-
-    delete TrackRoot;
 }

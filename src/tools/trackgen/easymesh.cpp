@@ -2581,6 +2581,6 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
     if (hasCur)
     {
         //Ac3dClose(curFd);
-        curAc3d.writeFile(outfile);
+        curAc3d.writeFile(outfile, false);
     }
 }

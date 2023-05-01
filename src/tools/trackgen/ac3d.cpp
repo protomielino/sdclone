@@ -667,7 +667,7 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
     }
 }
 
-void Ac3d::Object::write(std::ofstream &fout) const
+void Ac3d::Object::write(std::ofstream &fout, bool all) const
 {
     fout << "OBJECT " << type << std::endl;
     if (!name.empty())
@@ -693,9 +693,9 @@ void Ac3d::Object::write(std::ofstream &fout) const
         fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
     if (texoff.initialized)
         fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
-    if (subdiv.initalized)
+    if (all && subdiv.initalized)
         fout << "subdiv " << subdiv.value << std::endl;
-    if (crease.initalized)
+    if (all && crease.initalized)
         fout << "crease " << crease.value << std::endl;
     if (rot.initialized)
     {
@@ -708,13 +708,13 @@ void Ac3d::Object::write(std::ofstream &fout) const
     {
         fout << "loc " << loc[0] << " " << loc[1] << " " << loc[2] << std::endl;
     }
-    if (!url.empty())
+    if (all && !url.empty())
         fout << "url " << url << std::endl;
-    if (hidden)
+    if (all && hidden)
         fout << "hidden" << std::endl;
-    if (locked)
+    if (all && locked)
         fout << "locked" << std::endl;
-    if (folded)
+    if (all && folded)
         fout << "foulded" << std::endl;
     if (!vertices.empty())
     {
@@ -730,7 +730,7 @@ void Ac3d::Object::write(std::ofstream &fout) const
     }
     fout << "kids " << kids.size() << std::endl;
     for (const auto &kid : kids)
-        kid.write(fout);
+        kid.write(fout, false);
 }
 
 void Ac3d::Object::transform(const Matrix &matrix)
@@ -922,10 +922,10 @@ bool Ac3d::Object::pointInside(const Surface &surface, double x, double y, doubl
     const double cx = vertices[surface.refs[2].index][0];
     const double cy = vertices[surface.refs[2].index][1];
 
-    if ((cx - ax) * as_y - (cy - ay) * as_x > 0 == s_ab)
+    if ((((cx - ax) * as_y - (cy - ay) * as_x) > 0) == s_ab)
         return false;
 
-    if ((cx - bx) * (y - by) - (cy - by) * (x - bx) > 0 != s_ab)
+    if ((((cx - bx) * (y - by) - (cy - by) * (x - bx)) > 0) != s_ab)
         return false;
 
     const V3d v1 = vertices[surface.refs[1].index] - vertices[surface.refs[0].index];
@@ -1026,7 +1026,7 @@ void Ac3d::readFile(const std::string &fileName)
     }
 }
 
-void Ac3d::writeFile(const std::string &fileName) const
+void Ac3d::writeFile(const std::string &fileName, bool all) const
 {
     std::ofstream   fout(fileName);
 
@@ -1041,7 +1041,7 @@ void Ac3d::writeFile(const std::string &fileName) const
     for (const auto &material : materials)
         material.write(fout, versionC);
 
-    root.write(fout);
+    root.write(fout, all);
 }
 
 void Ac3d::transform(const Matrix &matrix)
@@ -1056,44 +1056,48 @@ void Ac3d::flattenGeometry()
     transform(matrix);
 }
 
-void Ac3d::merge(const Ac3d & ac3d)
+void Ac3d::merge(const Ac3d & ac3d, bool mergeMaterials)
 {
-    if (materials.empty())
-    {
-        materials = ac3d.materials;
-
-        for (const auto &kid : ac3d.root.kids)
-            root.kids.push_back(kid);
-
-        return;
-    }
-
     MaterialMap materialMap;
 
-    for (size_t i = 0; i < ac3d.materials.size(); i++)
+    if (mergeMaterials)
     {
-        bool found = false;
-        for (size_t j = 0; j < materials.size(); j++)
+        if (materials.empty())
         {
-            if (ac3d.materials[i].same(materials[j]))
-            {
-                materialMap[i] = j;
-                found = true;
-                break;
-            }
+            materials = ac3d.materials;
+
+            for (const auto &kid : ac3d.root.kids)
+                root.kids.push_back(kid);
+
+            return;
         }
 
-        if (!found)
+        for (size_t i = 0; i < ac3d.materials.size(); i++)
         {
-            materialMap[i] = static_cast<int>(materials.size());
-            materials.push_back(ac3d.materials[i]);
+            bool found = false;
+            for (size_t j = 0; j < materials.size(); j++)
+            {
+                if (ac3d.materials[i].same(materials[j]))
+                {
+                    materialMap[i] = j;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                materialMap[i] = static_cast<int>(materials.size());
+                materials.push_back(ac3d.materials[i]);
+            }
         }
     }
 
     for (const auto &kid : ac3d.root.kids)
     {
         root.kids.push_back(kid);
-        root.kids.back().remapMaterials(materialMap);
+        if (mergeMaterials)
+            root.kids.back().remapMaterials(materialMap);
     }
 }
 
