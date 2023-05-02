@@ -131,46 +131,12 @@ int ugly;               /* mora li biti globalna ??? */
 
 double xmax, xmin, ymax, ymin;
 
-struct vtx
-{
-    double x;
-    double y;
-    double z;
-};
+static std::vector<Ac3d::Object> Groups;
 
-struct ref
-{
-    int vtxidx;
-    double u;
-    double v;
-};
-
-struct surf
-{
-    struct ref ref[3];
-};
-
-struct group
-{
-    int nbvtx;
-    int maxvtx;
-    struct vtx *vertices;
-
-    int nbsurf;
-    int maxsurf;
-    struct surf *surfaces;
-};
-
-#define SURF_INCR 100
-#define VTX_INCR 100
-
-static struct group *Groups;
-static int ActiveGroups;
 static float GroupSize;
 static float XGroupOffset;
 static float YGroupOffset;
 static int XGroupNb;
-static int GroupNb;
 
 void swap_side(int s);
 
@@ -1842,67 +1808,45 @@ int load(void)
 }
 /*-load--------------------------------------------------------------------*/
 
-static int insert_node_in_group(struct nod *nod, struct group *group)
+static int insert_node_in_group(struct nod *nod, Ac3d::Object &group)
 {
-    int i;
-
     /* find if node is already present in this group */
-    for (i = 0; i < group->nbvtx; i++)
+    for (size_t i = 0; i < group.vertices.size(); i++)
     {
-        if ((group->vertices[i].x == nod->x) && (group->vertices[i].y == nod->y) && (group->vertices[i].z == nod->z))
-        {
-            return i;
-        }
+        if ((group.vertices[i][0] == nod->x) && (group.vertices[i][1] == nod->y) && (group.vertices[i][2] == nod->z))
+            return static_cast<int>(i);
     }
+
     /* insert new node */
-    if (group->nbvtx == group->maxvtx)
-    {
-        group->maxvtx += VTX_INCR;
-        group->vertices = (struct vtx *)realloc(group->vertices, group->maxvtx * sizeof(struct vtx));
-    }
-    group->vertices[group->nbvtx].x = nod->x;
-    group->vertices[group->nbvtx].y = nod->y;
-    group->vertices[group->nbvtx].z = nod->z;
-    group->nbvtx++;
-    return (group->nbvtx - 1);
+    group.vertices.emplace_back(nod->x, nod->y, nod->z);
+
+    return static_cast<int>(group.vertices.size() - 1);
 }
 
 static void insert_elem_in_group(struct ele *elem, struct nod *nods)
 {
-    int grIdx;
-    double xmean, ymean;
-    struct group *curGrp;
-    struct surf *curSurf;
+    const double xmean = (nods[elem->i].x + nods[elem->j].x + nods[elem->k].x) / 3.0;
+    const double ymean = (nods[elem->i].y + nods[elem->j].y + nods[elem->k].y) / 3.0;
+    const size_t grIdx = (int)((xmean - XGroupOffset) / GroupSize) + XGroupNb * (int)((ymean - YGroupOffset) / GroupSize);
+    Ac3d::Object &curGrp = Groups[grIdx];
+    Ac3d::Surface surf;
 
-    xmean = (nods[elem->i].x + nods[elem->j].x + nods[elem->k].x) / 3.0;
-    ymean = (nods[elem->i].y + nods[elem->j].y + nods[elem->k].y) / 3.0;
+    surf.surf = 0x10;
+    surf.refs.resize(3);
 
-    grIdx = (int)((xmean - XGroupOffset) / GroupSize) + XGroupNb * (int)((ymean - YGroupOffset) / GroupSize);
+    surf.refs[0].coord[0] = nods[elem->i].x / TexSize;
+    surf.refs[0].coord[1] = nods[elem->i].y / TexSize;
+    surf.refs[1].coord[0] = nods[elem->j].x / TexSize;
+    surf.refs[1].coord[1] = nods[elem->j].y / TexSize;
+    surf.refs[2].coord[0] = nods[elem->k].x / TexSize;
+    surf.refs[2].coord[1] = nods[elem->k].y / TexSize;
 
-    curGrp = &(Groups[grIdx]);
+    surf.refs[0].index = insert_node_in_group(&(nods[elem->i]), curGrp);
+    surf.refs[1].index = insert_node_in_group(&(nods[elem->j]), curGrp);
+    surf.refs[2].index = insert_node_in_group(&(nods[elem->k]), curGrp);
 
     /* insert the surface */
-    if (curGrp->nbsurf == curGrp->maxsurf)
-    {
-        if (curGrp->nbsurf == 0)
-        {
-            ActiveGroups++;
-        }
-        curGrp->maxsurf += SURF_INCR;
-        curGrp->surfaces = (struct surf *)realloc(curGrp->surfaces, curGrp->maxsurf * sizeof(struct surf));
-    }
-    curSurf = &(curGrp->surfaces[curGrp->nbsurf++]);
-
-    curSurf->ref[0].u = nods[elem->i].x / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-    curSurf->ref[0].v = nods[elem->i].y / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-    curSurf->ref[1].u = nods[elem->j].x / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-    curSurf->ref[1].v = nods[elem->j].y / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-    curSurf->ref[2].u = nods[elem->k].x / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-    curSurf->ref[2].v = nods[elem->k].y / TexSize; // + (TexRand * rand()/(RAND_MAX+1.0));
-
-    curSurf->ref[0].vtxidx = insert_node_in_group(&(nods[elem->i]), curGrp);
-    curSurf->ref[1].vtxidx = insert_node_in_group(&(nods[elem->j]), curGrp);
-    curSurf->ref[2].vtxidx = insert_node_in_group(&(nods[elem->k]), curGrp);
+    curGrp.surfaces.push_back(surf);
 }
 
 static void groups(void)
@@ -2019,42 +1963,20 @@ static void draw_ac(Ac3d &ac3d, const char *name)
 
     ac3d.addObject(objectGroup);
 
-    for (int i = 0; i < GroupNb; i++)
+    for (size_t i = 0; i < Groups.size(); i++)
     {
-        struct group *curGrp = &(Groups[i]);
-        if (curGrp->nbsurf == 0)
-        {
+        Ac3d::Object &curGrp = Groups[i];
+        if (curGrp.surfaces.empty())
             continue;
-        }
 
-        Ac3d::Object object;
-        object.type = "poly";
-        object.name = std::string(name) + std::to_string(i);
-        object.texture = TexName;
+        curGrp.type = "poly";
+        curGrp.name = std::string(name) + std::to_string(i);
+        curGrp.texture = TexName;
 
-        for (int j = 0; j < curGrp->nbvtx; j++)
-        {
-            object.vertices.emplace_back(curGrp->vertices[j].x, curGrp->vertices[j].z, -curGrp->vertices[j].y);
-        }
-
-        for (int j = 0; j < curGrp->nbsurf; j++)
-        {
-            Ac3d::Surface   surface;
-            surface.surf = 0x10;
-            surface.mat = 0;
-
-            for (int k = 0; k < 3; k++)
-            {
-                surface.refs.emplace_back(curGrp->surfaces[j].ref[k].vtxidx,
-                                          curGrp->surfaces[j].ref[k].u,
-                                          curGrp->surfaces[j].ref[k].v);
-            }
-            object.surfaces.push_back(surface);
-        }
-
-        ac3d.addObject(object);
+        ac3d.addObject(curGrp);
         ac3d.stack.pop();
     }
+    ac3d.stack.top()->flipAxes(false);
     ac3d.stack.pop();
 }
 /*-draw_ac--------------------------------------------------------------------*/
@@ -2487,8 +2409,6 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
 void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, Ac3d &allAc3d, bool all, int noElevation,
                      bool useBorder)
 {
-    const char *mat;
-
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, 10.0);
     GfOut("Track step: %.2f\n", TrackStep);
     Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
@@ -2502,12 +2422,11 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
 
     XGroupNb = (int)((track->max.x + Margin - (track->min.x - Margin)) / GroupSize) + 1;
 
-    GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
+    const int GroupNb = XGroupNb * ((int)((track->max.y + Margin - (track->min.y - Margin)) / GroupSize) + 1);
 
-    Groups = (struct group *)calloc(GroupNb, sizeof(struct group));
-    ActiveGroups = 0;
+    Groups.resize(GroupNb);
 
-    mat = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SURF, "grass");
+    const char *mat = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SURF, "grass");
     if (track->version < 4)
     {
         sprintf(buf, "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, mat);
@@ -2539,48 +2458,27 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
         }
     }
 
-    // FILE *curFd = NULL;
-    bool hasCur = false;
+    const bool hasCur = !outfile.empty();
     Ac3d curAc3d;
     curAc3d.addDefaultMaterial();
-
-    if (!outfile.empty())
-    {
-        // Attempt to fix AC3D (the application) segfault on opening the msh file.
-        // curFd = Ac3dOpen(outfile, 2);
-        //curFd = Ac3dOpen(outfile, 1);
-        hasCur = true;
-    }
 
     if (GetTrackOrientation(track) == CLOCKWISE)
     {
         GenerateMesh(track, true /* right */, true /* reverse */, false /* interior */, useBorder);
         GenerateMesh(track, false /* left */, false /* normal */, true /* exterior */, useBorder);
-        if (hasCur)
-        {
-            draw_ac(curAc3d, "TERR");
-        }
-        if (all)
-        {
-            draw_ac(allAc3d, "TERR");
-        }
     }
     else
     {
         GenerateMesh(track, false /* left */, false /* normal */, false /* interior */, useBorder);
         GenerateMesh(track, true /* right */, true /* reverse */, true /* exterior */, useBorder);
-        if (hasCur)
-        {
-            draw_ac(curAc3d, "TERR");
-        }
-        if (all)
-        {
-            draw_ac(allAc3d, "TERR");
-        }
     }
+
     if (hasCur)
-    {
-        //Ac3dClose(curFd);
+        draw_ac(curAc3d, "TERR");
+
+    if (all)
+        draw_ac(allAc3d, "TERR");
+
+    if (hasCur)
         curAc3d.writeFile(outfile, false);
-    }
 }
