@@ -83,7 +83,6 @@ InitObjects(tTrack *track, void *TrackHandle)
     inputPath.resize(inputPath.find_last_of('/'));
 
     const std::string modelPath(inputPath + ";" + GfDataDir() + "data/objects");
-    ssgModelPath("");   // using our own search
 
     const int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
@@ -273,7 +272,7 @@ AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigne
 }
 
 bool
-ssgSaveACInner(Ac3d::Object *ent, Ac3d &ac3d)
+saveACInner(Ac3d::Object *ent, Ac3d &ac3d)
 {
     /* WARNING - RECURSIVE! */
 
@@ -283,7 +282,7 @@ ssgSaveACInner(Ac3d::Object *ent, Ac3d &ac3d)
 
         for (auto & kid : ent->kids)
         {
-            if (!ssgSaveACInner(&kid, ac3d))
+            if (!saveACInner(&kid, ac3d))
             {
                 return false;
             }
@@ -446,7 +445,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
 
         const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-        ssgSaveACInner(&GroupRoot.root.kids.front(), GroupRoot);
+        saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
         GroupRoot.flipAxes(false); // convert to track coordinate system
         GroupRoot.writeFile(objectFile, false);
 
