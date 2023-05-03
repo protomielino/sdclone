@@ -1827,9 +1827,9 @@ static int insert_node_in_group(struct nod *nod, Ac3d::Object &group)
 
 static void insert_elem_in_group(struct ele *el, struct nod *nods)
 {
-    assert(el->i >= 0 && el->i < Groups.size());
-    assert(el->j >= 0 && el->j < Groups.size());
-    assert(el->k >= 0 && el->k < Groups.size());
+    assert(el->i >= 0 && el->i < Nn);
+    assert(el->j >= 0 && el->j < Nn);
+    assert(el->k >= 0 && el->k < Nn);
 
     const double xmean = (nods[el->i].x + nods[el->j].x + nods[el->k].x) / 3.0;
     const double ymean = (nods[el->i].y + nods[el->j].y + nods[el->k].y) / 3.0;
