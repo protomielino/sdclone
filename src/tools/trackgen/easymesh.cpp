@@ -127,7 +127,6 @@ struct chai
 } * chain;
 
 int Ne, Nn, Ns, Nc, Fl; /* number of: elements, nodes, sides */
-int ugly;               /* mora li biti globalna ??? */
 
 double xmax, xmin, ymax, ymin;
 
@@ -879,7 +878,7 @@ void diamond(void)
 /*-diamond-----------------------------------------------------------------*/
 
 /*=========================================================================*/
-void classify(void)
+int classify(void)
 /*----------------------------------------------------------+
 |  This function searches through all elements every time.  |
 |  Some optimisation will definitely bee needed             |
@@ -895,7 +894,7 @@ void classify(void)
     int e, ei, ej, ek, si, sj, sk;
     double ratio = 0.7, F;
 
-    ugly = OFF;
+    int ugly = OFF;
 
     for (e = 0; e < Ne; e++)
     {
@@ -1015,6 +1014,8 @@ void classify(void)
             }
         }
     }
+
+    return ugly;
 }
 /*-classify----------------------------------------------------------------*/
 
@@ -1023,8 +1024,10 @@ void classify(void)
 |  This function is very important.                  |
 |  It determines the position of the inserted node.  |
 +---------------------------------------------------*/
-void new_node()
+void new_node(int ugly)
 {
+    assert(ugly != OFF);
+
     int s = OFF, n = 0;
     double xM, yM, zM, p, q, qx, qy, rhoM, rho_M, d;
 
@@ -1111,7 +1114,6 @@ void new_node()
     {
         insert_node(xM + d * qx / q, yM + d * qy / q, zM, ON, OFF, 0, 0, 0, OFF);
     }
-    return;
 }
 /*-new_node----------------------------------------------------------------*/
 
@@ -1823,27 +1825,34 @@ static int insert_node_in_group(struct nod *nod, Ac3d::Object &group)
     return static_cast<int>(group.vertices.size() - 1);
 }
 
-static void insert_elem_in_group(struct ele *elem, struct nod *nods)
+static void insert_elem_in_group(struct ele *el, struct nod *nods)
 {
-    const double xmean = (nods[elem->i].x + nods[elem->j].x + nods[elem->k].x) / 3.0;
-    const double ymean = (nods[elem->i].y + nods[elem->j].y + nods[elem->k].y) / 3.0;
-    const size_t grIdx = (int)((xmean - XGroupOffset) / GroupSize) + XGroupNb * (int)((ymean - YGroupOffset) / GroupSize);
+    assert(el->i >= 0 && el->i < Groups.size());
+    assert(el->j >= 0 && el->j < Groups.size());
+    assert(el->k >= 0 && el->k < Groups.size());
+
+    const double xmean = (nods[el->i].x + nods[el->j].x + nods[el->k].x) / 3.0;
+    const double ymean = (nods[el->i].y + nods[el->j].y + nods[el->k].y) / 3.0;
+    const int grIdx = (int)((xmean - XGroupOffset) / GroupSize) + XGroupNb * (int)((ymean - YGroupOffset) / GroupSize);
+
+    assert(grIdx >= 0 && grIdx < Groups.size());
+
     Ac3d::Object &curGrp = Groups[grIdx];
     Ac3d::Surface surf;
 
     surf.surf = 0x10;
     surf.refs.resize(3);
 
-    surf.refs[0].coord[0] = nods[elem->i].x / TexSize;
-    surf.refs[0].coord[1] = nods[elem->i].y / TexSize;
-    surf.refs[1].coord[0] = nods[elem->j].x / TexSize;
-    surf.refs[1].coord[1] = nods[elem->j].y / TexSize;
-    surf.refs[2].coord[0] = nods[elem->k].x / TexSize;
-    surf.refs[2].coord[1] = nods[elem->k].y / TexSize;
+    surf.refs[0].coord[0] = nods[el->i].x / TexSize;
+    surf.refs[0].coord[1] = nods[el->i].y / TexSize;
+    surf.refs[1].coord[0] = nods[el->j].x / TexSize;
+    surf.refs[1].coord[1] = nods[el->j].y / TexSize;
+    surf.refs[2].coord[0] = nods[el->k].x / TexSize;
+    surf.refs[2].coord[1] = nods[el->k].y / TexSize;
 
-    surf.refs[0].index = insert_node_in_group(&(nods[elem->i]), curGrp);
-    surf.refs[1].index = insert_node_in_group(&(nods[elem->j]), curGrp);
-    surf.refs[2].index = insert_node_in_group(&(nods[elem->k]), curGrp);
+    surf.refs[0].index = insert_node_in_group(&(nods[el->i]), curGrp);
+    surf.refs[1].index = insert_node_in_group(&(nods[el->j]), curGrp);
+    surf.refs[2].index = insert_node_in_group(&(nods[el->k]), curGrp);
 
     /* insert the surface */
     curGrp.surfaces.push_back(surf);
@@ -1988,13 +1997,13 @@ static void generate_mesh(void)
     printf("Load Chains\n");
     load();
     erase();
-    classify();
+    int ugly = classify();
 
     do
     {
         Nn0 = Nn;
-        new_node();
-        classify();
+        new_node(ugly);
+        ugly = classify();
         if (Nn > (MAX_NODES / 2 - 2))
         {
             break;
