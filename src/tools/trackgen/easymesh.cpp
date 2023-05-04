@@ -2471,6 +2471,12 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
     Ac3d curAc3d;
     curAc3d.addDefaultMaterial();
 
+    // check if we should use the relief border
+    const std::string reliefBorder = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF_BORDER, "no");
+
+    if (reliefBorder == "yes")
+        useBorder = false;
+
     if (GetTrackOrientation(track) == CLOCKWISE)
     {
         GenerateMesh(track, true /* right */, true /* reverse */, false /* interior */, useBorder);

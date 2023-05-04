@@ -51,7 +51,7 @@ check development showroom
 check development straight-10
 check development testtrack
 check dirt mixed-2
-check road e-track-4 -B
+check road e-track-4
 check speedway a-speedway
 
 rm -rf temp_dir
