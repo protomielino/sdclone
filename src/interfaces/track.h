@@ -134,6 +134,7 @@
 #define TRK_ATT_COLOR               "color"
 #define TRK_ATT_OBJECT              "object"
 #define TRK_ATT_SEED                "random seed"
+#define TRK_ATT_USE_OBJ_MATERIALS   "use object materials"
 #define TRK_ATT_ORIENTATION_TYPE    "orientation type"
 #define TRK_ATT_ORIENTATION         "orientation"
 #define TRK_ATT_SCALE_TYPE          "scale type"

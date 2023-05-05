@@ -98,7 +98,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.6.0.7", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.6.0.8", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -404,6 +404,12 @@ int Application::generate()
 
         return EXIT_SUCCESS;
     }
+
+    // check if we should use the object's materials
+    const std::string useObjectMaterials = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_USE_OBJ_MATERIALS, "no");
+
+    if (useObjectMaterials == "yes")
+        MultipleMaterials = true;
 
     GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutputFileName, MultipleMaterials);
 
