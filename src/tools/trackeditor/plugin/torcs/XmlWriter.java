@@ -865,16 +865,16 @@ public class XmlWriter
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Terrain Generation"));
 
-		addContent(element, "track step", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getTrackStep());
-		addContent(element, "border margin", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin());
-		addContent(element, "border step", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderStep());
-		addContent(element, "border height", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderHeight());
-		addContent(element, "orientation", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getOrientation());
-		addContent(element, "maximum altitude", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude());
-		addContent(element, "minimum altitude", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude());
-		addContent(element, "group size", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getGroupSize());
-		addContent(element, "elevation map", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getElevationMap());
-		addContent(element, "relief file", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefFile());
+		addContent(element, "track step", "m", editorFrame.getTerrainGeneration().getTrackStep());
+		addContent(element, "border margin", "m", editorFrame.getTerrainGeneration().getBorderMargin());
+		addContent(element, "border step", "m", editorFrame.getTerrainGeneration().getBorderStep());
+		addContent(element, "border height", "m", editorFrame.getTerrainGeneration().getBorderHeight());
+		addContent(element, "orientation", editorFrame.getTerrainGeneration().getOrientation());
+		addContent(element, "maximum altitude", "m", editorFrame.getTerrainGeneration().getMaximumAltitude());
+		addContent(element, "minimum altitude", "m", editorFrame.getTerrainGeneration().getMinimumAltitude());
+		addContent(element, "group size", "m", editorFrame.getTerrainGeneration().getGroupSize());
+		addContent(element, "elevation map", editorFrame.getTerrainGeneration().getElevationMap());
+		addContent(element, "relief file", editorFrame.getTerrainGeneration().getReliefFile());
 
 		if (editorFrame.getReliefs().getChanged())
 		{
@@ -888,9 +888,10 @@ public class XmlWriter
 			}
 		}
 
-		addContent(element, "relief border", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefBorder());
-		addContent(element, "surface", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getSurface());
-		addContent(element, "random seed", null, editorFrame.getTrackData().getGraphic().getTerrainGeneration().getRandomSeed());
+		addContent(element, "relief border", editorFrame.getTerrainGeneration().getReliefBorder());
+		addContent(element, "surface", editorFrame.getTerrainGeneration().getSurface());
+		addContent(element, "random seed", null, editorFrame.getTerrainGeneration().getRandomSeed());
+		addContent(element, "use object materials", editorFrame.getTerrainGeneration().getUseObjectMaterials());
 
 		element.addContent(getObjectMaps());
 

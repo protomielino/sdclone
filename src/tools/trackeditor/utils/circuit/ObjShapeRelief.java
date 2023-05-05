@@ -237,9 +237,9 @@ public class ObjShapeRelief extends Segment
 		super.dump(indent);
 
 		System.out.println(indent + "  ObjShapeRelief");	
-		System.out.println(indent + "    reliefType  : " + (isInterior() ? "Interior" : "Exterior"));
-		System.out.println(indent + "    lineType    : " + (isPolyline() ? "Polyline" : "Polygon"));
-		System.out.println(indent + "    vertices    : " + vertices.size());
+		System.out.println(indent + "    reliefType       : " + (isInterior() ? "Interior" : "Exterior"));
+		System.out.println(indent + "    lineType         : " + (isPolyline() ? "Polyline" : "Polygon"));
+		System.out.println(indent + "    vertices         : " + vertices.size());
 		for (int i = 0; i < vertices.size(); i++)
 		{
 			System.out.println(indent + "      vertex[" + i + "] : " + vertices.get(i)[0] + ", " + vertices.get(i)[1] + ", " + vertices.get(i)[2]);

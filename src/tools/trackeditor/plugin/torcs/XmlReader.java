@@ -622,6 +622,7 @@ public class XmlReader
 	        data.getTerrainGeneration().setReliefBorder(getAttrStrValue(terrain, "relief border"));
 	        data.getTerrainGeneration().setSurface(getAttrStrValue(terrain, "surface"));
 	        data.getTerrainGeneration().setRandomSeed(getAttrIntValue(terrain, "random seed"));
+	        data.getTerrainGeneration().setUseObjectMaterials(getAttrStrValue(terrain, "use object materials"));
 
 	        Element objects = getChildWithName(terrain, "Object Maps");
 

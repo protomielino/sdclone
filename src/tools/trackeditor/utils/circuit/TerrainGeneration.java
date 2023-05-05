@@ -32,6 +32,7 @@ public class TerrainGeneration
 	private String				reliefBorder				= null;
 	private String				surface						= null;
 	private int					randomSeed					= Integer.MAX_VALUE;
+	private String				useObjectMaterials			= null;
 	private Vector<ObjectMap>	objectMaps					= new Vector<ObjectMap>();
 
 	/**
@@ -233,23 +234,33 @@ public class TerrainGeneration
 	{
 		this.randomSeed = randomSeed;
 	}
-	
+
+	public String getUseObjectMaterials()
+	{
+		return useObjectMaterials;
+	}
+	public void setUseObjectMaterials(String useObjectMaterials)
+	{
+		this.useObjectMaterials = useObjectMaterials;
+	}
+
 	public void dump(String indent)
     {
 		System.out.println(indent + "TerrainGeneration");
-		System.out.println(indent + "  trackStep       : " + trackStep);
-		System.out.println(indent + "  borderMargin    : " + borderMargin);
-		System.out.println(indent + "  borderStep      : " + borderStep);
-		System.out.println(indent + "  borderHeight    : " + borderHeight);
-		System.out.println(indent + "  orientation     : " + orientation);
-		System.out.println(indent + "  maximumAltitude : " + maximumAltitude);
-		System.out.println(indent + "  minimumAltitude : " + minimumAltitude);
-		System.out.println(indent + "  groupSize       : " + groupSize);
-		System.out.println(indent + "  elevationMap    : " + elevationMap);
+		System.out.println(indent + "  trackStep            : " + trackStep);
+		System.out.println(indent + "  borderMargin         : " + borderMargin);
+		System.out.println(indent + "  borderStep           : " + borderStep);
+		System.out.println(indent + "  borderHeight         : " + borderHeight);
+		System.out.println(indent + "  orientation          : " + orientation);
+		System.out.println(indent + "  maximumAltitude      : " + maximumAltitude);
+		System.out.println(indent + "  minimumAltitude      : " + minimumAltitude);
+		System.out.println(indent + "  groupSize            : " + groupSize);
+		System.out.println(indent + "  elevationMap         : " + elevationMap);
 		reliefs.dump(indent + "  ");
-		System.out.println(indent + "  reliefBorder    : " + reliefBorder);
-		System.out.println(indent + "  surface         : " + surface);
-		System.out.println(indent + "  random seed     : " + randomSeed);
+		System.out.println(indent + "  reliefBorder         : " + reliefBorder);
+		System.out.println(indent + "  surface              : " + surface);
+		System.out.println(indent + "  random seed          : " + randomSeed);
+		System.out.println(indent + "  use object materials : " + useObjectMaterials);
 		System.out.println(indent + "  objectMaps[" + objectMaps.size() + "]");
 		for (int i = 0; i < objectMaps.size(); i++)
 		{

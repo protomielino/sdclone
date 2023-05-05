@@ -99,6 +99,8 @@ public class TerrainProperties extends PropertyPanel
 	private SurfaceComboBox		surfaceComboBox				= null;
 	private JLabel				randomSeedLabel				= new JLabel();
 	private JTextField			randomSeedTextField			= new JTextField();
+	private JLabel				useObjectMaterialsLabel		= new JLabel();
+	private JComboBox<String>	useObjectMaterialsComboBox	= null;
 	private JButton				defaultButton				= null;
 	private JButton				deleteButton				= null;
 	private JButton				addObjectMapButton			= null;
@@ -155,20 +157,21 @@ public class TerrainProperties extends PropertyPanel
 		addLabel(this, 10, reliefBorderLabel, "Relief Border", 120);
 		addLabel(this, 11, surfaceLabel, "Surface", 120);
 		addLabel(this, 12, randomSeedLabel, "Random Seed", 120);
+		addLabel(this, 13, useObjectMaterialsLabel, "Use Object Materials", 120);
 
-		addTextField(this, 0, trackStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), 140, 125);
-		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 125);
-		addTextField(this, 2, borderStepTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderStep(), 140, 125);
-		addTextField(this, 3, borderHeightTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderHeight(), 140, 125);
+		addTextField(this, 0, trackStepTextField, getEditorFrame().getTerrainGeneration().getTrackStep(), 140, 125);
+		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTerrainGeneration().getBorderMargin(), 140, 125);
+		addTextField(this, 2, borderStepTextField, getEditorFrame().getTerrainGeneration().getBorderStep(), 140, 125);
+		addTextField(this, 3, borderHeightTextField, getEditorFrame().getTerrainGeneration().getBorderHeight(), 140, 125);
 
 		this.add(getOrientationComboBox(), null);
 
-		addTextField(this, 5, maximumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude(), 140, 125);
-		addTextField(this, 6, minimumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude(), 140, 125);
-		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), 140, 125);
-		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), 140, 295);
-		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), 140, 295);
-		addTextField(this, 12, randomSeedTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getRandomSeed(), 140, 125);
+		addTextField(this, 5, maximumAltitudeTextField, getEditorFrame().getTerrainGeneration().getMaximumAltitude(), 140, 125);
+		addTextField(this, 6, minimumAltitudeTextField, getEditorFrame().getTerrainGeneration().getMinimumAltitude(), 140, 125);
+		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTerrainGeneration().getGroupSize(), 140, 125);
+		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTerrainGeneration().getElevationMap(), 140, 295);
+		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTerrainGeneration().getReliefFile(), 140, 295);
+		addTextField(this, 12, randomSeedTextField, getEditorFrame().getTerrainGeneration().getRandomSeed(), 140, 125);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
@@ -179,7 +182,9 @@ public class TerrainProperties extends PropertyPanel
 		this.add(getElevationMapButton(), null);
 		this.add(getReliefFileButton(), null);
 		this.add(getReliefBorderComboBox(), null);
-		getReliefBorderComboBox().setSelectedItem(toNoneString(getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefBorder()));
+		this.add(getUseObjectMaterialsComboBox(), null);
+		getReliefBorderComboBox().setSelectedItem(toNoneString(getEditorFrame().getTerrainGeneration().getReliefBorder()));
+		getUseObjectMaterialsComboBox().setSelectedItem(toNoneString(getEditorFrame().getTerrainGeneration().getUseObjectMaterials()));
 	}
 
 	/**
@@ -195,7 +200,7 @@ public class TerrainProperties extends PropertyPanel
 			{"none", "clockwise", "counter-clockwise"};
 			orientationComboBox = new JComboBox<String>(items);
 			orientationComboBox.setBounds(140, 118, 125, 23);
-			String orientation = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getOrientation();
+			String orientation = getEditorFrame().getTerrainGeneration().getOrientation();
 			if (orientation == null || orientation.isEmpty())
 				orientation = "none";
 			orientationComboBox.setSelectedItem(orientation);
@@ -212,7 +217,7 @@ public class TerrainProperties extends PropertyPanel
 	{
 		if (surfaceComboBox == null)
 		{
-			String surface = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface();
+			String surface = getEditorFrame().getTerrainGeneration().getSurface();
 			addSurface(roadSurfaceVector, surface);
 			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
 			surfaceComboBox.setBounds(140, 307, 200, 23);
@@ -235,6 +240,22 @@ public class TerrainProperties extends PropertyPanel
 			reliefBorderComboBox.setBounds(140, 280, 125, 23);
 		}
 		return reliefBorderComboBox;
+	}
+
+	/**
+	 * This method initializes useObjectMaterialsComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox<String> getUseObjectMaterialsComboBox()
+	{
+		if (useObjectMaterialsComboBox == null)
+		{
+			String[] items = {"none", "yes", "no"};
+			useObjectMaterialsComboBox = new JComboBox<String>(items);
+			useObjectMaterialsComboBox.setBounds(140, 361, 125, 23);
+		}
+		return useObjectMaterialsComboBox;
 	}
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
@@ -518,7 +539,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 366, 510, 355);
+			tabbedPane.setBounds(10, 393, 510, 328);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
 
@@ -1010,74 +1031,74 @@ public class TerrainProperties extends PropertyPanel
 		MutableInteger integerResult = new MutableInteger();
 
 		if (isDifferent(trackStepTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getTrackStep(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getTrackStep(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setTrackStep(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setTrackStep(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(borderMarginTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderMargin(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getBorderMargin(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setBorderMargin(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setBorderMargin(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(borderStepTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderStep(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getBorderStep(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setBorderStep(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setBorderStep(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(borderHeightTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getBorderHeight(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getBorderHeight(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setBorderHeight(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setBorderHeight(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(maximumAltitudeTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getMaximumAltitude(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setMaximumAltitude(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setMaximumAltitude(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(minimumAltitudeTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getMinimumAltitude(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setMinimumAltitude(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setMinimumAltitude(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(groupSizeTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), doubleResult))
+			getEditorFrame().getTerrainGeneration().getGroupSize(), doubleResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setGroupSize(doubleResult.getValue());
+			getEditorFrame().getTerrainGeneration().setGroupSize(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent((String) getOrientationComboBox().getSelectedItem(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getOrientation(), stringResult))
+			getEditorFrame().getTerrainGeneration().getOrientation(), stringResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setOrientation(stringResult.getValue());
+			getEditorFrame().getTerrainGeneration().setOrientation(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(elevationMapTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), stringResult))
+			getEditorFrame().getTerrainGeneration().getElevationMap(), stringResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setElevationMap(stringResult.getValue());
+			getEditorFrame().getTerrainGeneration().setElevationMap(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(reliefFileTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), stringResult))
+			getEditorFrame().getTerrainGeneration().getReliefFile(), stringResult))
 		{
 			try
 			{
-				getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefFile(stringResult.getValue());
+				getEditorFrame().getTerrainGeneration().setReliefFile(stringResult.getValue());
 			}
 			catch (IOException e)
 			{				
@@ -1092,27 +1113,34 @@ public class TerrainProperties extends PropertyPanel
 		}
 
         if (isDifferent(reliefBorderComboBox.getSelectedItem().toString(),
-        	getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefBorder(), stringResult))
+        	getEditorFrame().getTerrainGeneration().getReliefBorder(), stringResult))
         {
-        	getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setReliefBorder(stringResult.getValue());
+        	getEditorFrame().getTerrainGeneration().setReliefBorder(stringResult.getValue());
             getEditorFrame().documentIsModified = true;
         }
 
 		if (isDifferent((String) surfaceComboBox.getSelectedItem(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface(), stringResult))
+			getEditorFrame().getTerrainGeneration().getSurface(), stringResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setSurface(stringResult.getValue());
+			getEditorFrame().getTerrainGeneration().setSurface(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(randomSeedTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getRandomSeed(), integerResult))
+			getEditorFrame().getTerrainGeneration().getRandomSeed(), integerResult))
 		{
-			getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().setRandomSeed(integerResult.getValue());
+			getEditorFrame().getTerrainGeneration().setRandomSeed(integerResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
-		Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
+        if (isDifferent(useObjectMaterialsComboBox.getSelectedItem().toString(),
+            getEditorFrame().getTerrainGeneration().getUseObjectMaterials(), stringResult))
+        {
+            getEditorFrame().getTerrainGeneration().setUseObjectMaterials(stringResult.getValue());
+            getEditorFrame().documentIsModified = true;
+        }
+
+        Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
 		int minCount = Math.min(objectMaps.size(), tabbedPane.getTabCount());
 		if (objectMaps.size() != tabbedPane.getTabCount())
 		{
