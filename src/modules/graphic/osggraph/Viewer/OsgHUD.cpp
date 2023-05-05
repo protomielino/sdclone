@@ -88,7 +88,7 @@ extern tdble SimTimeOfDay;
 extern int SimClouds;
 extern int SimRain;
 
-float tempVal = 0.0f;
+std::vector<float> horsepowerPoints;
 
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
 static void split(const std::string &s, char delim, std::vector<std::string> &elems)
@@ -1157,6 +1157,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                         const tCarElt *currCar, int SimClouds, int SimRain, float SimTimeOfDay)
 {
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
+    bool carHasChanged = true;
 
     CarData &data = carData[currCar];
 
@@ -1172,7 +1173,10 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             iterator->second->clearDataPoints();
 
         lastCar = currCar;
-    }
+		carHasChanged = true;
+    }else{
+		carHasChanged = false;
+	}
 
     //update all the graphs
 
@@ -1464,14 +1468,10 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     float carFuel = (float)((float)currCar->_fuel / (float)currCar->_tank);
 
     //update fuel bar
-    //changeImageSize(hudImgElements["fuel-icon-empty"], 1.0-carFuel, "top", hudScale);//not needed anymore we can just overwrite the off image with the on image
     changeImageSize(hudImgElements["fuel-icon-full"], carFuel, "bottom", hudScale);
 
 
-//abs
-//tcs
-//TODO: speed limiter
-
+//abs, tcs, speed limiter
     bool abs = false;   // Show ABS indicator?
     bool tcs = false;   // Show TCS indicator?
     bool spd = false;   // Show speed limiter indicator?
@@ -1799,6 +1799,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     changeImageSize(hudImgElements["tire-rl-cold"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
     changeImageSize(hudImgElements["tire-rl-optimal"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
     changeImageSize(hudImgElements["tire-rl-hot"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
+
 //tire slip
     float slip = 0.0f;
     slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
@@ -1830,8 +1831,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
     //timeof day
     temp.str("");
-    //todo this may only work with simuV4 ince (SimTimeOfDay is defined there)
-    // a better way to access this value would be "(int)SDTrack->local.timeofday" but we dont have access to track data from here at the moment
     double timeofday = SimTimeOfDay + s->currentTime;
 
     int hours = (int)(timeofday/60/60);
@@ -1879,7 +1878,138 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     if(SimRain > 0){
         changeImageAlpha(hudImgElements["trackdata-weathericon-rainy"],    1.0f);
     }
+//shifting leds
+	//read the car handle //engine section//torque data points
+	 GfParmGetNum(currCar->_carHandle, SECT_ENGINE, ARR_DATAPTS, NULL, 0.0f);
 
+	//get the number of datapoint in the engine section
+	std::string dataPointsPath = SECT_ENGINE "/" ARR_DATAPTS;
+    int dataPointsCount = GfParmGetEltNb(currCar->_carHandle, dataPointsPath.c_str());
+    
+    //engine data point values will be stored here
+	float rpm = 0.0f;
+	float torque = 0.0f;
+
+	//values from previous datapoint
+	float prevrpm = 0.0f;
+	float prevtorque = 0.0f;
+
+	float intermediaterpm = 0.0f;
+	float intermediatetorque = 0.0f;
+
+	//get the data points
+	//we do this one time (when a new car is selected)
+	if (carHasChanged)
+	{
+		//empty and than resize the vector to match the new maxrpm (we will have a datapoint for each rpm)
+		horsepowerPoints.clear();
+		horsepowerPoints.resize((int)currCar->_enginerpmMax);
+		
+		//fill it with data, for each datapoint
+		for (int i = 1; i <= dataPointsCount; i++)
+		{
+			std::string dataPointPath = dataPointsPath+"/"+ std::to_string(i);
+
+			rpm = GfParmGetNum(currCar->_carHandle, dataPointPath.c_str(), PRM_RPM, (char*) NULL, 0.0f/*RevsMax*/);
+			torque = GfParmGetNum(currCar->_carHandle, dataPointPath.c_str(), PRM_TQ, (char*) NULL, 0.0f);
+
+			//if the current data point has the same value of the previous datapoint; skip it
+			if (rpm > 0.0f && rpm == prevrpm){
+				continue;
+			}
+
+			// insert the horsepower value at the given rpm
+			auto position = horsepowerPoints.begin() + rpm;
+			float value = torque * rpm;
+			horsepowerPoints.insert(position, value);
+			
+			//calculate intermediate point/values from previous to current datapoin
+			for( int h = 1+prevrpm; h < (int)rpm; h++)
+			{
+				if(h > (int)currCar->_enginerpmMax) {break;}//quit the for cicle when we reach the rpmMax
+				intermediaterpm = h;
+				intermediatetorque =  prevtorque + (((torque-prevtorque) / (rpm - prevrpm)) * (h-prevrpm));
+				//GfLogInfo("Intermediate Point %i - rpm %i - torque %f \n", 0, (int)intermediaterpm, intermediatetorque);
+
+				// insert the horsepower value at the given rpm
+				auto position = horsepowerPoints.begin() + intermediaterpm;
+				float value = intermediatetorque * intermediaterpm;
+				horsepowerPoints.insert(position, value);
+			}
+			
+			prevrpm = rpm;
+			prevtorque = torque;
+		}
+	}
+	/*
+    GfLogInfo("RPM %i \n", (int)currCar->_enginerpm);
+    GfLogInfo("Gear %f - GearRation %f \n", (float)currCar->_gear, (float)currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)]);
+    GfLogInfo("nextGear %f - GearRation %f \n", (float)(currCar->_gear + 1.0), (float)currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset +1)]);
+	*/
+	//only do this when engine rpm is not 0 and the gear is not neutral
+	//otherwise we get infinite values
+	if(currCar->_enginerpm > 0 && currCar->_gear >= 1.0 ){ 
+		float nextRpm = currCar->_enginerpm / currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)] * currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset +1)];
+		
+		//reset all the led to off, we will turn on what's needed later
+		hudImgElements["light1-on"]->setNodeMask(0);
+		hudImgElements["light2-on"]->setNodeMask(0);
+		hudImgElements["light3-on"]->setNodeMask(0);
+		hudImgElements["light4-on"]->setNodeMask(0);
+		hudImgElements["light5-on"]->setNodeMask(0);
+		hudImgElements["light6-on"]->setNodeMask(0);
+		hudImgElements["light7-on"]->setNodeMask(0);
+		hudImgElements["light8-on"]->setNodeMask(0);
+		hudImgElements["light9-on"]->setNodeMask(0);
+		hudImgElements["light10-on"]->setNodeMask(0);
+		hudImgElements["light11-on"]->setNodeMask(0);
+		hudImgElements["light12-on"]->setNodeMask(0);
+		
+		float horsepowerCurr = horsepowerPoints.at((int)currCar->_enginerpm);
+		float horsepowerNext = horsepowerPoints.at((int)nextRpm);
+		//GfLogInfo("Curr gear %i (%f) - RPM %i - CurrPower %f \n", currCar->_gear, currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)], (int)RADS2RPM(currCar->_enginerpm), horsepowerCurr);
+		//GfLogInfo("Next gear %i (%f)- RPM %i - nextPower %f \n", currCar->_gear+1, currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset+1)], (int)RADS2RPM(nextRpm), horsepowerNext);
+
+		//green leds
+		if( horsepowerNext > horsepowerCurr * 80/100){
+			hudImgElements["light1-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 82/100){
+			hudImgElements["light2-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 84/100){
+			hudImgElements["light3-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 86/100){
+			hudImgElements["light4-on"]->setNodeMask(1);
+		}
+		//red leds
+		if( horsepowerNext > horsepowerCurr * 88/100){
+			hudImgElements["light5-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 90/100){
+			hudImgElements["light6-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 92/100){
+			hudImgElements["light7-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 94/100){
+			hudImgElements["light8-on"]->setNodeMask(1);
+		}
+		//purple leds
+		if( horsepowerNext > horsepowerCurr * 96/100){
+			hudImgElements["light9-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 98/100){
+			hudImgElements["light10-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 100/100){
+			hudImgElements["light11-on"]->setNodeMask(1);
+		}
+		if( horsepowerNext > horsepowerCurr * 102/100){
+			hudImgElements["light12-on"]->setNodeMask(1);
+		}
+	}
 
 // debug info
     temp.str("");
@@ -2223,6 +2353,7 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["deltaWidget"] =        (int)hudWidgets["deltaWidget"]->getNodeMask();
         hudElementsVisibilityStatus["rpmWidget"] =          (int)hudWidgets["rpmWidget"]->getNodeMask();
         hudElementsVisibilityStatus["trackdataWidget"] =    (int)hudWidgets["trackdataWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["shiftlightsWidget"] =    (int)hudWidgets["shiftlightsWidget"]->getNodeMask();
 
         hudWidgets["boardWidget"]->setNodeMask(0);
         hudWidgets["racepositionWidget"]->setNodeMask(0);
@@ -2244,6 +2375,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["deltaWidget"]->setNodeMask(0);
         hudWidgets["rpmWidget"]->setNodeMask(0);
         hudWidgets["trackdataWidget"]->setNodeMask(0);
+        hudWidgets["shiftlightsWidget"]->setNodeMask(0);
         hudElementsVisibilityStatusEnabled = false;
     }else{
         hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
@@ -2266,6 +2398,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["deltaWidget"]->setNodeMask(hudElementsVisibilityStatus["deltaWidget"]);
         hudWidgets["rpmWidget"]->setNodeMask(hudElementsVisibilityStatus["rpmWidget"]);
         hudWidgets["trackdataWidget"]->setNodeMask(hudElementsVisibilityStatus["trackdataWidget"]);
+        hudWidgets["shiftlightsWidget"]->setNodeMask(hudElementsVisibilityStatus["shiftlightsWidget"]);
         hudElementsVisibilityStatusEnabled = true;
     }
 }
