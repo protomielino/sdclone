@@ -48,6 +48,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/PitProperties.java
          gui/properties/PropertiesDialog.java
          gui/properties/PropertyPanel.java
+         gui/properties/ReliefProperties.java
          gui/properties/SectorProperties.java
          gui/properties/StartingGridProperties.java
          gui/properties/SurfaceProperties.java

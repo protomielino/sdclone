@@ -461,7 +461,7 @@ public class TerrainProperties extends PropertyPanel
 			tabbedPane.setBounds(10, 393, 510, 362);
 
 			tabbedPane.addTab("Object Maps", null, new ObjectMapProperties(getEditorFrame()));
-//			tabbedPane.addTab("Reliefs", null, new ReliefProperties(getEditorFrame()));
+			tabbedPane.addTab("Reliefs", null, new ReliefProperties(getEditorFrame()));
 		}
 		return tabbedPane;
 	}
@@ -589,8 +589,8 @@ public class TerrainProperties extends PropertyPanel
 		ObjectMapProperties properties1 = (ObjectMapProperties)component1;
 		properties1.exit();
 
-//		Component component2 = tabbedPane.getComponentAt(1);
-//		ReliefProperties properties2 = (ReliefProperties)component2;
-//		properties2.exit();
+		Component component2 = tabbedPane.getComponentAt(1);
+		ReliefProperties properties2 = (ReliefProperties)component2;
+		properties2.exit();
 	}
  } //  @jve:decl-index=0:visual-constraint="10,10"

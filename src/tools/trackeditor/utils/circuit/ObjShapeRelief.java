@@ -61,6 +61,22 @@ public class ObjShapeRelief extends Segment
 		return relief;
 	}
 
+	public ReliefType getReliefType()
+	{
+		return reliefType;
+	}
+	public void setReliefType(ReliefType reliefType)
+	{
+		this.reliefType = reliefType;
+	}
+	public LineType getLineType()
+	{
+		return lineType;
+	}
+	public void setLineType(LineType lineType)
+	{
+		this.lineType = lineType;
+	}
 	public boolean isInterior()
 	{
 		return reliefType == ReliefType.Interior;
