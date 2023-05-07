@@ -19,6 +19,13 @@ public class ObjShapeRelief extends Segment
 	private LineType			lineType;
 	private Vector<double[]>	vertices = new Vector<double[]>();
 
+	public ObjShapeRelief()
+	{
+		super("relief");
+		this.reliefType = ReliefType.Interior;
+		this.lineType = LineType.Polyline;
+	}
+
 	public ObjShapeRelief(ReliefType reliefType, LineType lineType, Vector<double[]> vertices)
 	{
 		super("relief");

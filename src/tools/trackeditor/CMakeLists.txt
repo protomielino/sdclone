@@ -43,6 +43,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/GraphicProperties.java
          gui/properties/ImageProperties.java
          gui/properties/LocalInfoProperties.java
+         gui/properties/ObjectMapProperties.java
          gui/properties/ObjectProperties.java
          gui/properties/PitProperties.java
          gui/properties/PropertiesDialog.java
