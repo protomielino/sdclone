@@ -2046,6 +2046,23 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		DeleteReliefAction deleteReliefAction = new DeleteReliefAction("Delete Relief", null, "Delete relief.");
 
 		JPopupMenu menu = new JPopupMenu();
+
+		Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+		int reliefIndex = reliefs.indexOf(shape);
+
+		if (reliefIndex != -1)
+		{
+			int pointIndex = reliefs.get(reliefIndex).getPointIndex(mousePoint);
+			
+			if (pointIndex != -1)
+			{
+				String info = "Relief " + (reliefIndex + 1) + " Point " + (pointIndex + 1);
+				JMenuItem itemInfo = new JMenuItem(info);
+				menu.add(itemInfo);
+				menu.addSeparator();
+			}
+		}
+		
 //		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
 //		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
 		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
