@@ -1888,7 +1888,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         //get the number of datapoint in the engine section
         std::string dataPointsPath = SECT_ENGINE "/" ARR_DATAPTS;
         int dataPointsCount = GfParmGetEltNb(currCar->_carHandle, dataPointsPath.c_str());
-        
+
         //engine data point values will be stored here
         float rpm = 0.0f;
         float torque = 0.0f;
@@ -1900,17 +1900,16 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         float intermediaterpm = 0.0f;
         float intermediatetorque = 0.0f;
 
+        //make sure there is enough space in our vector match the new maxrpm (we will have a datapoint for each rpm)
+        horsepowerPoints.resize((int)currCar->_enginerpmMax+1);
+
         //get the data points
         //we do this one time (when a new car is selected)
         if (carHasChanged)
         {
-            //empty and than resize the vector to match the new maxrpm (we will have a datapoint for each rpm)
-            GfLogDebug("OSGHUD: Resizing the horsepowerVector...\n");
+            //empty the vector to 
             horsepowerPoints.clear();
-            horsepowerPoints.resize((int)currCar->_enginerpmMax);
-            GfLogDebug("OSGHUD: Resizing the horsepowerVector...done\n");
 
-            
             //fill it with data, for each datapoint
             for (int i = 1; i <= dataPointsCount; i++)
             {
@@ -1928,7 +1927,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 auto position = horsepowerPoints.begin() + rpm;
                 float value = torque * rpm;
                 horsepowerPoints.insert(position, value);
-                
+
                 //calculate intermediate point/values from previous to current datapoin
                 for( int h = 1+prevrpm; h < (int)rpm; h++)
                 {
@@ -1954,7 +1953,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         */
         //only do this when engine rpm is not 0 and the gear is not neutral
         //otherwise we get infinite values
-        if(currCar->_enginerpm > 0 && currCar->_gear >= 1.0 ){ 
+        if(currCar->_enginerpm > 0 && currCar->_gear > 0 ){
             float nextRpm = currCar->_enginerpm / currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)] * currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset +1)];
             
             //reset all the led to off, we will turn on what's needed later
