@@ -1901,7 +1901,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         float intermediatetorque = 0.0f;
 
         //make sure there is enough space in our vector match the new maxrpm (we will have a datapoint for each rpm)
-        horsepowerPoints.resize((int)currCar->_enginerpmMax+1);
+        //horsepowerPoints.resize((int)currCar->_enginerpmMax+1);
 
         //get the data points
         //we do this one time (when a new car is selected)
@@ -1924,9 +1924,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 }
 
                 // insert the horsepower value at the given rpm
-                auto position = horsepowerPoints.begin() + rpm;
+                //auto position = horsepowerPoints.begin() + rpm;
                 float value = torque * rpm;
-                horsepowerPoints.insert(position, value);
 
                 //calculate intermediate point/values from previous to current datapoin
                 for( int h = 1+prevrpm; h < (int)rpm; h++)
@@ -1937,10 +1936,13 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                     //GfLogInfo("Intermediate Point %i - rpm %i - torque %f \n", 0, (int)intermediaterpm, intermediatetorque);
 
                     // insert the horsepower value at the given rpm
-                    auto position = horsepowerPoints.begin() + intermediaterpm;
+                    //auto position = horsepowerPoints.begin() + intermediaterpm;
                     float value = intermediatetorque * intermediaterpm;
-                    horsepowerPoints.insert(position, value);
+                    //horsepowerPoints.insert(position, value);
+                    horsepowerPoints.push_back(value);
                 }
+                //insert the poin value
+                horsepowerPoints.push_back(value);
                 
                 prevrpm = rpm;
                 prevtorque = torque;
