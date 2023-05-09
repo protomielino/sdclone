@@ -578,6 +578,7 @@ public class ObjectMapProperties extends PropertyPanel
 		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
 		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
 		        table.setAutoCreateRowSorter(true);
+		        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
 		        Set<String> names = getEditorFrame().getObjectColorNames();
 

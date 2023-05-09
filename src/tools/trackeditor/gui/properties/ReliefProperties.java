@@ -3,15 +3,21 @@ package gui.properties;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import gui.EditorFrame;
 import utils.circuit.ObjShapeRelief;
@@ -124,7 +130,10 @@ public class ReliefProperties extends PropertyPanel
 			super();
 			reliefTypeIndex = reliefShape.isInterior() ? 0 : 1;
 			lineTypeIndex = reliefShape.isPolygon() ? 0 : 1;
-			vertices = (Vector<double[]>)reliefShape.getVertices().clone();
+			for (int i = 0; i < reliefShape.getVertices().size(); i++)
+			{
+				vertices.add(new double[] { reliefShape.getVertices().get(i)[0], reliefShape.getVertices().get(i)[1], reliefShape.getVertices().get(i)[2]});
+			}
 			initialize();
 		}
 
@@ -139,8 +148,6 @@ public class ReliefProperties extends PropertyPanel
 			reliefTypeComboBox.setBounds(120, 10, 125, 23);
 			reliefTypeComboBox.setSelectedIndex(reliefTypeIndex);
 
-			reliefTypeComboBox.setEnabled(false);	// remove when editing ready
-			
 			reliefTypeComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -154,10 +161,8 @@ public class ReliefProperties extends PropertyPanel
 
 			lineTypeComboBox = new JComboBox<String>(lineTypes);
 			lineTypeComboBox.setBounds(120, 37, 125, 23);
-			lineTypeComboBox.setSelectedIndex(reliefTypeIndex);
+			lineTypeComboBox.setSelectedIndex(lineTypeIndex);
 
-			lineTypeComboBox.setEnabled(false);	// remove when editing ready
-			
 			lineTypeComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -219,10 +224,10 @@ public class ReliefProperties extends PropertyPanel
 
 	        public boolean isCellEditable(int row, int columnIndex)
 	        {
-//	        	if (columnIndex == 1 || columnIndex == 2 || columnIndex == 3)
-//	        	{
-//	        		return true;
-//	        	}
+	        	if (columnIndex == 1 || columnIndex == 2 || columnIndex == 3)
+	        	{
+	        		return true;
+	        	}
 	        	return false;
 	        }
 
@@ -259,7 +264,13 @@ public class ReliefProperties extends PropertyPanel
 			        fireTableCellUpdated(rowIndex, columnIndex);
 					break;
 				}
-		    }
+			}
+
+			public void removeRowAt(int row)
+			{
+				vertices.removeElementAt(row);
+				fireTableRowsDeleted(row - 1, vertices.size() - 1);
+			}
 	    }
 
 		class ReliefTablePanel extends JPanel
@@ -277,7 +288,40 @@ public class ReliefProperties extends PropertyPanel
 		        scrollPane = new JScrollPane(table);
 		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
 		        table.setAutoCreateRowSorter(true);
-
+		        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+		        
+		        JPopupMenu popupMenu = new JPopupMenu();
+		        JMenuItem deleteItem = new JMenuItem("Delete Row");
+		        table.addMouseListener(new MouseAdapter()
+		        {
+		        	public void mouseClicked(MouseEvent me)
+		        	{
+		        		if (SwingUtilities.isRightMouseButton(me) == true)
+		        		{
+		        			int row = table.rowAtPoint(me.getPoint());
+		        			if (table.getSelectedRow() != row)
+		        			{
+		        				table.setRowSelectionInterval(row, row);
+		        			}
+		        		}
+		        	}
+		        });
+		        deleteItem.addActionListener(new ActionListener()
+		        {
+		            public void actionPerformed(ActionEvent e)
+		            {
+		            	if (table.getSelectedRow() != -1)
+		            	{
+		            		if (JOptionPane.showConfirmDialog(null, "Delete this row?", "Delete Row", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+		            		{
+		            			model.removeRowAt(table.getSelectedRow());
+		            		}
+		            	}
+		            }
+		        });
+		        popupMenu.add(deleteItem);
+		        table.setComponentPopupMenu(popupMenu);
+		        
 		        add(scrollPane);
 		    }
 
@@ -296,47 +340,51 @@ public class ReliefProperties extends PropertyPanel
 		if (reliefs.getReliefs().size() != tabbedPane.getTabCount())
 		{
 			getEditorFrame().documentIsModified = true;
+			reliefs.setChanged(true);
 		}
 		for (int i = 0; i < minReliefCount; i++)
-        {
+		{
 			ObjShapeRelief relief = reliefs.getReliefs().elementAt(i);
-            ReliefPanel panel = (ReliefPanel) tabbedPane.getComponentAt(i);
-            String reliefType = panel.reliefTypes[panel.reliefTypeIndex];
-            if (isDifferent(panel.reliefTypeComboBox.getSelectedItem().toString(), reliefType, stringResult))
-            {
-            	relief.setReliefType(reliefType.equals("interior") ? ObjShapeRelief.ReliefType.Interior : ObjShapeRelief.ReliefType.Exterior);
-                getEditorFrame().documentIsModified = true;
-            }
-            String lineType = panel.lineTypes[panel.lineTypeIndex];
-            if (isDifferent(panel.lineTypeComboBox.getSelectedItem().toString(), lineType, stringResult))
-            {
-            	relief.setLineType(lineType.equals("closed") ? ObjShapeRelief.LineType.Polygon : ObjShapeRelief.LineType.Polyline);
-                getEditorFrame().documentIsModified = true;
-            }
+			ReliefPanel panel = (ReliefPanel) tabbedPane.getComponentAt(i);
+			String reliefType = panel.reliefTypes[panel.reliefTypeIndex];
+			if (isDifferent(panel.reliefTypeComboBox.getSelectedItem().toString(), reliefType, stringResult))
+			{
+				relief.setReliefType(stringResult.getValue().equals(panel.reliefTypes[0]) ? ObjShapeRelief.ReliefType.Interior : ObjShapeRelief.ReliefType.Exterior);
+				reliefs.setChanged(true);
+			}
+			String lineType = panel.lineTypes[panel.lineTypeIndex];
+			if (isDifferent(panel.lineTypeComboBox.getSelectedItem().toString(), lineType, stringResult))
+			{
+				relief.setLineType(stringResult.getValue().equals(panel.lineTypes[0]) ? ObjShapeRelief.LineType.Polygon : ObjShapeRelief.LineType.Polyline);
+				reliefs.setChanged(true);
+				getEditorFrame().documentIsModified = true;
+			}
 
-    		int minVertexCount = Math.min(panel.vertices.size(), relief.getVertices().size());
+			int minVertexCount = Math.min(panel.vertices.size(), relief.getVertices().size());
 
     		if (panel.vertices.size() != relief.getVertices().size())
     		{
     			getEditorFrame().documentIsModified = true;
+    			reliefs.setChanged(true);
     		}
-            for (int j = 0; j < minVertexCount; j++)
-            {
-            	for (int k = 0; k < 3; k++)
-            	{
-            		if (panel.vertices.get(j)[k] != relief.getVertices().get(j)[k])
-            		{
-            			relief.getVertices().get(j)[k] = panel.vertices.get(j)[k];
-                        getEditorFrame().documentIsModified = true;
-            		}
-            	}
-            }
+    		for (int j = 0; j < minVertexCount; j++)
+    		{
+    			for (int k = 0; k < 3; k++)
+    			{
+    				if (panel.vertices.get(j)[k] != relief.getVertices().get(j)[k])
+    				{
+    					relief.getVertices().get(j)[k] = panel.vertices.get(j)[k];
+    					getEditorFrame().documentIsModified = true;
+    					reliefs.setChanged(true);
+    				}
+    			}
+    		}
     		if (panel.vertices.size() < relief.getVertices().size())
     		{
     			// need to trim vertices
     			while (relief.getVertices().size() > panel.vertices.size())
     			{
-    				relief.getVertices().remove(relief.getVertices().size() - 1);
+    				relief.deleteVertexAt(relief.getVertices().size() - 1);
     			}
     		}
     		else if (relief.getVertices().size() < panel.vertices.size())
@@ -344,7 +392,7 @@ public class ReliefProperties extends PropertyPanel
     			// need to add to vertices
     			while (relief.getVertices().size() < panel.vertices.size())
     			{
-                	relief.getVertices().add(panel.vertices.get(relief.getVertices().size()));
+    				relief.addVertex(panel.vertices.get(relief.getVertices().size()));
     			}
     		}
 		}

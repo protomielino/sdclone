@@ -101,6 +101,20 @@ public class ObjShapeRelief extends Segment
 		this.vertices = vertices;
 	}
 
+	public void deleteVertexAt(int index)
+	{
+		points = null;
+		trPoints = null;
+		vertices.remove(index);
+	}
+
+	public void addVertex(double[] vertex)
+	{
+		points = null;
+		trPoints = null;
+		vertices.add(vertex);
+	}
+
 	public void calcShape(Rectangle2D.Double boundingRectangle)
 	{
 		if (points == null)
