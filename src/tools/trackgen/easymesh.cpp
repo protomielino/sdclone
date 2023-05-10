@@ -2418,14 +2418,14 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
 void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, Ac3d &allAc3d, bool all, int noElevation,
                      bool useBorder)
 {
-    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, 10.0);
+    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, DEFAULT_TRACK_STEP);
     GfOut("Track step: %.2f\n", TrackStep);
-    Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
-    GridStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, 10.0);
-    ExtHeight = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BHEIGHT, nullptr, 0.0);
+    Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, DEFAULT_BORDER_MARGIN);
+    GridStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, DEFAULT_BORDER_STEP);
+    ExtHeight = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BHEIGHT, nullptr, DEFAULT_BORDER_HEIGHT);
     GfOut("Border margin: %.2f    step: %.2f    height: %.2f\n", Margin, GridStep, ExtHeight);
 
-    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
+    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, DEFAULT_GROUP_SIZE);
     XGroupOffset = track->min.x - Margin;
     YGroupOffset = track->min.y - Margin;
 
@@ -2435,7 +2435,7 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
 
     Groups.resize(GroupNb);
 
-    const char *mat = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SURF, "grass");
+    const char *mat = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SURF, DEFAULT_SURFACE);
     if (track->version < 4)
     {
         sprintf(buf, "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, mat);

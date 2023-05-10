@@ -41,6 +41,7 @@
 #include "ac3d.h"
 #include "util.h"
 #include "objects.h"
+#include "trackgen.h"
 
 namespace
 {
@@ -333,8 +334,8 @@ InsertInner(Ac3d::Object *ent, Ac3d::Object *GroupRoot, std::vector<Ac3d::Object
 void
 Group(tTrack *track, void *TrackHandle, Ac3d::Object *Root, Ac3d::Object *GroupRoot, std::vector<Ac3d::Object *> &Groups)
 {
-    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
-    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
+    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, DEFAULT_BORDER_MARGIN);
+    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, DEFAULT_GROUP_SIZE);
     XGroupOffset = track->min.x - Margin;
     YGroupOffset = track->min.y - Margin;
 
@@ -380,7 +381,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
 
     InitObjects(track, TrackHandle);
 
-    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 0);
+    const tdble Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, DEFAULT_BORDER_MARGIN);
 
     const tdble xmin = track->min.x - Margin;
     const tdble xmax = track->max.x + Margin;

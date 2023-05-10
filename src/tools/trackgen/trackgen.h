@@ -29,6 +29,13 @@
 #define CLOCKWISE	0
 #define ANTICLOCKWISE	1
 
+#define DEFAULT_TRACK_STEP      10.0
+#define DEFAULT_BORDER_MARGIN   100.0
+#define DEFAULT_BORDER_STEP     10.0
+#define DEFAULT_BORDER_HEIGHT   0.0
+#define DEFAULT_GROUP_SIZE      100.0
+#define DEFAULT_SURFACE         "grass"
+
 #define CFG_FILE	"tools/trackgen/trackgen.xml"
 
 

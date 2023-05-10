@@ -45,7 +45,7 @@
 
 static unsigned char	*ElvImage;
 static int	ElvOk = 0;
-static tdble 	Margin;
+static tdble 	Margin = DEFAULT_BORDER_MARGIN;
 
 static tdble	kX, kY, dX, dY;
 static tdble	kZ, dZ;

@@ -48,7 +48,7 @@
 static std::vector<ssgBranch*> InteriorList;
 static std::vector<ssgBranch*> ExteriorList;
 
-static tdble GridStep;
+static tdble GridStep = DEFAULT_BORDER_STEP;
 
 static ssgEntity *Root = nullptr;
 
