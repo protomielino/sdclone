@@ -408,6 +408,9 @@ public class TerrainProperties extends PropertyPanel
 					setTextField(elevationMapTextField, TerrainGeneration.DEFAULT_ELEVATION_MAP);
 					setTextField(reliefFileTextField, TerrainGeneration.DEFAULT_RELIEF_FILE);
 					surfaceComboBox.setSelectedItem(TerrainGeneration.DEFAULT_SURFACE);
+					setTextField(randomSeedTextField, TerrainGeneration.DEFAULT_RANDOM_SEED);
+					reliefBorderComboBox.setSelectedItem(TerrainGeneration.DEFAULT_RELIEF_BORDER);
+					useObjectMaterialsComboBox.setSelectedItem(TerrainGeneration.DEFAULT_USE_OBJECT_MATERIALS);
 				}
 			});
 		}
@@ -441,6 +444,9 @@ public class TerrainProperties extends PropertyPanel
 					elevationMapTextField.setText(null);
 					reliefFileTextField.setText(null);
 					surfaceComboBox.setSelectedItem(null);
+					randomSeedTextField.setText(null);
+					reliefBorderComboBox.setSelectedItem(null);
+					useObjectMaterialsComboBox.setSelectedItem(null);
 				}
 			});
 		}

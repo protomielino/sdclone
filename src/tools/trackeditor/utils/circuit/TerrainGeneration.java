@@ -5,19 +5,20 @@ import java.util.Vector;
 
 public class TerrainGeneration
 {
-	public static final double 	DEFAULT_TRACK_STEP			= 20;
-	public static final double	DEFAULT_BORDER_MARGIN		= 50;
-	public static final double	DEFAULT_BORDER_STEP			= 30;
-	public static final double	DEFAULT_BORDER_HEIGHT		= 15;
-	public static final String	DEFAULT_ORIENTATION			= "clockwise";
-	public static final double	DEFAULT_MAXIMUM_ALTITUDE	= Double.NaN;
-	public static final double	DEFAULT_MINIMUM_ALTITUDE	= Double.NaN;
-	public static final double	DEFAULT_GROUP_SIZE			= Double.NaN;
-	public static final String	DEFAULT_ELEVATION_MAP		= null;
-	public static final String	DEFAULT_RELIEF_FILE			= null;
-	public static final String	DEFAULT_RELIEF_BORDER		= null;
-	public static final String	DEFAULT_SURFACE				= null;
-	public static final int		DEFAULT_RANDOM_SEED			= 1;
+	public static final double 	DEFAULT_TRACK_STEP				= 10;
+	public static final double	DEFAULT_BORDER_MARGIN			= 100;
+	public static final double	DEFAULT_BORDER_STEP				= 10;
+	public static final double	DEFAULT_BORDER_HEIGHT			= 0;
+	public static final String	DEFAULT_ORIENTATION				= "clockwise";
+	public static final double	DEFAULT_MAXIMUM_ALTITUDE		= Double.NaN;
+	public static final double	DEFAULT_MINIMUM_ALTITUDE		= Double.NaN;
+	public static final double	DEFAULT_GROUP_SIZE				= 100;
+	public static final String	DEFAULT_ELEVATION_MAP			= null;
+	public static final String	DEFAULT_RELIEF_FILE				= null;
+	public static final String	DEFAULT_RELIEF_BORDER			= "no";
+	public static final String	DEFAULT_SURFACE					= "grass";
+	public static final int		DEFAULT_RANDOM_SEED				= 1;
+	public static final String	DEFAULT_USE_OBJECT_MATERIALS	= "no";
 
 	private double				trackStep					= Double.NaN;
 	private double				borderMargin				= Double.NaN;
