@@ -1953,6 +1953,62 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	private void reliefSelected(ObjShapeRelief shape, MouseEvent me)
 	{
+		class AddPointBeforeAction extends AbstractAction
+		{
+			public AddPointBeforeAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+				int index = reliefs.indexOf(shape);
+
+				if (index != -1)
+				{
+					Undo.add(new UndoEditRelief(reliefs, shape));					
+					reliefs.get(index).addPoint2D(mousePoint, true);				
+					reliefs.get(index).calcShape(boundingRectangle);
+					selectedShape = null;
+					invalidate();
+					repaint();
+					editorFrame.documentIsModified = true;
+					return;
+				}
+			}
+		}
+
+		AddPointBeforeAction addPointBeforeAction = new AddPointBeforeAction("Add Point Before", null, "Add relief point before this point.");
+
+		class AddPointAfterAction extends AbstractAction
+		{
+			public AddPointAfterAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
+				int index = reliefs.indexOf(shape);
+
+				if (index != -1)
+				{
+					Undo.add(new UndoEditRelief(reliefs, shape));					
+					reliefs.get(index).addPoint2D(mousePoint, false);				
+					reliefs.get(index).calcShape(boundingRectangle);
+					selectedShape = null;
+					invalidate();
+					repaint();
+					editorFrame.documentIsModified = true;
+					return;
+				}
+			}
+		}
+
+		AddPointAfterAction addPointAfterAction = new AddPointAfterAction("Add Point After", null, "Add relief point after this point.");
+
 /*
 		class EditPointAction extends AbstractAction
 		{
@@ -2065,16 +2121,22 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		
 //		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
 //		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
+		JMenuItem itemAddPointBefore = new JMenuItem("Add Point Before");
+		JMenuItem itemAddPointAfter = new JMenuItem("Add Relief After");
 		JMenuItem itemDeletePoint = new JMenuItem("Delete Point");
 		JMenuItem itemDeleteRelief = new JMenuItem("Delete Relief");
 
 //	    itemEditPoint.setAction(editPointAction);
 //	    itemEditRelief.setAction(editReliefAction);
+	    itemAddPointBefore.setAction(addPointBeforeAction);
+	    itemAddPointAfter.setAction(addPointAfterAction);
 	    itemDeletePoint.setAction(deletePointAction);
 	    itemDeleteRelief.setAction(deleteReliefAction);
 
 //	    menu.add(itemEditPoint);
 //	    menu.add(itemEditRelief);
+	    menu.add(itemAddPointBefore);
+	    menu.add(itemAddPointAfter);
 	    menu.add(itemDeletePoint);
 	    menu.add(itemDeleteRelief);
 

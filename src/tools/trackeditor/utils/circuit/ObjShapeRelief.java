@@ -238,6 +238,35 @@ public class ObjShapeRelief extends Segment
 		return false;
 	}
 
+	public void addPoint2D(Point2D.Double point, boolean before)
+	{
+		if (points == null)
+			return;
+		
+		if (vertices.size() == 1)
+		{
+			points = null;
+			trPoints = null;
+			vertices.add(new double[] { vertices.get(0)[0] + (before ? -100 : 100), vertices.get(0)[1], vertices.get(0)[2] });
+			return;
+		}
+
+		for (int i = 0; i < points.length; i++)
+		{
+			if (points[i].distance(point) <= POINT_RADIUS)
+			{
+				points = null;
+				trPoints = null;
+				int next = (before ? i + vertices.size() - 1 : i + 1) % vertices.size();
+				int addAt = before ? i : (i + 1);				
+				vertices.add(addAt, new double[] { vertices.get(i)[0] + ((vertices.get(next)[0] - vertices.get(i)[0]) / 2),
+												   vertices.get(i)[1] + ((vertices.get(next)[1] - vertices.get(i)[1]) / 2), 
+												   vertices.get(i)[2] + ((vertices.get(next)[2] - vertices.get(i)[2]) / 2) });
+				return;
+			}
+		}
+	}
+
 	public void setPoint2D(int index, Point2D.Double point, Rectangle2D.Double boundingRectangle)
 	{
 		if (points == null)
