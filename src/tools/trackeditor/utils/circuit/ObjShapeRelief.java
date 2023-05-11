@@ -165,6 +165,18 @@ public class ObjShapeRelief extends Segment
 			if (maxY < trPoints[i].y)
 				maxY = (int) (trPoints[i].y);
 		}
+		
+		if (minX == maxX)
+		{
+			minX -= 1;
+			maxX += 1;
+		}
+		
+		if (minY == maxY)
+		{
+			minY -= 1;
+			maxY += 1;
+		}
 
 		if (clipBound.intersects(minX, minY, maxX - minX, maxY - minY))
 		{

@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -69,9 +70,6 @@ public class ReliefProperties extends PropertyPanel
 			addReliefButton = new JButton();
 			addReliefButton.setBounds(10, 300, 130, 25);
 			addReliefButton.setText("Add Releif");
-
-			addReliefButton.setEnabled(false);	// remove when editing ready
-			
 			addReliefButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -79,6 +77,15 @@ public class ReliefProperties extends PropertyPanel
 					ObjShapeRelief relief = new ObjShapeRelief();
 					Reliefs reliefs = getEditorFrame().getReliefs();
 
+					// add points
+					Rectangle2D.Double boundingRectangle = getEditorFrame().getBoundingRectangle();
+					double center[] = { boundingRectangle.width / 2, boundingRectangle.height / 2 };
+					double offset = tabbedPane.getTabCount() * 50;
+					relief.setReliefType(ObjShapeRelief.ReliefType.Interior);
+					relief.setLineType(ObjShapeRelief.LineType.Polyline);
+					relief.addVertex(new double[] { center[0] - 50, 0, -(center[1] + offset) });
+					relief.addVertex(new double[] { center[0] + 50, 0, -(center[1] + offset) });
+					
 					tabbedPane.addTab("relief " + String.valueOf(reliefs.getReliefs().size() + 1), null, new ReliefPanel(relief), null);
 					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				}
@@ -94,9 +101,6 @@ public class ReliefProperties extends PropertyPanel
 			deleteReliefButton = new JButton();
 			deleteReliefButton.setBounds(155, 300, 140, 25);
 			deleteReliefButton.setText("Delete Relief");
-
-			deleteReliefButton.setEnabled(false);	// remove when editing ready
-			
 			deleteReliefButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
