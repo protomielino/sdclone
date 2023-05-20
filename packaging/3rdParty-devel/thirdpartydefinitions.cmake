@@ -60,24 +60,27 @@ set(SDL2_MIXER_HASH SHA256=7a6ba86a478648ce617e3a5e9277181bc67f7ce9876605eea6aff
 # OpenAL-soft
 set(OPENAL_PROJECT_VERSION 1.23.1)
 set(OPENAL_PROJECT openal-soft-${OPENAL_PROJECT_VERSION})
-set(OPENAL_FILE ${OPENAL_PROJECT}.tar.bz2)
-set(OPENAL_URL https://www.openal-soft.org/openal-releases/${OPENAL_FILE})
-set(OPENAL_HASH SHA256=796f4b89134c4e57270b7f0d755f0fa3435b90da437b745160a49bd41c845b21)
+set(OPENAL_FILE ${OPENAL_PROJECT}.tar.gz)
+set(OPENAL_URL https://github.com/kcat/openal-soft/archive/refs/tags/${OPENAL_PROJECT_VERSION}.tar.gz)
+set(OPENAL_HASH SHA256=dfddf3a1f61059853c625b7bb03de8433b455f2f79f89548cbcbd5edca3d4a4a)
+
+# https://github.com/kcat/openal-soft/releases/tag/1.23.1
+# https://github.com/kcat/openal-soft/archive/refs/tags/1.23.1.tar.gz
 
 message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
 set(OPENAL_C11_VERSION 1.19.1)
 set(OPENAL_C11_PROJECT openal-soft-${OPENAL_C11_VERSION})
-set(OPENAL_C11_FILE ${OPENAL_C11_PROJECT}.tar.bz2)
-set(OPENAL_C11_URL https://www.openal-soft.org/openal-releases/${OPENAL_C11_FILE})
-set(OPENAL_C11_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9)
+set(OPENAL_C11_FILE ${OPENAL_C11_PROJECT}.tar.gz)
+set(OPENAL_C11_URL https://github.com/kcat/openal-soft/archive/refs/tags/${OPENAL_C11_FILE})
+set(OPENAL_C11_HASH SHA256=9f3536ab2bb7781dbafabc6a61e0b34b17edd16bd6c2eaf2ae71bc63078f98c7)
 
 message(STATUS "openal-soft versions newer than 1.18.2 need Visual Studio 2015 or newer")
 message(STATUS "so for older versions of Visual Studio, also download this version")
 set(OPENAL_LEGACY_VERSION 1.18.2)
 set(OPENAL_LEGACY_PROJECT openal-soft-${OPENAL_LEGACY_VERSION})
-set(OPENAL_LEGACY_FILE ${OPENAL_LEGACY_PROJECT}.tar.bz2)
-set(OPENAL_LEGACY_URL https://www.openal-soft.org/openal-releases/${OPENAL_LEGACY_FILE})
-set(OPENAL_LEGACY_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82)
+set(OPENAL_LEGACY_FILE ${OPENAL_LEGACY_PROJECT}.tar.gz)
+set(OPENAL_LEGACY_URL https://github.com/kcat/openal-soft/archive/refs/tags/${OPENAL_LEGACY_FILE})
+set(OPENAL_LEGACY_HASH SHA256=a598241d1af2e90c25a1b91da4c9ddc0e7cb6a4b5f1477fc680d139c57cd38cc)
 
 # PLIB
 message(STATUS "TODO: Need special handling for PLIB")
