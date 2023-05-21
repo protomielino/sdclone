@@ -720,7 +720,7 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
         pTgtCar->_trackLength = pSource->track->length;
         pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
         pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
-	pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
+    pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
         pTgtCar->_currLapTimeAtTrackPosition = (float *)malloc(pTgtCar->_trackPositionCount * sizeof(float));
         pTgtCar->_bestLapTimeAtTrackPosition = (float *)malloc(pTgtCar->_trackPositionCount * sizeof(float));
 
@@ -775,7 +775,7 @@ tRmInfo* ReSituationUpdater::copySituation(tRmInfo*& pTarget, const tRmInfo* pSo
                sizeof(double) * (pSource->track->numberOfSectors - 1));
         pTgtCar->_lastLapTime = pSrcCar->_lastLapTime;
         pTgtCar->_curTime = pSrcCar->_curTime;
-	pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
+    pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
         memcpy(pTgtCar->_bestLapTimeAtTrackPosition, pSrcCar->_bestLapTimeAtTrackPosition,
             pSrcCar->_trackPositionCount * sizeof(float));
         memcpy(pTgtCar->_currLapTimeAtTrackPosition, pSrcCar->_currLapTimeAtTrackPosition,
@@ -832,6 +832,7 @@ tRmInfo* ReSituationUpdater::copySituation(tRmInfo*& pTarget, const tRmInfo* pSo
         pTgtCar->_enginerpm = pSrcCar->_enginerpm;
         memcpy(&pTgtCar->priv.skid[0], &pSrcCar->priv.skid[0], 4*sizeof(tdble));
         memcpy(&pTgtCar->priv.reaction[0], &pSrcCar->priv.reaction[0], 4*sizeof(tdble));
+        pTgtCar->_airtemp = pSrcCar->_airtemp;
         pTgtCar->_collision = pSrcCar->_collision;
         pTgtCar->_smoke = pSrcCar->_smoke;
         pTgtCar->_normal = pSrcCar->_normal;
