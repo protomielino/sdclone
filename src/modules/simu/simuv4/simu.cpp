@@ -280,6 +280,11 @@ SimReConfig(tCarElt *carElt)
             car->wheel[i].currentGraining = 0.0;
             car->wheel[i].currentGripFactor = 1.0;
 
+            if (car->features & FEAT_TIRETEMPDEG)
+                car->wheel[i].Ttire = car->wheel[i].Tinit;
+            else
+                car->wheel[i].Ttire = car->wheel[i].Topt;
+
             if(car->features & FEAT_COMPOUNDS && carElt->pitcmd.tiresetChange)
             {
                 car->wheel[i].tireSet = carElt->pitcmd.tiresetChange;
@@ -294,11 +299,6 @@ SimReConfig(tCarElt *carElt)
                 GfLogInfo("# SimuV4 tire compound changed mu = %.3f - hysteresis = %.2f - wear factor = %.7f\n", car->wheel[i].mu,
                           car->wheel[i].hysteresisFactor, car->wheel[i].wearFactor);
             }
-
-            if (car->features & FEAT_TIRETEMPDEG)
-                car->wheel[i].Ttire = car->wheel[i].Tinit;
-            else
-                car->wheel[i].Ttire = car->wheel[i].Topt;
         }
     }
 
