@@ -94,6 +94,9 @@ TDriver::TDriver(int index)
     mWatchdogCount = 0;
     mHASTYC = false;
     mHASCPD = false;
+    mHASABS = false;
+    mHASTCL = false;
+    mHASESP = false;
     mCurveAheadFromStart = 0.0;
     mPathChangeTime = 0.0;
     initVars();
@@ -2342,7 +2345,7 @@ void TDriver::getBrakedistfactor()
 
 void TDriver::getSpeedFactors()
 {
-    mSectSpeedfactor = mSect[mSector].speedfactor * mTirecondition;
+    mSectSpeedfactor = mSect[mSector].speedfactor; // * mTirecondition;
 }
 
 void TDriver::updatePathCar(int path)
