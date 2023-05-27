@@ -4,12 +4,18 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -20,12 +26,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -539,6 +548,12 @@ public class ObjectMapProperties extends PropertyPanel
 					break;
 				}
 		    }
+
+			public void removeRowAt(int row)
+			{
+				data.removeElementAt(row);
+				fireTableRowsDeleted(row - 1, data.size() - 1);
+			}
 	    }
 
 	    public void setUpNameColumn(JTable table, TableColumn nameColumn, Set<String> names)
@@ -584,6 +599,27 @@ public class ObjectMapProperties extends PropertyPanel
 
 		        setUpNameColumn(table, table.getColumnModel().getColumn(1), names);
 
+		        table.addMouseListener(new MouseAdapter()
+		        {
+		            @Override
+		        	public void mouseClicked(MouseEvent me)
+		        	{
+		            	if (SwingUtilities.isRightMouseButton(me) == true)
+		        		{
+		        			int row = table.rowAtPoint(me.getPoint());
+			        		if (row != -1)
+		        			{
+		        				table.setRowSelectionInterval(row, row);
+		        		        if (me.getComponent() instanceof JTable )
+		        		        {
+		        		            JPopupMenu popup = createPopupMenu(objectTablePanel);
+		        		            popup.show(me.getComponent(), me.getX(), me.getY());
+		        		        }
+		        			}
+		        		}
+		        	}
+		        });
+
 		        add(scrollPane);
 		    }
 
@@ -592,6 +628,105 @@ public class ObjectMapProperties extends PropertyPanel
 	        	model.fireTableDataChanged();
 	        }
 		}
+
+	    public JPopupMenu createPopupMenu(ObjectTablePanel panel)
+	    {
+	        JPopupMenu popupMenu = new JPopupMenu();
+	        JMenuItem deleteItem = new JMenuItem("Delete Object");
+	        JMenuItem deleteAllColorItem = new JMenuItem("Delete All Objects With This Color");
+	        JMenuItem deleteAllNameItem = new JMenuItem("Delete All Objects With This Name");
+
+	        deleteItem.addActionListener(new ActionListener()
+	        {
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	int row = panel.table.getSelectedRow();
+	            	if (row != -1)
+	            	{
+	            		if (JOptionPane.showConfirmDialog(null, "Delete this object?", "Delete Object", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+	            		{
+	            			panel.model.removeRowAt(panel.table.convertRowIndexToModel(row));
+	            		}
+	            	}
+	            }
+	        });
+	        deleteAllColorItem.addActionListener(new ActionListener()
+	        {
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	int row = panel.table.getSelectedRow();
+	            	if (row != -1)
+	            	{
+	            		if (JOptionPane.showConfirmDialog(null, "Delete all objects with this color?", "Delete Objects With Color", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+	            		{
+	            			int color = data.elementAt(panel.table.convertRowIndexToModel(row)).color;
+	            			Vector<Integer> toDelete = new Vector<Integer>();
+	            			for (int i = 0; i < data.size(); i++)
+	            			{
+	            				if (color == data.elementAt(i).color)
+	            				{
+	            					toDelete.add(i);
+	            				}
+	            			}
+	            			Collections.sort(toDelete, new Comparator<Integer>()
+	            			{
+	                            @Override
+	                            public int compare(Integer o1, Integer o2)
+	                            {
+	                                // Changing the order of the elements
+	                                return o2 - o1;
+	                            }
+	                        });
+	            			for (int i = 0; i < toDelete.size(); i++)
+	            			{
+	            				panel.model.removeRowAt(toDelete.elementAt(i));
+	            			}
+	            		}
+	            	}
+	            }
+	        });
+	        deleteAllNameItem.addActionListener(new ActionListener()
+	        {
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	int row = panel.table.getSelectedRow();
+	            	if (row != -1)
+	            	{
+	            		if (JOptionPane.showConfirmDialog(null, "Delete all objects with this name?", "Delete Objects with Name", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+	            		{
+	            			String name = new String(data.elementAt(panel.table.convertRowIndexToModel(row)).name);
+	            			Vector<Integer> toDelete = new Vector<Integer>();
+	            			for (int i = 0; i < data.size(); i++)
+	            			{
+	            				if (name.equals(data.elementAt(i).name))
+	            				{
+	            					toDelete.add(i);
+	            				}
+	            			}
+	            			Collections.sort(toDelete, new Comparator<Integer>()
+	            			{
+	                            @Override
+	                            public int compare(Integer o1, Integer o2)
+	                            {
+	                                // Changing the order of the elements
+	                                return o2 - o1;
+	                            }
+	                        });
+	            			for (int i = 0; i < toDelete.size(); i++)
+	            			{
+	            				panel.model.removeRowAt(toDelete.elementAt(i));
+	            			}
+	            		}
+	            	}
+	            }
+	        });
+
+	        popupMenu.add(deleteItem);
+	        popupMenu.add(deleteAllColorItem);
+	        popupMenu.add(deleteAllNameItem);
+
+	        return popupMenu;
+	    }
 	}
 
 	public void exit()

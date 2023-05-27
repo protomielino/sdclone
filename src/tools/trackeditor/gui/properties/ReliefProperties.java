@@ -314,11 +314,12 @@ public class ReliefProperties extends PropertyPanel
 		        {
 		            public void actionPerformed(ActionEvent e)
 		            {
-		            	if (table.getSelectedRow() != -1)
+		            	int row = table.getSelectedRow();
+		            	if (row != -1)
 		            	{
 		            		if (JOptionPane.showConfirmDialog(null, "Delete this row?", "Delete Row", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 		            		{
-		            			model.removeRowAt(table.getSelectedRow());
+		            			model.removeRowAt(table.convertRowIndexToModel(row));
 		            		}
 		            	}
 		            }
@@ -328,11 +329,6 @@ public class ReliefProperties extends PropertyPanel
 		        
 		        add(scrollPane);
 		    }
-
-	        void dataChanged()
-	        {
-	        	model.fireTableDataChanged();
-	        }
 		}
 	}
 
