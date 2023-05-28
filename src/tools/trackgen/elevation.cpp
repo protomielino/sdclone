@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
-#include <cstdlib>
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -102,13 +101,11 @@ tdble GetElevation(tdble x, tdble y, tdble z)
 
 void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp, int heightSteps)
 {
-	ssgLoaderOptionsEx options;
 	float zmin, zmax;
 	float xmin, xmax, ymin, ymax;
 	float x, y, z;
 	int clr;
 	int i, j, k, l;
-	ssgRoot	*root;
 	int columns;
 	static char	buf[1024];
 	char *s;
@@ -153,19 +150,17 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 		return;
 	}
 
-	std::string inputPath(track->filename);
-	inputPath.resize(inputPath.find_last_of("/"));
+	Ac3d root;
 
-	ssgSetCurrentOptions(&options);
-	snprintf(buf, sizeof(buf), "%s;%sdata/textures;%sdata/img;.", inputPath.c_str(), GfDataDir(), GfDataDir());
-	ssgTexturePath(buf);
-	snprintf(buf, sizeof(buf), ".;%s", inputPath.c_str());
-	ssgModelPath(buf);
-	root = (ssgRoot*)ssgLoadAC(meshFile.c_str());
-
-	if (root == nullptr) {
+	try
+	{
+		root.readFile(meshFile);
+		root.flipAxes(true);
+	}
+	catch (...)
+	{
 		printf("Could not load %s, ", meshFile.c_str());
-		printf("please generate it with \"trackgen -c %s -n %s -a\"\n", track->category, track->internalname);
+		printf("please generate it with \"sd2-trackgen -c %s -n %s -a\"\n", track->category, track->internalname);
 		return;
 	}
 
@@ -187,7 +182,7 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 		for (i = 0; i < width; i++) {
 			x = i * kX + dX;
 			y = j * kY + dY;
-			z = getHOT(root, x, y);
+			z = root.getTerrainHeight(x, y);
 			if (z != -1000000.0f) {
 				switch (disp) {
 					case 0:

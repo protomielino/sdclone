@@ -99,38 +99,6 @@ GetFilename(const char *filename, const char *filepaths, char *buf, size_t size)
     return found;
 }
 
-float
-getHOT(ssgBranch *root, float x, float y)
-{
-    sgVec3 test_vec;
-    sgMat4 invmat;
-    sgMakeIdentMat4(invmat);
-
-    invmat[3][0] = -x;
-    invmat[3][1] = -y;
-    invmat[3][2] =  0.0f;
-
-    test_vec [0] = 0.0f;
-    test_vec [1] = 0.0f;
-    test_vec [2] = 100000.0f;
-
-    ssgHit *results;
-    int num_hits = ssgHOT (root, test_vec, invmat, &results);
-
-    float hot = -1000000.0f;
-
-    for (int i = 0; i < num_hits; i++)
-    {
-        ssgHit *h = &results[i];
-
-        float hgt = - h->plane[3] / h->plane[2];
-
-        if (hgt >= hot)
-            hot = hgt;
-    }
-
-    return hot;
-}
 /*
  * calculates an angle that aligns with the closest track segment. Angle
 * is determined so that the x axis is aligned parallel to track,
@@ -319,44 +287,6 @@ getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distanc
     *zRet=RtTrackHeightG(seg, *xRet, *yRet);
     printf("tried to align to border: x: %g y: %g z: %g angle: %g \n", *xRet, *yRet, *zRet, angle);
     //return values
-
-    return angle;
-}
-
-/*
- * calculates an angle based on plane equation (face normal) of the
-* terrain in this spot. * Angle is determined so that the x axis is
-* aligned to a horizontal intersection (i.e. height line) of the
-* terrain, with y axis pointing towards uphill
-*  FINISHED
-*/
-float
-getTerrainAngle(ssgBranch *root, float x, float y)
-{
-    sgVec3 test_vec;
-    sgMat4 invmat;
-    sgMakeIdentMat4(invmat);
-
-    invmat[3][0] = -x;
-    invmat[3][1] = -y;
-    invmat[3][2] =  0.0f;
-
-    test_vec [0] = 0.0f;
-    test_vec [1] = 0.0f;
-    test_vec [2] = 100000.0f;
-
-    ssgHit *results;
-    int num_hits = ssgHOT (root, test_vec, invmat, &results);
-
-    float angle = 0.0;
-
-    for (int i = 0; i < num_hits; i++)
-    {
-        ssgHit *h = &results[i];
-
-        angle = 180.0 - atan2f( h->plane[0],  h->plane[1]) * 180.0 /PI;
-
-    }
 
     return angle;
 }

@@ -1121,6 +1121,12 @@ double Ac3d::getTerrainHeight(double x, double y) const
     return terrainHeight;
 }
 
+/*
+ * calculates an angle based on plane equation (face normal) of the
+ * terrain in this spot. * Angle is determined so that the x axis is
+ * aligned to a horizontal intersection (i.e. height line) of the
+ * terrain, with y axis pointing towards uphill
+ */
 double Ac3d::getTerrainAngle(double x, double y) const
 {
     double  terrainHeight = -1000000;
