@@ -148,6 +148,28 @@ public class CheckDialog extends JDialog
 				}
 			}
 		}
+		
+		for (int i = 0; i < segments.size(); i++)
+		{
+			Segment segment = segments.get(i);
+
+			if ("fence".equals(segment.getValidLeftBarrierStyle(editorFrame)))
+			{
+				double width = segment.getValidLeftBarrierWidth(editorFrame);
+				if (width != 0)
+				{
+					textArea.append("Segment " + segment.getName() + " Left barrier style is fence with " + width + " width (set barrier style to wall or don't set a width)\n");
+				}
+			}
+			if ("fence".equals(segment.getValidRightBarrierStyle(editorFrame)))
+			{
+				double width = segment.getValidRightBarrierWidth(editorFrame);
+				if (width != 0)
+				{
+					textArea.append("Segment " + segment.getName() + " Right barrier style is fence with " + width + " width (set barrier style to wall or don't set a width)\n");
+				}
+			}
+		}
 	}
 	
 	public void checkHeader()
