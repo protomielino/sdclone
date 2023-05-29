@@ -208,7 +208,7 @@ Ac3d::Surface::Surface(std::ifstream &fin)
         if (tokens.empty())
             continue;
         if (tokens.at(0) == "SURF")
-            surf = std::stoi(tokens.at(1), nullptr, 16);
+            surf = static_cast<SURF>(std::stoi(tokens.at(1), nullptr, 16));
         else if (tokens.at(0) == "mat")
             mat = std::stoi(tokens.at(1));
         else if (tokens.at(0) == "refs")
@@ -847,24 +847,36 @@ void Ac3d::Object::generateTriangles()
 {
     if (type == "poly")
     {
-        for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end(); ++it)
+        for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end(); )
         {
-            if (it->refs.size() == 4)
+            if (!it->isPolygon())
             {
-                Surface surface;
-                surface.mat = it->mat;
-                surface.surf = it->surf;
-                surface.refs.resize(3);
-                surface.refs[0] = it->refs[0];
-                surface.refs[1] = it->refs[2];
-                surface.refs[2] = it->refs[3];
-                it->refs.resize(3);
-                surfaces.insert(++it, surface);
+                ++it;
+                continue;
             }
-            else if (it->refs.size() != 3)
+
+            if (it->refs.size() > 3)
             {
-                throw Exception("Not implemented yet");
+                std::list<Surface>::iterator original = it;
+                for (size_t i = 0; i < it->refs.size() - 3; i++)
+                {
+                    Surface surface;
+                    surface.mat = it->mat;
+                    surface.surf = it->surf;
+                    surface.refs.resize(3);
+                    surface.refs[0] = it->refs[0];
+                    surface.refs[1] = it->refs[i + 2];
+                    surface.refs[2] = it->refs[i + 3];
+                    surfaces.insert(++it, surface);
+                }
+                original->refs.resize(3);
             }
+            else if (it->refs.size() < 3)
+            {
+                throw Exception("Invalid polygon");
+            }
+            else
+                ++it;
         }
     }
     else

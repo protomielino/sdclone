@@ -1840,7 +1840,7 @@ static void insert_elem_in_group(struct ele *el, struct nod *nods)
     Ac3d::Object &curGrp = Groups[grIdx];
     Ac3d::Surface surf;
 
-    surf.surf = 0x10;
+    surf.surf = Ac3d::Surface::PolygonSingleSidedSmooth;
     surf.refs.resize(3);
 
     surf.refs[0].coord[0] = nods[el->i].x / TexSize;

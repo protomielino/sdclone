@@ -55,7 +55,7 @@ struct tDispElt
 {
     int start;
     int nb;
-    int surfType;
+    Ac3d::Surface::SURF surfType;
     char *name;
     int id;
     tTexElt *texture;
@@ -285,8 +285,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tdble curTexSeg;
     tdble curTexSize = 0;
     tdble curHeight;
-    int prevSurfType = 0x10;
-    int curSurfType = 0x10; // shaded single sided polygon
+    Ac3d::Surface::SURF prevSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
+    Ac3d::Surface::SURF curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth; // shaded single sided polygon
     tTexElt *texList = nullptr;
     tTexElt *curTexElt = nullptr;
     tTrackBarrier *curBarrier;
@@ -1968,7 +1968,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Right barrier */
-    curSurfType = 0x10;
+    curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -1992,7 +1992,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 continue;
             }
 
-            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
+            curSurfType = curBarrier->style == TR_FENCE ? Ac3d::Surface::PolygonDoubleSidedSmooth : Ac3d::Surface::PolygonSingleSidedSmooth;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 
             if (!curTexLink)
@@ -2306,7 +2306,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Left Barrier */
-    curSurfType = 0x10;
+    curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -2330,7 +2330,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 continue;
             }
             
-            curSurfType = curBarrier->style == TR_FENCE ? 0x30 : 0x10;
+            curSurfType = curBarrier->style == TR_FENCE ? Ac3d::Surface::PolygonDoubleSidedSmooth : Ac3d::Surface::PolygonSingleSidedSmooth;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 
             if (!curTexLink)
@@ -2657,7 +2657,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
     if (!bump)
     {
-        curSurfType = 0x10;
+        curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
 
         /* Turn Marks */
         for (i = 0, seg = Track->seg->next; i < Track->nseg; i++, seg = seg->next)
@@ -2735,7 +2735,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         /* Start Bridge */
         if (bridge)
         {
-            curSurfType = 0x10;
+            curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
             CHECKDISPLIST2("pylon1", 4, "S0Bg", 0);
 #define BR_HEIGHT_1 8.0
 #define BR_HEIGHT_2 6.0
@@ -2918,7 +2918,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
         pits = &(Track->pits);
         initPits(Track, TrackHandle, pits);
-        curSurfType = 0x30; // this must be 2 sided
+        curSurfType = Ac3d::Surface::PolygonDoubleSidedSmooth; // this must be 2 sided
 
         switch (pits->type)
         {
@@ -3057,7 +3057,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     return 0;
 } // InitScene
 
-static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name, int surfType)
+static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name, Ac3d::Surface::SURF surfType)
 {
     Ac3d::Object object;
     object.type = "poly";

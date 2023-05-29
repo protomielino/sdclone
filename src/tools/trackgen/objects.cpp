@@ -98,12 +98,17 @@ InitObjects(tTrack *track, void *TrackHandle)
 
         if (!objName)
         {
-            GfOut("Missing %s in section %s/%s", TRK_ATT_OBJECT, TRK_SECT_OBJECTS, GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS));
+            GfError("Missing %s in section %s/%s", TRK_ATT_OBJECT, TRK_SECT_OBJECTS, GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS));
             exit(1);
         }
 
         char filename[1024];
-        GetFilename(objName, modelPath.c_str(), filename, sizeof(filename));
+        if (!GetFilename(objName, modelPath.c_str(), filename, sizeof(filename)))
+        {
+            GfError("Couldn't find object %s in %s\n", objName, modelPath.c_str());
+            GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
+            continue;
+        }
         curObj->fileName = filename;
 
         try
@@ -115,8 +120,9 @@ InitObjects(tTrack *track, void *TrackHandle)
         }
         catch (const Ac3d::Exception &e)
         {
-            GfOut("Reading object %s: %s\n", curObj->fileName.c_str(), e.what());
-            exit(1);
+            GfError("Reading object %s: %s\n", curObj->fileName.c_str(), e.what());
+            GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
+            continue;
         }
 
         const std::string scaleType = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_SCALE_TYPE, "");

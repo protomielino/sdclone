@@ -120,13 +120,39 @@ struct Ac3d
             Ref(int index, double u, double v) : index(index), coord{ u, v } { }
         };
 
-        int                 surf = 0;
+        enum SURF : int { 
+            Polygon                     = 0x00,
+            ClosedLine                  = 0x01,
+            OpenLine                    = 0x02,
+            TypeMask                    = 0x0f,
+            SingleSided                 = 0x00,
+            DoubleSided                 = 0x20,
+            Flat                        = 0x00,
+            Smooth                      = 0x10,
+            PolygonSingleSidedFlat      = Polygon    | SingleSided | Flat,      // 0x00
+            ClosedLineSingleSidedFlat   = ClosedLine | SingleSided | Flat,      // 0x01
+            OpenLineSingleSidedFlat     = OpenLine   | SingleSided | Flat,      // 0x02
+            PolygonSingleSidedSmooth    = Polygon    | SingleSided | Smooth,    // 0x10
+            ClosedLineSingleSidedSmooth = ClosedLine | SingleSided | Smooth,    // 0x11
+            OpenLineSingleSidedSmooth   = OpenLine   | SingleSided | Smooth,    // 0x12
+            PolygonDoubleSidedFlat      = Polygon    | DoubleSided | Flat,      // 0x20
+            ClosedLineDoubleSidedFlat   = ClosedLine | DoubleSided | Flat,      // 0x21
+            OpenLineDoubleSidedFlat     = OpenLine   | DoubleSided | Flat,      // 0x22
+            PolygonDoubleSidedSmooth    = Polygon    | DoubleSided | Smooth,    // 0x30
+            ClosedLineDoubleSidedSmooth = ClosedLine | DoubleSided | Smooth,    // 0x31
+            OpenLineDoubleSidedSmooth   = OpenLine   | DoubleSided | Smooth,    // 0x32
+        };
+        SURF                surf = PolygonSingleSidedFlat;
         int                 mat = 0;
         std::vector<Ref>    refs;
 
         Surface() = default;
         explicit Surface(std::ifstream &fin);
         void write(std::ofstream &fout) const;
+        bool isPolygon() const
+        {
+            return (surf & TypeMask) == Polygon;
+        }
     };
 
     class v2 : public std::array<double, 2>
