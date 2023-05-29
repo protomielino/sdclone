@@ -677,7 +677,7 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
         else
             fout << "name " << name << std::endl;
     }
-    if (!data.empty())
+    if (all && !data.empty())
     {
         fout << "data " << data.length() << std::endl;
         fout << data << std::endl;

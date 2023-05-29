@@ -563,7 +563,9 @@ static int do_data     ( char *s )
 
   current_data [ len ] = '\0' ;
 
-  FGETC ( loader_fd ) ;  /* Final RETURN */
+  char c = FGETC ( loader_fd ) ;  /* Final RETURN */
+  if (c == '\r') /* check for windows line ending */
+      c = FGETC(loader_fd);
 
   ssgBranch *br = current_options->createBranch ( current_data ) ;
 
