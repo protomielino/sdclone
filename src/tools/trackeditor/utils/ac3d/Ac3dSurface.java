@@ -39,6 +39,7 @@ public class Ac3dSurface
 	public static final int SIDED_ONE					= 0x00;
 	public static final int SIDED_TWO					= 0x20;
 
+	private int			linenum							= 0;
 	private Integer 	surf;
 	private Integer 	mat;
 	private Vector<Ref>	refs = new Vector<Ref>();
@@ -222,5 +223,15 @@ public class Ac3dSurface
 	public void addRef(int index, double i, double j)
 	{
 		refs.add(new Ref(index, i, j));
+	}
+
+	public int getLinenum()
+	{
+		return linenum;
+	}
+
+	public void setLinenum(int linenum)
+	{
+		this.linenum = linenum;
 	}
 }

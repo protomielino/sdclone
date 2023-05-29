@@ -191,6 +191,7 @@ public class Ac3d
 						else if (tokens[0].equals("SURF"))
 						{
 							surface.setSurf(Integer.decode(tokens[1]));
+							surface.setLinenum(linenum);
 						}
 						else if (tokens[0].equals("mat"))
 						{
@@ -228,7 +229,7 @@ public class Ac3d
 				{
 					while (readLine())
 					{
-						if (tokens.length == 0)
+						if (tokens.length == 0 || (tokens.length == 1 && tokens[0].isBlank()))
 						{
 							continue;
 						}

@@ -736,7 +736,72 @@ public class CheckDialog extends JDialog
 		{
 			e.printStackTrace();
 		}
+		
+		Ac3d ac3dFile = new Ac3d();
+
+		try
+		{
+			ac3dFile.read(file);
+
+			Ac3dObject root = ac3dFile.getRoot();
+
+			if (root != null && "world".equals(root.getType()))
+			{
+				for (int i = 0; i < root.getKids().size(); i++)
+				{
+					checkKid(file, root.getKids().get(i));
+				}
+			}
+		}
+		catch (Ac3dException e)
+		{
+			textArea.append("Object file " + file.toString() + " line " + e.getLineNumber() + " : " + e.getLocalizedMessage() + "\n");
+		}
+		catch (Exception e)
+		{
+			textArea.append("Object file " + file.toString() + " : " + e.getLocalizedMessage() + "\n");
+		}		
 	}
+
+	public void checkKid(File file, Ac3dObject object)
+	{
+		if ("poly".equals(object.getType()))
+		{
+			Set<Integer> types = new HashSet<Integer>();
+			Set<Integer> mats = new HashSet<Integer>();
+			
+			for (int i = 0; i < object.getSurfaces().size(); i++)
+			{
+				Ac3dSurface	surface = object.getSurfaces().get(i);
+
+				if (surface.getRefs().size() != 3)
+				{
+					textArea.append("Object file " + file.toString() + " line " + surface.getLinenum() + " : surface with " +  surface.getRefs().size() + " vertices\n");																				
+				}
+				
+				types.add(surface.getSurf());
+				mats.add(surface.getMat());
+			}
+			
+			if (types.size() > 1)
+			{
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " surface types\n");																							
+			}
+			
+			if (mats.size() > 1)
+			{
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " materials\n");																							
+			}
+		}
+		else
+		{
+			for (int i = 0; i < object.getKids().size(); i++)
+			{
+				checkKid(file, object.getKids().get(i));
+			}
+		}
+	}
+
 	private void checkTexture(String description, String texture)
 	{
 		Vector<String> messages = new Vector<String>();
