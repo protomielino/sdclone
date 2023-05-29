@@ -790,7 +790,7 @@ public class CheckDialog extends JDialog
 			
 			if (mats.size() > 1)
 			{
-				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " materials\n");																							
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + mats.size() + " materials\n");																							
 			}
 		}
 		else
