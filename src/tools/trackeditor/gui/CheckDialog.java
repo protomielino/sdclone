@@ -152,7 +152,25 @@ public class CheckDialog extends JDialog
 		for (int i = 0; i < segments.size(); i++)
 		{
 			Segment segment = segments.get(i);
-
+			
+			if ("plan".equals(segment.getValidLeftBorderStyle(editorFrame)))
+			{
+				double height = segment.getValidLeftBorderHeight(editorFrame);
+				if (height != 0)
+				{
+					textArea.append("Segment " + segment.getName() + " Left border style is plan with " + height + " height (set border style to curb or wall or don't set a height)\n");
+				}
+			}
+			
+			if ("plan".equals(segment.getValidRightBorderStyle(editorFrame)))
+			{
+				double height = segment.getValidRightBorderHeight(editorFrame);
+				if (height != 0)
+				{
+					textArea.append("Segment " + segment.getName() + " Right border style is plan with " + height + " height (set border style to curb or wall or don't set a height)\n");
+				}
+			}
+			
 			if ("fence".equals(segment.getValidLeftBarrierStyle(editorFrame)))
 			{
 				double width = segment.getValidLeftBarrierWidth(editorFrame);
