@@ -160,8 +160,7 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append("Segment " + segment.getName() + " Left border style is plan with " + height + " height (set border style to curb or wall or don't set a height)\n");
 				}
-			}
-			
+			}			
 			if ("plan".equals(segment.getValidRightBorderStyle(editorFrame)))
 			{
 				double height = segment.getValidRightBorderHeight(editorFrame);
@@ -188,6 +187,56 @@ public class CheckDialog extends JDialog
 				}
 			}
 		}
+		
+		for (int i = 1; i < segments.size(); i++)
+		{
+			Segment segment = segments.get(i);
+			Segment previousSegment = segments.get(i - 1);
+			
+			String style = segment.getValidLeftBorderStyle(editorFrame);
+			String previousStyle = previousSegment.getValidLeftBorderStyle(editorFrame);
+			
+			if (!style.equals(previousStyle))
+			{
+				if (Double.isNaN(segment.getLeft().getBorderHeight()))
+				{
+					textArea.append("Segment " + segment.getName() + " Left border style changed from " + previousStyle + " to " + style + " but new height not set\n");					
+				}
+			}
+			
+			style = segment.getValidRightBorderStyle(editorFrame);
+			previousStyle = previousSegment.getValidRightBorderStyle(editorFrame);
+			
+			if (!style.equals(previousStyle))
+			{
+				if (Double.isNaN(segment.getRight().getBorderHeight()))
+				{
+					textArea.append("Segment " + segment.getName() + " Right border style changed from " + previousStyle + " to " + style + " but new height not set\n");					
+				}
+			}
+			
+			style = segment.getValidLeftBarrierStyle(editorFrame);
+			previousStyle = previousSegment.getValidLeftBarrierStyle(editorFrame);
+			
+			if (!style.equals(previousStyle))
+			{
+				if (Double.isNaN(segment.getLeft().getBarrierWidth()))
+				{
+					textArea.append("Segment " + segment.getName() + " Left barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");					
+				}
+			}
+			
+			style = segment.getValidRightBarrierStyle(editorFrame);
+			previousStyle = previousSegment.getValidRightBarrierStyle(editorFrame);
+			
+			if (!style.equals(previousStyle))
+			{
+				if (Double.isNaN(segment.getRight().getBarrierWidth()))
+				{
+					textArea.append("Segment " + segment.getName() + " Right barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");					
+				}
+			}
+		}		
 	}
 	
 	public void checkHeader()
