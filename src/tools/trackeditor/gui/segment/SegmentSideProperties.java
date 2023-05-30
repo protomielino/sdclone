@@ -318,6 +318,40 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					if (style == "none")
 						style = "";
 					side.setBorderStyle(style);
+
+					switch (borderStyleComboBox.getSelectedItem().toString())
+					{
+					case "none":
+						getBorderSurfaceComboBox().setEnabled(false);
+						getBorderSurfaceComboBox().setSelectedIndex(-1);
+						getBorderHeightSlider().setEnabled(false);
+						getBorderWidthSlider().setEnabled(false);
+						break;
+					case "plan":
+						getBorderSurfaceComboBox().setEnabled(true);
+						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+						getBorderHeightSlider().setEnabled(false);
+						getBorderHeightSlider().setValue(Double.NaN);
+						getBorderWidthSlider().setEnabled(true);
+						getBorderWidthSlider().setValue(side.getBorderWidth());
+						break;
+					case "wall":
+						getBorderSurfaceComboBox().setEnabled(true);
+						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+						getBorderHeightSlider().setEnabled(true);
+						getBorderHeightSlider().setValue(side.getBorderHeight());
+						getBorderWidthSlider().setEnabled(true);
+						getBorderWidthSlider().setValue(side.getBorderWidth());
+						break;
+					case "curb":
+						getBorderSurfaceComboBox().setEnabled(true);
+						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+						getBorderHeightSlider().setEnabled(true);
+						getBorderHeightSlider().setValue(side.getBorderHeight());
+						getBorderWidthSlider().setEnabled(true);
+						getBorderWidthSlider().setValue(side.getBorderWidth());
+						break;
+					}
 				}
 			});
 		}
@@ -413,6 +447,38 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					if (style == "none")
 						style = "";
 					side.setBarrierStyle(style);
+
+					switch (barrierStyleComboBox.getSelectedItem().toString())
+					{
+					case "none":
+						getBarrierSurfaceComboBox().setEnabled(false);
+						getBarrierSurfaceComboBox().setSelectedIndex(-1);
+						getBarrierHeightSlider().setEnabled(false);
+						getBarrierWidthSlider().setEnabled(false);
+						break;
+					case "no barrier":
+						getBarrierSurfaceComboBox().setEnabled(false);
+						getBarrierSurfaceComboBox().setSelectedIndex(-1);
+						getBarrierHeightSlider().setEnabled(false);
+						getBarrierWidthSlider().setEnabled(false);
+						break;
+					case "wall":
+						getBarrierSurfaceComboBox().setEnabled(true);
+						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+						getBarrierHeightSlider().setEnabled(true);
+						getBarrierHeightSlider().setValue(side.getBarrierHeight());
+						getBarrierWidthSlider().setEnabled(true);
+						getBarrierWidthSlider().setValue(side.getBarrierWidth());
+						break;
+					case "fence":
+						getBarrierSurfaceComboBox().setEnabled(true);
+						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+						getBarrierHeightSlider().setEnabled(true);
+						getBarrierHeightSlider().setValue(side.getBarrierHeight());
+						getBarrierWidthSlider().setEnabled(false);
+						getBarrierWidthSlider().setValue(Double.NaN);
+						break;
+					}
 				}
 			});
 		}
