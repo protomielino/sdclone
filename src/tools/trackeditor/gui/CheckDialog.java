@@ -186,6 +186,17 @@ public class CheckDialog extends JDialog
 					textArea.append("Segment " + segment.getName() + " Right barrier style is fence with " + width + " width (set barrier style to wall or don't set a width)\n");
 				}
 			}
+			
+			String style = segment.getValidLeftBarrierStyle(editorFrame);
+			if ("curb".equals(style) || "plan".equals(style))
+			{
+				textArea.append("Segment " + segment.getName() + " Left barrier invalid style " + style + "\n");
+			}
+			style = segment.getValidRightBarrierStyle(editorFrame);
+			if ("curb".equals(style) || "plan".equals(style))
+			{
+				textArea.append("Segment " + segment.getName() + " Right barrier invalid style " + style + "\n");
+			}
 		}
 		
 		for (int i = 1; i < segments.size(); i++)
