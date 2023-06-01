@@ -111,6 +111,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	private SegmentSlider		barrierWidthSlider		= null;
 	private SegmentSlider		borderHeightSlider		= null;
 
+	private boolean				setSource				= false;
+
 	/**
 	 *
 	 */
@@ -322,35 +324,103 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					switch (borderStyleComboBox.getSelectedItem().toString())
 					{
 					case "none":
-						getBorderSurfaceComboBox().setEnabled(false);
 						getBorderSurfaceComboBox().setSelectedIndex(-1);
+						getBorderSurfaceComboBox().setEnabled(false);
+
+						if (!setSource)
+						{
+							side.setBorderHeight(Double.NaN);
+						}
+						getBorderHeightSlider().setValue(side.getBorderHeight());
 						getBorderHeightSlider().setEnabled(false);
+
+						if (!setSource)
+						{
+							side.setBorderWidth(Double.NaN);
+						}
+						getBorderWidthSlider().setValue(side.getBorderWidth());
 						getBorderWidthSlider().setEnabled(false);
 						break;
 					case "plan":
 						getBorderSurfaceComboBox().setEnabled(true);
+						if (!setSource)
+						{
+							if (side.isRight())
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_RIGHT_SURFACE);
+							}
+							else
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
+							}
+						}
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+
+						if (!setSource)
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
+						getBorderHeightSlider().setValue(side.getBorderHeight());
 						getBorderHeightSlider().setEnabled(false);
-						getBorderHeightSlider().setValue(Double.NaN);
+
 						getBorderWidthSlider().setEnabled(true);
+						side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
 						getBorderWidthSlider().setValue(side.getBorderWidth());
 						break;
 					case "wall":
 						getBorderSurfaceComboBox().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
+						}
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+
 						getBorderHeightSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
+						}
 						getBorderHeightSlider().setValue(side.getBorderHeight());
+
 						getBorderWidthSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
+						}
 						getBorderWidthSlider().setValue(side.getBorderWidth());
 						break;
 					case "curb":
 						getBorderSurfaceComboBox().setEnabled(true);
+						if (!setSource)
+						{
+							if (side.isRight())
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE);
+							}
+							else
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
+							}
+						}
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
+
 						getBorderHeightSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
+						}
 						getBorderHeightSlider().setValue(side.getBorderHeight());
+
 						getBorderWidthSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
+						}
 						getBorderWidthSlider().setValue(side.getBorderWidth());
 						break;
+					}
+
+					if (!setSource)
+					{
+						parent.sideChanged();
 					}
 				}
 			});
@@ -451,33 +521,73 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					switch (barrierStyleComboBox.getSelectedItem().toString())
 					{
 					case "none":
-						getBarrierSurfaceComboBox().setEnabled(false);
-						getBarrierSurfaceComboBox().setSelectedIndex(-1);
-						getBarrierHeightSlider().setEnabled(false);
-						getBarrierWidthSlider().setEnabled(false);
-						break;
 					case "no barrier":
-						getBarrierSurfaceComboBox().setEnabled(false);
 						getBarrierSurfaceComboBox().setSelectedIndex(-1);
+						getBarrierSurfaceComboBox().setEnabled(false);
+
+						if (!setSource)
+						{
+							side.setBarrierHeight(Double.NaN);
+						}
+						getBarrierHeightSlider().setValue(side.getBarrierHeight());
 						getBarrierHeightSlider().setEnabled(false);
+
+						if (!setSource)
+						{
+							side.setBarrierWidth(Double.NaN);
+						}
+						getBarrierWidthSlider().setValue(side.getBarrierWidth());
 						getBarrierWidthSlider().setEnabled(false);
 						break;
 					case "wall":
 						getBarrierSurfaceComboBox().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
+						}
 						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+
 						getBarrierHeightSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
+						}
 						getBarrierHeightSlider().setValue(side.getBarrierHeight());
+
 						getBarrierWidthSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
+						}
 						getBarrierWidthSlider().setValue(side.getBarrierWidth());
 						break;
 					case "fence":
 						getBarrierSurfaceComboBox().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+						}
 						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+
 						getBarrierHeightSlider().setEnabled(true);
+						if (!setSource)
+						{
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+						}
 						getBarrierHeightSlider().setValue(side.getBarrierHeight());
+
+						if (!setSource)
+						{
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+						}
+						getBarrierWidthSlider().setValue(side.getBarrierWidth());
 						getBarrierWidthSlider().setEnabled(false);
-						getBarrierWidthSlider().setValue(Double.NaN);
 						break;
+					}
+
+					if (!setSource)
+					{
+						parent.sideChanged();
 					}
 				}
 			});
@@ -683,6 +793,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 	public void setSide(SegmentSide side)
 	{
+		setSource = true;
+
 		this.side = side;
 
 		// update side
@@ -738,6 +850,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 		this.validate();
 		this.repaint();
+
+		setSource = false;
 	}
 
 	/*

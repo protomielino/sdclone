@@ -336,6 +336,48 @@ public class TrackProperties extends PropertyPanel
 			
 			add(getBarrierSurfaceComboBox(), null);
 			add(getBarrierStyleComboBox(), null);
+
+			switch (side.getBorderStyle())
+			{
+			case "none":
+				borderWidthTextField.setEnabled(false);
+				borderHeightTextField.setEnabled(false);
+				borderSurfaceComboBox.setEnabled(false);
+				break;
+			case "plan":
+				borderWidthTextField.setEnabled(true);
+				borderHeightTextField.setEnabled(false);
+				borderSurfaceComboBox.setEnabled(true);
+				break;
+			case "wall":
+				borderWidthTextField.setEnabled(true);
+				borderHeightTextField.setEnabled(true);
+				borderSurfaceComboBox.setEnabled(true);
+				break;
+			case "curb":
+				borderWidthTextField.setEnabled(true);
+				borderHeightTextField.setEnabled(true);
+				borderSurfaceComboBox.setEnabled(true);
+				break;
+			}
+			switch (barrierStyleComboBox.getSelectedItem().toString())
+			{
+			case "none":
+				barrierWidthTextField.setEnabled(false);
+				barrierHeightTextField.setEnabled(false);
+				barrierSurfaceComboBox.setEnabled(false);
+				break;
+			case "fence":
+				barrierWidthTextField.setEnabled(false);
+				barrierHeightTextField.setEnabled(true);
+				barrierSurfaceComboBox.setEnabled(true);
+				break;
+			case "wall":
+				barrierWidthTextField.setEnabled(true);
+				barrierHeightTextField.setEnabled(true);
+				barrierSurfaceComboBox.setEnabled(true);
+				break;
+			}
 		}
 		
 		/**

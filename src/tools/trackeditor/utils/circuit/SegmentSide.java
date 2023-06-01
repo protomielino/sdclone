@@ -47,17 +47,14 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_BORDER_PLAN_WIDTH			= 0.5;
 	public static final double	DEFAULT_BORDER_CURB_WIDTH			= 0.5;
 	public static final double	DEFAULT_BORDER_WALL_WIDTH			= 0.25;
-
 	public static final double	DEFAULT_BORDER_PLAN_HEIGHT			= Double.NaN;
 	public static final double	DEFAULT_BORDER_CURB_HEIGHT			= 0.05;
 	public static final double	DEFAULT_BORDER_WALL_HEIGHT			= 1.0;
-
 	public static final String	DEFAULT_BORDER_PLAN_LEFT_SURFACE	= "curb-l";
 	public static final String	DEFAULT_BORDER_PLAN_RIGHT_SURFACE	= "curb-r";
 	public static final String	DEFAULT_BORDER_CURB_LEFT_SURFACE	= "curb-5cm-l";
 	public static final String	DEFAULT_BORDER_CURB_RIGHT_SURFACE	= "curb-5cm-r";
 	public static final String	DEFAULT_BORDER_WALL_SURFACE			= "concrete";
-
 	public static final String	DEFAULT_BORDER_STYLE				= "curb";
 	
 	public static final String	DEFAULT_PIT_ENTRY_SURFACE			= "asphalt";
@@ -219,10 +216,10 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setBarrierHeight(double barrierHeight)
 	{
+		this.barrierHeight = barrierHeight;
+		barrierHeightChanged();
 		if (!Double.isNaN(barrierHeight))
 		{
-			this.barrierHeight = barrierHeight;
-			barrierHeightChanged();
 			hasBarrier = true;
 		}
 	}
@@ -321,10 +318,10 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setBarrierWidth(double barrierWidth)
 	{
+		this.barrierWidth = barrierWidth;
+		barrierWidthChanged();
 		if (!Double.isNaN(barrierWidth))
 		{
-			this.barrierWidth = barrierWidth;
-			barrierWidthChanged();
 			hasBarrier = true;
 		}
 	}
@@ -373,10 +370,10 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setBorderHeight(double borderHeight)
 	{
+		this.borderHeight = borderHeight;
+		borderHeightChanged();
 		if (!Double.isNaN(borderHeight))
 		{
-			this.borderHeight = borderHeight;
-			borderHeightChanged();
 			hasBorder = true;
 		}
 	}
@@ -475,10 +472,10 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setBorderWidth(double borderWidth)
 	{
+		this.borderWidth = borderWidth;
+		borderWidthChanged();
 		if (!Double.isNaN(borderWidth))
 		{
-			this.borderWidth = borderWidth;
-			borderWidthChanged();
 			hasBorder = true;
 		}
 	}

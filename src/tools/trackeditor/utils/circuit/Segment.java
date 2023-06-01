@@ -854,7 +854,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -896,7 +896,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -938,7 +938,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -980,7 +980,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -1022,7 +1022,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		value = null;
         		break;
         	}
     	}
@@ -1064,7 +1064,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		value = null;
         		break;
         	}
     	}
@@ -1167,7 +1167,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_WIDTH;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -1212,7 +1212,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_WIDTH;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -1257,7 +1257,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_HEIGHT;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -1302,7 +1302,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_HEIGHT;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		value = Double.NaN;
         		break;
         	}
     	}
@@ -1347,7 +1347,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_SURFACE;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE;
+        		value = null;
         		break;
         	}
     	}
@@ -1392,7 +1392,7 @@ public class Segment implements Cloneable
         		value = SegmentSide.DEFAULT_BORDER_WALL_SURFACE;
         		break;
         	default:
-        		value = SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE;
+        		value = null;
         		break;
         	}
     	}
