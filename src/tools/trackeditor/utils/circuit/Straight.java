@@ -66,14 +66,16 @@ public class Straight extends Segment
 		double leftSideEndWidth = getValidLeftSideEndWidth(editorFrame);
 		double rightSideStartWidth = getValidRightSideStartWidth(editorFrame);
 		double rightSideEndWidth = getValidRightSideEndWidth(editorFrame);
+		double leftBarrierWidth = getValidLeftBarrierWidth(editorFrame);
+		double rightBarrierWidth = getValidRightBarrierWidth(editorFrame);
 
-		if (points == null || points.length != 4 * (5 + (showArrows > 0.0 ? 1 : 0)))
+		if (points == null || points.length != 4 * (7 + (showArrows > 0.0 ? 1 : 0)))
 		{
-			points = new Point2D.Double[4 * (5 + (showArrows > 0.0 ? 1 : 0))]; 
+			points = new Point2D.Double[4 * (7 + (showArrows > 0.0 ? 1 : 0))]; 
 			for (int i = 0; i < points.length; i++)
 				points[i] = new Point2D.Double();
 
-			trPoints = new Point2D.Double[4 * (5 + (showArrows > 0.0 ? 1 : 0))];
+			trPoints = new Point2D.Double[4 * (7 + (showArrows > 0.0 ? 1 : 0))];
 			for (int i = 0; i < trPoints.length; i++)
 				trPoints[i] = new Point2D.Double();
 		}
@@ -104,11 +106,11 @@ public class Straight extends Segment
 		points[5].x = points[4].x + cos;
 		points[5].y = points[4].y + sin;
 
-		points[7].x = currentX + cosTransLeft * trackWidth / 2;
-		points[7].y = currentY + sinTransLeft * trackWidth / 2;
+		points[7].x = points[0].x;
+		points[7].y = points[0].y;
 
-		points[6].x = points[7].x + cos;
-		points[6].y = points[7].y + sin;
+		points[6].x = points[1].x;
+		points[6].y = points[1].y;
 
 		// left side
 
@@ -118,54 +120,82 @@ public class Straight extends Segment
 		points[9].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth);
 		points[9].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth);
 
-		points[10].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth);
-		points[10].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth);
+		points[10].x = points[5].x;
+		points[10].y = points[5].y;
 
-		points[11].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth);
-		points[11].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth);
+		points[11].x = points[4].x;
+		points[11].y = points[4].y;
+		
+		// left barrier
 
+		points[12].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + leftBarrierWidth);
+		points[12].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + leftBarrierWidth);
+
+		points[13].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth + leftBarrierWidth);
+		points[13].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth + leftBarrierWidth);
+
+		points[15].x = points[8].x;
+		points[15].y = points[8].y;
+
+		points[14].x = points[9].x;
+		points[14].y = points[9].y;
+	
 		// right border
 
-		points[12].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
-		points[12].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
+		points[16].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
+		points[16].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
 
-		points[13].x = points[12].x + cos;
-		points[13].y = points[12].y + sin;
+		points[17].x = points[16].x + cos;
+		points[17].y = points[16].y + sin;
 
-		points[15].x = currentX - cosTransLeft * trackWidth / 2;
-		points[15].y = currentY - sinTransLeft * trackWidth / 2;
+		points[19].x = points[3].x;
+		points[19].y = points[3].y;
 
-		points[14].x = points[15].x + cos;
-		points[14].y = points[15].y + sin;
+		points[18].x = points[2].x;
+		points[18].y = points[2].y;
 
 		// right side
 
-		points[16].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
-		points[16].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
+		points[20].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
+		points[20].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
 
-		points[17].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
-		points[17].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
+		points[21].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
+		points[21].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
 
-		points[18].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
-		points[18].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
+		points[22].x = points[17].x;
+		points[22].y = points[17].y;
 
-		points[19].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
-		points[19].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
+		points[23].x = points[16].x;
+		points[23].y = points[16].y;
 
+		// right barrier
+
+		points[24].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + rightBarrierWidth);
+		points[24].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + rightBarrierWidth);
+
+		points[25].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth + rightBarrierWidth);
+		points[25].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth + rightBarrierWidth);
+
+		points[27].x = points[20].x;
+		points[27].y = points[20].y;
+
+		points[26].x = points[21].x;
+		points[26].y = points[21].y;
+	
 		if (showArrows > 0.0)
 		{
 			// arrow
-			points[20].x = currentX + cosTransLeft * trackWidth / 2;
-			points[20].y = currentY + sinTransLeft * trackWidth / 2;
+			points[28].x = currentX + cosTransLeft * trackWidth / 2;
+			points[28].y = currentY + sinTransLeft * trackWidth / 2;
 
-			points[21].x = points[0].x + cos - (cosTransLeft * trackWidth / 2) * 0.99999;
-			points[21].y = points[0].y + sin - (sinTransLeft * trackWidth / 2) * 0.99999;
+			points[29].x = points[0].x + cos - (cosTransLeft * trackWidth / 2) * 0.99999;
+			points[29].y = points[0].y + sin - (sinTransLeft * trackWidth / 2) * 0.99999;
 
-			points[23].x = currentX - cosTransLeft * trackWidth / 2;
-			points[23].y = currentY - sinTransLeft * trackWidth / 2;
+			points[31].x = currentX - cosTransLeft * trackWidth / 2;
+			points[31].y = currentY - sinTransLeft * trackWidth / 2;
 
-			points[22].x = points[23].x + cos + (cosTransLeft * trackWidth / 2) * 0.99999;
-			points[22].y = points[23].y + sin + (sinTransLeft * trackWidth / 2) * 0.99999;
+			points[30].x = points[23].x + cos + (cosTransLeft * trackWidth / 2) * 0.99999;
+			points[30].y = points[23].y + sin + (sinTransLeft * trackWidth / 2) * 0.99999;
 		}
 		// move track center
 		this.dx = cos;
@@ -181,7 +211,6 @@ public class Straight extends Segment
 		Editor.getProperties().setCurrentA(currentA);
 		Editor.getProperties().setCurrentX(currentX);
 		Editor.getProperties().setCurrentY(currentY);
-		
 	}
 
 	public void drag(Point2D.Double dragDelta)
