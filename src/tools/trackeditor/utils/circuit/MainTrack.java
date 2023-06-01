@@ -14,8 +14,8 @@ public class MainTrack
 	private String				profil						= null;
 	private double				profilStepsLength			= Double.NaN;
 	private Pits				pits						= new Pits();
-	private SegmentSide			left						= new SegmentSide();
-	private SegmentSide			right						= new SegmentSide();
+	private SegmentSide			left						= new SegmentSide(false);
+	private SegmentSide			right						= new SegmentSide(true);
 
 	/**
 	 * @return Returns the width.

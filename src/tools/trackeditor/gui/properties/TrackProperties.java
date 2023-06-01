@@ -74,7 +74,7 @@ public class TrackProperties extends PropertyPanel
      "barrier", "barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		roadSurfaceVector			= new Vector<String>(Arrays.asList(roadSurfaceItems));
 
-	private String[]			borderStyleItems			= {"none", "plan", "wall", "curb"};
+	private String[]			borderStyleItems			= {"none", "plan", "curb", "wall"};
 	
 	private String[]			borderSurfaceItems			=
 	{"curb-5cm-r", "curb-5cm-l", "curb-l", "tar-grass3-l",
@@ -98,7 +98,7 @@ public class TrackProperties extends PropertyPanel
 	 "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 	 "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector			= new Vector<String>(Arrays.asList(sideSurfaceItems));
-	private String[]			barrierStyleItems			= {"none", "wall", "fence"};
+	private String[]			barrierStyleItems			= {"none", "fence", "wall"};
 	private String[]			barrierSurfaceItems			=
 	{"barrier", "barrier2", "barrier-turn", "barrier-grille",
 	 "wall", "wall2", "tire-wall", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both",
@@ -443,6 +443,84 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBorderStyle(style);
+
+						switch (borderStyleComboBox.getSelectedItem().toString())
+						{
+						case "none":
+							side.setBorderWidth(Double.NaN);
+							borderWidthTextField.setText(null);
+							borderWidthTextField.setEnabled(false);
+
+							side.setBorderHeight(Double.NaN);
+							borderHeightTextField.setText(null);
+							borderHeightTextField.setEnabled(false);
+
+							side.setBorderSurface(null);
+							borderSurfaceComboBox.setSelectedIndex(-1);
+							borderSurfaceComboBox.setEnabled(false);
+
+							side.setHasBorder(false);
+							break;
+						case "plan":
+							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
+							borderWidthTextField.setEnabled(true);
+
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
+							borderHeightTextField.setText(null);
+							borderHeightTextField.setEnabled(false);
+
+							if (side.isRight())
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_RIGHT_SURFACE);
+							}
+							else
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
+							}
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
+							borderSurfaceComboBox.setEnabled(true);
+
+							side.setHasBorder(true);
+							break;
+						case "wall":
+							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
+							borderWidthTextField.setEnabled(true);
+
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
+							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
+							borderHeightTextField.setEnabled(true);
+
+							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
+							borderSurfaceComboBox.setEnabled(true);
+
+							side.setHasBorder(true);
+							break;
+						case "curb":
+							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
+							borderWidthTextField.setEnabled(true);
+
+							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
+							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
+							borderHeightTextField.setEnabled(true);
+
+							if (side.isRight())
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE);
+							}
+							else
+							{
+								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
+							}
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
+							borderSurfaceComboBox.setEnabled(true);
+
+							side.setHasBorder(true);
+							break;
+						}
 					}
 				});
 			}
@@ -498,6 +576,55 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBarrierStyle(style);
+
+						switch (barrierStyleComboBox.getSelectedItem().toString())
+						{
+						case "none":
+							side.setBarrierWidth(Double.NaN);
+							barrierWidthTextField.setText(null);
+							barrierWidthTextField.setEnabled(false);
+
+							side.setBarrierHeight(Double.NaN);
+							barrierHeightTextField.setText(null);
+							barrierHeightTextField.setEnabled(false);
+
+							side.setBarrierSurface(null);
+							barrierSurfaceComboBox.setSelectedIndex(-1);
+							barrierSurfaceComboBox.setEnabled(false);
+
+							side.setHasBarrier(false);
+							break;
+						case "fence":
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+							barrierWidthTextField.setText(null);
+							barrierWidthTextField.setEnabled(false);
+
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
+							barrierHeightTextField.setEnabled(true);
+
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
+							barrierSurfaceComboBox.setEnabled(true);
+
+							side.setHasBarrier(true);
+							break;
+						case "wall":
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
+							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
+							barrierWidthTextField.setEnabled(true);
+
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
+							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
+							barrierHeightTextField.setEnabled(true);
+
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
+							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
+							barrierSurfaceComboBox.setEnabled(true);
+
+							side.setHasBarrier(true);
+							break;
+						}
 					}
 				});
 			}

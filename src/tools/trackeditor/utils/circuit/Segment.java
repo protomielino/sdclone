@@ -49,8 +49,8 @@ public class Segment implements Cloneable
 	protected String		name					= "";
 	protected String		comment					= null;
 
-	protected SegmentSide	left					= new SegmentSide();
-	protected SegmentSide	right					= new SegmentSide();
+	protected SegmentSide	left					= new SegmentSide(false);
+	protected SegmentSide	right					= new SegmentSide(true);
 	//	 type
 	protected String		type;
 	protected int			count;
@@ -843,7 +843,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierWidth();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BARRIER_WIDTH;
+        	String style = getValidLeftBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		break;
+        	}
     	}
 
         return value;
@@ -872,7 +885,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierWidth();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BARRIER_WIDTH;
+        	String style = getValidRightBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_WIDTH;
+        		break;
+        	}
     	}
 
         return value;
@@ -901,7 +927,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierHeight();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BARRIER_HEIGHT;
+        	String style = getValidLeftBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		break;
+        	}
     	}
 
         return value;
@@ -930,7 +969,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierHeight();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BARRIER_HEIGHT;
+        	String style = getValidRightBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT;
+        		break;
+        	}
     	}
 
         return value;
@@ -959,7 +1011,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierSurface();
         if (value == null || value.isEmpty())
     	{
-            value = SegmentSide.DEFAULT_BARRIER_SURFACE;
+        	String style = getValidLeftBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		break;
+        	}
     	}
 
         return value;
@@ -988,7 +1053,20 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierSurface();
         if (value == null || value.isEmpty())
     	{
-            value = SegmentSide.DEFAULT_BARRIER_SURFACE;
+        	String style = getValidRightBarrierStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "fence":
+        		value = SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BARRIER_WALL_SURFACE;
+        		break;
+        	}
     	}
 
         return value;
@@ -1075,7 +1153,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderWidth();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BORDER_WIDTH;
+        	String style = getValidLeftBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_WIDTH;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_WIDTH;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		break;
+        	}
     	}
 
         return value;
@@ -1104,7 +1198,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBorderWidth();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BORDER_WIDTH;
+        	String style = getValidRightBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_WIDTH;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_WIDTH;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_WIDTH;
+        		break;
+        	}
     	}
 
         return value;
@@ -1133,7 +1243,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderHeight();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BORDER_HEIGHT;
+        	String style = getValidLeftBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_HEIGHT;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		break;
+        	}
     	}
 
         return value;
@@ -1162,7 +1288,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBorderHeight();
         if (Double.isNaN(value))
     	{
-            value = SegmentSide.DEFAULT_BORDER_HEIGHT;
+        	String style = getValidRightBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_HEIGHT;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_HEIGHT;
+        		break;
+        	}
     	}
 
         return value;
@@ -1191,7 +1333,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderSurface();
         if (value == null || value.isEmpty())
     	{
-            value = SegmentSide.DEFAULT_BORDER_SURFACE;
+        	String style = getValidLeftBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_SURFACE;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE;
+        		break;
+        	}
     	}
 
         return value;
@@ -1220,7 +1378,23 @@ public class Segment implements Cloneable
         value = editorFrame.getTrackData().getMainTrack().getRight().getBorderSurface();
         if (value == null || value.isEmpty())
     	{
-            value = SegmentSide.DEFAULT_BORDER_SURFACE;
+        	String style = getValidRightBorderStyle(editorFrame);
+
+        	switch (style)
+        	{
+        	case "plan":
+        		value = SegmentSide.DEFAULT_BORDER_PLAN_RIGHT_SURFACE;
+        		break;
+        	case "curb":
+        		value = SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE;
+        		break;
+        	case "wall":
+        		value = SegmentSide.DEFAULT_BORDER_WALL_SURFACE;
+        		break;
+        	default:
+        		value = SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE;
+        		break;
+        	}
     	}
 
         return value;

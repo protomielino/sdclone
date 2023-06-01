@@ -35,13 +35,29 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_SIDE_END_WIDTH				= 4.0;
 	public static final String	DEFAULT_SIDE_SURFACE				= "grass";
 	public static final String	DEFAULT_SIDE_BANKING_TYPE			= null;
-	public static final double	DEFAULT_BARRIER_HEIGHT				= 1.0;
-	public static final double	DEFAULT_BARRIER_WIDTH				= 0.1;
-	public static final String	DEFAULT_BARRIER_SURFACE				= "barrier";
+
+	public static final double	DEFAULT_BARRIER_FENCE_HEIGHT		= 2.0;
+	public static final double	DEFAULT_BARRIER_WALL_HEIGHT			= 1.0;
+	public static final double	DEFAULT_BARRIER_FENCE_WIDTH			= Double.NaN;
+	public static final double	DEFAULT_BARRIER_WALL_WIDTH			= 0.25;
+	public static final String	DEFAULT_BARRIER_FENCE_SURFACE		= "barrier-grille";
+	public static final String	DEFAULT_BARRIER_WALL_SURFACE		= "barrier";
 	public static final String	DEFAULT_BARRIER_STYLE				= "wall";
-	public static final double	DEFAULT_BORDER_WIDTH				= 0.5;
-	public static final double	DEFAULT_BORDER_HEIGHT				= 0.05;
-	public static final String	DEFAULT_BORDER_SURFACE				= "curb-5cm-r";
+
+	public static final double	DEFAULT_BORDER_PLAN_WIDTH			= 0.5;
+	public static final double	DEFAULT_BORDER_CURB_WIDTH			= 0.5;
+	public static final double	DEFAULT_BORDER_WALL_WIDTH			= 0.25;
+
+	public static final double	DEFAULT_BORDER_PLAN_HEIGHT			= Double.NaN;
+	public static final double	DEFAULT_BORDER_CURB_HEIGHT			= 0.05;
+	public static final double	DEFAULT_BORDER_WALL_HEIGHT			= 1.0;
+
+	public static final String	DEFAULT_BORDER_PLAN_LEFT_SURFACE	= "curb-l";
+	public static final String	DEFAULT_BORDER_PLAN_RIGHT_SURFACE	= "curb-r";
+	public static final String	DEFAULT_BORDER_CURB_LEFT_SURFACE	= "curb-5cm-l";
+	public static final String	DEFAULT_BORDER_CURB_RIGHT_SURFACE	= "curb-5cm-r";
+	public static final String	DEFAULT_BORDER_WALL_SURFACE			= "concrete";
+
 	public static final String	DEFAULT_BORDER_STYLE				= "curb";
 	
 	public static final String	DEFAULT_PIT_ENTRY_SURFACE			= "asphalt";
@@ -111,12 +127,13 @@ public class SegmentSide implements Cloneable
 	private boolean				prevBorderStyleChanged		= false;
 	private boolean				thisBorderStyleChanged		= false;
 
+	private boolean				isRight;
 	/**
 	 *  
 	 */
-	public SegmentSide()
+	public SegmentSide(boolean isRight)
 	{
-
+		this.isRight = isRight;
 	}
 
 	public void set(SegmentSide side)
@@ -149,16 +166,28 @@ public class SegmentSide implements Cloneable
 		setSideSurface(DEFAULT_SIDE_SURFACE);
 
 		setHasBarrier(true);
-		setBarrierHeight(DEFAULT_BARRIER_HEIGHT);
-		setBarrierWidth(DEFAULT_BARRIER_WIDTH);
-		setBarrierSurface(DEFAULT_BARRIER_SURFACE);
+		setBarrierHeight(DEFAULT_BARRIER_WALL_HEIGHT);
+		setBarrierWidth(DEFAULT_BARRIER_WALL_WIDTH);
+		setBarrierSurface(DEFAULT_BARRIER_WALL_SURFACE);
 		setBarrierStyle(DEFAULT_BARRIER_STYLE);
 
 		setHasBorder(true);
-		setBorderWidth(DEFAULT_BORDER_WIDTH);
-		setBorderHeight(DEFAULT_BORDER_HEIGHT);
-		setBorderSurface(DEFAULT_BORDER_SURFACE);
+		setBorderWidth(DEFAULT_BORDER_CURB_WIDTH);
+		setBorderHeight(DEFAULT_BORDER_CURB_HEIGHT);
+		if (isRight)
+		{
+			setBorderSurface(DEFAULT_BORDER_CURB_RIGHT_SURFACE);
+		}
+		else
+		{
+			setBorderSurface(DEFAULT_BORDER_CURB_LEFT_SURFACE);
+		}
 		setBorderStyle(DEFAULT_BORDER_STYLE);
+	}
+
+	public boolean isRight()
+	{
+		return isRight;
 	}
 
 	/**
@@ -915,6 +944,7 @@ public class SegmentSide implements Cloneable
 			s.hasSide = this.hasSide;
 			s.hasBorder = this.hasBorder;
 			s.hasBarrier = this.hasBarrier;
+			s.isRight = this.isRight;
 			
 		} catch (CloneNotSupportedException e)
 		{
