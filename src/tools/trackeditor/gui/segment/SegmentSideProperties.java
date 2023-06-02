@@ -317,8 +317,11 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 				public void actionPerformed(ActionEvent e)
 				{
 					String oldStyle = side.getBorderStyle();
-					String style = borderStyleComboBox.getSelectedItem().toString();
-					boolean styleChanged = !oldStyle.equals(style);
+					if (oldStyle.isEmpty())
+						oldStyle = "none";
+					String newStyle = borderStyleComboBox.getSelectedItem().toString();
+					boolean styleChanged = !oldStyle.equals(newStyle);
+					String style = newStyle;
 					if (style == "none")
 						style = "";
 					side.setBorderStyle(style);
@@ -326,7 +329,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					{
 						return;
 					}
-					switch (borderStyleComboBox.getSelectedItem().toString())
+					switch (newStyle)
 					{
 					case "none":
 						side.setBorderSurface(null);
@@ -348,31 +351,19 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						{
 							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
 						}
-						if (!Double.isNaN(side.getBorderHeight()))
-						{
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
-						}
-						if (Double.isNaN(side.getBorderWidth()))
-						{
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
-						}
+						side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
+						side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
 						getBorderSurfaceComboBox().setEnabled(true);
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
-						getBorderHeightSlider().setValue(side.getBorderHeight());
-						getBorderHeightSlider().setEnabled(false);
+						getBorderHeightSlider().setEnabled(true);
+						getBorderHeightSlider().setValueFrozen(side.getBorderHeight());
 						getBorderWidthSlider().setEnabled(true);
 						getBorderWidthSlider().setValue(side.getBorderWidth());
 						break;
 					case "wall":
 						side.setBorderSurface(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
-						if (Double.isNaN(side.getBorderHeight()))
-						{
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
-						}
-						if (Double.isNaN(side.getBorderWidth()))
-						{
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
-						}
+						side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
+						side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
 						getBorderSurfaceComboBox().setEnabled(true);
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
 						getBorderHeightSlider().setEnabled(true);
@@ -389,14 +380,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						{
 							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
 						}
-						if ( Double.isNaN(side.getBorderHeight()))
-						{
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
-						}
-						if (Double.isNaN(side.getBorderWidth()))
-						{
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
-						}
+						side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
+						side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
 						getBorderSurfaceComboBox().setEnabled(true);
 						getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
 						getBorderHeightSlider().setEnabled(true);
@@ -498,17 +483,19 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 				public void actionPerformed(ActionEvent e)
 				{
 					String oldStyle = side.getBarrierStyle();
-					String style = barrierStyleComboBox.getSelectedItem().toString();
-					boolean styleChanged = !oldStyle.equals(style);
+					if (oldStyle.isEmpty())
+						oldStyle = "none";
+					String newStyle = barrierStyleComboBox.getSelectedItem().toString();
+					boolean styleChanged = !oldStyle.equals(newStyle);
+					String style = newStyle;
 					if (style == "none")
 						style = "";
 					side.setBarrierStyle(style);
 					if (setSource || !styleChanged)
 						return;
-					switch (barrierStyleComboBox.getSelectedItem().toString())
+					switch (newStyle)
 					{
 					case "none":
-					case "no barrier":
 						side.setBarrierSurface(null);
 						side.setBarrierHeight(Double.NaN);
 						side.setBarrierWidth(Double.NaN);
@@ -519,16 +506,21 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						getBarrierWidthSlider().setValue(side.getBarrierWidth());
 						getBarrierWidthSlider().setEnabled(false);
 						break;
+					case "no barrier":
+						side.setBarrierSurface(null);
+						side.setBarrierHeight(0.0);
+						side.setBarrierWidth(0.0);
+						getBarrierSurfaceComboBox().setSelectedIndex(-1);
+						getBarrierSurfaceComboBox().setEnabled(false);
+						getBarrierHeightSlider().setEnabled(true);
+						getBarrierHeightSlider().setValueFrozen(side.getBarrierHeight());
+						getBarrierWidthSlider().setEnabled(true);
+						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						break;
 					case "wall":
 						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
-						if (Double.isNaN(side.getBarrierHeight()))
-						{
-							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
-						}
-						if (Double.isNaN(side.getBarrierWidth()))
-						{
-							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
-						}
+						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
+						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
 						getBarrierSurfaceComboBox().setEnabled(true);
 						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
 						getBarrierHeightSlider().setEnabled(true);
@@ -538,20 +530,14 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						break;
 					case "fence":
 						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
-						if (Double.isNaN(side.getBarrierHeight()))
-						{
-							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
-						}
-						if (Double.isNaN(side.getBarrierWidth()))
-						{
-							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-						}
+						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
 						getBarrierSurfaceComboBox().setEnabled(true);
 						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
 						getBarrierHeightSlider().setEnabled(true);
 						getBarrierHeightSlider().setValue(side.getBarrierHeight());
-						getBarrierWidthSlider().setValue(side.getBarrierWidth());
-						getBarrierWidthSlider().setEnabled(false);
+						getBarrierWidthSlider().setEnabled(true);
+						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
 						break;
 					}
 					parent.sideChanged();
@@ -806,14 +792,14 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		else
 			this.getBarrierSurfaceComboBox().setSelectedIndex(-1);
 		
+		this.getBarrierHeightSlider().setValue(side.getBarrierHeight());
+		this.getBarrierWidthSlider().setValue(side.getBarrierWidth());
+
 		style = side.getBarrierStyle();
 		if (style == null || style.isEmpty())
 			style = "none";
 		this.getBarrierStyleComboBox().setSelectedItem(style);
 		
-		this.getBarrierHeightSlider().setValue(side.getBarrierHeight());
-		this.getBarrierWidthSlider().setValue(side.getBarrierWidth());
-
 		this.validate();
 		this.repaint();
 

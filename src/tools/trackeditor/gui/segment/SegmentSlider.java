@@ -64,8 +64,6 @@ public class SegmentSlider extends JPanel
 	private double			value;
 	private NumberFormat	nf;
 
-	//private Segment shape;
-
 	/**
 	 *  
 	 */
@@ -377,6 +375,46 @@ public class SegmentSlider extends JPanel
 				getTextField().setEnabled(true);
 				getSlider().setValue((int) value);
 				getSlider().setEnabled(true);
+				if (this.optional)
+					checkBox.setSelected(true);
+			}
+		}
+	}
+
+	/**
+	 * @param value
+	 *            The frozen value to set.
+	 */
+	public void setValueFrozen(double val)
+	{
+		this.checkBox.setEnabled(false);
+		this.getTextField().setEnabled(false);
+		this.getSlider().setEnabled(false);
+		this.sectionLabel.setEnabled(false);
+		this.attLabel.setEnabled(false);
+
+		if (Double.isNaN(val))
+		{
+			this.value = val;
+			getTextField().setText("");
+			getSlider().setValue((int) (min * this.realToTextCoeff));
+			if (this.optional)
+				checkBox.setSelected(false);
+		}
+		else
+		{
+			this.value = val * this.realToTextCoeff;
+			if (value > getSlider().getMaximum())
+			{
+				int newMaximum = (int) Math.ceil(value);
+				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getSlider().getMaximum());
+				getSlider().setMaximum(newMaximum);
+			}
+			getTextField().setText(nf.format(value));
+			getTextField().setCaretPosition(0);
+			if (isEnabled())
+			{
+				getSlider().setValue((int) value);
 				if (this.optional)
 					checkBox.setSelected(true);
 			}

@@ -38,7 +38,7 @@ public class SegmentSide implements Cloneable
 
 	public static final double	DEFAULT_BARRIER_FENCE_HEIGHT		= 2.0;
 	public static final double	DEFAULT_BARRIER_WALL_HEIGHT			= 1.0;
-	public static final double	DEFAULT_BARRIER_FENCE_WIDTH			= Double.NaN;
+	public static final double	DEFAULT_BARRIER_FENCE_WIDTH			= 0.0;
 	public static final double	DEFAULT_BARRIER_WALL_WIDTH			= 0.25;
 	public static final String	DEFAULT_BARRIER_FENCE_SURFACE		= "barrier-grille";
 	public static final String	DEFAULT_BARRIER_WALL_SURFACE		= "barrier";
@@ -47,7 +47,7 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_BORDER_PLAN_WIDTH			= 0.5;
 	public static final double	DEFAULT_BORDER_CURB_WIDTH			= 0.5;
 	public static final double	DEFAULT_BORDER_WALL_WIDTH			= 0.25;
-	public static final double	DEFAULT_BORDER_PLAN_HEIGHT			= Double.NaN;
+	public static final double	DEFAULT_BORDER_PLAN_HEIGHT			= 0.0;
 	public static final double	DEFAULT_BORDER_CURB_HEIGHT			= 0.05;
 	public static final double	DEFAULT_BORDER_WALL_HEIGHT			= 1.0;
 	public static final String	DEFAULT_BORDER_PLAN_LEFT_SURFACE	= "curb-l";
@@ -185,6 +185,16 @@ public class SegmentSide implements Cloneable
 	public boolean isRight()
 	{
 		return isRight;
+	}
+
+	public String getName()
+	{
+		if (isRight)
+		{
+			return new String("right");
+		}
+
+		return new String("left");
 	}
 
 	/**
