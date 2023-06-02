@@ -288,6 +288,7 @@ public class TrackProperties extends PropertyPanel
 		private SurfaceComboBox		barrierSurfaceComboBox		= null;
 		private JLabel				barrierStyleLabel			= new JLabel();
 		private JComboBox<String>	barrierStyleComboBox		= null;
+		private boolean				initialized					= false;
 
 		/**
 		 *
@@ -378,6 +379,8 @@ public class TrackProperties extends PropertyPanel
 				barrierSurfaceComboBox.setEnabled(true);
 				break;
 			}
+			
+			initialized = true;
 		}
 		
 		/**
@@ -485,6 +488,9 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBorderStyle(style);
+						
+						if (!initialized)
+							return;
 
 						switch (borderStyleComboBox.getSelectedItem().toString())
 						{
@@ -498,19 +504,19 @@ public class TrackProperties extends PropertyPanel
 							borderHeightTextField.setEnabled(false);
 
 							side.setBorderSurface(null);
-							borderSurfaceComboBox.setSelectedIndex(-1);
 							borderSurfaceComboBox.setEnabled(false);
+							borderSurfaceComboBox.setSelectedIndex(-1);
 
 							side.setHasBorder(false);
 							break;
 						case "plan":
 							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 							borderWidthTextField.setEnabled(true);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 
 							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
-							borderHeightTextField.setText(null);
 							borderHeightTextField.setEnabled(false);
+							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
 
 							if (side.isRight())
 							{
@@ -520,34 +526,34 @@ public class TrackProperties extends PropertyPanel
 							{
 								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
 							}
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 							borderSurfaceComboBox.setEnabled(true);
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 
 							side.setHasBorder(true);
 							break;
 						case "wall":
 							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 							borderWidthTextField.setEnabled(true);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 
 							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
-							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
 							borderHeightTextField.setEnabled(true);
+							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
 
 							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 							borderSurfaceComboBox.setEnabled(true);
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 
 							side.setHasBorder(true);
 							break;
 						case "curb":
 							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 							borderWidthTextField.setEnabled(true);
+							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
 
 							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
-							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
 							borderHeightTextField.setEnabled(true);
+							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
 
 							if (side.isRight())
 							{
@@ -557,8 +563,8 @@ public class TrackProperties extends PropertyPanel
 							{
 								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
 							}
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 							borderSurfaceComboBox.setEnabled(true);
+							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 
 							side.setHasBorder(true);
 							break;
@@ -618,6 +624,9 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBarrierStyle(style);
+						
+						if (!initialized)
+							return;
 
 						switch (barrierStyleComboBox.getSelectedItem().toString())
 						{
@@ -638,12 +647,13 @@ public class TrackProperties extends PropertyPanel
 							break;
 						case "fence":
 							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-							barrierWidthTextField.setText(null);
+							barrierWidthTextField.setEnabled(true);
+							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
 							barrierWidthTextField.setEnabled(false);
 
 							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
-							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
 							barrierHeightTextField.setEnabled(true);
+							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
 
 							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
 							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
@@ -653,12 +663,12 @@ public class TrackProperties extends PropertyPanel
 							break;
 						case "wall":
 							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
-							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
 							barrierWidthTextField.setEnabled(true);
+							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
 
 							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
-							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
 							barrierHeightTextField.setEnabled(true);
+							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
 
 							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
 							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
