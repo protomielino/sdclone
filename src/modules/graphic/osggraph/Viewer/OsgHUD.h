@@ -150,6 +150,7 @@ class SDHUD
                                         float newY,
                                         float hudScale);
         static void changeImageAlpha(osg::Geometry *geom, float newAlpha);
+        static void changeImageTexture(osg::Geometry *geom, const std::string &newTextureUrl);
         static void changeImageVertex(osg::Geometry *geom,
                                         float angleFrom,
                                         float angleTo,

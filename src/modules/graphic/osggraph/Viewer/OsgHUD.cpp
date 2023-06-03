@@ -1096,6 +1096,20 @@ void SDHUD::changeImageAlpha(osg::Geometry *geom,
 
 }
 
+void SDHUD::changeImageTexture(osg::Geometry *geom,
+                            const std::string &newTextureUrl)
+{
+    osg::TextureRectangle* texture;
+
+    //get the texture data of this object
+    texture = dynamic_cast<osg::TextureRectangle*>(geom->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
+
+    // setup texture
+    osg::Image* myImg = osgDB::readImageFile(newTextureUrl);
+    osg::TextureRectangle* myTexture = new osg::TextureRectangle;
+    texture->setImage(myImg);
+}
+
 // TODO[END]: move this to utils? /src/modules/graphic/osggraph/Utils
 
 SDHUD::SDHUD() :
@@ -1144,7 +1158,7 @@ void SDHUD::CreateHUD(int scrH, int scrW)
 
     GfLogDebug("OSGHUD: Hud Scale is: %f\n", hudScale);
 
-	GfLogDebug("OSGHUD: Generating the HUD from the xml file.\n");
+    GfLogDebug("OSGHUD: Generating the HUD from the xml file.\n");
 
     //generate the hud from the relative xml file
     camera->addChild(generateHudFromXmlFile(scrH, scrW));
@@ -1175,10 +1189,10 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             iterator->second->clearDataPoints();
 
         lastCar = currCar;
-		carHasChanged = true;
+        carHasChanged = true;
     }else{
-		carHasChanged = false;
-	}
+        carHasChanged = false;
+    }
 
     //update all the graphs
 
@@ -2092,6 +2106,114 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         changeImageVertex(hudImgVertexElements["newtacho-rpmon"], startAngle, endOfWhiteLineAngle, rpmVal1, newtachobb.xMin(), newtachobb.yMin(), hudScale);
         changeImageVertex(hudImgVertexElements["newtacho-rpmonred"], endOfWhiteLineAngle, endAngle, rpmVal2, newtachobb.xMin(), newtachobb.yMin(), hudScale);
 
+//driverinfo
+        double deltaAhead =0.0f;
+        double deltaBehind =0.0f;
+
+        //if we are not first get the gap to the car dirctly ahead of us
+        if(currCar->_pos > 1){
+            //if he is in my same lap
+            if (firstAheadCar->_laps == currCar->_laps){
+                //get how much time it took him to reach his position from my position
+                deltaAhead = firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine] - firstAheadCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
+                deltaAhead = deltaAhead * -1;
+            }else{
+                // if he is on the next lap or many laps ahead
+                int lapsAhead = firstAheadCar->_laps - currCar->_laps;
+                //if he has not lapped me
+                if (currCar->_distFromStartLine > firstAheadCar->_distFromStartLine){
+                    deltaAhead = (lapsAhead -1) * firstAheadCar->_lastLapTime; //for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                    deltaAhead += firstAheadCar->_lastLapTime - firstAheadCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];//how much time took him to reach the startline from my position
+                    deltaAhead += firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine];//how much time took him to reach his position from the startline
+                    deltaAhead = deltaAhead * -1;
+                //he has lapped me
+                }else{
+                    deltaAhead += lapsAhead * firstAheadCar->_lastLapTime; //for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                    deltaAhead += firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine] - firstAheadCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];//how much time took him to reach his position from my position in this lap
+                    deltaAhead = deltaAhead * -1;
+                }
+            }
+        }
+
+        //if we are not first get the gap to the car dirctly behind us
+        if(currCar->_pos < s->_ncars){
+            //if he is in my same lap
+            if (firstBehindCar->_laps == currCar->_laps){
+                //get how much time it took me to reach my position from my position
+                deltaBehind = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine];
+            }else{
+                // if he is on the prev lap or many laps Behind
+                int lapsBehind = currCar->_laps - firstBehindCar->_laps;
+                //if we have not lapped him
+                if (currCar->_distFromStartLine < firstBehindCar->_distFromStartLine){
+                    deltaBehind = (lapsBehind -1) * currCar->_lastLapTime; //for simplicity we consider our last laptime (this may be totally wrong if we for example have pitted in the last lap)
+                    deltaBehind += currCar->_lastLapTime - currCar->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine];//how much time took us to reach the startline from his position
+                    deltaBehind += currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];//how much time took us to reach our position from the startline
+                    deltaBehind = deltaBehind;
+                //we have lapped him
+                }else{
+                    deltaBehind += lapsBehind * currCar->_lastLapTime; //for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                    deltaBehind += currCar->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine] - currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];//how much time took us to reach our position from his position in this lap
+                    deltaBehind = deltaBehind;
+                }
+            }
+        }
+        //get the actual name of the car
+        temp.str("");
+        void *carparam;
+        char *carName;
+        temp << "cars/models/" << currCar->_carName << "/" << currCar->_carName << ".xml";
+        carparam = GfParmReadFile(temp.str().c_str(), GFPARM_RMODE_STD);
+        carName = GfParmGetName(carparam);
+        GfParmReleaseHandle(carparam);
+
+        //update the hud strings
+        temp.str("");
+        temp << currCar->_pos;
+        hudTextElements["driverinfo-position"]->setText(temp.str());
+        hudTextElements["driverinfo-name"]->setText(currCar->_name);
+        hudTextElements["driverinfo-team"]->setText(currCar->_teamname);
+
+        hudTextElements["driverinfo-carclass"]->setText(currCar->_category);
+        hudTextElements["driverinfo-carmodel"]->setText(carName);
+
+        hudTextElements["driverinfo-bestlap"]->setText(formatLaptime(currCar->_bestLapTime,0));
+        hudTextElements["driverinfo-lastlap"]->setText(formatLaptime(currCar->_lastLapTime,0));
+
+        if( s->_ncars > 1 ){
+			temp.str("");
+			temp << "P" << firstAheadCar->_pos;
+			hudTextElements["driverinfo-posahead"]->setText(temp.str());
+			temp.str("");
+			temp << "P" << firstBehindCar->_pos;
+			hudTextElements["driverinfo-posbehind"]->setText(temp.str());
+
+			hudTextElements["driverinfo-gapahead"]->setText(formatLaptime(deltaAhead,-1));
+			hudTextElements["driverinfo-gapbehind"]->setText(formatLaptime(deltaBehind,-1));
+		}else{
+			temp.str("");
+			hudTextElements["driverinfo-posahead"]->setText(temp.str());
+			hudTextElements["driverinfo-posbehind"]->setText(temp.str());
+			hudTextElements["driverinfo-gapahead"]->setText(temp.str());
+			hudTextElements["driverinfo-gapbehind"]->setText(temp.str());
+		}
+        //special case for human drivers (since they have no tean and nation assigned (for now)
+        if(currCar->_driverType == RM_DRV_HUMAN){
+            hudTextElements["driverinfo-team"]->setText("");
+            hudImgElements["driverinfo-flag"]->setNodeMask(0);
+        }else{
+            hudImgElements["driverinfo-flag"]->setNodeMask(1);
+        }
+        //update the flag texture
+        std::string nationname = currCar->_nationname;
+        //to lowercase
+        std::transform(nationname.begin(), nationname.end(), nationname.begin(), [](unsigned char c) {
+            return std::tolower(c);
+        });
+        temp.str("");
+        temp << "data/img/flags/4x3/" << nationname.c_str() <<".svg";
+        changeImageTexture(hudImgElements["driverinfo-flag"], temp.str());
+
 //edithud
     if (hudEditModeEnabled){
         //if there is some widgetGroup selected display the edithud and relative controls around it else keep it hidden
@@ -2101,7 +2223,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             hudWidgets["edithudWidget"]->setNodeMask(0);
         }
 
-        tMouseInfo	*mouse;
+        tMouseInfo    *mouse;
         mouse = GfuiMouseInfo();
 
         //mouse started to be pressed
@@ -2330,9 +2452,9 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             {
                 recalculateImageWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
             }
-    //		else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
-    //		{
-    //		}
+    //        else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
+    //        {
+    //        }
         }
     }
 }
@@ -2362,6 +2484,7 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["rpmWidget"] =          (int)hudWidgets["rpmWidget"]->getNodeMask();
         hudElementsVisibilityStatus["trackdataWidget"] =    (int)hudWidgets["trackdataWidget"]->getNodeMask();
         hudElementsVisibilityStatus["shiftlightsWidget"] =  (int)hudWidgets["shiftlightsWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["driverinfoWidget"] =   (int)hudWidgets["driverinfoWidget"]->getNodeMask();
 
         hudWidgets["boardWidget"]->setNodeMask(0);
         hudWidgets["racepositionWidget"]->setNodeMask(0);
@@ -2369,6 +2492,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["laptimeWidget"]->setNodeMask(0);
         hudWidgets["carinfoWidget"]->setNodeMask(0);
         hudImgVertexElements["newtacho-rpmon"]->setNodeMask(0);
+        hudImgVertexElements["newtacho-rpmonred"]->setNodeMask(0);
         hudWidgets["carstatusWidget"]->setNodeMask(0);
         hudWidgets["driverinputWidget"]->setNodeMask(0);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
@@ -2384,6 +2508,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["rpmWidget"]->setNodeMask(0);
         hudWidgets["trackdataWidget"]->setNodeMask(0);
         hudWidgets["shiftlightsWidget"]->setNodeMask(0);
+        hudWidgets["driverinfoWidget"]->setNodeMask(0);
         hudElementsVisibilityStatusEnabled = false;
     }else{
         hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
@@ -2392,6 +2517,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["laptimeWidget"]->setNodeMask(hudElementsVisibilityStatus["laptimeWidget"]);
         hudWidgets["carinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["carinfoWidget"]);
         hudImgVertexElements["newtacho-rpmon"]->setNodeMask(hudElementsVisibilityStatus["newtacho-rpmon"]);
+        hudImgVertexElements["newtacho-rpmonred"]->setNodeMask(hudElementsVisibilityStatus["newtacho-rpmonred"]);
         hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
         hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
@@ -2407,6 +2533,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["rpmWidget"]->setNodeMask(hudElementsVisibilityStatus["rpmWidget"]);
         hudWidgets["trackdataWidget"]->setNodeMask(hudElementsVisibilityStatus["trackdataWidget"]);
         hudWidgets["shiftlightsWidget"]->setNodeMask(hudElementsVisibilityStatus["shiftlightsWidget"]);
+        hudWidgets["driverinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinfoWidget"]);
         hudElementsVisibilityStatusEnabled = true;
     }
 }
@@ -2603,6 +2730,9 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             float positionVerticalModifier =    GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
                             float positionHorizontalModifier =  GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
+                            float forcedImageWidth = GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 );
+                            float forcedImageHeight = GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 );
+
                             GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
 
                             //start preparing the image
@@ -2628,6 +2758,15 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //correct the image size to match the hud scale
                             float imgWidth = img->s() *  hudScale;
                             float imgHeight = img->t() * hudScale;
+                            
+                            //if we specified a different size use that
+                           // GfLogError ("OSGHUD: Forced image width %f: \n", forcedImageWidth);
+                           // GfLogError ("for %s: \n", url.c_str());
+                            if (forcedImageWidth > 0.0f){
+                                GfLogError ("OSGHUD: Force a different image size for image: %s\n", url.c_str());
+                                imgWidth = forcedImageWidth * hudScale;
+                                imgHeight = forcedImageHeight * hudScale;
+                            }
 
                             // create geometry
                             osg::Geometry* geom = new osg::Geometry;
@@ -3243,9 +3382,8 @@ void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 
 bool SDHUD::isMouseOverWidgetGroup (std::string widgetGroupName)
 {
-    tMouseInfo	*mouse;
+    tMouseInfo    *mouse;
     mouse = GfuiMouseInfo();
-//	widgetGroupName = "widgets/"+widgetGroupName;
     osg::BoundingBox targetWidgetGroupBoundingBox = getBoundigBoxFromWidgetGroupName(widgetGroupName);
 
     float mousePosX = mouse->X * hudScreenW /640;
