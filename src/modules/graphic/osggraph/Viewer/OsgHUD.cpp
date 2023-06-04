@@ -1827,6 +1827,39 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
     changeImageAlpha(hudImgElements["tire-rl-slip"], slip);
 
+//tire compound
+	temp.str("");
+//    tCarSetupItem *setupCompound = &(car->carElt->setup.tireCompound);
+//	switch((int)currCar->setup.reqTirecompound.value)
+//GfLogInfo("Compound %f\n", currCar->setup.tireCompound.value);
+//GfLogInfo("Compound2 %f\n", currCar->setup.reqTirecompound.value); //this does not work it always return 0
+	switch((int)currCar->setup.tireCompound.value)
+	{
+	case 1:
+		temp << "S"; //SOFT
+		break;
+	case 2:
+		temp << "M"; //MEDIUM
+		break;
+	case 3:
+		temp << "H"; //HARD
+		break;
+	case 4:
+		temp << "R"; //WET
+		break;
+	case 5:
+		temp << "R+"; //EXTREME WET
+		break;
+	default:
+		temp << ""; //no valid value found, leave empty
+	}
+
+	hudTextElements["tire-fl-compound"]->setText(temp.str());
+	hudTextElements["tire-fr-compound"]->setText(temp.str());
+	hudTextElements["tire-rl-compound"]->setText(temp.str());
+	hudTextElements["tire-rr-compound"]->setText(temp.str());
+
+
 //gforces
     osg::BoundingBox gforcegraphbb =hudImgElements["gforces-graph"]->getBoundingBox();
     osg::BoundingBox gforcedotbb = hudImgElements["gforces-dot"]->getBoundingBox();
@@ -2110,7 +2143,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         double deltaAhead =0.0f;
         double deltaBehind =0.0f;
 
-        //if we are not first get the gap to the car dirctly ahead of us
+        //if we are not first get the gap to the car directly ahead of us
         if(currCar->_pos > 1){
             //if he is in my same lap
             if (firstAheadCar->_laps == currCar->_laps){
@@ -2135,7 +2168,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             }
         }
 
-        //if we are not first get the gap to the car dirctly behind us
+        //if we are not last get the gap to the car directly behind us
         if(currCar->_pos < s->_ncars){
             //if he is in my same lap
             if (firstBehindCar->_laps == currCar->_laps){
@@ -2181,15 +2214,28 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         hudTextElements["driverinfo-lastlap"]->setText(formatLaptime(currCar->_lastLapTime,0));
 
         if( s->_ncars > 1 ){
-			temp.str("");
-			temp << "P" << firstAheadCar->_pos;
-			hudTextElements["driverinfo-posahead"]->setText(temp.str());
-			temp.str("");
-			temp << "P" << firstBehindCar->_pos;
-			hudTextElements["driverinfo-posbehind"]->setText(temp.str());
-
-			hudTextElements["driverinfo-gapahead"]->setText(formatLaptime(deltaAhead,-1));
-			hudTextElements["driverinfo-gapbehind"]->setText(formatLaptime(deltaBehind,-1));
+			//if we are not first
+			if(currCar->_pos > 1){
+				temp.str("");
+				temp << "P" << firstAheadCar->_pos;
+				hudTextElements["driverinfo-posahead"]->setText(temp.str());
+				hudTextElements["driverinfo-gapahead"]->setText(formatLaptime(deltaAhead,-1));
+			}else{
+				temp.str("");
+				hudTextElements["driverinfo-posahead"]->setText(temp.str());
+				hudTextElements["driverinfo-gapahead"]->setText(temp.str());
+			}
+			//if we are not last
+			if(currCar->_pos < s->_ncars){
+				temp.str("");
+				temp << "P" << firstBehindCar->_pos;
+				hudTextElements["driverinfo-posbehind"]->setText(temp.str());
+				hudTextElements["driverinfo-gapbehind"]->setText(formatLaptime(deltaBehind,-1));
+			}else{
+				temp.str("");
+				hudTextElements["driverinfo-posbehind"]->setText(temp.str());
+				hudTextElements["driverinfo-gapbehind"]->setText(temp.str());
+			}
 		}else{
 			temp.str("");
 			hudTextElements["driverinfo-posahead"]->setText(temp.str());
@@ -2197,7 +2243,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 			hudTextElements["driverinfo-gapahead"]->setText(temp.str());
 			hudTextElements["driverinfo-gapbehind"]->setText(temp.str());
 		}
-        //special case for human drivers (since they have no tean and nation assigned (for now)
+        //special case for human drivers (since they have no team and nation assigned (for now)
         if(currCar->_driverType == RM_DRV_HUMAN){
             hudTextElements["driverinfo-team"]->setText("");
             hudImgElements["driverinfo-flag"]->setNodeMask(0);
