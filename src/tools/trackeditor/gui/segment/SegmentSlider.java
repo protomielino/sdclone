@@ -56,9 +56,7 @@ public class SegmentSlider extends JPanel
 	private String			attr;
 	private double			min;
 	private double			max;
-	private double			extent;
-	private double			tickSpacing;
-	private double			realToTextCoeff;
+	private double			resolution		= Double.NaN;
 	private String			method;
 	private Object			parent;
 	private double			value;
@@ -67,11 +65,32 @@ public class SegmentSlider extends JPanel
 	/**
 	 *  
 	 */
-	public SegmentSlider()
+	public SegmentSlider(double min, double max, double resolution)
 	{
+		super();
+		this.min = min;
+		this.max = max;
+		this.resolution = resolution;
 		initialize();
 		this.parent = this.getParent();
 		new SliderLink();
+	}
+
+	public SegmentSlider(double min, double max, double resolution, double value, String section, String attr, String method, boolean optional)
+	{
+		super();
+		this.min = min;
+		this.max = max;
+		this.resolution = resolution;
+		this.value = value;
+		this.section = section;
+		this.attr = attr;
+		this.method = method;
+		this.optional = optional;
+		initialize();
+		this.parent = this.getParent();
+		new SliderLink();
+		setValue(value);
 	}
 
 	/**
@@ -104,12 +123,22 @@ public class SegmentSlider extends JPanel
 		this.add(getSlider(), null);
 	}
 
+	private void setSliderValue(double value)
+	{
+		getSlider().setValue((int) Math.round(value / resolution));
+	}
+
+	private double getSliderValue()
+	{
+		return getSlider().getValue() * resolution;
+	}
+
 	/**
 	 * This method initializes textField
 	 * 
 	 * @return javax.swing.JTextField
 	 */
-	public JTextField getTextField()
+	private JTextField getTextField()
 	{
 		if (textField == null)
 		{
@@ -137,12 +166,14 @@ public class SegmentSlider extends JPanel
 	 * 
 	 * @return javax.swing.JSlider
 	 */
-	public JSlider getSlider()
+	private JSlider getSlider()
 	{
 		if (slider == null)
 		{
 			slider = new JSlider();
 			slider.setOrientation(JSlider.VERTICAL);
+			slider.setMinimum((int) Math.floor(min / resolution));
+			slider.setMaximum((int) Math.ceil(max / resolution));
 		}
 		return slider;
 	}
@@ -210,24 +241,9 @@ public class SegmentSlider extends JPanel
 	}
 
 	/**
-	 * @return Returns the extent.
-	 */
-	public double getExtent()
-	{
-		return extent;
-	}
-	/**
-	 * @param extent
-	 *            The extent to set.
-	 */
-	public void setExtent(double extent)
-	{
-		this.extent = extent;
-	}
-	/**
 	 * @return Returns the max.
 	 */
-	public double getMax()
+	private double getMax()
 	{
 		return max;
 	}
@@ -235,15 +251,15 @@ public class SegmentSlider extends JPanel
 	 * @param max
 	 *            The max to set.
 	 */
-	public void setMax(double max)
+	private void setMax(double max)
 	{
-		getSlider().setMaximum((int)max);
+		getSlider().setMaximum((int) Math.ceil(max / resolution));
 		this.max = max;
 	}
 	/**
 	 * @return Returns the min.
 	 */
-	public double getMin()
+	private double getMin()
 	{
 		return min;
 	}
@@ -251,40 +267,10 @@ public class SegmentSlider extends JPanel
 	 * @param min
 	 *            The min to set.
 	 */
-	public void setMin(double min)
+	private void setMin(double min)
 	{
-		getSlider().setMinimum((int)min);
+		getSlider().setMinimum((int) Math.floor(min / resolution));
 		this.min = min;
-	}
-	/**
-	 * @return Returns the realToTextCoeff.
-	 */
-	public double getRealToTextCoeff()
-	{
-		return realToTextCoeff;
-	}
-	/**
-	 * @param realToTextCoeff
-	 *            The realToTextCoeff to set.
-	 */
-	public void setRealToTextCoeff(double realToTextCoeff)
-	{
-		this.realToTextCoeff = realToTextCoeff;
-	}
-	/**
-	 * @return Returns the tickSpacing.
-	 */
-	public double getTickSpacing()
-	{
-		return tickSpacing;
-	}
-	/**
-	 * @param tickSpacing
-	 *            The tickSpacing to set.
-	 */
-	public void setTickSpacing(double val)
-	{
-		this.tickSpacing = val;
 	}
 
 	public void setEnabled(boolean value)
@@ -341,7 +327,7 @@ public class SegmentSlider extends JPanel
 	 */
 	public double getValue()
 	{
-		return value / this.realToTextCoeff;
+		return value;
 	}
 	/**
 	 * @param value
@@ -349,33 +335,38 @@ public class SegmentSlider extends JPanel
 	 */
 	public void setValue(double val)
 	{
+		value = val;
 		if (Double.isNaN(val))
 		{
-			this.value = val;
 			getTextField().setText("");
 			getTextField().setEnabled(false);
-			getSlider().setValue((int) (min * this.realToTextCoeff));
+			setSliderValue(min);
 			getSlider().setEnabled(false);
-			if (this.optional)
+			if (optional)
 				checkBox.setSelected(false);
 		}
 		else
 		{
-			this.value = val * this.realToTextCoeff;
-			if (value > getSlider().getMaximum())
+			if (value > getMax())
 			{
 				int newMaximum = (int) Math.ceil(value);
-				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getSlider().getMaximum());
-				getSlider().setMaximum(newMaximum);
+				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getMax());
+				setMax(newMaximum);
+			}
+			else if (value < getMin())
+			{
+				int newMinimum = (int) Math.floor(value);
+				System.out.println("Increasing slider minimum to " + newMinimum + " was " + getMin());
+				setMax(newMinimum);
 			}
 			getTextField().setText(nf.format(value));
 			getTextField().setCaretPosition(0);
 			if (isEnabled())
 			{
 				getTextField().setEnabled(true);
-				getSlider().setValue((int) value);
+				setSliderValue(value);
 				getSlider().setEnabled(true);
-				if (this.optional)
+				if (optional)
 					checkBox.setSelected(true);
 			}
 		}
@@ -387,35 +378,40 @@ public class SegmentSlider extends JPanel
 	 */
 	public void setValueFrozen(double val)
 	{
-		this.checkBox.setEnabled(false);
-		this.getTextField().setEnabled(false);
-		this.getSlider().setEnabled(false);
-		this.sectionLabel.setEnabled(false);
-		this.attLabel.setEnabled(false);
+		value = val;
+		checkBox.setEnabled(false);
+		getTextField().setEnabled(false);
+		getSlider().setEnabled(false);
+		sectionLabel.setEnabled(false);
+		attLabel.setEnabled(false);
 
 		if (Double.isNaN(val))
 		{
-			this.value = val;
 			getTextField().setText("");
-			getSlider().setValue((int) (min * this.realToTextCoeff));
-			if (this.optional)
+			setSliderValue(min);
+			if (optional)
 				checkBox.setSelected(false);
 		}
 		else
 		{
-			this.value = val * this.realToTextCoeff;
-			if (value > getSlider().getMaximum())
+			if (value > getMax())
 			{
 				int newMaximum = (int) Math.ceil(value);
-				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getSlider().getMaximum());
-				getSlider().setMaximum(newMaximum);
+				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getMax());
+				setMax(newMaximum);
+			}
+			else if (value < getMin())
+			{
+				int newMinimum = (int) Math.floor(value);
+				System.out.println("Increasing slider minimum to " + newMinimum + " was " + getMin());
+				setMax(newMinimum);
 			}
 			getTextField().setText(nf.format(value));
 			getTextField().setCaretPosition(0);
 			if (isEnabled())
 			{
-				getSlider().setValue((int) value);
-				if (this.optional)
+				setSliderValue(value);
+				if (optional)
 					checkBox.setSelected(true);
 			}
 		}
@@ -423,8 +419,8 @@ public class SegmentSlider extends JPanel
 
 	private void setValueInternal(double val)
 	{
-		this.value = val;
-		getSlider().setValue((int) value);
+		value = val;
+		setSliderValue(value);
 		double textValue = 0;
 		if (!getTextField().getText().equals(""))
 		{
@@ -460,7 +456,7 @@ public class SegmentSlider extends JPanel
 		}
 	}
 
-	public void valueChanged()
+	private void valueChanged()
 	{
 		if (sliderListeners != null)
 		{
@@ -476,12 +472,8 @@ public class SegmentSlider extends JPanel
 	/** *** Inner class SliderLink****** */
 	class SliderLink
 	{
-		double	multCoeff;
-
 		SliderLink()
 		{
-			multCoeff = 1;// / tickSpacing;
-
 			checkBox.addChangeListener(new ChangeListener()
 			{
 				public void stateChanged(ChangeEvent e)
@@ -522,7 +514,7 @@ public class SegmentSlider extends JPanel
 					getTextField().setText(nf.format(value));
 					getTextField().setCaretPosition(0);
 					getTextField().setEnabled(true);
-					getSlider().setValue((int) value);
+					setSliderValue(value);
 					getSlider().setEnabled(true);
 					valueChanged();
 				}
@@ -534,7 +526,7 @@ public class SegmentSlider extends JPanel
 				{
 					getTextField().setText("");
 					getTextField().setEnabled(false);
-					getSlider().setValue((int) (min * realToTextCoeff));
+					setSliderValue(min);
 					getSlider().setEnabled(false);
 					valueChanged();
 				}
@@ -545,13 +537,13 @@ public class SegmentSlider extends JPanel
 		{
 			if (!getTextField().getText().equals(""))
 			{
-				double tmp1 = getSlider().getValue();
+				double tmp1 = getSliderValue();
 				try
 				{
 					double tmp2 = Double.parseDouble(getTextField().getText());
 					if (tmp1 != tmp2 && !(tmp2 >= tmp1 && tmp2 < (tmp1 + 1)))
 					{
-						setValueInternal(getSlider().getValue());
+						setValueInternal(tmp1);
 					}
 				}
 				catch (Exception e)
@@ -570,7 +562,7 @@ public class SegmentSlider extends JPanel
 			{
 				try
 				{
-					double tmp = Double.parseDouble(getTextField().getText()) * multCoeff;
+					double tmp = Double.parseDouble(getTextField().getText());
 					setValueInternal(tmp);
 				}
 				catch (Exception e)

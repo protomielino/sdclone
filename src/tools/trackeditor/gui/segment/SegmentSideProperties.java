@@ -556,17 +556,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (barrierHeightSlider == null)
 		{
-			barrierHeightSlider = new SegmentSlider();
+			barrierHeightSlider = new SegmentSlider(0, 50, 0.5, side.getBarrierHeight(), "Height", "", "BarrierHeight", true);
 			barrierHeightSlider.setBounds(52, 25, 50, 290);
-			barrierHeightSlider.setSection("Height");
-			barrierHeightSlider.setAttr("");
-			barrierHeightSlider.setMin(0);
-			barrierHeightSlider.setMax(50);
-			barrierHeightSlider.setExtent(2);
-			barrierHeightSlider.setTickSpacing(0.5);
-			barrierHeightSlider.setRealToTextCoeff(1);
-			barrierHeightSlider.setMethod("BarrierHeight");
-			barrierHeightSlider.setOptional(true);
 			barrierHeightSlider.addSliderListener(this);
 		}
 		return barrierHeightSlider;
@@ -581,17 +572,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (sideStartWidthSlider == null)
 		{
-			sideStartWidthSlider = new SegmentSlider();
+			sideStartWidthSlider = new SegmentSlider(0, 100, 0.5, side.getSideStartWidth(), "Width", "Start", "SideStartWidth", true);
 			sideStartWidthSlider.setBounds(358, 25, 50, 290);
-			sideStartWidthSlider.setSection("Width");
-			sideStartWidthSlider.setAttr("Start");
-			sideStartWidthSlider.setMin(0);
-			sideStartWidthSlider.setMax(100);
-			sideStartWidthSlider.setExtent(2);
-			sideStartWidthSlider.setTickSpacing(0.5);
-			sideStartWidthSlider.setRealToTextCoeff(1);
-			sideStartWidthSlider.setMethod("SideStartWidth");
-			sideStartWidthSlider.setOptional(true);
 			sideStartWidthSlider.addSliderListener(this);
 		}
 		return sideStartWidthSlider;
@@ -605,17 +587,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (borderWidthSlider == null)
 		{
-			borderWidthSlider = new SegmentSlider();
+			borderWidthSlider = new SegmentSlider(0, 5, 0.05, side.getBorderWidth(), "Width", "", "BorderWidth", true);
 			borderWidthSlider.setBounds(720, 25, 50, 290);
-			borderWidthSlider.setSection("Width");
-			borderWidthSlider.setAttr("");
-			borderWidthSlider.setMin(0);
-			borderWidthSlider.setMax(5);
-			borderWidthSlider.setExtent(1);
-			borderWidthSlider.setTickSpacing(0.05);
-			borderWidthSlider.setRealToTextCoeff(1);
-			borderWidthSlider.setMethod("BorderWidth");
-			borderWidthSlider.setOptional(true);
 			borderWidthSlider.addSliderListener(this);
 		}
 		return borderWidthSlider;
@@ -629,17 +602,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (sideEndWidthSlider == null)
 		{
-			sideEndWidthSlider = new SegmentSlider();
+			sideEndWidthSlider = new SegmentSlider(0, 100, 0.5, side.getSideEndWidth(), "Width", "End", "SideEndWidth", true);
 			sideEndWidthSlider.setBounds(413, 25, 50, 290);
-			sideEndWidthSlider.setSection("Width");
-			sideEndWidthSlider.setAttr("End");
-			sideEndWidthSlider.setMin(0);
-			sideEndWidthSlider.setMax(100);
-			sideEndWidthSlider.setExtent(2);
-			sideEndWidthSlider.setTickSpacing(0.5);
-			sideEndWidthSlider.setRealToTextCoeff(1);
-			sideEndWidthSlider.setMethod("SideEndWidth");
-			sideEndWidthSlider.setOptional(true);
 			sideEndWidthSlider.addSliderListener(this);
 		}
 		return sideEndWidthSlider;
@@ -653,17 +617,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (barrierWidthSlider == null)
 		{
-			barrierWidthSlider = new SegmentSlider();
+			barrierWidthSlider = new SegmentSlider(0, 50, 0.1, side.getBarrierWidth(), "Width", "", "BarrierWidth", true);
 			barrierWidthSlider.setBounds(107, 25, 50, 290);
-			barrierWidthSlider.setSection("Width");
-			barrierWidthSlider.setAttr("");
-			barrierWidthSlider.setMin(0);
-			barrierWidthSlider.setMax(50);
-			barrierWidthSlider.setExtent(2);
-			barrierWidthSlider.setTickSpacing(0.5);
-			barrierWidthSlider.setRealToTextCoeff(1);
-			barrierWidthSlider.setMethod("BarrierWidth");
-			barrierWidthSlider.setOptional(true);
 			barrierWidthSlider.addSliderListener(this);
 		}
 		return barrierWidthSlider;
@@ -677,17 +632,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (borderHeightSlider == null)
 		{
-			borderHeightSlider = new SegmentSlider();
+			borderHeightSlider = new SegmentSlider(0, 5, 0.005, side.getBorderHeight(), "Height", "", "BorderHeight", true);
 			borderHeightSlider.setBounds(665, 25, 50, 290);
-			borderHeightSlider.setSection("Height");
-			borderHeightSlider.setAttr("");
-			borderHeightSlider.setMin(0);
-			borderHeightSlider.setMax(50);
-			borderHeightSlider.setExtent(2);
-			borderHeightSlider.setTickSpacing(0.5);
-			borderHeightSlider.setRealToTextCoeff(1);
-			borderHeightSlider.setMethod("BorderHeight");
-			borderHeightSlider.setOptional(true);
 			borderHeightSlider.addSliderListener(this);
 		}
 		return borderHeightSlider;
