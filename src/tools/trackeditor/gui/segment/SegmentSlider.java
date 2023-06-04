@@ -108,11 +108,11 @@ public class SegmentSlider extends JPanel
 		this.setLayout(new SegmentSliderLayout());
 		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 		this.setSize(50, 250);
-		sectionLabel.setText("Section");
+		sectionLabel.setText(section);
 		sectionLabel.setFont(new java.awt.Font("Dialog", java.awt.Font.PLAIN, 10));
 		sectionLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		sectionLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-		attLabel.setText("Attr");
+		attLabel.setText(attr);
 		attLabel.setFont(new java.awt.Font("Dialog", java.awt.Font.PLAIN, 10));
 		attLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
 		attLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
