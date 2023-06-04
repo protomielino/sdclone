@@ -541,7 +541,7 @@ public class SegmentSlider extends JPanel
 				try
 				{
 					double tmp2 = Double.parseDouble(getTextField().getText());
-					if (tmp1 != tmp2 && !(tmp2 >= tmp1 && tmp2 < (tmp1 + 1)))
+					if (tmp1 != tmp2 && !(tmp2 >= tmp1 && tmp2 < (tmp1 + resolution)))
 					{
 						setValueInternal(tmp1);
 					}
