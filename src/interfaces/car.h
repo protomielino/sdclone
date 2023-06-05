@@ -343,6 +343,7 @@ typedef struct {
     tdble         currentPressure;		        // current tire pressure considering temperature
     tdble         currentWear;			        // [0..1], 1 means totally worn (tread thickness 0)
     tdble         currentGraining;		        // [0..1], 1 means totally grained
+    int           compound;						//the curretly used tire compound     (SOFT = 1, MEDIUM = 2, HARD = 3, WET = 4, EXTREM_WET = 5);
 } tWheelState;
 /* structure access */
 #define _ride(i)                priv.wheel[i].relPos.z
@@ -364,6 +365,7 @@ typedef struct {
 #define _tyreTreadDepth(i)      priv.wheel[i].treadDepth
 #define _tyreEffMu(i)           priv.wheel[i].effectiveMu
 #define _tyreCurrentPressure(i)     priv.wheel[i].currentPressure
+#define _tyreCompound(i)        priv.wheel[i].compound
 
 #define MAX_GEARS	10	/* including reverse and neutral */
 

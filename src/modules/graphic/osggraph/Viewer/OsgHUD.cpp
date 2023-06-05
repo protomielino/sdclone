@@ -1828,36 +1828,34 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     changeImageAlpha(hudImgElements["tire-rl-slip"], slip);
 
 //tire compound
-	temp.str("");
-//    tCarSetupItem *setupCompound = &(car->carElt->setup.tireCompound);
-//	switch((int)currCar->setup.reqTirecompound.value)
-//GfLogInfo("Compound %f\n", currCar->setup.tireCompound.value);
-//GfLogInfo("Compound2 %f\n", currCar->setup.reqTirecompound.value); //this does not work it always return 0
-	switch((int)currCar->setup.tireCompound.value)
-	{
-	case 1:
-		temp << "S"; //SOFT
-		break;
-	case 2:
-		temp << "M"; //MEDIUM
-		break;
-	case 3:
-		temp << "H"; //HARD
-		break;
-	case 4:
-		temp << "R"; //WET
-		break;
-	case 5:
-		temp << "R+"; //EXTREME WET
-		break;
-	default:
-		temp << ""; //no valid value found, leave empty
+    for (int i = 0; i < 4; i++) { //for each tires
+		temp.str("");
+		switch((int)currCar->_tyreCompound(i))
+		{
+		case 1:
+			temp << "S"; //SOFT
+			break;
+		case 2:
+			temp << "M"; //MEDIUM
+			break;
+		case 3:
+			temp << "H"; //HARD
+			break;
+		case 4:
+			temp << "R"; //WET
+			break;
+		case 5:
+			temp << "R+"; //EXTREME WET
+			break;
+		default:
+			temp << ""; //no valid value found, leave empty
+		}
+		if (i==0) hudTextElements["tire-fr-compound"]->setText(temp.str());
+		if (i==1) hudTextElements["tire-fl-compound"]->setText(temp.str());
+		if (i==2) hudTextElements["tire-rr-compound"]->setText(temp.str());
+		if (i==3) hudTextElements["tire-rl-compound"]->setText(temp.str());
 	}
 
-	hudTextElements["tire-fl-compound"]->setText(temp.str());
-	hudTextElements["tire-fr-compound"]->setText(temp.str());
-	hudTextElements["tire-rl-compound"]->setText(temp.str());
-	hudTextElements["tire-rr-compound"]->setText(temp.str());
 
 
 //gforces

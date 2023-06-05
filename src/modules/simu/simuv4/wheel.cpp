@@ -934,6 +934,7 @@ void SimWheelUpdateTire(tCar *car, int index)
     car->carElt->_tyreT_out(index) = wheel->Ttire;
     car->carElt->_tyreTreadDepth(index) =  1.0 - wheel->currentWear;
     car->carElt->_tyreCurrentPressure(index) = wheel->currentPressure;
+    car->carElt->_tyreCompound(index) = wheel->tireSet;
     GfLogDebug("SimuV4 wheel tyre updated Grip = %.2f - Temperature = %.3f - Graining = %.5f - Wear = %.5f - Optimal = %3.2f\n",
                   wheel->currentGripFactor, wheel->Ttire, wheel->currentGraining, wheel->currentWear, car->carElt->_tyreT_opt(index));
 }
