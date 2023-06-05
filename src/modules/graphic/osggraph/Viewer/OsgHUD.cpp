@@ -2257,7 +2257,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             return std::tolower(c);
         });
         temp.str("");
-        temp << "data/img/flags/4x3/" << nationname.c_str() <<".svg";
+        std::string uk = "uk";
+        if (nationname == uk){
+			nationname = "gb";
+		}
+        temp << "data/img/flags/4x3png/" << nationname.c_str() <<".png";
         changeImageTexture(hudImgElements["driverinfo-flag"], temp.str());
 
 //edithud
