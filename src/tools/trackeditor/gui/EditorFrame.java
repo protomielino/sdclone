@@ -228,6 +228,8 @@ public class EditorFrame extends JFrame
 	private final static String	RECENT_FILES_STRING					= "recent.files.";
 	private int					recentFilesMax						= 10;
 	private final static String	RECENT_FILES_MAX					= "RecentFilesMax";
+	private boolean				interactiveFixes					= false;
+	private final static String	INTERACTIVE_FIXES					= "InteractiveFixes";
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
@@ -337,6 +339,7 @@ public class EditorFrame extends JFrame
 		binDirectory = preferences.get(SD_BIN_DIRECTORY, null);
 		libDirectory = preferences.get(SD_LIB_DIRECTORY, null);
 		recentFilesMax = Integer.parseInt(preferences.get(RECENT_FILES_MAX, "10"));
+		interactiveFixes = preferences.getBoolean(INTERACTIVE_FIXES, false);
 
 		readDefaultSurfaces();
 		readDefaultObjects();
@@ -443,6 +446,18 @@ public class EditorFrame extends JFrame
 		}
 
 		preferences.put(RECENT_FILES_MAX, this.recentFilesMax+"");
+	}
+
+	public boolean getInteractiveFixes()
+	{
+		return interactiveFixes;
+	}
+
+	public void setInteractiveFixes(boolean value)
+	{
+		interactiveFixes = value;
+
+		preferences.putBoolean(INTERACTIVE_FIXES, interactiveFixes);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -1273,6 +1288,7 @@ public class EditorFrame extends JFrame
 			setBinDirectory(preferencesDialog.getBinDirectory());
 			setLibDirectory(preferencesDialog.getLibDirectory());
 			setRecentFilesMax(preferencesDialog.getRecentFilesMax());
+			setInteractiveFixes(preferencesDialog.getInteractiveFixes());
 			readDefaultSurfaces();
 			readDefaultObjects();
 			if (view.segmentParamDialog != null)

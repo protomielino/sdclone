@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -17,22 +18,23 @@ import javax.swing.WindowConstants;
 
 public class PreferencesDialog extends JDialog
 {
-	public static boolean		APPROVE					= false;
+	public static boolean		APPROVE						= false;
 	private EditorFrame			editorFrame;
-	private JPanel				jPanel					= null;
-	private JLabel				dataDirectoryLabel		= null;
-	private JTextField			dataDirectoryTextField	= null;
-	private JButton				dataDirectoryButton		= null;
-	private JLabel				binDirectoryLabel		= null;
-	private JTextField			binDirectoryTextField	= null;
-	private JButton				binDirectoryButton		= null;
-	private JLabel				libDirectoryLabel		= null;
-	private JTextField			libDirectoryTextField	= null;
-	private JButton				libDirectoryButton		= null;
-	private JLabel				recentFilesMaxLabel		= null;
-	private JTextField			recentFilesMaxTextField	= null;
-	private JButton				okButton				= null;
-	private JButton				cancelButton			= null;
+	private JPanel				jPanel						= null;
+	private JLabel				dataDirectoryLabel			= null;
+	private JTextField			dataDirectoryTextField		= null;
+	private JButton				dataDirectoryButton			= null;
+	private JLabel				binDirectoryLabel			= null;
+	private JTextField			binDirectoryTextField		= null;
+	private JButton				binDirectoryButton			= null;
+	private JLabel				libDirectoryLabel			= null;
+	private JTextField			libDirectoryTextField		= null;
+	private JButton				libDirectoryButton			= null;
+	private JLabel				recentFilesMaxLabel			= null;
+	private JTextField			recentFilesMaxTextField		= null;
+	private JCheckBox			interactiveFixesCheckBox	= null;
+	private JButton				okButton					= null;
+	private JButton				cancelButton				= null;
 
 	public PreferencesDialog(EditorFrame editorFrame)
 	{
@@ -84,6 +86,7 @@ public class PreferencesDialog extends JDialog
 			jPanel.add(getLibDirectoryTextField(), null);
 			jPanel.add(getLibDirectoryButton(), null);
 			jPanel.add(getRecentFilesMaxTextField(), null);
+			jPanel.add(getInteractiveFixesCheckBox(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
 		}
@@ -251,6 +254,18 @@ public class PreferencesDialog extends JDialog
 		return recentFilesMaxTextField;
 	}
 
+	private JCheckBox getInteractiveFixesCheckBox()
+	{
+		if (interactiveFixesCheckBox == null)
+		{
+			interactiveFixesCheckBox = new JCheckBox();
+			interactiveFixesCheckBox.setBounds(200, 139, 290, 23);
+			interactiveFixesCheckBox.setText("Interactive Fixes");
+			interactiveFixesCheckBox.setSelected(editorFrame.getInteractiveFixes());
+		}
+		return interactiveFixesCheckBox;
+	}
+
 	private JButton getOkButton()
 	{
 		if (okButton == null)
@@ -327,6 +342,11 @@ public class PreferencesDialog extends JDialog
 	public int getRecentFilesMax()
 	{
 		return Integer.parseInt(getRecentFilesMaxTextField().getText());
+	}
+
+	public boolean getInteractiveFixes()
+	{
+		return getInteractiveFixesCheckBox().isSelected();
 	}
 
 	protected void processWindowEvent(WindowEvent e)
