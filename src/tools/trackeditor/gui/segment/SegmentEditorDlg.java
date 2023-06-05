@@ -681,8 +681,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		this.shape = shape;
 		addSurface(roadSurfaceVector, shape.getSurface());
-		this.getRightPanel().setSide(shape.getRight());
-		this.getLeftPanel().setSide(shape.getLeft());
+		this.getRightPanel().setSide(shape, shape.getRight());
+		this.getLeftPanel().setSide(shape, shape.getLeft());
 
 		// update all fields
 
@@ -793,7 +793,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (rightPanel == null)
 		{
-			rightPanel = new SegmentSideProperties(this, shape.getRight());
+			rightPanel = new SegmentSideProperties(this, shape, shape.getRight());
 			rightPanel.setTitle("Right");
 		}
 		return rightPanel;
@@ -807,7 +807,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (leftPanel == null)
 		{
-			leftPanel = new SegmentSideProperties(this, shape.getLeft());
+			leftPanel = new SegmentSideProperties(this, shape, shape.getLeft());
 			leftPanel.setTitle("Left");
 		}
 		return leftPanel;
