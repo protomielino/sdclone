@@ -741,11 +741,11 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			if (parent.editorFrame.getInteractiveFixes())
 			{
 				// fix up bad value (height should be 0)
-				if (!Double.isNaN(side.getBorderHeight()) && side.getBorderHeight() != 0)
+				if (getBorderHeight(segment, side) != 0)
 				{
 					String[] options = { "Set height to 0.0", "Set style to wall", "Set style to curb", "Ignore" };
-					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " border style \"plan\" with height " +
-							side.getBorderHeight() + " width " + side.getBorderWidth() + " surface \"" + side.getBorderSurface() + "\"",
+					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " border style \"plan\" with " +
+							getBorderHeightText(segment, side) + " " + getBorderWidthText(segment, side) + " " + getBorderSurfaceText(segment, side),
 							"Invalid Border Height", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[3]))
 					{
 					case 0: // set height to 0
@@ -762,34 +762,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					case 3: // ignore
 						// nothing
 						break;
-					}
-				}
-				else if (Double.isNaN(side.getBorderHeight()))
-				{
-					double height = side.isRight() ? segment.getValidRightBorderHeight(parent.editorFrame) : segment.getValidLeftBorderHeight(parent.editorFrame);
-					
-					if (height != 0)
-					{
-						String[] options = { "Set height to 0.0", "Set style to wall", "Set style to curb", "Ignore" };
-						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " border style \"plan\" with inherited height " +
-								height + " width " + side.getBorderWidth() + " surface \"" + side.getBorderSurface() + "\"",
-								"Invalid Inherited Border Height", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[3]))
-						{
-						case 0: // set height to 0
-							side.setBorderHeight(0);
-							break;
-						case 1: // set style to wall
-							side.setBorderStyle("wall");
-							getBorderStyleComboBox().setSelectedItem(side.getBorderStyle());
-							break;
-						case 2: // set style to curb
-							side.setBorderStyle("curb");
-							getBorderStyleComboBox().setSelectedItem(side.getBorderStyle());
-							break;
-						case 3: // ignore
-							// nothing
-							break;
-						}
 					}
 				}
 			}
@@ -840,18 +812,21 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		case "no barrier":
 			if (parent.editorFrame.getInteractiveFixes())
 			{
-				// fix up bad values (width and height should be 0)
-				if (!Double.isNaN(side.getBarrierHeight()) && side.getBarrierHeight() != 0)
+				// fix up bad values (height should be 0)
+				if (getBarrierHeight(segment, side) != 0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with height " + side.getBarrierHeight() +
+					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with" +
+						getBarrierHeightText(segment, side) + getBarrierWidthText(segment, side) + getBarrierSurfaceText(segment, side) +
 						" ?\n\nShould be 0.0.", "Fix Barrier Height", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 					{
 						side.setBarrierHeight(0);
 					}
 				}
-				if (!Double.isNaN(side.getBarrierWidth()) && side.getBarrierWidth() != 0)
+				// fix up bad values (width should be 0)
+				if (getBarrierWidth(segment, side) != 0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with width " + side.getBarrierWidth() +
+					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with " +
+						getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side) +
 						" ?\n\nShould be 0.0.", "Fix Barrier Width", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 					{
 						side.setBarrierWidth(0);
@@ -873,11 +848,11 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			if (parent.editorFrame.getInteractiveFixes())
 			{
 				// fix up bad value (width should be 0)
-				if (!Double.isNaN(side.getBarrierWidth()) && side.getBarrierWidth() != 0)
+				if (getBarrierWidth(segment, side) != 0)
 				{
 					String[] options = { "Set width to 0.0", "Set style to wall", "Ignore" };
-					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with width " +
-							side.getBarrierWidth() + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
+					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with" +
+							getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side),
 							"Invalid Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]))
 					{
 					case 0: // set width to 0
@@ -892,30 +867,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						break;
 					}
 				}
-				else if (Double.isNaN(side.getBarrierWidth()))
-				{
-					double width = side.isRight() ? segment.getValidRightBarrierWidth(parent.editorFrame) : segment.getValidLeftBarrierWidth(parent.editorFrame);
-					
-					if (width != 0)
-					{
-						String[] options = { "Set width to 0.0", "Set style to wall", "Ignore" };
-						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with inherited width " +
-								width + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
-								"Invalid Inherited Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]))
-						{
-						case 0: // set width to 0
-							side.setBarrierWidth(0);
-							break;
-						case 1: // set style to wall
-							side.setBarrierStyle("wall");
-							getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
-							break;
-						case 2: // ignore
-							// nothing
-							break;
-						}
-					}
-				}
 			}
 			getBarrierHeightSlider().setEnabled(true);
 			getBarrierHeightSlider().setValue(side.getBarrierHeight());
@@ -923,12 +874,13 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
 			break;
 		case "plan":
+		case "curb":
 			if (parent.editorFrame.getInteractiveFixes())
 			{
-				// fix up bad value (plan not a valid style)
+				// fix up bad value (plan and curb are not a valid style)
 				String[] options = { "Set style to none", "Set style to no barrier", "Set style to fence", "Set style to wall", "Ignore" };
-				switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"plan\" with width " +
-						side.getBarrierWidth() + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"", 
+				switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"" + style + "\" with" +
+						getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side), 
 						"Invalid Barrier Style", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[4]))
 				{
 				case 0: // none
@@ -956,17 +908,18 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 				case 2: // fence
 					side.setBarrierStyle("fence");
 					// fix up bad value (width should be 0)
-					if (!Double.isNaN(side.getBarrierWidth()) && side.getBarrierWidth() != 0)
+					getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
+					if (getBarrierWidth(segment, side) != 0)
 					{
 						String[] options1 = { "Set width to 0.0", "Set style to wall", "Ignore" };
-						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with width " +
-								side.getBarrierWidth() + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
+						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with" +
+								getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side),
 								"Invalid Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[2]))
 						{
-						case 0: // set width to 0
-							side.setBarrierWidth(0);
+						case 0: // set width to default
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
 							break;
-						case 1: // set style to wall
+						case 1: // set style to fence
 							side.setBarrierStyle("wall");
 							getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
 							break;
@@ -974,30 +927,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 							// nothing
 							break;
 						}
-					}
-					else if (Double.isNaN(side.getBarrierWidth()))
-					{
-						double width = side.isRight() ? segment.getValidRightBarrierWidth(parent.editorFrame) : segment.getValidLeftBarrierWidth(parent.editorFrame);
-						if (width != 0)
-						{
-							String[] options1 = { "Set width to 0.0", "Set style to wall", "Ignore" };
-							switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"fence\" with inherited width " +
-									width + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
-									"Invalid Inherited Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[2]))
-							{
-							case 0: // set width to 0
-								side.setBarrierWidth(0);
-								break;
-							case 1: // set style to wall
-								side.setBarrierStyle("wall");
-								getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
-								break;
-							case 2: // ignore
-								// nothing
-								break;
-							}
-						}
-					}
+					}					
 					getBarrierHeightSlider().setEnabled(true);
 					getBarrierHeightSlider().setValue(side.getBarrierHeight());
 					getBarrierWidthSlider().setEnabled(true);
@@ -1005,12 +935,13 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					break;
 				case 3: // wall
 					side.setBarrierStyle("wall");
+					getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
 					// fix up bad value (width should not be 0)
-					if (side.getBarrierWidth() == 0)
+					if (getBarrierWidth(segment, side) == 0)
 					{
 						String[] options1 = { "Set width to " + SegmentSide.DEFAULT_BARRIER_WALL_WIDTH, "Set style to fence", "Ignore" };
-						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with width " +
-								side.getBarrierWidth() + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
+						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with" +
+								getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side),
 								"Invalid Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[2]))
 						{
 						case 0: // set width to default
@@ -1024,36 +955,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 							// nothing
 							break;
 						}
-					}
-					else if (Double.isNaN(side.getBarrierWidth()))
-					{
-						double width = side.isRight() ? segment.getValidRightBarrierWidth(parent.editorFrame) : segment.getValidLeftBarrierWidth(parent.editorFrame);
-						// fix up bad value (width should not be 0)
-						if (width == 0)
-						{
-							String[] options1 = { "Set width to " + SegmentSide.DEFAULT_BARRIER_WALL_WIDTH, "Set style to fence", "Ignore" };
-							switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with inherited width " +
-									width + " height " + side.getBarrierHeight() + " surface \"" + side.getBarrierSurface() + "\"",
-									"Invalid Inherited Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[2]))
-							{
-							case 0: // set width to default
-								side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
-								break;
-							case 1: // set style to fence
-								side.setBarrierStyle("fence");
-								getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
-								break;
-							case 2: // ignore
-								// nothing
-								break;
-							}
-						}
-					}
-					if (side.getBarrierHeight() == 0)
+					}					
+					if (getBarrierHeight(segment, side) == 0)
 					{
 						String[] options1 = { "Set height to " + SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT, "Ignore" };
-						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with height " +
-								side.getBarrierHeight() + " width " + side.getBarrierWidth() + " surface \"" + side.getBarrierSurface() + "\"",
+						switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with" +
+								getBarrierHeightText(segment, side) + getBarrierWidthText(segment, side) + getBarrierSurfaceText(segment, side),
 								"Invalid Barrier Height", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[1]))
 						{
 						case 0: // set height
@@ -1062,25 +969,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						case 1: // ignore
 							// nothing
 							break;
-						}
-					}
-					else if (Double.isNaN(side.getBarrierHeight()))
-					{
-						double height = side.isRight() ? segment.getValidRightBarrierHeight(parent.editorFrame) : segment.getValidLeftBarrierHeight(parent.editorFrame);
-						if (height == 0)
-						{
-							String[] options1 = { "Set height to " + SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT, "Ignore" };
-							switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"wall\" with inherited height " +
-									side.getBarrierHeight() + " width " + side.getBarrierWidth() + " surface \"" + side.getBarrierSurface() + "\"",
-									"Invalid Inherited Barrier Height", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[1]))
-							{
-							case 0: // set height
-								side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
-								break;
-							case 1: // ignore
-								// nothing
-								break;
-							}
 						}
 					}
 					getBarrierHeightSlider().setEnabled(true);
@@ -1100,6 +988,126 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		this.repaint();
 
 		setSource = false;
+	}
+	
+	private double getBarrierHeight(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBarrierHeight()))
+		{
+			return side.getBarrierHeight();
+		}
+		
+		return side.isRight() ? segment.getValidRightBarrierHeight(parent.editorFrame) : segment.getValidLeftBarrierHeight(parent.editorFrame);
+	}
+
+	private String getBarrierHeightText(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBarrierHeight()))
+		{
+			return " height " + side.getBarrierHeight();
+		}
+		
+		return " inherited height " + getBarrierHeight(segment, side);
+	}
+
+	private double getBarrierWidth(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBarrierWidth()))
+		{
+			return side.getBarrierWidth();
+		}
+		
+		return side.isRight() ? segment.getValidRightBarrierWidth(parent.editorFrame) : segment.getValidLeftBarrierWidth(parent.editorFrame);
+	}
+
+	private String getBarrierWidthText(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBarrierWidth()))
+		{
+			return " width " + side.getBarrierWidth();
+		}
+		
+		return " inherited width " + getBarrierWidth(segment, side);
+	}
+
+	private String getBarrierSurface(Segment segment, SegmentSide side)
+	{
+		if (side.getBarrierSurface() != null && !side.getBarrierSurface().isEmpty())
+		{
+			return side.getBarrierSurface();
+		}
+		
+		return side.isRight() ? segment.getValidRightBarrierSurface(parent.editorFrame) : segment.getValidLeftBarrierSurface(parent.editorFrame);
+	}
+
+	private String getBarrierSurfaceText(Segment segment, SegmentSide side)
+	{
+		if (side.getBarrierSurface() != null && !side.getBarrierSurface().isEmpty())
+		{
+			return " surface \"" + side.getBarrierSurface() + "\"";
+		}
+		
+		return " inherited surface \"" + getBarrierSurface(segment, side) + "\"";
+	}
+
+	private double getBorderHeight(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBorderHeight()))
+		{
+			return side.getBorderHeight();
+		}
+		
+		return side.isRight() ? segment.getValidRightBorderHeight(parent.editorFrame) : segment.getValidLeftBorderHeight(parent.editorFrame);
+	}
+
+	private String getBorderHeightText(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBorderHeight()))
+		{
+			return " height " + side.getBorderHeight();
+		}
+		
+		return " inherited height " + getBorderHeight(segment, side);
+	}
+
+	private double getBorderWidth(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBorderWidth()))
+		{
+			return side.getBorderWidth();
+		}
+		
+		return side.isRight() ? segment.getValidRightBorderWidth(parent.editorFrame) : segment.getValidLeftBorderWidth(parent.editorFrame);
+	}
+
+	private String getBorderWidthText(Segment segment, SegmentSide side)
+	{
+		if (!Double.isNaN(side.getBorderWidth()))
+		{
+			return " width " + side.getBorderWidth();
+		}
+		
+		return " inherited width " + getBorderWidth(segment, side);
+	}
+
+	private String getBorderSurface(Segment segment, SegmentSide side)
+	{
+		if (side.getBorderSurface() != null && !side.getBorderSurface().isEmpty())
+		{
+			return side.getBorderSurface();
+		}
+		
+		return side.isRight() ? segment.getValidRightBorderSurface(parent.editorFrame) : segment.getValidLeftBorderSurface(parent.editorFrame);
+	}
+
+	private String getBorderSurfaceText(Segment segment, SegmentSide side)
+	{
+		if (side.getBorderSurface() != null && !side.getBorderSurface().isEmpty())
+		{
+			return " surface \"" + side.getBorderSurface() + "\"";
+		}
+		
+		return " inherited surface \"" + getBorderSurface(segment, side) + "\"";
 	}
 
 	/*
