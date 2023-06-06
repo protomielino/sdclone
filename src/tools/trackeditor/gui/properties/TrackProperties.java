@@ -495,78 +495,50 @@ public class TrackProperties extends PropertyPanel
 						switch (borderStyleComboBox.getSelectedItem().toString())
 						{
 						case "none":
-							side.setBorderWidth(Double.NaN);
 							borderWidthTextField.setText(null);
 							borderWidthTextField.setEnabled(false);
-
-							side.setBorderHeight(Double.NaN);
 							borderHeightTextField.setText(null);
 							borderHeightTextField.setEnabled(false);
-
-							side.setBorderSurface(null);
 							borderSurfaceComboBox.setEnabled(false);
 							borderSurfaceComboBox.setSelectedIndex(-1);
-
-							side.setHasBorder(false);
 							break;
 						case "plan":
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH);
 							borderWidthTextField.setEnabled(true);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
-
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT);
+							borderWidthTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_PLAN_WIDTH));
 							borderHeightTextField.setEnabled(false);
-							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
-
+							borderHeightTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_PLAN_HEIGHT));
+							borderSurfaceComboBox.setEnabled(true);
 							if (side.isRight())
 							{
-								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_RIGHT_SURFACE);
+								borderSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BORDER_PLAN_RIGHT_SURFACE);
 							}
 							else
 							{
-								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
+								borderSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BORDER_PLAN_LEFT_SURFACE);
 							}
-							borderSurfaceComboBox.setEnabled(true);
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
-
-							side.setHasBorder(true);
 							break;
 						case "wall":
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_WALL_WIDTH);
 							borderWidthTextField.setEnabled(true);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
-
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT);
+							borderWidthTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_WALL_WIDTH));
 							borderHeightTextField.setEnabled(true);
-							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
-
-							side.setBorderSurface(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
+							borderHeightTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_WALL_HEIGHT));
 							borderSurfaceComboBox.setEnabled(true);
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
-
-							side.setHasBorder(true);
+							borderSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BORDER_WALL_SURFACE);
 							break;
 						case "curb":
-							side.setBorderWidth(SegmentSide.DEFAULT_BORDER_CURB_WIDTH);
 							borderWidthTextField.setEnabled(true);
-							borderWidthTextField.setText(Double.toString(side.getBorderWidth()));
-
-							side.setBorderHeight(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT);
+							borderWidthTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_CURB_WIDTH));
 							borderHeightTextField.setEnabled(true);
-							borderHeightTextField.setText(Double.toString(side.getBorderHeight()));
-
+							borderHeightTextField.setText(Double.toString(SegmentSide.DEFAULT_BORDER_CURB_HEIGHT));
+							borderSurfaceComboBox.setEnabled(true);
 							if (side.isRight())
 							{
-								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE);
+								borderSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BORDER_CURB_RIGHT_SURFACE);
 							}
 							else
 							{
-								side.setBorderSurface(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
+								borderSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BORDER_CURB_LEFT_SURFACE);
 							}
-							borderSurfaceComboBox.setEnabled(true);
-							borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
-
-							side.setHasBorder(true);
 							break;
 						}
 					}
@@ -631,50 +603,28 @@ public class TrackProperties extends PropertyPanel
 						switch (barrierStyleComboBox.getSelectedItem().toString())
 						{
 						case "none":
-							side.setBarrierWidth(Double.NaN);
-							barrierWidthTextField.setText(null);
 							barrierWidthTextField.setEnabled(false);
-
-							side.setBarrierHeight(Double.NaN);
+							barrierWidthTextField.setText(null);
 							barrierHeightTextField.setText(null);
 							barrierHeightTextField.setEnabled(false);
-
-							side.setBarrierSurface(null);
-							barrierSurfaceComboBox.setSelectedIndex(-1);
 							barrierSurfaceComboBox.setEnabled(false);
-
-							side.setHasBarrier(false);
+							barrierSurfaceComboBox.setSelectedIndex(-1);
 							break;
 						case "fence":
-							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-							barrierWidthTextField.setEnabled(true);
-							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
 							barrierWidthTextField.setEnabled(false);
-
-							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+							barrierWidthTextField.setText(Double.toString(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH));
 							barrierHeightTextField.setEnabled(true);
-							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
-
-							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
-							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
+							barrierHeightTextField.setText(Double.toString(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT));
 							barrierSurfaceComboBox.setEnabled(true);
-
-							side.setHasBarrier(true);
+							barrierSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
 							break;
 						case "wall":
-							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH);
 							barrierWidthTextField.setEnabled(true);
-							barrierWidthTextField.setText(Double.toString(side.getBarrierWidth()));
-
-							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT);
+							barrierWidthTextField.setText(Double.toString(SegmentSide.DEFAULT_BARRIER_WALL_WIDTH));
 							barrierHeightTextField.setEnabled(true);
-							barrierHeightTextField.setText(Double.toString(side.getBarrierHeight()));
-
-							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
-							barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
+							barrierHeightTextField.setText(Double.toString(SegmentSide.DEFAULT_BARRIER_WALL_HEIGHT));
 							barrierSurfaceComboBox.setEnabled(true);
-
-							side.setHasBarrier(true);
+							barrierSurfaceComboBox.setSelectedItem(SegmentSide.DEFAULT_BARRIER_WALL_SURFACE);
 							break;
 						}
 					}
