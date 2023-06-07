@@ -812,24 +812,36 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		case "no barrier":
 			if (parent.editorFrame.getInteractiveFixes())
 			{
-				// fix up bad values (height should be 0)
+				// fix up bad values (height should be 0)	
 				if (getBarrierHeight(segment, side) != 0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with" +
-						getBarrierHeightText(segment, side) + getBarrierWidthText(segment, side) + getBarrierSurfaceText(segment, side) +
-						" ?\n\nShould be 0.0.", "Fix Barrier Height", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					String[] options = { "Set height to 0.0", "Ignore" };
+					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with" +
+							getBarrierHeightText(segment, side) + getBarrierWidthText(segment, side) + getBarrierSurfaceText(segment, side),
+							"Invalid Barrier Height", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]))
 					{
+					case 0: // set height to 0
 						side.setBarrierHeight(0);
+						break;
+					case 1: // ignore
+						// nothing
+						break;
 					}
 				}
 				// fix up bad values (width should be 0)
 				if (getBarrierWidth(segment, side) != 0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with " +
-						getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side) +
-						" ?\n\nShould be 0.0.", "Fix Barrier Width", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					String[] options = { "Set width to 0.0", "Ignore" };
+					switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + " barrier style \"no barrier\" with" +
+							getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side),
+							"Invalid Barrier Width", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]))
 					{
+					case 0: // set width to 0
 						side.setBarrierWidth(0);
+						break;
+					case 1: // ignore
+						// nothing
+						break;
 					}
 				}
 			}
@@ -888,6 +900,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					side.setBarrierSurface(null);
 					side.setBarrierHeight(Double.NaN);
 					side.setBarrierWidth(Double.NaN);
+					side.setHasBarrier(false);
 					getBarrierSurfaceComboBox().setSelectedIndex(-1);
 					getBarrierHeightSlider().setValue(side.getBarrierHeight());
 					getBarrierHeightSlider().setEnabled(false);
