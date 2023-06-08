@@ -334,11 +334,11 @@ public class TrackProperties extends PropertyPanel
 
 			addTextField(this, 8, barrierWidthTextField, side.getBarrierWidth(), 150, 125);
 			addTextField(this, 9, barrierHeightTextField, side.getBarrierHeight(), 150, 125);
-			
+
 			add(getBarrierSurfaceComboBox(), null);
 			add(getBarrierStyleComboBox(), null);
 
-			switch (side.getBorderStyle())
+			switch (borderStyleComboBox.getSelectedItem().toString())
 			{
 			case "none":
 				borderWidthTextField.setEnabled(false);
