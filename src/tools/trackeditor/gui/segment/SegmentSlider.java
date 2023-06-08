@@ -357,7 +357,7 @@ public class SegmentSlider extends JPanel
 			{
 				int newMinimum = (int) Math.floor(value);
 				System.out.println("Increasing slider minimum to " + newMinimum + " was " + getMin());
-				setMax(newMinimum);
+				setMin(newMinimum);
 			}
 			getTextField().setText(nf.format(value));
 			getTextField().setCaretPosition(0);
@@ -404,7 +404,7 @@ public class SegmentSlider extends JPanel
 			{
 				int newMinimum = (int) Math.floor(value);
 				System.out.println("Increasing slider minimum to " + newMinimum + " was " + getMin());
-				setMax(newMinimum);
+				setMin(newMinimum);
 			}
 			getTextField().setText(nf.format(value));
 			getTextField().setCaretPosition(0);
