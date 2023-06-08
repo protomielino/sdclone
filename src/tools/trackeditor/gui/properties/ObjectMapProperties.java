@@ -766,6 +766,7 @@ public class ObjectMapProperties extends PropertyPanel
     		if (data.size() != objects.size())
     		{
     			getEditorFrame().documentIsModified = true;
+    			objectMap.setChanged(true);
     		}
             for (int j = 0; j < minDataCount; j++)
             {
@@ -789,17 +790,30 @@ public class ObjectMapProperties extends PropertyPanel
             		object.setImageY(datum.y);
         			getEditorFrame().documentIsModified = true;
             	}
+
+            	if (getEditorFrame().documentIsModified)
+            	{
+            		objectMap.setChanged(true);
+            		
+            		// force recalculation of points
+            		object.points = null;
+            	}
             }
-    		if (data.size() < objects.size())
-    		{
-    			// need to trim objects
-    			while (objects.size() > data.size())
-    			{
-    				objects.remove(objects.size() - 1);
-    			}
-    		}
-    		else if (objects.size() < data.size())
-    		{
+            // recalculate colors
+            if (getEditorFrame().documentIsModified)
+            {
+            	objectMap.recalculateColors();
+            }
+            if (data.size() < objects.size())
+            {
+            	// need to trim objects
+            	while (objects.size() > data.size())
+            	{
+            		objects.remove(objects.size() - 1);
+            	}
+            }
+            else if (objects.size() < data.size())
+            {
     			// need to add to objects
     			while (objects.size() < data.size())
     			{

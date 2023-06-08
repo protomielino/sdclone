@@ -107,6 +107,14 @@ public class ObjectMap
 	public Set<Integer> getColors() {
 		return colors;
 	}
+	
+	public void recalculateColors() {
+		colors.clear();
+		for (int i = 0; i < objects.size(); i++)
+		{
+			colors.add(objects.get(i).getRGB());
+		}
+	}
 
 	public int getImageWidth() {
 		return imageWidth;
