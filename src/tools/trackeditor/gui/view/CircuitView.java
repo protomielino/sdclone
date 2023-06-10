@@ -2442,6 +2442,88 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		DeleteAdjacentAction deleteAdjacentAction = new DeleteAdjacentAction("Delete Adjacent Objects", null, "Delete adjacent objects of this type.");
 
+		class DeleteAllAdjacentAction extends AbstractAction
+		{
+			int 					rgb = shape.getRGB();
+			int						x = shape.getImageX();
+			int						y = shape.getImageY();
+			Vector<ObjectMapObject>	deletedObjects = new Vector<ObjectMapObject>();
+
+			public DeleteAllAdjacentAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public boolean findDeletedObject(ObjShapeObject object)
+			{
+				for (ObjectMapObject deleted : deletedObjects)
+				{
+					if (deleted.object == object)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			public void findAdjacent(ObjShapeObject objectShape)
+			{
+				for (ObjectMap objectMap : editorFrame.getObjectMaps())
+				{
+					for (ObjShapeObject object : objectMap.getObjects())
+					{
+						if (rgb == object.getRGB())
+						{
+							int dx = Math.abs(objectShape.getImageX() - object.getImageX());
+							int dy = Math.abs(objectShape.getImageY() - object.getImageY());
+
+							if ((dx == 1 && dy == 0) || (dx == 1 && dy == 1) || (dx == 0 && dy == 1))
+							{
+								if (!(object.getImageX() == x && object.getImageY() == y))
+								{
+									if (!findDeletedObject(object))
+									{
+										deletedObjects.add(new ObjectMapObject(objectMap, object));
+										findAdjacent(object);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			public void findAllAdjacent(ObjShapeObject objectShape)
+			{
+				for (ObjectMap objectMap : editorFrame.getObjectMaps())
+				{
+					for (ObjShapeObject object : objectMap.getObjects())
+					{
+						if (rgb == object.getRGB())
+						{
+							findAdjacent(object);
+						}
+					}
+				}
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				findAllAdjacent(shape);
+
+				Undo.add(new UndoDeleteAllObjects(deletedObjects));
+
+				for (ObjectMapObject deletedObject : deletedObjects)
+				{
+					deletedObject.objectMap.removeObject(deletedObject.object);
+				}
+
+				selectedShape = null;
+				editorFrame.documentIsModified = true;
+				invalidate();
+				repaint();
+			}
+		}
+
+		DeleteAllAdjacentAction deleteAllAdjacentAction = new DeleteAllAdjacentAction("Delete All Adjacent Objects", null, "Delete all adjacent objects of this type.");
+
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem itemCopy = new JMenuItem("Copy");
 	    JMenuItem itemEdit = new JMenuItem("Edit");
@@ -2449,6 +2531,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	    JMenuItem itemDelete = new JMenuItem("Delete");
 	    JMenuItem itemDeleteAll = new JMenuItem("Delete All");
 	    JMenuItem itemDeleteAdjacent = new JMenuItem("Delete Adjacent");
+	    JMenuItem itemDeleteAllAdjacent = new JMenuItem("Delete All Adjacent");
 
 	    itemCopy.setAction(copyAction);
 	    itemEdit.setAction(editAction);
@@ -2456,13 +2539,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	    itemDelete.setAction(deleteAction);
 	    itemDeleteAll.setAction(deleteAllAction);
 	    itemDeleteAdjacent.setAction(deleteAdjacentAction);
+	    itemDeleteAllAdjacent.setAction(deleteAllAdjacentAction);
 
 	    menu.add(itemCopy);
+	    menu.addSeparator();
 	    menu.add(itemEdit);
 	    menu.add(itemEditAll);
+	    menu.addSeparator();
 	    menu.add(itemDelete);
 	    menu.add(itemDeleteAll);
+	    menu.addSeparator();
 	    menu.add(itemDeleteAdjacent);
+	    menu.add(itemDeleteAllAdjacent);
 
 	    menu.addPopupMenuListener(new PopupMenuListener()
 	    {
