@@ -2373,24 +2373,96 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		DeleteAllAction deleteAllAction = new DeleteAllAction("Delete All Objects", null, "Delete all objects of this type.");
 
+		class DeleteAdjacentAction extends AbstractAction
+		{
+			int 					rgb = shape.getRGB();
+			int						x = shape.getImageX();
+			int						y = shape.getImageY();
+			Vector<ObjectMapObject>	deletedObjects = new Vector<ObjectMapObject>();
+
+			public DeleteAdjacentAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public boolean findDeletedObject(ObjShapeObject object)
+			{
+				for (ObjectMapObject deleted : deletedObjects)
+				{
+					if (deleted.object == object)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			public void findAdjacent(ObjShapeObject objectShape)
+			{
+				for (ObjectMap objectMap : editorFrame.getObjectMaps())
+				{
+					for (ObjShapeObject object : objectMap.getObjects())
+					{
+						if (rgb == object.getRGB())
+						{
+							int dx = Math.abs(objectShape.getImageX() - object.getImageX());
+							int dy = Math.abs(objectShape.getImageY() - object.getImageY());
+
+							if ((dx == 1 && dy == 0) || (dx == 1 && dy == 1) || (dx == 0 && dy == 1))
+							{
+								if (!(object.getImageX() == x && object.getImageY() == y))
+								{
+									if (!findDeletedObject(object))
+									{
+										deletedObjects.add(new ObjectMapObject(objectMap, object));
+										findAdjacent(object);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				findAdjacent(shape);
+
+				Undo.add(new UndoDeleteAllObjects(deletedObjects));
+
+				for (ObjectMapObject deletedObject : deletedObjects)
+				{
+					deletedObject.objectMap.removeObject(deletedObject.object);
+				}
+
+				selectedShape = null;
+				editorFrame.documentIsModified = true;
+				invalidate();
+				repaint();
+			}
+		}
+
+		DeleteAdjacentAction deleteAdjacentAction = new DeleteAdjacentAction("Delete Adjacent Objects", null, "Delete adjacent objects of this type.");
+
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem itemCopy = new JMenuItem("Copy");
 	    JMenuItem itemEdit = new JMenuItem("Edit");
 	    JMenuItem itemEditAll = new JMenuItem("Edit All");
 	    JMenuItem itemDelete = new JMenuItem("Delete");
 	    JMenuItem itemDeleteAll = new JMenuItem("Delete All");
+	    JMenuItem itemDeleteAdjacent = new JMenuItem("Delete Adjacent");
 
 	    itemCopy.setAction(copyAction);
 	    itemEdit.setAction(editAction);
 	    itemEditAll.setAction(editAllAction);
 	    itemDelete.setAction(deleteAction);
 	    itemDeleteAll.setAction(deleteAllAction);
+	    itemDeleteAdjacent.setAction(deleteAdjacentAction);
 
 	    menu.add(itemCopy);
 	    menu.add(itemEdit);
 	    menu.add(itemEditAll);
 	    menu.add(itemDelete);
 	    menu.add(itemDeleteAll);
+	    menu.add(itemDeleteAdjacent);
 
 	    menu.addPopupMenuListener(new PopupMenuListener()
 	    {
