@@ -46,6 +46,10 @@ extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 #include <sstream>
 #include <iomanip> //setprecision
 
+#include <algorithm> //tolower
+#include <string> //tolower
+#include <cctype> //tolower
+
 //string constants for dashboard
 static std::string strEmpty;
 static std::string strBrakeRep("F/R Brake Rep.");
