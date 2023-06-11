@@ -293,7 +293,7 @@ public class PitProperties extends PropertyPanel
 			DoubleValue speedLimit = getEditorFrame().getPits().getSpeedLimit();
 			int indicator = -1;
 
-			if (speedLimit == null || speedLimit.units == null || speedLimit.value == Double.NaN)
+			if (speedLimit == null || speedLimit.units == null || Double.isNaN(speedLimit.value))
 				indicator = 0;
 			else if (speedLimit.units.equals("m") || speedLimit.units.equalsIgnoreCase("mps"))
 				indicator = 1;

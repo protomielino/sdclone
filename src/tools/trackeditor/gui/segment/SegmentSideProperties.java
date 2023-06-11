@@ -326,7 +326,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					boolean styleChanged = !oldStyle.equals(newStyle);
 					String style = newStyle;
 					if (style == "none")
-						style = "";
+						style = null;
 					side.setBorderStyle(style);
 					if (setSource || !styleChanged)
 					{
@@ -335,6 +335,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					switch (newStyle)
 					{
 					case "none":
+						side.setBorderStyle(null);
 						side.setBorderSurface(null);
 						side.setBorderHeight(Double.NaN);
 						side.setBorderWidth(Double.NaN);
@@ -440,7 +441,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 				{
 					String type = sideBankingTypeComboBox.getSelectedItem().toString();
 					if (type == "none")
-						type = "";
+						type = null;
 					side.setSideBankingType(type);
 				}
 			});
@@ -492,7 +493,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					boolean styleChanged = !oldStyle.equals(newStyle);
 					String style = newStyle;
 					if (style == "none")
-						style = "";
+						style = null;
 					side.setBarrierStyle(style);
 					if (setSource || !styleChanged)
 						return;
@@ -896,11 +897,10 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						"Invalid Barrier Style", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[4]))
 				{
 				case 0: // none
-					side.setBarrierStyle("none");
+					side.setBarrierStyle(null);
 					side.setBarrierSurface(null);
 					side.setBarrierHeight(Double.NaN);
 					side.setBarrierWidth(Double.NaN);
-					side.setHasBarrier(false);
 					getBarrierSurfaceComboBox().setSelectedIndex(-1);
 					getBarrierHeightSlider().setValue(side.getBarrierHeight());
 					getBarrierHeightSlider().setEnabled(false);

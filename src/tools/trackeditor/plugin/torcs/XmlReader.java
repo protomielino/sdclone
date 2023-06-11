@@ -964,7 +964,6 @@ public class XmlReader
         Element el = getChildWithName(seg, sPart + " Side");
         if (el != null)
         {
-            part.setHasSide(true);
             double width = getAttrNumValue(el, "width", "m");
             if (Double.isNaN(width))
             {
@@ -984,32 +983,24 @@ public class XmlReader
                 part.setSideBankingType(getAttrStrValue(el, "type"));            	
             }
         }
-        else
-            part.setHasSide(false);
 
         el = getChildWithName(seg, sPart + " Border");
         if (el != null)
         {
-            part.setHasBorder(true);
             part.setBorderWidth(getAttrNumValue(el, "width", "m"));
             part.setBorderHeight(getAttrNumValue(el, "height", "m"));
             part.setBorderSurface(getAttrStrValue(el, "surface"));
             part.setBorderStyle(getAttrStrValue(el, "style"));
         }
-        else
-            part.setHasBorder(false);
 
         el = getChildWithName(seg, sPart + " Barrier");
         if (el != null)
         {
-            part.setHasBarrier(true);
             part.setBarrierWidth(getAttrNumValue(el, "width", "m"));
             part.setBarrierHeight(getAttrNumValue(el, "height", "m"));
             part.setBarrierSurface(getAttrStrValue(el, "surface"));
             part.setBarrierStyle(getAttrStrValue(el, "style"));
         }
-        else
-            part.setHasBarrier(false);
     }
 
     private synchronized Element getChildWithName(Element element,

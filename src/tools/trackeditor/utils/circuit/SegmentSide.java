@@ -80,7 +80,7 @@ public class SegmentSide implements Cloneable
 	private SegmentSide			props						= null;
 
 	//	Side
-	protected boolean			hasSide						= false;
+	private boolean			hasSide						= false;
 	protected double			sideStartWidth				= Double.NaN;
 	private boolean				prevSideStartWidthChanged	= false;
 	private boolean				thisSideStartWidthChanged	= false;
@@ -95,7 +95,7 @@ public class SegmentSide implements Cloneable
 	private boolean				thisSideBankingTypeChanged	= false;
 
 	//	Barrier
-	protected boolean			hasBarrier					= false;
+	private boolean			hasBarrier					= false;
 	protected double			barrierHeight				= Double.NaN;
 	private boolean				prevBarrierHeightChanged	= false;
 	private boolean				thisBarrierHeightChanged	= false;
@@ -110,7 +110,7 @@ public class SegmentSide implements Cloneable
 	private boolean				thisBarrierStyleChanged		= false;
 
 	// Border
-	protected boolean			hasBorder					= false;
+	private boolean			hasBorder					= false;
 	protected double			borderWidth					= Double.NaN;
 	private boolean				prevBorderWidthChanged		= false;
 	private boolean				thisBorderWidthChanged		= false;
@@ -157,18 +157,15 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setNewTrackDefaults()
 	{
-		setHasSide(true);
 		setSideStartWidth(DEFAULT_SIDE_START_WIDTH);
 		setSideEndWidth(DEFAULT_SIDE_END_WIDTH);
 		setSideSurface(DEFAULT_SIDE_SURFACE);
 
-		setHasBarrier(true);
 		setBarrierHeight(DEFAULT_BARRIER_WALL_HEIGHT);
 		setBarrierWidth(DEFAULT_BARRIER_WALL_WIDTH);
 		setBarrierSurface(DEFAULT_BARRIER_WALL_SURFACE);
 		setBarrierStyle(DEFAULT_BARRIER_STYLE);
 
-		setHasBorder(true);
 		setBorderWidth(DEFAULT_BORDER_CURB_WIDTH);
 		setBorderHeight(DEFAULT_BORDER_CURB_HEIGHT);
 		if (isRight)
@@ -204,13 +201,13 @@ public class SegmentSide implements Cloneable
 	{
 		return hasBarrier;
 	}
-	/**
-	 * @param hasBarrier
-	 *            The hasBarrier to set.
-	 */
-	public void setHasBarrier(boolean hasBarrier)
+
+	private void checkHasBarrier()
 	{
-		this.hasBarrier = hasBarrier;
+		hasBarrier = !Double.isNaN(barrierHeight) ||
+				     !Double.isNaN(barrierWidth) ||
+				     (barrierSurface != null && !barrierSurface.isEmpty()) ||
+				     (barrierStyle != null && !barrierStyle.isEmpty());
 	}
 
 	/**
@@ -228,10 +225,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierHeight = barrierHeight;
 		barrierHeightChanged();
-		if (!Double.isNaN(barrierHeight))
-		{
-			hasBarrier = true;
-		}
+		checkHasBarrier();
 	}
 	/**
 	 *  
@@ -264,7 +258,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierStyle = barrierStyle;
 		barrierStyleChanged();
-		hasBarrier = true;
+		checkHasBarrier();
 	}
 	/**
 	 *  
@@ -297,7 +291,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierSurface = barrierSurface;
 		barrierSurfaceChanged();
-		hasBarrier = true;
+		checkHasBarrier();
 	}
 	/**
 	 *  
@@ -330,10 +324,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierWidth = barrierWidth;
 		barrierWidthChanged();
-		if (!Double.isNaN(barrierWidth))
-		{
-			hasBarrier = true;
-		}
+		checkHasBarrier();
 	}
 	/**
 	 *  
@@ -358,13 +349,13 @@ public class SegmentSide implements Cloneable
 	{
 		return hasBorder;
 	}
-	/**
-	 * @param hasBorder
-	 *            The hasBorder to set.
-	 */
-	public void setHasBorder(boolean hasBorder)
+
+	private void checkHasBorder()
 	{
-		this.hasBorder = hasBorder;
+		hasBorder = !Double.isNaN(borderHeight) ||
+				    !Double.isNaN(borderWidth) ||
+				    (borderSurface != null && !borderSurface.isEmpty()) ||
+				    (borderStyle != null && !borderStyle.isEmpty());
 	}
 
 	/**
@@ -382,10 +373,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderHeight = borderHeight;
 		borderHeightChanged();
-		if (!Double.isNaN(borderHeight))
-		{
-			hasBorder = true;
-		}
+		checkHasBorder();
 	}
 	/**
 	 *  
@@ -418,7 +406,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderStyle = borderStyle;
 		borderStyleChanged();
-		hasBorder = true;
+		checkHasBorder();
 	}
 	/**
 	 *  
@@ -451,7 +439,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderSurface = borderSurface;
 		borderSurfaceChanged();
-		hasBorder = true;
+		checkHasBorder();
 	}
 	/**
 	 *  
@@ -484,10 +472,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderWidth = borderWidth;
 		borderWidthChanged();
-		if (!Double.isNaN(borderWidth))
-		{
-			hasBorder = true;
-		}
+		checkHasBorder();
 	}
 	/**
 	 *  
@@ -512,14 +497,15 @@ public class SegmentSide implements Cloneable
 	{
 		return hasSide;
 	}
-	/**
-	 * @param hasSide
-	 *            The hasSide to set.
-	 */
-	public void setHasSide(boolean hasSide)
+
+	private void checkHasSide()
 	{
-		this.hasSide = hasSide;
+		hasSide = !Double.isNaN(sideStartWidth) ||
+				  !Double.isNaN(sideEndWidth) ||
+				  (sideSurface != null && !sideSurface.isEmpty()) ||
+				  (sideBankingType != null && !sideBankingType.isEmpty());
 	}
+
 	/**
 	 * @return Returns the sideEndWidth.
 	 */
@@ -533,12 +519,9 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setSideEndWidth(double sideEndWidth)
 	{
-		if (!Double.isNaN(sideEndWidth))
-		{
-			this.sideEndWidth = sideEndWidth;
-			sideEndWidthChanged();
-			hasSide = true;
-		}
+		this.sideEndWidth = sideEndWidth;
+		sideEndWidthChanged();
+		checkHasSide();
 	}
 	/**
 	 *  
@@ -569,12 +552,9 @@ public class SegmentSide implements Cloneable
 	 */
 	public void setSideStartWidth(double sideStartWidth)
 	{
-		if (!Double.isNaN(sideStartWidth))
-		{
-			this.sideStartWidth = sideStartWidth;
-			sideStartWidthChanged();
-			hasSide = true;
-		}
+		this.sideStartWidth = sideStartWidth;
+		sideStartWidthChanged();
+		checkHasSide();
 	}
 	/**
 	 *  
@@ -607,7 +587,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.sideSurface = sideSurface;
 		sideSurfaceChanged();
-		hasSide = true;
+		checkHasSide();
 	}
 
 	/**
@@ -641,7 +621,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.sideBankingType = sideBankingType;
 		sideBankingTypeChanged();
-		hasSide = true;
+		checkHasSide();
 	}
 
 	/**
