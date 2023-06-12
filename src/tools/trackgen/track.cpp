@@ -758,6 +758,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Right Border */
+    lastSeg = nullptr;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -770,6 +771,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if ((mseg->rside != nullptr) && (mseg->rside->type2 == TR_RBORDER))
             {
                 seg = mseg->rside;
+                if (lastSeg && lastSeg->style != seg->style)
+                    startNeeded = true;
                 CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
                 if (!curTexLink)
                 {
@@ -1122,13 +1125,14 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 }
                 texLen = (curTexSeg + mseg->length) / curTexSize;
 
+                width = RtTrackGetWidth(seg, ts);
+                texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
+
                 switch (seg->style)
                 {
                 case TR_PLAN:
                     if (j == 0)
                     {
-                        width = RtTrackGetWidth(seg, ts);
-                        texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
                         SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                     }
@@ -1137,8 +1141,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     switch (j)
                     {
                     case 0:
-                        width = RtTrackGetWidth(seg, ts);
-                        texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
                         SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_CURB)))
@@ -1148,8 +1150,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         }
                         break;
                     case 1:
-                        width = RtTrackGetWidth(seg, ts);
-                        texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         break;
@@ -1188,10 +1188,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
                 startNeeded = false;
                 runninglentgh += seg->length;
+                lastSeg = seg;
             }
             else
             {
                 startNeeded = true;
+                lastSeg = nullptr;
             }
         }
     }
@@ -1202,6 +1204,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     startNeeded = true;
     runninglentgh = 0;
     hasBorder = false;
+    lastSeg = nullptr;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
     {
         if ((mseg->rside != nullptr) && ((mseg->rside->type2 == TR_RSIDE) || (mseg->rside->rside != nullptr)))
@@ -1366,6 +1369,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Left Border */
+    lastSeg = nullptr;
     for (int j = 0; j < 3; j++)
     {
         prevTexId = 0;
@@ -1378,6 +1382,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if ((mseg->lside != nullptr) && (mseg->lside->type2 == TR_LBORDER))
             {
                 seg = mseg->lside;
+                if (lastSeg && lastSeg->style != seg->style)
+                    startNeeded = true;
                 CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
                 if (!curTexLink)
                 {
@@ -1791,10 +1797,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
                 startNeeded = false;
                 runninglentgh += seg->length;
+                lastSeg = seg;
             }
             else
             {
                 startNeeded = true;
+                lastSeg = nullptr;
             }
         }
     }
@@ -1805,6 +1813,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     startNeeded = true;
     runninglentgh = 0;
     hasBorder = false;
+    lastSeg = nullptr;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
     {
         if ((mseg->lside != nullptr) && ((mseg->lside->type2 == TR_LSIDE) || (mseg->lside->lside != nullptr)))
