@@ -829,17 +829,22 @@ const Ac3d::BoundingSphere &Ac3d::Object::getBoundingSphere() const
     return boundingSphere;
 }
 
-void Ac3d::Object::remapMaterials(const MaterialMap &materialMap)
+void Ac3d::Object::remapMaterials(bool mergeMaterials, const MaterialMap &materialMap)
 {
     if (type == "poly")
     {
         for (auto &surface : surfaces)
-            surface.mat = static_cast<int>(materialMap.find(surface.mat)->second);
+        {
+            if (mergeMaterials)
+                surface.mat = static_cast<int>(materialMap.find(surface.mat)->second);
+            else
+                surface.mat = 0;
+        }
     }
     else
     {
         for (auto &kid : kids)
-            kid.remapMaterials(materialMap);
+            kid.remapMaterials(mergeMaterials, materialMap);
     }
 }
 
@@ -1108,8 +1113,7 @@ void Ac3d::merge(const Ac3d & ac3d, bool mergeMaterials)
     for (const auto &kid : ac3d.root.kids)
     {
         root.kids.push_back(kid);
-        if (mergeMaterials)
-            root.kids.back().remapMaterials(materialMap);
+        root.kids.back().remapMaterials(mergeMaterials, materialMap);
     }
 }
 

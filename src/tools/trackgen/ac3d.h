@@ -264,7 +264,7 @@ struct Ac3d
         void flipAxes(bool in);
         const BoundingBox &getBoundingBox() const;
         const BoundingSphere &getBoundingSphere() const;
-        void remapMaterials(const MaterialMap &materialMap);
+        void remapMaterials(bool mergeMaterials, const MaterialMap &materialMap);
         void generateTriangles();
         void getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const;
         bool pointInside(const Surface &surface, double x, double y, double &z, V3d &normal) const;
