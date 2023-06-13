@@ -806,7 +806,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         switch (j)
                         {
                         case 0:
-                            if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_CURB))
+                            if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_CURB) ||
+                                (mseg->prev->rside->style == TR_CURB && (mseg->prev->rside->style != seg->height) || (mseg->prev->rside->style != seg->height)))
                             {
                                 SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z - 0.1);
                                 SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
@@ -1144,7 +1145,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case 0:
                         SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
-                        if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_CURB)))
+                        if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_CURB) ||
+                            (mseg->next->rside->style == TR_CURB && (mseg->next->rside->width != seg->width || mseg->next->rside->height != seg->height))))
                         {
                             SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z - 0.1);
                             SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
@@ -1421,7 +1423,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                             break;
                         case 1:
-                            if (!mseg->prev->lside || (mseg->prev->lside->type2 != TR_LBORDER) || (mseg->prev->lside->style != TR_CURB))
+                            if (!mseg->prev->lside || (mseg->prev->lside->type2 != TR_LBORDER) || (mseg->prev->lside->style != TR_CURB) ||
+                                (mseg->prev->lside->style == TR_CURB && (mseg->prev->lside->width != seg->width || mseg->prev->lside->height != seg->height)))
                             {
                                 SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                                 SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z - 0.1);
@@ -1759,7 +1762,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case 1:
                         SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
                         SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                        if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_CURB)))
+                        if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_CURB) ||
+                            (mseg->next->lside->style == TR_CURB && (mseg->next->lside->height != seg->height || mseg->next->lside->width != seg->width))))
                         {
                             SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                             SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z - 0.1);
