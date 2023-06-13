@@ -834,7 +834,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             SETPOINT(texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             break;
                         case 2:
-                            if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_WALL))
+                            if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_WALL) ||
+                                (mseg->prev->rside->style == TR_WALL && mseg->prev->rside->height < seg->height))
                             {
                                 SETPOINT(texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                                 SETPOINT(texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
@@ -1772,7 +1773,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case 0:
                         SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         SETPOINT(texLen, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                        if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_WALL)))
+                        if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_WALL) ||
+                            (mseg->prev->lside->style == TR_WALL && mseg->prev->lside->height < seg->height)))
                         {
                             SETPOINT(texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                             SETPOINT(texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
