@@ -625,9 +625,10 @@ static tdble distance(const t3Dd &p1, const t3Dd &p2)
     return sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-// Create the left walls, start must point to a segment with a wall on the left and a leading
-// non wall segment.
-// FIXME: Does not work for a closed ring "by design".
+// Create the walls, start must point to a segment with a wall.
+//
+// Solid has problems when 2 walls touch so we nolonger break up walls that have changes
+// in height or width. This should not be a problem as long as cars stay on the ground.
 void buildWalls(tTrackSeg *start, int side) {
 
     if (start == NULL) {
@@ -653,12 +654,8 @@ void buildWalls(tTrackSeg *start, int side) {
             t3Dd evr = s->vertex[TR_ER];
             static float weps = 0.01f;
 
-            // Close the start with a ploygon?
-            if (p == NULL || p->style != TR_WALL ||
-                (distance(p->vertex[TR_EL], svl) > weps) ||
-                (distance(p->vertex[TR_ER], svr) > weps) ||
-                (fabs(h - p->height) > weps) ||
-                fixedid == 0)
+            // Close the wall start with a ploygon?
+            if (p == NULL || p->style != TR_WALL || fixedid == 0)
             {
                 // Enough space in array?
                 if (fixedid >= sizeof(fixedobjects)/sizeof(fixedobjects[0]))
@@ -684,6 +681,13 @@ void buildWalls(tTrackSeg *start, int side) {
                     dtVertex(svr.x, svr.y, svr.z + h);
                     dtVertex(svl.x, svl.y, svl.z + h);
                 dtEnd();
+            }
+
+            // fill in hole if width changes
+            if (p != NULL && p->style == TR_WALL && (distance(p->vertex[TR_EL], svl) > weps || distance(p->vertex[TR_ER], svr) > weps))
+            {
+                // TODO: we can get away with not adding this polygon if the change of width
+                // is small but it will be a problem if the hole is bigger than a car.
             }
 
             // Build sides, left, top, right. Depending on how we want to use it we
@@ -720,10 +724,7 @@ void buildWalls(tTrackSeg *start, int side) {
             }
 
             // Close the end with a ploygon?
-            if (n == NULL || n->style != TR_WALL ||
-                (distance(n->vertex[TR_SL], evl) > weps) ||
-                (distance(n->vertex[TR_SR], evr) > weps) ||
-                (fabs(h - n->height) > weps))
+            if (n == NULL || n->style != TR_WALL)
             {
                 if (close == true)
                 {
