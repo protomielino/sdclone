@@ -42,6 +42,7 @@
 #include "util.h"
 #include "objects.h"
 #include "trackgen.h"
+#include "robottools.h"
 
 namespace
 {
@@ -73,9 +74,21 @@ struct objdef
 
 std::vector<objdef> objects;
 
+tdble   trackOffsetX = 0;
+tdble   trackOffsetY = 0;
+
 void
 InitObjects(tTrack *track, void *TrackHandle)
 {
+    tTrkLocPos pos;
+    pos.seg = track->seg;
+    pos.type = TR_LPOS_MAIN;
+    pos.toStart = 0;
+    pos.toRight = 0;
+    pos.toMiddle = 0;
+    pos.toLeft = 0;
+    RtTrackLocal2Global(&pos, &trackOffsetX, &trackOffsetY, TR_TOMIDDLE);
+
     ObjUniqId = 0;
 
     srand((unsigned int)GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SEED, nullptr, 1));
@@ -248,7 +261,7 @@ AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigne
                 /* NEW: calculate angle for border-aligned orientation */
                 float xNeu, yNeu, zNeu;
                 angle = getBorderAngle(track, TrackHandle, x, y, curObj.distance, &xNeu, &yNeu, &zNeu);
-                //noch was mit x und y machen
+                // do something else with x and y
                 x = xNeu;
                 y = yNeu;
                 z = zNeu;
@@ -259,7 +272,8 @@ AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigne
                 z = TrackRoot.getTerrainHeight(x, y);
                 if (z == -1000000.0f)
                 {
-                    printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g\n", curObj.fileName.c_str(), x, y, z);
+                    printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g (track x: %g track y: %g)\n",
+                        curObj.fileName.c_str(), x, y, z, x - trackOffsetX, y - trackOffsetY);
                     return;
                 }
             }
