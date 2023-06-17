@@ -21,6 +21,7 @@
 package utils.circuit;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import gui.EditorFrame;
 import utils.Editor;
@@ -75,6 +76,35 @@ public class Curve extends Segment
 		shape.nbSteps = nbSteps;
 
 		return shape;
+	}
+
+	public Rectangle2D.Double getBounds()
+	{
+		if (points == null || points.length == 0)
+			return (new Rectangle2D.Double(0, 0, 0, 0));
+
+		double minX = Double.MAX_VALUE;
+		double maxX = -Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE;
+		double maxY = -Double.MAX_VALUE;
+
+		for (int i = 0; i < points.length; i++)
+		{
+			// don't use barrier points
+			if ((i >= 12 && i <= 15) || (i >= 24 && i <= 27))
+				continue;
+			
+			if (minX > points[i].x)
+				minX = points[i].x;
+			if (maxX < points[i].x)
+				maxX = points[i].x;
+			if (minY > points[i].y)
+				minY = points[i].y;
+			if (maxY < points[i].y)
+				maxY = points[i].y;
+		}
+
+		return (new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY));
 	}
 
 	public void calcShape(EditorFrame editorFrame) throws Exception
