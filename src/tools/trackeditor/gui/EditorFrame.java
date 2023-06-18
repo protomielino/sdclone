@@ -230,6 +230,8 @@ public class EditorFrame extends JFrame
 	private final static String	RECENT_FILES_MAX					= "RecentFilesMax";
 	private boolean				interactiveFixes					= false;
 	private final static String	INTERACTIVE_FIXES					= "InteractiveFixes";
+	private boolean				cursorCoordinates					= false;
+	private final static String	CURSOR_COORDINATES					= "CursorCoordinates";
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
@@ -340,6 +342,7 @@ public class EditorFrame extends JFrame
 		libDirectory = preferences.get(SD_LIB_DIRECTORY, null);
 		recentFilesMax = Integer.parseInt(preferences.get(RECENT_FILES_MAX, "10"));
 		interactiveFixes = preferences.getBoolean(INTERACTIVE_FIXES, false);
+		cursorCoordinates = preferences.getBoolean(CURSOR_COORDINATES, false);
 
 		readDefaultSurfaces();
 		readDefaultObjects();
@@ -458,6 +461,18 @@ public class EditorFrame extends JFrame
 		interactiveFixes = value;
 
 		preferences.putBoolean(INTERACTIVE_FIXES, interactiveFixes);
+	}
+
+	public boolean getCursorCoordinates()
+	{
+		return cursorCoordinates;
+	}
+
+	public void setCursorCoordinates(boolean value)
+	{
+		cursorCoordinates = value;
+
+		preferences.putBoolean(CURSOR_COORDINATES, cursorCoordinates);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -1289,8 +1304,10 @@ public class EditorFrame extends JFrame
 			setLibDirectory(preferencesDialog.getLibDirectory());
 			setRecentFilesMax(preferencesDialog.getRecentFilesMax());
 			setInteractiveFixes(preferencesDialog.getInteractiveFixes());
+			setCursorCoordinates(preferencesDialog.getCursorCoordinates());
 			readDefaultSurfaces();
 			readDefaultObjects();
+			view.redrawCircuit();
 			if (view.segmentParamDialog != null)
 				view.segmentParamDialog.refresh();
 		}

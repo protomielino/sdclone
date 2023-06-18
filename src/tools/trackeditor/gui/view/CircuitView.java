@@ -17,6 +17,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
@@ -87,7 +89,7 @@ import utils.undo.UndoSplitSegment;
  * @version 0.1a
  */
 
-public class CircuitView extends JComponent implements KeyListener, MouseListener, MouseMotionListener,WindowListener //,Scrollable
+public class CircuitView extends JComponent implements KeyListener, MouseListener, MouseMotionListener, WindowListener, MouseWheelListener
 {
 	/** zooming factor */
 	double						zoomFactor						= 1.0;
@@ -200,7 +202,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	/** upward link to parent frame */
 	EditorFrame					editorFrame;
-	
+
+	Graphics					graphics						= null;
+
 	private final String sep = System.getProperty("file.separator");
 
 	/**
@@ -216,7 +220,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			addKeyListener(this);
 			addMouseListener(this);
 			addMouseMotionListener(this);
-			//addMouseWheelListener( this );
+			addMouseWheelListener(this);
 			this.editorFrame = editorFrame;
 			terrain = new ObjShapeTerrain();
 			Editor.getProperties().addPropertiesListener(new ActionListener()
@@ -926,7 +930,13 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void mouseMoved(MouseEvent e)
 	{
 		screenToReal(e, mousePoint);
-		
+
+		if (editorFrame.getCursorCoordinates())
+		{
+			invalidate();
+			repaint();
+		}
+
 		try
 		{
 			switch (currentState)
@@ -1007,6 +1017,19 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		} catch (Exception ex)
 		{
 			ex.printStackTrace();
+		}
+	}
+
+	public void mouseWheelMoved(MouseWheelEvent e)
+	{
+		screenToReal(e, mousePoint);
+
+		getParent().dispatchEvent(e);
+
+		if (editorFrame.getCursorCoordinates())
+		{
+			invalidate();
+			repaint();
 		}
 	}
 
@@ -1434,6 +1457,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	public void paint(Graphics g)
 	{
+		graphics = g;
+
+		// visible part of screen in pixels
+		Rectangle r = getVisibleRect();
+
+		if (editorFrame.getCursorCoordinates())
+		{
+			if (editorFrame.getTrackData() != null)
+			{
+				String coordinates = String.format("x: %.3f y: %.3f",  + mousePoint.x, + mousePoint.y);
+
+				graphics.drawString(coordinates, r.x + 10, r.y + 20);
+			}
+		}
+
 		if (editorFrame.getTrackData() != null && editorFrame.getTrackData().getSegments() != null)
 		{
 			if (boundingRectangle == null)
@@ -1441,9 +1479,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				return;
 			}
 			
-			// visible part of screen in pixels
-			Rectangle r = getVisibleRect();
-
 			// out zone size in meters
 			outZoneWidth = (r.getWidth() / 2) / zoomFactor;
 			outZoneHeight = (r.getHeight() / 2) / zoomFactor;
@@ -1774,18 +1809,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			{
 				ObjShapeObject object = objects.get(j);
 
-				Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
-																 boundingRectangle.getMinY() - border,
-																 boundingRectangle.getWidth() + (border * 2),
-																 boundingRectangle.getHeight() + (border * 2));
-
-				double widthScale = rect.getWidth() / objectMap.getImageWidth();
-				double heightScale = rect.getHeight() / objectMap.getImageHeight();
-
-				double worldX = rect.getMinX() + (object.getImageX() * widthScale);
-				double worldY = rect.getMinY() + ((objectMap.getImageHeight() - object.getImageY()) * heightScale);
-
-				Point2D.Double location = new Point2D.Double(worldX, worldY);
+				Point2D.Double location = new Point2D.Double();
+				imageToReal(object.getImageX(), object.getImageY(), objectMap.getImageWidth(), objectMap.getImageHeight(), location);
 
 				object.calcShape(location);
 			}
@@ -2689,7 +2714,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		imageXY[0] = (int)Math.round(imageWidth * ((real.x + -rect.x) / rect.width));
 		imageXY[1] = (int)Math.round(imageHeight * (1 - (((real.y + -rect.y) / rect.height))));
 	}
-	
+
+	private void imageToReal(int imageX, int imageY, int imageWidth, int imageHeight, Point2D.Double real)
+	{
+		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+		Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
+														 boundingRectangle.getMinY() - border,
+														 boundingRectangle.getWidth() + (border * 2),
+														 boundingRectangle.getHeight() + (border * 2));
+		double widthScale = rect.getWidth() / imageWidth;
+		double heightScale = rect.getHeight() / imageHeight;
+
+		real.x = rect.getMinX() + (imageX * widthScale);
+		real.y = rect.getMinY() + ((imageHeight - imageY) * heightScale);
+	}
+
 	private void noObjectSelected(MouseEvent me)
 	{
 		class AddNewAction extends AbstractAction

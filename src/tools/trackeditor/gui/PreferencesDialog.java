@@ -33,6 +33,7 @@ public class PreferencesDialog extends JDialog
 	private JLabel				recentFilesMaxLabel			= null;
 	private JTextField			recentFilesMaxTextField		= null;
 	private JCheckBox			interactiveFixesCheckBox	= null;
+	private JCheckBox			cursorCoordinatesCheckBox	= null;
 	private JButton				okButton					= null;
 	private JButton				cancelButton				= null;
 
@@ -87,6 +88,7 @@ public class PreferencesDialog extends JDialog
 			jPanel.add(getLibDirectoryButton(), null);
 			jPanel.add(getRecentFilesMaxTextField(), null);
 			jPanel.add(getInteractiveFixesCheckBox(), null);
+			jPanel.add(getCursorCoordinatesCheckBox(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
 		}
@@ -266,6 +268,18 @@ public class PreferencesDialog extends JDialog
 		return interactiveFixesCheckBox;
 	}
 
+	private JCheckBox getCursorCoordinatesCheckBox()
+	{
+		if (cursorCoordinatesCheckBox == null)
+		{
+			cursorCoordinatesCheckBox = new JCheckBox();
+			cursorCoordinatesCheckBox.setBounds(200, 161, 290, 23);
+			cursorCoordinatesCheckBox.setText("Cursor Track Coordinates");
+			cursorCoordinatesCheckBox.setSelected(editorFrame.getCursorCoordinates());
+		}
+		return cursorCoordinatesCheckBox;
+	}
+
 	private JButton getOkButton()
 	{
 		if (okButton == null)
@@ -347,6 +361,11 @@ public class PreferencesDialog extends JDialog
 	public boolean getInteractiveFixes()
 	{
 		return getInteractiveFixesCheckBox().isSelected();
+	}
+
+	public boolean getCursorCoordinates()
+	{
+		return getCursorCoordinatesCheckBox().isSelected();
 	}
 
 	protected void processWindowEvent(WindowEvent e)
