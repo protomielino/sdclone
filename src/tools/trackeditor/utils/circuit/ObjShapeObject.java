@@ -111,11 +111,13 @@ public class ObjShapeObject extends Segment
 
 	public void setLocation(Point2D.Double location) {
 		this.location = location;
+		calcShape(location);
 	}
 
 	public void setTrackLocation(double x, double y) {
 		location.x = x;
 		location.y = y;
+		calcShape(location);
 	}
 
 	public void calcShape(Point2D.Double location)

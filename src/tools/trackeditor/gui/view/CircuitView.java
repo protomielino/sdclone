@@ -2715,7 +2715,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		imageXY[1] = (int)Math.round(imageHeight * (1 - (((real.y + -rect.y) / rect.height))));
 	}
 
-	private void imageToReal(int imageX, int imageY, int imageWidth, int imageHeight, Point2D.Double real)
+	public void imageToReal(int imageX, int imageY, int imageWidth, int imageHeight, Point2D.Double real)
 	{
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
 		Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,

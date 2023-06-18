@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -141,21 +142,26 @@ public class ObjectMapProperties extends PropertyPanel
 		private JTextField			objectMapTextField		= new JTextField();
 		private JButton				objectMapCreateButton 	= null;
 		private JButton				objectMapButton			= null;
-		private ObjectTablePanel	objectTablePanel		= null;
+		private ObjectTablePanel	objectTablePanel		= null;		
+		private ObjectMap			objectMap				= null;
 
         public class Data
         {
         	String	name;
         	Integer	color;
-        	Integer	x;
-        	Integer	y;
+        	Integer	imageX;
+        	Integer	imageY;
+        	Double  trackX;
+        	Double  trackY;
 
-        	Data(String name, Integer color, Integer x, Integer y)
+        	Data(String name, Integer color, Integer imageX, Integer imageY, double trackX, double trackY)
         	{
         		this.name = name;
         		this.color = color;
-        		this.x = x;
-        		this.y = y;
+        		this.imageX = imageX;
+        		this.imageY = imageY;
+        		this.trackX = trackX;
+        		this.trackY = trackY;
         	}
         }
 
@@ -172,13 +178,14 @@ public class ObjectMapProperties extends PropertyPanel
 		public ObjectMapPanel(ObjectMap objectMap)
 		{
 			super();
-			initialize(objectMap);
+			this.objectMap = objectMap;
+			initialize();
 		}
 
 		/**
 		 *
 		 */
-		private void initialize(ObjectMap objectMap)
+		private void initialize()
 		{
 			setLayout(null);
 
@@ -385,8 +392,9 @@ public class ObjectMapProperties extends PropertyPanel
 							{
 								name = new String("Unknown");
 							}
-
-							data.add(new Data(name, rgb, x, y));
+							Point2D.Double real = new Point2D.Double();
+							getEditorFrame().getCircuitView().imageToReal(x, y, imageWidth, imageHeight, real);
+							data.add(new Data(name, rgb, x, y, real.x, real.y));
 						}
 					}
 				}
@@ -397,10 +405,8 @@ public class ObjectMapProperties extends PropertyPanel
     	{
     		data.clear();
 
-			for (int i = 0; i < objectMap.getObjects().size(); i++)
+			for (ObjShapeObject object : objectMap.getObjects())
 			{
-				ObjShapeObject object = objectMap.getObjects().get(i);
-
 				String name = getEditorFrame().getObjectColorName(object.getRGB());
 
 				if (name == null)
@@ -408,7 +414,9 @@ public class ObjectMapProperties extends PropertyPanel
 					name = new String("Unknown");
 				}
 
-				data.add(new Data(name, object.getRGB(), object.getImageX(), object.getImageY()));
+				Point2D.Double real = new Point2D.Double();
+				getEditorFrame().getCircuitView().imageToReal(object.getImageX(), object.getImageY(), objectMap.getImageWidth(), objectMap.getImageHeight(), real);
+				data.add(new Data(name, object.getRGB(), object.getImageX(), object.getImageY(), real.x, real.y));
 			}
     	}
 
@@ -456,12 +464,13 @@ public class ObjectMapProperties extends PropertyPanel
 
 		class ObjectTableModel extends AbstractTableModel
 	    {
-	        private final String[] 		columnNames = { null, "Name", "Color", "X", "Y" };
+	        private final String[] 		columnNames = { null, "Name", "Color", "Image X", "Image Y", "Track X", "Track Y" };
 	        private final Class<?>[] 	columnClass = new Class[]
 	        {
-	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class
+	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class
 	        };
 			private ObjectMap 			objectMap = null;
+			private Point2D.Double 		real = new Point2D.Double();
 
 	        ObjectTableModel(ObjectMap objectMap)
 			{
@@ -511,9 +520,13 @@ public class ObjectMapProperties extends PropertyPanel
 				case 2:
 					return String.format("0x%06X", datum.color);
 				case 3:
-					return datum.x;
+					return datum.imageX;
 				case 4:
-					return datum.y;
+					return datum.imageY;
+				case 5:
+					return datum.trackX;
+				case 6:
+					return datum.trackY;
 				}
 				return null;
 			}
@@ -539,12 +552,26 @@ public class ObjectMapProperties extends PropertyPanel
 			        fireTableCellUpdated(rowIndex, columnIndex + 1);
 			        break;
 				case 3:
-					datum.x = (Integer) value;
-			        fireTableCellUpdated(rowIndex, columnIndex);
+					datum.imageX = (Integer) value;
+					fireTableCellUpdated(rowIndex, columnIndex);			        
+					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
+					datum.trackX = real.x;
+					fireTableCellUpdated(rowIndex, columnIndex + 2);			        
 					break;
 				case 4:
-					datum.y = (Integer) value;
-			        fireTableCellUpdated(rowIndex, columnIndex);
+					datum.imageY = (Integer) value;
+					fireTableCellUpdated(rowIndex, columnIndex);			        
+					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
+					datum.trackY = real.y;
+					fireTableCellUpdated(rowIndex, columnIndex + 2);			        
+					break;
+				case 5:
+					datum.trackX = (Double) value;
+					fireTableCellUpdated(rowIndex, columnIndex);
+					break;
+				case 6:
+					datum.trackY = (Double) value;
+					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
 				}
 		    }
@@ -590,7 +617,8 @@ public class ObjectMapProperties extends PropertyPanel
 		        model = new ObjectTableModel(objectMap);
 		        table = new JTable(model);
 		        scrollPane = new JScrollPane(table);
-		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
+		        table.getColumnModel().getColumn(0).setPreferredWidth(35);
+		        table.getColumnModel().getColumn(1).setPreferredWidth(120);
 		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
 		        table.setAutoCreateRowSorter(true);
 		        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -779,15 +807,17 @@ public class ObjectMapProperties extends PropertyPanel
         			getEditorFrame().documentIsModified = true;
             	}
 
-            	if (!datum.x.equals(object.getImageX()))
+            	if (!datum.imageX.equals(object.getImageX()))
             	{
-            		object.setImageX(datum.x);
+            		object.setImageX(datum.imageX);
+            		object.setTrackLocation(datum.trackX, datum.trackY);
         			getEditorFrame().documentIsModified = true;
             	}
 
-            	if (!datum.y.equals(object.getImageY()))
+            	if (!datum.imageY.equals(object.getImageY()))
             	{
-            		object.setImageY(datum.y);
+            		object.setImageY(datum.imageY);
+            		object.setTrackLocation(datum.trackX, datum.trackY);
         			getEditorFrame().documentIsModified = true;
             	}
 
@@ -819,7 +849,7 @@ public class ObjectMapProperties extends PropertyPanel
     			{
                 	ObjectMapPanel.Data datum = data.get(objects.size());
 
-    				objects.add(new ObjShapeObject(datum.color, datum.x, datum.y));
+    				objects.add(new ObjShapeObject(datum.color, datum.imageX, datum.imageY));
     			}
     		}
 		}

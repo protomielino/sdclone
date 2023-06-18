@@ -267,6 +267,10 @@ public class EditorFrame extends JFrame
 		this.currentObjectColor = currentObjectColor;
 	}
 
+	public CircuitView getCircuitView() {
+		return view;
+	}
+
 	public class NewProjectInfo
 	{
 		public String	name;
