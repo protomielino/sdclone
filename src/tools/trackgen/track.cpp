@@ -771,7 +771,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if ((mseg->rside != nullptr) && (mseg->rside->type2 == TR_RBORDER))
             {
                 seg = mseg->rside;
-                if (lastSeg && lastSeg->style != seg->style || mseg->prev->rside->width != seg->width || mseg->prev->rside->height != seg->height)
+                if ((lastSeg && lastSeg->style != seg->style) || mseg->prev->rside->width != seg->width || mseg->prev->rside->height != seg->height)
                     startNeeded = true;
                 CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
                 if (!curTexLink)
@@ -807,7 +807,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         {
                         case 0:
                             if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_CURB) ||
-                                (mseg->prev->rside->style == TR_CURB && (mseg->prev->rside->style != seg->height) || (mseg->prev->rside->style != seg->height)))
+                                (mseg->prev->rside->style == TR_CURB && (mseg->prev->rside->width != seg->width || mseg->prev->rside->height != seg->height)))
                             {
                                 SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z - 0.1);
                                 SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
@@ -1386,7 +1386,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if ((mseg->lside != nullptr) && (mseg->lside->type2 == TR_LBORDER))
             {
                 seg = mseg->lside;
-                if (lastSeg && lastSeg->style != seg->style || mseg->prev->lside->width != seg->width || mseg->prev->lside->height != seg->height)
+                if ((lastSeg && lastSeg->style != seg->style) || mseg->prev->lside->width != seg->width || mseg->prev->lside->height != seg->height)
                     startNeeded = true;
                 CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
                 if (!curTexLink)
