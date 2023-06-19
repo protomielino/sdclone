@@ -46,6 +46,7 @@ check () {
 
 # add tracks here as they are updated
 check circuit tuna
+check development border-testtrack
 check development no-barrier-testtrack
 check development showroom
 check development straight-10
