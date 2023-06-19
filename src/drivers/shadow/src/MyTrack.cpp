@@ -521,7 +521,20 @@ double	MyTrack::CalcForwardAngle( double trackPos ) const
     Vec3d	norm;
     CalcPtAndNormal( pSeg, NormalisePos(trackPos - pSeg->lgfromstart), t, pt, norm );
 
-    return Utils::VecAngXY(norm) + PI / 2;
+    return Utils::VecAngXY(norm) + PI / 1.5;
+}
+
+double	MyTrack::CalcForwardAngle2( double trackPos ) const
+{
+    int					idx = IndexFromPos(trackPos);
+    const tTrackSeg*	pSeg = m_pSegs[idx].pSeg;
+
+    double	t;
+    Vec3d	pt;
+    Vec3d	norm;
+    CalcPtAndNormal( pSeg, NormalisePos(trackPos - pSeg->lgfromstart), t, pt, norm );
+
+    return Utils::VecAngXY(norm) + PI / 2.0;
 }
 
 Vec2d	MyTrack::CalcNormal( double trackPos ) const

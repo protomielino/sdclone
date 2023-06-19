@@ -432,19 +432,22 @@ void	Driver::InitTrack(
         {
             tdble temp = pTrack->local.airtemperature;
 
-            if (temp < 13.0 || pS->_totLaps * (double)pTrack->length < 57800.0)
+            if (temp < 13.0 /*|| pS->_totLaps * (double)pTrack->length < 57800.0*/)
             {
                 GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 1);
+                m_cm[p].COMPOUNDS = 1;
                 LogSHADOW.info("Compounds choice SOFT !!!\n");
             }
-            else if (temp < 25.0 || pS->_totLaps * (double)pTrack->length < 171000.0)
+            else if (temp < 25.0 /*|| pS->_totLaps * (double)pTrack->length < 171000.0*/)
             {
                 GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 2);
+                m_cm[p].COMPOUNDS = 2;
                 LogSHADOW.info("Compounds choice MEDIUM !!!\n");
             }
             else
             {
                 GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 3);
+                m_cm[p].COMPOUNDS = 3;
                 LogSHADOW.info("Compounds choice HARD !!!\n");
             }
 
@@ -453,11 +456,13 @@ void	Driver::InitTrack(
             if (rain > 0 && rain < 3)
             {
                 GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 4);
+                m_cm[p].COMPOUNDS = 4;
                 LogSHADOW.info("Compounds choice WET !!!\n");
             }
             else if (rain > 2)
             {
                 GfParmSetNum(hCarParm, SECT_TIRESET, PRM_COMPOUNDS_SET, (char*)NULL, 5);
+                m_cm[p].COMPOUNDS = 5;
                 LogSHADOW.info("Compounds choice EXTREM WET !!!\n");
             }
         }
@@ -2975,6 +2980,12 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 int		Driver::PitCmd( int index, tCarElt* car, tSituation* s )
 {
     m_Strategy.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
+    if (m_cm[PATH_NORMAL].HASCOMPOUNDS)
+    {
+        int compounds = m_Strategy.GetCompounds();
+        m_cm[PATH_NORMAL].COMPOUNDS = compounds;
+        LogSHADOW.info("# Change compounds in pit = %i\n", compounds);
+    }
 
     return false;
 }

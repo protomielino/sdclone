@@ -50,6 +50,7 @@ public:
     bool	WantToPit() const;
     double  calcRefuel(CarElt* pCar) const;
     int		PitType() const;		// type of pit requested.
+    int     GetCompounds() const { return mCompounds; };
 
     double	FuelPerM( const CarElt* pCar ) const;
     double  WearPerM( const CarElt* pCar ) const;
@@ -76,6 +77,7 @@ private:
     bool            m_HasTYC;
     bool            m_HasTPC;
     int             m_Rain;
+    int             mCompounds;
 
     int				m_state;
 

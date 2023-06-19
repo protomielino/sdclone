@@ -103,6 +103,7 @@ private:
 
 public:
     int		FLAGS;			// options that modify calculations
+    int     COMPOUNDS;      // Compounds in car
     double	MASS;			// fixed mass of car.
     double	FUEL;			// mass of fuel in car.
     double  FUELPERMETER;
@@ -112,6 +113,9 @@ public:
     double	TYRE_MU;		// mu value of tyres (min of those avail).
     double	TYRE_MU_F;		// mu value of front tyres.
     double	TYRE_MU_R;		// mu value of rear  tyres.
+    double	TYRE_MU1[6];	// mu value of tyres with compounds
+    double	TYRE_MU_F1[6];	// mu value of front tyres with compounds
+    double	TYRE_MU_R1[6];	// mu value of rear  tyres with compounds
     double  EFFECTIVEMU;    // effective MU.
     double	MU_SCALE;		// scaling of MU to use for this car.
     double  TIREWEARPERMETER;

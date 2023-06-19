@@ -139,7 +139,7 @@ void	PitPath::MakePath(
 
     pBasePath->GetPtInfo(m_pitExitPos, pi);
     y[6] = pi.offs;
-    s[6] = -tan(pi.oang - m_pTrack->CalcForwardAngle(m_pitExitPos));
+    s[6] = -tan(pi.oang - m_pTrack->CalcForwardAngle2(m_pitExitPos));
 
     double sign = (pPitInfo->side == TR_LFT) ? -1.0 : 1.0;
     {for( int i = 1; i < NPOINTS - 1; i++ )
@@ -156,16 +156,18 @@ void	PitPath::MakePath(
     // x,y,s is in track centre relative coords... convert to global coords.
     Vec2d   gp[NPOINTS];
     Vec2d   gv[NPOINTS];
-    {for( int i = 0; i < NPOINTS; i++ )
+
+    for( int i = 0; i < NPOINTS; i++ )
     {
         LocalToGlobalXY( x[i], y[i], s[i], &gp[i], &gv[i] );
-    }}
+    }
 
     ParametricCubicSpline   pspline(NPOINTS, gp, gv);
 
     // modify points in line path for pits...
     int		idx0 = (m_pTrack->IndexFromPos(m_pitEntryPos) + 1) % NSEG;
     int		idx1 = m_pTrack->IndexFromPos(m_pitExitPos);
+
     {for( int i = idx0; i != idx1; i = (i + 1) % NSEG )
     {
         //double	x = ToSplinePos(m_pTrack->GetAt(i).segDist);
@@ -213,8 +215,10 @@ void	PitPath::MakePath(
     PropagateBraking( cm );
 
     idx0 = (m_pTrack->IndexFromPos(m_pitEntryPos) + 1) % NSEG;
+
     while( m_pts[idx0].spd < pBasePath->GetAt(idx0).spd )
         idx0 = (idx0 + NSEG - 1) % NSEG;
+
     m_pitEntryPos = m_pts[idx0].Dist();
 }
 
@@ -222,6 +226,7 @@ bool	PitPath::InPitSection( double trackPos ) const
 {
     trackPos = ToSplinePos(trackPos);
     double	pitExitPos = ToSplinePos(m_pitExitPos);
+
     return m_pitEntryPos <= trackPos && trackPos <= pitExitPos;
 }
 
@@ -235,8 +240,10 @@ double	PitPath::EntryToPitDistance() const
 {
 //	double dist = GetAt(m_stopIdx).Dist() - m_pitEntryPos;
     double dist = m_stopPos - m_pitEntryPos;
+
     if( dist < 0 )
         dist += m_pTrack->GetLength();
+
     return dist;
 }
 
@@ -244,6 +251,7 @@ double	PitPath::ToSplinePos( double trackPos ) const
 {
     if( trackPos < m_pitEntryPos )
         trackPos += m_pTrack->GetLength();
+
     return trackPos;
 }
 

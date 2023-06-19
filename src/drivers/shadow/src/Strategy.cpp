@@ -37,11 +37,12 @@ Strategy::Strategy( const MyTrack& track, const PitPath& pitPath ):
     m_pitPath(pitPath),
       m_warnDamageLimit(5000),
       m_dangerDamageLimit(7000),
-      m_warnTyreLimit(0.3),
-      m_dangerTyreLimit(0.03),
+      m_warnTyreLimit(0.25),
+      m_dangerTyreLimit(0.1),
       m_HasTYC(false),
       m_HasTPC(false),
       m_Rain(0),
+      mCompounds(0),
       m_state(PIT_NONE),
       m_lastFuel(0),
       m_totalFuel(0),
@@ -356,26 +357,31 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
                     if (remainingLaps <= 10 && m_Rain < 2)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                        mCompounds = 1;
                         LogSHADOW.info("Change Tire SOFT !\n");
                     }
                     else if (remainingLaps <= 25 && m_Rain < 2)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        mCompounds = 2;
                         LogSHADOW.info("Change Tire MEDIUM !\n");
                     }
                     else if(m_Rain < 2)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                        mCompounds = 3;
                         LogSHADOW.info("Change Tire HARD !\n");
                     }
                     else if (m_Rain < 3)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::WET;
+                        mCompounds = 4;
                         LogSHADOW.info("Change Tire WET !\n");
                     }
                     else
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
+                        mCompounds = 5;
                         LogSHADOW.info("Change Tire EXTREM WET !\n");
                     }
                 }

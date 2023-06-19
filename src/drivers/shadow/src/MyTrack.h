@@ -77,6 +77,7 @@ public:
     double	CalcHeightAbovePoint( const Vec3d& start_point, const Vec3d& direction, const Seg* hint = 0 ) const;
 
     double	CalcForwardAngle( double trackPos ) const;
+    double	CalcForwardAngle2( double trackPos ) const;
     Vec2d	CalcNormal( double trackPos ) const;
 
     double	GetFriction( int index, double offset ) const;

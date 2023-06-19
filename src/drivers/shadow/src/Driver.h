@@ -416,8 +416,8 @@ private:
             QUAD_SMOOTH_ITERS = 0;
             SPDC_NORMAL = 5;
             SPDC_TRAFFIC = 0;
-            OPPONENT_SPEED = 15;
-            RACETIME_LIMIT = 20;
+            OPPONENT_SPEED = 28;
+            RACETIME_LIMIT = 5;
             ACC_MAX_SPIN_SPEED = 3.5;
             DEC_MAX_SPIN_SPEED = 2;
             STEER_K_ACC = 0;
