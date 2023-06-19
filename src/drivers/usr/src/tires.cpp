@@ -29,7 +29,7 @@ void Tires::init(const tCarElt* car)
 {
     mCar = car;
     mDistWhenNew = 0;
-    mWear = 100.0;
+    mWear = 0.0;
     mHotTemp = 273.15 + GfParmGetNum(mCar->_carHandle, "private", "hottemp", (char*)NULL, 120.0);
     mMuScale = GfParmGetNum(mCar->_carHandle, "private", "mu scale", (char*)NULL, 1.0);
 }
@@ -56,16 +56,14 @@ void Tires::update()
     }
 
     // Calc dist to tire change
-    double distused = mCar->_distRaced;//- mDistWhenNew;
+    double distused = mCar->_distRaced - mDistWhenNew;
     if (distused > 1000.0)
     {
         mAvgWearPerMeter = mWear / distused;
-        //GfLogInfo("USR Tires AvgWear = %.9f\n", mAvgWearPerMeter);
     }
 
-    //double wearuntilchange = mWear / mAvgWearPerMeter;
-    mDistLeft = mWear / mAvgWearPerMeter;
-    //GfLogInfo("USR Tires mDistleft = %.8f\n", mDistLeft);
+    double wearuntilchange = 100.0 - mWear;
+    mDistLeft = wearuntilchange / mAvgWearPerMeter;
 
     mGripFactor = updateGripFactor();
 }
