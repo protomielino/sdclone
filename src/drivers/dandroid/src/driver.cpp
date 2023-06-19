@@ -44,6 +44,14 @@ TDriver::TDriver(int index)
     // Variables
     mTrack = NULL;
     mTirecondition = 1.0;
+    mMu = 1.0;
+    mTireMu = 1.0;
+
+    for(int i = 0; i <6; i++)
+    {
+        mTireMuC[i] = 0.0;
+    }
+
     mPrevgear = 0;
     mAccel = 0.0;
     mAccelAvg = 0.0;
@@ -762,7 +770,7 @@ double TDriver::curveSpeed(double radius)
 {
     radius = fabs(radius);
 
-    return mSectSpeedfactor * sqrt(mMu * GRAVITY * radius / (1.0 - MIN(0.99, radius * mCA * mMu / mMass)));
+    return mSectSpeedfactor * sqrt(mMu * mTirecondition * GRAVITY * radius / (1.0 - MIN(0.99, radius * mCA * mMu / mMass)));
 }
 
 double TDriver::bumpSpeed(double curv_z, double curvespeed)
@@ -2728,7 +2736,9 @@ double TDriver::getFuel(double dist)
     {
         double tiredist = dist / mWEARPERMETER;
         LogDANDROID.info("Distance : %.2f - Tire distance : %.7g\n", dist, tiredist);
-        double mindist = MIN(dist, tiredist);
+        double fueldistance = dist / mFUELPERMETER;
+        double distance = MIN(tiredist, fueldistance);
+        double mindist = MIN(dist, distance);
         LogDANDROID.info("Minimum distance : %.3f\n", mindist);
         dist = mindist;
     }
@@ -2746,7 +2756,7 @@ double TDriver::getFuel(double dist)
 void TDriver::writeSectorSpeeds()
 {
     char dirname[256];
-    sprintf(dirname, "%sdrivers/%s/%s/learned/", GetLocalDir(), MyBotName, mCarType.c_str());
+    sprintf(dirname, "%s/drivers/%s/%s/learned/", GetLocalDir(), MyBotName, mCarType.c_str());
 #ifdef DANDROID_TORCS
     if (GfCreateDir(strdup(dirname)) == GF_DIR_CREATED) {
 #else

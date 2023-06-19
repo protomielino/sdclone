@@ -284,7 +284,7 @@ void Pit::update(double fromstart)
                 totalfuel += lastfuel + lastpitfuel - car->priv.fuel;
                 fuellapscounted++;
                 avgfuelperlap = totalfuel / fuellapscounted;
-                LogDANDROID.debug("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
+                LogDANDROID.info("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
             }
 
             lastfuel = car->priv.fuel;
@@ -314,7 +314,7 @@ void Pit::update(double fromstart)
             else
             {
                 teamcarfuel = teamcar->_fuel;
-                if (teamcarfuel < 2.0 * maxfuelperlap)
+                if (teamcarfuel < 2.2 * maxfuelperlap)
                 {
                     pitdamage = false;
                 }
@@ -363,7 +363,7 @@ double Pit::getFuel()
     }
 
     double fuel = MAX(MIN(stintfuel - car->_fuel, car->_tank - car->_fuel), 0.0);
-    LogDANDROID.debug("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", mFromStart, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
+    LogDANDROID.info("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", mFromStart, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
 
     return fuel;
 }
@@ -437,16 +437,16 @@ double Pit::tyreCondition()
 
 double Pit::tyreTreadDepthFront()
 {
-    double Right = (car->_tyreTreadDepth(0));
-    double Left = (car->_tyreTreadDepth(1));
+    double Right = car->_tyreTreadDepth(0);
+    double Left = car->_tyreTreadDepth(1);
 
     return 100 * MIN(Right, Left);
 }
 
 double Pit::tyreTreadDepthRear()
 {
-    double Right = (car->_tyreTreadDepth(2));
-    double Left = (car->_tyreTreadDepth(3));
+    double Right = car->_tyreTreadDepth(2);
+    double Left = car->_tyreTreadDepth(3);
 
     return 100 * MIN(Right, Left);
 }
@@ -491,7 +491,50 @@ void Pit::pitCommand()
         car->_pitRepair = getRepair();
         lastpitfuel = getFuel();
         car->_pitFuel = (tdble) lastpitfuel;
-        car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::NONE : tCarPitCmd::ALL;
+
+        if ((HASTYC && car->_pitFuel && tyreTreadDepth() < 50.0 && car->_remainingLaps > 10.0) || tyreTreadDepth() < 15.0)
+        {
+            car->pitcmd.tireChange	= tCarPitCmd::ALL;
+
+            if(HASCPD)
+            {
+                int	remainingLaps = car->race.remainingLaps + 1;
+
+                if (remainingLaps <= 10 && RAIN < 2)
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                    //mTireMu = mTireMuC[1];
+                    LogDANDROID.info("Change Tire SOFT !\n");
+                }
+                else if (remainingLaps <= 25 && RAIN < 2)
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                    //mMyCar->setTireMu(2);
+                    LogDANDROID.info("Change Tire MEDIUM !\n");
+                }
+                else if(RAIN < 2)
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                    //mMyCar->setTireMu(3);
+                    LogDANDROID.info("Change Tire HARD !\n");
+                }
+                else if (RAIN < 3)
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::WET;
+                    //mMyCar->setTireMu(4);
+                    LogDANDROID.info("Change Tire WET !\n");
+                }
+                else
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
+                    //mMyCar->setTireMu(5);
+                    LogDANDROID.info("Change Tire EXTREM WET !\n");
+                }
+            }
+        }
+        else
+            car->pitcmd.tireChange = tCarPitCmd::NONE;
+
         setPitstop(false);
     }
 }

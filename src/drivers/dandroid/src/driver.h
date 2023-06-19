@@ -188,6 +188,8 @@ private:
     int    mDriverMsgCarIndex;
     Pit    mPit;
     double mMu;    // friction coefficient
+    double mTireMu;
+    double mTireMuC[6];
     double mTirecondition;
     double mMass;  // mass of car + fuel
     double mSpeed;

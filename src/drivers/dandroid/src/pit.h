@@ -60,6 +60,7 @@ public:
     double toSplineCoord(double x);
     void   update(double fromstart);
     int    getRepair();
+    int    getCompound();
     double getFuel();
     double getSpeedlimit();
     double getSpeedlimit(double fromstart);
@@ -73,7 +74,7 @@ public:
     double tyreTreadDepth();
     double avgWearPerMeter() { return avgwearpermeter; }
     void   setTYC(bool tyc) { HASTYC = tyc; }
-    void   setCPD(bool cpd) { HASCPD = cpd; }
+    void   setCPD(bool c) { HASCPD = c; }
     void   pitCommand();
 public:
     PTrack         track;
@@ -111,7 +112,7 @@ public:
     double         MIN_WEAR;
     bool           HASTYC;
     bool           HASCPD;
-
+    int            RAIN;
 };
 
 #endif // _PIT_H_
