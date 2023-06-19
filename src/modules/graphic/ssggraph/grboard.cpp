@@ -625,6 +625,64 @@ cGrBoard::grDispGGraph()
       snprintf(buf, sizeof(buf), "Air Temperature: %3.2f", K2C(car_->_airtemp));
       GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 65.0);
       //GfLogInfo("~grboard air temp temperature = %3.8f\n", K2C(car_->_airtemp));
+
+      if(car_->_tyreCompound(0) > 0)
+      {
+          switch(car_->_tyreCompound(0))
+          {
+          case 1:
+              snprintf(buf, sizeof(buf), "S");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "S");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "S");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 - 47.0);
+              snprintf(buf, sizeof(buf), "S");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 - 47.0);
+              break;
+          case 2:
+              snprintf(buf, sizeof(buf), "M");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "M");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "M");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 - 47.0);
+              snprintf(buf, sizeof(buf), "M");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 - 47.0);
+              break;
+          case 3:
+          default:
+              snprintf(buf, sizeof(buf), "H");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "H");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "H");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 - 47.0);
+              snprintf(buf, sizeof(buf), "H");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 - 47.0);
+              break;
+          case 4:
+              snprintf(buf, sizeof(buf), "W");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "W");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "W");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 - 47.0);
+              snprintf(buf, sizeof(buf), "W");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 - 47.0);
+              break;
+          case 5:
+              snprintf(buf, sizeof(buf), "E");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "E");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 + 34.0);
+              snprintf(buf, sizeof(buf), "E");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 33.00, Y1 - 47.0);
+              snprintf(buf, sizeof(buf), "E");
+              GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 26.00, Y1 - 47.0);
+              break;
+          }
+      }
   }
 }
 
