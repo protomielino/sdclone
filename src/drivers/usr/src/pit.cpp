@@ -317,7 +317,7 @@ void Pit::update()
 
     if(mMyCar->HASTYC)
     {
-        pittyres = (mMyCar->tires()->TyreTreadDepth() < 15.00 && remaininglaps  > 5.0);
+        pittyres = (mMyCar->tires()->TyreTreadDepth() < 10.00 && remaininglaps  > 5.0);
         LogUSR.debug(" # Tyre depth = %.2f Pit Tyres change = %i\n", mMyCar->tires()->TyreTreadDepth(), pittyres);
     }
     else
@@ -491,6 +491,8 @@ double Pit::calcRefuel()
     LogUSR.info("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
     LogUSR.info("USR Tire pitstops %i\n", tirespitstops);
     LogUSR.info("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
+    LogUSR.info("USR Tire distance = %.2f - Tire Laps = %.2f\n", mMyCar->tires()->TyreTreadDepth() / mCar->_remainingLaps * mTrack->length,
+                mMyCar->tires()->distLeft() / mTrack->length);
 
     return stintfuel - mCar->_fuel;
 }
@@ -543,31 +545,26 @@ void Pit::pitCommand()
                     if (remainingLaps <= 10 && mRain < 2)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
-                        mMyCar->setTireMu(1);
                         LogUSR.info("Change Tire SOFT !\n");
                     }
                     else if (remainingLaps <= 25 && mRain < 2)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
-                        mMyCar->setTireMu(2);
                         LogUSR.info("Change Tire MEDIUM !\n");
                     }
                     else if(mRain < 2)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
-                        mMyCar->setTireMu(3);
                         LogUSR.info("Change Tire HARD !\n");
                     }
                     else if (mRain < 3)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::WET;
-                        mMyCar->setTireMu(4);
                         LogUSR.info("Change Tire WET !\n");
                     }
                     else
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::EXTREM_WET;
-                        mMyCar->setTireMu(5);
                         LogUSR.info("Change Tire EXTREM WET !\n");
                     }
             }

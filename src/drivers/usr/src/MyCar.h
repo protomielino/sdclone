@@ -46,7 +46,6 @@ public:
   double bumpSpeed(double curv_z) const;
   void   driveForward() { mGearDirection = 1; }
   void   driveBackwards() { mGearDirection = -1; }
-  void   setTireMu(int c) { mTireMu = mTireMuC[c]; }
   double v() const { return mSpeed; }
   double vX() const { return mSpeedX; }
   double accelFiltered() const { return mAccelFilter.get(); }
@@ -155,7 +154,6 @@ private:
   double mCarMass;
   double mTankVol;
   double mTireMu;
-  double mTireMuC[6];
 
   // Aerodynamic constants
   double mFrontCA;

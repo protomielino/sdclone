@@ -58,7 +58,7 @@ private:
     double calcRefuel();
 
     const tTrack* mTrack;
-    MyCar* mMyCar;
+    const MyCar* mMyCar;
     tCarElt* mCar;
     const tCarElt* mTeamCar;
     const tTrackOwnPit* mPit; // pointer to my pit
