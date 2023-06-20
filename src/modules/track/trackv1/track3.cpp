@@ -209,7 +209,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 	    /* Border parameters */
 	    bw = GfParmGetCurNum(TrackHandle, path, KeyBorderWidth[side], (char*)NULL, borderWidth[side]);
 	    borderWidth[side] = bw;
-	    borderHeight[side] = GfParmGetCurNum(TrackHandle, path, KeyBorderHeight[side], (char*)NULL, 0.0);
+	    borderHeight[side] = GfParmGetCurNum(TrackHandle, path, KeyBorderHeight[side], (char*)NULL, borderHeight[side]);
 	    borderMaterial[side] = GfParmGetCurStr(TrackHandle, path, KeyBorderSurface[side], borderMaterial[side]);
 	    borderSurface[side] = AddTrackSurface(TrackHandle, theTrack, borderMaterial[side]);
 	    style = GfParmGetCurStr(TrackHandle, path, KeyBorderStyle[side], ValStyle[borderStyle[side]]);
