@@ -1823,8 +1823,15 @@ void smoothTriNorm(std::list<ob_t> &objects)
     printf("Smooth called on %s\n", objects.front().name.c_str());
     for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (it->canSkip())
+        if (it->canSkip() || it->type == "group")
             continue;
+
+        if (it->numsurf == 0)
+        {
+            printf("Skipping %s because there are no surfaces\n", it->name.c_str());
+            continue;
+        }
+
         for (int i = 0; i < it->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
@@ -1861,7 +1868,7 @@ void smoothTriNorm(std::list<ob_t> &objects)
 
     for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (it->canSkip())
+        if (it->canSkip() || it->type == "group" || it->numsurf == 0)
             continue;
         for (int i = 0; i < it->numvert; i++)
         {
