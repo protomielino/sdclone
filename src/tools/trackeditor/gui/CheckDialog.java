@@ -845,9 +845,15 @@ public class CheckDialog extends JDialog
 	{
 		if ("poly".equals(object.getType()))
 		{
+			if (object.getSurfaces().isEmpty())
+			{
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with no surfaces\n");
+				return;
+			}
+
 			Set<Integer> types = new HashSet<Integer>();
 			Set<Integer> mats = new HashSet<Integer>();
-			
+
 			for (int i = 0; i < object.getSurfaces().size(); i++)
 			{
 				Ac3dSurface	surface = object.getSurfaces().get(i);
@@ -856,16 +862,16 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append("Object file " + file.toString() + " line " + surface.getLinenum() + " : surface with " +  surface.getRefs().size() + " vertices\n");																				
 				}
-				
+
 				types.add(surface.getSurf());
 				mats.add(surface.getMat());
 			}
-			
+
 			if (types.size() > 1)
 			{
 				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " surface types\n");																							
 			}
-			
+
 			if (mats.size() > 1)
 			{
 				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + mats.size() + " materials\n");																							
