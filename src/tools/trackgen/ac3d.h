@@ -287,6 +287,7 @@ struct Ac3d
     void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;
+    static void tokenizeLine(const std::string &line, std::vector<std::string> &tokens);
 };
 
 #endif /* _AC3D_H_ */

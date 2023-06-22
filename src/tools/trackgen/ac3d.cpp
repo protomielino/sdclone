@@ -102,11 +102,8 @@ Ac3d::Material::Material(std::ifstream &fin, const std::string &name) : name(nam
     while (std::getline(fin, line))
     {
         std::vector<std::string> tokens;
-        std::istringstream       iss(line);
 
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
+        tokenizeLine(line, tokens);
 
         if (tokens.empty())
             continue;
@@ -152,7 +149,7 @@ Ac3d::Material::Material(std::ifstream &fin, const std::string &name) : name(nam
             }
         }
         else
-            throw Exception("Invalid AC3D file;");
+            throw Exception("Invalid AC3D file");
     }
 }
 
@@ -160,7 +157,7 @@ void Ac3d::Material::write(std::ofstream &fout, bool versionC) const
 {
     if (versionC)
     {
-        fout << "MAT " << name << std::endl;
+        fout << "MAT \"" << name << "\"" << std::endl;
         fout << "rgb " << rgb[0] << " " << rgb[1] << " " << rgb[2] << std::endl;
         fout << "amb " << amb[0] << " " << amb[1] << " " << amb[2] << std::endl;
         fout << "emis " << emis[0] << " " << emis[1] << " " << emis[2] << std::endl;
@@ -171,7 +168,7 @@ void Ac3d::Material::write(std::ofstream &fout, bool versionC) const
     }
     else
     {
-        fout << "MATERIAL " << name
+        fout << "MATERIAL \"" << name << "\""
              << " rgb " << rgb[0] << " " << rgb[1] << " " << rgb[2]
              << "  amb " << amb[0] << " " << amb[1] << " " << amb[2]
              << "  emis " << emis[0] << " " << emis[1] << " " << emis[2]
@@ -199,11 +196,8 @@ Ac3d::Surface::Surface(std::ifstream &fin)
     while (std::getline(fin, line))
     {
         std::vector<std::string> tokens;
-        std::istringstream       iss(line);
 
-        std::copy(std::istream_iterator<std::string>(iss),
-            std::istream_iterator<std::string>(),
-            std::back_inserter(tokens));
+        tokenizeLine(line, tokens);
 
         if (tokens.empty())
             continue;
@@ -536,11 +530,8 @@ Ac3d::Object::Object(std::ifstream &fin)
     while (std::getline(fin, line))
     {
         std::vector<std::string> tokens;
-        std::istringstream       iss(line);
 
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
+        tokenizeLine(line, tokens);
 
         if (tokens.empty())
             continue;
@@ -563,11 +554,8 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
     while (std::getline(fin, line))
     {
         std::vector<std::string> tokens;
-        std::istringstream       iss(line);
-
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
+ 
+        tokenizeLine(line, tokens);
 
         if (tokens.empty())
             continue;
@@ -641,11 +629,7 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
                 if (line.empty())
                     continue;
 
-                std::istringstream       iss1(line);
-
-                std::copy(std::istream_iterator<std::string>(iss1),
-                          std::istream_iterator<std::string>(),
-                          std::back_inserter(tokens));
+                tokenizeLine(line, tokens);
 
                 vertices.emplace_back(std::stod(tokens.at(0)), std::stod(tokens.at(1)), std::stod(tokens.at(2)));
                 i++;
@@ -672,10 +656,7 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     fout << "OBJECT " << type << std::endl;
     if (!name.empty())
     {
-        if (name[0] != '\"')
-            fout << "name \"" << name << "\"" << std::endl;
-        else
-            fout << "name " << name << std::endl;
+        fout << "name \"" << name << "\"" << std::endl;
     }
     if (all && !data.empty())
     {
@@ -684,10 +665,7 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     }
     if (!texture.empty())
     {
-        if (texture[0] != '\"')
-            fout << "texture \"" << texture << "\"" << std::endl;
-        else
-            fout << "texture " << texture << std::endl;
+        fout << "texture \"" << texture << "\"" << std::endl;
     }
     if (texrep.initialized)
         fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
@@ -985,7 +963,7 @@ void Ac3d::addDefaultMaterial()
 {
     Ac3d::Material mat;
 
-    mat.name = "\"\"";
+    mat.name = "";
     mat.rgb.set(0.4, 0.4, 0.4);
     mat.amb.set(0.8, 0.8, 0.8);
     mat.emis.set(0.4, 0.4, 0.4);
@@ -1019,11 +997,8 @@ void Ac3d::readFile(const std::string &fileName)
         while (std::getline(fin, line))
         {
             std::vector<std::string> tokens;
-            std::istringstream       iss(line);
-
-            std::copy(std::istream_iterator<std::string>(iss),
-                      std::istream_iterator<std::string>(),
-                      std::back_inserter(tokens));
+ 
+            tokenizeLine(line, tokens);
 
             if (tokens.empty())
                 continue;
@@ -1034,12 +1009,12 @@ void Ac3d::readFile(const std::string &fileName)
             else if (tokens.at(0) == "OBJECT")
                 root.parse(fin, tokens.at(1));
             else
-                throw Exception("Invalid AC3D file;");
+                throw Exception("Invalid AC3D file");
         }
     }
     catch (std::out_of_range &)
     {
-        throw Exception("Invalid AC3D file;");
+        throw Exception("Invalid AC3D file");
     }
 }
 
@@ -1155,4 +1130,35 @@ double Ac3d::getTerrainAngle(double x, double y) const
         angle = 180.0 - atan2(terrainNormal[0], terrainNormal[1]) * 180.0 / PI;
 
     return angle;
+}
+
+void Ac3d::tokenizeLine(const std::string &line, std::vector<std::string> &tokens)
+{
+    tokens.clear();
+    size_t i = 0;
+    while (i < line.length())
+    {
+        while (std::isspace(line[i]))
+            i++;
+        if (line[i] == '\"')
+        {
+            size_t start = ++i;
+
+            while (i < line.size() && line[i] != '\"')
+                i++;
+
+            if (i >= line.size())
+                throw Exception("Invalid AC3D file");
+            tokens.emplace_back(line.substr(start, i - start));
+            i++;
+        }
+        else
+        {
+            size_t start = i++;
+            while (i < line.size() && !std::isspace(line[i]))
+                i++;
+            tokens.emplace_back(line.substr(start, i - start));
+            i++;
+        }
+    }
 }
