@@ -16,6 +16,7 @@ public class ObjShapeRelief extends Segment
 	public enum LineType { Polygon, Polyline };
 
 	private ReliefType			reliefType;
+	private String				reliefName = new String();
 	private LineType			lineType;
 	private Vector<double[]>	vertices = new Vector<double[]>();
 
@@ -26,9 +27,10 @@ public class ObjShapeRelief extends Segment
 		this.lineType = LineType.Polyline;
 	}
 
-	public ObjShapeRelief(ReliefType reliefType, LineType lineType, Vector<double[]> vertices)
+	public ObjShapeRelief(String name, ReliefType reliefType, LineType lineType, Vector<double[]> vertices)
 	{
 		super("relief");
+		this.reliefName = name;
 		this.reliefType = reliefType;
 		this.lineType = lineType;
 		this.vertices = vertices;
@@ -308,6 +310,16 @@ public class ObjShapeRelief extends Segment
 		}
 
 		return -1;
+	}
+
+	public String getReliefName()
+	{
+		return reliefName;
+	}
+
+	public void setReliefName(String reliefName)
+	{
+		this.reliefName = reliefName;
 	}
 
 	public void dump(String indent)

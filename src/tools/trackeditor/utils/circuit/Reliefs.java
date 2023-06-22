@@ -16,6 +16,7 @@ import utils.ac3d.Ac3dMaterial;
 public class Reliefs
 {
 	private String					fileName	= null;
+	private Vector<Ac3dMaterial>	materials	= new Vector<Ac3dMaterial>();
 	private Vector<ObjShapeRelief>	reliefs		= new Vector<ObjShapeRelief>();
 	private Boolean					changed		= false;
 
@@ -61,6 +62,8 @@ public class Reliefs
 
 		ac3dFile.read(new File(filename.toString()));
 
+		materials = ac3dFile.getMaterials();
+
 		Ac3dObject root = ac3dFile.getRoot();
 
 		root.flatten();
@@ -97,7 +100,7 @@ public class Reliefs
 							vertices.add(object.getVertices().get(surface.getRefs().get(k).index));
 						}
 							
-						reliefs.add(new ObjShapeRelief(type, lineType, vertices));
+						reliefs.add(new ObjShapeRelief(object.getName(), type, lineType, vertices));
 					}
 				}
 			}
@@ -128,23 +131,28 @@ public class Reliefs
 
 		ac3dFile.setRoot(world);
 
-		Ac3dMaterial material = new Ac3dMaterial("");
+		if (materials.isEmpty())
+		{
+			Ac3dMaterial material = new Ac3dMaterial("");
 
-		material.setRgb(new double[] { 0, 0, 1 });
-		material.setAmb(new double[] { 0.2, 0.2, 0.2 });
-		material.setEmis(new double[] { 0, 0, 0 });
-		material.setSpec(new double[] { 0.5, 0.5, 0.5 });
-		material.setShi(10);
-		material.setTrans(0);
+			material.setRgb(new double[] { 0, 0, 1 });
+			material.setAmb(new double[] { 0.2, 0.2, 0.2 });
+			material.setEmis(new double[] { 0, 0, 0 });
+			material.setSpec(new double[] { 0.5, 0.5, 0.5 });
+			material.setShi(10);
+			material.setTrans(0);
 
-		ac3dFile.getMaterials().add(material);
+			ac3dFile.getMaterials().add(material);
+		}
+		else
+			ac3dFile.setMaterials(materials);
 
 		for (int i = 0; i < reliefs.size(); i++)
 		{
 			ObjShapeRelief relief = reliefs.get(i);
 			Ac3dObject kid = new Ac3dObject("poly", 0);
 
-			kid.setName("line");
+			kid.setName(relief.getReliefName());
 			kid.setData(relief.isInterior() ? "interior" : "exterior");
 			kid.setVertices(relief.getVertices());
 

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class Ac3d
@@ -17,13 +19,82 @@ public class Ac3d
 	private Vector<Ac3dMaterial>	materials	= new Vector<Ac3dMaterial>();
 	private Ac3dObject				root		= null;
 
+    private String[] tokenizeLine(String text)  throws Ac3dException
+    {
+        List<String> result;
+        StringBuilder str;
+        int i;
+        String token;
+
+        result = new ArrayList<>();
+        str = new StringBuilder(text);
+
+        while (true)
+        {
+            // trimLeft
+            i = 0;
+            while ((i < str.length()) && (Character.isWhitespace(str.charAt(i))))
+            {
+                i++;
+            }
+            str = str.delete(0, i);
+
+            // stop when str is empty
+            if (str.length() == 0)
+            {
+                break;
+            }
+
+            // if str start with a double quote
+            if (str.charAt(0) == '"')
+            {
+                // find the next double quote
+                i = 1;
+                while (i < str.length())
+                {
+                    if (str.charAt(i) == str.charAt(0))
+                    {
+                        break;
+                    }
+                    i += 1;
+                }
+
+                if (i >= str.length())
+                {
+                    throw new Ac3dException("Quote parse error.", linenum);
+                }
+
+                // add the found string to the token vector without the quotes
+                token = str.substring(1, i);
+                result.add(token);
+                str = str.delete(0, i + 1);
+            }
+            else
+            {
+                // find first whiteSpace
+                i = 0;
+                while ((i < str.length()) && (!Character.isWhitespace(str.charAt(i))))
+                {
+                    i++;
+                }
+
+                // add the found string to the token vector
+                token = str.substring(0, i);
+                result.add(token);
+                str = str.delete(0, i);
+            }
+        }
+
+        return result.toArray(new String[result.size()]);
+    }
+
 	private boolean readLine() throws IOException
 	{
 		line = br.readLine();
 
 		if (line != null)
 		{
-			tokens = line.split("\\s+");
+			tokens = tokenizeLine(line);
 			linenum++;
 		}
 

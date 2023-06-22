@@ -71,7 +71,7 @@ public class Ac3dMaterial
 	{
 		if (versionC)
 		{
-			file.write("MAT " + name + "\n");
+			file.write("MAT \"" + name + "\"\n");
 			file.write("rgb " + rgb[0] + " " + rgb[1] + " " + rgb[2] + "\n");
 			file.write("amb " + amb[0] + " " + amb[1] + " " + amb[2] + "\n");
 			file.write("emis " + emis[0] + " " + emis[1] + " " + emis[2] + "\n");

@@ -2,6 +2,8 @@ package utils.ac3d;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Vector;
 
 public class Ac3dObject
@@ -117,6 +119,12 @@ public class Ac3dObject
 
 	public void write(FileWriter file) throws IOException
 	{
+		NumberFormat	nf;
+		nf = NumberFormat.getNumberInstance(Locale.US);
+		nf.setMaximumFractionDigits(6);
+		nf.setMinimumFractionDigits(0);
+		nf.setGroupingUsed(false);
+
 		file.write("OBJECT " + type + "\n");
 
 		if (name != null && !name.isEmpty())
@@ -131,22 +139,24 @@ public class Ac3dObject
 
 		if (texrep != null && texrep.length == 2)
 		{
-			file.write("texrep " + texrep[0] + " " + texrep[1] + "\n");
+			file.write("texrep " + nf.format(texrep[0]) + " " + nf.format(texrep[1]) + "\n");
 		}
 
 		if (texoff != null && texoff.length == 2)
 		{
-			file.write("texoff " + texoff[0] + " " + texoff[1] + "\n");
+			file.write("texoff " + nf.format(texoff[0]) + " " + nf.format(texoff[1]) + "\n");
 		}
 
 		if (rot != null && rot.length == 9)
 		{
-			file.write("rot " + rot[0] + " " + rot[1] + " " + rot[2] + " " + rot[3] + " " + rot[4] + " " + rot[5] + " " + rot[6] + " " + rot[7] + " " + rot[8] + "\n");
+			file.write("rot " + nf.format(rot[0]) + " " + nf.format(rot[1]) + " " + nf.format(rot[2]) +
+					" " + nf.format(rot[3]) + " " + nf.format(rot[4]) + " " + nf.format(rot[5]) +
+					" " + nf.format(rot[6]) + " " + nf.format(rot[7]) + " " + nf.format(rot[8]) + "\n");
 		}
 
 		if (loc != null && loc.length == 3)
 		{
-			file.write("loc " + loc[0] + " " + loc[1] + " " + loc[2] + "\n");
+			file.write("loc " + nf.format(loc[0]) + " " + nf.format(loc[1]) + " " + nf.format(loc[2]) + "\n");
 		}
 
 		if (crease != null)
@@ -187,7 +197,7 @@ public class Ac3dObject
 			{
 				double vertex[] = vertices.get(i);
 
-				file.write(vertex[0] + " " + vertex[1] + " " + vertex[2] + "\n");
+				file.write(nf.format(vertex[0]) + " " + nf.format(vertex[1]) + " " + nf.format(vertex[2]) + "\n");
 			}
 		}
 

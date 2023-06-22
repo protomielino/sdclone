@@ -2,6 +2,8 @@ package utils.ac3d;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Vector;
 
 public class Ac3dSurface
@@ -165,6 +167,12 @@ public class Ac3dSurface
 	
 	public void write(FileWriter file) throws IOException
 	{
+		NumberFormat	nf;
+		nf = NumberFormat.getNumberInstance(Locale.US);
+		nf.setMaximumFractionDigits(6);
+		nf.setMinimumFractionDigits(0);
+		nf.setGroupingUsed(false);
+
 		if (surf != null)
 		{
 			file.write("SURF " + String.format("0x%02X", surf) + "\n");
@@ -181,7 +189,7 @@ public class Ac3dSurface
 		{
 			Ref ref = refs.get(i);
 
-			file.write(ref.index + " " + ref.coord[0] + " " + ref.coord[1] + "\n");
+			file.write(ref.index + " " + nf.format(ref.coord[0]) + " " + nf.format(ref.coord[1]) + "\n");
 		}
 	}
 
