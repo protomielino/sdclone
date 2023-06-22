@@ -101,8 +101,8 @@ void PackedBuffer::pack_ubyte(unsigned char v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_ubyte: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_ubyte: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -118,8 +118,8 @@ void PackedBuffer::pack_short(short v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_short: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_short: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -135,8 +135,8 @@ void PackedBuffer::pack_int(int v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_int: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_int: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -152,8 +152,8 @@ void PackedBuffer::pack_ushort(unsigned short v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_ushort: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_ushort: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -169,8 +169,8 @@ void PackedBuffer::pack_uint(unsigned int v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_uint: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_uint: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -187,8 +187,8 @@ void PackedBuffer::pack_float(float v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_float: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_float: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -212,8 +212,8 @@ void PackedBuffer::pack_double(double v) { const size_t size = sizeof(Uint64);
 
     if (bounds_error(size))
     {
-        GfLogError("pack_double: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_double: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -243,8 +243,8 @@ void PackedBuffer::pack_vector(const float *v)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_vector: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_vector: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -269,8 +269,8 @@ void PackedBuffer::pack_string(const void *m, int len)
 {
     if (bounds_error(len))
     {
-        GfLogError("pack_string: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_string: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -288,8 +288,8 @@ void PackedBuffer::pack_stdstring(const std::string& str)
 
     if (bounds_error(size))
     {
-        GfLogError("pack_stdstring: buffer overflow: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("pack_stdstring: buffer overflow: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -303,8 +303,8 @@ unsigned char PackedBuffer::unpack_ubyte()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_ubyte: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_ubyte: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -322,8 +322,8 @@ short PackedBuffer::unpack_short()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_short: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_short: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -341,8 +341,8 @@ int PackedBuffer::unpack_int()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_int: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_int: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -360,13 +360,13 @@ unsigned short PackedBuffer::unpack_ushort()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_ushort: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_ushort: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
     Uint16 x;
-    
+
     ::memcpy(&x, buf_data, size);
     next_data(size);
 
@@ -379,8 +379,8 @@ unsigned int PackedBuffer::unpack_uint()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_uint: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_uint: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -388,7 +388,7 @@ unsigned int PackedBuffer::unpack_uint()
 
     ::memcpy(&x, buf_data, size);
     next_data(size);
-    
+
     return (unsigned int)ntohl(x);
 }
 
@@ -398,8 +398,8 @@ float PackedBuffer::unpack_float()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_float: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_float: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -410,7 +410,7 @@ float PackedBuffer::unpack_float()
     ::memcpy(&x, buf_data, size);
     next_data(size);
     u.intval = (Uint32)ntohl(x);
-    
+
     return u.floatval;
 }
 
@@ -423,8 +423,8 @@ double PackedBuffer::unpack_double()
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_double: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_double: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -445,8 +445,8 @@ float *PackedBuffer::unpack_vector(float *v)
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_vector: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_vector: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -470,8 +470,8 @@ void *PackedBuffer::unpack_string(void *m, int len)
 {
     if (bounds_error(len))
     {
-        GfLogError("unpack_string: buffer overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_string: buffer overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 
@@ -487,8 +487,8 @@ std::string &PackedBuffer::unpack_stdstring(std::string& str)
 
     if (bounds_error(size))
     {
-        GfLogError("unpack_stdstring: packed overrun: buf_size=%d "
-                "data_length=%d\n", buf_size, data_length);
+        GfLogError("unpack_stdstring: packed overrun: buf_size=%zu "
+                "data_length=%zu\n", buf_size, data_length);
         throw PackedBufferException();
     }
 

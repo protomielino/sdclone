@@ -195,8 +195,7 @@ void NetServer::SendStartTimePacket(int &startTime)
     {
         GfLogFatal("SendStartTimePacket: packed buffer error\n");
     }
-    GfLogTrace("SendStartTimePacket: packed data length=%d\n",
-            msg.length());
+    GfLogTrace("SendStartTimePacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -250,7 +249,7 @@ void NetServer::GenerateDriversForXML()
 
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
-	GfParmListClean(params, RE_SECT_DRIVERS);
+    GfParmListClean(params, RE_SECT_DRIVERS);
 
     // We only want to add human drivers which don't already exist
     NetServerMutexData *pSData = LockServerData();
@@ -261,7 +260,7 @@ void NetServer::GenerateDriversForXML()
         bool found = false;
 
         // Skip the ones which aren't active
-	if (pSData->m_vecNetworkPlayers[i].active == false) continue;
+    if (pSData->m_vecNetworkPlayers[i].active == false) continue;
 
         while (!found) {
             sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index++);
@@ -410,7 +409,7 @@ void NetServer::SetCarInfo(const char *pszName)
     {
         if (vecDrivers[i].name == m_strDriverName)
         {
-            strncpy(vecDrivers[i].car,pszName,64);
+            strncpy(vecDrivers[i].car, pszName, 64);
             UpdateDriver(vecDrivers[i]);
             break;
         }
@@ -509,7 +508,7 @@ bool NetServer::SendPlayerAcceptedPacket(ENetPeer * pPeer)
         GfLogFatal("SendPlayerAcceptedPacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendPlayerAcceptedPacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendPlayerAcceptedPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -537,7 +536,7 @@ bool NetServer::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
         GfLogFatal("SendPlayerRejectedPacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendPlayerRejectedPacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendPlayerRejectedPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -572,7 +571,7 @@ void NetServer::SendDriversReadyPacket()
         GfLogFatal("SendDriversReadyPacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendDriversReadyPacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendDriversReadyPacket: packed data length=%zu\n", msg.length());
 
     UnlockNetworkData();
 
@@ -597,7 +596,7 @@ void NetServer::SendRaceSetupPacket()
         GfLogFatal("SendRaceSetupPacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendRaceSetupPacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendRaceSetupPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -617,7 +616,7 @@ void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
     bool bReady;
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadDriverReadyPacket: packed data length=%d\n",
+    GfLogTrace("ReadDriverReadyPacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -651,7 +650,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     GfLogTrace ("Client Player Info connected from %s\n",hostName);
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadDriverInfoPacket: packed data length=%d\n",
+    GfLogTrace("ReadDriverInfoPacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -757,7 +756,7 @@ void NetServer::SendWeatherPacket()
         GfLogFatal("SendWeatherPacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendWeatherPacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendWeatherPacket: packed data length=%zu\n", msg.length());
 
     ENetPacket *pWeatherPacket = enet_packet_create(msg.buffer(),
             msg.length(),
@@ -786,7 +785,7 @@ void NetServer::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
         GfLogFatal("SendTimePacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendTimePacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendTimePacket: packed data length=%zu\n", msg.length());
 
     //TODO change to peer send
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
@@ -851,7 +850,7 @@ void NetServer::SendFilePacket(const char *pszFile)
         GfLogFatal("SendFilePacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendFilePacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendFilePacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -970,7 +969,7 @@ void NetServer::RemovePlayerFromRace(unsigned int idx)
         GfLogFatal("RemovePlayerFromRace: packed buffer error\n");
     }
 
-    GfLogTrace("RemovePlayerFromRace: packed data length=%d\n", msg.length());
+    GfLogTrace("RemovePlayerFromRace: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -999,8 +998,7 @@ void NetServer::ReadPacket(ENetEvent event)
             memset(&name[0],0,256);
 
             PackedBuffer msg(pPacket->data, pPacket->dataLength);
-            GfLogTrace("ReadPacket: packed data length=%d\n",
-                    msg.length());
+            GfLogTrace("ReadPacket: packed data length=%zu\n", msg.length());
 
             try
             {
@@ -1041,18 +1039,18 @@ void NetServer::ReadPacket(ENetEvent event)
         break;
     case CARSTATUS_PACKET:
         ReadCarStatusPacket(event.packet);
-		RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
+        RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
         break;
     case LAPSTATUS_PACKET:
         ReadLapStatusPacket(event.packet);
-		RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
+        RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
         break;
     case DRIVERREADY_PACKET:
         ReadDriverReadyPacket(event.packet);
         break;
 
     default:
-        GfLogTrace ("A packet of length %u containing %s was received from %s on channel %u.\n",
+        GfLogTrace ("A packet of length %zu containing %s was received from %s on channel %u.\n",
                 event.packet -> dataLength,
                 event.packet -> data,
                 (char*)event.peer -> data,
@@ -1084,7 +1082,7 @@ void NetServer::SendFinishTimePacket()
         GfLogFatal("SendFinishTimePacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendFinishTimePacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendFinishTimePacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -1122,7 +1120,7 @@ void NetServer::SendPrepareToRacePacket()
         GfLogFatal("SendPrepareToRacePacket: packed buffer error\n");
     }
 
-    GfLogTrace("SendPrepareToRacePacket: packed data length=%d\n", msg.length());
+    GfLogTrace("SendPrepareToRacePacket: packed data length=%zu\n", msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -1186,7 +1184,7 @@ void NetServer::Dump(const char* pszCaller)
     NetMutexData *pNData = LockNetworkData();
     NetServerMutexData *pSData = LockServerData();
 
-    GfLogDebug("%s : vecReady:%u, vecPlayers:%u\n",
+    GfLogDebug("%s : vecReady:%zu, vecPlayers:%zu\n",
             pszCaller, pNData->m_vecReadyStatus.size(), pSData->m_vecNetworkPlayers.size());
 
     UnlockServerData();

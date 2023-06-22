@@ -218,7 +218,7 @@ void NetClient::SetDriverReady(bool bReady)
     {
         GfLogFatal("SetDriverReady: packed buffer error\n");
     }
-    GfLogTrace("SetDriverReady: packed data length=%d\n", msg.length());
+    GfLogTrace("SetDriverReady: packed data length=%zu\n", msg.length());
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(),
             msg.length(),
@@ -275,7 +275,7 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
     {
         GfLogFatal("SendDriverInfoPacket: packed buffer error\n");
     }
-    GfLogTrace("SendDriverInfoPacket: packed data length=%d\n",
+    GfLogTrace("SendDriverInfoPacket: packed data length=%zu\n",
             msg.length());
 
     ENetPacket * pPacket = enet_packet_create (msg.buffer(),
@@ -305,7 +305,7 @@ void NetClient::SendReadyToStartPacket()
     {
         GfLogFatal("SendReadyToStartPacket: packed buffer error\n");
     }
-    GfLogTrace("SendReadyToStartPacket: packed data length=%d\n",
+    GfLogTrace("SendReadyToStartPacket: packed data length=%zu\n",
             msg.length());
 
     ENetPacket *pPacket = enet_packet_create (msg.buffer(),
@@ -331,7 +331,7 @@ void NetClient::SendServerTimeRequest()
     {
         GfLogFatal("SendServerTimeRequest: packed buffer error\n");
     }
-    GfLogTrace("SendServerTimeRequest: packed data length=%d\n",
+    GfLogTrace("SendServerTimeRequest: packed data length=%zu\n",
             msg.length());
 
 
@@ -360,7 +360,7 @@ void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
     //double time = GfTimeClock();
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadStartTimePacket: packed data length=%d\n",
+    GfLogTrace("ReadStartTimePacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -508,7 +508,7 @@ void NetClient::ReadPacket(ENetEvent event)
         break;
     default:
         assert(false);
-        GfLogDebug ("A packet of length %u containing %s was received from %s on channel %u.\n",
+        GfLogDebug ("A packet of length %zu containing %s was received from %s on channel %u.\n",
                 event.packet -> dataLength,
                 event.packet -> data,
                 (char*)event.peer -> data,
@@ -547,7 +547,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
     int rsize;
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadAllDriverReadyPacket: packed data length=%d\n",
+    GfLogTrace("ReadAllDriverReadyPacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -575,7 +575,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
 {
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadFinishTimePacket: packed data length=%d\n",
+    GfLogTrace("ReadFinishTimePacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -603,7 +603,7 @@ void NetClient::ReadTimePacket(ENetPacket *pPacket)
     double time = 0;
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadTimePacket: packed data length=%d\n",
+    GfLogTrace("ReadTimePacket: packed data length=%zu\n",
             msg.length());
 
     try
@@ -630,7 +630,7 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
     memset(file, 0, sizeof file);
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
-    GfLogTrace("ReadFilePacket: packed data length=%d\n",
+    GfLogTrace("ReadFilePacket: packed data length=%zu\n",
             msg.length());
 
     try
