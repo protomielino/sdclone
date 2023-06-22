@@ -690,7 +690,7 @@ void NetClient::SetCarInfo(const char *pszName)
     {
         if (vecDrivers[i].name == m_strDriverName)
         {
-            strncpy(vecDrivers[i].car,pszName,64);
+            strncpy(vecDrivers[i].car,pszName,63);
             SendDriverInfoPacket(&vecDrivers[i]);
         }
     }

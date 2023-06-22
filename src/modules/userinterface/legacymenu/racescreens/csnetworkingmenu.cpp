@@ -388,7 +388,7 @@ UpdateNetworkPlayers()
 			// Write car model, as it may have changed via garage menu
 			if (NetIsServer()) {
 				NetServerMutexData *pSData = NetGetServer()->LockServerData();
-				strncpy(pSData->m_vecNetworkPlayers[idx-1].car, car, 64);
+				strncpy(pSData->m_vecNetworkPlayers[idx-1].car, car, 63);
 				GfLogInfo("idx %d car set to %s\n", idx, car);
 
 				// also need to write back for garage menu
@@ -1131,12 +1131,12 @@ GetHumanDriver(NetDriver &driver,int index)
 
 	if (GfParmExistsSection(params, path2) == 0) return 0;
 
-	strncpy(driver.name,GfParmGetStr(params, path2, "name",NULL),64);
-	strncpy(driver.sname,GfParmGetStr(params, path2, ROB_ATTR_SNAME, NULL), 64);
-	strncpy(driver.cname,GfParmGetStr(params, path2, ROB_ATTR_CODE, NULL), 4);
-	strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),64);
-	strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),64);
-	strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),64);
+	strncpy(driver.name,GfParmGetStr(params, path2, "name",NULL),63);
+	strncpy(driver.sname,GfParmGetStr(params, path2, ROB_ATTR_SNAME, NULL), 63);
+	strncpy(driver.cname,GfParmGetStr(params, path2, ROB_ATTR_CODE, NULL), 3);
+	strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),63);
+	strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),63);
+	strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),63);
 
 	driver.racenumber = GfParmGetNum(params, path2, "race number",NULL,1.0);
 	driver.red = GfParmGetNum(params, path2, "red",NULL,1.0);
