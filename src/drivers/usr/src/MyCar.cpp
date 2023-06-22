@@ -138,6 +138,75 @@ void MyCar::readConstSpecs(void* CarHandle)
     double tiremufront = MIN(tiremuFL, tiremuFR);
     double tiremurear = MIN(tiremuRL, tiremuRR);
     mTireMu = MIN(tiremufront, tiremurear);
+
+    if (HASCPD)
+    {
+        char path[256];
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[1] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[2] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[3] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[4] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[5] = MIN(tiremufront, tiremurear);
+
+        int compounds = GfParmGetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 1);
+        mTireMu = mTireMuC[compounds];
+        LogUSR.debug("# USR tire mu = %.2f\n", mTireMu);
+    }
+
     mBrakePressMax = GfParmGetNum(CarHandle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, 0);
     mBrakeRepartition = GfParmGetNum(CarHandle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0);
     mFrontWingAngle = GfParmGetNum(CarHandle, SECT_FRNTWING, PRM_WINGANGLE, (char*)NULL, 0);
@@ -229,6 +298,7 @@ void MyCar::update(double dt)
     }
 
     mSegMu = mTires.gripFactor() * mTireMu * mCar->_trkPos.seg->surface->kFriction;
+    LogUSR.debug("# USR CarModel Tire Mu = %.3f - SegMu = %.3f\n", mTireMu, mSegMu);
     mCW = mBodyCW * (1.0 + mCar->_dammage / 10000.0) + mWingCW;
     mToMiddle = mCar->_trkPos.toMiddle;
     double yawdiff = Utils::normPiPi(mCar->_yaw - mYaw);
