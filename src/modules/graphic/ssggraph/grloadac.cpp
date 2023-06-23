@@ -418,25 +418,58 @@ static int do_obj_light ( char * ) { return OBJ_LIGHT ; }
 
 static int do_material ( char *s )
 {
-  char name [ 1024 ] ;
+  std::string name; // not used
   sgVec4 rgb  ;
   sgVec4 amb  ;
   sgVec4 emis ;
   sgVec4 spec ;
   int   shi ;
   float trans ;
+  const char *p = s;
 
-  //#537: Limiting parsing 1023 bytes to fit in "name", as we have
-  // no info how long a string we received as param "s"
-  if ( sscanf ( s,
-  "%1023s rgb %f %f %f amb %f %f %f emis %f %f %f spec %f %f %f shi %d trans %f",
-    name,
+  // skip whitespace
+  while (*p != '\0' && std::isspace(*p))
+      p++;
+
+  if (*p == '\"')
+  {
+      p++;
+
+      while (*p != '\0' && *p != '\"')
+      {
+          name.push_back(p[0]);
+          p++;
+      }
+  }
+  else
+  {
+      while (*p != '\0' && !std::isspace(*p))
+      {
+          name.push_back(p[0]);
+          p++;
+      }
+  }
+
+  if (*p == '\0')
+  {
+      ulSetError(UL_WARNING, "grloadac:do_material: Can't parse this MATERIAL: %512s", s);
+      return PARSE_CONT;
+  }
+
+  p++;
+
+  // skip whitespace
+  while (*p != '\0' && std::isspace(*p))
+      p++;
+
+  if ( sscanf ( p,
+    "rgb %f %f %f amb %f %f %f emis %f %f %f spec %f %f %f shi %d trans %f",
     &rgb [0], &rgb [1], &rgb [2],
     &amb [0], &amb [1], &amb [2],
     &emis[0], &emis[1], &emis[2],
     &spec[0], &spec[1], &spec[2],
     &shi,
-    &trans ) != 15 )
+    &trans ) != 14 )
   {
     //#537: Limiting error message length, as PLIB error handler
     // can store only 1024 bytes
@@ -444,10 +477,6 @@ static int do_material ( char *s )
   }
   else
   {
-    char *nm = name ;
-
-    skip_quotes ( &nm ) ;
-
     amb [ 3 ] = emis [ 3 ] = spec [ 3 ] = 1.0f ;
     rgb [ 3 ] = 1.0f - trans ;
 
