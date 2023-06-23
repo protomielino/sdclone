@@ -480,30 +480,63 @@ int computeNorm(const point_t &pv1, const point_t &pv2, const point_t &pv3, poin
 
 int doMaterial(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    char name[256] = { 0 };
-    mat_t materialt;
+    mat_t material;
     char *p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown MATERIAL format %s\n", Line);
         return (-1);
     }
+
+    // skip whitespace
+    while (*p != '\0' && std::isspace(*p))
+        p++;
+
+    if (*p == '\"')
+    {
+        p++;
+
+        while (*p != '\0' && *p != '\"')
+        {
+            material.name.push_back(p[0]);
+            p++;
+        }
+    }
+    else
+    {
+        while (*p != '\0' && !std::isspace(*p))
+        {
+            material.name.push_back(p[0]);
+            p++;
+        }
+    }
+
+    if (*p == '\0')
+    {
+        fprintf(stderr, "invalid MATERIAL format %s\n", Line);
+        return (-1);
+    }
+
+    p++;
+
+    // skip whitespace
+    while (*p != '\0' && std::isspace(*p))
+        p++;
+
     if (sscanf(p,
-            "%255s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
-            name, &(materialt.rgb.r), &(materialt.rgb.g), &(materialt.rgb.b),
-            &(materialt.amb.r), &(materialt.amb.g), &(materialt.amb.b),
-            &(materialt.emis.r), &(materialt.emis.g), &(materialt.emis.b),
-            &(materialt.spec.r), &(materialt.spec.g), &(materialt.spec.b),
-            &(materialt.shi), &(materialt.trans)) != 15)
+            "rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
+            &(material.rgb.r), &(material.rgb.g), &(material.rgb.b),
+            &(material.amb.r), &(material.amb.g), &(material.amb.b),
+            &(material.emis.r), &(material.emis.g), &(material.emis.b),
+            &(material.spec.r), &(material.spec.g), &(material.spec.b),
+            &(material.shi), &(material.trans)) != 14)
     {
         fprintf(stderr, "invalid MATERIAL format %s\n", p);
         return (-1);
     }
 
-    materialt.name = name;
-
     // append to list
-    materials.push_back(materialt); // use emplace_back someday
+    materials.push_back(material); // use emplace_back someday
 
     nummaterial++;
 
