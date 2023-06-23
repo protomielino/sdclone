@@ -26,6 +26,7 @@ import utils.SegmentVector;
 import utils.TrackData;
 import utils.ac3d.Ac3d;
 import utils.ac3d.Ac3dException;
+import utils.ac3d.Ac3dMaterial;
 import utils.ac3d.Ac3dObject;
 import utils.ac3d.Ac3dSurface;
 import utils.circuit.Curve;
@@ -487,6 +488,19 @@ public class CheckDialog extends JDialog
 				{
 					ac3dFile.read(file);
 
+					for (Ac3dMaterial material : ac3dFile.getMaterials())
+					{
+						String name = material.getName();
+						
+						if (name != null && !name.isEmpty())
+						{
+							if (name.contains(" "))
+							{
+								textArea.append("Relief file " + file.toString() + " : material \"" + name + "\" has space in name\n");					
+							}
+						}
+					}
+
 					Ac3dObject root = ac3dFile.getRoot();
 
 					if (root != null && "world".equals(root.getType()))
@@ -820,6 +834,19 @@ public class CheckDialog extends JDialog
 		try
 		{
 			ac3dFile.read(file);
+			
+			for (Ac3dMaterial material : ac3dFile.getMaterials())
+			{
+				String name = material.getName();
+				
+				if (name != null && !name.isEmpty())
+				{
+					if (name.contains(" "))
+					{
+						textArea.append("Object file " + file.toString() + " : material \"" + name + "\" has space in name\n");					
+					}
+				}
+			}
 
 			Ac3dObject root = ac3dFile.getRoot();
 
