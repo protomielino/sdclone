@@ -3583,7 +3583,7 @@ void printMaterials(FILE *file, const std::vector<mat_t> &materials)
     {
         const mat_t &material = materials[j];
         fprintf(file,
-            "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0\n",
+            "MATERIAL \"%s\" rgb %1.2f %1.2f %1.2f  amb %1.2f %1.2f %1.2f  emis %1.2f %1.2f %1.2f  spec %1.2f %1.2f %1.2f  shi %d  trans 0\n",
             material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
             material.amb.g, material.amb.b, material.emis.r, material.emis.g,
             material.emis.b, material.spec.r, material.spec.g, material.spec.b,

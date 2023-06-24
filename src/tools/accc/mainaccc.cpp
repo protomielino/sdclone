@@ -58,7 +58,7 @@ double smooth_angle = 70.0;
 
 void usage(void)
 {
-    fprintf(stderr, "Ac3d Compiler $Revision: 1.4.2 $\n");
+    fprintf(stderr, "Ac3d Compiler $Revision: 1.4.3 $\n");
     fprintf(stderr, "Usage: accc [option] <inputfile> <outputfile> [dist][-order \"orderstring\"]<\n");
     fprintf(stderr, "+o: ac3d to ac3d : the result file is optimized\n");
     fprintf(stderr, "                   in using groups by zone of track\n");
