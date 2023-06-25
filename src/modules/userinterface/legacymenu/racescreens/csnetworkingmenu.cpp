@@ -1139,13 +1139,6 @@ GetHumanDriver(NetDriver &driver,int index)
     memcpy(driver.type,GfParmGetStr(params, path2, "type", NULL), sizeof(driver.type));
     memcpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level", NULL), sizeof(driver.skilllevel));
 
-    /*strncpy(driver.name, GfParmGetStr(params, path2, "name", NULL), 64);
-    strncpy(driver.sname, GfParmGetStr(params, path2, "short name", NULL), 64);
-    strncpy(driver.cname, GfParmGetStr(params, path2, "code name", NULL), 4);
-    strncpy(driver.car,GfParmGetStr(params, path2, "car name", NULL), 64);
-    strncpy(driver.type,GfParmGetStr(params, path2, "type", NULL), 64);
-    strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level", NULL), 64);*/
-
     driver.racenumber = GfParmGetNum(params, path2, "race number",NULL,1.0);
     driver.red = GfParmGetNum(params, path2, "red",NULL,1.0);
     driver.green = GfParmGetNum(params, path2, "green",NULL,1.0);
