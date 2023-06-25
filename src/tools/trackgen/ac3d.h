@@ -37,6 +37,20 @@
 
 struct Ac3d
 {
+    struct V2d : public std::array<double, 2>
+    {
+        V2d()
+        {
+            at(0) = 0;
+            at(1) = 0;
+        }
+        V2d(double x, double y)
+        {
+            at(0) = x;
+            at(1) = y;
+        }
+    };
+
     struct V3d : public std::array<double, 3>
     {
         V3d()
@@ -113,34 +127,40 @@ struct Ac3d
     {
         struct Ref
         {
-            int                     index = 0;
-            std::array<double, 2>   coord{ 0, 0 };
+            int                 index = 0;
+            int                 count = 1;
+            std::array<V2d, 4>  coords;
 
             Ref() = default;
-            Ref(int index, double u, double v) : index(index), coord{ u, v } { }
+            Ref(int index, double u, double v) : index(index) { coords[0] = { u, v }; }
         };
 
         enum SURF : int { 
-            Polygon                     = 0x00,
-            ClosedLine                  = 0x01,
-            OpenLine                    = 0x02,
-            TypeMask                    = 0x0f,
-            SingleSided                 = 0x00,
-            DoubleSided                 = 0x20,
-            Flat                        = 0x00,
-            Smooth                      = 0x10,
-            PolygonSingleSidedFlat      = Polygon    | SingleSided | Flat,      // 0x00
-            ClosedLineSingleSidedFlat   = ClosedLine | SingleSided | Flat,      // 0x01
-            OpenLineSingleSidedFlat     = OpenLine   | SingleSided | Flat,      // 0x02
-            PolygonSingleSidedSmooth    = Polygon    | SingleSided | Smooth,    // 0x10
-            ClosedLineSingleSidedSmooth = ClosedLine | SingleSided | Smooth,    // 0x11
-            OpenLineSingleSidedSmooth   = OpenLine   | SingleSided | Smooth,    // 0x12
-            PolygonDoubleSidedFlat      = Polygon    | DoubleSided | Flat,      // 0x20
-            ClosedLineDoubleSidedFlat   = ClosedLine | DoubleSided | Flat,      // 0x21
-            OpenLineDoubleSidedFlat     = OpenLine   | DoubleSided | Flat,      // 0x22
-            PolygonDoubleSidedSmooth    = Polygon    | DoubleSided | Smooth,    // 0x30
-            ClosedLineDoubleSidedSmooth = ClosedLine | DoubleSided | Smooth,    // 0x31
-            OpenLineDoubleSidedSmooth   = OpenLine   | DoubleSided | Smooth,    // 0x32
+            Polygon                         = 0x00,
+            ClosedLine                      = 0x01,
+            OpenLine                        = 0x02,
+            TriangleStrip                   = 0x04,
+            TypeMask                        = 0x0f,
+            SingleSided                     = 0x00,
+            DoubleSided                     = 0x20,
+            Flat                            = 0x00,
+            Smooth                          = 0x10,
+            PolygonSingleSidedFlat          = Polygon       | SingleSided | Flat,      // 0x00
+            ClosedLineSingleSidedFlat       = ClosedLine    | SingleSided | Flat,      // 0x01
+            OpenLineSingleSidedFlat         = OpenLine      | SingleSided | Flat,      // 0x02
+            TriangleStripSingleSidedFlat    = TriangleStrip | SingleSided | Flat,      // 0x04
+            PolygonSingleSidedSmooth        = Polygon       | SingleSided | Smooth,    // 0x10
+            ClosedLineSingleSidedSmooth     = ClosedLine    | SingleSided | Smooth,    // 0x11
+            OpenLineSingleSidedSmooth       = OpenLine      | SingleSided | Smooth,    // 0x12
+            TriangleStripSingleSidedSmooth  = TriangleStrip | SingleSided | Smooth,    // 0x14
+            PolygonDoubleSidedFlat          = Polygon       | DoubleSided | Flat,      // 0x20
+            ClosedLineDoubleSidedFlat       = ClosedLine    | DoubleSided | Flat,      // 0x21
+            OpenLineDoubleSidedFlat         = OpenLine      | DoubleSided | Flat,      // 0x22
+            TriangleStripDoubleSidedFlat    = TriangleStrip | DoubleSided | Flat,      // 0x24
+            PolygonDoubleSidedSmooth        = Polygon       | DoubleSided | Smooth,    // 0x30
+            ClosedLineDoubleSidedSmooth     = ClosedLine    | DoubleSided | Smooth,    // 0x31
+            OpenLineDoubleSidedSmooth       = OpenLine      | DoubleSided | Smooth,    // 0x32
+            TriangleStripDoubleSidedSmooth  = TriangleStrip | DoubleSided | Smooth,    // 0x34
         };
         SURF                surf = PolygonSingleSidedFlat;
         int                 mat = 0;
@@ -231,29 +251,30 @@ struct Ac3d
 
     struct Object
     {
-        std::string		        type;
-        std::string		        name;
-        std::string		        data;
-        std::string		        texture;
-        v2                      texrep;
-        v2                      texoff;
-        Value<int>				subdiv;
-        Value<double>			crease;
-        v9                      rot;
-        v3			            loc;
-        std::string				url;
-        bool				    hidden = false;
-        bool				    locked = false;
-        bool				    folded = false;
-        std::vector<V3d>        vertices;
-        std::list<Surface>      surfaces;
-        std::list<Object>       kids;
+        std::string		            type;
+        std::string		            name;
+        std::string		            data;
+        std::vector<std::string>    textures;
+        v2                          texrep;
+        v2                          texoff;
+        Value<int>				    subdiv;
+        Value<double>			    crease;
+        v9                          rot;
+        v3			                loc;
+        std::string				    url;
+        bool				        hidden = false;
+        bool				        locked = false;
+        bool				        folded = false;
+        std::vector<V3d>            vertices;
+        std::vector<V3d>            normals;
+        std::list<Surface>          surfaces;
+        std::list<Object>           kids;
 
         // not part of AC3D file
-        mutable bool            hasBoundingBox = false;
-        mutable BoundingBox     boundingBox;
-        mutable bool            hasBoundingSphere = false;
-        mutable BoundingSphere  boundingSphere;
+        mutable bool                hasBoundingBox = false;
+        mutable BoundingBox         boundingBox;
+        mutable bool                hasBoundingSphere = false;
+        mutable BoundingSphere      boundingSphere;
 
         Object() = default;
         Object(const std::string &type, const std::string &name) : type(type), name(name) { }

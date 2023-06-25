@@ -222,8 +222,29 @@ Ac3d::Surface::Surface(std::ifstream &fin)
                           std::back_inserter(tokens));
 
                 refs[i].index = std::stoi(tokens.at(0));
-                refs[i].coord[0] = std::stod(tokens.at(1));
-                refs[i].coord[1] = std::stod(tokens.at(2));
+                refs[i].coords[0][0] = std::stod(tokens.at(1));
+                refs[i].coords[0][1] = std::stod(tokens.at(2));
+
+                if (tokens.size() >= 5)
+                {
+                    refs[i].count = 2;
+                    refs[i].coords[1][0] = std::stod(tokens.at(3));
+                    refs[i].coords[1][1] = std::stod(tokens.at(4));
+
+                    if (tokens.size() >= 7)
+                    {
+                        refs[i].count = 3;
+                        refs[i].coords[2][0] = std::stod(tokens.at(5));
+                        refs[i].coords[2][1] = std::stod(tokens.at(6));
+
+                        if (tokens.size() >= 9)
+                        {
+                            refs[i].count = 4;
+                            refs[i].coords[3][0] = std::stod(tokens.at(7));
+                            refs[i].coords[3][1] = std::stod(tokens.at(8));
+                        }
+                    }
+                }
                 i++;
             }
             break;
@@ -239,7 +260,26 @@ void Ac3d::Surface::write(std::ofstream &fout) const
     fout << "mat " << mat << std::endl;
     fout << "refs " << refs.size() << std::endl;
     for (const auto &ref : refs)
-        fout << ref.index << " " << ref.coord[0] << " " << ref.coord[1] << std::endl;
+    {
+        fout << ref.index << " " << ref.coords[0][0] << " " << ref.coords[0][1];
+
+        if (ref.count >= 2)
+        {
+            fout << " " << ref.coords[1][0] << " " << ref.coords[1][1];
+
+            if (ref.count >= 3)
+            {
+                fout << " " << ref.coords[2][0] << " " << ref.coords[2][1];
+
+                if (ref.count == 4)
+                {
+                    fout << " " << ref.coords[3][0] << " " << ref.coords[3][1];
+                }
+            }
+        }
+
+        fout << std::endl;
+    }
 }
 
 //--------------------------------- Matrix ------------------------------------
@@ -540,7 +580,7 @@ Ac3d::Object::Object(std::ifstream &fin)
             parse(fin, tokens.at(1));
             return;
         }
-        
+
         throw Exception("Invalid AC3D file");
     }
 }
@@ -574,7 +614,15 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         }
         else if (tokens.at(0) == "texture")
         {
-            texture = tokens.at(1);
+            if (tokens.size() == 2)
+            {
+                if (textures.size() == 0)
+                    textures.push_back(tokens.at(1));
+                else
+                    textures[0] = tokens.at(1);
+            }
+            else
+                textures.push_back(tokens.at(1));
         }
         else if (tokens.at(0) == "texrep")
         {
@@ -632,6 +680,10 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
                 tokenizeLine(line, tokens);
 
                 vertices.emplace_back(std::stod(tokens.at(0)), std::stod(tokens.at(1)), std::stod(tokens.at(2)));
+
+                if (tokens.size() == 6)
+                    normals.emplace_back(std::stod(tokens.at(3)), std::stod(tokens.at(4)), std::stod(tokens.at(5)));
+
                 i++;
             }
         }
@@ -645,7 +697,21 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         {
             const int numKids = std::stoi(tokens.at(1));
             for (int i = 0; i < numKids; i++)
+            {
+                std::streambuf::pos_type len = fin.tellg();
+                std::string peekLine;
+                std::getline(fin, peekLine);
+                std::vector<std::string> peekTokens;
+                tokenizeLine(peekLine, peekTokens);
+                fin.seekg(len, std::ios_base::beg);
+                if (peekTokens.size() < 1 || peekTokens[0] != "OBJECT")
+                {
+                    // this is a common problem with accc generated files so ignore it
+                    // throw Exception("Invalid AC3D file: wrong number of kids");
+                    return;
+                }
                 kids.emplace_back(fin);
+            }
             return;
         }
     }
@@ -663,9 +729,19 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
         fout << "data " << data.length() << std::endl;
         fout << data << std::endl;
     }
-    if (!texture.empty())
+    for (size_t i = 0; i < std::min(textures.size(), size_t(4)); i++)
     {
-        fout << "texture \"" << texture << "\"" << std::endl;
+        if (textures.size() == 1)
+            fout << "texture \"" << textures[0] << "\"" << std::endl;
+        else
+        {
+            const std::string types[4] = { "base", "tiled", "skids", "shad" };
+
+            if (textures[i] == "empty_texture_no_mapping")
+                fout << "texture " << textures[i] << " " << types[i] << std::endl;
+            else
+                fout << "texture \"" << textures[i] << "\" " << types[i] << std::endl;
+        }
     }
     if (texrep.initialized)
         fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
@@ -697,8 +773,13 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     if (!vertices.empty())
     {
         fout << "numvert " << vertices.size() << std::endl;
-        for (const auto &vertex : vertices)
-            fout << vertex[0] << " " << vertex[1] << " " << vertex[2] << std::endl;
+        for (size_t i = 0; i < vertices.size(); i++)
+        {
+            fout << vertices[i][0] << " " << vertices[i][1] << " " << vertices[i][2];
+            if (normals.size() == vertices.size())
+                fout << " " << normals[i][0] << " " << normals[i][1] << " " << normals[i][2];
+            fout << std::endl;
+        }
     }
     if (!surfaces.empty())
     {

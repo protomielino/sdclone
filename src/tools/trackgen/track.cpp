@@ -3079,7 +3079,7 @@ static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name,
     Ac3d::Object object;
     object.type = "poly";
     object.name = name;
-    object.texture = texture;
+    object.textures.emplace_back(texture);
 
     for (int i = 0; i < nb; i++)
     {

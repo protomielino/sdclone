@@ -1843,12 +1843,12 @@ static void insert_elem_in_group(struct ele *el, struct nod *nods)
     surf.surf = Ac3d::Surface::PolygonSingleSidedSmooth;
     surf.refs.resize(3);
 
-    surf.refs[0].coord[0] = nods[el->i].x / TexSize;
-    surf.refs[0].coord[1] = nods[el->i].y / TexSize;
-    surf.refs[1].coord[0] = nods[el->j].x / TexSize;
-    surf.refs[1].coord[1] = nods[el->j].y / TexSize;
-    surf.refs[2].coord[0] = nods[el->k].x / TexSize;
-    surf.refs[2].coord[1] = nods[el->k].y / TexSize;
+    surf.refs[0].coords[0][0] = nods[el->i].x / TexSize;
+    surf.refs[0].coords[0][1] = nods[el->i].y / TexSize;
+    surf.refs[1].coords[0][0] = nods[el->j].x / TexSize;
+    surf.refs[1].coords[0][1] = nods[el->j].y / TexSize;
+    surf.refs[2].coords[0][0] = nods[el->k].x / TexSize;
+    surf.refs[2].coords[0][1] = nods[el->k].y / TexSize;
 
     surf.refs[0].index = insert_node_in_group(&(nods[el->i]), curGrp);
     surf.refs[1].index = insert_node_in_group(&(nods[el->j]), curGrp);
@@ -1980,7 +1980,10 @@ static void draw_ac(Ac3d &ac3d, const char *name)
 
         curGrp.type = "poly";
         curGrp.name = std::string(name) + std::to_string(i);
-        curGrp.texture = TexName;
+        if (curGrp.textures.empty())
+            curGrp.textures.emplace_back(TexName);
+        else
+            curGrp.textures[0] = TexName;
 
         ac3d.addObject(curGrp);
         ac3d.stack.pop();
