@@ -409,7 +409,8 @@ void NetServer::SetCarInfo(const char *pszName)
     {
         if (vecDrivers[i].name == m_strDriverName)
         {
-            strncpy(vecDrivers[i].car, pszName, 63);
+            memcpy(vecDrivers[i].car, pszName, sizeof(vecDrivers[i].car));
+            //strncpy(vecDrivers[i].car, pszName, 64);
             UpdateDriver(vecDrivers[i]);
             break;
         }
@@ -420,7 +421,7 @@ void NetServer::CreateNetworkRobotFile()
 {
     RobotXml rXml;
     NetServerMutexData *pSData = LockServerData();
-    rXml.CreateRobotFile("networkhuman",pSData->m_vecNetworkPlayers);
+    rXml.CreateRobotFile("networkhuman", pSData->m_vecNetworkPlayers);
     UnlockServerData();
 }
 
@@ -431,9 +432,9 @@ void NetServer::RemoveDriver(ENetEvent event)
     enet_uint32 peerConnectID = *((enet_uint32*)(event.peer->data));
 
     char hostName[256];
-    enet_address_get_host_ip (&address,hostName,256);
+    enet_address_get_host_ip (&address, hostName, 256);
 
-    GfLogTrace ("Client Player Info disconnect from %s\n",hostName);
+    GfLogTrace ("Client Player Info disconnect from %s\n", hostName);
 
     std::vector<NetDriver>::iterator p;
 

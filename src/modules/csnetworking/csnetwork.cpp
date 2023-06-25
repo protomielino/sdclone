@@ -178,18 +178,18 @@ NetDriver::NetDriver()
     //TODO more to initialize...
     //Initialize values
     idx = -1;
-    memset(name,0,sizeof(name));
-    memset(car,0,sizeof(car));
-    memset(team,0,sizeof(team));
-    memset(author,0,sizeof(author));
+    memset(name, 0, sizeof(name));
+    memset(car, 0, sizeof(car));
+    memset(team, 0, sizeof(team));
+    memset(author, 0, sizeof(author));
     racenumber = 1;
-    memset(skilllevel,0,sizeof(skilllevel));
+    memset(skilllevel, 0, sizeof(skilllevel));
     red = 1.0;
     green = 1.0;
     blue = 1.0;
     client = false;
-    memset(module,0,sizeof(module));
-    memset(type,0,sizeof(type));
+    memset(module, 0, sizeof(module));
+    memset(type, 0, sizeof(type));
     connectionID = 0;
 }
 
@@ -394,7 +394,8 @@ void NetNetwork::ReadDriverData(NetDriver &driver,int index,void *params)
     char path2[256];
     sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
     const char *pMod = GfParmGetStr(params, path2, RM_ATTR_MODULE,NULL);
-    strncpy(&driver.module[0],pMod,63);
+    memcpy(driver.module, pMod, sizeof(driver.module));
+    //strncpy(&driver.module[0], pMod, 64);
     driver.idx = (int)GfParmGetNum(params, path2, RM_ATTR_IDX, NULL,-1);
 }
 

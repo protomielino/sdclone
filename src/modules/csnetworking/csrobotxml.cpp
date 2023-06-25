@@ -37,20 +37,21 @@ bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vec
     GfParmListClean(params, "Robots");
     char path2[256];
 
-    for (int i=0;i<(int)vecDrivers.size();i++)
+    for (int i=0; i<(int)vecDrivers.size(); i++)
     {
         sprintf(path2, "Robots/index/%d",i+1);
-        GfParmSetStr(params, path2, "name",vecDrivers[i].name);
-        GfParmSetStr(params, path2, "short name",vecDrivers[i].sname);
-        GfParmSetStr(params, path2, "code name", vecDrivers[i].cname);
-        GfParmSetStr(params, path2, "car name",vecDrivers[i].car);
+        GfParmSetStr(params, path2, "name", vecDrivers[i].name);
+        GfParmSetStr(params, path2, "short name", vecDrivers[i].sname);
+        GfParmSetStr(params, path2, "code name",  vecDrivers[i].cname);
+        GfParmSetStr(params, path2, "car name", vecDrivers[i].car);
         GfParmSetNum(params, path2, "race number", (char*)NULL,(tdble) vecDrivers[i].racenumber);
-        GfParmSetNum(params, path2, "red", (char*)NULL, vecDrivers[i].red);
+        GfParmSetNum(params, path2, "red", (char*)NULL,  vecDrivers[i].red);
         GfParmSetNum(params, path2, "green", (char*)NULL, vecDrivers[i].green);
         GfParmSetNum(params, path2, "blue", (char*)NULL, vecDrivers[i].blue);
-        GfParmSetStr(params, path2, "type",vecDrivers[i].type);
-        GfParmSetStr(params, path2, "skill level",vecDrivers[i].skilllevel);
-        GfParmSetStr(params, path2, "networkrace","yes");
+        GfParmSetStr(params, path2, "type", vecDrivers[i].type);
+        GfParmSetStr(params, path2, "skill level", vecDrivers[i].skilllevel);
+        GfParmSetStr(params, path2, "networkrace", "yes");
+
         if (vecDrivers[i].client)
             GfParmSetStr(params, path2, "client","yes");
         else
@@ -91,22 +92,31 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
         std::string strClient = GfParmGetStr(params, path2, "client",NULL);
         if (strClient == "yes")
             driver.client = true;
-        else 
+        else
             driver.client = false;
 
-        strncpy(driver.sname, GfParmGetStr(params, path2, "short name", NULL), 63);
-        strncpy(driver.cname, GfParmGetStr(params, path2, "code name",NULL), 3);
-        strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),63);
-        strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),64);
-        strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),63);
+        memcpy(driver.name, GfParmGetStr(params, path2, "name", NULL), sizeof(driver.name));
+        memcpy(driver.sname, GfParmGetStr(params, path2, "short name", NULL), sizeof(driver.sname));
+        memcpy(driver.cname, GfParmGetStr(params, path2, "code name", NULL), sizeof(driver.cname));
+        memcpy(driver.car,GfParmGetStr(params, path2, "car name", NULL), sizeof(driver.car));
+        memcpy(driver.type,GfParmGetStr(params, path2, "type", NULL), sizeof(driver.type));
+        memcpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level", NULL), sizeof(driver.skilllevel));
 
-        driver.racenumber = (int)GfParmGetNum(params, path2, "race number",NULL,1.0);
-        driver.red = GfParmGetNum(params, path2, "red",NULL,1.0);
-        driver.green = GfParmGetNum(params, path2, "green",NULL,1.0);
-        driver.blue = GfParmGetNum(params, path2, "blue",NULL,1.0);
+        /*strncpy(driver.name, GfParmGetStr(params, path2, "name", NULL), 64);
+        strncpy(driver.sname, GfParmGetStr(params, path2, "short name", NULL), 64);
+        strncpy(driver.cname, GfParmGetStr(params, path2, "code name", NULL), 4);
+        strncpy(driver.car,GfParmGetStr(params, path2, "car name", NULL), 64);
+        strncpy(driver.type,GfParmGetStr(params, path2, "type", NULL), 64);
+        strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level", NULL), 64);*/
+
+        driver.racenumber = (int)GfParmGetNum(params, path2, "race number", NULL, 1.0);
+        driver.red = GfParmGetNum(params, path2, "red", NULL, 1.0);
+        driver.green = GfParmGetNum(params, path2, "green", NULL, 1.0);
+        driver.blue = GfParmGetNum(params, path2, "blue", NULL, 1.0);
         std::string strHost = GfParmGetStr(params, path2, "host","");
 
-        strncpy(driver.module,NETWORKROBOT,64);
+        //memcpy(driver.module, NETWORKROBOT, sizeof(driver.module));
+        strncpy(driver.module, NETWORKROBOT, 64);
         vecDrivers.push_back(driver);
     }
 

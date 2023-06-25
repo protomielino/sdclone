@@ -36,6 +36,7 @@ version              : $Id$
 #endif
 
 #include <string>
+#include <cstring>
 #include <vector>
 #include <set>
 #include <map>
@@ -87,7 +88,7 @@ version              : $Id$
 
 enum EnumClientAccepted { PROCESSINGCLIENT,CLIENTREJECTED,CLIENTACCEPTED };
 
-//Use a structure to pass as a network ENetPacket sent 
+//Use a structure to pass as a network ENetPacket sent
 //Packed / Compressed to reduce internet bandwidth requirements
 struct CarControlsPacked
 {
@@ -143,7 +144,7 @@ struct CarStatusPacked
 };
 
 
-//Holds driver values 
+//Holds driver values
 class NETWORKING_API NetDriver
 {
 public:
@@ -152,7 +153,7 @@ public:
 
     int idx;
     char name[64];
-	char sname[64];
+    char sname[64];
     char cname[4];
     char car[64];
     char team[64];
@@ -164,7 +165,7 @@ public:
     char type[64];
     bool client;
     bool active;
-	enet_uint32 connectionID;
+    enet_uint32 connectionID;
 };
 
 //Holds car setup values
@@ -195,7 +196,7 @@ public:
 };
 
 //Put data here that is read by the network thread and the main thread
-class NETWORKING_API NetServerMutexData 
+class NETWORKING_API NetServerMutexData
 {
 public:
     void Init();
@@ -217,8 +218,8 @@ public:
     virtual ~NetNetwork();
 
     void SetCurrentTime(double time) {m_currentTime = time;}
-    bool IsServerMode(); 
-    bool IsClientMode(); 
+    bool IsServerMode();
+    bool IsClientMode();
     bool SetCurrentDriver();
     int GetNetworkHumanIdx();
     int	 GetDriverIdx();
@@ -281,7 +282,7 @@ protected:
     bool m_bBeginRace;
     bool m_bRaceInfoChanged;
     bool m_bRefreshDisplay;
-    double m_racestarttime;	
+    double m_racestarttime;
     bool m_bPrepareToRace;
     bool m_bTimeSynced;
     bool m_bRaceActive;
@@ -365,7 +366,7 @@ protected:
 
     ENetHost * m_pClient;
 
-    ENetPeer *m_pServer;	
+    ENetPeer *m_pServer;
 
 };
 
