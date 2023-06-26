@@ -91,6 +91,7 @@ public class SegmentSlider extends JPanel
 		this.parent = this.getParent();
 		new SliderLink();
 		setValue(value);
+		setOptional(optional);
 	}
 
 	/**
