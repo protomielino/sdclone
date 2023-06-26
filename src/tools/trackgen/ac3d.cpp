@@ -1067,9 +1067,9 @@ void Ac3d::readFile(const std::string &fileName)
     if (!std::getline(fin, line))
         throw Exception("Couldn't read file");
 
-    if (line == "AC3Db")
+    if (line.substr(0, 5) == "AC3Db")
         versionC = false;
-    else if (line == "AC3Dc")
+    else if (line.substr(0, 5) == "AC3Dc")
         versionC = true;
     else
         throw Exception("Not AC3D file");
