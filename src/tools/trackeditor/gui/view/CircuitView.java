@@ -484,16 +484,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								newShape2.setArcDeg(arc - tmpAngle);
 								newShape2.setRadiusEnd(rEnd);
 								newShape2.setRadiusStart(tmpRadius);
-								double leftSide = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
-								double rightSide = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
-								newShape2.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
-								newShape2.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
-								newShape2.getLeft().setSideStartWidth(leftSide);
-								newShape2.getRight().setSideStartWidth(rightSide);
-								newShape2.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
-								newShape2.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
-								oldShape.getRight().setSideEndWidth(rightSide);
-								oldShape.getLeft().setSideEndWidth(leftSide);
+								splitSegment(oldShape, newShape2, splitPoint);
 								newShape2.setProfilStepsLength(4.0);
 								int count2 = Editor.getProperties().getCurveNameCount() + 1;
 								Editor.getProperties().setCurveNameCount(count2);
@@ -540,16 +531,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								newShape2.setArcDeg(arc - tmpAngle);
 								newShape2.setRadiusEnd(rEnd);
 								newShape2.setRadiusStart(tmpRadius);
-								double leftSide = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
-								double rightSide = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
-								newShape2.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
-								newShape2.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
-								newShape2.getLeft().setSideStartWidth(leftSide);
-								newShape2.getRight().setSideStartWidth(rightSide);
-								newShape2.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
-								newShape2.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
-								oldShape.getRight().setSideEndWidth(rightSide);
-								oldShape.getLeft().setSideEndWidth(leftSide);
+								splitSegment(oldShape, newShape2, splitPoint);
 								newShape2.setProfilStepsLength(4.0);
 								int count2 = Editor.getProperties().getCurveNameCount() + 1;
 								Editor.getProperties().setCurveNameCount(count2);
@@ -575,16 +557,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 										break;
 									}
 								}
-								double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
-								double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
-								newShape3.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
-								newShape3.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
-								newShape3.getLeft().setSideStartWidth(leftSide2);
-								newShape3.getRight().setSideStartWidth(rightSide2);
-								newShape3.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
-								newShape3.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
-								oldShape.getRight().setSideEndWidth(rightSide2);
-								oldShape.getLeft().setSideEndWidth(leftSide2);
+								splitSegment(oldShape, newShape3, splitPoint);
 								int count3 = Editor.getProperties().getStraightNameCount() + 1;
 								Editor.getProperties().setStraightNameCount(count3);
 								newShape3.setName("straight " + count3);
@@ -633,6 +606,63 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	private void splitSegment(Segment oldShape, Segment newShape, double splitPoint)
+	{
+		double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
+		double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+		newShape.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
+		newShape.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
+		newShape.getLeft().setSideStartWidth(leftSide2);
+		newShape.getRight().setSideStartWidth(rightSide2);
+		newShape.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
+		newShape.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
+		oldShape.getRight().setSideEndWidth(rightSide2);
+		oldShape.getLeft().setSideEndWidth(leftSide2);
+		
+		if (!Double.isNaN(oldShape.getHeightStartLeft()) && !Double.isNaN(oldShape.getHeightEndLeft()))
+		{								
+			newShape.setHeightEndLeft(oldShape.getHeightEndLeft());
+			double leftHeight = oldShape.getHeightStartLeft() + (oldShape.getHeightEndLeft() - oldShape.getHeightStartLeft()) * splitPoint;
+			newShape.setHeightStartLeft(leftHeight);
+			oldShape.setHeightEndLeft(leftHeight);
+		}
+		
+		if (!Double.isNaN(oldShape.getHeightStartRight()) && !Double.isNaN(oldShape.getHeightEndRight()))
+		{								
+			newShape.setHeightEndRight(oldShape.getHeightEndRight());
+			double rightHeight = oldShape.getHeightStartRight() + (oldShape.getHeightEndRight() - oldShape.getHeightStartRight()) * splitPoint;
+			newShape.setHeightStartRight(rightHeight);
+			oldShape.setHeightEndRight(rightHeight);
+		}
+		
+		if (!Double.isNaN(oldShape.getBankingStart()) && !Double.isNaN(oldShape.getBankingEnd()))
+		{								
+			newShape.setBankingEnd(oldShape.getBankingEnd());
+			double banking = oldShape.getBankingStart() + (oldShape.getBankingEnd() - oldShape.getBankingStart()) * splitPoint;
+			newShape.setBankingStart(banking);
+			oldShape.setBankingEnd(banking);
+		}
+		
+		if (!Double.isNaN(oldShape.getProfilStartTangent()) && !Double.isNaN(oldShape.getProfilEndTangent()))
+		{
+			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
+			// FIXME: calculate the slope at the split point									
+			double tangent = oldShape.getProfilStartTangent() + (oldShape.getProfilEndTangent() - oldShape.getProfilStartTangent()) * splitPoint;
+			newShape.setProfilStartTangent(tangent);
+			oldShape.setProfilEndTangent(tangent);
+		}
+		
+		if (!Double.isNaN(oldShape.getGrade()))
+		{
+			newShape.setGrade(oldShape.getGrade());
+		}
+		
+		if (oldShape.getSurface() != null && !oldShape.getSurface().isEmpty())
+		{
+			newShape.setSurface(oldShape.getSurface());
+		}		
 	}
 
 	private ObjectMap findObjectMap(ObjShapeObject object)
