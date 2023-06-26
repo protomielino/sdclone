@@ -993,56 +993,57 @@ RmNetworkClientMenu(void* pPreviousScreen)
     //ShowWaitingToConnectScreen();
 
 
-    if (racemanMenuHdle)
-        GfuiScreenRelease(racemanMenuHdle);
-
-    racemanMenuHdle = GfuiScreenCreate(NULL,  previousMenuHandle, (tfuiCallback)OnActivateNetworkClient,
-                                       NULL, (tfuiCallback)NULL, 1);
-
-    void *mparam = GfuiMenuLoad("networkclientmenu.xml");
-    GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
-
-    GfuiMenuDefaultKeysAdd(racemanMenuHdle);
-
-    g_trackHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"trackname");
-
-    g_lapsHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"lapcountname");
-    g_catHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"carcatname");
-
-    g_OutlineId = GfuiMenuCreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
-
-    //Show players
-    for (int i = 0; i < MAXNETWORKPLAYERS; i++)
+    if (!racemanMenuHdle)
     {
-        char buf[1024];
-        sprintf(buf,"ready%i",i);
-        g_readystatus[i] = GfuiMenuCreateStaticImageControl(racemanMenuHdle,mparam,buf);
-        GfuiVisibilitySet(racemanMenuHdle,g_readystatus[i],false);
 
-        sprintf(buf,"driver%i",i);
-        g_playerNames[i] = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,buf);
-        GfuiLabelSetText(racemanMenuHdle,g_playerNames[i],"");
 
-        sprintf(buf,"car%i",i);
-        g_carNames[i] =  GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,buf);
-        GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
+        racemanMenuHdle = GfuiScreenCreate(NULL, previousMenuHandle, (tfuiCallback)OnActivateNetworkClient,
+            NULL, (tfuiCallback)NULL, 1);
+
+        void* mparam = GfuiMenuLoad("networkclientmenu.xml");
+        GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
+
+        GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+
+        g_trackHd = GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, "trackname");
+
+        g_lapsHd = GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, "lapcountname");
+        g_catHd = GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, "carcatname");
+
+        g_OutlineId = GfuiMenuCreateStaticImageControl(racemanMenuHdle, mparam, "outlineimage");
+
+        //Show players
+        for (int i = 0; i < MAXNETWORKPLAYERS; i++)
+        {
+            char buf[1024];
+            sprintf(buf, "ready%i", i);
+            g_readystatus[i] = GfuiMenuCreateStaticImageControl(racemanMenuHdle, mparam, buf);
+            GfuiVisibilitySet(racemanMenuHdle, g_readystatus[i], false);
+
+            sprintf(buf, "driver%i", i);
+            g_playerNames[i] = GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, buf);
+            GfuiLabelSetText(racemanMenuHdle, g_playerNames[i], "");
+
+            sprintf(buf, "car%i", i);
+            g_carNames[i] = GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, buf);
+            GfuiLabelSetText(racemanMenuHdle, g_carNames[i], "");
+        }
+
+        g_ReadyCheckboxId =
+            GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
+                NULL, onClientPlayerReady);
+        g_CarSetupButtonId =
+            GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
+                racemanMenuHdle, rmCarSettingsMenu);
+
+        g_DisconnectButtonId =
+            GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "disconnect",
+                NULL, rmNetworkClientDisconnect);
+
+        GfParmReleaseHandle(mparam);
+
+        //UpdateNetworkPlayers();
     }
-
-    g_ReadyCheckboxId =
-        GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
-                                      NULL, onClientPlayerReady);
-    g_CarSetupButtonId =
-        GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
-                                    racemanMenuHdle, rmCarSettingsMenu);
-
-    g_DisconnectButtonId =
-        GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "disconnect",
-                                    NULL,rmNetworkClientDisconnect);
-
-    GfParmReleaseHandle(mparam);
-
-    //UpdateNetworkPlayers();
-
     GfuiScreenActivate(racemanMenuHdle);
 
     //GfuiApp().eventLoop().setRecomputeCB(ClientIdle);

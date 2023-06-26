@@ -394,7 +394,7 @@ void NetNetwork::ReadDriverData(NetDriver &driver,int index,void *params)
     char path2[256];
     sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
     const char *pMod = GfParmGetStr(params, path2, RM_ATTR_MODULE,NULL);
-    memcpy(driver.module, pMod, sizeof(driver.module));
+    strncpy(driver.module, pMod, sizeof(driver.module) - 1);
     //strncpy(&driver.module[0], pMod, 64);
     driver.idx = (int)GfParmGetNum(params, path2, RM_ATTR_IDX, NULL,-1);
 }
