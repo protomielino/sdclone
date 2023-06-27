@@ -80,7 +80,7 @@ public class SegmentSide implements Cloneable
 	private SegmentSide			props						= null;
 
 	//	Side
-	private boolean			hasSide						= false;
+	private boolean				hasSide						= false;
 	protected double			sideStartWidth				= Double.NaN;
 	private boolean				prevSideStartWidthChanged	= false;
 	private boolean				thisSideStartWidthChanged	= false;
@@ -95,7 +95,7 @@ public class SegmentSide implements Cloneable
 	private boolean				thisSideBankingTypeChanged	= false;
 
 	//	Barrier
-	private boolean			hasBarrier					= false;
+	private boolean				hasBarrier					= false;
 	protected double			barrierHeight				= Double.NaN;
 	private boolean				prevBarrierHeightChanged	= false;
 	private boolean				thisBarrierHeightChanged	= false;
@@ -110,7 +110,7 @@ public class SegmentSide implements Cloneable
 	private boolean				thisBarrierStyleChanged		= false;
 
 	// Border
-	private boolean			hasBorder					= false;
+	private boolean				hasBorder					= false;
 	protected double			borderWidth					= Double.NaN;
 	private boolean				prevBorderWidthChanged		= false;
 	private boolean				thisBorderWidthChanged		= false;

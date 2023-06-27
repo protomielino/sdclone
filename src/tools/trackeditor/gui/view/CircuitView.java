@@ -612,15 +612,36 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
 		double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+
 		newShape.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
 		newShape.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
+		newShape.getLeft().setBorderStyle(oldShape.getLeft().getBorderStyle());		
+		newShape.getRight().setBorderStyle(oldShape.getRight().getBorderStyle());		
+		newShape.getLeft().setBorderSurface(oldShape.getLeft().getBorderSurface());
+		newShape.getRight().setBorderSurface(oldShape.getRight().getBorderSurface());
+		newShape.getLeft().setBorderHeight(oldShape.getLeft().getBorderHeight());
+		newShape.getRight().setBorderHeight(oldShape.getRight().getBorderHeight());
+
 		newShape.getLeft().setSideStartWidth(leftSide2);
 		newShape.getRight().setSideStartWidth(rightSide2);
 		newShape.getLeft().setSideEndWidth(oldShape.getLeft().getSideEndWidth());
 		newShape.getRight().setSideEndWidth(oldShape.getRight().getSideEndWidth());
-		oldShape.getRight().setSideEndWidth(rightSide2);
+		newShape.getLeft().setSideBankingType(oldShape.getLeft().getSideBankingType());
+		newShape.getRight().setSideBankingType(oldShape.getRight().getSideBankingType());
+		newShape.getLeft().setSideSurface(oldShape.getLeft().getSideSurface());
+		newShape.getRight().setSideSurface(oldShape.getRight().getSideSurface());
 		oldShape.getLeft().setSideEndWidth(leftSide2);
-		
+		oldShape.getRight().setSideEndWidth(rightSide2);
+
+		newShape.getLeft().setBarrierStyle(oldShape.getLeft().getBarrierStyle());		
+		newShape.getRight().setBarrierStyle(oldShape.getRight().getBarrierStyle());		
+		newShape.getLeft().setBarrierSurface(oldShape.getLeft().getBarrierSurface());
+		newShape.getRight().setBarrierSurface(oldShape.getRight().getBarrierSurface());
+		newShape.getLeft().setBarrierHeight(oldShape.getLeft().getBarrierHeight());
+		newShape.getRight().setBarrierHeight(oldShape.getRight().getBarrierHeight());
+		newShape.getLeft().setBarrierWidth(oldShape.getLeft().getBarrierWidth());
+		newShape.getRight().setBarrierWidth(oldShape.getRight().getBarrierWidth());
+
 		if (!Double.isNaN(oldShape.getHeightStartLeft()) && !Double.isNaN(oldShape.getHeightEndLeft()))
 		{								
 			newShape.setHeightEndLeft(oldShape.getHeightEndLeft());
@@ -628,7 +649,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setHeightStartLeft(leftHeight);
 			oldShape.setHeightEndLeft(leftHeight);
 		}
-		
+
 		if (!Double.isNaN(oldShape.getHeightStartRight()) && !Double.isNaN(oldShape.getHeightEndRight()))
 		{								
 			newShape.setHeightEndRight(oldShape.getHeightEndRight());
@@ -636,7 +657,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setHeightStartRight(rightHeight);
 			oldShape.setHeightEndRight(rightHeight);
 		}
-		
+
 		if (!Double.isNaN(oldShape.getBankingStart()) && !Double.isNaN(oldShape.getBankingEnd()))
 		{								
 			newShape.setBankingEnd(oldShape.getBankingEnd());
@@ -644,7 +665,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setBankingStart(banking);
 			oldShape.setBankingEnd(banking);
 		}
-		
+
 		if (!Double.isNaN(oldShape.getProfilStartTangent()) && !Double.isNaN(oldShape.getProfilEndTangent()))
 		{
 			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
@@ -653,16 +674,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setProfilStartTangent(tangent);
 			oldShape.setProfilEndTangent(tangent);
 		}
-		
-		if (!Double.isNaN(oldShape.getGrade()))
-		{
-			newShape.setGrade(oldShape.getGrade());
-		}
-		
-		if (oldShape.getSurface() != null && !oldShape.getSurface().isEmpty())
-		{
-			newShape.setSurface(oldShape.getSurface());
-		}		
+
+		newShape.setGrade(oldShape.getGrade());
+		newShape.setSurface(oldShape.getSurface());
 	}
 
 	private ObjectMap findObjectMap(ObjShapeObject object)
