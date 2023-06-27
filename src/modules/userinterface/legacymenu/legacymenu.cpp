@@ -130,8 +130,26 @@ bool LegacyMenu::startRace()
         // Configure the new race (but don't enter the config. menu tree).
         LmRaceEngine().configureRace(/* bInteractive */ false);
 
-        // Start the race engine state automaton
-        LmRaceEngine().startNewRace();
+#ifdef CLIENT_SERVER
+        std::string racID = pSelRaceMan->getId();
+        if ((0 == strcmp(racID.c_str(), "netserver")))
+        {
+            ::RmNetworkHostMenu();
+        }
+        else if ((0 == strcmp(racID.c_str(), "netwatcher")))
+        {
+            // TODO netwatcher menu may be RmNetworkClientMenu() 
+            // with no driver ??
+            ::RmNetworkClientMenu();
+        }
+        else if ((0 == strcmp(racID.c_str(), "netclient")))
+        {
+            ::RmNetworkClientMenu();
+        }
+        else
+#endif
+            // Start the race engine state automaton
+            LmRaceEngine().startNewRace();
     }
 	else
 	{

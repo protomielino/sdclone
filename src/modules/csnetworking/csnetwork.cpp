@@ -179,6 +179,8 @@ NetDriver::NetDriver()
     //Initialize values
     idx = -1;
     memset(name, 0, sizeof(name));
+    memset(sname, 0, sizeof(sname));
+    memset(cname, 0, sizeof(cname));
     memset(car, 0, sizeof(car));
     memset(team, 0, sizeof(team));
     memset(author, 0, sizeof(author));
@@ -188,6 +190,7 @@ NetDriver::NetDriver()
     green = 1.0;
     blue = 1.0;
     client = false;
+    active = false;
     memset(module, 0, sizeof(module));
     memset(type, 0, sizeof(type));
     connectionID = 0;
@@ -264,7 +267,9 @@ int NetNetwork::GetNetworkHumanIdx()
     char buf[255];
     sprintf(buf,"drivers/networkhuman/networkhuman.xml");
     void *params = GfParmReadFileLocal(buf,GFPARM_RMODE_REREAD);
-    assert(params);
+    
+    if(params)
+    {
     char path2[256];
 
     int i=0;
@@ -283,6 +288,11 @@ int NetNetwork::GetNetworkHumanIdx()
     while(pName);
 
     GfParmReleaseHandle(params);
+    }
+    else
+    {
+        GfLogError("Unable to parse file %s\n", buf);
+    }
 
     return idx;
 }
