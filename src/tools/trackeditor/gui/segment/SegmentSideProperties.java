@@ -496,7 +496,9 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						style = null;
 					side.setBarrierStyle(style);
 					if (setSource || !styleChanged)
+					{
 						return;
+					}
 					switch (newStyle)
 					{
 					case "none":
@@ -1243,6 +1245,11 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	 */
 	public void sliderChanged(SegmentSlider slider)
 	{
+		// ignore when triggered by setSide
+		if (setSource)
+		{
+			return;
+		}
 		Interpreter line = new Interpreter();
 		String command = "";
 
