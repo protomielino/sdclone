@@ -175,6 +175,7 @@ reTrackDump(const tTrack *track, int verbose)
     GfLogInfo("XSize    = %f m\n", track->max.x);
     GfLogInfo("YSize    = %f m\n", track->max.y);
     GfLogInfo("ZSize    = %f m\n", track->max.z);
+    GfLogInfo("Max Pits = %i\n", track->pits.nMaxPits);
 
     switch (track->pits.type)
     {
