@@ -1985,6 +1985,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     }
 
     /* Right barrier */
+    tTrackBarrier *lastBarrier = nullptr;
     curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
     for (int j = 0; j < 3; j++)
     {
@@ -2008,6 +2009,9 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 runninglentgh = 0;
                 continue;
             }
+
+            if (lastBarrier && (lastBarrier->style != curBarrier->style || lastBarrier->width != curBarrier->width || lastBarrier->height != curBarrier->height))
+                startNeeded = true;
 
             curSurfType = curBarrier->style == TR_FENCE ? Ac3d::Surface::PolygonDoubleSidedSmooth : Ac3d::Surface::PolygonSingleSidedSmooth;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
@@ -2058,7 +2062,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         trkpos.toStart = 0;
                         trkpos.toRight = -curBarrier->width;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        if ((mseg->prev->barrier[0]->style != TR_WALL) || (mseg->prev->barrier[0]->height != curBarrier->height))
+                        if ((mseg->prev->barrier[0]->style != TR_WALL) || (mseg->prev->barrier[0]->height != curBarrier->height) || (mseg->prev->barrier[0]->width != curBarrier->width))
                         {
                             SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                             SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
@@ -2300,7 +2304,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
                     SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
                     SETPOINT(texLen, 1.00, x, y, seg->vertex[TR_ER].z);
-                    if ((mseg->next->barrier[0]->style != TR_WALL) || (mseg->next->barrier[0]->height != curBarrier->height))
+                    if ((mseg->next->barrier[0]->style != TR_WALL) || (mseg->next->barrier[0]->height != curBarrier->height) || (mseg->next->barrier[0]->width != curBarrier->width))
                     {
                         SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                         SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
@@ -2319,10 +2323,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             }
             startNeeded = false;
             runninglentgh += seg->length;
+            lastBarrier = curBarrier;
         }
     }
 
     /* Left Barrier */
+    lastBarrier = nullptr;
     curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
     for (int j = 0; j < 3; j++)
     {
@@ -2347,6 +2353,9 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 continue;
             }
             
+            if (lastBarrier && (lastBarrier->style != curBarrier->style || lastBarrier->width != curBarrier->width || lastBarrier->height != curBarrier->height))
+                startNeeded = true;
+
             curSurfType = curBarrier->style == TR_FENCE ? Ac3d::Surface::PolygonDoubleSidedSmooth : Ac3d::Surface::PolygonSingleSidedSmooth;
             CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 
@@ -2386,7 +2395,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
                         trkpos.seg = seg;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        if ((mseg->prev->barrier[1]->style != TR_WALL) || (mseg->prev->barrier[1]->height != curBarrier->height))
+                        if ((mseg->prev->barrier[1]->style != TR_WALL) || (mseg->prev->barrier[1]->height != curBarrier->height) || (mseg->prev->barrier[1]->width != curBarrier->width))
                         {
                             SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                             SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
@@ -2638,7 +2647,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
                     SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_EL].z);
                     SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
-                    if ((mseg->next->barrier[1]->style != TR_WALL) || (mseg->next->barrier[1]->height != curBarrier->height))
+                    if ((mseg->next->barrier[1]->style != TR_WALL) || (mseg->next->barrier[1]->height != curBarrier->height) || (mseg->next->barrier[1]->width != curBarrier->width))
                     {
                         SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
@@ -2669,6 +2678,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             
             startNeeded = false;
             runninglentgh += seg->length;
+            lastBarrier = curBarrier;
         }
     }
 
