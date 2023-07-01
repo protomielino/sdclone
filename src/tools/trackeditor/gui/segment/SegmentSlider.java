@@ -31,8 +31,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import utils.SegmentSliderLayout;
 /**
@@ -145,6 +150,47 @@ public class SegmentSlider extends JPanel
 		{
 			textField = new JTextField();
 			textField.setHorizontalAlignment(JTextField.LEFT);			
+			textField.getDocument().addDocumentListener(new DocumentListener()
+			{
+				public void changedUpdate(DocumentEvent e)
+				{
+				}
+				public void insertUpdate(DocumentEvent e)
+				{
+					Runnable doHighlight = new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							Document document = e.getDocument();
+							try
+							{
+								String s = document.getText(0, document.getLength());
+								if (!s.equals(""))
+								{
+									try
+									{
+										double tmp = Double.parseDouble(getTextField().getText());
+										setValueInternal(tmp);
+									}
+									catch (Exception ex)
+									{
+										ex.printStackTrace();
+									}
+								}
+							}
+							catch (BadLocationException ex)
+							{
+								ex.printStackTrace();
+							}
+						}
+					};
+					SwingUtilities.invokeLater(doHighlight);
+				}
+				public void removeUpdate(DocumentEvent e)
+				{
+				}
+			});
 			textField.addKeyListener(new KeyAdapter()
 			{
 				public void keyTyped(KeyEvent e)
