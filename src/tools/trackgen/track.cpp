@@ -2021,11 +2021,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     startNeeded = true;
                 else if (lastBarrier->style == curBarrier->style)
                 {
-                    if (std::fabs(xprev - seg->vertex[TR_SR].x) > 0.001 || std::fabs(yprev - seg->vertex[TR_SR].y) > 0.001)
-                    {
+                    tTrackSeg *prevSide = mseg->prev;
+                    while (prevSide->rside)
+                        prevSide = prevSide->rside;
+                    startPolygonNeeded = std::fabs(seg->vertex[TR_SR].x - prevSide->vertex[TR_ER].x) > 0.001 || std::fabs(seg->vertex[TR_SR].y - prevSide->vertex[TR_ER].y) > 0.001;
+                    if (startPolygonNeeded)
                         startNeeded = true;
-                        startPolygonNeeded = true;
-                    }
                 }
             }
 
@@ -2391,11 +2392,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     startNeeded = true;
                 else if (lastBarrier->style == curBarrier->style)
                 {
-                    tTrackSeg *prevSide = mseg->next;
+                    tTrackSeg *prevSide = mseg->prev;
                     while (prevSide->lside)
-                        prevSide = prevSide->rside;
+                        prevSide = prevSide->lside;
                     startPolygonNeeded = std::fabs(seg->vertex[TR_SL].x - prevSide->vertex[TR_EL].x) > 0.001 || std::fabs(seg->vertex[TR_SL].y - prevSide->vertex[TR_EL].y) > 0.001;
-                    startNeeded = true;
+                    if (startPolygonNeeded)
+                        startNeeded = true;
                 }
             }
 
