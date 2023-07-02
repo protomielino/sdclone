@@ -479,7 +479,8 @@ typedef struct RmInfo
 #define RM_VAL_MOD_SIMU_V2_1	"simuv2.1"
 #define RM_VAL_MOD_SIMU_V3		"simuv3"
 #define RM_VAL_MOD_SIMU_V4		"simuv4"
-#define RM_VAL_MOD_SIMU_REPLAY		"simureplay"
+#define RM_VAL_MOD_SIMU_V4_1    "simuv4.1"
+#define RM_VAL_MOD_SIMU_REPLAY	"simureplay"
 #define RM_VAL_MOD_TRACK		"track"
 #define RM_VAL_MOD_SSGRAPH		"ssggraph"
 #define RM_VAL_MOD_OSGGRAPH		"osggraph"
@@ -488,9 +489,9 @@ typedef struct RmInfo
 
 #define RM_VAL_REPLAY_OFF		"0"
 #define RM_VAL_REPLAY_LOW		"2"
-#define RM_VAL_REPLAY_NORMAL		"10"
+#define RM_VAL_REPLAY_NORMAL	"10"
 #define RM_VAL_REPLAY_HIGH		"30"
-#define RM_VAL_REPLAY_PERFECT		"100"
+#define RM_VAL_REPLAY_PERFECT	"100"
 
 /* Race Engine itself */
 
