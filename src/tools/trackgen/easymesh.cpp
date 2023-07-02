@@ -2175,6 +2175,17 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
             while (seg->rside)
                 seg = seg->rside;
 
+            // find previous last side segment
+            tTrackSeg *prevSide = mseg->prev;
+            while (prevSide->rside)
+                prevSide = prevSide->rside;
+
+            if (std::fabs(seg->vertex[TR_SR].x - prevSide->vertex[TR_ER].x) > 0.001 ||
+                std::fabs(seg->vertex[TR_SR].y - prevSide->vertex[TR_ER].y) > 0.001)
+            {
+                startNeeded = true;
+            }
+
             if (startNeeded)
             {
                 ADD_POINT(seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z, GridStep, i + 1);
@@ -2267,6 +2278,17 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
             seg = mseg;
             while (seg->lside)
                 seg = seg->lside;
+
+            // find previous last side segment
+            tTrackSeg *prevSide = mseg->prev;
+            while (prevSide->lside)
+                prevSide = prevSide->lside;
+
+            if (std::fabs(seg->vertex[TR_SL].x - prevSide->vertex[TR_EL].x) > 0.001 ||
+                std::fabs(seg->vertex[TR_SL].y - prevSide->vertex[TR_EL].y) > 0.001)
+            {
+                startNeeded = true;
+            }
 
             if (startNeeded)
             {
