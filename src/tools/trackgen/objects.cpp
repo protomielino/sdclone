@@ -205,7 +205,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 }
 
 void
-AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigned int clr, tdble x, tdble y, bool multipleMaterials)
+AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigned int clr, tdble x, tdble y, bool multipleMaterials, bool individual)
 {
     for (auto &curObj : objects)
     {
@@ -215,6 +215,12 @@ AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigne
             tdble           dv = 0;
             tdble           angle = 0;
             float           z = 0;
+            tdble           orientation = 0;
+            
+            if (individual)
+            {
+                orientation = GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0);
+            }
 
             Ac3d obj(curObj.ac3d);
 
@@ -279,7 +285,7 @@ AddObject(tTrack *track, void *TrackHandle, Ac3d &TrackRoot, Ac3d &Root, unsigne
             }
 
             printf("placing object %s: x: %g y: %g z: %g \n", curObj.fileName.c_str(), x, y, z);
-            m.makeRotation(angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
+            m.makeRotation(angle + orientation, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
             obj.transform(m);
 
             m.makeLocation(x, y, z);
@@ -408,71 +414,116 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
     const tdble ymin = track->min.y - Margin;
     const tdble ymax = track->max.y + Margin;
 
-    static const char * section = TRK_SECT_TERRAIN "/" TRK_SECT_OBJMAP;
-
-    if (GfParmGetEltNb(TrackHandle, section) == 0)
-    {
-        return;
-    }
-
-    GfParmListSeekFirst(TrackHandle, section);
-
     int index = 0;
-    do
+
+    if (GfParmGetEltNb(TrackHandle, TRK_SECT_TERRAIN_OBJMAP) != 0)
     {
-        Ac3d Root;
+        GfParmListSeekFirst(TrackHandle, TRK_SECT_TERRAIN_OBJMAP);
 
-        index++;
-        const char *map = GfParmGetCurStr(TrackHandle, section, TRK_ATT_OBJMAP, "");
-
-        const std::string imageFile(inputPath + "/" + map);
-        printf("Processing object map %s\n", imageFile.c_str());
-        int	width, height;
-        unsigned char *MapImage = GfTexReadImageFromPNG(imageFile.c_str(), 2.2, &width, &height, 0, 0, false);
-
-        if (!MapImage)
+        do
         {
-            return;
-        }
+            Ac3d Root;
 
-        const tdble kX = (xmax - xmin) / width;
-        const tdble dX = xmin;
-        const tdble kY = (ymax - ymin) / height;
-        const tdble dY = ymin;
+            index++;
+            const char *map = GfParmGetCurStr(TrackHandle, TRK_SECT_TERRAIN_OBJMAP, TRK_ATT_OBJMAP, "");
 
-        for (int j = 0; j < height; j++)
-        {
-            for (int i = 0; i < width; i++)
+            const std::string imageFile(inputPath + "/" + map);
+            printf("Processing object map %s\n", imageFile.c_str());
+            int	width, height;
+            unsigned char *MapImage = GfTexReadImageFromPNG(imageFile.c_str(), 2.2, &width, &height, 0, 0, false);
+
+            if (!MapImage)
             {
-                const unsigned int clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
+                return;
+            }
 
-                if (clr)
+            const tdble kX = (xmax - xmin) / width;
+            const tdble dX = xmin;
+            const tdble kY = (ymax - ymin) / height;
+            const tdble dY = ymin;
+
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
                 {
-                    printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
-                    AddObject(track, TrackHandle, TrackRoot, Root, clr, i * kX + dX, j * kY + dY, multipleMaterials);
+                    const unsigned int clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
+
+                    if (clr)
+                    {
+                        printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
+                        AddObject(track, TrackHandle, TrackRoot, Root, clr, i * kX + dX, j * kY + dY, multipleMaterials, false);
+                    }
                 }
             }
-        }
 
-        free(MapImage);
+            free(MapImage);
 
-        Ac3d GroupRoot;
-        GroupRoot.materials = Root.materials;
-        Ac3d::Object object("group", "");
-        GroupRoot.addObject(object);
-        std::vector<Ac3d::Object *> Groups;
+            Ac3d GroupRoot;
+            GroupRoot.materials = Root.materials;
+            Ac3d::Object object("group", "");
+            GroupRoot.addObject(object);
+            std::vector<Ac3d::Object *> Groups;
 
-        Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
+            Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
 
-        const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
-        const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-        saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
-        GroupRoot.flipAxes(false); // convert to track coordinate system
-        GroupRoot.writeFile(objectFile, false);
+            const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
+            const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
+            saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
+            GroupRoot.flipAxes(false); // convert to track coordinate system
+            GroupRoot.writeFile(objectFile, false);
 
-        if (all)
+            if (all)
+            {
+                allAc3d.merge(GroupRoot, multipleMaterials);
+            }
+        } while (!GfParmListSeekNext(TrackHandle, TRK_SECT_TERRAIN_OBJMAP));
+    }
+
+    if (GfParmGetEltNb(TrackHandle, TRK_SECT_TERRAIN_OBJECTS) != 0)
+    {
+        tTrkLocPos trkpos;
+
+        trkpos.type = TR_LPOS_MAIN;
+        trkpos.toStart = 0;
+        trkpos.toRight = 0;
+        trkpos.seg = track->seg->next;
+        tdble zeroX;
+        tdble zeroY;
+        RtTrackLocal2Global(&trkpos, &zeroX, &zeroY, TR_TORIGHT);
+
+        GfParmListSeekFirst(TrackHandle, TRK_SECT_TERRAIN_OBJECTS);
+
+        do
         {
-             allAc3d.merge(GroupRoot, multipleMaterials);
-        }
-    } while (!GfParmListSeekNext(TrackHandle, section));
+            Ac3d Root;
+
+            index++;
+
+            const tdble x = GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_X, "m", 0);
+            const tdble y = GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_Y, "m", 0);
+            const unsigned int color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
+
+            printf("found color: 0x%X x: %f y: %f\n", color, x, y);
+            AddObject(track, TrackHandle, TrackRoot, Root, color, x + zeroX, y + zeroY, multipleMaterials, true);
+
+            Ac3d GroupRoot;
+            GroupRoot.materials = Root.materials;
+            Ac3d::Object object("group", "");
+            GroupRoot.addObject(object);
+            std::vector<Ac3d::Object *> Groups;
+
+            Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
+
+            const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
+            const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
+            saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
+            GroupRoot.flipAxes(false); // convert to track coordinate system
+            GroupRoot.writeFile(objectFile, false);
+
+            if (all)
+            {
+                allAc3d.merge(GroupRoot, multipleMaterials);
+            }
+        } while (!GfParmListSeekNext(TrackHandle, TRK_SECT_TERRAIN_OBJECTS));
+    }
 }

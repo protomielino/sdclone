@@ -144,7 +144,9 @@
 
 #define TRK_ATT_DH                  "delta height"
 #define TRK_ATT_DV                  "delta vert"
-#define TRK_SECT_OBJMAP             "Object Maps"
+
+#define TRK_SECT_TERRAIN_OBJMAP     "Graphic/Terrain Generation/Object Maps"
+#define TRK_SECT_TERRAIN_OBJECTS    "Graphic/Terrain Generation/Objects"
 #define TRK_SECT_SURFACES           "Surfaces"
 #define TRK_SECT_OBJECTS            "Objects"
 
