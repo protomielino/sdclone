@@ -414,6 +414,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	protected void cancel()
 	{
+		editorFrame.setGraphicObjectProperties(null);
 		editorFrame.getProject().setPropertiesEditorX(this.getX());
 		editorFrame.getProject().setPropertiesEditorY(this.getY());
 		editorFrame.getProject().setPropertiesEditorTab(this.tabbedPane.getSelectedIndex());

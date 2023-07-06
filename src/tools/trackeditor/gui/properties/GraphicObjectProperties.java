@@ -33,8 +33,9 @@ import utils.circuit.GraphicObject;
 
 public class GraphicObjectProperties extends PropertyPanel
 {
-	private GraphicObjectTablePanel	graphicObjectTablePanel	= null;
-	private Vector<GraphicObject>	graphicObjects			= null;
+	private GraphicObjectTablePanel		graphicObjectTablePanel	= null;
+	private Vector<GraphicObject>		graphicObjects			= null;
+	private Vector<GraphicObjectData>	data					= new Vector<GraphicObjectData>();
 
 	public GraphicObjectProperties(EditorFrame editorFrame)
 	{
@@ -47,31 +48,17 @@ public class GraphicObjectProperties extends PropertyPanel
 		setLayout(null);
 		graphicObjects = getEditorFrame().getGraphicObjects();
 		add(getGraphicObjectTablePanel(), null);
+		getEditorFrame().setGraphicObjectProperties(this);
 	}
 
-	public class Data
-	{
-		String	name;
-		Integer	color;
-		Double  trackX;
-		Double  trackY;
-		Double	orientation;
-
-		Data(String name, Integer color, double trackX, double trackY, double orientation)
-		{
-			this.name = name;
-			this.color = color;
-			this.trackX = trackX;
-			this.trackY = trackY;
-			this.orientation = orientation;
-		}
-	}
-
-	private Vector<Data> data = new Vector<Data>();
-
-	public Vector<Data> getData()
+	public Vector<GraphicObjectData> getData()
 	{
 		return data;
+	}
+	
+	public void addData(GraphicObjectData graphicObjectData)
+	{
+		graphicObjectTablePanel.model.addRow(graphicObjectData);
 	}
 
 	private GraphicObjectTablePanel getGraphicObjectTablePanel()
@@ -147,7 +134,7 @@ public class GraphicObjectProperties extends PropertyPanel
 				name = new String("Unknown");
 			}
 
-			data.add(new Data(name, object.getColor(), object.getX(), object.getY(), object.getOrientation()));
+			data.add(new GraphicObjectData(name, object.getColor(), object.getX(), object.getY(), object.getOrientation()));
 		}
 	}
 
@@ -197,7 +184,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			Data datum = data.get(rowIndex);
+			GraphicObjectData datum = data.get(rowIndex);
 
 			switch (columnIndex)
 			{
@@ -225,7 +212,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
-			Data datum = data.get(rowIndex);
+			GraphicObjectData datum = data.get(rowIndex);
 
 			switch (columnIndex)
 			{
@@ -268,6 +255,12 @@ public class GraphicObjectProperties extends PropertyPanel
 		{
 			data.removeElementAt(row);
 			fireTableRowsDeleted(row - 1, data.size() - 1);
+		}
+		
+		public void addRow(GraphicObjectData graphicObjectData)
+		{
+			data.add(graphicObjectData);
+			fireTableRowsInserted(data.size() - 1, data.size() - 1);
 		}
 	}
 
@@ -418,7 +411,7 @@ public class GraphicObjectProperties extends PropertyPanel
 		}
 		for (int j = 0; j < minDataCount; j++)
 		{
-			Data datum = data.get(j);
+			GraphicObjectData datum = data.get(j);
 			GraphicObject object = graphicObjects.get(j);
 
 			if (!datum.name.equals(object.getName()))
@@ -473,7 +466,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			// need to add to objects
 			while (graphicObjects.size() < data.size())
 			{
-				Data datum = data.get(graphicObjects.size());
+				GraphicObjectData datum = data.get(graphicObjects.size());
 
 				graphicObjects.add(new GraphicObject(datum.name, datum.color, new Point2D.Double(datum.trackX, datum.trackY)));
 

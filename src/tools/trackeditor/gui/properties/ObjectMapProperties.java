@@ -663,8 +663,10 @@ public class ObjectMapProperties extends PropertyPanel
 	        JMenuItem deleteItem = new JMenuItem("Delete Object");
 	        JMenuItem deleteAllColorItem = new JMenuItem("Delete All Objects With This Color");
 	        JMenuItem deleteAllNameItem = new JMenuItem("Delete All Objects With This Name");
+		    JMenuItem moveToObjects = new JMenuItem("Move To Objects");
+		    JMenuItem moveAllToObjects = new JMenuItem("Move All To Objects");
 
-	        deleteItem.addActionListener(new ActionListener()
+		    deleteItem.addActionListener(new ActionListener()
 	        {
 	            public void actionPerformed(ActionEvent e)
 	            {
@@ -748,10 +750,70 @@ public class ObjectMapProperties extends PropertyPanel
 	            	}
 	            }
 	        });
+		    moveToObjects.addActionListener(new ActionListener()
+	        {
+				public void actionPerformed(ActionEvent e)
+				{
+	            	int row = panel.table.getSelectedRow();
+	            	if (row != -1)
+	            	{
+	            		if (JOptionPane.showConfirmDialog(null, "Move this object?", "Move Object", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+	            		{
+		            		Data datum = data.elementAt(panel.table.convertRowIndexToModel(row));											
+							String name = getEditorFrame().getObjectColorName(datum.color) + "-" + data.size();
+		            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum.trackX, datum.trackY, Double.NaN);
+		            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
+	            			panel.model.removeRowAt(panel.table.convertRowIndexToModel(row));
+	            		}
+					}
+				}
+	        });
+		    moveAllToObjects.addActionListener(new ActionListener()
+		    {
+				public void actionPerformed(ActionEvent e)
+				{
+	            	int row = panel.table.getSelectedRow();
+	            	if (row != -1)
+	            	{
+	            		if (JOptionPane.showConfirmDialog(null, "Move all objects with this name?", "Move Objects with Name", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+	            		{
+	            			Data datum = data.elementAt(panel.table.convertRowIndexToModel(row));
+	            			Vector<Integer> toDelete = new Vector<Integer>();
+	            			for (int i = 0; i < data.size(); i++)
+	            			{
+	            				if (datum.name.equals(data.elementAt(i).name))
+	            				{
+	            					toDelete.add(i);
+	            				}
+	            			}
+	            			Collections.sort(toDelete, new Comparator<Integer>()
+	            			{
+	                            @Override
+	                            public int compare(Integer o1, Integer o2)
+	                            {
+	                                // Changing the order of the elements
+	                                return o2 - o1;
+	                            }
+	                        });
+	            			int size = data.size();
+	            			for (int i = 0; i < toDelete.size(); i++)
+	            			{
+			            		Data datum1 = data.elementAt(panel.table.convertRowIndexToModel(row));											
+								String name = getEditorFrame().getObjectColorName(datum.color) + "-" + size++;
+			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum1.trackX, datum1.trackY, Double.NaN);
+			            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
+	            				panel.model.removeRowAt(toDelete.elementAt(i));
+	            			}	            			
+	            		}
+	            	}
+				}
+		    });
 
 	        popupMenu.add(deleteItem);
 	        popupMenu.add(deleteAllColorItem);
 	        popupMenu.add(deleteAllNameItem);
+	        popupMenu.add(moveToObjects);
+	        popupMenu.add(moveAllToObjects);
 
 	        return popupMenu;
 	    }

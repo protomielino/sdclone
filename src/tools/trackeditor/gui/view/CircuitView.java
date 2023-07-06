@@ -72,7 +72,6 @@ import utils.undo.UndoEditAllObjects;
 import utils.undo.UndoEditGraphicObject;
 import utils.undo.UndoEditObject;
 import utils.undo.UndoEditRelief;
-import utils.undo.UndoMoveGraphicObject;
 import utils.undo.UndoSegmentChange;
 import utils.undo.UndoSplitSegment;
 

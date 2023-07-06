@@ -20,6 +20,7 @@
  */
 package gui;
 
+import gui.properties.GraphicObjectProperties;
 import gui.properties.PropertiesDialog;
 import gui.splash.SplashScreen;
 import gui.view.CircuitView;
@@ -253,6 +254,16 @@ public class EditorFrame extends JFrame
 	private int 				currentObjectMap					= -1;
 	private int					currentObjectColor					= 0;
 	private boolean				currentObjectGraphic				= false;
+
+	private GraphicObjectProperties	graphicObjectProperties			= null;
+	
+	public GraphicObjectProperties getGraphicObjectProperties() {
+		return graphicObjectProperties;
+	}
+
+	public void setGraphicObjectProperties(GraphicObjectProperties graphicObjectProperties) {
+		this.graphicObjectProperties = graphicObjectProperties;
+	}
 
 	public boolean isPasteObject() {
 		return pasteObject;
