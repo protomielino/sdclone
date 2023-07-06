@@ -5,36 +5,37 @@ import java.util.Vector;
 
 public class TerrainGeneration
 {
-	public static final double 	DEFAULT_TRACK_STEP				= 10;
-	public static final double	DEFAULT_BORDER_MARGIN			= 100;
-	public static final double	DEFAULT_BORDER_STEP				= 10;
-	public static final double	DEFAULT_BORDER_HEIGHT			= 0;
-	public static final String	DEFAULT_ORIENTATION				= "clockwise";
-	public static final double	DEFAULT_MAXIMUM_ALTITUDE		= Double.NaN;
-	public static final double	DEFAULT_MINIMUM_ALTITUDE		= Double.NaN;
-	public static final double	DEFAULT_GROUP_SIZE				= 100;
-	public static final String	DEFAULT_ELEVATION_MAP			= null;
-	public static final String	DEFAULT_RELIEF_FILE				= null;
-	public static final String	DEFAULT_RELIEF_BORDER			= "no";
-	public static final String	DEFAULT_SURFACE					= "grass";
-	public static final int		DEFAULT_RANDOM_SEED				= 1;
-	public static final String	DEFAULT_USE_OBJECT_MATERIALS	= "no";
+	public static final double 		DEFAULT_TRACK_STEP				= 10;
+	public static final double		DEFAULT_BORDER_MARGIN			= 100;
+	public static final double		DEFAULT_BORDER_STEP				= 10;
+	public static final double		DEFAULT_BORDER_HEIGHT			= 0;
+	public static final String		DEFAULT_ORIENTATION				= "clockwise";
+	public static final double		DEFAULT_MAXIMUM_ALTITUDE		= Double.NaN;
+	public static final double		DEFAULT_MINIMUM_ALTITUDE		= Double.NaN;
+	public static final double		DEFAULT_GROUP_SIZE				= 100;
+	public static final String		DEFAULT_ELEVATION_MAP			= null;
+	public static final String		DEFAULT_RELIEF_FILE				= null;
+	public static final String		DEFAULT_RELIEF_BORDER			= "no";
+	public static final String		DEFAULT_SURFACE					= "grass";
+	public static final int			DEFAULT_RANDOM_SEED				= 1;
+	public static final String		DEFAULT_USE_OBJECT_MATERIALS	= "no";
 
-	private double				trackStep					= Double.NaN;
-	private double				borderMargin				= Double.NaN;
-	private double				borderStep					= Double.NaN;
-	private double				borderHeight				= Double.NaN;
-	private String				orientation					= null;
-	private double				maximumAltitude				= Double.NaN;
-	private double				minimumAltitude				= Double.NaN;
-	private double				groupSize					= Double.NaN;
-	private String				elevationMap				= null;
-	private Reliefs				reliefs						= new Reliefs();
-	private String				reliefBorder				= null;
-	private String				surface						= null;
-	private int					randomSeed					= Integer.MAX_VALUE;
-	private String				useObjectMaterials			= null;
-	private Vector<ObjectMap>	objectMaps					= new Vector<ObjectMap>();
+	private double					trackStep						= Double.NaN;
+	private double					borderMargin					= Double.NaN;
+	private double					borderStep						= Double.NaN;
+	private double					borderHeight					= Double.NaN;
+	private String					orientation						= null;
+	private double					maximumAltitude					= Double.NaN;
+	private double					minimumAltitude					= Double.NaN;
+	private double					groupSize						= Double.NaN;
+	private String					elevationMap					= null;
+	private Reliefs					reliefs							= new Reliefs();
+	private String					reliefBorder					= null;
+	private String					surface							= null;
+	private int						randomSeed						= Integer.MAX_VALUE;
+	private String					useObjectMaterials				= null;
+	private Vector<ObjectMap>		objectMaps						= new Vector<ObjectMap>();
+	private Vector<GraphicObject>	graphicObjects					= new Vector<GraphicObject>();
 
 	/**
 	 * @return Returns the terrainTrackStep.
@@ -245,6 +246,15 @@ public class TerrainGeneration
 		this.useObjectMaterials = useObjectMaterials;
 	}
 
+	public Vector<GraphicObject> getGraphicObjects()
+	{
+		return graphicObjects;
+	}
+	public void setGraphicObjects(Vector<GraphicObject> graphicObjects)
+	{
+		this.graphicObjects = graphicObjects;
+	}
+
 	public void dump(String indent)
     {
 		System.out.println(indent + "TerrainGeneration");
@@ -262,10 +272,17 @@ public class TerrainGeneration
 		System.out.println(indent + "  surface              : " + surface);
 		System.out.println(indent + "  random seed          : " + randomSeed);
 		System.out.println(indent + "  use object materials : " + useObjectMaterials);
-		System.out.println(indent + "  objectMaps[" + objectMaps.size() + "]");
+		System.out.println(indent + "  objectMaps           : " + objectMaps.size());
 		for (int i = 0; i < objectMaps.size(); i++)
 		{
+			System.out.println(indent + "  objectMaps[" + i + "]");
 			objectMaps.get(i).dump(indent + "    ");
+		}
+		System.out.println(indent + "  graphicObjects       : " + graphicObjects.size());
+		for (int i = 0; i < graphicObjects.size(); i++)
+		{
+			System.out.println(indent + "  graphicObjects[" + i + "]");
+			graphicObjects.get(i).dump(indent + "    ");
 		}
     }
 }

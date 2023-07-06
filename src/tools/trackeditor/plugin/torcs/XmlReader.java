@@ -20,6 +20,7 @@
  */
 package plugin.torcs;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -49,6 +50,7 @@ import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
 import utils.circuit.Graphic;
+import utils.circuit.GraphicObject;
 import utils.circuit.LocalInfo;
 import utils.circuit.Segment;
 import utils.circuit.SegmentSide;
@@ -624,12 +626,30 @@ public class XmlReader
 	        data.getTerrainGeneration().setRandomSeed(getAttrIntValue(terrain, "random seed"));
 	        data.getTerrainGeneration().setUseObjectMaterials(getAttrStrValue(terrain, "use object materials"));
 
-	        Element objects = getChildWithName(terrain, "Object Maps");
+	        Element objects = getChildWithName(terrain, "Objects");
 
 	        if (objects != null)
 	        {
+	        	Vector<GraphicObject>	graphicObjects = new Vector<GraphicObject>();
+	        	Iterator<Element> it = objects.getChildren().iterator();
+	        	while (it.hasNext())
+	        	{
+	        		Element el = it.next();
+	        		GraphicObject object = new GraphicObject(el.getAttribute("name").getValue(),
+	        				getAttrIntValue(el, "color"),
+	        				new Point2D.Double(getAttrNumValue(el, "x"), getAttrNumValue(el, "y")));
+	        		object.setOrientation(getAttrNumValue(el, "orientation", "deg"));
+	        		graphicObjects.add(object);
+	        	}
+	        	data.getTerrainGeneration().setGraphicObjects(graphicObjects);
+	        }
+
+	        Element objectMaps = getChildWithName(terrain, "Object Maps");
+
+	        if (objectMaps != null)
+	        {
 		        Vector<ObjectMap> objMap = new Vector<ObjectMap>();
-		        Iterator<Element> it = objects.getChildren().iterator();
+		        Iterator<Element> it = objectMaps.getChildren().iterator();
 		        while (it.hasNext())
 		        {
                     ObjectMap obj = new ObjectMap();

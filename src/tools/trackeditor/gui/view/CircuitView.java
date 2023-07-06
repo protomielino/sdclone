@@ -47,6 +47,7 @@ import utils.Editor;
 import utils.EditorPoint;
 import utils.SegmentVector;
 import utils.circuit.Curve;
+import utils.circuit.GraphicObject;
 import utils.circuit.ObjShapeHandle;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjShapeRelief;
@@ -56,17 +57,22 @@ import utils.circuit.Reliefs;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.XmlObjPits;
+import utils.undo.MovedObject;
 import utils.undo.ObjectMapObject;
 import utils.undo.Undo;
+import utils.undo.UndoAddGraphicObject;
 import utils.undo.UndoAddObject;
 import utils.undo.UndoAddSegment;
 import utils.undo.UndoDeleteAllObjects;
+import utils.undo.UndoDeleteGraphicObject;
 import utils.undo.UndoDeleteObject;
 import utils.undo.UndoDeleteRelief;
 import utils.undo.UndoDeleteSegment;
 import utils.undo.UndoEditAllObjects;
+import utils.undo.UndoEditGraphicObject;
 import utils.undo.UndoEditObject;
 import utils.undo.UndoEditRelief;
+import utils.undo.UndoMoveGraphicObject;
 import utils.undo.UndoSegmentChange;
 import utils.undo.UndoSplitSegment;
 
@@ -669,7 +675,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (!Double.isNaN(oldShape.getProfilStartTangent()) && !Double.isNaN(oldShape.getProfilEndTangent()))
 		{
 			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
-			// FIXME: calculate the slope at the split point									
+			// TODO calculate the slope at the split point
 			double tangent = oldShape.getProfilStartTangent() + (oldShape.getProfilEndTangent() - oldShape.getProfilStartTangent()) * splitPoint;
 			newShape.setProfilStartTangent(tangent);
 			oldShape.setProfilEndTangent(tangent);
@@ -698,7 +704,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			Segment obj = findObjAtMousePos();
 
-			if (obj != null && obj.getType() == "object")
+			if (obj != null && obj.getType().equals("object"))
 			{
 				objectDragging = true;
 				objectShape = (ObjShapeObject) obj;
@@ -708,7 +714,24 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				screenToReal(e, real);
 				objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
 			}
-			else if (obj != null && obj.getType() == "relief")
+			else if (obj != null && obj.getType().equals("graphic object"))
+			{
+				objectDragging = true;
+				objectShape = (ObjShapeObject) obj;
+				for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+				{
+					if (graphicObject.getShape() == objectShape)
+					{
+						Undo.add(new UndoEditGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
+
+						Point2D.Double real = new Point2D.Double(0, 0);
+						screenToReal(e, real);
+						objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
+						break;
+					}
+				}
+			}
+			else if (obj != null && obj.getType().equals("relief"))
 			{
 				reliefDragging = true;
 				reliefShape = (ObjShapeRelief) obj;
@@ -781,6 +804,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						if (selectedShape != null)
 						{
 							if (selectedShape.getType().equals("object"))
+							{
+								objectSelected((ObjShapeObject)selectedShape, e);
+							}
+							else if (selectedShape.getType().equals("graphic object"))
 							{
 								objectSelected((ObjShapeObject)selectedShape, e);
 							}
@@ -898,22 +925,33 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			{
 				Point2D.Double real = new Point2D.Double();
 				screenToReal(e, real);
-				
+
 				real.x = real.x + objectOffset.x;
 				real.y = real.y + objectOffset.y;
-							
-				ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
 
-				int imageXY[] = { 0, 0 };
-				realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
-				
-				objectShape.setImageXY(imageXY[0], imageXY[1]);				
-				objectShape.calcShape(new Point2D.Double(real.x, real.y));
-				
-				editorFrame.documentIsModified = true;
-				objectMap.setChanged(true);
-				invalidate();
-				repaint();
+				if (objectShape.getType().equals("object"))
+				{
+					ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+
+					int imageXY[] = { 0, 0 };
+					realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
+
+					objectShape.setImageXY(imageXY[0], imageXY[1]);
+					objectShape.calcShape(new Point2D.Double(real.x, real.y));
+
+					editorFrame.documentIsModified = true;
+					objectMap.setChanged(true);
+					invalidate();
+					repaint();
+				}
+				else if (objectShape.getType().equals("graphic object"))
+				{
+					objectShape.calcShape(new Point2D.Double(real.x, real.y));
+
+					editorFrame.documentIsModified = true;
+					invalidate();
+					repaint();
+				}
 			}
 			else if (reliefShape != null && reliefDragging == true)
 			{
@@ -1363,16 +1401,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		if (showObjects)
 		{
-			Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-
-			for (int j = 0; j < objectMaps.size(); j++)
+			for (ObjectMap objectMap : editorFrame.getObjectMaps())
 			{
-				Vector<ObjShapeObject> objects = objectMaps.get(j).getObjects();
-
-				for (int k = 0; k < objects.size(); k++)
+				for (ObjShapeObject object : objectMap.getObjects())
 				{
-					ObjShapeObject object = objects.get(k);
-
 					try
 					{
 						if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
@@ -1386,6 +1418,25 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						ex.printStackTrace();
 					}
+				}
+			}
+
+			for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+			{
+				ObjShapeObject object = graphicObject.getShape();
+
+				try
+				{
+					if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
+							&& object.contains(mousePoint))
+					{
+						// object found !
+						return object;
+					}
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -1599,30 +1650,44 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (showObjects)
 			{
-				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-
-				for (int j = 0; j < objectMaps.size(); j++)
+				for (ObjectMap objectMap : editorFrame.getObjectMaps())
 				{
-					Vector<ObjShapeObject> objects = objectMaps.get(j).getObjects();
-
-					for (int k = 0; k < objects.size(); k++)
+					for (ObjShapeObject object : objectMap.getObjects())
 					{
-						ObjShapeObject object = objects.get(k);
-
 						g.setColor(object.getColor());
 						if (object == selectedShape)
 						{
 							Graphics2D g2 = (Graphics2D) g;
-			                g2.setStroke(new BasicStroke(3));
+							g2.setStroke(new BasicStroke(3));
 						}
-						
+
 						object.draw(g, affineTransform);
-						
+
 						if (object == selectedShape)
 						{
 							Graphics2D g2 = (Graphics2D) g;
-			                g2.setStroke(new BasicStroke(1));
+							g2.setStroke(new BasicStroke(1));
 						}
+					}
+				}
+
+				for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+				{
+					ObjShapeObject object = graphicObject.getShape();
+
+					g.setColor(object.getColor());
+					if (object == selectedShape)
+					{
+						Graphics2D g2 = (Graphics2D) g;
+						g2.setStroke(new BasicStroke(3));
+					}
+
+					object.draw(g, affineTransform);
+
+					if (object == selectedShape)
+					{
+						Graphics2D g2 = (Graphics2D) g;
+						g2.setStroke(new BasicStroke(1));
 					}
 				}
 			}
@@ -1835,7 +1900,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 	}
 
-	public void setObjects(Vector<ObjectMap> objectMaps)
+	public void setObjects(Vector<GraphicObject> objects)
+	{
+		for (GraphicObject object : objects)
+		{
+			ObjShapeObject shape = object.getShape();
+
+			Point2D.Double location = new Point2D.Double();
+			location.x = object.getX();
+			location.y = object.getY();
+
+			shape.calcShape(location);
+		}
+	}
+
+	public void setObjectMaps(Vector<ObjectMap> objectMaps)
 	{
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
 
@@ -1884,10 +1963,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void setShowObjects(boolean showObjects)
 	{
 		this.showObjects = showObjects;
-		if (showObjects && editorFrame.getObjectMaps().size() > 0)
+		if (showObjects)
 		{
-			setObjects(editorFrame.getObjectMaps());
-			editorFrame.setCurrentObjectMap(0);
+			if (editorFrame.getGraphicObjects().size() > 0)
+			{
+				editorFrame.setCurrentObjectGraphic(true);
+			}
+			else if (editorFrame.getObjectMaps().size() > 0)
+			{
+				setObjectMaps(editorFrame.getObjectMaps());
+				editorFrame.setCurrentObjectMap(0);
+				editorFrame.setCurrentObjectGraphic(false);
+			}
 		}
 	}
 
@@ -1993,7 +2080,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		if (showObjects)
 		{
-			setObjects(editorFrame.getObjectMaps());
+			setObjectMaps(editorFrame.getObjectMaps());
+			setObjects(editorFrame.getGraphicObjects());
 		}
 
 		if (showReliefs)
@@ -2230,6 +2318,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	private void objectSelected(ObjShapeObject shape, MouseEvent me)
 	{
+		boolean isGraphicObject = shape.getType().equals("graphic object");
+
 		class CopyAction extends AbstractAction
 		{
 			public CopyAction(String text, ImageIcon icon, String desc)
@@ -2239,8 +2329,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
-				editorFrame.setCurrentObjectMap(0);	// this is wrong
+				if (isGraphicObject)
+				{
+					editorFrame.setCurrentObjectGraphic(true);
+				}
+				else
+				{
+					editorFrame.setCurrentObjectGraphic(false);
+					// TODO handle more than one object map
+					editorFrame.setCurrentObjectMap(0);
+				}
 				editorFrame.setCurrentObjectColor(shape.getRGB());
+				editorFrame.setPasteObject(true);
 				selectedShape = null;
 				invalidate();
 				repaint();
@@ -2258,13 +2358,45 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
+				if (isGraphicObject)
+				{
+					for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+					{
+						if (graphicObject.getShape() == shape)
+						{
+							Undo.add(new UndoEditGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
+
+							TrackObjectDialog editObjectDialog = new TrackObjectDialog(editorFrame, false, graphicObject, me.getXOnScreen(), me.getYOnScreen());
+
+							editObjectDialog.setModal(true);
+							editObjectDialog.setVisible(true);
+
+							if (editObjectDialog.isChanged())
+							{
+								editorFrame.documentIsModified = true;
+							}
+							else
+							{
+								Undo.pop();
+							}
+
+							selectedShape = null;
+							invalidate();
+							repaint();
+							return;
+						}
+					}
+				}
+
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-				
+
 				for (int i = 0; i < objectMaps.size(); i++)
 				{
 					ObjectMap	objectMap = objectMaps.get(i);
 					Vector<ObjShapeObject>	objects = objectMap.getObjects();
-					
+
 					for (int j = 0; j < objects.size(); j++)
 					{
 						if (objects.elementAt(j) == shape)
@@ -2272,13 +2404,19 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							Undo.add(new UndoEditObject(objectMap, shape));
 
 							TrackObjectDialog editObjectDialog = new TrackObjectDialog(editorFrame, false, shape, me.getXOnScreen(), me.getYOnScreen());
-							
+
 							editObjectDialog.setModal(true);
 							editObjectDialog.setVisible(true);
-							
+
 							if (editObjectDialog.isChanged())
+							{
 								editorFrame.documentIsModified = true;
-							
+							}
+							else
+							{
+								Undo.pop();
+							}
+
 							selectedShape = null;
 							invalidate();
 							repaint();
@@ -2300,13 +2438,27 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
+				if (isGraphicObject)
+				{
+					for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+					{
+						if (graphicObject.getShape() == shape)
+						{
+							JOptionPane.showMessageDialog(null, "Not implemented yet!", "Edit All Objects", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					}
+				}
+
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-				
+
 				for (int i = 0; i < objectMaps.size(); i++)
 				{
 					ObjectMap	objectMap = objectMaps.get(i);
 					Vector<ObjShapeObject>	objects = objectMap.getObjects();
-					
+
 					for (int j = 0; j < objects.size(); j++)
 					{
 						if (objects.elementAt(j) == shape)
@@ -2328,11 +2480,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								for (int k = 0; k < objectMaps.size(); k++)
 								{
 									objectMap = objectMaps.get(k);
-									
+
 									for (int l = 0; l < objectMap.getObjects().size(); l++)
 									{
 										ObjShapeObject object = objectMap.getObjects().get(l);
-										
+
 										if (object.getRGB() == originalRGB)
 										{
 											// remember the object to change
@@ -2351,7 +2503,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 								editorFrame.documentIsModified = true;
 							}
-							
+							else
+							{
+								Undo.pop();
+							}
+
 							selectedShape = null;
 							invalidate();
 							repaint();
@@ -2373,13 +2529,32 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
+				if (isGraphicObject)
+				{
+					for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+					{
+						if (graphicObject.getShape() == shape)
+						{
+							Undo.add(new UndoDeleteGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
+							editorFrame.getGraphicObjects().remove(graphicObject);
+							selectedShape = null;
+							invalidate();
+							repaint();
+							editorFrame.documentIsModified = true;
+							return;
+						}
+					}
+				}
+
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-				
+
 				for (int i = 0; i < objectMaps.size(); i++)
 				{
 					ObjectMap objectMap = objectMaps.get(i);
 					int index = objectMap.getObjectIndex(shape);
-					
+
 					if (index != -1)
 					{
 						Undo.add(new UndoDeleteObject(objectMap, shape));
@@ -2395,7 +2570,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 
 		DeleteAction deleteAction = new DeleteAction("Delete Object", null, "Delete object.");
-		
+
 		class DeleteAllAction extends AbstractAction
 		{
 			public DeleteAllAction(String text, ImageIcon icon, String desc)
@@ -2405,34 +2580,48 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
+				if (isGraphicObject)
+				{
+					for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+					{
+						if (graphicObject.getShape() == shape)
+						{
+							JOptionPane.showMessageDialog(null, "Not implemented yet!", "Delete All Objects", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					}
+				}
+
 				int rgb = shape.getRGB();
 				Vector<ObjectMapObject> deletedObjects = new Vector<ObjectMapObject>();
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-				
+
 				for (int i = 0; i < objectMaps.size(); i++)
 				{
 					ObjectMap objectMap = objectMaps.get(i);
-					
+
 					for (int j = objectMap.getObjects().size() - 1; j >= 0; j--)
 					{
 						ObjShapeObject object = objectMap.getObjects().get(j);
-						
+
 						if (object.getRGB() == rgb)
 						{
 							deletedObjects.add(new ObjectMapObject(objectMap, object));
 						}
 					}
 				}
-				
+
 				Undo.add(new UndoDeleteAllObjects(deletedObjects));
-				
+
 				for (int i = 0; i < deletedObjects.size(); i++)
 				{
 					ObjectMapObject deletedObject = deletedObjects.get(i);
-					
+
 					deletedObject.objectMap.removeObject(deletedObject.object);	
 				}
-				
+
 				selectedShape = null;
 				editorFrame.documentIsModified = true;
 				invalidate();
@@ -2465,7 +2654,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				}
 				return false;
 			}
-			public void findAdjacent(ObjShapeObject objectShape)
+			public void findAdjacent(ObjShapeObject objShape)
 			{
 				for (ObjectMap objectMap : editorFrame.getObjectMaps())
 				{
@@ -2473,8 +2662,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						if (rgb == object.getRGB())
 						{
-							int dx = Math.abs(objectShape.getImageX() - object.getImageX());
-							int dy = Math.abs(objectShape.getImageY() - object.getImageY());
+							int dx = Math.abs(objShape.getImageX() - object.getImageX());
+							int dy = Math.abs(objShape.getImageY() - object.getImageY());
 
 							if ((dx == 1 && dy == 0) || (dx == 1 && dy == 1) || (dx == 0 && dy == 1))
 							{
@@ -2493,6 +2682,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
 				findAdjacent(shape);
 
 				Undo.add(new UndoDeleteAllObjects(deletedObjects));
@@ -2534,7 +2725,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				}
 				return false;
 			}
-			public void findAdjacent(ObjShapeObject objectShape)
+			public void findAdjacent(ObjShapeObject objShape)
 			{
 				for (ObjectMap objectMap : editorFrame.getObjectMaps())
 				{
@@ -2542,8 +2733,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						if (rgb == object.getRGB())
 						{
-							int dx = Math.abs(objectShape.getImageX() - object.getImageX());
-							int dy = Math.abs(objectShape.getImageY() - object.getImageY());
+							int dx = Math.abs(objShape.getImageX() - object.getImageX());
+							int dy = Math.abs(objShape.getImageY() - object.getImageY());
 
 							if ((dx == 1 && dy == 0) || (dx == 1 && dy == 1) || (dx == 0 && dy == 1))
 							{
@@ -2560,7 +2751,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					}
 				}
 			}
-			public void findAllAdjacent(ObjShapeObject objectShape)
+			public void findAllAdjacent(ObjShapeObject objShape)
 			{
 				for (ObjectMap objectMap : editorFrame.getObjectMaps())
 				{
@@ -2575,6 +2766,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
 				findAllAdjacent(shape);
 
 				Undo.add(new UndoDeleteAllObjects(deletedObjects));
@@ -2593,33 +2786,155 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		DeleteAllAdjacentAction deleteAllAdjacentAction = new DeleteAllAdjacentAction("Delete All Adjacent Objects", null, "Delete all adjacent objects of this type.");
 
+		class MoveToObjectsAction extends AbstractAction
+		{
+			public MoveToObjectsAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				if (JOptionPane.showOptionDialog(null, "Undo not implemented yet!", "No undo for this action!",
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null) != JOptionPane.OK_OPTION)
+				{
+					return;
+				}
+								
+				editorFrame.setPasteObject(false);
+				
+				String name = editorFrame.getObjectColorName(shape.getRGB());
+				for (GraphicObject object : editorFrame.getGraphicObjects())
+				{
+					if (object.getName().equals(name))
+					{
+						name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+						break;
+					}
+				}
+				GraphicObject graphicObject = new GraphicObject(name, shape.getRGB(), shape.getTrackLocation());
+				editorFrame.getGraphicObjects().add(graphicObject);
+				ObjectMap	shapeObjectMap = null;
+				for (ObjectMap	objectMap : editorFrame.getObjectMaps())
+				{
+					Vector<ObjShapeObject>	objects = objectMap.getObjects();
+
+					for (int j = 0; j < objects.size(); j++)
+					{
+						if (objects.elementAt(j) == shape)
+						{
+							shapeObjectMap = objectMap;
+							break;
+						}
+					}
+				}
+				// TODO
+				//Undo.add(new UndoMoveGraphicObject(editorFrame.getGraphicObjects(), graphicObject, shapeObjectMap, shape));
+				shapeObjectMap.removeObject(shape);
+				editorFrame.documentIsModified = true;
+				redrawCircuit();
+			}
+		}
+
+		MoveToObjectsAction moveToObjectsAction = new MoveToObjectsAction("Move Object To Objects", null, "Move object to Objects.");
+
+		class MoveAllToObjectsAction extends AbstractAction
+		{
+			Vector<MovedObject>	movedObjects = new Vector<MovedObject>();
+			int 				rgb = shape.getRGB();
+
+			public MoveAllToObjectsAction(String text, ImageIcon icon, String desc)
+			{
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+			}
+			public void actionPerformed(ActionEvent e)
+			{
+				if (JOptionPane.showOptionDialog(null, "Undo not implemented yet!", "No undo for this action!",
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null) != JOptionPane.OK_OPTION)
+				{
+					return;
+				}
+				
+				editorFrame.setPasteObject(false);
+
+				for (ObjectMap objectMap : editorFrame.getObjectMaps())
+				{
+					for (ObjShapeObject object : objectMap.getObjects())
+					{
+						if (rgb == object.getRGB())
+						{
+							// TODO fix name
+							String name = editorFrame.getObjectColorName(rgb) + "-" + movedObjects.size();
+							MovedObject movedObject = new MovedObject(new GraphicObject(name, rgb, object.getTrackLocation()), new ObjectMapObject(objectMap, object));
+							movedObjects.add(movedObject);
+						}
+					}
+				}
+				
+				for (MovedObject movedObject : movedObjects)
+				{
+					editorFrame.getGraphicObjects().add(movedObject.newObject);
+				}
+				// TODO
+				//Undo.add(new UndoMoveAllGraphicObject(editorFrame.getGraphicObjects(), movedObjects);
+				for (MovedObject movedObject : movedObjects)
+				{
+					movedObject.oldObject.objectMap.removeObject(movedObject.oldObject.object);
+				}
+				editorFrame.documentIsModified = true;
+				redrawCircuit();
+			}
+		}
+
+		MoveAllToObjectsAction moveAllToObjectsAction = new MoveAllToObjectsAction("Move All Objects To Objects", null, "Move all objects of this type to Objects.");
+
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem itemCopy = new JMenuItem("Copy");
 	    JMenuItem itemEdit = new JMenuItem("Edit");
-	    JMenuItem itemEditAll = new JMenuItem("Edit All");
+	    JMenuItem itemEditAll = isGraphicObject ? null : new JMenuItem("Edit All");
 	    JMenuItem itemDelete = new JMenuItem("Delete");
-	    JMenuItem itemDeleteAll = new JMenuItem("Delete All");
-	    JMenuItem itemDeleteAdjacent = new JMenuItem("Delete Adjacent");
-	    JMenuItem itemDeleteAllAdjacent = new JMenuItem("Delete All Adjacent");
+	    JMenuItem itemDeleteAll = isGraphicObject ? null : new JMenuItem("Delete All");
+	    JMenuItem itemDeleteAdjacent = isGraphicObject ? null : new JMenuItem("Delete Adjacent");
+	    JMenuItem itemDeleteAllAdjacent = isGraphicObject ? null : new JMenuItem("Delete All Adjacent");
+	    JMenuItem itemMoveToObjects = isGraphicObject ? null : new JMenuItem("Move To Objects");
+	    JMenuItem itemMoveAllToObjects = isGraphicObject ? null : new JMenuItem("Move To Objects");
 
 	    itemCopy.setAction(copyAction);
 	    itemEdit.setAction(editAction);
-	    itemEditAll.setAction(editAllAction);
 	    itemDelete.setAction(deleteAction);
-	    itemDeleteAll.setAction(deleteAllAction);
-	    itemDeleteAdjacent.setAction(deleteAdjacentAction);
-	    itemDeleteAllAdjacent.setAction(deleteAllAdjacentAction);
+	    if (isGraphicObject)
+	    {
+	    }
+	    else
+	    {
+	    	itemEditAll.setAction(editAllAction);
+	    	itemDeleteAll.setAction(deleteAllAction);
+	    	itemDeleteAdjacent.setAction(deleteAdjacentAction);
+	    	itemDeleteAllAdjacent.setAction(deleteAllAdjacentAction);
+		    itemMoveToObjects.setAction(moveToObjectsAction);
+		    itemMoveAllToObjects.setAction(moveAllToObjectsAction);
+	    }
 
 	    menu.add(itemCopy);
 	    menu.addSeparator();
 	    menu.add(itemEdit);
-	    menu.add(itemEditAll);
+	    if (!isGraphicObject)
+	    {
+	    	menu.add(itemEditAll);
+	    }
 	    menu.addSeparator();
 	    menu.add(itemDelete);
-	    menu.add(itemDeleteAll);
-	    menu.addSeparator();
-	    menu.add(itemDeleteAdjacent);
-	    menu.add(itemDeleteAllAdjacent);
+	    if (!isGraphicObject)
+	    {
+		    menu.add(itemDeleteAll);
+		    menu.addSeparator();
+		    menu.add(itemDeleteAdjacent);
+		    menu.add(itemDeleteAllAdjacent);
+		    menu.addSeparator();
+		    menu.add(itemMoveToObjects);
+		    menu.add(itemMoveAllToObjects);
+	    }
 
 	    menu.addPopupMenuListener(new PopupMenuListener()
 	    {
@@ -2642,106 +2957,206 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	private void addNewObject(MouseEvent me)
 	{
-		Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
-		
-		if (objectMaps.isEmpty())
+		if (editorFrame.getObjectMaps().isEmpty() && editorFrame.getGraphicObjects().isEmpty())
 		{
-			String[] options = {"Create", "Cancel"};
-			
-			int option = JOptionPane.showOptionDialog(this, "No Object Map",
-					"No Object Map", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-			
-			if (option == 1)					
-				return;
-			
-			if (Double.isNaN(editorFrame.getTerrainGeneration().getBorderMargin()))
+			String[] options = {"Add to ObjectMap", "Add to Objects", "Cancel"};
+
+			int option = JOptionPane.showOptionDialog(this, "Add New Object",
+					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+			if (option == 0)
 			{
-				JOptionPane.showMessageDialog(editorFrame, "Setting margin to 100 meters.", "No Border Margin", JOptionPane.INFORMATION_MESSAGE);
-				editorFrame.getTerrainGeneration().setBorderMargin(100);
+				createObjectMap(me);
+				addToObjectMap(me);
 			}
-			
-			boolean write = true;
-			
-			Path filename = Paths.get(Editor.getProperties().getPath() + sep + "object-map1.png");
-			
-			if (filename.toFile().exists())
+			else if (option == 1)
 			{
-				String[] options1 = {"Overwrite", "Use Existing", "Cancel"};
-				
-				int option1 = JOptionPane.showOptionDialog(this, filename.getFileName().toString() + " already exists!",
-						"Create Object Map", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options1, options1[0]);
-				
-				if (option1 == 1)
-				{
-					ObjectMap	objectMap = new ObjectMap();
-					
-					objectMap.setName("map 1");
-					try
-					{
-						objectMap.setObjectMap(filename.getFileName().toString());
-					
-						editorFrame.getObjectMaps().add(objectMap);
-					}
-					catch (IOException ex)
-					{
-					}
-					
-					write = false;
-				}
-				else if (option1 == 2)
-				{
-					return;
-				}
+				addToObjects(me);
 			}
-			
-			if (write)
+			return;
+		}
+
+		if (!editorFrame.getObjectMaps().isEmpty())
+		{
+			String[] options = {"Yes", "No", "Cancel"};
+
+			int option = JOptionPane.showOptionDialog(this, "Add new object to ObjectMap?",
+					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+			if (option == 0)
 			{
-				int imageWidth = 1024;
-				int imageHeight = (int)Math.round(1024 * (boundingRectangle.height / boundingRectangle.width));
-				BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-				Graphics2D graphic = image.createGraphics();
-				graphic.setColor(new Color(0x00000000));
-				graphic.fillRect(0, 0, imageWidth, imageHeight);
-			
-				graphic.dispose();
-				
+				addToObjectMap(me);
+			}
+			else if (option == 1)
+			{
+				addToObjects(me);
+			}
+		}
+		else
+		{
+			String[] options = {"Yes", "No", "Cancel"};
+
+			int option = JOptionPane.showOptionDialog(this, "Add new object to Objects?",
+					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+			if (option == 0)
+			{
+				addToObjects(me);
+			}
+			else if (option == 1)
+			{
+				if (editorFrame.getObjectMaps().isEmpty())
+				{
+					createObjectMap(me);
+				}
+				else if (editorFrame.getCurrentObjectMap() == -1)
+				{
+					if (editorFrame.getObjectMaps().size() == 1)
+					{
+						editorFrame.setCurrentObjectMap(0);
+					}
+					else
+					{
+						// TODO pick which one
+						editorFrame.setCurrentObjectMap(0);
+					}
+				}
+				addToObjectMap(me);
+			}
+		}
+	}
+
+	private void addToObjects(MouseEvent me)
+	{
+		Point2D.Double real = new Point2D.Double();
+		screenToReal(me, real);
+
+		// TODO fix name
+		String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor());
+
+		for (GraphicObject object : editorFrame.getGraphicObjects())
+		{
+			if (object.getName().equals(name))
+			{
+				name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+				break;
+			}
+		}
+
+		GraphicObject	graphicObject = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+
+		TrackObjectDialog	addObjectDialog = new TrackObjectDialog(editorFrame, graphicObject, me.getXOnScreen(), me.getYOnScreen());
+
+		addObjectDialog.setModal(true);
+		addObjectDialog.setVisible(true);
+
+		if (addObjectDialog.isChanged())
+		{
+			editorFrame.setCurrentObjectColor(graphicObject.getColor());
+			editorFrame.getGraphicObjects().add(graphicObject);
+			Undo.add(new UndoAddGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
+			editorFrame.setCurrentObjectGraphic(true);
+			editorFrame.setCurrentObjectColor(graphicObject.getColor());
+			editorFrame.documentIsModified = true;
+			redrawCircuit();
+		}
+	}
+
+	private void createObjectMap(MouseEvent me)
+	{
+		if (Double.isNaN(editorFrame.getTerrainGeneration().getBorderMargin()))
+		{
+			JOptionPane.showMessageDialog(editorFrame, "Setting margin to 100 meters.", "No Border Margin", JOptionPane.INFORMATION_MESSAGE);
+			editorFrame.getTerrainGeneration().setBorderMargin(100);
+		}
+
+		boolean write = true;
+
+		Path filename = Paths.get(Editor.getProperties().getPath() + sep + "object-map1.png");
+
+		if (filename.toFile().exists())
+		{
+			String[] options1 = {"Overwrite", "Use Existing", "Cancel"};
+
+			int option1 = JOptionPane.showOptionDialog(this, filename.getFileName().toString() + " already exists!",
+					"Create Object Map", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options1, options1[0]);
+
+			if (option1 == 1)
+			{
+				ObjectMap	objectMap = new ObjectMap();
+
+				objectMap.setName("map 1");
 				try
 				{
-					ImageIO.write(image, "png", new File(filename.toString()));
-					
-					ObjectMap	objectMap = new ObjectMap();
-					
-					objectMap.setName("map 1");
 					objectMap.setObjectMap(filename.getFileName().toString());
-					
+
 					editorFrame.getObjectMaps().add(objectMap);
 				}
 				catch (IOException ex)
-				{			
+				{
 				}
+
+				write = false;
 			}
-			
-			editorFrame.setCurrentObjectMap(0);
+			else if (option1 == 2)
+			{
+				return;
+			}
 		}
-		
+
+		if (write)
+		{
+			int imageWidth = 1024;
+			int imageHeight = (int)Math.round(1024 * (boundingRectangle.height / boundingRectangle.width));
+			BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphic = image.createGraphics();
+			graphic.setColor(new Color(0x00000000));
+			graphic.fillRect(0, 0, imageWidth, imageHeight);
+
+			graphic.dispose();
+
+			try
+			{
+				ImageIO.write(image, "png", new File(filename.toString()));
+
+				ObjectMap	objectMap = new ObjectMap();
+
+				objectMap.setName("map 1");
+				objectMap.setObjectMap(filename.getFileName().toString());
+
+				editorFrame.getObjectMaps().add(objectMap);
+			}
+			catch (IOException ex)
+			{
+			}
+		}
+
+		editorFrame.setCurrentObjectMap(0);
+	}
+
+	private void addToObjectMap(MouseEvent me)
+	{
 		ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
 		Point2D.Double real = new Point2D.Double();
 		screenToReal(me, real);
 
 		int imageXY[] = { 0, 0 };
 		realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
-		
+
 		ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
 		
+		object.setLocation(real);
+
 		TrackObjectDialog	addObjectDialog = new TrackObjectDialog(editorFrame, object, me.getXOnScreen(), me.getYOnScreen());
-		
+
 		addObjectDialog.setModal(true);
 		addObjectDialog.setVisible(true);
-		
+
 		if (addObjectDialog.isChanged())
 		{
 			objectMap.addObject(object);			
 			Undo.add(new UndoAddObject(objectMap, object));
+			editorFrame.setCurrentObjectGraphic(false);
 			editorFrame.setCurrentObjectColor(object.getRGB());
 			editorFrame.documentIsModified = true;
 			redrawCircuit();
@@ -2751,6 +3166,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	private void realToImage(Point2D.Double real, int imageWidth, int imageHeight, int imageXY[])
 	{
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+		if (Double.isNaN(border))
+		{
+			JOptionPane.showMessageDialog(editorFrame, "Setting margin to 100 meters.", "No Border Margin", JOptionPane.INFORMATION_MESSAGE);
+			border = 100;
+			editorFrame.getTrackData().getGraphic().getTerrainGeneration().setBorderMargin(border);
+		}
 		Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
 				 										 boundingRectangle.getMinY() - border,
 				 										 boundingRectangle.getWidth() + (border * 2),
@@ -2762,6 +3183,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void imageToReal(int imageX, int imageY, int imageWidth, int imageHeight, Point2D.Double real)
 	{
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
+		if (Double.isNaN(border))
+		{
+			System.out.println("border not set");
+			border = 0;
+		}
 		Rectangle2D.Double rect = new Rectangle2D.Double(boundingRectangle.getMinX() - border,
 														 boundingRectangle.getMinY() - border,
 														 boundingRectangle.getWidth() + (border * 2),
@@ -2784,6 +3210,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
+				editorFrame.setPasteObject(false);
+
 				addNewObject(me);
 			}
 		}
@@ -2799,17 +3227,40 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
-				ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
 				Point2D.Double real = new Point2D.Double();
 				screenToReal(me, real);
 
-				int imageXY[] = { 0, 0 };
-				realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
+				if (editorFrame.isCurrentObjectGraphic())
+				{
+					// TODO fix name
+					String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()); // this is wrong
+
+					for (GraphicObject object : editorFrame.getGraphicObjects())
+					{
+						if (object.getName().equals(name))
+						{
+							name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+							break;
+						}
+					}
+
+					GraphicObject	object = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+					editorFrame.getGraphicObjects().add(object);
+					Undo.add(new UndoAddGraphicObject(editorFrame.getGraphicObjects(), object));
+				}
+				else
+				{
+					ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+
+					int imageXY[] = { 0, 0 };
+					realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
 						
-				ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
-				objectMap.addObject(object);
-				Undo.add(new UndoAddObject(objectMap, object));
+					ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
 				
+					objectMap.addObject(object);
+					Undo.add(new UndoAddObject(objectMap, object));
+				}
+
 				editorFrame.documentIsModified = true;
 				redrawCircuit();
 			}
@@ -2844,7 +3295,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	    menu.add(item1);
 
-		if (editorFrame.getCurrentObjectMap() != -1 && editorFrame.getCurrentObjectColor() != 0)
+		if (editorFrame.isPasteObject())
 		{
 		    JMenuItem item2 = new JMenuItem("Paste");
 

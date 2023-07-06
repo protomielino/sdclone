@@ -84,4 +84,13 @@ public class Undo
 		undoSegments.add(undo);
 		redoSegments.clear();
 	}
+
+	public static void pop()
+	{
+		if (undoSegments.size() > 0)
+		{
+			UndoInterface last = undoSegments.lastElement();
+			undoSegments.remove(last);
+		}
+	}
 }

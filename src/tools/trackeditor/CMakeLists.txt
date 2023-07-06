@@ -27,7 +27,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}trackeditor)
 
-   SET(_JAVA_SRC 
+   SET(_JAVA_SRC
          gui/CheckDialog.java
          gui/DefaultObjectsDialog.java
          gui/DefaultSurfacesDialog.java
@@ -40,6 +40,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/CameraProperties.java
          gui/properties/EnvMapProperties.java
          gui/properties/GeneralProperties.java
+         gui/properties/GraphicObjectProperties.java
          gui/properties/GraphicProperties.java
          gui/properties/ImageProperties.java
          gui/properties/LocalInfoProperties.java
@@ -95,6 +96,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/Curve.java
          utils/circuit/EnvironmentMapping.java
          utils/circuit/Graphic.java
+         utils/circuit/GraphicObject.java
          utils/circuit/Header.java
          utils/circuit/LocalInfo.java
          utils/circuit/MainTrack.java
@@ -119,17 +121,23 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/TurnMarks.java
          utils/circuit/XmlObjPits.java
          utils/undo/ObjectMapObject.java
+         utils/undo/MovedObject.java
          utils/undo/Undo.java
+         utils/undo/UndoAddGraphicObject.java
          utils/undo/UndoAddObject.java
          utils/undo/UndoAddSegment.java
+         utils/undo/UndoDeleteGraphicObject.java
          utils/undo/UndoDeleteObject.java
          utils/undo/UndoDeleteRelief.java
          utils/undo/UndoDeleteAllObjects.java
          utils/undo/UndoDeleteSegment.java
          utils/undo/UndoEditAllObjects.java
+         utils/undo/UndoEditGraphicObject.java
          utils/undo/UndoEditObject.java
          utils/undo/UndoEditRelief.java
          utils/undo/UndoInterface.java
+         utils/undo/UndoMoveAllGraphicObjects.java
+         utils/undo/UndoMoveGraphicObject.java
          utils/undo/UndoSegmentChange.java
          utils/undo/UndoSplitSegment.java)
 

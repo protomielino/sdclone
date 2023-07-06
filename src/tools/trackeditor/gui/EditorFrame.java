@@ -77,6 +77,7 @@ import utils.Properties;
 import utils.SegmentVector;
 import utils.TrackData;
 import utils.circuit.Curve;
+import utils.circuit.GraphicObject;
 import utils.circuit.MainTrack;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
@@ -247,9 +248,27 @@ public class EditorFrame extends JFrame
 	private DefaultObjectsDialog	defaultObjectsDialog			= null;
 	
 	private String				originalTitle						= null;
-	
+
+	private boolean				pasteObject							= false;
 	private int 				currentObjectMap					= -1;
 	private int					currentObjectColor					= 0;
+	private boolean				currentObjectGraphic				= false;
+
+	public boolean isPasteObject() {
+		return pasteObject;
+	}
+
+	public void setPasteObject(boolean pasteObject) {
+		this.pasteObject = pasteObject;
+	}
+
+	public boolean isCurrentObjectGraphic() {
+		return currentObjectGraphic;
+	}
+
+	public void setCurrentObjectGraphic(boolean currentObjectGraphic) {
+		this.currentObjectGraphic = currentObjectGraphic;
+	}
 
 	public int getCurrentObjectMap() {
 		return currentObjectMap;
@@ -3184,6 +3203,11 @@ public class EditorFrame extends JFrame
 		return trackData.getObjectMaps();
 	}
 	
+	public Vector<GraphicObject> getGraphicObjects()
+	{
+		return trackData.getGraphicObjects();
+	}
+
 	public Reliefs getReliefs()
 	{
 		return trackData.getReliefs();

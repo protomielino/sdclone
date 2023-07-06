@@ -12,8 +12,8 @@ public class ObjShapeObject extends Segment
 	private Color				color;
 	
 	// position
-	private int					imageX;
-	private int					imageY;
+	private int					imageX = Integer.MAX_VALUE;
+	private int					imageY = Integer.MAX_VALUE;
 	
 	// shape info
 	private Point2D.Double		location 	= new Point2D.Double(0, 0);
@@ -36,6 +36,14 @@ public class ObjShapeObject extends Segment
 		this.color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 		this.imageX = imageX;
 		this.imageY = imageY;
+	}
+
+	public ObjShapeObject(String name, int rgb, Point2D.Double location)
+	{
+		super(name, "graphic object");
+		this.rgb = rgb & 0x00ffffff;
+		this.color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+		calcShape(location);
 	}
 
 	@Override
@@ -105,12 +113,22 @@ public class ObjShapeObject extends Segment
 		imageY = y;
 	}
 	
-	public Point2D.Double getTrackLocation() {
+	public final Point2D.Double getTrackLocation() {
 		return location;
 	}
 
 	public void setLocation(Point2D.Double location) {
 		this.location = location;
+		calcShape(location);
+	}
+
+	public void setTrackLocationX(double x) {
+		location.x = x;
+		calcShape(location);
+	}
+
+	public void setTrackLocationY(double y) {
+		location.y = y;
 		calcShape(location);
 	}
 

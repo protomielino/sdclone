@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import utils.circuit.Camera;
 import utils.circuit.Graphic;
+import utils.circuit.GraphicObject;
 import utils.circuit.Header;
 import utils.circuit.LocalInfo;
 import utils.circuit.MainTrack;
@@ -239,5 +240,10 @@ public final class TrackData
 	public Reliefs getReliefs()
 	{
 		return getGraphic().getTerrainGeneration().getReliefs();
+	}
+
+	public Vector<GraphicObject> getGraphicObjects()
+	{
+		return getGraphic().getTerrainGeneration().getGraphicObjects();
 	}
 }

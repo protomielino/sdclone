@@ -466,6 +466,7 @@ public class TerrainProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 393, 510, 362);
 
+			tabbedPane.addTab("Objects", null, new GraphicObjectProperties(getEditorFrame()));
 			tabbedPane.addTab("Object Maps", null, new ObjectMapProperties(getEditorFrame()));
 			tabbedPane.addTab("Reliefs", null, new ReliefProperties(getEditorFrame()));
 		}
@@ -591,11 +592,15 @@ public class TerrainProperties extends PropertyPanel
             getEditorFrame().documentIsModified = true;
         }
 
-		Component component1 = tabbedPane.getComponentAt(0);
+		Component component0 = tabbedPane.getComponentAt(0);
+		GraphicObjectProperties properties0 = (GraphicObjectProperties)component0;
+		properties0.exit();
+
+		Component component1 = tabbedPane.getComponentAt(1);
 		ObjectMapProperties properties1 = (ObjectMapProperties)component1;
 		properties1.exit();
 
-		Component component2 = tabbedPane.getComponentAt(1);
+		Component component2 = tabbedPane.getComponentAt(2);
 		ReliefProperties properties2 = (ReliefProperties)component2;
 		properties2.exit();
 	}

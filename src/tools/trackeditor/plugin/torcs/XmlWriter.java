@@ -39,6 +39,7 @@ import utils.SegmentVector;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
+import utils.circuit.GraphicObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Sector;
 import utils.circuit.Segment;
@@ -894,6 +895,7 @@ public class XmlWriter
 		addContent(element, "use object materials", editorFrame.getTerrainGeneration().getUseObjectMaterials());
 
 		element.addContent(getObjectMaps());
+		element.addContent(getGraphicObjects());
 
 		return element;
 	}
@@ -913,6 +915,27 @@ public class XmlWriter
 			el.setAttribute(new Attribute("name", data.getName()));
 
 			addContent(el, "env map image", data.getEnvMapImage());
+
+			element.addContent(el);
+		}
+
+		return element;
+	}
+
+	private synchronized Element getGraphicObjects()
+	{
+		Element element = new Element("section");
+		element.setAttribute(new Attribute("name", "Objects"));
+
+		for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+		{
+			Element el = new Element("section");
+			el.setAttribute(new Attribute("name", graphicObject.getName()));
+
+			addHexContent(el, "color", null, graphicObject.getColor());
+			addContent(el, "x", "m", graphicObject.getX());
+			addContent(el, "y", "m", graphicObject.getY());
+			addContent(el, "orientation", "deg", graphicObject.getOrientation());
 
 			element.addContent(el);
 		}
