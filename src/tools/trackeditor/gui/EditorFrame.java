@@ -380,7 +380,7 @@ public class EditorFrame extends JFrame
 		{
 			JOptionPane.showMessageDialog(this,
 					"You need to specify the Speed Dreams data directory in order to\n" +
-					"load the default surfaces, textures and models.\n" +
+					"load the default surfaces, textures and objects.\n" +
 					"Make sure you have write permission if you intend to edit or add\n" +
 					"tracks in this directory.\n\n" +
 					"You may need to specify the bin directory where sd2-trackgen is\n" +
