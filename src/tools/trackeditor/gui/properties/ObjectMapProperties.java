@@ -778,15 +778,15 @@ public class ObjectMapProperties extends PropertyPanel
 	            		if (JOptionPane.showConfirmDialog(null, "Move all objects with this name?", "Move Objects with Name", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 	            		{
 	            			Data datum = data.elementAt(panel.table.convertRowIndexToModel(row));
-	            			Vector<Integer> toDelete = new Vector<Integer>();
+	            			Vector<Integer> toMove = new Vector<Integer>();
 	            			for (int i = 0; i < data.size(); i++)
 	            			{
 	            				if (datum.name.equals(data.elementAt(i).name))
 	            				{
-	            					toDelete.add(i);
+	            					toMove.add(i);
 	            				}
 	            			}
-	            			Collections.sort(toDelete, new Comparator<Integer>()
+	            			Collections.sort(toMove, new Comparator<Integer>()
 	            			{
 	                            @Override
 	                            public int compare(Integer o1, Integer o2)
@@ -796,13 +796,16 @@ public class ObjectMapProperties extends PropertyPanel
 	                            }
 	                        });
 	            			int size = data.size();
-	            			for (int i = 0; i < toDelete.size(); i++)
+	            			for (int i = 0; i < toMove.size(); i++)
 	            			{
-			            		Data datum1 = data.elementAt(panel.table.convertRowIndexToModel(row));											
+			            		Data datum1 = data.elementAt(i);											
 								String name = getEditorFrame().getObjectColorName(datum.color) + "-" + size++;
 			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum1.trackX, datum1.trackY, Double.NaN);
 			            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
-	            				panel.model.removeRowAt(toDelete.elementAt(i));
+	            			}	            			
+	            			for (int i = 0; i < toMove.size(); i++)
+	            			{
+	            				panel.model.removeRowAt(toMove.elementAt(i));
 	            			}	            			
 	            		}
 	            	}
