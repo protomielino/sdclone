@@ -54,7 +54,14 @@ public class PreferencesDialog extends JDialog
 		Point p = new Point();
 		p.x = editorFrame.getProject().getPreferencesDialogX();
 		p.y = editorFrame.getProject().getPreferencesDialogY();
-		this.setLocation(p);
+		if (p.x == 0 && p.y == 0)
+		{
+			setLocationRelativeTo(getParent());
+		}
+		else
+		{
+			this.setLocation(p);
+		}
 		this.setTitle("Preferences Dialog");
 	}
 	

@@ -355,14 +355,12 @@ public class EditorFrame extends JFrame
 			_splash.incProgress(20);
 			Editor.getProperties().addPropertiesListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					//view.setBackgroundImage(properties.getImage());
 					//documentIsModified = true;
 
 				}
-
 			});
 			initialize();
 		} catch (Exception e)
@@ -377,6 +375,20 @@ public class EditorFrame extends JFrame
 		recentFilesMax = Integer.parseInt(preferences.get(RECENT_FILES_MAX, "10"));
 		interactiveFixes = preferences.getBoolean(INTERACTIVE_FIXES, false);
 		cursorCoordinates = preferences.getBoolean(CURSOR_COORDINATES, false);
+
+		if (dataDirectory == null)
+		{
+			JOptionPane.showMessageDialog(this,
+					"You need to specify the Speed Dreams data directory in order to\n" +
+					"load the default surfaces, textures and models.\n" +
+					"Make sure you have write permission if you intend to edit or add\n" +
+					"tracks in this directory.\n\n" +
+					"You may need to specify the bin directory where sd2-trackgen is\n" +
+					"located if it is not in your executable path.",
+					"First Time Setup",
+					JOptionPane.INFORMATION_MESSAGE);
+			newPreferencesDialog();
+		}
 
 		readDefaultSurfaces();
 		readDefaultObjects();
@@ -797,7 +809,15 @@ public class EditorFrame extends JFrame
 		Image image = new ImageIcon(getClass().getResource("/icon.png")).getImage();
 		this.setIconImage(image);
 		setSize(new Dimension(preferences.getInt("Width", 800), preferences.getInt("Height", 600)));
-		setLocation(new Point(preferences.getInt("X", 0), preferences.getInt("Y", 0)));
+		Point point = new Point(preferences.getInt("X", 0), preferences.getInt("Y", 0));
+		if (point.x == 0 && point.y == 0)
+		{
+			setLocationRelativeTo(null);
+		}
+		else
+		{
+			setLocation(point);		
+		}
 		menuFile.setText("File");
 		itemCloseCircuit.setText("Exit");
 		itemCloseCircuit.addActionListener(new ActionListener()
