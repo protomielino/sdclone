@@ -57,12 +57,14 @@ import utils.circuit.Reliefs;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.XmlObjPits;
+import utils.undo.DeletedObject;
 import utils.undo.MovedObject;
 import utils.undo.ObjectMapObject;
 import utils.undo.Undo;
 import utils.undo.UndoAddGraphicObject;
 import utils.undo.UndoAddObject;
 import utils.undo.UndoAddSegment;
+import utils.undo.UndoDeleteAllGraphicObjects;
 import utils.undo.UndoDeleteAllObjects;
 import utils.undo.UndoDeleteGraphicObject;
 import utils.undo.UndoDeleteObject;
@@ -2387,6 +2389,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
+					
+					return;
 				}
 
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
@@ -2449,6 +2453,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
+					
+					return;
 				}
 
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
@@ -2545,6 +2551,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
+					
+					return;
 				}
 
 				Vector<ObjectMap> objectMaps = editorFrame.getObjectMaps();
@@ -2583,14 +2591,28 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				if (isGraphicObject)
 				{
-					for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+					Vector<DeletedObject> deletedObjects = new Vector<DeletedObject>();
+					
+					for (int i = 0; i < editorFrame.getGraphicObjects().size(); i++)
 					{
-						if (graphicObject.getShape() == shape)
+						if (editorFrame.getGraphicObjects().get(i).getShape().getRGB() == shape.getRGB())
 						{
-							JOptionPane.showMessageDialog(null, "Not implemented yet!", "Delete All Objects", JOptionPane.INFORMATION_MESSAGE);
-							return;
+							deletedObjects.add(0, new DeletedObject(editorFrame.getGraphicObjects().get(i), i));
 						}
 					}
+					
+					Undo.add(new UndoDeleteAllGraphicObjects(editorFrame.getGraphicObjects(), deletedObjects));
+					
+					for (int i = 0; i < deletedObjects.size(); i++)
+					{
+						editorFrame.getGraphicObjects().remove(deletedObjects.get(i).object);
+					}
+					
+					selectedShape = null;
+					editorFrame.documentIsModified = true;
+					invalidate();
+					repaint();
+					return;
 				}
 
 				int rgb = shape.getRGB();
@@ -2893,7 +2915,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	    JMenuItem itemEdit = new JMenuItem("Edit");
 	    JMenuItem itemEditAll = isGraphicObject ? null : new JMenuItem("Edit All");
 	    JMenuItem itemDelete = new JMenuItem("Delete");
-	    JMenuItem itemDeleteAll = isGraphicObject ? null : new JMenuItem("Delete All");
+	    JMenuItem itemDeleteAll = new JMenuItem("Delete All");
 	    JMenuItem itemDeleteAdjacent = isGraphicObject ? null : new JMenuItem("Delete Adjacent");
 	    JMenuItem itemDeleteAllAdjacent = isGraphicObject ? null : new JMenuItem("Delete All Adjacent");
 	    JMenuItem itemMoveToObjects = isGraphicObject ? null : new JMenuItem("Move To Objects");
@@ -2902,13 +2924,13 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	    itemCopy.setAction(copyAction);
 	    itemEdit.setAction(editAction);
 	    itemDelete.setAction(deleteAction);
+	    itemDeleteAll.setAction(deleteAllAction);
 	    if (isGraphicObject)
 	    {
 	    }
 	    else
 	    {
 	    	itemEditAll.setAction(editAllAction);
-	    	itemDeleteAll.setAction(deleteAllAction);
 	    	itemDeleteAdjacent.setAction(deleteAdjacentAction);
 	    	itemDeleteAllAdjacent.setAction(deleteAllAdjacentAction);
 		    itemMoveToObjects.setAction(moveToObjectsAction);
@@ -2924,9 +2946,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	    }
 	    menu.addSeparator();
 	    menu.add(itemDelete);
+		menu.add(itemDeleteAll);
 	    if (!isGraphicObject)
 	    {
-		    menu.add(itemDeleteAll);
 		    menu.addSeparator();
 		    menu.add(itemDeleteAdjacent);
 		    menu.add(itemDeleteAllAdjacent);
