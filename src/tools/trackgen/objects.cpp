@@ -493,37 +493,37 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
 
         GfParmListSeekFirst(TrackHandle, TRK_SECT_TERRAIN_OBJECTS);
 
+        Ac3d Root;
+
+        index++;
+
         do
         {
-            Ac3d Root;
-
-            index++;
-
             const tdble x = GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_X, "m", 0);
             const tdble y = GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_Y, "m", 0);
             const unsigned int color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
 
             printf("found color: 0x%X x: %f y: %f\n", color, x, y);
             AddObject(track, TrackHandle, TrackRoot, Root, color, x + zeroX, y + zeroY, multipleMaterials, true);
-
-            Ac3d GroupRoot;
-            GroupRoot.materials = Root.materials;
-            Ac3d::Object object("group", "");
-            GroupRoot.addObject(object);
-            std::vector<Ac3d::Object *> Groups;
-
-            Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
-
-            const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
-            const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
-            saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
-            GroupRoot.flipAxes(false); // convert to track coordinate system
-            GroupRoot.writeFile(objectFile, false);
-
-            if (all)
-            {
-                allAc3d.merge(GroupRoot, multipleMaterials);
-            }
         } while (!GfParmListSeekNext(TrackHandle, TRK_SECT_TERRAIN_OBJECTS));
+
+        Ac3d GroupRoot;
+        GroupRoot.materials = Root.materials;
+        Ac3d::Object object("group", "");
+        GroupRoot.addObject(object);
+        std::vector<Ac3d::Object *> Groups;
+
+        Group(track, TrackHandle, &Root.root, &GroupRoot.root.kids.front(), Groups);
+
+        const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
+        const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
+        saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
+        GroupRoot.flipAxes(false); // convert to track coordinate system
+        GroupRoot.writeFile(objectFile, false);
+
+        if (all)
+        {
+            allAc3d.merge(GroupRoot, multipleMaterials);
+        }
     }
 }
