@@ -121,11 +121,13 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/TurnMarks.java
          utils/circuit/XmlObjPits.java
          utils/undo/ObjectMapObject.java
+         utils/undo/DeletedObject.java
          utils/undo/MovedObject.java
          utils/undo/Undo.java
          utils/undo/UndoAddGraphicObject.java
          utils/undo/UndoAddObject.java
          utils/undo/UndoAddSegment.java
+         utils/undo/UndoDeleteAllGraphicObject.java
          utils/undo/UndoDeleteGraphicObject.java
          utils/undo/UndoDeleteObject.java
          utils/undo/UndoDeleteRelief.java
