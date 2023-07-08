@@ -127,7 +127,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/undo/UndoAddGraphicObject.java
          utils/undo/UndoAddObject.java
          utils/undo/UndoAddSegment.java
-         utils/undo/UndoDeleteAllGraphicObject.java
+         utils/undo/UndoDeleteAllGraphicObjects.java
          utils/undo/UndoDeleteGraphicObject.java
          utils/undo/UndoDeleteObject.java
          utils/undo/UndoDeleteRelief.java
