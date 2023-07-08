@@ -74,6 +74,7 @@ import utils.undo.UndoEditAllObjects;
 import utils.undo.UndoEditGraphicObject;
 import utils.undo.UndoEditObject;
 import utils.undo.UndoEditRelief;
+import utils.undo.UndoMoveGraphicObject;
 import utils.undo.UndoSegmentChange;
 import utils.undo.UndoSplitSegment;
 
@@ -2816,12 +2817,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			public void actionPerformed(ActionEvent e)
 			{
-				if (JOptionPane.showOptionDialog(null, "Undo not implemented yet!", "No undo for this action!",
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null) != JOptionPane.OK_OPTION)
-				{
-					return;
-				}
-								
 				editorFrame.setPasteObject(false);
 				
 				String name = editorFrame.getObjectColorName(shape.getRGB());
@@ -2849,8 +2844,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						}
 					}
 				}
-				// TODO
-				//Undo.add(new UndoMoveGraphicObject(editorFrame.getGraphicObjects(), graphicObject, shapeObjectMap, shape));
+				Undo.add(new UndoMoveGraphicObject(editorFrame.getGraphicObjects(), graphicObject, shapeObjectMap, shape));
 				shapeObjectMap.removeObject(shape);
 				editorFrame.documentIsModified = true;
 				redrawCircuit();
