@@ -560,8 +560,11 @@ public class ObjectProperties extends PropertyPanel
 				String fileName = fc.getSelectedFile().toString();
 				int index = fileName.lastIndexOf(sep);
 				String pathToFile = fileName.substring(0, index);
+				String pathToObjects = getEditorFrame().getDataDirectory() + sep + "data" + sep + "objects";
 				if (pathToFile.equals(Editor.getProperties().getPath()))
 					fileName = fileName.substring(index + 1);
+				else if (pathToFile.equals(pathToObjects))
+					fileName = fileName.substring(pathToObjects.length() + 1);
 				objectTextField.setText(fileName);
 			}
 		}

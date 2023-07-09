@@ -596,7 +596,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						if (mustFireEvent)
 							fireSelectionChanged(selectionChangedEvent);
 
-						JOptionPane.showMessageDialog(this, "Not implemented yet!", "Moving Finish Line", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Moving Finish Line", JOptionPane.INFORMATION_MESSAGE);
 						
 						handledShape = null;
 						editorFrame.documentIsModified = true;
@@ -759,29 +759,33 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			if (editorFrame.getTrackData() == null)
 				return;
 
-			try
+			screenToReal(e, clickPoint);
+
+			// must check for a segment under the mouse
+			Segment obj = findObjAtMousePos();
+
+			Segment lastSelectedShape = selectedShape;
+
+			boolean selectedShapeChanged = (selectedShape != obj);
+			selectedShape = obj;
+
+			handleDragging = -1;
+
+			if (selectedShape != null)
 			{
-				screenToReal(e, clickPoint);
-
-				// must check for a segment under the mouse
-				Segment obj = findObjAtMousePos();
-
-				Segment lastSelectedShape = selectedShape;
-
-				boolean selectedShapeChanged = (selectedShape != obj);
-				selectedShape = obj;
-
-				handleDragging = -1;
-
-				if (selectedShape != null)
+				if (showObjects && (selectedShape.getType().equals("str") || selectedShape.getType().equals("lft") || selectedShape.getType().equals("rgt")))
+				{
+					noObjectSelected(e);
+				}
+				else
 				{
 					dragging = true;
-
+	
 					int curHandle = 0;
 					for (Iterator<Segment> i = handles.iterator(); i.hasNext(); curHandle++)
 					{
 						ObjShapeHandle h = (ObjShapeHandle) i.next();
-
+	
 						// is the mouse in the handledShape handle ?
 						if (e.getX() > h.trPoints[0].getX() - ObjShapeHandle.handleSize
 								&& e.getX() < h.trPoints[0].getX() + ObjShapeHandle.handleSize
@@ -794,80 +798,79 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						}
 					}
 				}
-				else if (showObjects)
-					noObjectSelected(e);
-
-				if (lastSelectedShape != selectedShape)
-					fireSelectionChanged(selectionChangedEvent);
-
-				switch (currentState)
-				{
-					case STATE_NONE :
-					{
-						if (selectedShape != null)
-						{
-							if (selectedShape.getType().equals("object"))
-							{
-								objectSelected((ObjShapeObject)selectedShape, e);
-							}
-							else if (selectedShape.getType().equals("graphic object"))
-							{
-								objectSelected((ObjShapeObject)selectedShape, e);
-							}
-							else if (selectedShape.getType().equals("relief"))
-							{
-								reliefSelected((ObjShapeRelief)selectedShape, e);
-							}
-							else
-							{
-								Undo.add(new UndoSegmentChange(editorFrame, selectedShape));
-								openSegmentDialog(selectedShape);
-							}
-						}
-
-						if (selectedShapeChanged)
-						{
-							invalidate();
-							repaint();
-						}
-					}
-						break;
-
-					case STATE_SHOW_BGRD_START_POSITION :
-					{
-						//						if (backgroundRectangle.contains(clickPoint))
-						//						{
-						//							backgroundRectangle.setRect(backgroundRectangle.getX()
-						// - clickPoint.getX(),
-						//									backgroundRectangle.getY() - clickPoint.getY(),
-						// backgroundRectangle.getWidth(),
-						//									backgroundRectangle.getHeight());
-						//
-						//							torcstuneSection.setAttributeOfPart("attnum", "name",
-						// "bgrd img x", "val", Integer
-						//									.toString((int) backgroundRectangle.getX()));
-						//							torcstuneSection.setAttributeOfPart("attnum", "name",
-						// "bgrd img y", "val", Integer
-						//									.toString((int) backgroundRectangle.getY()));
-						//							torcstuneSection.setAttributeOfPart("attnum", "name",
-						// "bgrd img width", "val", Integer
-						//									.toString((int) backgroundRectangle.getWidth()));
-						//							torcstuneSection.setAttributeOfPart("attnum", "name",
-						// "bgrd img height", "val", Integer
-						//									.toString((int) backgroundRectangle.getHeight()));
-						//
-						//							editorFrame.documentIsModified = true;
-						//							invalidate();
-						//							repaint();
-						//
-						//							setState(STATE_NONE);
-						//						}
-					}
-						break;
-				}
-			} catch (Exception ex)
+			}
+			else if (showObjects)
 			{
-				ex.printStackTrace();
+				noObjectSelected(e);
+			}
+
+			if (lastSelectedShape != selectedShape)
+				fireSelectionChanged(selectionChangedEvent);
+
+			switch (currentState)
+			{
+			case STATE_NONE :
+			{
+				if (selectedShape != null)
+				{
+					if (selectedShape.getType().equals("object"))
+					{
+						objectSelected((ObjShapeObject)selectedShape, e);
+					}
+					else if (selectedShape.getType().equals("graphic object"))
+					{
+						objectSelected((ObjShapeObject)selectedShape, e);
+					}
+					else if (selectedShape.getType().equals("relief"))
+					{
+						reliefSelected((ObjShapeRelief)selectedShape, e);
+					}
+					else
+					{
+						Undo.add(new UndoSegmentChange(editorFrame, selectedShape));
+						openSegmentDialog(selectedShape);
+					}
+				}
+
+				if (selectedShapeChanged)
+				{
+					invalidate();
+					repaint();
+				}
+			}
+			break;
+
+			case STATE_SHOW_BGRD_START_POSITION :
+			{
+				//						if (backgroundRectangle.contains(clickPoint))
+				//						{
+				//							backgroundRectangle.setRect(backgroundRectangle.getX()
+				// - clickPoint.getX(),
+				//									backgroundRectangle.getY() - clickPoint.getY(),
+				// backgroundRectangle.getWidth(),
+				//									backgroundRectangle.getHeight());
+				//
+				//							torcstuneSection.setAttributeOfPart("attnum", "name",
+				// "bgrd img x", "val", Integer
+				//									.toString((int) backgroundRectangle.getX()));
+				//							torcstuneSection.setAttributeOfPart("attnum", "name",
+				// "bgrd img y", "val", Integer
+				//									.toString((int) backgroundRectangle.getY()));
+				//							torcstuneSection.setAttributeOfPart("attnum", "name",
+				// "bgrd img width", "val", Integer
+				//									.toString((int) backgroundRectangle.getWidth()));
+				//							torcstuneSection.setAttributeOfPart("attnum", "name",
+				// "bgrd img height", "val", Integer
+				//									.toString((int) backgroundRectangle.getHeight()));
+				//
+				//							editorFrame.documentIsModified = true;
+				//							invalidate();
+				//							repaint();
+				//
+				//							setState(STATE_NONE);
+				//						}
+			}
+			break;
 			}
 		}
 	}
@@ -1354,8 +1357,50 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		if (editorFrame.getTrackData() == null)
 			return null;
+
+		// must look for an object under the mouse first
+		if (showObjects)
+		{
+			for (ObjectMap objectMap : editorFrame.getObjectMaps())
+			{
+				for (ObjShapeObject object : objectMap.getObjects())
+				{
+					try
+					{
+						if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
+								&& object.contains(mousePoint))
+						{
+							// object found !
+							return object;
+						}
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			}
+
+			for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+			{
+				ObjShapeObject object = graphicObject.getShape();
+
+				try
+				{
+					if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
+							&& object.contains(mousePoint))
+					{
+						// object found !
+						return object;
+					}
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+		}
 		
-		// must look for an object under the mouse
 		int count = 0;
 		try
 		{
@@ -1393,48 +1438,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						// relief found !
 						return relief;
-					}
-				}
-				catch (Exception ex)
-				{
-					ex.printStackTrace();
-				}
-			}
-		}
-
-		if (showObjects)
-		{
-			for (ObjectMap objectMap : editorFrame.getObjectMaps())
-			{
-				for (ObjShapeObject object : objectMap.getObjects())
-				{
-					try
-					{
-						if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
-								&& object.contains(mousePoint))
-						{
-							// object found !
-							return object;
-						}
-					}
-					catch (Exception ex)
-					{
-						ex.printStackTrace();
-					}
-				}
-			}
-
-			for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
-			{
-				ObjShapeObject object = graphicObject.getShape();
-
-				try
-				{
-					if (Class.forName("utils.circuit.Segment").isAssignableFrom(object.getClass())
-							&& object.contains(mousePoint))
-					{
-						// object found !
-						return object;
 					}
 				}
 				catch (Exception ex)
@@ -1879,7 +1882,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(this, "Couldn't open : " + fileName, "Background Image", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(editorFrame, "Couldn't open : " + fileName, "Background Image", JOptionPane.ERROR_MESSAGE);
 			backgroundImg = null;
 		}
 	}
@@ -1974,10 +1977,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			else if (editorFrame.getObjectMaps().size() > 0)
 			{
-				setObjectMaps(editorFrame.getObjectMaps());
 				editorFrame.setCurrentObjectMap(0);
 				editorFrame.setCurrentObjectGraphic(false);
 			}
+			setObjectMaps(editorFrame.getObjectMaps());
 		}
 	}
 
@@ -2451,7 +2454,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						if (graphicObject.getShape() == shape)
 						{
-							JOptionPane.showMessageDialog(null, "Not implemented yet!", "Edit All Objects", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Edit All Objects", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 					}
@@ -2970,7 +2973,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			String[] options = {"Add to ObjectMap", "Add to Objects", "Cancel"};
 
-			int option = JOptionPane.showOptionDialog(this, "Add New Object",
+			int option = JOptionPane.showOptionDialog(editorFrame, "Add New Object",
 					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (option == 0)
@@ -2989,7 +2992,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			String[] options = {"Yes", "No", "Cancel"};
 
-			int option = JOptionPane.showOptionDialog(this, "Add new object to ObjectMap?",
+			int option = JOptionPane.showOptionDialog(editorFrame, "Add new object to ObjectMap?",
 					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (option == 0)
@@ -3005,7 +3008,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			String[] options = {"Yes", "No", "Cancel"};
 
-			int option = JOptionPane.showOptionDialog(this, "Add new object to Objects?",
+			int option = JOptionPane.showOptionDialog(editorFrame, "Add new object to Objects?",
 					"Add New Object", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (option == 0)
@@ -3087,7 +3090,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			String[] options1 = {"Overwrite", "Use Existing", "Cancel"};
 
-			int option1 = JOptionPane.showOptionDialog(this, filename.getFileName().toString() + " already exists!",
+			int option1 = JOptionPane.showOptionDialog(editorFrame, filename.getFileName().toString() + " already exists!",
 					"Create Object Map", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options1, options1[0]);
 
 			if (option1 == 1)
