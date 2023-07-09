@@ -501,16 +501,6 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
 
     if (GfParmGetEltNb(TrackHandle, TRK_SECT_TERRAIN_OBJECTS) != 0)
     {
-        tTrkLocPos trkpos;
-
-        trkpos.type = TR_LPOS_MAIN;
-        trkpos.toStart = 0;
-        trkpos.toRight = 0;
-        trkpos.seg = track->seg->next;
-        tdble zeroX;
-        tdble zeroY;
-        RtTrackLocal2Global(&trkpos, &zeroX, &zeroY, TR_TORIGHT);
-
         GfParmListSeekFirst(TrackHandle, TRK_SECT_TERRAIN_OBJECTS);
 
         Ac3d ObjectsRoot;
@@ -524,7 +514,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
             const unsigned int color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
 
             printf("found color: 0x%X x: %f y: %f\n", color, x, y);
-            AddObject(track, TrackHandle, TerrainRoot, TrackRoot, ObjectsRoot, color, x + zeroX, y + zeroY, multipleMaterials, true);
+            AddObject(track, TrackHandle, TerrainRoot, TrackRoot, ObjectsRoot, color, x + trackOffsetX, y + trackOffsetY, multipleMaterials, true);
         } while (!GfParmListSeekNext(TrackHandle, TRK_SECT_TERRAIN_OBJECTS));
 
         Ac3d GroupRoot;
