@@ -411,7 +411,7 @@ int Application::generate()
     if (useObjectMaterials == "yes")
         MultipleMaterials = true;
 
-    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutputFileName, MultipleMaterials);
+    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutTrackName, OutputFileName, MultipleMaterials);
 
     allAc3d.writeFile(OutputFileName + ".ac", false);
     GfParmReleaseHandle(TrackHandle);
