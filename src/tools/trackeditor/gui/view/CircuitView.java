@@ -922,6 +922,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 	}
 
+	private ObjectMap getObjectMapFromObject(ObjShapeObject shape)
+	{
+		for (ObjectMap objectMap : editorFrame.getObjectMaps())
+		{
+			for (ObjShapeObject object : objectMap.getObjects())
+			{
+				if (object == shape)
+				{
+					return objectMap;
+				}
+			}
+		}
+		return null;
+	}
+
 	/** input events management */
 	public void mouseDragged(MouseEvent e)
 	{
@@ -937,7 +952,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				if (objectShape.getType().equals("object"))
 				{
-					ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+					ObjectMap objectMap = getObjectMapFromObject(objectShape);
 
 					int imageXY[] = { 0, 0 };
 					realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
