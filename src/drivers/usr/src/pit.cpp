@@ -434,6 +434,7 @@ void Pit::updateFuel(double fromstart)
             mTotalFuel += mLastFuel + mLastPitFuel - mCar->priv.fuel;
             mFuelLapsCounted++;
             mAvgFuelPerLap = mTotalFuel / mFuelLapsCounted;
+            LogUSR.info("# AVG Fuel per lap = %.6f - Fuel per meter = %.8f\n", mAvgFuelPerLap, mAvgFuelPerLap / mTrack->length);
         }
 
         mLastFuel = mCar->priv.fuel;

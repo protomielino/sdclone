@@ -75,6 +75,8 @@ using namespace std;
 #define PRV_PIT_TIRE_WARN			"pit tire warn limit"
 #define PRV_PIT_TIRE_DANGER		    "pit tire danger limit"
 #define PRV_PRACTICE_INIT_FUEL      "practice init fuel"
+#define PRV_FUELPERMETER            "fuel per m"
+#define PRV_WEARPERMETER            "wear per m"
 #define PRV_PIT_TEST_STOP           "pit test stop"
 #define PRV_SKID_FACTOR				"skid factor"
 #define PRV_SKID_FACTOR_TRAFFIC		"skid factor traffic"
@@ -469,12 +471,15 @@ void	Driver::InitTrack(
 
         m_cm[p].FLAGS = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_CARMODEL_FLAGS, NULL, (tdble)m_cm[PATH_NORMAL].FLAGS);
         m_cm[p].MU_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_MU_SCALE, NULL, m_cm[PATH_NORMAL].MU_SCALE);
+        m_cm[p].FUELPERMETER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_FUELPERMETER, NULL, m_cm[PATH_NORMAL].FUELPERMETER);
+        m_cm[p].TIREWEARPERMETER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_WEARPERMETER, NULL, m_cm[PATH_NORMAL].TIREWEARPERMETER);
         m_cm[p].SKILL = driverskill;
         m_cm[p].BRAKE_MU_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_BRAKE_MU_SCALE, NULL, m_cm[PATH_NORMAL].BRAKE_MU_SCALE);
         m_cm[p].KZ_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KZ_SCALE, NULL, m_cm[PATH_NORMAL].KZ_SCALE);
         m_cm[p].KV_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KV_SCALE, NULL, m_cm[PATH_NORMAL].KV_SCALE);
 
         LogSHADOW.info( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
+        LogSHADOW.info(" *** FUEL PER METER    : %.8f\n", m_cm[p].FUELPERMETER);
         LogSHADOW.info( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
         LogSHADOW.info( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
         LogSHADOW.info( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
@@ -584,14 +589,14 @@ void	Driver::InitTrack(
                       m_priv[PATH_NORMAL].PIT_START_BUF_SEGS);
 
     // setup initial fuel for race.
-    double  wearPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "wear per m", 0, 0.0f);
+    double  wearPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "wear per m", 0, 0.00008f);
     double distance         = pS->_totLaps * (double)pTrack->length;
     double tiredist         = distance / wearPerM;
-    LogSHADOW.info("Tire distance : %.7g\n", tiredist);
+    LogSHADOW.info("Tire distance : %.7f\n", tiredist);
     double mindist = MIN(distance, tiredist);
-    LogSHADOW.info("Minimum distance : %.2g\n", mindist);
+    LogSHADOW.info("Minimum distance : %.2f\n", mindist);
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
-    double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*)NULL, 100.0f);
+    double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*)NULL, 120.0f);
     int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*)NULL, 0);
     LogSHADOW.info(" # Pit test stop = %i\n", pittest);
     double	fullRaceFuel	= 1.05 * pS->_totLaps * (double)pTrack->length * fuelPerM;
