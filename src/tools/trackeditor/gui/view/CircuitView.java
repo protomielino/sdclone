@@ -2958,9 +2958,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		    menu.addSeparator();
 		    menu.add(itemDeleteAdjacent);
 		    menu.add(itemDeleteAllAdjacent);
-		    //menu.addSeparator();
-		    //menu.add(itemMoveToObjects);
-		    //menu.add(itemMoveAllToObjects);
+		    menu.addSeparator();
+		    menu.add(itemMoveToObjects);
+		    menu.add(itemMoveAllToObjects);
 	    }
 
 	    menu.addPopupMenuListener(new PopupMenuListener()

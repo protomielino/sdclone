@@ -815,8 +815,8 @@ public class ObjectMapProperties extends PropertyPanel
 	        popupMenu.add(deleteItem);
 	        popupMenu.add(deleteAllColorItem);
 	        popupMenu.add(deleteAllNameItem);
-	        popupMenu.add(moveToObjects);
-	        popupMenu.add(moveAllToObjects);
+	        //popupMenu.add(moveToObjects);
+	        //popupMenu.add(moveAllToObjects);
 
 	        return popupMenu;
 	    }
