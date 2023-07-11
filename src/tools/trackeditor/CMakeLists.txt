@@ -40,6 +40,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/CameraProperties.java
          gui/properties/EnvMapProperties.java
          gui/properties/GeneralProperties.java
+         gui/properties/GraphicObjectData.java
          gui/properties/GraphicObjectProperties.java
          gui/properties/GraphicProperties.java
          gui/properties/ImageProperties.java
