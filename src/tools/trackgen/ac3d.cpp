@@ -1058,7 +1058,7 @@ void Ac3d::addDefaultMaterial()
 
 void Ac3d::readFile(const std::string &fileName)
 {
-    std::ifstream   fin(fileName);
+    std::ifstream   fin(fileName, std::ios::binary);
 
     if (!fin)
         throw Exception("Couldn't open file");
@@ -1082,7 +1082,7 @@ void Ac3d::readFile(const std::string &fileName)
  
             tokenizeLine(line, tokens);
 
-            if (tokens.empty())
+            if (tokens.empty() || tokens[0].empty())
                 continue;
             if (tokens.at(0) == "MATERIAL")
                 materials.emplace_back(tokens);
