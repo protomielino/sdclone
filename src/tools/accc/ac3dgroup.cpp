@@ -116,23 +116,6 @@ void loadAndGroup(const std::string &OutputFileName)
     /* now collapse the texture and texture arrays of 1 2 3 in 0 */
     collapseTextures(ob0, ob1, ob2, ob3);
 
-    // todo: merge materials
-    if (!mat1.empty() && materialNeedsMerge(mat0, mat1))
-    {
-        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL1);
-        exit(-1);
-    }
-    if (!mat2.empty() && materialNeedsMerge(mat0, mat2))
-    {
-        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL2);
-        exit(-1);
-    }
-    if (!mat3.empty() && materialNeedsMerge(mat0, mat3))
-    {
-        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL3);
-        exit(-1);
-    }
-
     fprintf(stderr, "splitting objects\n");
     splitObjects(ob0);
 

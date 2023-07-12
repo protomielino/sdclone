@@ -834,7 +834,7 @@ void splitOb(std::list<ob_t> &objects, std::list<ob_t>::iterator &it)
                     {
                         if (curstoredidx[i] != -1)
                         {
-                            if (workob.textarray[curstoredidx[i]] != curvertex[i].uv)
+                            if (workob.textarray.empty() || workob.textarray[curstoredidx[i]] != curvertex[i].uv)
                             {
                                 touse = false;
                                 /* triangle is not ok */

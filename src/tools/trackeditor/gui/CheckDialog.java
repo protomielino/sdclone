@@ -872,6 +872,11 @@ public class CheckDialog extends JDialog
 	{
 		if ("poly".equals(object.getType()))
 		{
+			if (object.getTexture() == null || object.getTexture().isEmpty())
+			{
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with no texture\n");
+			}
+
 			if (object.getSurfaces().isEmpty())
 			{
 				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with no surfaces\n");
