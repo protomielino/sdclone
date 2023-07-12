@@ -922,7 +922,8 @@ void Ac3d::Object::generateTriangles()
             if (it->refs.size() > 3)
             {
                 std::list<Surface>::iterator original = it;
-                for (size_t i = 0; i < it->refs.size() - 3; i++)
+                size_t count = it->refs.size() - 3;
+                for (size_t i = 0; i < count; i++)
                 {
                     Surface surface;
                     surface.mat = it->mat;
