@@ -2442,6 +2442,8 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
 
     if (object->numsurf < 3 && !writeit)
         return;
+    if (object->vertexarray.size() < 3)
+        return;
     fprintf(stderr, "stripifying %s                    \r", object->name.c_str());
     sprintf(filename, "temp.obj");
     stripeout = fopen(filename, "w");
