@@ -657,7 +657,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		f.z = wheel->forces.z;
 
 		// TODO: Check whether this is correct.
-		t3Dd angles = { static_cast<tdble>(wheel->relPos.ax + asin(rel_normal.x)), static_cast<tdble>(asin(rel_normal.y)), waz };
+		t3Dd angles = { wheel->relPos.ax + asin(rel_normal.x), asin(rel_normal.y), waz };
 		NaiveInverseRotate (f, angles, &wheel->forces);
 		// transmit reaction forces to the car	
 		wheel->forces.x +=(Ft* CosA - Fn * SinA);
