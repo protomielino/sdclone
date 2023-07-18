@@ -283,6 +283,11 @@ struct Ac3d
         void write(std::ofstream &fout, bool all) const;
         void transform(const Matrix &matrix);
         void flipAxes(bool in);
+        void splitBySURF();
+        void splitByMaterial();
+        void removeSurfacesNotSURF(int SURF);
+        void removeSurfacesNotMaterial(int material);
+        void removeUnusedVertices();
         const BoundingBox &getBoundingBox() const;
         const BoundingSphere &getBoundingSphere() const;
         void remapMaterials(bool mergeMaterials, const MaterialMap &materialMap);
@@ -305,6 +310,8 @@ struct Ac3d
     void transform(const Matrix &matrix);
     void flipAxes(bool in);
     void generateTriangles();
+    void splitBySURF();
+    void splitByMaterial();
     void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;

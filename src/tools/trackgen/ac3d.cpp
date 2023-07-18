@@ -29,6 +29,7 @@
 #include <iterator>
 #include <sstream>
 #include <iomanip>
+#include <set>
 #include <cmath>
 
 //------------------------------------- V3d -----------------------------------
@@ -616,7 +617,7 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         {
             if (tokens.size() == 2)
             {
-                if (textures.size() == 0)
+                if (textures.empty())
                     textures.push_back(tokens.at(1));
                 else
                     textures[0] = tokens.at(1);
@@ -698,13 +699,13 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
             const int numKids = std::stoi(tokens.at(1));
             for (int i = 0; i < numKids; i++)
             {
-                std::streambuf::pos_type len = fin.tellg();
+                const std::streambuf::pos_type len = fin.tellg();
                 std::string peekLine;
                 std::getline(fin, peekLine);
                 std::vector<std::string> peekTokens;
                 tokenizeLine(peekLine, peekTokens);
                 fin.seekg(len, std::ios_base::beg);
-                if (peekTokens.size() < 1 || peekTokens[0] != "OBJECT")
+                if (peekTokens.empty() || peekTokens[0] != "OBJECT")
                 {
                     // this is a common problem with accc generated files so ignore it
                     // throw Exception("Invalid AC3D file: wrong number of kids");
@@ -856,6 +857,148 @@ void Ac3d::Object::flipAxes(bool in)
     }
 }
 
+void Ac3d::Object::removeSurfacesNotSURF(int SURF)
+{
+    for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end();)
+    {
+        if (it->surf != SURF)
+            it = surfaces.erase(it);
+        else
+            ++it;
+    }
+}
+
+void Ac3d::Object::removeSurfacesNotMaterial(int material)
+{
+    for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end();)
+    {
+        if (it->mat != material)
+            it = surfaces.erase(it);
+        else
+            ++it;
+    }
+}
+
+void Ac3d::Object::removeUnusedVertices()
+{
+    std::set<int> usedIndex;
+    for (auto & surface: surfaces)
+    {
+        for (auto &ref : surface.refs)
+        {
+            usedIndex.insert(ref.index);
+        }
+    }
+    int originalIndex = 0;
+    for (int i = 0; i < vertices.size(); originalIndex++)
+    {
+        if (usedIndex.find(originalIndex) == usedIndex.end())
+        {
+            vertices.erase(vertices.begin() + i);
+        }
+        else
+        {
+            for (auto &surface: surfaces)
+            {
+                for (auto &ref : surface.refs)
+                {
+                    if (ref.index == originalIndex)
+                        ref.index = i;
+                }
+            }
+            i++;
+        }
+    }
+}
+
+void Ac3d::Object::splitBySURF()
+{
+    if (type == "poly")
+        return;
+
+    for (std::list<Object>::iterator it = kids.begin(); it != kids.end(); ++it)
+    {
+        const Object &kid = *it;
+
+        std::set<int> surfTypes;
+        if (kid.type == "poly")
+        {
+            // get the different SURFs
+            for (auto surface : kid.surfaces)
+                surfTypes.insert(surface.surf);
+
+            if (surfTypes.size() > 1)
+            {
+                const std::list<Object>::iterator last = it;
+                std::list<Object>::iterator first = last;
+
+                // add the new objects to the kids
+                for (size_t i = 1; i < surfTypes.size(); i++)
+                    first = kids.insert(first, Object(kid));
+ 
+                std::set<int>::iterator it1 = surfTypes.begin();
+                int i = 0;
+                for (std::list<Object>::iterator it2 = first; it2 != std::next(last, 1); ++it2, ++it1)
+                {
+                    // make name unique
+                    it2->name = it2->name + std::to_string(i++);
+
+                    // remove all the others SURFs
+                    it2->removeSurfacesNotSURF(*it1);
+
+                    // remove the unused vertices
+                    it2->removeUnusedVertices();
+                }
+                it = last;
+            }
+        }
+    }
+}
+
+void Ac3d::Object::splitByMaterial()
+{
+    if (type == "poly")
+        return;
+
+    for (std::list<Object>::iterator it = kids.begin(); it != kids.end(); ++it)
+    {
+        const Object &kid = *it;
+
+        std::set<int> materialTypes;
+        if (kid.type == "poly")
+        {
+            // get the different SURFs
+            for (auto surface : kid.surfaces)
+                materialTypes.insert(surface.surf);
+
+            if (materialTypes.size() > 1)
+            {
+                const std::list<Object>::iterator last = it;
+                std::list<Object>::iterator first = last;
+
+                // add the new objects to the kids
+                for (size_t i = 1; i < materialTypes.size(); i++)
+                    first = kids.insert(first, Object(kid));
+
+                std::set<int>::iterator it1 = materialTypes.begin();
+                int i = 0;
+                for (std::list<Object>::iterator it2 = first; it2 != std::next(last, 1); ++it2, ++it1)
+                {
+                    // make name unique
+                    it2->name = it2->name + std::to_string(i++);
+
+                    // remove all the others SURFs
+                    it2->removeSurfacesNotMaterial(*it1);
+
+                    // remove the unused vertices
+                    it2->removeUnusedVertices();
+                }
+                it = last;
+            }
+        }
+    }
+}
+
 const Ac3d::BoundingBox &Ac3d::Object::getBoundingBox() const
 {
     if (type == "poly")
@@ -921,8 +1064,8 @@ void Ac3d::Object::generateTriangles()
 
             if (it->refs.size() > 3)
             {
-                std::list<Surface>::iterator original = it;
-                size_t count = it->refs.size() - 3;
+                const std::list<Surface>::iterator original = it;
+                const size_t count = it->refs.size() - 3;
                 for (size_t i = 0; i < count; i++)
                 {
                     Surface surface;
@@ -1224,7 +1367,7 @@ void Ac3d::tokenizeLine(const std::string &line, std::vector<std::string> &token
             i++;
         if (line[i] == '\"')
         {
-            size_t start = ++i;
+            const size_t start = ++i;
 
             while (i < line.size() && line[i] != '\"')
                 i++;
@@ -1236,11 +1379,21 @@ void Ac3d::tokenizeLine(const std::string &line, std::vector<std::string> &token
         }
         else
         {
-            size_t start = i++;
+            const size_t start = i++;
             while (i < line.size() && !std::isspace(line[i]))
                 i++;
             tokens.emplace_back(line.substr(start, i - start));
             i++;
         }
     }
+}
+
+void Ac3d::splitBySURF()
+{
+    root.splitBySURF();
+}
+
+void Ac3d::splitByMaterial()
+{
+    root.splitByMaterial();
 }
