@@ -54,6 +54,13 @@ double Ac3d::V3d::length() const
     return sqrt((*this)[0] * (*this)[0] + (*this)[1] * (*this)[1] + (*this)[2] * (*this)[2]);
 }
 
+void Ac3d::V3d::normalize()
+{
+    const double l = length();
+    if (l != 0.0)
+        *this = *this / length();
+}
+
 double Ac3d::V3d::dot(const V3d &other) const
 {
     return (*this)[0] * other[0] + (*this)[1] * other[1] + (*this)[2] * other[2];
@@ -692,7 +699,21 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         {
             const int numsurf = std::stoi(tokens.at(1));
             for (int i = 0; i < numsurf; i++)
+            {
                 surfaces.emplace_back(fin);
+
+                Surface &surface = surfaces.back();
+
+                if (surface.isPolygon() && surface.refs.size() >= 3)
+                {
+                    const V3d &p0 = vertices[surface.refs[0].index];
+                    const V3d &p1 = vertices[surface.refs[1].index];
+                    const V3d &p2 = vertices[surface.refs[2].index];
+
+                    surface.normal = ((p1 - p0).cross(p2 - p1));
+                    surface.normal.normalize();
+                }
+            }
         }
         else if (tokens.at(0) == "kids")
         {
@@ -918,12 +939,12 @@ void Ac3d::Object::splitBySURF()
 
     for (std::list<Object>::iterator it = kids.begin(); it != kids.end(); ++it)
     {
-        const Object &kid = *it;
+        Object &kid = *it;
 
-        std::set<int> surfTypes;
         if (kid.type == "poly")
         {
             // get the different SURFs
+            std::set<int> surfTypes;
             for (auto surface : kid.surfaces)
                 surfTypes.insert(surface.surf);
 
@@ -952,6 +973,8 @@ void Ac3d::Object::splitBySURF()
                 it = last;
             }
         }
+        else
+            kid.splitBySURF();
     }
 }
 
@@ -962,12 +985,12 @@ void Ac3d::Object::splitByMaterial()
 
     for (std::list<Object>::iterator it = kids.begin(); it != kids.end(); ++it)
     {
-        const Object &kid = *it;
+        Object &kid = *it;
 
-        std::set<int> materialTypes;
         if (kid.type == "poly")
         {
             // get the different SURFs
+            std::set<int> materialTypes;
             for (auto surface : kid.surfaces)
                 materialTypes.insert(surface.surf);
 
@@ -996,6 +1019,41 @@ void Ac3d::Object::splitByMaterial()
                 it = last;
             }
         }
+        else
+            kid.splitByMaterial();
+    }
+}
+
+void Ac3d::Object::splitByUV()
+{
+    if (type == "poly")
+        return;
+
+    for (std::list<Object>::iterator it = kids.begin(); it != kids.end(); ++it)
+    {
+        Object &kid = *it;
+        if (kid.type == "poly")
+        {
+            bool needSplit = false;
+            std::vector<std::set<V2d>> uvs(vertices.size());
+            for (const auto &surface : surfaces)
+            {
+                for (const auto &ref : surface.refs)
+                {
+                    uvs[ref.index].insert(ref.coords[0]);
+
+                    if (uvs[ref.index].size() > 1)
+                        needSplit = true;
+                }
+            }
+
+            if (needSplit)
+            {
+                // TODO
+            }
+        }
+        else
+            kid.splitByUV();
     }
 }
 
@@ -1396,4 +1454,9 @@ void Ac3d::splitBySURF()
 void Ac3d::splitByMaterial()
 {
     root.splitByMaterial();
+}
+
+void Ac3d::splitByUV()
+{
+    root.splitByUV();
 }

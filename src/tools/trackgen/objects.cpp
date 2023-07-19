@@ -297,6 +297,7 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             obj.transform(m);
             obj.splitBySURF();
             obj.splitByMaterial();
+            obj.splitByUV();
 
             objectsRoot.merge(obj, multipleMaterials);
 

@@ -72,6 +72,7 @@ struct Ac3d
         double dot(const V3d &other) const;
         V3d cross(const V3d &other) const;
         double length() const;
+        void normalize();
     };
 
     struct Color : public std::array<double, 3>
@@ -165,6 +166,7 @@ struct Ac3d
         SURF                surf = PolygonSingleSidedFlat;
         int                 mat = 0;
         std::vector<Ref>    refs;
+        V3d                 normal = { 0, 0, 0 };
 
         Surface() = default;
         explicit Surface(std::ifstream &fin);
@@ -285,6 +287,7 @@ struct Ac3d
         void flipAxes(bool in);
         void splitBySURF();
         void splitByMaterial();
+        void splitByUV();
         void removeSurfacesNotSURF(int SURF);
         void removeSurfacesNotMaterial(int material);
         void removeUnusedVertices();
@@ -312,6 +315,7 @@ struct Ac3d
     void generateTriangles();
     void splitBySURF();
     void splitByMaterial();
+    void splitByUV();
     void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;
