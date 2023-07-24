@@ -18,7 +18,7 @@ import gui.EditorFrame;
  * Copyright : Copyright (c) 2002 Patrice Espie
  * </p>
  * <p>
- * Soci�t� :
+ * Societe
  * </p>
  * 
  * @author Patrice Espie

@@ -17,7 +17,7 @@ import java.awt.geom.Point2D;
  * Copyright : Copyright (c) 2002 Patrice Espie
  * </p>
  * <p>
- * Soci�t� :
+ * Societe
  * </p>
  * 
  * @author Patrice Espie
