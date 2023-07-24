@@ -31,6 +31,7 @@
 #include <iomanip>
 #include <set>
 #include <cmath>
+#include <cctype>
 
 //------------------------------------- V3d -----------------------------------
 

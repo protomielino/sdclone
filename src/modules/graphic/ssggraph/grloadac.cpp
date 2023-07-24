@@ -41,6 +41,7 @@
 
 #include <zlib.h> // gz*
 #include <plib/ssg.h>
+#include <cctype>
 
 #include "grutil.h"
 #include "grloadac.h"
