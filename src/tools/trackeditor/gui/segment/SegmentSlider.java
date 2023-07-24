@@ -484,8 +484,8 @@ public class SegmentSlider extends JPanel
 		{
 			getTextField().setText(nf.format(value));
 			getTextField().setCaretPosition(0);
-			valueChanged();
 		}
+		valueChanged();
 	}
 
 	public synchronized void removeSliderListener(SliderListener l)
