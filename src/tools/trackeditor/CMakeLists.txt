@@ -105,6 +105,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/ObjShapeObject.java
          utils/circuit/ObjShapeRelief.java
          utils/circuit/ObjShapeTerrain.java
+         utils/circuit/ObjectData.java
          utils/circuit/ObjectMap.java
          utils/circuit/Pits.java
          utils/circuit/Reliefs.java

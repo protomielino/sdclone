@@ -45,8 +45,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
+import gui.TrackObjectDialog;
 import utils.Editor;
 import utils.circuit.ObjShapeObject;
+import utils.circuit.ObjectData;
 import utils.circuit.ObjectMap;
 
 public class ObjectMapProperties extends PropertyPanel
@@ -145,29 +147,9 @@ public class ObjectMapProperties extends PropertyPanel
 		private ObjectTablePanel	objectTablePanel		= null;		
 		private ObjectMap			objectMap				= null;
 
-        public class Data
-        {
-        	String	name;
-        	Integer	color;
-        	Integer	imageX;
-        	Integer	imageY;
-        	Double  trackX;
-        	Double  trackY;
+		private Vector<ObjectData> data = new Vector<ObjectData>();
 
-        	Data(String name, Integer color, Integer imageX, Integer imageY, double trackX, double trackY)
-        	{
-        		this.name = name;
-        		this.color = color;
-        		this.imageX = imageX;
-        		this.imageY = imageY;
-        		this.trackX = trackX;
-        		this.trackY = trackY;
-        	}
-        }
-
-		private Vector<Data> data = new Vector<Data>();
-
-		public Vector<Data> getData()
+		public Vector<ObjectData> getData()
 		{
 			return data;
 		}
@@ -394,7 +376,7 @@ public class ObjectMapProperties extends PropertyPanel
 							}
 							Point2D.Double real = new Point2D.Double();
 							getEditorFrame().getCircuitView().imageToReal(x, y, imageWidth, imageHeight, real);
-							data.add(new Data(name, rgb, x, y, real.x, real.y));
+							data.add(new ObjectData(name, rgb, x, y, real.x, real.y));
 						}
 					}
 				}
@@ -416,7 +398,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 				Point2D.Double real = new Point2D.Double();
 				getEditorFrame().getCircuitView().imageToReal(object.getImageX(), object.getImageY(), objectMap.getImageWidth(), objectMap.getImageHeight(), real);
-				data.add(new Data(name, object.getRGB(), object.getImageX(), object.getImageY(), real.x, real.y));
+				data.add(new ObjectData(name, object.getRGB(), object.getImageX(), object.getImageY(), real.x, real.y));
 			}
     	}
 
@@ -509,7 +491,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 			public Object getValueAt(int rowIndex, int columnIndex)
 			{
-				Data datum = data.get(rowIndex);
+				ObjectData datum = data.get(rowIndex);
 
 				switch (columnIndex)
 				{
@@ -533,7 +515,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 			public void setValueAt(Object value, int rowIndex, int columnIndex)
 			{
-				Data datum = data.get(rowIndex);
+				ObjectData datum = data.get(rowIndex);
 
 				switch (columnIndex)
 				{
@@ -657,15 +639,72 @@ public class ObjectMapProperties extends PropertyPanel
 	        }
 		}
 
-	    public JPopupMenu createPopupMenu(ObjectTablePanel panel)
-	    {
-	        JPopupMenu popupMenu = new JPopupMenu();
-	        JMenuItem deleteItem = new JMenuItem("Delete Object");
-	        JMenuItem deleteAllColorItem = new JMenuItem("Delete All Objects With This Color");
-	        JMenuItem deleteAllNameItem = new JMenuItem("Delete All Objects With This Name");
-		    JMenuItem moveToObjects = new JMenuItem("Move To Objects");
-		    JMenuItem moveAllToObjects = new JMenuItem("Move All To Objects");
+		public JPopupMenu createPopupMenu(ObjectTablePanel panel)
+		{
+			JPopupMenu popupMenu = new JPopupMenu();
+			JMenuItem editItem = new JMenuItem("Edit Object");
+			JMenuItem editAllColorItem = new JMenuItem("Edit All Objects With This Color");
+			JMenuItem deleteItem = new JMenuItem("Delete Object");
+			JMenuItem deleteAllColorItem = new JMenuItem("Delete All Objects With This Color");
+			JMenuItem deleteAllNameItem = new JMenuItem("Delete All Objects With This Name");
+			JMenuItem moveToObjects = new JMenuItem("Move To Objects");
+			JMenuItem moveAllToObjects = new JMenuItem("Move All To Objects");
 
+			editItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					int row = panel.table.getSelectedRow();
+					if (row != -1)
+					{
+						ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
+
+						TrackObjectDialog editObjectDialog = new TrackObjectDialog(getEditorFrame(), false, datum);
+
+						editObjectDialog.setModal(true);
+						editObjectDialog.setVisible(true);
+
+						if (editObjectDialog.isChanged())
+						{
+							panel.model.setValueAt(datum.name, row, 1);
+							panel.model.setValueAt(datum.color, row, 2);
+
+							getEditorFrame().documentIsModified = true;
+						}
+					}
+				}
+			});
+			editAllColorItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					int row = panel.table.getSelectedRow();
+					if (row != -1)
+					{
+						ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
+						int	oldColor = datum.color;
+
+						TrackObjectDialog editObjectDialog = new TrackObjectDialog(getEditorFrame(), false, datum);
+
+						editObjectDialog.setModal(true);
+						editObjectDialog.setVisible(true);
+
+						if (editObjectDialog.isChanged())
+						{
+							for (int i = 0; i < data.size(); i++)
+							{
+								if (data.elementAt(i).color == oldColor)
+								{
+									panel.model.setValueAt(datum.name, i, 1);
+									panel.model.setValueAt(datum.color, i, 2);
+								}
+							}
+
+							getEditorFrame().documentIsModified = true;
+						}
+					}
+				}
+			});
 		    deleteItem.addActionListener(new ActionListener()
 	        {
 	            public void actionPerformed(ActionEvent e)
@@ -759,7 +798,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            	{
 	            		if (JOptionPane.showConfirmDialog(null, "Move this object?", "Move Object", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 	            		{
-		            		Data datum = data.elementAt(panel.table.convertRowIndexToModel(row));											
+	            			ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));											
 							String name = getEditorFrame().getObjectColorName(datum.color) + "-" + data.size();
 		            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum.trackX, datum.trackY, Double.NaN);
 		            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
@@ -777,7 +816,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            	{
 	            		if (JOptionPane.showConfirmDialog(null, "Move all objects with this name?", "Move Objects with Name", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 	            		{
-	            			Data datum = data.elementAt(panel.table.convertRowIndexToModel(row));
+	            			ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
 	            			Vector<Integer> toMove = new Vector<Integer>();
 	            			for (int i = 0; i < data.size(); i++)
 	            			{
@@ -798,7 +837,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            			int size = data.size();
 	            			for (int i = 0; i < toMove.size(); i++)
 	            			{
-			            		Data datum1 = data.elementAt(i);											
+	            				ObjectData datum1 = data.elementAt(i);											
 								String name = getEditorFrame().getObjectColorName(datum.color) + "-" + size++;
 			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum1.trackX, datum1.trackY, Double.NaN);
 			            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
@@ -812,9 +851,13 @@ public class ObjectMapProperties extends PropertyPanel
 				}
 		    });
 
+	        popupMenu.add(editItem);
+	        popupMenu.add(editAllColorItem);
+	        popupMenu.addSeparator();
 	        popupMenu.add(deleteItem);
 	        popupMenu.add(deleteAllColorItem);
 	        popupMenu.add(deleteAllNameItem);
+		    //popupMenu.addSeparator();
 	        //popupMenu.add(moveToObjects);
 	        //popupMenu.add(moveAllToObjects);
 
@@ -852,7 +895,7 @@ public class ObjectMapProperties extends PropertyPanel
                 getEditorFrame().documentIsModified = true;
             }
 
-            Vector<ObjectMapPanel.Data> data = panel.getData();
+            Vector<ObjectData> data = panel.getData();
             Vector<ObjShapeObject>	objects = objectMap.getObjects();
     		int minDataCount = Math.min(data.size(), objects.size());
 
@@ -863,7 +906,7 @@ public class ObjectMapProperties extends PropertyPanel
     		}
             for (int j = 0; j < minDataCount; j++)
             {
-            	ObjectMapPanel.Data datum = data.get(j);
+            	ObjectData datum = data.get(j);
             	ObjShapeObject object = objects.get(j);
 
             	if (!datum.color.equals(object.getRGB()))
@@ -912,7 +955,7 @@ public class ObjectMapProperties extends PropertyPanel
     			// need to add to objects
     			while (objects.size() < data.size())
     			{
-                	ObjectMapPanel.Data datum = data.get(objects.size());
+    				ObjectData datum = data.get(objects.size());
 
     				objects.add(new ObjShapeObject(datum.color, datum.imageX, datum.imageY));
     			}
