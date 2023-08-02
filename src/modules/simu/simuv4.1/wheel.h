@@ -96,6 +96,14 @@ typedef struct
     tdble initialTemperature;		// Initial temperature of the tire (initial pressure, p0/T0=constant)
     tdble hysteresisFactor;			// Factor to adjust the hysteresis (model fitting), usually close to 1.0.
     tdble hysteresisFactorC[6];     // Factor to adjust the hysteresis for compounds
+	tdble coolingFactor;			// Factor to adjust the cooling rate
+	tdble coolingFactorC[6];		// Factor to adjust the cooling rate for compounds 
+	tdble latHeatFactor;			// Factor to adjust lateral friction heating
+	tdble latHeatFactorC[6];		// Factor to adjust lateral friction heating for compounds 
+	tdble longHeatFactor;			// Factor to adjust longtudinal friction heating
+	tdble longHeatFactorC[6];		// Factor to adjust longtudinal friction heating for compounds 
+	tdble tireSpeedCoolFactor;		// Factor to adjust air speed cooling constant. Should be close to 1.0 for most cars.
+	tdble tireSpeedCoolFactorC[6];	// Factor to adjust air speed cooling constant per compound.
     tdble wearFactor;				// Factor to adjust the wear (model fitting), usually close to 1.0.
     tdble wearFactorC[6];               // Factor to adjust the wear for compounds
 

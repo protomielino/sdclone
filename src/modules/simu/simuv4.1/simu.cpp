@@ -294,6 +294,10 @@ SimReConfig(tCarElt *carElt)
                 car->wheel[i].mu = car->wheel[i].muC[car->wheel[i].tireSet];
                 car->wheel[i].Topt = car->wheel[i].ToptC[car->wheel[i].tireSet];
                 car->wheel[i].hysteresisFactor = car->wheel[i].hysteresisFactorC[car->wheel[i].tireSet];
+				car->wheel[i].coolingFactor = car->wheel[i].coolingFactorC[car->wheel[i].tireSet];
+				car->wheel[i].latHeatFactor = car->wheel[i].latHeatFactorC[car->wheel[i].tireSet];
+				car->wheel[i].longHeatFactor = car->wheel[i].longHeatFactorC[car->wheel[i].tireSet];
+				car->wheel[i].tireSpeedCoolFactor = car->wheel[i].tireSpeedCoolFactorC[car->wheel[i].tireSet];
                 car->wheel[i].wearFactor = car->wheel[i].wearFactorC[car->wheel[i].tireSet];
                 car->carElt->_tyreT_opt(i) = car->wheel[i].Topt;
                 GfLogInfo("# SimuV4 tire compound changed mu = %.3f - hysteresis = %.2f - wear factor = %.7f\n", car->wheel[i].mu,
