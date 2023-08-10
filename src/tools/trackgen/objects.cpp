@@ -216,10 +216,12 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             tdble           angle = 0;
             float           z = 0;
             tdble           orientation = 0;
+            tdble           height = 0;
             
             if (individual)
             {
                 orientation = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0);
+                height = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_HEIGHT, "m", 0);
             }
 
             Ac3d obj(curObj.ac3d);
@@ -293,7 +295,7 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             m.makeRotation(angle + orientation, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
             obj.transform(m);
 
-            m.makeLocation(x, y, z);
+            m.makeLocation(x, y, z + height);
             obj.transform(m);
             obj.splitBySURF();
             obj.splitByMaterial();

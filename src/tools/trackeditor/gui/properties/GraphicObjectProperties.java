@@ -29,6 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
+import gui.TrackObjectDialog;
 import utils.circuit.GraphicObject;
 
 public class GraphicObjectProperties extends PropertyPanel
@@ -134,16 +135,16 @@ public class GraphicObjectProperties extends PropertyPanel
 				name = new String("Unknown");
 			}
 
-			data.add(new GraphicObjectData(name, object.getColor(), object.getX(), object.getY(), object.getOrientation()));
+			data.add(new GraphicObjectData(name, object.getColor(), object.getX(), object.getY(), object.getOrientation(), object.getHeight()));
 		}
 	}
 
 	class GraphicObjectTableModel extends AbstractTableModel
 	{
-		private final String[] 		columnNames = { null, "Name", "Object", "Color", "Track X", "Track Y", "Orientation" };
+		private final String[] 		columnNames = { null, "Name", "Object", "Color", "Track X", "Track Y", "Orientation", "Height" };
 		private final Class<?>[] 	columnClass = new Class[]
 				{
-						Integer.class, String.class, String.class, Integer.class, Double.class, Double.class, Double.class
+						Integer.class, String.class, String.class, Integer.class, Double.class, Double.class, Double.class, Double.class
 				};
 		private Vector<GraphicObject>	graphicObjects = null;
 
@@ -206,6 +207,12 @@ public class GraphicObjectProperties extends PropertyPanel
 					return datum.orientation;
 				}
 				return null;
+			case 7:
+				if (datum.height != null && !Double.isNaN(datum.height))
+				{
+					return datum.height;
+				}
+				return null;
 			}
 			return null;
 		}
@@ -246,6 +253,10 @@ public class GraphicObjectProperties extends PropertyPanel
 				break;
 			case 6:
 				datum.orientation = (Double) value;
+				fireTableCellUpdated(rowIndex, columnIndex);
+				break;
+			case 7:
+				datum.height = (Double) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
 			}
@@ -342,8 +353,36 @@ public class GraphicObjectProperties extends PropertyPanel
 	public JPopupMenu createPopupMenu(GraphicObjectTablePanel panel)
 	{
 		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuItem editItem = new JMenuItem("Edit Object");
 		JMenuItem deleteItem = new JMenuItem("Delete Object");
 		JMenuItem deleteAllColorItem = new JMenuItem("Delete All Objects With This Color");
+
+		editItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int row = panel.table.getSelectedRow();
+				if (row != -1)
+				{
+					GraphicObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
+
+					TrackObjectDialog editObjectDialog = new TrackObjectDialog(getEditorFrame(), false, datum);
+
+					editObjectDialog.setModal(true);
+					editObjectDialog.setVisible(true);
+
+					if (editObjectDialog.isChanged())
+					{
+						panel.model.setValueAt(datum.name, row, 1);
+						panel.model.setValueAt(datum.color, row, 3);
+						panel.model.setValueAt(datum.orientation, row, 6);
+						panel.model.setValueAt(datum.height, row, 7);
+
+						getEditorFrame().documentIsModified = true;
+					}
+				}
+			}
+		});
 
 		deleteItem.addActionListener(new ActionListener()
 		{
@@ -395,6 +434,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			}
 		});
 
+		popupMenu.add(editItem);
 		popupMenu.add(deleteItem);
 		popupMenu.add(deleteAllColorItem);
 
@@ -451,6 +491,20 @@ public class GraphicObjectProperties extends PropertyPanel
 				object.setOrientation(datum.orientation);
 				getEditorFrame().documentIsModified = true;
 			}
+
+			if (datum.height == null)
+			{
+				if (!Double.isNaN(object.getHeight())) 
+				{
+					object.setHeight(Double.NaN);
+					getEditorFrame().documentIsModified = true;
+				}
+			}
+			else if (!datum.height.equals(object.getHeight()))
+			{
+				object.setHeight(datum.height);
+				getEditorFrame().documentIsModified = true;
+			}
 		}
 
 		if (data.size() < graphicObjects.size())
@@ -473,6 +527,11 @@ public class GraphicObjectProperties extends PropertyPanel
 				if (datum.orientation != null && !Double.isNaN(datum.orientation))
 				{
 					graphicObjects.lastElement().setOrientation(datum.orientation);
+				}
+
+				if (datum.height != null && !Double.isNaN(datum.height))
+				{
+					graphicObjects.lastElement().setHeight(datum.height);
 				}
 			}
 		}

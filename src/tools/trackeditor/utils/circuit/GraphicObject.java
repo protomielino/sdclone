@@ -8,6 +8,7 @@ public class GraphicObject
 
 	// TODO add more overrides here
 	private double 			orientation = Double.NaN;
+	private double			height		= Double.NaN;
 
 	public GraphicObject(String name, int rgb, Point2D.Double location)
 	{
@@ -86,6 +87,16 @@ public class GraphicObject
 		this.orientation = orientation;
 	}
 
+	public double getHeight()
+	{
+		return height;
+	}
+
+	public void setHeight(double height)
+	{
+		this.height = height;
+	}
+
 	public void dump(String indent)
 	{
 		System.out.println(indent + "name        : " + getName());
@@ -93,5 +104,6 @@ public class GraphicObject
 		System.out.println(indent + "x           : " + getX());
 		System.out.println(indent + "y           : " + getY());
 		System.out.println(indent + "orientation : " + getOrientation());
+		System.out.println(indent + "height      : " + getHeight());
 	}
 }

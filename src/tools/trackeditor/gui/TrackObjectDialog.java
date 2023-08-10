@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import gui.properties.GraphicObjectData;
 import utils.circuit.GraphicObject;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectData;
@@ -25,6 +26,7 @@ public class TrackObjectDialog extends JDialog
 	private GraphicObject		graphicObject			= null;
 	private ObjShapeObject		objectShape				= null;
 	private ObjectData			objectData				= null;
+	private GraphicObjectData	graphicObjectData		= null;
 	private Vector<TrackObject> objects					= null;
 	private boolean				ignoreActions			= true;
 	private boolean				changed					= false;
@@ -51,6 +53,9 @@ public class TrackObjectDialog extends JDialog
 
 	private JLabel				orientationLabel		= new JLabel();
 	private JTextField			orientationTextField	= new JTextField();
+
+	private JLabel				heightLabel				= new JLabel();
+	private JTextField			heightTextField			= new JTextField();
 
 	private JButton				applyButton				= new JButton();
 	private JButton				cancelButton			= new JButton();
@@ -108,6 +113,15 @@ public class TrackObjectDialog extends JDialog
 		initialize(0, 0);
 	}
 
+	public TrackObjectDialog(EditorFrame editorFrame, boolean all, GraphicObjectData graphicObjectData)
+	{
+		super();
+		this.graphicObjectData = graphicObjectData;
+		setTitle("Edit Object");
+		this.editorFrame = editorFrame;
+		initialize(0, 0);
+	}
+
 	public boolean isChanged()
 	{
 		return changed;
@@ -120,6 +134,11 @@ public class TrackObjectDialog extends JDialog
 			return objectShape.getRGB();
 		}
 
+		if (graphicObjectData != null)
+		{
+			return graphicObjectData.color;
+		}
+
 		return objectData.color;
 	}
 	private void setRGB(int rgb)
@@ -127,6 +146,12 @@ public class TrackObjectDialog extends JDialog
 		if (objectShape != null)
 		{
 			objectShape.setRGB(rgb);
+			return;
+		}
+
+		if (graphicObjectData != null)
+		{
+			graphicObjectData.color = rgb;
 			return;
 		}
 
@@ -140,6 +165,11 @@ public class TrackObjectDialog extends JDialog
 			return objectShape.getName();
 		}
 
+		if (graphicObjectData != null)
+		{
+			return graphicObjectData.name;
+		}
+		
 		return objectData.name;
 	}
 	private void setObjectName(String name)
@@ -147,6 +177,12 @@ public class TrackObjectDialog extends JDialog
 		if (objectShape != null)
 		{
 			objectShape.setName(name);
+			return;
+		}
+
+		if (graphicObjectData != null)
+		{
+			graphicObjectData.name = name;
 			return;
 		}
 
@@ -158,6 +194,11 @@ public class TrackObjectDialog extends JDialog
 		if (objectShape != null)
 		{
 			return objectShape.getTrackLocation();
+		}
+
+		if (graphicObjectData != null)
+		{
+			return new Point2D.Double(graphicObjectData.trackX, graphicObjectData.trackY);
 		}
 
 		return new Point2D.Double(objectData.trackX, objectData.trackY);
@@ -182,15 +223,43 @@ public class TrackObjectDialog extends JDialog
 
 		return objectData.imageY;
 	}
+	
+	private double getOrientation()
+	{
+		if (graphicObject != null)
+		{
+			return graphicObject.getOrientation();
+		}
+		else if (graphicObjectData != null)
+		{		
+			return graphicObjectData.orientation;
+		}
+		
+		return Double.NaN;
+	}
+	
+	private double getObjectHeight()
+	{
+		if (graphicObject != null)
+		{
+			return graphicObject.getHeight();
+		}
+		else if (graphicObjectData != null)
+		{		
+			return graphicObjectData.height;
+		}
+		
+		return Double.NaN;
+	}
 
 	private void initialize(int x, int y)
 	{
-		isGraphicObject = objectShape != null && objectShape.getType().equals("graphic object");
+		isGraphicObject = (objectShape != null && objectShape.getType().equals("graphic object")) || graphicObjectData != null;
 
 		setLayout(null);
-		setSize(320, 252);
+		setSize(320, 279);
 		setResizable(false);
-		if (objectData == null)
+		if (objectData == null && graphicObjectData == null)
 		{
 			setLocation(x, y);
 		}
@@ -296,12 +365,19 @@ public class TrackObjectDialog extends JDialog
 			orientationLabel.setText("Orientation");
 			orientationLabel.setBounds(10, 145, 120, 23);
 
-			if (!Double.isNaN(graphicObject.getOrientation()))
-				orientationTextField.setText("" + graphicObject.getOrientation());
+			if (!Double.isNaN(getOrientation()))
+				orientationTextField.setText("" + getOrientation());
 			orientationTextField.setBounds(120, 145, 170, 23);
+			
+			heightLabel.setText("Height");
+			heightLabel.setBounds(10, 172, 120, 23);
+
+			if (!Double.isNaN(getObjectHeight()))
+				heightTextField.setText("" + getObjectHeight());
+			heightTextField.setBounds(120, 172, 170, 23);
 		}
 
-		applyButton.setBounds(50, 177, 70, 25);
+		applyButton.setBounds(50, 204, 70, 25);
 		applyButton.setText("Apply");
 		applyButton.addActionListener(new ActionListener()
 		{
@@ -311,7 +387,7 @@ public class TrackObjectDialog extends JDialog
 			}
 		});
 
-		cancelButton.setBounds(185, 177, 70, 25);
+		cancelButton.setBounds(185, 204, 70, 25);
 		cancelButton.setText("Cancel");
 		cancelButton.addActionListener(new ActionListener()
 		{
@@ -344,6 +420,8 @@ public class TrackObjectDialog extends JDialog
 		{
 			add(orientationLabel);
 			add(orientationTextField);
+			add(heightLabel);
+			add(heightTextField);
 		}
 
 		add(applyButton);
@@ -435,7 +513,7 @@ public class TrackObjectDialog extends JDialog
 
 		setRGB(rgb);
 
-		if (isGraphicObject)
+		if (objectShape != null)
 		{
 			String newName = nameTextField.getText();
 
@@ -467,6 +545,64 @@ public class TrackObjectDialog extends JDialog
 				{
 				}
 			}
+			
+			String heightText = heightTextField.getText();
+			if (heightText == null || heightText.isEmpty())
+			{
+				graphicObject.setHeight(Double.NaN);
+			}
+			else
+			{
+				try
+				{
+					graphicObject.setHeight(Double.parseDouble(heightText));
+				}
+				catch (NumberFormatException e)
+				{
+				}
+			}			
+		}
+		else if (graphicObjectData != null)
+		{
+			String newName = nameTextField.getText();
+
+			if (!newName.equals(graphicObjectData.name))
+			{
+				// TODO: check for duplicate name
+				graphicObjectData.name = newName;
+			}
+
+			String orientationText = orientationTextField.getText();
+			if (orientationText == null || orientationText.isEmpty())
+			{
+				graphicObjectData.orientation = null;
+			}
+			else
+			{
+				try
+				{
+					graphicObjectData.orientation = Double.parseDouble(orientationText);
+				}
+				catch (NumberFormatException e)
+				{
+				}
+			}
+			
+			String heightText = heightTextField.getText();
+			if (heightText == null || heightText.isEmpty())
+			{
+				graphicObjectData.height = null;
+			}
+			else
+			{
+				try
+				{
+					graphicObjectData.height = Double.parseDouble(heightText);
+				}
+				catch (NumberFormatException e)
+				{
+				}
+			}			
 		}
 
 		changed = true;

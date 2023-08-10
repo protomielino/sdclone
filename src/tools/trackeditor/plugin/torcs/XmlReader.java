@@ -639,6 +639,7 @@ public class XmlReader
 	        				getAttrIntValue(el, "color"),
 	        				new Point2D.Double(getAttrNumValue(el, "x"), getAttrNumValue(el, "y")));
 	        		object.setOrientation(getAttrNumValue(el, "orientation", "deg"));
+	        		object.setHeight(getAttrNumValue(el, "height", "m"));
 	        		graphicObjects.add(object);
 	        	}
 	        	data.getTerrainGeneration().setGraphicObjects(graphicObjects);
