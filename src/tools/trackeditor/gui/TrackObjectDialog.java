@@ -22,43 +22,44 @@ import utils.circuit.TrackObject;
 
 public class TrackObjectDialog extends JDialog
 {
-	private EditorFrame			editorFrame				= null;
-	private GraphicObject		graphicObject			= null;
-	private ObjShapeObject		objectShape				= null;
-	private ObjectData			objectData				= null;
-	private GraphicObjectData	graphicObjectData		= null;
-	private Vector<TrackObject> objects					= null;
-	private boolean				ignoreActions			= true;
-	private boolean				changed					= false;
-	private boolean				isGraphicObject			= false;
+	private EditorFrame					editorFrame				= null;
+	private GraphicObject				graphicObject			= null;
+	private ObjShapeObject				objectShape				= null;
+	private ObjectData					objectData				= null;
+	private GraphicObjectData			graphicObjectDatum		= null;
+	private Vector<GraphicObjectData>	graphicObjectData		= null;
+	private Vector<TrackObject> 		trackObjects			= null;
+	private boolean						ignoreActions			= true;
+	private boolean						changed					= false;
+	private boolean						isGraphicObject			= false;
 
-	private int					rgb						= 0;
+	private int							rgb						= 0;
 
-	private JCheckBox			defaultCheckBox			= new JCheckBox();
+	private JCheckBox					defaultCheckBox			= new JCheckBox();
 
-	private JLabel				nameLabel				= new JLabel();
-	private JTextField			nameTextField			= new JTextField();
+	private JLabel						nameLabel				= new JLabel();
+	private JTextField					nameTextField			= new JTextField();
 
-	private JLabel				objectLabel				= new JLabel();
-	private JComboBox<String>	objectComboBox			= null;
+	private JLabel						objectLabel				= new JLabel();
+	private JComboBox<String>			objectComboBox			= null;
 
-	private JLabel				colorLabel				= new JLabel();
-	private JTextField			colorTextField			= new JTextField();
+	private JLabel						colorLabel				= new JLabel();
+	private JTextField					colorTextField			= new JTextField();
 
-	private JLabel				trackLocationLabel		= new JLabel();
-	private JTextField			trackLocationTextField	= new JTextField();
+	private JLabel						trackLocationLabel		= new JLabel();
+	private JTextField					trackLocationTextField	= new JTextField();
 
-	private JLabel				imageLocationLabel		= new JLabel();
-	private JTextField			imageLocationTextField	= new JTextField();
+	private JLabel						imageLocationLabel		= new JLabel();
+	private JTextField					imageLocationTextField	= new JTextField();
 
-	private JLabel				orientationLabel		= new JLabel();
-	private JTextField			orientationTextField	= new JTextField();
+	private JLabel						orientationLabel		= new JLabel();
+	private JTextField					orientationTextField	= new JTextField();
 
-	private JLabel				heightLabel				= new JLabel();
-	private JTextField			heightTextField			= new JTextField();
+	private JLabel						heightLabel				= new JLabel();
+	private JTextField					heightTextField			= new JTextField();
 
-	private JButton				applyButton				= new JButton();
-	private JButton				cancelButton			= new JButton();
+	private JButton						applyButton				= new JButton();
+	private JButton						cancelButton			= new JButton();
 
 	public TrackObjectDialog(EditorFrame editorFrame, ObjShapeObject objectShape, int x, int y)
 	{
@@ -113,11 +114,12 @@ public class TrackObjectDialog extends JDialog
 		initialize(0, 0);
 	}
 
-	public TrackObjectDialog(EditorFrame editorFrame, boolean all, GraphicObjectData graphicObjectData)
+	public TrackObjectDialog(EditorFrame editorFrame, boolean all, GraphicObjectData graphicObjectDatum, Vector<GraphicObjectData> graphicObjectData)
 	{
 		super();
-		this.graphicObjectData = graphicObjectData;
-		setTitle("Edit Object");
+		this.graphicObjectDatum = graphicObjectDatum;
+ 		this.graphicObjectData = graphicObjectData;
+ 		setTitle("Edit Object");
 		this.editorFrame = editorFrame;
 		initialize(0, 0);
 	}
@@ -134,9 +136,9 @@ public class TrackObjectDialog extends JDialog
 			return objectShape.getRGB();
 		}
 
-		if (graphicObjectData != null)
+		if (graphicObjectDatum != null)
 		{
-			return graphicObjectData.color;
+			return graphicObjectDatum.color;
 		}
 
 		return objectData.color;
@@ -149,9 +151,9 @@ public class TrackObjectDialog extends JDialog
 			return;
 		}
 
-		if (graphicObjectData != null)
+		if (graphicObjectDatum != null)
 		{
-			graphicObjectData.color = rgb;
+			graphicObjectDatum.color = rgb;
 			return;
 		}
 
@@ -165,9 +167,9 @@ public class TrackObjectDialog extends JDialog
 			return objectShape.getName();
 		}
 
-		if (graphicObjectData != null)
+		if (graphicObjectDatum != null)
 		{
-			return graphicObjectData.name;
+			return graphicObjectDatum.name;
 		}
 		
 		return objectData.name;
@@ -180,9 +182,9 @@ public class TrackObjectDialog extends JDialog
 			return;
 		}
 
-		if (graphicObjectData != null)
+		if (graphicObjectDatum != null)
 		{
-			graphicObjectData.name = name;
+			graphicObjectDatum.name = name;
 			return;
 		}
 
@@ -196,9 +198,9 @@ public class TrackObjectDialog extends JDialog
 			return objectShape.getTrackLocation();
 		}
 
-		if (graphicObjectData != null)
+		if (graphicObjectDatum != null)
 		{
-			return new Point2D.Double(graphicObjectData.trackX, graphicObjectData.trackY);
+			return new Point2D.Double(graphicObjectDatum.trackX, graphicObjectDatum.trackY);
 		}
 
 		return new Point2D.Double(objectData.trackX, objectData.trackY);
@@ -230,9 +232,12 @@ public class TrackObjectDialog extends JDialog
 		{
 			return graphicObject.getOrientation();
 		}
-		else if (graphicObjectData != null)
-		{		
-			return graphicObjectData.orientation;
+		else if (graphicObjectDatum != null)
+		{
+			if (graphicObjectDatum.orientation != null)
+			{
+				return graphicObjectDatum.orientation;
+			}
 		}
 		
 		return Double.NaN;
@@ -244,9 +249,12 @@ public class TrackObjectDialog extends JDialog
 		{
 			return graphicObject.getHeight();
 		}
-		else if (graphicObjectData != null)
-		{		
-			return graphicObjectData.height;
+		else if (graphicObjectDatum != null)
+		{
+			if (graphicObjectDatum.height != null)
+			{
+				return graphicObjectDatum.height;
+			}
 		}
 		
 		return Double.NaN;
@@ -254,12 +262,12 @@ public class TrackObjectDialog extends JDialog
 
 	private void initialize(int x, int y)
 	{
-		isGraphicObject = (objectShape != null && objectShape.getType().equals("graphic object")) || graphicObjectData != null;
+		isGraphicObject = (objectShape != null && objectShape.getType().equals("graphic object")) || graphicObjectDatum != null;
 
 		setLayout(null);
 		setSize(320, 279);
 		setResizable(false);
-		if (objectData == null && graphicObjectData == null)
+		if (objectData == null && graphicObjectDatum == null)
 		{
 			setLocation(x, y);
 		}
@@ -291,11 +299,11 @@ public class TrackObjectDialog extends JDialog
 		});
 
 		// search for color in track objects first
-		objects = editorFrame.getTrackData().getTrackObjects();
+		trackObjects = editorFrame.getTrackData().getTrackObjects();
 		int objectIndex	= -1;
-		for (int i = 0; i < objects.size(); i++)
+		for (int i = 0; i < trackObjects.size(); i++)
 		{
-			if (objects.get(i).getColor() == getRGB())
+			if (trackObjects.get(i).getColor() == getRGB())
 			{
 				defaultCheckBox.setSelected(false);
 				objectIndex = i;
@@ -306,10 +314,10 @@ public class TrackObjectDialog extends JDialog
 		// search in default objects if not found
 		if (objectIndex == -1)
 		{
-			objects = editorFrame.getDefaultObjects();
-			for (int i = 0; i < objects.size(); i++)
+			trackObjects = editorFrame.getDefaultObjects();
+			for (int i = 0; i < trackObjects.size(); i++)
 			{
-				if (objects.get(i).getColor() == getRGB())
+				if (trackObjects.get(i).getColor() == getRGB())
 				{
 					defaultCheckBox.setSelected(true);
 					objectIndex = i;
@@ -324,9 +332,9 @@ public class TrackObjectDialog extends JDialog
 			defaultCheckBox.setSelected(true);
 		}
 
-		for (int i = 0; i < objects.size(); i++)
+		for (int i = 0; i < trackObjects.size(); i++)
 		{
-			objectComboBox.addItem(objects.get(i).getName());
+			objectComboBox.addItem(trackObjects.get(i).getName());
 		}
 
 		if (isGraphicObject)
@@ -453,9 +461,9 @@ public class TrackObjectDialog extends JDialog
 
 		trackLocationTextField.setText(String.format("%.3f", getTrackLocation().x) + ", " + String.format("%.3f", getTrackLocation().y));
 
-		setObjectName(objects.get(objectComboBox.getSelectedIndex()).getName());
+		setObjectName(trackObjects.get(objectComboBox.getSelectedIndex()).getName());
 		
-		rgb = objects.get(objectComboBox.getSelectedIndex()).getColor();
+		rgb = trackObjects.get(objectComboBox.getSelectedIndex()).getColor();
 		
 		Color backgroundColor = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 		colorTextField.setBackground(backgroundColor);
@@ -477,22 +485,22 @@ public class TrackObjectDialog extends JDialog
 		
 		if (defaultCheckBox.isSelected())
 		{
-			objects = editorFrame.getDefaultObjects();
+			trackObjects = editorFrame.getDefaultObjects();
 		}
 		else
 		{
-			objects = editorFrame.getTrackData().getObjects();
+			trackObjects = editorFrame.getTrackData().getObjects();
 		}
 
 		ignoreActions = true;
 		objectComboBox.removeAllItems();
 		int objectIndex = -1;
 
-		for (int i = 0; i < objects.size(); i++)
+		for (int i = 0; i < trackObjects.size(); i++)
 		{
-			objectComboBox.addItem(objects.get(i).getName());
+			objectComboBox.addItem(trackObjects.get(i).getName());
 
-			if (objects.get(i).getColor() == getRGB())
+			if (trackObjects.get(i).getColor() == getRGB())
 			{
 				objectIndex = i;
 			}
@@ -562,26 +570,33 @@ public class TrackObjectDialog extends JDialog
 				}
 			}			
 		}
-		else if (graphicObjectData != null)
+		else if (graphicObjectDatum != null)
 		{
 			String newName = nameTextField.getText();
 
-			if (!newName.equals(graphicObjectData.name))
+			for (GraphicObjectData objectData : graphicObjectData)
 			{
-				// TODO: check for duplicate name
-				graphicObjectData.name = newName;
+				if (objectData != graphicObjectDatum)
+				{
+					if (objectData.name.equals(newName))
+					{
+						JOptionPane.showMessageDialog(this, "Object name already used!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
 			}
+			graphicObjectDatum.name = newName;
 
 			String orientationText = orientationTextField.getText();
 			if (orientationText == null || orientationText.isEmpty())
 			{
-				graphicObjectData.orientation = null;
+				graphicObjectDatum.orientation = null;
 			}
 			else
 			{
 				try
 				{
-					graphicObjectData.orientation = Double.parseDouble(orientationText);
+					graphicObjectDatum.orientation = Double.parseDouble(orientationText);
 				}
 				catch (NumberFormatException e)
 				{
@@ -591,13 +606,13 @@ public class TrackObjectDialog extends JDialog
 			String heightText = heightTextField.getText();
 			if (heightText == null || heightText.isEmpty())
 			{
-				graphicObjectData.height = null;
+				graphicObjectDatum.height = null;
 			}
 			else
 			{
 				try
 				{
-					graphicObjectData.height = Double.parseDouble(heightText);
+					graphicObjectDatum.height = Double.parseDouble(heightText);
 				}
 				catch (NumberFormatException e)
 				{

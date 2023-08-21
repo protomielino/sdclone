@@ -26,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
@@ -34,6 +35,15 @@ import utils.circuit.GraphicObject;
 
 public class GraphicObjectProperties extends PropertyPanel
 {
+	private final int 					ROW_INDEX				= 0;
+	private final int 					NAME_INDEX				= 1;
+	private final int 					OBJECT_INDEX 			= 2;
+	private final int 					COLOR_INDEX				= 3;
+	private final int 					TRACK_X_INDEX			= 4;
+	private final int 					TRACK_Y_INDEX			= 5;
+	private final int 					ORIENTATION_INDEX		= 6;
+	private final int 					HEIGHT_INDEX			= 7;
+
 	private GraphicObjectTablePanel		graphicObjectTablePanel	= null;
 	private Vector<GraphicObject>		graphicObjects			= null;
 	private Vector<GraphicObjectData>	data					= new Vector<GraphicObjectData>();
@@ -80,7 +90,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			JLabel label = (JLabel)c;
 
-			if (column == 3)
+			if (column == COLOR_INDEX)
 			{
 				int rgb = Integer.decode(value.toString());
 				Color color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
@@ -96,7 +106,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			}
 			else
 			{
-				if (column == 1)
+				if (column == NAME_INDEX)
 				{
 					// TODO this needs to change the other cells if there was a conflict that is now fixed
 					label.setBackground(Color.WHITE);
@@ -176,7 +186,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 		public boolean isCellEditable(int row, int columnIndex)
 		{
-			if (columnIndex == 0 || columnIndex == 3)
+			if (columnIndex == ROW_INDEX || columnIndex == COLOR_INDEX)
 			{
 				return false;
 			}
@@ -189,25 +199,25 @@ public class GraphicObjectProperties extends PropertyPanel
 
 			switch (columnIndex)
 			{
-			case 0:
+			case ROW_INDEX:
 				return rowIndex + 1;
-			case 1:
+			case NAME_INDEX:
 				return datum.name;
-			case 2:
+			case OBJECT_INDEX:
 				return getEditorFrame().getObjectColorName(datum.color);
-			case 3:
+			case COLOR_INDEX:
 				return String.format("0x%06X", datum.color);
-			case 4:
+			case TRACK_X_INDEX:
 				return datum.trackX;
-			case 5:
+			case TRACK_Y_INDEX:
 				return datum.trackY;
-			case 6:
+			case ORIENTATION_INDEX:
 				if (datum.orientation != null && !Double.isNaN(datum.orientation))
 				{
 					return datum.orientation;
 				}
 				return null;
-			case 7:
+			case HEIGHT_INDEX:
 				if (datum.height != null && !Double.isNaN(datum.height))
 				{
 					return datum.height;
@@ -223,15 +233,11 @@ public class GraphicObjectProperties extends PropertyPanel
 
 			switch (columnIndex)
 			{
-			case 1:
+			case NAME_INDEX:
 				datum.name = (String) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
-			case 2:
-			{
-				datum.name = (String) value;
-				fireTableCellUpdated(rowIndex, columnIndex);
-
+			case OBJECT_INDEX:
 				if (value.equals("Unknown"))
 				{
 					datum.color = graphicObjects.get(rowIndex).getColor();
@@ -240,22 +246,27 @@ public class GraphicObjectProperties extends PropertyPanel
 				{
 					datum.color = getEditorFrame().getObjectColor(datum.name);
 				}
-				fireTableCellUpdated(rowIndex, columnIndex + 1);
+				fireTableCellUpdated(rowIndex, COLOR_INDEX);
+				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
-			}
-			case 4:
+			case COLOR_INDEX:
+				datum.color = (Integer) value;
+				fireTableCellUpdated(rowIndex, columnIndex);
+				fireTableCellUpdated(rowIndex, OBJECT_INDEX);
+				break;
+			case TRACK_X_INDEX:
 				datum.trackX = (Double) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
-			case 5:
+			case TRACK_Y_INDEX:
 				datum.trackY = (Double) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
-			case 6:
+			case ORIENTATION_INDEX:
 				datum.orientation = (Double) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
-			case 7:
+			case HEIGHT_INDEX:
 				datum.height = (Double) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
@@ -309,8 +320,8 @@ public class GraphicObjectProperties extends PropertyPanel
 			model = new GraphicObjectTableModel(graphicObjects);
 			table = new JTable(model);
 			scrollPane = new JScrollPane(table);
-			table.getColumnModel().getColumn(0).setPreferredWidth(35);
-			table.getColumnModel().getColumn(2).setPreferredWidth(120);
+			table.getColumnModel().getColumn(ROW_INDEX).setPreferredWidth(35);
+			table.getColumnModel().getColumn(OBJECT_INDEX).setPreferredWidth(120);
 			table.setDefaultRenderer(Integer.class, new ColorRenderer());
 			table.setDefaultRenderer(String.class, new ColorRenderer());
 			table.setAutoCreateRowSorter(true);
@@ -318,7 +329,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 			Set<String> names = getEditorFrame().getObjectColorNames();
 
-			setUpNameColumn(table, table.getColumnModel().getColumn(2), names);
+			setUpNameColumn(table, table.getColumnModel().getColumn(OBJECT_INDEX), names);
 
 			table.addMouseListener(new MouseAdapter()
 			{
@@ -352,6 +363,17 @@ public class GraphicObjectProperties extends PropertyPanel
 
 	public JPopupMenu createPopupMenu(GraphicObjectTablePanel panel)
 	{
+		if (panel.table.isEditing())
+		{
+			int row = panel.table.getEditingRow();
+			int col = panel.table.getEditingColumn();
+			if (row < panel.table.getRowCount())
+			{
+				TableCellEditor cellEditor = panel.table.getCellEditor(row, col);
+				cellEditor.stopCellEditing();
+			}
+		}
+
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem editItem = new JMenuItem("Edit Object");
 		JMenuItem deleteItem = new JMenuItem("Delete Object");
@@ -366,17 +388,17 @@ public class GraphicObjectProperties extends PropertyPanel
 				{
 					GraphicObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
 
-					TrackObjectDialog editObjectDialog = new TrackObjectDialog(getEditorFrame(), false, datum);
+					TrackObjectDialog editObjectDialog = new TrackObjectDialog(getEditorFrame(), false, datum, data);
 
 					editObjectDialog.setModal(true);
 					editObjectDialog.setVisible(true);
 
 					if (editObjectDialog.isChanged())
 					{
-						panel.model.setValueAt(datum.name, row, 1);
-						panel.model.setValueAt(datum.color, row, 3);
-						panel.model.setValueAt(datum.orientation, row, 6);
-						panel.model.setValueAt(datum.height, row, 7);
+						panel.model.setValueAt(datum.name, row, NAME_INDEX);
+						panel.model.setValueAt(datum.color, row, COLOR_INDEX);
+						panel.model.setValueAt(datum.orientation, row, ORIENTATION_INDEX);
+						panel.model.setValueAt(datum.height, row, HEIGHT_INDEX);
 
 						getEditorFrame().documentIsModified = true;
 					}
