@@ -238,17 +238,20 @@ public class GraphicObjectProperties extends PropertyPanel
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
 			case OBJECT_INDEX:
-				if (value.equals("Unknown"))
+			{
+				String objectName = (String) value;
+				if ("Unknown".equals(objectName))
 				{
 					datum.color = graphicObjects.get(rowIndex).getColor();
 				}
 				else
 				{
-					datum.color = getEditorFrame().getObjectColor(datum.name);
+					datum.color = getEditorFrame().getObjectColor(objectName);
 				}
 				fireTableCellUpdated(rowIndex, COLOR_INDEX);
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
+			}
 			case COLOR_INDEX:
 				datum.color = (Integer) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
