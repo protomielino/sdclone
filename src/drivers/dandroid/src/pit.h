@@ -72,7 +72,7 @@ public:
     double tyreTreadDepthFront();
     double tyreTreadDepthRear();
     double tyreTreadDepth();
-    double avgWearPerMeter() { return avgwearpermeter; }
+    double avgWearPerLap() { return avgwearperlap; }
     void   setTYC(bool tyc) { HASTYC = tyc; }
     void   setCPD(bool c) { HASCPD = c; }
     void   pitCommand();
@@ -102,7 +102,8 @@ public:
     double         totalfuel;        /* the total amount of fuel we needed for the race */
     int            fuellapscounted;  /* the total laps we counted, maybe we miss a lap */
     double         avgfuelperlap;    /* the average amount of fuel we needed for a lap */
-    double         avgwearpermeter;  /* the average amount wear tire by meter */
+    double         avgwearperlap;  /* the average amount wear tire by meter */
+    double         lastwearperlap;
     double         maxwearperlap;    /* the maximum amount of wear we needed for a lap */
     int            PIT_DAMAGE;
     int            MAX_DAMAGE;
