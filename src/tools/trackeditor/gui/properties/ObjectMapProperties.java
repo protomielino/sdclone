@@ -42,6 +42,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
@@ -138,6 +139,14 @@ public class ObjectMapProperties extends PropertyPanel
 
 	private class ObjectMapPanel extends JPanel
 	{
+		private final int 			ROW_INDEX				= 0;
+		private final int 			OBJECT_INDEX 			= 1;
+		private final int 			COLOR_INDEX				= 2;
+		private final int 			IMAGE_X_INDEX			= 3;
+		private final int 			IMAGE_Y_INDEX			= 4;
+		private final int 			TRACK_X_INDEX			= 5;
+		private final int 			TRACK_Y_INDEX			= 6;
+
 		private JLabel				nameLabel				= new JLabel();
 		private JTextField 			nameTextField			= new JTextField();
 		private JLabel				objectMapLabel			= new JLabel();
@@ -420,7 +429,7 @@ public class ObjectMapProperties extends PropertyPanel
 		        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		        JLabel label = (JLabel)c;
 
-		        if (column == 2)
+		        if (column == COLOR_INDEX)
 		    	{
 		    		int rgb = Integer.decode(value.toString());
 		    		Color color = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
@@ -446,7 +455,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 		class ObjectTableModel extends AbstractTableModel
 	    {
-	        private final String[] 		columnNames = { null, "Name", "Color", "Image X", "Image Y", "Track X", "Track Y" };
+	        private final String[] 		columnNames = { null, "Object", "Color", "Image X", "Image Y", "Track X", "Track Y" };
 	        private final Class<?>[] 	columnClass = new Class[]
 	        {
 	        	Integer.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Double.class
@@ -482,7 +491,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 	        public boolean isCellEditable(int row, int columnIndex)
 	        {
-	        	if (columnIndex == 1 || columnIndex == 3 || columnIndex == 4)
+	        	if (columnIndex == OBJECT_INDEX || columnIndex == IMAGE_X_INDEX || columnIndex == IMAGE_Y_INDEX)
 	        	{
 	        		return true;
 	        	}
@@ -495,19 +504,19 @@ public class ObjectMapProperties extends PropertyPanel
 
 				switch (columnIndex)
 				{
-				case 0:
+				case ROW_INDEX:
 					return rowIndex + 1;
-				case 1:
+				case OBJECT_INDEX:
 					return datum.name;
-				case 2:
+				case COLOR_INDEX:
 					return String.format("0x%06X", datum.color);
-				case 3:
+				case IMAGE_X_INDEX:
 					return datum.imageX;
-				case 4:
+				case IMAGE_Y_INDEX:
 					return datum.imageY;
-				case 5:
+				case TRACK_X_INDEX:
 					return datum.trackX;
-				case 6:
+				case TRACK_Y_INDEX:
 					return datum.trackY;
 				}
 				return null;
@@ -519,7 +528,7 @@ public class ObjectMapProperties extends PropertyPanel
 
 				switch (columnIndex)
 				{
-				case 1:
+				case OBJECT_INDEX:
 					datum.name = (String) value;
 			        fireTableCellUpdated(rowIndex, columnIndex);
 
@@ -531,27 +540,33 @@ public class ObjectMapProperties extends PropertyPanel
 			        {
 			        	datum.color = getEditorFrame().getObjectColor(datum.name);
 			        }
-			        fireTableCellUpdated(rowIndex, columnIndex + 1);
+			        fireTableCellUpdated(rowIndex, COLOR_INDEX);
 			        break;
-				case 3:
+				case COLOR_INDEX:
+					datum.color = (Integer) value;
+					fireTableCellUpdated(rowIndex, columnIndex);
+					datum.name = getEditorFrame().getObjectColorName(datum.color);
+					fireTableCellUpdated(rowIndex, OBJECT_INDEX);
+					break;
+				case IMAGE_X_INDEX:
 					datum.imageX = (Integer) value;
 					fireTableCellUpdated(rowIndex, columnIndex);			        
 					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
 					datum.trackX = real.x;
-					fireTableCellUpdated(rowIndex, columnIndex + 2);			        
+					fireTableCellUpdated(rowIndex, TRACK_X_INDEX);			        
 					break;
-				case 4:
+				case IMAGE_Y_INDEX:
 					datum.imageY = (Integer) value;
 					fireTableCellUpdated(rowIndex, columnIndex);			        
 					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
 					datum.trackY = real.y;
-					fireTableCellUpdated(rowIndex, columnIndex + 2);			        
+					fireTableCellUpdated(rowIndex, TRACK_Y_INDEX);			        
 					break;
-				case 5:
+				case TRACK_X_INDEX:
 					datum.trackX = (Double) value;
 					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
-				case 6:
+				case TRACK_Y_INDEX:
 					datum.trackY = (Double) value;
 					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
@@ -599,15 +614,15 @@ public class ObjectMapProperties extends PropertyPanel
 		        model = new ObjectTableModel(objectMap);
 		        table = new JTable(model);
 		        scrollPane = new JScrollPane(table);
-		        table.getColumnModel().getColumn(0).setPreferredWidth(35);
-		        table.getColumnModel().getColumn(1).setPreferredWidth(120);
+		        table.getColumnModel().getColumn(ROW_INDEX).setPreferredWidth(35);
+		        table.getColumnModel().getColumn(OBJECT_INDEX).setPreferredWidth(120);
 		        table.setDefaultRenderer(Integer.class, new ColorRenderer());
 		        table.setAutoCreateRowSorter(true);
 		        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
 		        Set<String> names = getEditorFrame().getObjectColorNames();
 
-		        setUpNameColumn(table, table.getColumnModel().getColumn(1), names);
+		        setUpNameColumn(table, table.getColumnModel().getColumn(OBJECT_INDEX), names);
 
 		        table.addMouseListener(new MouseAdapter()
 		        {
@@ -641,6 +656,17 @@ public class ObjectMapProperties extends PropertyPanel
 
 		public JPopupMenu createPopupMenu(ObjectTablePanel panel)
 		{
+			if (panel.table.isEditing())
+			{
+				int row = panel.table.getEditingRow();
+				int col = panel.table.getEditingColumn();
+				if (row < panel.table.getRowCount())
+				{
+					TableCellEditor cellEditor = panel.table.getCellEditor(row, col);
+					cellEditor.stopCellEditing();
+				}
+			}
+
 			JPopupMenu popupMenu = new JPopupMenu();
 			JMenuItem editItem = new JMenuItem("Edit Object");
 			JMenuItem editAllColorItem = new JMenuItem("Edit All Objects With This Color");
@@ -666,8 +692,8 @@ public class ObjectMapProperties extends PropertyPanel
 
 						if (editObjectDialog.isChanged())
 						{
-							panel.model.setValueAt(datum.name, row, 1);
-							panel.model.setValueAt(datum.color, row, 2);
+							panel.model.setValueAt(datum.name, row, OBJECT_INDEX);
+							panel.model.setValueAt(datum.color, row, COLOR_INDEX);
 
 							getEditorFrame().documentIsModified = true;
 						}
@@ -695,8 +721,8 @@ public class ObjectMapProperties extends PropertyPanel
 							{
 								if (data.elementAt(i).color == oldColor)
 								{
-									panel.model.setValueAt(datum.name, i, 1);
-									panel.model.setValueAt(datum.color, i, 2);
+									panel.model.setValueAt(datum.name, i, OBJECT_INDEX);
+									panel.model.setValueAt(datum.color, i, COLOR_INDEX);
 								}
 							}
 
