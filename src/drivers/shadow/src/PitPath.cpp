@@ -144,7 +144,7 @@ void	PitPath::MakePath(
     double sign = (pPitInfo->side == TR_LFT) ? -1.0 : 1.0;
     {for( int i = 1; i < NPOINTS - 1; i++ )
     {
-        y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - pPitInfo->width;
+        y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - 0.3 * pPitInfo->width -2.2;
         y[i] *= sign;
     }}
 
