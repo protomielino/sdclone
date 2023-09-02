@@ -298,7 +298,7 @@ Section -Tracks
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\tuna\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\circuit\atlanta"
-  File /r "${BUILD_INST_DIR}\data\tracks\circuit\atlanta\*.*"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\atlanta\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\road\e-track-4"
   File /r "${BUILD_INST_DIR}\data\tracks\road\e-track-4\*.*"
