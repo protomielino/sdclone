@@ -294,6 +294,9 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\goldstone-sand"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\goldstone-sand\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\circuit\jarama"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\jarama\*.*"
+
   SetOutPath "$INSTDIR\data\tracks\circuit\tuna"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\tuna\*.*"
 

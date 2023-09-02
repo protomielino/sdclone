@@ -68,6 +68,7 @@ data/tracks/circuit/CMakeLists.txt
 data/tracks/circuit/braga
 data/tracks/circuit/dijon
 data/tracks/circuit/goldstone-sand
+data/tracks/circuit/jarama
 data/tracks/circuit/tuna
 
 data/tracks/road/CMakeLists.txt
