@@ -202,11 +202,11 @@ set(OSG_HASH SHA256=0e9e3e4cc6f463f21a901934a95e9264b231a1d5db90f72dcb4b8cc94b0d
 
 # sqlite3
 message(STATUS "Note the YEAR in the path AND hard-coded filename")
-set(SQLITE3_VERSION 3.36.0)
+set(SQLITE3_VERSION 3.43.1)
 set(SQLITE3_PROJECT sqlite3-${SQLITE3_VERSION})
-set(SQLITE3_FILE sqlite-amalgamation-3360000.zip)
-set(SQLITE3_URL https://www.sqlite.org/2021/${SQLITE3_FILE})
-set(SQLITE3_HASH SHA256=999826fe4c871f18919fdb8ed7ec9dd8217180854dd1fe21eea96aed36186729)
+set(SQLITE3_FILE sqlite-amalgamation-3430100.zip)
+set(SQLITE3_URL https://www.sqlite.org/2023/${SQLITE3_FILE})
+set(SQLITE3_HASH SHA256=7e634bbd4b2870a83dc7c1e3cc02e4d30b8555cd7db7b332f24e0c447fd0dd16)
 
 # GLM
 set(GLM_VERSION 0.9.9.8)
