@@ -56,6 +56,16 @@ InstallDirRegKey ${GAME_ROOT_REGKEY} "${GAME_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
+Section -CoreBinaries
+
+  SetOverwrite on
+
+  ; WIP physics engines.
+  SetOutPath "$INSTDIR\lib\modules\simu"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv4.1.dll"
+
+SectionEnd
+
 Section -CoreData
 
   SetOverwrite on
