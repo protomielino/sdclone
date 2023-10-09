@@ -305,6 +305,7 @@ gfctrlJoyInit(void)
     gfctrlJoyPresent = SDL_NumJoysticks();
     if (gfctrlJoyPresent > GFCTRL_JOY_NUMBER) gfctrlJoyPresent = GFCTRL_JOY_NUMBER;
 
+    GfLogInfo("%d Joysticks found\n", gfctrlJoyPresent);
     for (int index = 0; index < gfctrlJoyPresent; index++) {
 		if (!Joysticks[index]) {
 			Joysticks[index] = SDL_JoystickOpen(index);
@@ -323,9 +324,29 @@ gfctrlJoyInit(void)
 
         // Find which Haptic device relates to this joystick
         Haptics[index] = SDL_HapticOpenFromJoystick(Joysticks[index]);
+        
+        SDL_JoystickType type = SDL_JoystickGetType(Joysticks[index]);
 
+        GfLogInfo("Joystick %d: %s\n", index + 1, names[index].c_str());
+        GfLogInfo("  vendor:  %04x\n", SDL_JoystickGetVendor(Joysticks[index]));
+        GfLogInfo("  product: %04x\n", SDL_JoystickGetProduct(Joysticks[index]));
+        GfLogInfo("  type:    %s\n", type == SDL_JOYSTICK_TYPE_UNKNOWN ? "Unknown" :
+                                     type == SDL_JOYSTICK_TYPE_GAMECONTROLLER ? "Game Controller" :
+                                     type == SDL_JOYSTICK_TYPE_WHEEL ? "Wheel" :
+                                     type == SDL_JOYSTICK_TYPE_ARCADE_STICK ? "Arcade Stick" :
+                                     type == SDL_JOYSTICK_TYPE_FLIGHT_STICK ? "Flight Stick" :
+                                     type == SDL_JOYSTICK_TYPE_DANCE_PAD ? "Dance Pad" :
+                                     type == SDL_JOYSTICK_TYPE_GUITAR ? "Guitar" :
+                                     type == SDL_JOYSTICK_TYPE_DRUM_KIT ? "Drum Kit" :
+                                     type == SDL_JOYSTICK_TYPE_ARCADE_PAD ? "Arcade Pad" :
+                                     type == SDL_JOYSTICK_TYPE_THROTTLE ? "Throttle" :
+                                     "Unknown");
+        GfLogInfo("  axes:    %d\n", SDL_JoystickNumAxes(Joysticks[index]));
+        GfLogInfo("  buttons: %d\n", SDL_JoystickNumButtons(Joysticks[index]));
+        GfLogInfo("  hats:    %d\n", SDL_JoystickNumHats(Joysticks[index]));
+        GfLogInfo("  haptic:  %s\n", Haptics[index] ? "yes" : "no");
+        
         if (!Haptics[index]) {
-            GfLogInfo("Joystick %d does not support haptic\n", index);
             continue;
         }
 
