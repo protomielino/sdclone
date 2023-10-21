@@ -537,6 +537,11 @@ public class TrackObjectDialog extends JDialog
 				}
 			}
 			objectShape.setName(newName);
+			
+			if (graphicObject == null)
+			{
+				graphicObject = new GraphicObject(objectShape);
+			}
 
 			String orientationText = orientationTextField.getText();
 			if (orientationText == null || orientationText.isEmpty())
