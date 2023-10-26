@@ -354,19 +354,19 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
                 {
                     int	remainingLaps = pCar->race.remainingLaps + 1;
 
-                    if (remainingLaps <= 10 && m_Rain < 2)
+                    if (remainingLaps <= 10 && m_Rain < 1)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
                         mCompounds = 1;
                         LogSHADOW.info("Change Tire SOFT !\n");
                     }
-                    else if (remainingLaps <= 25 && m_Rain < 2)
+                    else if (remainingLaps <= 25 && m_Rain < 1)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
                         mCompounds = 2;
                         LogSHADOW.info("Change Tire MEDIUM !\n");
                     }
-                    else if(m_Rain < 2)
+                    else if(m_Rain < 2 && pCar->priv.localTemperature > 28.0)
                     {
                         pCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
                         mCompounds = 3;

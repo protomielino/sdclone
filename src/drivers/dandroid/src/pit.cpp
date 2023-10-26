@@ -506,7 +506,7 @@ void Pit::pitCommand()
             {
                 int	remainingLaps = car->race.remainingLaps + 1;
 
-                if (RAIN < 2)
+                if (RAIN < 1)
                 {
                     if (remainingLaps + 1 < 15.0)
                     {
@@ -518,11 +518,11 @@ void Pit::pitCommand()
                         car->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
                         LogDANDROID.info("Change Tire MEDIUM !\n");
                     }
-                    else
-                    {
-                        car->pitcmd.tiresetChange = tCarPitCmd::HARD;
-                        LogDANDROID.info("Change Tire HARD !\n");
-                    }
+                }
+                else if (RAIN < 2 && car->priv.localTemperature > 28.0)
+                {
+                    car->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                    LogDANDROID.info("Change Tire HARD !\n");
                 }
                 else if (RAIN < 3)
                 {

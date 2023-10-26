@@ -541,19 +541,19 @@ void Pit::pitCommand()
             {
                     int	remainingLaps = mCar->race.remainingLaps + 1;
 
-                    if (remainingLaps <= 10 && mRain < 2)
+                    if (remainingLaps <= 10  && mRain < 1)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
                         mMyCar->setTireMu(1);
                         LogUSR.info("Change Tire SOFT !\n");
                     }
-                    else if (remainingLaps <= 25 && mRain < 2)
+                    else if (remainingLaps <= 25 && mRain < 1)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
                         mMyCar->setTireMu(2);
                         LogUSR.info("Change Tire MEDIUM !\n");
                     }
-                    else if(mRain < 2)
+                    else if(mRain < 2 && mCar->priv.localTemperature > 28.0 )
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
                         mMyCar->setTireMu(3);
