@@ -2848,7 +2848,7 @@ int TDriver::getTires(PCarHandle CarHandle, double dist)
         mTiresStart = 2;
     }
     else if ((mTrack->local.rain < 2 && mTrack->local.airtemperature > 28.0)
-             || (mTrack->local.rain = 0 && dist >= 30))
+             || (mTrack->local.rain == 0 && dist >= 30))
     {
         GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 3);
         mTireMu = mTireMuC[2];
