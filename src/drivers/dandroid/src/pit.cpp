@@ -43,6 +43,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     MIN_WEAR = 0.4;
     HASTYC = false;
     HASCPD = false;
+    RAIN = track->local.rain;
     track = t;
     car = c;
     teamcar = NULL;
