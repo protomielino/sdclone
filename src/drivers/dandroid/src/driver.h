@@ -139,6 +139,7 @@ private:
     void controlYawRate(double& targetangle);
     bool hysteresis(bool lastout, double in, double hyst);
     double getFuel(double dist);
+    int    getTires(PCarHandle CarHandle, double dist);
     void writeSectorSpeeds();
     bool readSectorSpeeds();
     void driverMsg(std::string desc);
@@ -191,6 +192,7 @@ private:
     double mTireMu;
     double mTireMuC[6];
     double mTirecondition;
+    int    mTiresStart;
     double mMass;  // mass of car + fuel
     double mSpeed;
     double mClutchtime;

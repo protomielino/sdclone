@@ -210,6 +210,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         GfParmSetNum(*CarParmHandle, SECT_ENGINE, PRM_FUELCONS, (char*)NULL, 0.0);
     }
 
+    if(mHASCPD)
+        mTiresStart = getTires(CarHandle, Situation->_totLaps);
+
     GfParmSetNum(*CarParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble)mFuelStart);
 
     // Get skill level
@@ -1833,6 +1836,83 @@ void TDriver::readConstSpecs(PCarHandle CarHandle)
     }
     else
       LogDANDROID.info("#Car has TCL no\n");
+
+    double tiremuFL = GfParmGetNum(CarHandle, SECT_FRNTLFTWHEEL, PRM_MU, NULL, 0);
+    double tiremuFR = GfParmGetNum(CarHandle, SECT_FRNTRGTWHEEL, PRM_MU, NULL, 0);
+    double tiremuRL = GfParmGetNum(CarHandle, SECT_REARLFTWHEEL, PRM_MU, NULL, 0);
+    double tiremuRR = GfParmGetNum(CarHandle, SECT_REARRGTWHEEL, PRM_MU, NULL, 0);
+    double tiremufront = MIN(tiremuFL, tiremuFR);
+    double tiremurear = MIN(tiremuRL, tiremuRR);
+    mTireMu = MIN(tiremufront, tiremurear);
+
+    if (mHASCPD)
+    {
+        char path[256];
+        double tiremuFR, tiremuFL, tiremuRR, tiremuRL, tiremufront, tiremurear;
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_SOFT);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[1] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_MEDIUM);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[2] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_HARD);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[3] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_WET);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[4] = MIN(tiremufront, tiremurear);
+
+        sprintf(path, "%s/%s/%s", SECT_FRNTRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuFR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_FRNTLFTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuFL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARRGTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuRR = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        sprintf(path, "%s/%s/%s", SECT_REARLFTWHEEL, SECT_COMPOUNDS, SECT_EXTREM_WET);
+        tiremuRL = GfParmGetNum(CarHandle, path, PRM_MU, (char*)NULL, mTireMu);
+        tiremufront = MIN(tiremuFL, tiremuFR);
+        tiremurear = MIN(tiremuRL, tiremuRR);
+        mTireMuC[5] = MIN(tiremufront, tiremurear);
+
+        int compounds = GfParmGetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 1);
+        mTireMu = mTireMuC[compounds];
+    }
 }
 
 void TDriver::readVarSpecs(PCarSettings CarParmHandle)
@@ -2751,6 +2831,43 @@ double TDriver::getFuel(double dist)
     }
 
     return fuel = MAX(MIN(fuel, mTANKVOL), 0.0);
+}
+
+int TDriver::getTires(PCarHandle CarHandle, double dist)
+{
+    if (dist < 16 && mTrack->local.rain < 1)
+    {
+        GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 1);
+        mTireMu = mTireMuC[0];
+        mTiresStart = 1;
+    }
+    else if (dist < 30 && mTrack->local.rain < 1)
+    {
+        GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 2);
+        mTireMu = mTireMuC[1];
+        mTiresStart = 2;
+    }
+    else if ((mTrack->local.rain < 2 && mTrack->local.airtemperature > 28.0)
+             || (mTrack->local.rain = 0 && dist >= 30))
+    {
+        GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 3);
+        mTireMu = mTireMuC[2];
+        mTiresStart = 3;
+    }
+    else if (mTrack->local.rain < 3)
+    {
+        GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 4);
+        mTireMu = mTireMuC[3];
+        mTiresStart = 4;
+    }
+    else
+    {
+        GfParmSetNum(CarHandle, SECT_TIRESET, PRM_COMPOUNDS_SET, NULL, 5);
+        mTireMu = mTireMuC[4];
+        mTiresStart = 5;
+    }
+
+    return mTiresStart;
 }
 
 void TDriver::writeSectorSpeeds()
