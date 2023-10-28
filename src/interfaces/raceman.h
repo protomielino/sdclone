@@ -480,6 +480,7 @@ typedef struct RmInfo
 #define RM_VAL_MOD_SIMU_V3		"simuv3"
 #define RM_VAL_MOD_SIMU_V4		"simuv4"
 #define RM_VAL_MOD_SIMU_V4_1    "simuv4.1"
+#define RM_VAL_MOD_SIMU_V5      "simuv5"
 #define RM_VAL_MOD_SIMU_REPLAY	"simureplay"
 #define RM_VAL_MOD_TRACK		"track"
 #define RM_VAL_MOD_SSGRAPH		"ssggraph"

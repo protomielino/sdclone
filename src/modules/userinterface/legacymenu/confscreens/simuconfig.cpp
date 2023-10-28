@@ -42,8 +42,8 @@
 /* list of available simulation engine */
 static const int DefaultSimuVersion = 1;
 static const char *SimuVersionList[] =
-    { RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4, RM_VAL_MOD_SIMU_V4_1, RM_VAL_MOD_SIMU_REPLAY };
-static const char *SimuVersionDispNameList[] = 	{ "V2.0", "V2.1", "V3.0", "V4.0", "V4.1", "Replay" };
+    { RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4, RM_VAL_MOD_SIMU_V4_1, RM_VAL_MOD_SIMU_V5, RM_VAL_MOD_SIMU_REPLAY };
+static const char *SimuVersionDispNameList[] = 	{ "V2.0", "V2.1", "V3.0", "V4.0", "V4.1", "V5.0", "Replay" };
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
 static int CurSimuVersion = DefaultSimuVersion;
 
