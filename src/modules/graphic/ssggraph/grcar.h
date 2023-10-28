@@ -51,7 +51,6 @@ public:
     float		needleColor[4];
 };
 
-
 class tgrCarInfo
 {
 public:
@@ -74,8 +73,14 @@ public:
     ssgSelector			*driverSelector;
     ssgSelector			*steerSelector;
     ssgSelector			*rearwingSelector;
+    ssgSelector         *rpmlightsSelector;
+    ssgSelector         *gearSelector;
     bool				driverSelectorinsg;
     bool				rearwingSelectorinsg;
+    bool                rpmlightsSelectorinsg;
+    bool                gearSelectorinsg;
+    bool                cockpitSelectorinsg;
+    bool                separatemodelSelectorinsg;
     ssgStateSelector	*envSelector;
     ssgTransform		*wheelPos[4];
     ssgTransform		*wheelRot[4];
@@ -113,4 +118,6 @@ extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTim
 extern void grInitCommonState(void);
 //extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
 extern void grPropagateDamage (tSituation *);
+extern void grDrawCarShadow(void);
+extern bool grShadowStatic;
 #endif /* _GRCAR_H_ */

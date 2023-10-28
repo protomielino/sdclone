@@ -454,6 +454,8 @@ typedef struct
     tdble	enginerpmMaxPw;
     tdble	engineMaxTq;
     tdble	engineMaxPw;
+    tdble   engineMaxTempWater;
+    tdble   engineTempWater;
     tdble	gearRatio[MAX_GEARS];	/**< including final drive */
     int		gearNb;                 /**< incl reverse and neutral */
     int		gearOffset;             /**< gearRatio[gear + gearOffset] is the ratio for gear */
@@ -494,6 +496,8 @@ typedef struct
 #define _enginerpmMaxPw	priv.enginerpmMaxPw
 #define _engineMaxTq	priv.engineMaxTq
 #define _engineMaxPw	priv.engineMaxPw
+#define _engineMaxTempWater priv.engineMaxTempWater
+#define _engineTempWater    priv.engineTempWater
 #define _gearRatio      priv.gearRatio
 #define _gearNb         priv.gearNb
 #define _gearOffset     priv.gearOffset
@@ -836,6 +840,7 @@ typedef struct CarElt
 #define PRM_FUELCONS		"fuel cons factor"
 #define PRM_ENGBRKCOEFF		"brake coefficient"
 #define PRM_ENGBRKLINCOEFF	"brake linear coefficient"
+#define PRM_ENGINEMAXTEMPWATER "max temperature water"
 #define PRM_POWER			"power"
 #define PRM_TURBO			"turbo"
 #define PRM_TURBO_RPM		"turbo rpm"
@@ -857,6 +862,7 @@ typedef struct CarElt
 #define LST_RANGES			"Ranges"
 #define PRM_THRESHOLD		"threshold"
 #define PRM_CAR				"car"
+
 #define PRM_WHEELSON		"wheels"
 #define PRM_TEMPLATE		"template"
 #define PRM_ENV				"env"
@@ -868,6 +874,13 @@ typedef struct CarElt
 #define PRM_SW_MODEL        "model"
 #define PRM_SW_MODELHR      "hi res model"
 #define PRM_SW_ANGLE        "angle"
+
+#define SECT_COMPOUND_MODEL "compound model"
+#define PRM_SOFTMODEL       "model soft"
+#define PRM_MEDIUMMODEL     "model medium"
+#define PRM_HARDMODEL       "model hard"
+#define PRM_WETMODEL        "model wet"
+#define PRM_EXTWETMODEL     "model extrem wet"
 
 #define LST_DRIVER          "Driver"
 #define PRM_DRIVERSTEER     "steer"
@@ -882,7 +895,13 @@ typedef struct CarElt
 #define PRM_WATER_A_MODEL   "water analogique model"
 #define PRM_OIL_A_MODEL     "oil analogic model"
 
-#define PRM_RPM_D_MODEL     "rpm digital model"
+#define LST_RPM_LED         "rpm led"
+#define PRM_RPM_LED_OFF     "rpm led model off"
+#define PRM_RPM_LED_ON      "rpm led model on"
+
+#define LST_DIGIT_GEAR      "digit gear"
+#define PRM_GEAR_MODEL      "gear model"
+
 #define PRM_SPEED_D_MODEL   "speed digital model"
 #define PRM_SPD_D_MODEL     "spd digital model"
 #define PRM_FUEL_D_MODEL    "fuel digital model"
@@ -897,6 +916,11 @@ typedef struct CarElt
 
 #define SECT_COCKPIT		"cockpit"
 #define PRM_MODELCOCKPIT	"model cockpit"
+
+#define SECT_SEPARATE_MODEL "separate model"
+#define PRM_METAL_BODY      "metal model"
+#define PRM_CARBON_BODY     "carbon model"
+#define PRM_MIRROR          "mirror model"
 
 #define SECT_WING_MODEL		"wing model"
 #define PRM_WING_1			"model short oval"
@@ -1003,6 +1027,12 @@ typedef enum
 #define PRM_FRONT_WHEEL_3D      "3d front wheel"
 #define PRM_REAR_WHEEL_3D       "3d rear wheel"
 
+#define PRM_WHEELSOFT_3D        "3d wheel soft"
+#define PRM_WHEELMEDIUM_3D      "3d wheel medium"
+#define PRM_WHEELHARD_3D        "3d wheel hard"
+#define PRM_WHEELWET_3D         "3d wheel wet"
+#define PRM_WHEELEXTWET_3D      "3d wheel extrem wet"
+
 /* Lights */
 #define	VAL_LIGHT_HEAD1		"head1"
 #define	VAL_LIGHT_HEAD2		"head2"
@@ -1012,13 +1042,16 @@ typedef enum
 #define	VAL_LIGHT_REAR		"rear"
 
 /* Simulation Options */
-#define PRM_DAMAGE_TYRES            "damage/tyres"
-#define PRM_DAMAGE_SUSPENSION       "damage/suspension"
-#define PRM_DAMAGE_ALIGNMENT        "damage/alignment"
-#define PRM_DAMAGE_AERO             "damage/aero"
-#define PRM_MODEL_AEROFLOW          "model/aero/flow"
-#define PRM_MODEL_AERO_FACTOR       "model/aero/factor"
-#define PRM_MODEL_TYRE_TEMPERATURE  "model/tyre/temperature"
+#define PRM_DAMAGE_TYRES              "damage/tyres"
+#define PRM_DAMAGE_SUSPENSION         "damage/suspension"
+#define PRM_DAMAGE_ALIGNMENT          "damage/alignment"
+#define PRM_DAMAGE_AERO               "damage/aero"
+#define PRM_DAMAGE_ENGINE             "damage/engine"
+#define PRM_MODEL_AEROFLOW            "model/aero/flow"
+#define PRM_MODEL_AERO_FACTOR         "model/aero/factor"
+#define PRM_MODEL_TYRE_TEMPERATURE    "model/tyres/temperature"
+#define PRM_MODEL_TYRE_COMPOUNDS      "model/tyres/compounds"
+#define PRM_MODEL_ENGINE_TEMPERATURE  "model/engine/temperature"
 
 // Collision constants.
 #define SEM_COLLISION			0x01
