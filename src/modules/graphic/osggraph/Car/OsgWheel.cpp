@@ -33,6 +33,17 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car_elt,void *handle)
 
     this->brakes.setCar(car);
 
+    const char *wheelSoft3DModNamePrfx =
+            GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEELSOFT_3D, "");
+    const char *wheelMedium3DModNamePrfx =
+            GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEELMEDIUM_3D, "");
+    const char *wheelHard3DModNamePrfx =
+            GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEELHARD_3D, "");
+    const char *wheelWet3DModNamePrfx =
+            GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEELWET_3D, "");
+    const char *wheelExtremWet3DModNamePrfx =
+            GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEELEXTWET_3D, "");
+
     const char *wheelFront3DModFileNamePrfx =
             GfParmGetStr(handle, SECT_GROBJECTS, PRM_FRONT_WHEEL_3D, "");
     const char *wheelRear3DModFileNamePrfx =
@@ -40,26 +51,41 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car_elt,void *handle)
     const char *wheel3DModFileNamePrfx =
             GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEEL_3D, "wheel");
 
-    if (*wheelFront3DModFileNamePrfx)
+    if (*wheelSoft3DModNamePrfx)
     {
-        wheels[FRNT_RGT] = initWheel(FRNT_RGT, wheelFront3DModFileNamePrfx);
-        wheels[FRNT_LFT] = initWheel(FRNT_LFT, wheelFront3DModFileNamePrfx);
-    }
-    else
-    {
-        wheels[FRNT_RGT] =initWheel(FRNT_RGT, wheel3DModFileNamePrfx);
-        wheels[FRNT_LFT] =initWheel(FRNT_LFT, wheel3DModFileNamePrfx);
-    }
+        wheels[FRNT_RGT] =initWheel(FRNT_RGT, true, wheelSoft3DModNamePrfx, wheelMedium3DModNamePrfx,
+                                    wheelHard3DModNamePrfx, wheelWet3DModNamePrfx, wheelExtremWet3DModNamePrfx);
+        wheels[FRNT_LFT] =initWheel(FRNT_LFT, true, wheelSoft3DModNamePrfx, wheelMedium3DModNamePrfx,
+                                    wheelHard3DModNamePrfx, wheelWet3DModNamePrfx, wheelExtremWet3DModNamePrfx);
 
-    if (*wheelRear3DModFileNamePrfx)
-    {
-        wheels[REAR_RGT] =initWheel(REAR_RGT, wheelRear3DModFileNamePrfx);
-        wheels[REAR_LFT] =initWheel(REAR_LFT, wheelRear3DModFileNamePrfx);
+        wheels[REAR_RGT] =initWheel(REAR_RGT, true, wheelSoft3DModNamePrfx, wheelMedium3DModNamePrfx,
+                                    wheelHard3DModNamePrfx, wheelWet3DModNamePrfx, wheelExtremWet3DModNamePrfx);
+        wheels[REAR_LFT] =initWheel(REAR_LFT, true, wheelSoft3DModNamePrfx, wheelMedium3DModNamePrfx,
+                                    wheelHard3DModNamePrfx, wheelWet3DModNamePrfx, wheelExtremWet3DModNamePrfx);
     }
     else
     {
-        wheels[REAR_RGT] =initWheel(REAR_RGT, wheel3DModFileNamePrfx);
-        wheels[REAR_LFT] =initWheel(REAR_LFT, wheel3DModFileNamePrfx);
+        if (*wheelFront3DModFileNamePrfx)
+        {
+            wheels[FRNT_RGT] = initWheel(FRNT_RGT, false, wheelFront3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+            wheels[FRNT_LFT] = initWheel(FRNT_LFT, false, wheelFront3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+        }
+        else
+        {
+            wheels[FRNT_RGT] =initWheel(FRNT_RGT, false, wheel3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+            wheels[FRNT_LFT] =initWheel(FRNT_LFT, false, wheel3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+        }
+
+        if (*wheelRear3DModFileNamePrfx)
+        {
+            wheels[REAR_RGT] =initWheel(REAR_RGT, false, wheelRear3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+            wheels[REAR_LFT] =initWheel(REAR_LFT, false, wheelRear3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+        }
+        else
+        {
+            wheels[REAR_RGT] =initWheel(REAR_RGT, false, wheel3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+            wheels[REAR_LFT] =initWheel(REAR_LFT, false, wheel3DModFileNamePrfx, NULL, NULL, NULL, NULL);
+        }
     }
 
     osg::ref_ptr<osg::Group> group = new osg::Group;
@@ -72,12 +98,15 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car_elt,void *handle)
     return group.get();
 }
 
-osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
+osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, bool compound, const char *wheel_mod_name,
+                                                       const char *medium_mod_name, const char *hard_mod_name,
+                                                       const char *wet_mod_name, const char *extwet_mod_name)
 {
     osgLoader loader;
     char wheel_file_name[32];
     static const int MaxPathSize = 512;
     char buf[MaxPathSize];
+    compounds = compound;
 
     const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
@@ -92,7 +121,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
         GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
 
         if (!exist)
-                bSkinName.clear();
+            bSkinName.clear();
         else
         {
             snprintf(buf, MaxPathSize, "wheel3d-%s", car->_skinName);
@@ -121,15 +150,81 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 
     wheels_switches[wheelIndex] = new osg::Switch;
 
-    // Load speed-dependant 3D wheel model if available
-    for(int j=0;j<4;j++)
+    if (compounds)
     {
-        osg::ref_ptr<osg::Node> wheel = 0;
-        if (wheel_mod_name && strlen(wheel_mod_name))
+        for(int j=0; j<4; j++)
         {
-            snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
-            wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
-            wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (wheel_mod_name && strlen(wheel_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+                GfLogDebug("Loading compound %s\n", wheel_mod_name);
+            }
+        }
+
+        for(int j=0; j<4; j++)
+        {
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (medium_mod_name && strlen(medium_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", medium_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+                GfLogDebug("Loading compound %s\n", medium_mod_name);
+            }
+        }
+
+        for(int j=0; j<4; j++)
+        {
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (hard_mod_name && strlen(hard_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", hard_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+                GfLogDebug("Loading compound %s\n", hard_mod_name);
+            }
+        }
+
+        for(int j=0; j<4; j++)
+        {
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (wet_mod_name && strlen(wet_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", wet_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+                GfLogDebug("Loading compound %s\n", wet_mod_name);
+            }
+        }
+
+        for(int j=0; j<4; j++)
+        {
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (extwet_mod_name && strlen(extwet_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", extwet_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+                GfLogDebug("Loading compound %s\n", extwet_mod_name);
+            }
+        }
+    }
+    else
+    {
+
+        // Load speed-dependant 3D wheel model if available
+        for(int j=0; j<4; j++)
+        {
+            osg::ref_ptr<osg::Node> wheel = 0;
+            if (wheel_mod_name && strlen(wheel_mod_name))
+            {
+                snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
+                wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
+                wheels_switches[wheelIndex]->addChild(wheel.get(), false);
+            }
         }
     }
 
@@ -185,12 +280,23 @@ void SDWheels::updateWheels()
         trans->setMatrix(spinMatrix);
         wheels[i]->setMatrix(posMatrix);
 
+
         for (j = 0; j < 3; j++)
         {
             if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
                 break;
         }
 
-        this->wheels_switches[i]->setSingleChildOn(j);
+        int compoundSelector = (car->priv.wheel[i].compound - 1);
+        int selectchild = compoundSelector * 4;
+        int v = j + selectchild;
+
+        if (compounds)
+        {
+            this->wheels_switches[i]->setSingleChildOn(v);
+            GfLogDebug("Drawing Compounds = %i\n", v);
+        }
+        else
+            this->wheels_switches[i]->setSingleChildOn(j);
     }
 }

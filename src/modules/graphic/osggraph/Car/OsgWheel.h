@@ -37,7 +37,10 @@ private :
     osg::ref_ptr<osg::Switch> wheels_switches[4];
     osg::ref_ptr<osg::MatrixTransform> wheels[4];
     SDBrakes brakes;
-    osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndex, const char *wheel_mod_name);
+    osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndex, bool compound, const char *wheel_mod_name,
+                                                 const char *medium_mod_name, const char *hard_mod_name,
+                                                 const char *wet_mod_name, const char *extwet_mod_name);
+    bool compounds;
 
 public :
     SDWheels() : car(nullptr) { }

@@ -20,6 +20,7 @@
 #include "sim.h"
 
 float enginePressure;
+double engineCoefficient;
 
 void
 SimEngineConfig(tCar *car)
@@ -56,6 +57,7 @@ SimEngineConfig(tCar *car)
     car->engine.I_joint = car->engine.I;
     car->engine.timeInLimiter = 0.0f;
     car->engine.max_temp_water = GfParmGetNum(hdle, SECT_ENGINE, PRM_ENGINEMAXTEMPWATER, (char*)NULL, 95.0f);
+    engineCoefficient = GfParmGetNum(hdle, SECT_ENGINE, PRM_ENGINETEMPCOEFF, (char*)NULL, 0.0000047f);
     car->carElt->_engineMaxTempWater = car->engine.max_temp_water;
 
     if(car->options->engine_temperature)
@@ -407,7 +409,7 @@ tdble SimEngineUpdateWater(tCar *car)
     else
         temp2 = Tair;
 
-    tdble temp = 35.0 / K2C(temp2);
+    tdble temp = 32.0 / K2C(temp2);
 
     if (water < engine->max_temp_water - 20.0f)
         water = engine->temp_water + (1.0f / (engine->rads * Tair * SimDeltaTime));
@@ -425,8 +427,6 @@ tdble SimEngineUpdateWater(tCar *car)
             GfLogDebug("Engine RPM 2 = %.2f - Reverse Limiter = %.2f - air speed = %.5f - Air Pressure = %.5f - Pressure = %.5f - gain = %.8f\n", engine->rads, engine->revsLimiter,
                       car->airSpeed2, SimAirPressure, air,gain);
         }
-
-
 
         if(car->options->engine_damage)
             damage = tdble(car->dammage) / 10000.0;
@@ -451,7 +451,7 @@ tdble SimEngineUpdateWater(tCar *car)
 
     engine->temp_water = water;
 
-    if(engine->temp_water > engine->max_temp_water + 10.0f)
+    if(engine->temp_water > engine->max_temp_water + 6.0f)
         car->carElt->_state |= RM_CAR_STATE_BROKEN;
 
     return 0.0;

@@ -841,6 +841,7 @@ typedef struct CarElt
 #define PRM_ENGBRKCOEFF		"brake coefficient"
 #define PRM_ENGBRKLINCOEFF	"brake linear coefficient"
 #define PRM_ENGINEMAXTEMPWATER "max temperature water"
+#define PRM_ENGINETEMPCOEFF "engine temperature coefficient"
 #define PRM_POWER			"power"
 #define PRM_TURBO			"turbo"
 #define PRM_TURBO_RPM		"turbo rpm"
