@@ -92,7 +92,7 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\lib\modules\graphic"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\graphic\*.*"
   SetOutPath "$INSTDIR\lib\modules\simu"
-  File "${BUILD_INST_DIR}\lib\modules\simu\simuv4.dll"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv5.dll"
   SetOutPath "$INSTDIR\lib\modules\telemetry"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\telemetry\*.*"
   SetOutPath "$INSTDIR\lib\modules\track"

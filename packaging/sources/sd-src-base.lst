@@ -52,6 +52,7 @@ src/modules/racing
 src/modules/simu/CMakeLists.txt
 src/modules/simu/simuv2.1
 src/modules/simu/simuv4
+src/modules/simu/simuv5
 src/modules/sound
 src/modules/telemetry
 src/modules/track
