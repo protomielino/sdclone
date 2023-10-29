@@ -47,21 +47,20 @@
 #ifdef WEBSERVER
 #include <webserver.h>
 #endif //WEBSERVER
-#include "racewebmetar.h"
+
 #include <portability.h>
 
 #include <racemanagers.h>
 #include <race.h>
 
 #include "standardgame.h"
-
+#include "racewebmetar.h"
 #include "racesituation.h"
 #include "racemain.h"
 #include "raceupdate.h"
 #include "racestate.h"
 #include "raceresults.h"
 #include "racecareer.h"
-
 #include "raceinit.h"
 
 
@@ -150,7 +149,7 @@ ReRaceConfigure(bool bInteractive)
 {
     // Update race engine info.
     ReInfo->mainParams = ReInfo->params =
-        StandardGame::self().race()->getManager()->getDescriptorHandle();
+            StandardGame::self().race()->getManager()->getDescriptorHandle();
 
     GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
     GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
@@ -182,17 +181,17 @@ ReRaceRestore(void* hparmResults)
         // (the target state is right after the end of the previous event,
         //  which was from the previous group).
         const char* pszPrevParamsFile =
-            GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_PREV_FILE, 0);
+                GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_PREV_FILE, 0);
         if (!pszPrevParamsFile)
             GfLogWarning("Career : No previous file in MainResults\n");
         ReInfo->params =
-            pszPrevParamsFile ? GfParmReadFile(pszPrevParamsFile, GFPARM_RMODE_STD) : ReInfo->mainParams;
+                pszPrevParamsFile ? GfParmReadFile(pszPrevParamsFile, GFPARM_RMODE_STD) : ReInfo->mainParams;
         const char* pszPrevResultsFile =
-            GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, 0);
+                GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, 0);
         if (!pszPrevResultsFile)
             GfLogWarning("Career : Failed to load previous results from previous params\n");
         ReInfo->results =
-            pszPrevResultsFile ? GfParmReadFile(pszPrevResultsFile, GFPARM_RMODE_STD) : ReInfo->mainResults;
+                pszPrevResultsFile ? GfParmReadFile(pszPrevResultsFile, GFPARM_RMODE_STD) : ReInfo->mainResults;
         ReInfo->_reRaceName = ReGetPrevRaceName(/* bLoop = */true);
     }
 
@@ -246,107 +245,107 @@ ReResumeRace()
 static void
 initStartingGrid(void)
 {
-  char path[64];
-  int i;
-  tTrackSeg *curseg;
-  int rows;
-  tdble a, b;
-  //tdble wi2; // Never used.
-  tdble d1, d2,d3;
-  tdble startpos, tr, ts;
-  tdble speedInit;
-  tdble heightInit;
-  tCarElt *car;
-  const char *pole;
-  void *trHdle = ReInfo->track->params;
-  void *params = ReInfo->params;
+    char path[64];
+    int i;
+    tTrackSeg *curseg;
+    int rows;
+    tdble a, b;
+    //tdble wi2; // Never used.
+    tdble d1, d2,d3;
+    tdble startpos, tr, ts;
+    tdble speedInit;
+    tdble heightInit;
+    tCarElt *car;
+    const char *pole;
+    void *trHdle = ReInfo->track->params;
+    void *params = ReInfo->params;
 
-  snprintf(path, sizeof(path), "%s/%s", ReInfo->_reRaceName, RM_SECT_STARTINGGRID);
+    snprintf(path, sizeof(path), "%s/%s", ReInfo->_reRaceName, RM_SECT_STARTINGGRID);
 
-  /* Search for the first turn for find the pole side */
-  curseg = ReInfo->track->seg->next;
-  while (curseg->type == TR_STR) {
-    /* skip the straight segments */
-    curseg = curseg->next;
-  }
-  /* Set the pole for the inside of the first turn */
-  if (curseg->type == TR_LFT) {
-    pole = GfParmGetStr(params, path, RM_ATTR_POLE, "left");
-  } else {
-    pole = GfParmGetStr(params, path, RM_ATTR_POLE, "right");
-  }
-  /* Tracks definitions can force the pole side */
-  pole = GfParmGetStr(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_POLE, pole);
-
-  if (strcmp(pole, "left") == 0) {
-    a = ReInfo->track->width;
-    b = -a;
-  } else {
-    a = 0;
-    b = ReInfo->track->width;
-  }
-  //wi2 = ReInfo->track->width * 0.5f; // Never used.
-
-  rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
-  rows = (int)GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_ROWS, (char*)NULL, (tdble)rows);
-  d1 = GfParmGetNum(params, path, RM_ATTR_TOSTART, (char*)NULL, 10);
-  d1 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_TOSTART, (char*)NULL, d1);
-  d2 = GfParmGetNum(params, path, RM_ATTR_COLDIST, (char*)NULL, 10);
-  d2 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_COLDIST, (char*)NULL, d2);
-  d3 = GfParmGetNum(params, path, RM_ATTR_COLOFFSET, (char*)NULL, 5);
-  d3 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_COLOFFSET, (char*)NULL, d3);
-  speedInit = GfParmGetNum(params, path, RM_ATTR_INITSPEED, (char*)NULL, 0.0);
-  heightInit = GfParmGetNum(params, path, RM_ATTR_INITHEIGHT, (char*)NULL, 0.3f);
-  heightInit = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_INITHEIGHT, (char*)NULL, heightInit);
-
-  if (rows < 1) {
-    rows = 1;
-  }
-  for (i = 0; i < ReInfo->s->_ncars; i++) {
-    car = &(ReInfo->carList[i]);
-    car->_speed_x = speedInit;
-    startpos = ReInfo->track->length - (d1 + (i / rows) * d2 + (i % rows) * d3);
-    tr = a + b * ((i % rows) + 1) / (rows + 1);
-    curseg = ReInfo->track->seg;  /* last segment */
-    while (startpos < curseg->lgfromstart) {
-      curseg = curseg->prev;
+    /* Search for the first turn for find the pole side */
+    curseg = ReInfo->track->seg->next;
+    while (curseg->type == TR_STR) {
+        /* skip the straight segments */
+        curseg = curseg->next;
     }
-    ts = startpos - curseg->lgfromstart;
-    car->_trkPos.seg = curseg;
-    car->_trkPos.toRight = tr;
-    switch (curseg->type) {
-      case TR_STR:
-        car->_trkPos.toStart = ts;
-        RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
-        car->_yaw = curseg->angle[TR_ZS];
-        break;
-      case TR_RGT:
-        car->_trkPos.toStart = ts / curseg->radius;
-        RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
-        car->_yaw = curseg->angle[TR_ZS] - car->_trkPos.toStart;
-        break;
-      case TR_LFT:
-        car->_trkPos.toStart = ts / curseg->radius;
-        RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
-        car->_yaw = curseg->angle[TR_ZS] + car->_trkPos.toStart;
-        break;
+    /* Set the pole for the inside of the first turn */
+    if (curseg->type == TR_LFT) {
+        pole = GfParmGetStr(params, path, RM_ATTR_POLE, "left");
+    } else {
+        pole = GfParmGetStr(params, path, RM_ATTR_POLE, "right");
     }
-    car->_pos_Z = RtTrackHeightL(&(car->_trkPos)) + heightInit;
+    /* Tracks definitions can force the pole side */
+    pole = GfParmGetStr(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_POLE, pole);
 
-    FLOAT_NORM0_2PI(car->_yaw);
+    if (strcmp(pole, "left") == 0) {
+        a = ReInfo->track->width;
+        b = -a;
+    } else {
+        a = 0;
+        b = ReInfo->track->width;
+    }
+    //wi2 = ReInfo->track->width * 0.5f; // Never used.
 
-    RePhysicsEngine().configureCar(car);
-  }
+    rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
+    rows = (int)GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_ROWS, (char*)NULL, (tdble)rows);
+    d1 = GfParmGetNum(params, path, RM_ATTR_TOSTART, (char*)NULL, 10);
+    d1 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_TOSTART, (char*)NULL, d1);
+    d2 = GfParmGetNum(params, path, RM_ATTR_COLDIST, (char*)NULL, 10);
+    d2 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_COLDIST, (char*)NULL, d2);
+    d3 = GfParmGetNum(params, path, RM_ATTR_COLOFFSET, (char*)NULL, 5);
+    d3 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_COLOFFSET, (char*)NULL, d3);
+    speedInit = GfParmGetNum(params, path, RM_ATTR_INITSPEED, (char*)NULL, 0.0);
+    heightInit = GfParmGetNum(params, path, RM_ATTR_INITHEIGHT, (char*)NULL, 0.3f);
+    heightInit = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_INITHEIGHT, (char*)NULL, heightInit);
+
+    if (rows < 1) {
+        rows = 1;
+    }
+    for (i = 0; i < ReInfo->s->_ncars; i++) {
+        car = &(ReInfo->carList[i]);
+        car->_speed_x = speedInit;
+        startpos = ReInfo->track->length - (d1 + (i / rows) * d2 + (i % rows) * d3);
+        tr = a + b * ((i % rows) + 1) / (rows + 1);
+        curseg = ReInfo->track->seg;  /* last segment */
+        while (startpos < curseg->lgfromstart) {
+            curseg = curseg->prev;
+        }
+        ts = startpos - curseg->lgfromstart;
+        car->_trkPos.seg = curseg;
+        car->_trkPos.toRight = tr;
+        switch (curseg->type) {
+        case TR_STR:
+            car->_trkPos.toStart = ts;
+            RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
+            car->_yaw = curseg->angle[TR_ZS];
+            break;
+        case TR_RGT:
+            car->_trkPos.toStart = ts / curseg->radius;
+            RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
+            car->_yaw = curseg->angle[TR_ZS] - car->_trkPos.toStart;
+            break;
+        case TR_LFT:
+            car->_trkPos.toStart = ts / curseg->radius;
+            RtTrackLocal2Global(&(car->_trkPos), &(car->_pos_X), &(car->_pos_Y), TR_TORIGHT);
+            car->_yaw = curseg->angle[TR_ZS] + car->_trkPos.toStart;
+            break;
+        }
+        car->_pos_Z = RtTrackHeightL(&(car->_trkPos)) + heightInit;
+
+        FLOAT_NORM0_2PI(car->_yaw);
+
+        RePhysicsEngine().configureCar(car);
+    }
 }
 
 
 static void
 initPits(void)
 {
-  tTrackPitInfo *pits;
-  int i, j;
+    tTrackPitInfo *pits;
+    int i, j;
 
-  /*
+    /*
   typedef std::map<std::string, int> tTeamsMap;
   typedef tTeamsMap::const_iterator tTeamsMapIterator;
   tTeamsMap teams;
@@ -363,89 +362,116 @@ initPits(void)
   }
   */
 
-  // How many cars are sharing a pit?
-  int carsPerPit = (int) GfParmGetNum(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_CARSPERPIT, NULL, 1.0f);
-  if (carsPerPit < 1) {
-    carsPerPit = 1;
-  } else if (carsPerPit > TR_PIT_MAXCARPERPIT) {
-    carsPerPit = TR_PIT_MAXCARPERPIT;
-  }
-  GfLogInfo("Cars per pit: %d\n", carsPerPit);
+    // How many cars are sharing a pit?
+    int carsPerPit = (int) GfParmGetNum(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_CARSPERPIT, NULL, 1.0f);
+    if (carsPerPit < 1)
+    {
+        carsPerPit = 1;
+    }
+    else if (carsPerPit > TR_PIT_MAXCARPERPIT)
+    {
+        carsPerPit = TR_PIT_MAXCARPERPIT;
+    }
 
-  switch (ReInfo->track->pits.type) {
+    if( ReInfo->s->_ncars > ReInfo->track->pits.nMaxPits)
+    {
+        carsPerPit = TR_PIT_MAXCARPERPIT;
+    }
+
+    GfLogInfo("Cars per pit: %d\n", carsPerPit);
+
+    switch (ReInfo->track->pits.type)
+    {
     case TR_PIT_ON_TRACK_SIDE:
     case TR_PIT_NO_BUILDING:
-      pits = &(ReInfo->track->pits);
-      pits->driversPitsNb = ReInfo->s->_ncars;
-      pits->carsPerPit = carsPerPit;
+        pits = &(ReInfo->track->pits);
+        pits->driversPitsNb = ReInfo->s->_ncars;
+        pits->carsPerPit = carsPerPit;
 
-      // Initialize pit data for every pit, necessary because of restarts
-      // (track gets not reloaded, no calloc).
-      for (i = 0; i < pits->nMaxPits; i++) {
-        tTrackOwnPit *pit = &(pits->driversPits[i]);
-        pit->freeCarIndex = 0;
-        pit->pitCarIndex = TR_PIT_STATE_FREE;
-        for (j = 0; j < TR_PIT_MAXCARPERPIT; j++) {
-          pit->car[j] = NULL;
-        }
-      }
+        // Initialize pit data for every pit, necessary because of restarts
+        // (track gets not reloaded, no calloc).
+        for (i = 0; i < pits->nMaxPits; i++)
+        {
+            tTrackOwnPit *pit = &(pits->driversPits[i]);
+            pit->freeCarIndex = 0;
+            pit->pitCarIndex = TR_PIT_STATE_FREE;
 
-      // Assign cars to pits. Inefficient (O(n*n)), but just at initialization, so do not care.
-      // One pit can just host cars of one team (this matches with the reality)
-      for (i = 0; i < ReInfo->s->_ncars; i++) {
-        // Find pit for the cars team.
-        tCarElt *car = &(ReInfo->carList[i]);
-        for (j = 0; j < pits->nMaxPits; j++) {
-          tTrackOwnPit *pit = &(pits->driversPits[j]);
-          // Put car in this pit if the pit is unused or used by a teammate and there is
-          // space left.
-          if (pit->freeCarIndex <= 0 ||
-            (strcmp(pit->car[0]->_teamname, car->_teamname) == 0 && pit->freeCarIndex < carsPerPit))
-          {
-            // Assign car to pit.
-            pit->car[pit->freeCarIndex] = car;
-            // If this is the first car, set up more pit values ; assumption: the whole team
-            // uses the same car. If not met, it does not matter much, but the car might be
-            // captured a bit too easy or too hard.
-            if (pit->freeCarIndex == 0) {
-              pit->pitCarIndex = TR_PIT_STATE_FREE;
-              pit->lmin = pit->pos.seg->lgfromstart + pit->pos.toStart - pits->len / 2.0f + car->_dimension_x / 2.0f;
-              if (pit->lmin > ReInfo->track->length) {
-                pit->lmin -= ReInfo->track->length;
-              }
-              pit->lmax = pit->pos.seg->lgfromstart + pit->pos.toStart + pits->len / 2.0f - car->_dimension_x / 2.0f;
-              if (pit->lmax > ReInfo->track->length) {
-                pit->lmax -= ReInfo->track->length;
-              }
+            for (j = 0; j < TR_PIT_MAXCARPERPIT; j++)
+            {
+                pit->car[j] = NULL;
             }
-            (pit->freeCarIndex)++;
-            ReInfo->carList[i]._pit = pit;
-            // Assigned, continue with next car.
-            break;
-          }
         }
-      }
 
-      // Print out assignments.
-      for (i = 0; i < pits->nMaxPits; i++) {
-        tTrackOwnPit *pit = &(pits->driversPits[i]);
-        for (j = 0; j < pit->freeCarIndex; j++) {
-          if (j == 0) {
-            GfLogTrace("Pit %d, Team: %s, ", i, pit->car[j]->_teamname);
-          }
-          GfLogTrace("%d: %s ", j, pit->car[j]->_name);
-        }
-        if (j > 0) {
-          GfOut("\n");
-        }
-      }
+        // Assign cars to pits. Inefficient (O(n*n)), but just at initialization, so do not care.
+        // One pit can just host cars of one team (this matches with the reality)
+        for (i = 0; i < ReInfo->s->_ncars; i++)
+        {
+            // Find pit for the cars team.
+            tCarElt *car = &(ReInfo->carList[i]);
 
-      break;
+            for (j = 0; j < pits->nMaxPits; j++)
+            {
+                tTrackOwnPit *pit = &(pits->driversPits[j]);
+                // Put car in this pit if the pit is unused or used by a teammate and there is
+                // space left.
+                if (pit->freeCarIndex <= 0 ||
+                        (strcmp(pit->car[0]->_teamname, car->_teamname) == 0 && pit->freeCarIndex < carsPerPit))
+                {
+                    // Assign car to pit.
+                    pit->car[pit->freeCarIndex] = car;
+                    // If this is the first car, set up more pit values ; assumption: the whole team
+                    // uses the same car. If not met, it does not matter much, but the car might be
+                    // captured a bit too easy or too hard.
+                    if (pit->freeCarIndex == 0)
+                    {
+                        pit->pitCarIndex = TR_PIT_STATE_FREE;
+                        pit->lmin = pit->pos.seg->lgfromstart + pit->pos.toStart - pits->len / 2.0f + car->_dimension_x / 2.0f;
+                        if (pit->lmin > ReInfo->track->length)
+                        {
+                            pit->lmin -= ReInfo->track->length;
+                        }
+
+                        pit->lmax = pit->pos.seg->lgfromstart + pit->pos.toStart + pits->len / 2.0f - car->_dimension_x / 2.0f;
+                        if (pit->lmax > ReInfo->track->length)
+                        {
+                            pit->lmax -= ReInfo->track->length;
+                        }
+                    }
+                    (pit->freeCarIndex)++;
+                    ReInfo->carList[i]._pit = pit;
+                    // Assigned, continue with next car.
+                    break;
+                }
+            }
+        }
+
+        // Print out assignments.
+        for (i = 0; i < pits->nMaxPits; i++)
+        {
+            tTrackOwnPit *pit = &(pits->driversPits[i]);
+
+            for (j = 0; j < pit->freeCarIndex; j++)
+            {
+                if (j == 0)
+                {
+                    GfLogTrace("Pit %d, Team: %s, ", i, pit->car[j]->_teamname);
+                }
+
+                GfLogTrace("%d: %s ", j, pit->car[j]->_name);
+            }
+
+            if (j > 0)
+            {
+                GfOut("\n");
+            }
+        }
+
+        break;
     case TR_PIT_ON_SEPARATE_PATH:
-      break;
+        break;
     case TR_PIT_NONE:
-      break;
-  }
+        break;
+    }
 }
 
 /**
@@ -463,320 +489,320 @@ initPits(void)
  */
 static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int relativeRobotIdx, char normal_carname, char const *cardllname )
 {
-  tCarElt *elt;
-  tMemoryPool oldPool;
-  char path[PathLenMax];
-  char path2[PathLenMax];
-  char buf[PathLenMax];
-  char buf2[PathLenMax];
-  char const *str;
-  char const *category;
-  char const *subcategory;
-  char const *teamname;
-  std::string carname;
-  tModInfoNC *curModInfo;
-  tRobotItf *curRobot;
-  void *robhdle;
-  void *cathdle;
-  void *carhdle;
-  void *handle;
-  int k;
-  int xx;
-  char isHuman;
-  int robotIdx = relativeRobotIdx;
+    tCarElt *elt;
+    tMemoryPool oldPool;
+    char path[PathLenMax];
+    char path2[PathLenMax];
+    char buf[PathLenMax];
+    char buf2[PathLenMax];
+    char const *str;
+    char const *category;
+    char const *subcategory;
+    char const *teamname;
+    std::string carname;
+    tModInfoNC *curModInfo;
+    tRobotItf *curRobot;
+    void *robhdle;
+    void *cathdle;
+    void *carhdle;
+    void *handle;
+    int k;
+    int xx;
+    char isHuman;
+    int robotIdx = relativeRobotIdx;
 
-  /* good robot found */
-  curModInfo = &((*(ReInfo->robModList))->modInfo[modindex]);
+    /* good robot found */
+    curModInfo = &((*(ReInfo->robModList))->modInfo[modindex]);
 
-  subcategory = ReInfo->track->subcategory;
+    subcategory = ReInfo->track->subcategory;
 
 #if 0 //SDW
-  if (replayReplay)
-    GfLogInfo("Driver in car %d being driven by replay\n", carindex);
-  else
+    if (replayReplay)
+        GfLogInfo("Driver in car %d being driven by replay\n", carindex);
+    else
 #endif
-    GfLogInfo("Driver's name: %s\n", curModInfo->name);
+        GfLogInfo("Driver's name: %s\n", curModInfo->name);
 
-  isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
+    isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
 
-  /* Extended is forced for humans, so no need to increase robotIdx */
-  if (!normal_carname && !isHuman)
-    robotIdx += curModInfo->index;
+    /* Extended is forced for humans, so no need to increase robotIdx */
+    if (!normal_carname && !isHuman)
+        robotIdx += curModInfo->index;
 
-  /* Retrieve the driver interface (function pointers) */
-  curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
+    /* Retrieve the driver interface (function pointers) */
+    curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
 
-  /* ... and initialize the driver */
+    /* ... and initialize the driver */
 #if 0 // SDW
-  if (replayReplay) {
-    // Register against the Replay driver (which does nothing)
-    curModInfo->fctInit(carindex, (void*)(curRobot));
-  } else if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
+    if (replayReplay) {
+        // Register against the Replay driver (which does nothing)
+        curModInfo->fctInit(carindex, (void*)(curRobot));
+    } else if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
 #else
-  if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
+    if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
 #endif
-    curModInfo->fctInit(robotIdx, (void*)(curRobot));
-  } else {
-    curRobot->rbNewTrack = NULL;
-    curRobot->rbNewRace  = NULL;
-    curRobot->rbPauseRace = NULL;
-    curRobot->rbResumeRace  = NULL;
-    curRobot->rbDrive    = NULL;
-    curRobot->rbPitCmd   = NULL;
-    curRobot->rbEndRace  = NULL;
-    curRobot->rbShutdown = NULL;
-    curRobot->index      = 0;
-  }
+        curModInfo->fctInit(robotIdx, (void*)(curRobot));
+    } else {
+        curRobot->rbNewTrack = NULL;
+        curRobot->rbNewRace  = NULL;
+        curRobot->rbPauseRace = NULL;
+        curRobot->rbResumeRace  = NULL;
+        curRobot->rbDrive    = NULL;
+        curRobot->rbPitCmd   = NULL;
+        curRobot->rbEndRace  = NULL;
+        curRobot->rbShutdown = NULL;
+        curRobot->index      = 0;
+    }
 
-  /* Retrieve and load the robotXML file :
+    /* Retrieve and load the robotXML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
-  snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
-  robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
+    snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
+    robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
 
-  if (!robhdle)
-    robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    if (!robhdle)
+        robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
-  if (normal_carname || isHuman)
-    snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-  else
-    snprintf(path, sizeof(path), "%s", ROB_SECT_ARBITRARY);
-
-  /* Load car/driver info (in race engine data structure) */
-  if (robhdle)
-  {
-    elt = &(ReInfo->carList[carindex]);
-    GF_TAILQ_INIT(&(elt->_penaltyList));
-
-    const std::string strDType = GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT);
-    if (strDType == ROB_VAL_ROBOT){
-      elt->_driverType = RM_DRV_ROBOT;
-      elt->_networkPlayer = 0;
-    }
-    else if (strDType == ROB_VAL_HUMAN)
-    {
-      elt->_driverType = RM_DRV_HUMAN;
-      std::string strNetPlayer = GfParmGetStr(robhdle, path, "networkrace", "no");
-      elt->_networkPlayer = (strNetPlayer == "yes") ? 1 : 0;
-    }
-
-    elt->index = carindex;
-    elt->robot = curRobot;
-    elt->_paramsHandle = robhdle;
-    elt->_driverIndex = robotIdx;
-    elt->_moduleIndex = relativeRobotIdx;
-    strncpy(elt->_modName, cardllname, MAX_NAME_LEN - 1);
-    elt->_modName[MAX_NAME_LEN - 1] = 0;
-
-    //snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-    snprintf( path2, sizeof(path2), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
-    if (normal_carname || elt->_driverType == RM_DRV_HUMAN) {
-      strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
-      strncpy(elt->_sname, GfParmGetStr(robhdle, path, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
-      strncpy(elt->_cname, GfParmGetStr(robhdle, path, ROB_ATTR_CODE, "---"), 3);
-      strncpy(elt->_nationname, GfParmGetStr(robhdle, path, ROB_ATTR_NATION, "none"), 2);
-    }
+    if (normal_carname || isHuman)
+        snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
     else
+        snprintf(path, sizeof(path), "%s", ROB_SECT_ARBITRARY);
+
+    /* Load car/driver info (in race engine data structure) */
+    if (robhdle)
     {
-      strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
-      strncpy(elt->_sname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
-      strncpy(elt->_cname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_CODE, "---"), 3);
-      strncpy(elt->_nationname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NATION, "EU"), 2);
-    }
+        elt = &(ReInfo->carList[carindex]);
+        GF_TAILQ_INIT(&(elt->_penaltyList));
 
-    elt->_name[MAX_NAME_LEN - 1] = 0;
-    elt->_sname[MAX_NAME_LEN - 1] = 0;
-    elt->_cname[3] = 0;
-    elt->_nationname[2] = 0;
-
-    teamname = GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none");
-    teamname = GfParmGetStr(ReInfo->params, path2, ROB_ATTR_TEAM, teamname ); //Use the name in params if it has a team name
-    strncpy(elt->_teamname, teamname, MAX_NAME_LEN - 1);
-    elt->_teamname[MAX_NAME_LEN - 1] = 0;
-
-    elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, -1.0f);
-
-    if (normal_carname) /* Even if we get a normal_carname for humans we use it despite of forced extended mode*/
-      strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
-    else
-      strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
-    elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
-
-    // Load custom skin name and targets from race info (if specified).
-    snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
-    if (GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, 0))
-    {
-      strncpy(elt->_skinName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, ""), MAX_NAME_LEN - 1);
-      elt->_skinName[MAX_NAME_LEN - 1] = 0; // Texture name
-    }
-    elt->_skinTargets = (int)GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
-
-    // Load other data from robot descriptor.
-    elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
-    if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) // Increase racenumber if needed
-      elt->_raceNumber += elt->_moduleIndex;
-    elt->_skillLevel = ARCADE;
-    str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
-    for(k = 0; k < NSkillLevels; k++) {
-      if (strcmp(aPszSkillLevelNames[k], str) == 0) {
-        elt->_skillLevel = static_cast<tSkillLevel>(k);
-        break;
-      }
-    }
-    elt->_startRank  = carindex;
-    elt->_pos        = carindex+1;
-    elt->_remainingLaps = ReInfo->s->_totLaps;
-
-    elt->_newTrackMemPool = NULL;
-    elt->_newRaceMemPool = NULL;
-    elt->_endRaceMemPool = NULL;
-    elt->_shutdownMemPool = NULL;
-
-    carname = elt->_carName;
-
-    GfLogTrace("Driver #%d(%d) : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
-               carindex, listindex, elt->_modName, elt->_name, elt->_carName,
-               elt->_category, elt->_skinName, elt->_skinTargets);
-
-    if ((strncmp(carname.c_str(), "mpa1", 4) == 0))
-    {
-        if (strcmp(subcategory, "long") == 0)
-            carname = carname+"-long";
-        else if (strcmp(subcategory, "short") == 0)
-            carname = carname+"-short";
-        else
-            carname = carname+"-road";
-
-        GfLogTrace("MPA... Category car = %s \n", carname.c_str());
-
-        /* Retrieve and load car specs : merge car default specs,
-        category specs and driver modifications (=> handle) */
-        /* Read Car model specifications */
-        snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, carname.c_str());
-        carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-
-    }
-    else
-    {
-        /* Retrieve and load car specs : merge car default specs,
-        category specs and driver modifications (=> handle) */
-        /* Read Car model specifications */
-        snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
-        carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    }
-
-    category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-    if (category)
-    {
-      GfLogTrace("Checking/Merging %s specs into %s base setup for %s ...\n",
-                 category, elt->_carName, curModInfo->name);
-      strncpy(elt->_category, category, MAX_NAME_LEN - 1);
-      elt->_category[MAX_NAME_LEN - 1] = 0;
-      /* Read Car Category specifications */
-      snprintf(buf2, sizeof(buf2), "cars/categories/%s.xml", elt->_category);
-      cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-      int errorcode = 0;
-
-      if ((errorcode = GfParmCheckHandle(cathdle, carhdle)))
-      {
-        switch (errorcode)
-        {
-          case -1:
-            GfLogError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
-            break;
-
-          case -2:
-            GfLogError("Parameters out of bound for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
-            break;
-
-          case -3:
-            GfLogError("Parameter not allowed for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
-            break;
-
-          default:
-            GfLogError("Unknown error for %s (driver %s)!!!\n",elt->_carName, elt->_name);
-            break;
+        const std::string strDType = GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT);
+        if (strDType == ROB_VAL_ROBOT){
+            elt->_driverType = RM_DRV_ROBOT;
+            elt->_networkPlayer = 0;
         }
-        return NULL;
-      }
+        else if (strDType == ROB_VAL_HUMAN)
+        {
+            elt->_driverType = RM_DRV_HUMAN;
+            std::string strNetPlayer = GfParmGetStr(robhdle, path, "networkrace", "no");
+            elt->_networkPlayer = (strNetPlayer == "yes") ? 1 : 0;
+        }
 
-      carhdle = GfParmMergeHandles(cathdle, carhdle,
-                                   GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+        elt->index = carindex;
+        elt->robot = curRobot;
+        elt->_paramsHandle = robhdle;
+        elt->_driverIndex = robotIdx;
+        elt->_moduleIndex = relativeRobotIdx;
+        strncpy(elt->_modName, cardllname, MAX_NAME_LEN - 1);
+        elt->_modName[MAX_NAME_LEN - 1] = 0;
 
-      /* The code below stores the carnames to a separate xml-file
+        //snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
+        snprintf( path2, sizeof(path2), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
+        if (normal_carname || elt->_driverType == RM_DRV_HUMAN) {
+            strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
+            strncpy(elt->_sname, GfParmGetStr(robhdle, path, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
+            strncpy(elt->_cname, GfParmGetStr(robhdle, path, ROB_ATTR_CODE, "---"), 3);
+            strncpy(elt->_nationname, GfParmGetStr(robhdle, path, ROB_ATTR_NATION, "none"), 2);
+        }
+        else
+        {
+            strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
+            strncpy(elt->_sname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
+            strncpy(elt->_cname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_CODE, "---"), 3);
+            strncpy(elt->_nationname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NATION, "EU"), 2);
+        }
+
+        elt->_name[MAX_NAME_LEN - 1] = 0;
+        elt->_sname[MAX_NAME_LEN - 1] = 0;
+        elt->_cname[3] = 0;
+        elt->_nationname[2] = 0;
+
+        teamname = GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none");
+        teamname = GfParmGetStr(ReInfo->params, path2, ROB_ATTR_TEAM, teamname ); //Use the name in params if it has a team name
+        strncpy(elt->_teamname, teamname, MAX_NAME_LEN - 1);
+        elt->_teamname[MAX_NAME_LEN - 1] = 0;
+
+        elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, -1.0f);
+
+        if (normal_carname) /* Even if we get a normal_carname for humans we use it despite of forced extended mode*/
+            strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
+        else
+            strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
+        elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
+
+        // Load custom skin name and targets from race info (if specified).
+        snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
+        if (GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, 0))
+        {
+            strncpy(elt->_skinName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, ""), MAX_NAME_LEN - 1);
+            elt->_skinName[MAX_NAME_LEN - 1] = 0; // Texture name
+        }
+        elt->_skinTargets = (int)GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
+
+        // Load other data from robot descriptor.
+        elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
+        if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) // Increase racenumber if needed
+            elt->_raceNumber += elt->_moduleIndex;
+        elt->_skillLevel = ARCADE;
+        str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
+        for(k = 0; k < NSkillLevels; k++) {
+            if (strcmp(aPszSkillLevelNames[k], str) == 0) {
+                elt->_skillLevel = static_cast<tSkillLevel>(k);
+                break;
+            }
+        }
+        elt->_startRank  = carindex;
+        elt->_pos        = carindex+1;
+        elt->_remainingLaps = ReInfo->s->_totLaps;
+
+        elt->_newTrackMemPool = NULL;
+        elt->_newRaceMemPool = NULL;
+        elt->_endRaceMemPool = NULL;
+        elt->_shutdownMemPool = NULL;
+
+        carname = elt->_carName;
+
+        GfLogTrace("Driver #%d(%d) : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
+                   carindex, listindex, elt->_modName, elt->_name, elt->_carName,
+                   elt->_category, elt->_skinName, elt->_skinTargets);
+
+        if ((strncmp(carname.c_str(), "mpa1", 4) == 0))
+        {
+            if (strcmp(subcategory, "long") == 0)
+                carname = carname+"-long";
+            else if (strcmp(subcategory, "short") == 0)
+                carname = carname+"-short";
+            else
+                carname = carname+"-road";
+
+            GfLogTrace("MPA... Category car = %s \n", carname.c_str());
+
+            /* Retrieve and load car specs : merge car default specs,
+        category specs and driver modifications (=> handle) */
+            /* Read Car model specifications */
+            snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, carname.c_str());
+            carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+        }
+        else
+        {
+            /* Retrieve and load car specs : merge car default specs,
+        category specs and driver modifications (=> handle) */
+            /* Read Car model specifications */
+            snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
+            carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+        }
+
+        category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
+        if (category)
+        {
+            GfLogTrace("Checking/Merging %s specs into %s base setup for %s ...\n",
+                       category, elt->_carName, curModInfo->name);
+            strncpy(elt->_category, category, MAX_NAME_LEN - 1);
+            elt->_category[MAX_NAME_LEN - 1] = 0;
+            /* Read Car Category specifications */
+            snprintf(buf2, sizeof(buf2), "cars/categories/%s.xml", elt->_category);
+            cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+            int errorcode = 0;
+
+            if ((errorcode = GfParmCheckHandle(cathdle, carhdle)))
+            {
+                switch (errorcode)
+                {
+                case -1:
+                    GfLogError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+                    break;
+
+                case -2:
+                    GfLogError("Parameters out of bound for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
+                    break;
+
+                case -3:
+                    GfLogError("Parameter not allowed for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
+                    break;
+
+                default:
+                    GfLogError("Unknown error for %s (driver %s)!!!\n",elt->_carName, elt->_name);
+                    break;
+                }
+                return NULL;
+            }
+
+            carhdle = GfParmMergeHandles(cathdle, carhdle,
+                                         GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+
+            /* The code below stores the carnames to a separate xml-file
          such that at newTrack it is known which car is used.
          TODO: find a better method for this */
-      handle = GfParmReadFileLocal("drivers/curcarnames.xml", GFPARM_RMODE_CREAT);
-      if (handle) {
-        snprintf(path, sizeof(path), "drivers/%s/%d", cardllname, elt->_driverIndex);
-        GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
-        GfParmWriteFile (0, handle, "Car names");
-        GfParmReleaseHandle (handle);
-        handle = NULL;
-      }
-      if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
-      {
-        GfPoolMove(&elt->_newTrackMemPool, &oldPool);
-        curRobot->rbNewTrack(elt->_driverIndex, ReInfo->track, carhdle, &handle, ReInfo->s);
-        GfPoolFreePool( &oldPool );
-      }
-      else
-        handle = NULL;
+            handle = GfParmReadFileLocal("drivers/curcarnames.xml", GFPARM_RMODE_CREAT);
+            if (handle) {
+                snprintf(path, sizeof(path), "drivers/%s/%d", cardllname, elt->_driverIndex);
+                GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
+                GfParmWriteFile (0, handle, "Car names");
+                GfParmReleaseHandle (handle);
+                handle = NULL;
+            }
+            if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
+            {
+                GfPoolMove(&elt->_newTrackMemPool, &oldPool);
+                curRobot->rbNewTrack(elt->_driverIndex, ReInfo->track, carhdle, &handle, ReInfo->s);
+                GfPoolFreePool( &oldPool );
+            }
+            else
+                handle = NULL;
 
-      if (handle && handle != carhdle && !replayReplay)
-      {
-        GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
-                   curModInfo->name, elt->_carName);
+            if (handle && handle != carhdle && !replayReplay)
+            {
+                GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
+                           curModInfo->name, elt->_carName);
 
-        if (GfParmCheckHandle(carhdle, handle))
-        {
-          GfLogError("Bad Car parameters for driver %s\n", elt->_name);
-          return NULL;
+                if (GfParmCheckHandle(carhdle, handle))
+                {
+                    GfLogError("Bad Car parameters for driver %s\n", elt->_name);
+                    return NULL;
+                }
+
+                handle = GfParmMergeHandles(carhdle, handle,
+                                            GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+            }
+            else
+            {
+                GfLogTrace("Keeping %s setup as is for %s (no specific setup).\n",
+                           elt->_carName, curModInfo->name);
+                handle = carhdle;
+            }
+
+            elt->_carHandle = handle;
+
+            /* Initialize sectors */
+            elt->_currentSector = 0;
+            elt->_nbSectors = ReInfo->track->numberOfSectors;
+            elt->_curSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
+            elt->_bestSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
+            for (xx = 0; xx < elt->_nbSectors - 1; ++xx)
+            {
+                elt->_curSplitTime[xx] = -1.0f;
+                elt->_bestSplitTime[xx] = -1.0f;
+            }
         }
+        else
+        {
+            elt->_category[ 0 ] = '\0';
+            GfLogError("Bad Car category for driver %s\n", elt->_name);
 
-        handle = GfParmMergeHandles(carhdle, handle,
-                                    GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-      }
-      else
-      {
-        GfLogTrace("Keeping %s setup as is for %s (no specific setup).\n",
-                   elt->_carName, curModInfo->name);
-        handle = carhdle;
-      }
+            return NULL;
+        }
+        //since we now know how much space we need (track lenght) we can now alloc the memory for these variables
+        elt->_trackPositionCount = (int)(ReInfo->track->length + 1); // round up
+        elt->_currLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
+        elt->_bestLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
 
-      elt->_carHandle = handle;
-
-      /* Initialize sectors */
-      elt->_currentSector = 0;
-      elt->_nbSectors = ReInfo->track->numberOfSectors;
-      elt->_curSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
-      elt->_bestSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
-      for (xx = 0; xx < elt->_nbSectors - 1; ++xx)
-      {
-        elt->_curSplitTime[xx] = -1.0f;
-        elt->_bestSplitTime[xx] = -1.0f;
-      }
+        return elt;
     }
     else
     {
-      elt->_category[ 0 ] = '\0';
-      GfLogError("Bad Car category for driver %s\n", elt->_name);
-
-      return NULL;
+        GfLogError("No description file for robot %s\n", cardllname);
     }
-    //since we now know how much space we need (track lenght) we can now alloc the memory for these variables
-    elt->_trackPositionCount = (int)(ReInfo->track->length + 1); // round up
-    elt->_currLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
-    elt->_bestLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
-    
-    return elt;
-  }
-  else
-  {
-    GfLogError("No description file for robot %s\n", cardllname);
-  }
 
-  return NULL;
+    return NULL;
 }
 
 
@@ -787,204 +813,204 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 int
 ReInitCars(void)
 {
-  char buf[1024];
-  char path[1024];
-  int nCars;
-  int index;
-  const char *robotModuleName;
-  int robotIdx;
-  void *robhdle;
-  tCarElt *elt;
-  //const char *focused; // Never used.
-  //int focusedIdx; // Never used.
-  void *params = ReInfo->params;
+    char buf[1024];
+    char path[1024];
+    int nCars;
+    int index;
+    const char *robotModuleName;
+    int robotIdx;
+    void *robhdle;
+    tCarElt *elt;
+    //const char *focused; // Never used.
+    //int focusedIdx; // Never used.
+    void *params = ReInfo->params;
 
-  /* Get the number of cars (= drivers) racing */
-  nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-  GfLogTrace("Loading %d car(s)\n", nCars);
+    /* Get the number of cars (= drivers) racing */
+    nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
+    GfLogTrace("Loading %d car(s)\n", nCars);
 
-  FREEZ(ReInfo->carList);
-  ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
-  FREEZ(ReInfo->rules);
-  ReInfo->rules = (tRmCarRules*)calloc(nCars, sizeof(tRmCarRules));
-  //focused = GfParmGetStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-  //focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
-  index = 0;
+    FREEZ(ReInfo->carList);
+    ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
+    FREEZ(ReInfo->rules);
+    ReInfo->rules = (tRmCarRules*)calloc(nCars, sizeof(tRmCarRules));
+    //focused = GfParmGetStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
+    //focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
+    index = 0;
 
-  /* For each car/driver : */
-  for (int i = 1; i < nCars + 1; i++)
-  {
-    /* Get the name of the module (= shared library) of the robot */
-    snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
-    robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
-    robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
+    /* For each car/driver : */
+    for (int i = 1; i < nCars + 1; i++)
+    {
+        /* Get the name of the module (= shared library) of the robot */
+        snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
+        robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
+        robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
 
 #if 0 // SDW
-    if (replayReplay)
-      // Register against the Replay driver
-      snprintf(path, sizeof(path), "%sdrivers/replay/replay%s", GfLibDir(), DLLEXT);
-    else
+        if (replayReplay)
+            // Register against the Replay driver
+            snprintf(path, sizeof(path), "%sdrivers/replay/replay%s", GfLibDir(), DLLEXT);
+        else
 #endif
-      snprintf(path, sizeof(path), "%sdrivers/%s/%s%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
+            snprintf(path, sizeof(path), "%sdrivers/%s/%s%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
-    /* Load the robot shared library */
-    if (GfModLoad(CAR_IDENT, path, ReInfo->robModList))
-    {
-      GfLogError("Failed to load robot module %s\n", path);
-      continue;
+        /* Load the robot shared library */
+        if (GfModLoad(CAR_IDENT, path, ReInfo->robModList))
+        {
+            GfLogError("Failed to load robot module %s\n", path);
+            continue;
+        }
+
+        /* Load the racing driver info in the race data structure */
+        elt = NULL;
+        snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
+        if ((int)GfParmGetNum(ReInfo->params, path, RM_ATTR_EXTENDED, NULL, 0) == 0)
+        {
+            /* Search for the index of the racing driver in the list of interfaces
+         of the module */
+            for (int j = 0; j < (*(ReInfo->robModList))->modInfoSize; j++)
+            {
+                if ((*(ReInfo->robModList))->modInfo[j].name && (*(ReInfo->robModList))->modInfo[j].index == robotIdx)
+                {
+                    /* We have the right driver : load it */
+                    elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
+                    if (!elt)
+                    {
+                        GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
+                        snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
+                        ReUI().addLoadingMessage(buf);
+                        snprintf(buf, sizeof(buf), "       Have a look at the console window for mode details about the error");
+                        ReUI().addLoadingMessage(buf);
+                        snprintf(buf, sizeof(buf), "       Back to the config menu in 10 s ...");
+                        ReUI().addLoadingMessage(buf);
+
+                        // Wait some time to allow the user to read the message!
+                        GfSleep(10.0); // 10 seconds
+                    }
+                }
+            }
+        }
+        else
+        {
+            GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
+            snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", robotModuleName, robotModuleName);
+            robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
+            if (!robhdle)
+                robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+
+            if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
+            {
+                /* Human driver */
+                elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->robModList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
+            }
+            else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
+                                          GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
+            {
+                elt = reLoadSingleCar( index, i, (*(ReInfo->robModList))->modInfoSize, robotIdx, FALSE, robotModuleName );
+            }
+            else
+                GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
+        }
+
+        if (elt)
+            ++index;
     }
 
-    /* Load the racing driver info in the race data structure */
-    elt = NULL;
-    snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
-    if ((int)GfParmGetNum(ReInfo->params, path, RM_ATTR_EXTENDED, NULL, 0) == 0)
+    nCars = index; /* real number of cars */
+    if (nCars == 0)
     {
-      /* Search for the index of the racing driver in the list of interfaces
-         of the module */
-      for (int j = 0; j < (*(ReInfo->robModList))->modInfoSize; j++)
-      {
-        if ((*(ReInfo->robModList))->modInfo[j].name && (*(ReInfo->robModList))->modInfo[j].index == robotIdx)
-        {
-          /* We have the right driver : load it */
-          elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
-          if (!elt)
-          {
-            GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
-            snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
-            ReUI().addLoadingMessage(buf);
-            snprintf(buf, sizeof(buf), "       Have a look at the console window for mode details about the error");
-            ReUI().addLoadingMessage(buf);
-            snprintf(buf, sizeof(buf), "       Back to the config menu in 10 s ...");
-            ReUI().addLoadingMessage(buf);
-
-            // Wait some time to allow the user to read the message!
-            GfSleep(10.0); // 10 seconds
-          }
-        }
-      }
+        GfLogError("No driver for that race ; exiting ...\n");
+        return -1;
     }
     else
     {
-      GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
-      snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", robotModuleName, robotModuleName);
-      robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
-      if (!robhdle)
-        robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-
-      if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
-      {
-        /* Human driver */
-        elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->robModList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
-      }
-      else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
-                              GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
-      {
-        elt = reLoadSingleCar( index, i, (*(ReInfo->robModList))->modInfoSize, robotIdx, FALSE, robotModuleName );
-      }
-      else
-        GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
+        GfLogInfo("%d driver(s) ready to race\n", nCars);
     }
 
-    if (elt)
-      ++index;
-  }
-
-  nCars = index; /* real number of cars */
-  if (nCars == 0)
-  {
-    GfLogError("No driver for that race ; exiting ...\n");
-    return -1;
-  }
-  else
-  {
-    GfLogInfo("%d driver(s) ready to race\n", nCars);
-  }
-
-  if (replayReplay)
-    replayRecord = 0;
-  else
-  {
-    const char *replayRateSchemeName;
+    if (replayReplay)
+        replayRecord = 0;
+    else
+    {
+        const char *replayRateSchemeName;
 
         void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
         replayRateSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, "0");
         GfParmReleaseHandle(paramHandle);
 
-    replayRecord = atoi(replayRateSchemeName);
-  }
+        replayRecord = atoi(replayRateSchemeName);
+    }
 
-  if (replayRecord || replayReplay)
-  {
+    if (replayRecord || replayReplay)
+    {
 #ifdef THIRD_PARTY_SQLITE3
-    int result;
+        int result;
 
-    result = sqlite3_open("/tmp/race.sqlite", &replayDB);
-    if (result) {
-      GfLogError("Replay: Unable to open Database: %s\n", sqlite3_errmsg(replayDB));
-      sqlite3_close(replayDB);
-      replayDB = NULL;
-    } else {
-      GfLogInfo("Replay: Database Opened 0x8%8.8X\n", replayDB);
+        result = sqlite3_open("/tmp/race.sqlite", &replayDB);
+        if (result) {
+            GfLogError("Replay: Unable to open Database: %s\n", sqlite3_errmsg(replayDB));
+            sqlite3_close(replayDB);
+            replayDB = NULL;
+        } else {
+            GfLogInfo("Replay: Database Opened 0x8%8.8X\n", replayDB);
 
-      if (replayRecord)
-        GfLogInfo("Replay: Record Timestep = %f\n", 1/(float)replayRecord);
+            if (replayRecord)
+                GfLogInfo("Replay: Record Timestep = %f\n", 1/(float)replayRecord);
 
-      if (replayReplay)
-        GfLogInfo("Replay: Playback from file\n");
+            if (replayReplay)
+                GfLogInfo("Replay: Playback from file\n");
 
-      /* speed up database by turning of synchronous behaviour/etc */
-      sqlite3_exec(replayDB, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
-      sqlite3_exec(replayDB, "PRAGMA journal_mode = OFF", NULL, NULL, NULL);
-      sqlite3_exec(replayDB, "PRAGMA count_changes = OFF", NULL, NULL, NULL);
+            /* speed up database by turning of synchronous behaviour/etc */
+            sqlite3_exec(replayDB, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
+            sqlite3_exec(replayDB, "PRAGMA journal_mode = OFF", NULL, NULL, NULL);
+            sqlite3_exec(replayDB, "PRAGMA count_changes = OFF", NULL, NULL, NULL);
 #if 0 // This pragma seems to prevent re-opening the sqlite3 database
-      sqlite3_exec(replayDB, "PRAGMA locking_mode = EXCLUSIVE", NULL, NULL, NULL);
+            sqlite3_exec(replayDB, "PRAGMA locking_mode = EXCLUSIVE", NULL, NULL, NULL);
 #endif
-      sqlite3_exec(replayDB, "PRAGMA default_temp_store = MEMORY", NULL, NULL, NULL);
+            sqlite3_exec(replayDB, "PRAGMA default_temp_store = MEMORY", NULL, NULL, NULL);
 
-      //replayBlobs = (sqlite3_stmt *) calloc(nCars, sizeof(void *)); //sqlite3_stmt));
+            //replayBlobs = (sqlite3_stmt *) calloc(nCars, sizeof(void *)); //sqlite3_stmt));
 
-      replayTimestamp = -5;
-      ghostcarActive = 0;
+            replayTimestamp = -5;
+            ghostcarActive = 0;
+        }
+#endif
     }
-#endif
-  }
 
-  ReInfo->s->_ncars = nCars;
-  FREEZ(ReInfo->s->cars);
-  ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
-  for (int i = 0; i < nCars; i++)
-  {
-    ReInfo->s->cars[i] = &(ReInfo->carList[i]);
+    ReInfo->s->_ncars = nCars;
+    FREEZ(ReInfo->s->cars);
+    ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
+    for (int i = 0; i < nCars; i++)
+    {
+        ReInfo->s->cars[i] = &(ReInfo->carList[i]);
 
 #ifdef THIRD_PARTY_SQLITE3
-    //open a table for each car
-    if (replayDB) {
-      char command[200];
-      int result;
+        //open a table for each car
+        if (replayDB) {
+            char command[200];
+            int result;
 
-      if (replayRecord) {
-        snprintf(command, sizeof(command), "DROP TABLE IF EXISTS car%d", i);
-        result = sqlite3_exec(replayDB, command, 0, 0, 0);
-        if (result) GfLogInfo("Replay: Unable to drop table car%d: %s\n", i, sqlite3_errmsg(replayDB));
-      }
+            if (replayRecord) {
+                snprintf(command, sizeof(command), "DROP TABLE IF EXISTS car%d", i);
+                result = sqlite3_exec(replayDB, command, 0, 0, 0);
+                if (result) GfLogInfo("Replay: Unable to drop table car%d: %s\n", i, sqlite3_errmsg(replayDB));
+            }
 
-      snprintf(command, sizeof(command), "CREATE TABLE IF NOT EXISTS car%d (timestamp, lap, datablob BLOB)", i);
-      result = sqlite3_exec(replayDB, command, 0, 0, 0);
-      if (result) {
-         GfLogInfo("Replay: Unable to create table car%d: %s\n", i, sqlite3_errmsg(replayDB));
-         exit(0);
-      }
+            snprintf(command, sizeof(command), "CREATE TABLE IF NOT EXISTS car%d (timestamp, lap, datablob BLOB)", i);
+            result = sqlite3_exec(replayDB, command, 0, 0, 0);
+            if (result) {
+                GfLogInfo("Replay: Unable to create table car%d: %s\n", i, sqlite3_errmsg(replayDB));
+                exit(0);
+            }
 
-      if (replayReplay) {
-        // Build index to allow faster read access
-        snprintf(command, sizeof(command), "CREATE UNIQUE INDEX IF NOT EXISTS index%d ON car%d (timestamp)", i, i);
-        result = sqlite3_exec(replayDB, command, 0, 0, 0);
-        if (result) GfLogInfo("Replay: Unable to create index car%d: %s\n", i, sqlite3_errmsg(replayDB));
-      }
-    }
+            if (replayReplay) {
+                // Build index to allow faster read access
+                snprintf(command, sizeof(command), "CREATE UNIQUE INDEX IF NOT EXISTS index%d ON car%d (timestamp)", i, i);
+                result = sqlite3_exec(replayDB, command, 0, 0, 0);
+                if (result) GfLogInfo("Replay: Unable to create index car%d: %s\n", i, sqlite3_errmsg(replayDB));
+            }
+        }
 #endif
-  }
-    #ifdef WEBSERVER
+    }
+#ifdef WEBSERVER
     // webServer lap logger.
     //Find human cars
     for (int i = 0; i < ReInfo->s->_ncars; i++)
@@ -996,89 +1022,89 @@ ReInitCars(void)
 
             //send race data
             webServer().sendRaceStart (
-                ReInfo->s->cars[i]->_skillLevel,	//user_skill,
-                ReInfo->track->internalname,		//track_id,
-                ReInfo->s->cars[i]->_carName,		//car_id
-                ReInfo->s->_raceType,				//type of race: 0 practice/ 1 qualify/ 2 race
-                ReInfo->s->cars[i]->_carHandle,		//car setup file,
-                ReInfo->s->cars[i]->_pos,			//car starting position,
-                VERSION_LONG 						//speed dreams version
-            );
+                        ReInfo->s->cars[i]->_skillLevel,	//user_skill,
+                        ReInfo->track->internalname,		//track_id,
+                        ReInfo->s->cars[i]->_carName,		//car_id
+                        ReInfo->s->_raceType,				//type of race: 0 practice/ 1 qualify/ 2 race
+                        ReInfo->s->cars[i]->_carHandle,		//car setup file,
+                        ReInfo->s->cars[i]->_pos,			//car starting position,
+                        VERSION_LONG 						//speed dreams version
+                        );
 
         }
     }
-    #endif //WEBSERVER
+#endif //WEBSERVER
 
 
-  ReInfo->_rePitRequester = 0;
+    ReInfo->_rePitRequester = 0;
 
-  // TODO: reconsider splitting the call into one for cars, track and maybe other objects.
-  // I stuff for now anything into one call because collision detection works with the same
-  // library on all objects, so it is a bit dangerous to distribute the handling to various
-  // locations (because the library maintains global state like a default collision handler etc.).
-  RePhysicsEngine().initialize(nCars, ReInfo->track);
+    // TODO: reconsider splitting the call into one for cars, track and maybe other objects.
+    // I stuff for now anything into one call because collision detection works with the same
+    // library on all objects, so it is a bit dangerous to distribute the handling to various
+    // locations (because the library maintains global state like a default collision handler etc.).
+    RePhysicsEngine().initialize(nCars, ReInfo->track);
 
-  initStartingGrid();
+    initStartingGrid();
 
-  initPits();
+    initPits();
 
-  return 0;
+    return 0;
 }
 
 void
 ReRaceCleanup(void)
 {
-  RePhysicsEngine().shutdown();
-  StandardGame::self().unloadPhysicsEngine();
+    RePhysicsEngine().shutdown();
+    StandardGame::self().unloadPhysicsEngine();
 
-  ReStoreRaceResults(ReInfo->_reRaceName);
+    ReStoreRaceResults(ReInfo->_reRaceName);
 
-  ReRaceCleanDrivers();
+    ReRaceCleanDrivers();
 
 #ifdef THIRD_PARTY_SQLITE3
-  GfLogInfo("Replay: Database closed\n");
-  if (replayDB)
-    sqlite3_close(replayDB);
+    GfLogInfo("Replay: Database closed\n");
+    if (replayDB)
+        sqlite3_close(replayDB);
 
-  replayDB = NULL;
+    replayDB = NULL;
 #endif
-  replayRecord = 0;
+    replayRecord = 0;
 }
 
 
 void
 ReRaceCleanDrivers(void)
 {
-  int i;
-  tRobotItf *robot;
-  int nCars;
-  tMemoryPool oldPool = NULL;
+    int i;
+    tRobotItf *robot;
+    int nCars;
+    tMemoryPool oldPool = NULL;
 
-  nCars = ReInfo->s->_ncars;
+    nCars = ReInfo->s->_ncars;
 
-  for (i = 0; i < nCars; i++)
-  {
-    robot = ReInfo->s->cars[i]->robot;
-    GfPoolMove( &ReInfo->s->cars[i]->_shutdownMemPool, &oldPool );
-
-    if (robot->rbShutdown && !(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
+    for (i = 0; i < nCars; i++)
     {
-      robot->rbShutdown(robot->index);
+        robot = ReInfo->s->cars[i]->robot;
+        GfPoolMove( &ReInfo->s->cars[i]->_shutdownMemPool, &oldPool );
+
+        if (robot->rbShutdown && !(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
+        {
+            robot->rbShutdown(robot->index);
+        }
+
+        GfPoolFreePool( &oldPool );
+        GfParmReleaseHandle(ReInfo->s->cars[i]->_paramsHandle);
+        free(robot);
+        free(ReInfo->s->cars[i]->_curSplitTime);
+        free(ReInfo->s->cars[i]->_bestSplitTime);
     }
 
-    GfPoolFreePool( &oldPool );
-    GfParmReleaseHandle(ReInfo->s->cars[i]->_paramsHandle);
-    free(robot);
-    free(ReInfo->s->cars[i]->_curSplitTime);
-    free(ReInfo->s->cars[i]->_bestSplitTime);
-  }
+    RtTeamManagerRelease();
 
-  RtTeamManagerRelease();
-
-  FREEZ(ReInfo->s->cars);
-  ReInfo->s->cars = 0;
-  ReInfo->s->_ncars = 0;
-  GfModUnloadList(&ReRacingRobotsModList);
+    FREEZ(ReInfo->s->cars);
+    ReInfo->s->cars = 0;
+    ReInfo->s->_ncars = 0;
+    GfModUnloadList(&ReRacingRobotsModList);
 }
 
 // Get the name of the current "race"
