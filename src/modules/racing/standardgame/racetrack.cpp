@@ -420,6 +420,12 @@ reTrackInitWeather(void)
     }
 
      // Ground water = rain for the moment (might change in the future).
+
+    if (strcmp(ReInfo->track->category, "speedway") == 0)
+    {
+        rain = TR_RAIN_NONE;
+    }
+
     const int water = rain;
 
     // Update track local info.
@@ -568,7 +574,11 @@ reTrackInitWeatherValues(void)
      reTrackUpdatePressure();
 
      // Update track local info.
-     trackLocal->rain = rain;
+     if (strcmp(ReInfo->track->category, "speedway") == 0)
+        trackLocal->rain = TR_RAIN_NONE;
+     else
+         trackLocal->rain = rain;
+
      trackLocal->hail = 0;
      trackLocal->snow = 0;
      trackLocal->clouds = (int)clouds;
@@ -754,7 +764,7 @@ reTrackInitRealWeather(void)
         else
             trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
 
-        if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
+        if (ReInfo->s->_features & RM_FEATURE_WETTRACK && (!strcmp(ReInfo->track->category, "speedway")) == 0)
         {
             trackLocal->rain = webMetar->getRain();
             trackLocal->water = trackLocal->rain;
