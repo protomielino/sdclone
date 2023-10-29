@@ -294,7 +294,7 @@ void SDWheels::updateWheels()
         if (compounds)
         {
             this->wheels_switches[i]->setSingleChildOn(v);
-            GfLogDebug("Drawing Compounds = %i\n", v);
+            GfLogInfo("Drawing Compounds = %i\n", v);
         }
         else
             this->wheels_switches[i]->setSingleChildOn(j);
