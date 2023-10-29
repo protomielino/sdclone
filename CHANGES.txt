@@ -1,15 +1,49 @@
 Speed Dreams 2.4.0
 ================================
  Physics
- *simuV4:
- 	updated atmosphere for ne code config
+	*SimuV5 :
+		- migration of features from simuv4 to simuv5.
+		- creation of simulation options for calls on certain functions depending 
+		on the level of the robot (arcade/semi-rookie/rookie/amateur/semi-pro/pro)
+		- tyre&degradation moved features->options simulation (activate on semi-pro & pro)
+		- aero factor added with level < semi-pro
+		- first work on engine temperature with engine > maxtemperature engine broken.
+
+ 	*simuV4:
+ 		updated atmosphere for new code config
+
+ Racing
+	*Standargame :
+		- fix bug with pit sharing (before if number runners > pit lasts runners have not pit)
+		now pit sharing is activate if racers > pit
+		- desactivate rain for speedways
+ Robots 
+	*Simplix
+		- manage tyre&degradation for all cars now
+
+	*USR
+		- manage tyre&degradation for all cars now
+		- activate rain on all MPAxx
+
+	*Shadow
+		- manage tyre&degradation for all cars now
+		- activate rain on all MPAxx
+
+	*DanDroid
+		- manage tyre&degradation for all cars now
+		- activate rain on all MPAxx
 
  Code
  	* added seasons in race parameters
  	* change code for config weather (removed all random values by formula)
 
+ Cars
+	* reworking all MPA1 cars
+
  Tracks
  	* new kurpfalzring circuit
+	* new WIP Atlanta road
+	* rework Lemans road (WIP)
 
 Speed Dreams 2.2.0
 ================================
