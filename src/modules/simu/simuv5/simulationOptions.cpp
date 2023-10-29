@@ -38,7 +38,7 @@ void SimulationOptions::SetFromSkill (tSkillLevel skill)
         option_list.Set(PRM_DAMAGE_AERO, false);
         option_list.Set(PRM_DAMAGE_ENGINE, false);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
-        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, false);
+        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, true);
         option_list.Set(PRM_MODEL_ENGINE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 4.0f);
         break;
@@ -49,7 +49,7 @@ void SimulationOptions::SetFromSkill (tSkillLevel skill)
         option_list.Set(PRM_DAMAGE_AERO, true);
         option_list.Set(PRM_DAMAGE_ENGINE, false);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
-        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, false);
+        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, true);
         option_list.Set(PRM_MODEL_ENGINE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 4.0f);
         break;
@@ -61,7 +61,7 @@ void SimulationOptions::SetFromSkill (tSkillLevel skill)
         option_list.Set(PRM_DAMAGE_ENGINE, false);
         option_list.Set(PRM_MODEL_AEROFLOW, SIMPLE);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
-        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, false);
+        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, true);
         option_list.Set(PRM_MODEL_ENGINE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 3.0f);
         break;
@@ -73,7 +73,7 @@ void SimulationOptions::SetFromSkill (tSkillLevel skill)
         option_list.Set(PRM_DAMAGE_ENGINE, true);
         option_list.Set(PRM_MODEL_AEROFLOW, SIMPLE);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
-        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, false);
+        option_list.Set(PRM_MODEL_TYRE_COMPOUNDS, true);
         option_list.Set(PRM_MODEL_ENGINE_TEMPERATURE, true);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 2.0f);
         break;
@@ -137,6 +137,7 @@ bool SimulationOptions::StrToBool (const char* s, bool dontcare)
     {
         return false;
     }
+
     return dontcare;
 }
 

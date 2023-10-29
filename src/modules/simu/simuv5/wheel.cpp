@@ -111,19 +111,23 @@ void SimWheelConfig(tCar *car, int index)
     tireratio             = GfParmGetNum(hdle, WheelSect[index], PRM_TIRERATIO, (char*)NULL, 0.75f);
     wheel->mu             = GfParmGetNum(hdle, WheelSect[index], PRM_MU, (char*)NULL, 1.0f);
 
-    if (car->features & FEAT_COMPOUNDS && car->options->compounds)
+    if ((car->features & FEAT_COMPOUNDS) && car->options->compounds)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
         wheel->muC[1] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+        GfLogInfo("Mu in simuV5 soft = %.3f\n", wheel->muC[1]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->muC[2] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+        GfLogInfo("Mu in simuV5 medium = %.3f\n", wheel->muC[1]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
         wheel->muC[3] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+        GfLogInfo("Mu in simuV5 hard = %.3f\n", wheel->muC[1]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
         wheel->muC[4] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+        GfLogInfo("Mu in simuV5 wet = %.3f\n", wheel->muC[1]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
         wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
@@ -136,6 +140,13 @@ void SimWheelConfig(tCar *car, int index)
             wheel->muC[5] -= 0.3;
             GfLogInfo("# Simu MU compound with no rain wet = %.3f - extreme wet = %.3f\n",
                       wheel->muC[4], wheel->muC[5]);
+        }
+
+        if(SimRain > 0)
+        {
+            wheel->muC[1] = 1.0;
+            wheel->muC[2] = 1.0;
+            wheel->muC[3] -= 0.2;
         }
     }
 
@@ -194,7 +205,7 @@ void SimWheelConfig(tCar *car, int index)
     wheel->treadDepth = 1.0;
     wheel->Topt = GfParmGetNum(hdle, WheelSect[index], PRM_OPTTEMP, (char*)NULL, 350.0f);
 
-    if (car->features & FEAT_COMPOUNDS && car->options->compounds)
+    if ((car->features & FEAT_COMPOUNDS) && car->options->compounds)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
         wheel->TinitC[1] = GfParmGetNum(hdle, path, PRM_INITTEMP, (char*)NULL, wheel->Tinit);
@@ -225,7 +236,6 @@ void SimWheelConfig(tCar *car, int index)
     if (car->options->tyre_temperature)
     {
         wheel->Ttire = wheel->Tinit;
-
     }
     else
     {

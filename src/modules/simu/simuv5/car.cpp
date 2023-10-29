@@ -43,7 +43,7 @@ SimCarConfig(tCar *car)
 
     car->options = new SimulationOptions;
     car->options->SetFromSkill (carElt->_skillLevel);
-    car->options->LoadFromFile (hdle);
+    //car->options->LoadFromFile (hdle);
 
     car->fuel_time = 0.0;
     car->fuel_consumption = 0.0;
@@ -68,66 +68,76 @@ SimCarConfig(tCar *car)
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_AEROTOCG;
+        GfLogInfo("SimuV5 feature AEROTOCG on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_SLOWGRIP, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_SLOWGRIP;
+        GfLogInfo("SimuV5 feature SLOW GRIP on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_REALGEARCHANGE, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_REALGEARCHANGE;
+        GfLogInfo("SimuV5 feature REAL GEAR CHANGE on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_REVLIMIT, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_REVLIMIT;
+        GfLogInfo("SimuV5 feature REV LIMIT on\n");
     }
 
-    enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+    /*enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_TIRETEMPDEG;
-    }
+    }*/
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TIRECOMPOUNDS, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_COMPOUNDS;
+        GfLogInfo("SimuV5 feature COMPOUNDS on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_FIXEDWHEELFORCE, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_FIXEDWHEELFORCE;
+        GfLogInfo("SimuV5 feature FIXED WHEEL FORCE on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_TCLINSIMU;
+        GfLogInfo("SimuV5 feature TCL SIMU on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_ABSINSIMU;
+        GfLogInfo("SimuV5 feature ABS SIMU on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_ESPINSIMU;
+        GfLogInfo("SimuV5 feature ESP IMU on\n");
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_LIMITEDGROUNDEFFECT, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
         car->features = car->features | FEAT_LIMITEDGROUNDEFFECT;
+        GfLogInfo("SimuV5 feature LIMITED GROUND EFFECT on\n");
     }
 
     /* continue with car parameters */
@@ -207,6 +217,7 @@ SimCarConfig(tCar *car)
         setupSpring->stepsize = 1000;
         K[i] = setupSpring->desired_value;
     }
+
     setupSpring = &(car->carElt->setup.heaveSpring[0]);
     setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
     GfParmGetNumWithLimits(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
@@ -442,7 +453,7 @@ SimCarConfig(tCar *car)
         i = 1;
     }
 
-    if (car->features & FEAT_COMPOUNDS && car->options->compounds)
+    if ((car->features & FEAT_COMPOUNDS) && car->options->compounds)
     {
         priv->dashboardRequest[0].type = DI_COMPOUND_SET;
         priv->dashboardRequest[0].setup = &(setup->reqTirecompound);

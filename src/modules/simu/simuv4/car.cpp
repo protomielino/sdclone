@@ -61,6 +61,7 @@ SimCarConfig(tCar *car)
     car->TCL_SlipScale = 1.0f;
     car->ABS_SlipScale = 0.1f;
     car->ABS_BrakeScale = 1.0f;
+
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_AEROTOCG, VAL_NO);
     if (strcmp(enabling, VAL_YES) == 0)
     {
