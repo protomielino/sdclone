@@ -564,12 +564,6 @@ public class TrackObjectDialog extends JDialog
 			return;
 		}
 		
-		if (objectMapComboBox.getSelectedIndex() == -1)
-		{
-			JOptionPane.showMessageDialog(this, "No object map selected!", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
 		setRGB(rgb);
 
 		if (objectShape != null)
