@@ -2357,8 +2357,19 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				else
 				{
 					editorFrame.setCurrentObjectGraphic(false);
-					// TODO handle more than one object map
-					editorFrame.setCurrentObjectMap(0);
+					int objectMapIndex = 0;
+					for (ObjectMap objectMap : editorFrame.getObjectMaps())
+					{
+						for (ObjShapeObject object : objectMap.getObjects())
+						{
+							if (shape == object)
+							{
+								editorFrame.setCurrentObjectMap(objectMapIndex);
+								break;								
+							}
+						}
+						objectMapIndex++;
+					}
 				}
 				editorFrame.setCurrentObjectColor(shape.getRGB());
 				editorFrame.setPasteObject(true);
@@ -2994,6 +3005,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			if (option == 0)
 			{
 				createObjectMap(me);
+				editorFrame.setCurrentObjectMap(0);
 				addToObjectMap(me);
 			}
 			else if (option == 1)
@@ -3019,7 +3031,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				addToObjects(me);
 			}
 		}
-		else
+		else // no object maps
 		{
 			String[] options = {"Yes", "No", "Cancel"};
 
@@ -3032,22 +3044,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			else if (option == 1)
 			{
-				if (editorFrame.getObjectMaps().isEmpty())
-				{
-					createObjectMap(me);
-				}
-				else if (editorFrame.getCurrentObjectMap() == -1)
-				{
-					if (editorFrame.getObjectMaps().size() == 1)
-					{
-						editorFrame.setCurrentObjectMap(0);
-					}
-					else
-					{
-						// TODO pick which one
-						editorFrame.setCurrentObjectMap(0);
-					}
-				}
+				createObjectMap(me);
+				editorFrame.setCurrentObjectMap(0);
 				addToObjectMap(me);
 			}
 		}
@@ -3163,7 +3161,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	private void addToObjectMap(MouseEvent me)
 	{
-		ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+		ObjectMap objectMap = null;
+		if (editorFrame.getCurrentObjectMap() == -1)
+		{
+			if (editorFrame.getObjectMaps().isEmpty())
+			{
+				createObjectMap(me);
+			}
+			editorFrame.setCurrentObjectMap(0);
+		}
+		
+		objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+		
 		Point2D.Double real = new Point2D.Double();
 		screenToReal(me, real);
 
@@ -3181,8 +3190,20 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		if (addObjectDialog.isChanged())
 		{
-			objectMap.addObject(object);			
-			Undo.add(new UndoAddObject(objectMap, object));
+			ObjectMap newObjectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+			if (newObjectMap != objectMap)
+			{
+				if (objectMap.getImageWidth() != newObjectMap.getImageWidth() ||
+					objectMap.getImageHeight() != newObjectMap.getImageHeight())
+				{
+					// convert location to image coordinates
+					realToImage(real, newObjectMap.getImageWidth(), newObjectMap.getImageHeight(), imageXY);
+					object.setImageX(imageXY[0]);
+					object.setImageY(imageXY[1]);
+				}
+			}
+			newObjectMap.addObject(object);			
+			Undo.add(new UndoAddObject(newObjectMap, object));
 			editorFrame.setCurrentObjectGraphic(false);
 			editorFrame.setCurrentObjectColor(object.getRGB());
 			editorFrame.documentIsModified = true;

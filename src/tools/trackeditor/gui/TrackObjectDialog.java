@@ -34,11 +34,14 @@ public class TrackObjectDialog extends JDialog
 	private boolean						isGraphicObject			= false;
 
 	private int							rgb						= 0;
+	
+	private JLabel						objectMapLabel			= null;
+	private JComboBox<String>			objectMapComboBox		= null;
 
 	private JCheckBox					defaultCheckBox			= new JCheckBox();
 
-	private JLabel						nameLabel				= new JLabel();
-	private JTextField					nameTextField			= new JTextField();
+	private JLabel						nameLabel				= null;
+	private JTextField					nameTextField			= null;
 
 	private JLabel						objectLabel				= new JLabel();
 	private JComboBox<String>			objectComboBox			= null;
@@ -275,6 +278,7 @@ public class TrackObjectDialog extends JDialog
 		{
 			setLocationRelativeTo(getParent());
 		}
+		
 		defaultCheckBox.setText("Default Objects");
 		defaultCheckBox.setBounds(120, 10, 150, 23);
 		defaultCheckBox.addActionListener(new ActionListener()
@@ -339,11 +343,34 @@ public class TrackObjectDialog extends JDialog
 
 		if (isGraphicObject)
 		{
-			nameLabel.setText("Name");
+			nameLabel = new JLabel("Name");
 			nameLabel.setBounds(10, 37, 120, 23);
 
-			nameTextField.setText(getObjectName());
+			nameTextField = new JTextField(getObjectName());
 			nameTextField.setBounds(120, 37, 170, 23);
+		}
+		else
+		{
+			if (editorFrame.getObjectMaps().size() > 0)
+			{
+				objectMapLabel = new JLabel("Object Map");
+				objectMapLabel.setBounds(10, 37, 120, 23);
+				
+				objectMapComboBox = new JComboBox<String>();
+				objectMapComboBox.setBounds(120, 37, 170, 23);
+				for (int i = 0; i < editorFrame.getObjectMaps().size(); i++)
+				{
+					objectMapComboBox.addItem(editorFrame.getObjectMaps().get(i).getName());
+				}
+				objectMapComboBox.setSelectedIndex(editorFrame.getCurrentObjectMap());			
+				objectMapComboBox.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						objectMapComboBoxChanged();
+					}
+				});
+			}			
 		}
 
 		colorLabel.setText("Color");
@@ -410,6 +437,11 @@ public class TrackObjectDialog extends JDialog
 			add(nameLabel);
 			add(nameTextField);
 		}
+		else
+		{
+			add(objectMapLabel);
+			add(objectMapComboBox);
+		}
 
 		add(objectLabel);
 		add(objectComboBox);
@@ -440,6 +472,19 @@ public class TrackObjectDialog extends JDialog
 		objectComboBox.setSelectedIndex(objectIndex);
 	}
 
+	private void objectMapComboBoxChanged()
+	{
+		if (ignoreActions)
+			return;
+		if (objectMapComboBox.getSelectedIndex() == -1)
+		{
+			JOptionPane.showMessageDialog(this, "No object map selected!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		editorFrame.setCurrentObjectMap(objectMapComboBox.getSelectedIndex());
+		changed = true;
+	}
+	
 	private void objectComboBoxChanged()
 	{
 		if (ignoreActions)
@@ -518,25 +563,40 @@ public class TrackObjectDialog extends JDialog
 			JOptionPane.showMessageDialog(this, "No object selected!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		
+		if (objectMapComboBox.getSelectedIndex() == -1)
+		{
+			JOptionPane.showMessageDialog(this, "No object map selected!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
 		setRGB(rgb);
 
 		if (objectShape != null)
 		{
-			String newName = nameTextField.getText();
-
-			for (GraphicObject object : editorFrame.getGraphicObjects())
+			if (nameTextField != null)
 			{
-				if (object.getShape() != objectShape)
+				String newName = nameTextField.getText();
+	
+				for (GraphicObject object : editorFrame.getGraphicObjects())
 				{
-					if (object.getName().equals(newName))
+					if (object.getShape() != objectShape)
 					{
-						JOptionPane.showMessageDialog(this, "Object name already used!", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+						if (object.getName().equals(newName))
+						{
+							JOptionPane.showMessageDialog(this, "Object name already used!", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 					}
 				}
+				objectShape.setName(newName);
 			}
-			objectShape.setName(newName);
+			else
+			{
+				String newName = (String) objectComboBox.getSelectedItem();
+				
+				objectShape.setName(newName);
+			}
 			
 			if (graphicObject == null)
 			{
