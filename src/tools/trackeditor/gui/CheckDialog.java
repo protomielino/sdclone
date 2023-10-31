@@ -31,6 +31,7 @@ import utils.ac3d.Ac3dObject;
 import utils.ac3d.Ac3dSurface;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
+import utils.circuit.GraphicObject;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Pits;
@@ -753,6 +754,19 @@ public class CheckDialog extends JDialog
 				if (!terrainRectangle.contains(location))
 				{
 					textArea.append("Object Map " + objectMaps.get(i).getName() + " Object " + object.getName() + " outside terrain boundary\n");
+				}
+			}
+		}
+		
+		//check for graphic objects with same name
+		Vector<GraphicObject> graphicObjects = trackData.getGraphic().getTerrainGeneration().getGraphicObjects();
+		for (int i = 0; i < graphicObjects.size() - 1; i++)
+		{
+			for (int j = i + 1; j < graphicObjects.size(); j++)
+			{
+				if (graphicObjects.get(i).getName().equals(graphicObjects.get(j).getName()))
+				{
+					textArea.append("Graphic Objects has duplicate name: " + graphicObjects.get(i).getName() + "\n");					
 				}
 			}
 		}
