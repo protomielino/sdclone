@@ -259,3 +259,50 @@ IF(OPTION_ALL_IN_ONE_PACKAGING)
    ENDIF(MSVC AND ${CMAKE_VERSION} VERSION_LESS "3.17")
    INCLUDE(CPack)
 ENDIF(OPTION_ALL_IN_ONE_PACKAGING)
+
+IF(OPTION_PORTABLE_PACKAGING)
+   IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
+         #[[
+         This section adds a batch file for running speed-dreams-2.exe with a local settings directory.
+         This is similar to how 'Portable Apps' work.
+         It also adds projects to build a self-extracting 7-zip file (if 7-zip is installed)
+      ]]
+   ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
+   IF(WIN32)
+
+      find_program(7ZIP_EXE 7z.exe PATH_SUFFIXES 7-Zip)
+      find_file(7ZIP_WIN 7z.sfx PATH_SUFFIXES 7-Zip)
+
+      set(SD_EXE_NAME "speed-dreams-2.exe")
+      SET(PORTABLE_PACKAGE_FILE_NAME "speed-dreams-2-r${SVN_REV}-portable-setup" CACHE STRING "Name for portable package file")
+      SET(PORTABLE_BATCH_FILE_NAME "speed-dreams-2-r${SVN_REV}-portable.bat" CACHE STRING "Name for portable batch file")
+
+            CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/portable/sd-portable.bat.in" 
+                  "${CMAKE_BINARY_DIR}/${PORTABLE_BATCH_FILE_NAME}" @ONLY)
+         
+      INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/${PORTABLE_BATCH_FILE_NAME}" DESTINATION .)
+
+      # NOTE this WILL pick up changes and additions!
+      # just re-build INSTALL no need to rerun CMake configure!
+      INSTALL(DIRECTORY packaging/portable/settings DESTINATION . )
+
+      if(7ZIP_EXE AND 7ZIP_WIN)
+
+         ADD_CUSTOM_TARGET(PORTABLE_INSTALL)
+         ADD_CUSTOM_TARGET(PORTABLE_PACKAGE DEPENDS PORTABLE_INSTALL)
+
+         ADD_CUSTOM_COMMAND(TARGET PORTABLE_INSTALL
+                     COMMAND "${CMAKE_COMMAND}" --build . --target INSTALL --config $<CONFIG>
+                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                     COMMENT "Building INSTALL...")
+
+         ADD_CUSTOM_COMMAND(TARGET PORTABLE_PACKAGE
+                        COMMAND ${7ZIP_EXE} a -sfx7z.sfx ${CMAKE_BINARY_DIR}/${PORTABLE_PACKAGE_FILE_NAME} *
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}
+                        COMMENT "Building portable package...")
+
+      else(7ZIP_EXE AND 7ZIP_WIN)
+            message(STATUS "Could not find 7-ZIP. Portable build disabled.")
+      endif(7ZIP_EXE AND 7ZIP_WIN)
+   ENDIF(WIN32)
+ENDIF(OPTION_PORTABLE_PACKAGING)
