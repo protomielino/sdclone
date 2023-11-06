@@ -506,8 +506,6 @@ public class TrackObjectDialog extends JDialog
 
 		trackLocationTextField.setText(String.format("%.3f", getTrackLocation().x) + ", " + String.format("%.3f", getTrackLocation().y));
 
-		setObjectName(trackObjects.get(objectComboBox.getSelectedIndex()).getName());
-		
 		rgb = trackObjects.get(objectComboBox.getSelectedIndex()).getColor();
 		
 		Color backgroundColor = new Color((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
