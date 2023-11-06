@@ -757,7 +757,7 @@ reTrackInitRealWeather(void)
         else
             trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
-        trackLocal->airpressure = (tdble)(trackLocal->airpressure * 100);
+        trackLocal->airpressure = (tdble)(trackLocal->airpressure);
 
         if (webMetar->getDensity_C() == WebMetarNaN)
             trackLocal->airdensity = 1.219f;

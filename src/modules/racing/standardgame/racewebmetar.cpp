@@ -1125,6 +1125,15 @@ bool ReWebMetar::scanPressure()
     char *m = _m;
     double factor;
     int press, i;
+    bool unitProvided = true;
+    bool valueProvided = true;
+    //_pressure = 101300.0;
+
+    if (*m == '\0')
+    {
+        _pressure = 101300.0;	// pressure not provided... assume standard pressure
+        return true;
+    }
 
     if (*m == 'A')
         factor = 3386.388640341 / 100;
@@ -1139,7 +1148,59 @@ bool ReWebMetar::scanPressure()
 
     press *= 100;
 
-    if (!strncmp(m, "//", 2))	// not spec compliant!
+    if (*m == ' ')	// ignore space
+        m++;
+
+    if (!strncmp(m, "////", 4))
+    {
+        // sensor failure... assume standard pressure
+        if (*(m - 1) == 'A')
+            press = 2992;
+        else
+            press = 1013;
+
+        m += 4;
+    }
+    else
+    {
+        if (!scanNumber(&m, &press, 2, 4))
+        {
+            valueProvided = false;
+
+            // sensor failure... assume standard pressure
+            if (*(m - 1) == 'A')
+                press = 2992;
+            else
+                press = 1013;
+        }
+    }
+
+    if (press < 100)
+    {
+        // 2-digit pressure may have further data following
+        press *= 100;
+        if (!strncmp(m, "//", 2)) 	// not spec compliant!
+            m += 2;
+        else if (scanNumber(&m, &i, 2))
+            press += i;
+    }
+
+    if (*m == ',' || *m == '=')	// ignore trailing comma, equals
+        m++;
+
+    if ((unitProvided || valueProvided) && !scanBoundary(&m))
+        return false;
+
+    // derive unit when not explicitly provided
+    if (!unitProvided)
+        factor = (press > 2000 ? 3386.388640341 / 100.0 : 100.0);
+
+    _pressure = (press * factor);
+    _m = m;
+
+    return true;
+
+    /*if (!strncmp(m, "//", 2))	// not spec compliant!
         m += 2;
     else if (scanNumber(&m, &i, 2))
         press += i;
@@ -1155,7 +1216,7 @@ bool ReWebMetar::scanPressure()
     GfLogDebug("Pressure = %.3f\n", _pressure);
     _grpcount++;
 
-    return true;
+    return true;*/
 }
 
 static const char *runway_deposit[] =
