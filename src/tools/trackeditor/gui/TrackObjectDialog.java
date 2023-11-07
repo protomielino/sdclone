@@ -482,7 +482,6 @@ public class TrackObjectDialog extends JDialog
 			return;
 		}
 		editorFrame.setCurrentObjectMap(objectMapComboBox.getSelectedIndex());
-		changed = true;
 	}
 	
 	private void objectComboBoxChanged()
@@ -561,7 +560,7 @@ public class TrackObjectDialog extends JDialog
 			JOptionPane.showMessageDialog(this, "No object selected!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		setRGB(rgb);
 
 		if (objectShape != null)
@@ -588,6 +587,7 @@ public class TrackObjectDialog extends JDialog
 				String newName = (String) objectComboBox.getSelectedItem();
 				
 				objectShape.setName(newName);
+				editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap()).setChanged(true);
 			}
 			
 			if (graphicObject == null)

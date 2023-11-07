@@ -2435,6 +2435,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						if (objects.elementAt(j) == shape)
 						{
+							editorFrame.setCurrentObjectMap(i);
+							
 							Undo.add(new UndoEditObject(objectMap, shape));
 
 							TrackObjectDialog editObjectDialog = new TrackObjectDialog(editorFrame, false, shape, me.getXOnScreen(), me.getYOnScreen());
