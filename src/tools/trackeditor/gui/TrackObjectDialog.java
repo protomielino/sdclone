@@ -177,22 +177,6 @@ public class TrackObjectDialog extends JDialog
 		
 		return objectData.name;
 	}
-	private void setObjectName(String name)
-	{
-		if (objectShape != null)
-		{
-			objectShape.setName(name);
-			return;
-		}
-
-		if (graphicObjectDatum != null)
-		{
-			graphicObjectDatum.name = name;
-			return;
-		}
-
-		objectData.name = name;
-	}
 
 	private Point2D.Double getTrackLocation()
 	{
@@ -608,6 +592,8 @@ public class TrackObjectDialog extends JDialog
 				}
 				catch (NumberFormatException e)
 				{
+					JOptionPane.showMessageDialog(this, "Invalid orientation!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}
 			
@@ -624,6 +610,8 @@ public class TrackObjectDialog extends JDialog
 				}
 				catch (NumberFormatException e)
 				{
+					JOptionPane.showMessageDialog(this, "Invalid height!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}			
 		}
@@ -657,6 +645,8 @@ public class TrackObjectDialog extends JDialog
 				}
 				catch (NumberFormatException e)
 				{
+					JOptionPane.showMessageDialog(this, "Invalid orientation!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}
 			
@@ -673,6 +663,8 @@ public class TrackObjectDialog extends JDialog
 				}
 				catch (NumberFormatException e)
 				{
+					JOptionPane.showMessageDialog(this, "Invalid height!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}			
 		}
