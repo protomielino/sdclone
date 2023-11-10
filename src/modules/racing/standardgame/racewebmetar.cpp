@@ -742,8 +742,6 @@ bool ReWebMetar::scanRwyVisRange()
     _runways[id]._min_visibility = r._min_visibility;
     _runways[id]._max_visibility = r._max_visibility;
 
-    GfLogInfo(" METAR Visibility = %.1f\n", r._min_visibility);
-
     return true;
 }
 
@@ -962,6 +960,7 @@ bool ReWebMetar::scanSkyCondition()
         if (i == 3)
         {
             cl._coverage = ReWebMetarCloud::COVERAGE_CLEAR;
+            priorCoverage = cl._coverage;
             _clouds.push_back(cl);
         }
         else
@@ -1027,8 +1026,8 @@ bool ReWebMetar::scanSkyCondition()
     }
     else if (!strncmp(m, "///", i = 3))
     {
-            cl._coverage = ReWebMetarCloud::COVERAGE_NIL; // should we add 'unknown'?
-
+        cl._coverage = ReWebMetarCloud::COVERAGE_NIL; // should we add 'unknown'?
+        priorCoverage = cl._coverage;
     }
     else
     {
