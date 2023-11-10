@@ -245,7 +245,7 @@ public:
     inline double		getTemperature_F()	const { return _temp == WebMetarNaN ? WebMetarNaN : 1.8 * _temp + 32; }
     inline double		getDewpoint_C()		const { return _dewp; }
     inline double		getDewpoint_F()		const { return _dewp == WebMetarNaN ? WebMetarNaN : 1.8 * _dewp + 32; }
-    inline double		getPressure_hPa()	const { return _pressure == WebMetarNaN ? WebMetarNaN : _pressure / 100; }
+    inline double		getPressure_hPa()	const { return _pressure == WebMetarNaN ? WebMetarNaN : _pressure; }
     inline double		getPressure_inHg()	const { return _pressure == WebMetarNaN ? WebMetarNaN : _pressure * 0.0002952998330101010; }
     inline double       getDensity_C()      const { return _density; }
 
@@ -253,6 +253,9 @@ public:
     inline int			getHail()			const { return _hail; }
     inline int			getSnow()			const { return _snow; }
     inline bool			getCAVOK()			const { return _cavok; }
+
+    inline double       getRelativeHumidity() const { return _relativehumidity; }
+
 
     double				getRelHumidity()	const;
 
@@ -263,7 +266,6 @@ public:
 
 protected:
     std::string	_url;
-    int			_grpcount;
     bool		_x_proxy;
     char*		_data;
     char*		_m;
@@ -287,6 +289,7 @@ protected:
     int			_rain;
     int			_hail;
     int			_snow;
+    double      _relativehumidity;
     int         _cloudnumber;
     int         _cloud1;
     double      _cloud_altitude1;

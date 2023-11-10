@@ -64,7 +64,6 @@ static size_t curl_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 }
 
 ReWebMetar::ReWebMetar() :
-    _grpcount(0),
     _x_proxy(false),
     _data(NULL),
     _m(NULL),
@@ -87,6 +86,7 @@ ReWebMetar::ReWebMetar() :
     _rain(false),
     _hail(false),
     _snow(false),
+    _relativehumidity(-1),
     _cloudnumber(0),
     _cloud1(-1),
     _cloud_altitude1(-1),
@@ -158,7 +158,7 @@ void ReWebMetar::ReWebMetarLoad(const string& m)
 {
     _data = new char[m.length() + 2];	// make room for " \0"
     strcpy(_data, m.c_str());
-    _url = _data;
+    _url = m;
 
     normalizeData();
 
@@ -202,14 +202,8 @@ void ReWebMetar::ReWebMetarLoad(const string& m)
     scanRemark();
     density();
 
-    if (_grpcount < 4)
-    {
-        delete[] _data;
-    }
-
     _url = "";
 }
-
 
 /**
   * Clears lists and maps to discourage access after destruction.
@@ -221,7 +215,6 @@ ReWebMetar::~ReWebMetar()
     _weather.clear();
     delete[] _data;
 }
-
 
 void ReWebMetar::useCurrentDate()
 {
@@ -284,7 +277,7 @@ bool ReWebMetar::scanPreambleDate()
     _month = month;
     _day = day;
     _m = m;
-    GfLogDebug("YEAR = %i - MONTH = %i - DAY = %i\n", _year, _month, _day);
+    GfLogInfo(" METAR YEAR = %i - MONTH = %i - DAY = %i\n", _year, _month, _day);
 
     return true;
 }
@@ -297,13 +290,20 @@ bool ReWebMetar::scanPreambleTime()
     int hour, minute;
 
     if (!scanNumber(&m, &hour, 2))
+    {
+        GfLogDebug("Erreur scan Pre amble Time hour = %i\n", hour);
+
         return false;
+    }
 
     if (*m++ != ':')
         return false;
 
     if (!scanNumber(&m, &minute, 2))
+    {
+        GfLogDebug("Erreur scan Pre amble Time minute = %i\n", minute);
         return false;
+    }
 
     /*if (!scanBoundary(&m))
         return false;*/
@@ -311,7 +311,7 @@ bool ReWebMetar::scanPreambleTime()
     _hour = hour;
     _minute = minute;
     _m = m;
-    GfLogDebug("HOUR = %i - MINUTES = %i\n", _hour, _minute);
+    GfLogInfo(" METAR hour = %i - minutes = %i\n", _hour, _minute);
 
     return true;
 }
@@ -319,12 +319,12 @@ bool ReWebMetar::scanPreambleTime()
 // (METAR|SPECI)
 bool ReWebMetar::scanType()
 {
-    GfLogDebug("Start scan Tyoe ...\n");
+    GfLogDebug("Start scan Type ...\n");
+
     if (strncmp(_m, "METAR ", 6) && strncmp(_m, "SPECI ", 6))
         return false;
 
     _m += 6;
-    _grpcount++;
 
     return true;
 }
@@ -344,8 +344,7 @@ bool ReWebMetar::scanId()
     strncpy(_icao, _m, 4);
     _icao[4] = '\0';
     _m = m;
-    GfLogDebug("ICAO = %s\n", _icao);
-    _grpcount++;
+    GfLogInfo(" METAR ICAO = %s\n", _icao);
 
     return true;
 }
@@ -376,7 +375,8 @@ bool ReWebMetar::scanDate()
     _hour = hour;
     _minute = minute;
     _m = m;
-    _grpcount++;
+
+    GfLogInfo(" METAR day = %i - hour = %i - minute = %i\n", _day, _hour, _minute);
 
     return true;
 }
@@ -410,8 +410,6 @@ bool ReWebMetar::scanModifier()
     _report_type = type;
     _m = m;
 
-    _grpcount++;
-
     return true;
 }
 
@@ -423,27 +421,42 @@ bool ReWebMetar::scanWind()
     char *m = _m;
     int dir;
 
+    if(*m =='?' || *m == 'E')
+        m++;
+
     if (!strncmp(m, "VRB", 3))
         m += 3, dir = -1;
+    else if(!strncmp(m, "///", 3))
+        m += 3, dir = -1;
     else if (!scanNumber(&m, &dir, 3))
-        return false;
+        dir = -1;
+
+    if (*m =='/' && *(m+1) != '/')
+        m++;
 
     int i;
 
-    if (!scanNumber(&m, &i, 2, 3))
-        return false;
+    if (!strncmp(m, "//", 2))
+        m += 2, i = -1;
+    else if (!scanNumber(&m, &i, 1, 3))
+        i = -1;
 
     double speed = i;
     double gust = NaN;
 
-    if (*m == 'G')
+    if (*m == ' ' && *(m+1) == 'G')
+        m++;
+    if  (*m == 'G')
     {
         m++;
 
+        if (!strncmp(m, "//", 2))
+            m += 2, i = -1;
         if (!scanNumber(&m, &i, 2, 3))
             return false;
 
-        gust = i;
+        if (i != -1)
+            gust = i;
     }
 
     double factor;
@@ -463,14 +476,13 @@ bool ReWebMetar::scanWind()
         return false;
 
     _m = m;
-    _wind_dir = dir;
-    _wind_speed = speed * factor;
+    _wind_dir = dir == -1 ? 0 : dir;
+    _wind_speed = speed < 0.0 ? 00 : speed * factor;
 
     if (gust != NaN)
         _gust_speed = gust * factor;
 
-    _grpcount++;
-    GfLogDebug("Wind speed = %.3f - Wind Direction = %d\n", _wind_speed, _wind_dir);
+    GfLogInfo(" METAR Wind speed = %.3f - Wind Direction = %d\n", _wind_speed, _wind_dir);
 
     return true;
 }
@@ -482,21 +494,27 @@ bool ReWebMetar::scanVariability()
     char *m = _m;
     int from, to;
 
-    if (!scanNumber(&m, &from, 3))
+    if (!strncmp(m, "///", 3))
+        m += 3, from = -1;
+    else if (!scanNumber(&m, &from, 1, 3))
         return false;
 
     if (*m++ != 'V')
         return false;
 
-    if (!scanNumber(&m, &to, 3))
+    if (!strncmp(m, "///", 3)) // direction not measurable
+        m += 3, to = -1;
+    else if (!scanNumber(&m, &to, 1, 3))
         return false;
 
     if (!scanBoundary(&m))
         return false;
+
     _m = m;
     _wind_range_from = from;
     _wind_range_to = to;
-    _grpcount++;
+
+    GfLogInfo(" METAR wind range from = %i - wind range to = %i\n", _wind_range_from, _wind_range_to);
 
     return true;
 }
@@ -505,12 +523,19 @@ bool ReWebMetar::scanVisibility()
 // TODO: if only directed vis are given, do still set min/max
 {
     GfLogDebug("Start scan Visibility ...\n");
-    if (!strncmp(_m, "//// ", 5))
-    {         // spec compliant?
-        _m += 5;
-        _grpcount++;
+    if (!strncmp(_m, "///// ", 5))
+        return false;
 
-        return true;
+    if (!strncmp(_m, "////", 4))
+    {
+        _m += 4;
+
+        if (!strncmp(_m, "SM", 2))
+            _m += 2;
+        else if(!strncmp(_m, "KM", 2))
+            _m += 2;
+
+        return scanBoundary(&_m);
     }
 
     char *m = _m;
@@ -520,7 +545,7 @@ bool ReWebMetar::scanVisibility()
     // \d{4}(N|NE|E|SE|S|SW|W|NW)?
     if (scanNumber(&m, &i, 4))
     {
-        if( strncmp( m, "NDV",3 ) == 0 )
+        if( strncmp( m, "NDV", 3 ) == 0 )
         {
             m+=3; // tolerate NDV (no directional validation)
         }
@@ -570,7 +595,7 @@ bool ReWebMetar::scanVisibility()
         if (*m == 'M')
             m++, modifier = ReWebMetarVisibility::LESS_THAN;
 
-        if (!scanNumber(&m, &i, 1, 2))
+        if (!scanNumber(&m, &i, 1, 3))
             return false;
 
         distance = i;
@@ -581,6 +606,7 @@ bool ReWebMetar::scanVisibility()
 
             if (!scanNumber(&m, &i, 1, 2))
                 return false;
+
             distance /= i;
         }
         else if (*m == ' ')
@@ -597,7 +623,8 @@ bool ReWebMetar::scanVisibility()
             if (!scanNumber(&m, &denom, 1, 2))
                 return false;
 
-            distance += (double)i / denom;
+            if (denom != 0)
+                distance += (double)i / denom;
         }
 
         if (!strncmp(m, "SM", 2))
@@ -612,6 +639,7 @@ bool ReWebMetar::scanVisibility()
         return false;
 
     ReWebMetarVisibility *v;
+
     if (dir != -1)
         v = &_dir_visibility[dir / 45];
     else if (_min_visibility._distance == NaN)
@@ -624,9 +652,8 @@ bool ReWebMetar::scanVisibility()
     v->_modifier = modifier;
     v->_direction = dir;
     _m = m;
-    _grpcount++;
 
-    GfLogDebug("Distance = %.3f - Modifier = %i - Direction = %i\n", v->_distance, v->_modifier, v->_direction);
+    GfLogInfo(" METAR visibility Distance = %.3f - Modifier = %i - Direction = %i\n", v->_distance, v->_modifier, v->_direction);
 
     return true;
 }
@@ -641,8 +668,10 @@ bool ReWebMetar::scanRwyVisRange()
 
     if (*m++ != 'R')
         return false;
+
     if (!scanNumber(&m, &i, 2))
         return false;
+
     if (*m == 'L' || *m == 'C' || *m == 'R')
         m++;
 
@@ -653,22 +682,33 @@ bool ReWebMetar::scanRwyVisRange()
     if (*m++ != '/')
         return false;
 
+    if (!strncmp(m, "////", 4))
+    {
+        // sensor failure... ignore
+        _m = m + 4;
+
+        return scanBoundary(&_m);
+    }
+
     int from, to;
 
     if (*m == 'P')
         m++, r._min_visibility._modifier = ReWebMetarVisibility::GREATER_THAN;
     else if (*m == 'M')
         m++, r._min_visibility._modifier = ReWebMetarVisibility::LESS_THAN;
+
     if (!scanNumber(&m, &from, 4))
         return false;
 
     if (*m == 'V')
     {
         m++;
+
         if (*m == 'P')
             m++, r._max_visibility._modifier = ReWebMetarVisibility::GREATER_THAN;
         else if (*m == 'M')
             m++, r._max_visibility._modifier = ReWebMetarVisibility::LESS_THAN;
+
         if (!scanNumber(&m, &to, 4))
             return false;
     } else
@@ -701,7 +741,8 @@ bool ReWebMetar::scanRwyVisRange()
 
     _runways[id]._min_visibility = r._min_visibility;
     _runways[id]._max_visibility = r._max_visibility;
-    _grpcount++;
+
+    GfLogInfo(" METAR Visibility = %.1f\n", r._min_visibility);
 
     return true;
 }
@@ -722,6 +763,7 @@ static const struct Token description[] =
 { "FZ", "freezing" },
 { "MI", "shallow" },
 { "PR", "partial" },
+{ "RE", "recent" },
 { 0, 0 }
 };
 
@@ -732,6 +774,7 @@ static const struct Token phenomenon[] =
 { "GS",   "small hail and/or snow pellets" },
 { "IC",   "ice crystals" },
 { "PE",   "ice pellets" },
+{ "PL",   "ice pellets" },
 { "RA",   "rain" },
 { "SG",   "snow grains" },
 { "SN",   "snow" },
@@ -745,12 +788,11 @@ static const struct Token phenomenon[] =
 { "PY",   "spray" },
 { "SA",   "sand" },
 { "VA",   "volcanic ash" },
-{ "DS",   "duststorm" },
+{ "DS",   "dust storm" },
 { "FC",   "funnel cloud/tornado waterspout" },
 { "PO",   "well-developed dust/sand whirls" },
 { "SQ",   "squalls" },
 { "SS",   "sandstorm" },
-{ "UP",   "unknown" },	// ... due to failed automatic acquisition
 { 0, 0 }
 };
 
@@ -767,8 +809,16 @@ bool ReWebMetar::scanWeather()
     if (!strncmp(m, "// ", 3))
     {
         _m += 3;
-        _grpcount++;
+
         return false;
+    }
+
+    // maintenance flag
+    if (*m == 'M' && *(m+1) == ' ')
+    {
+        _m++;
+
+        return scanBoundary(&_m);
     }
 
     if ((a = scanToken(&m, special)))
@@ -815,6 +865,8 @@ bool ReWebMetar::scanWeather()
 
         if (!strcmp(a->id, "RA"))
             _rain = w.intensity;
+        else if (!strcmp(a->id, "DZ"))
+            _rain = LIGHT;
         else if (!strcmp(a->id, "HA"))
         {
             _hail = w.intensity;
@@ -843,7 +895,7 @@ bool ReWebMetar::scanWeather()
         _weather2.push_back( w );
     }
 
-    _grpcount++;
+    GfLogInfo(" METAR rain = %i\n", _rain);
 
     return true;
 }
@@ -882,6 +934,7 @@ bool ReWebMetar::scanSkyCondition()
     char *m = _m;
     int i;
     ReWebMetarCloud cl;
+    static ReWebMetarCloud::Coverage priorCoverage;
 
     if (!strncmp(m, "//////", 6))
     {
@@ -895,8 +948,11 @@ bool ReWebMetar::scanSkyCondition()
         return true;
     }
 
-    if  (!strncmp(m, "SKC", i = 3)		         // sky clear
-            || !strncmp(m, "CAVOK", i = 5))      // ceiling and visibility OK (implies 9999)
+    if (!strncmp(m, "CLR", i = 3)                   // clear
+            || !strncmp(m, "SKC", i = 3)		// sky clear
+            || !strncmp(m, "NCD", i = 3)		// nil cloud detected
+            || !strncmp(m, "NSC", i = 3)		// no significant clouds
+            || !strncmp(m, "CAVOK", i = 5))     // ceiling and visibility OK (implies 9999)
     {
         m += i;
 
@@ -919,55 +975,87 @@ bool ReWebMetar::scanSkyCondition()
     }
 
     if (!strncmp(m, "VV", i = 2))				// vertical visibility
-        ;
+       _vert_visibility._modifier = ReWebMetarVisibility::NOGO;
     else if (!strncmp(m, "CLR", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_CIRRUS;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("CLR / CIRRUS  - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR CLR / CIRRUS  - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "FEW", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_FEW;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("FEW  - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR FEW  - cloudnumber = %i\n", _cloudnumber);
     }
-    else if (!strncmp(m, "NCD", i = 3))
+    else if (!strncmp(m, "NCD", i = 3) || !strncmp(m, "CB", i = 2))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_MANY;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
     }
-    else if (!strncmp(m, "NSC", i = 3))
+    else if (!strncmp(m, "NSC", i = 3) || !strncmp(m, "TCU", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_CUMULUS;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "SCT", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_SCATTERED;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("SCATTERED - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR SCATTERED - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "BKN", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_BROKEN;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("BROKEN - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR BROKEN - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "OVC", i = 3))
     {
         cl._coverage = ReWebMetarCloud::COVERAGE_OVERCAST;
+        priorCoverage = cl._coverage;
         _cloudnumber =  _cloudnumber + 1;
-        GfLogDebug("OVERCAST - cloudnumber = %i\n", _cloudnumber);
+        GfLogInfo(" METAR OVERCAST - cloudnumber = %i\n", _cloudnumber);
+    }
+    else if (!strncmp(m, "///", i = 3))
+    {
+            cl._coverage = ReWebMetarCloud::COVERAGE_NIL; // should we add 'unknown'?
+
     }
     else
-        return false;
+    {
+        // check for an implied coverage element
+        if (*m >= '0' && *m <= '9' &&
+            *(m+1) >= '0' && *(m+1) <= '9' &&
+            *(m+2) >= '0' && *(m+2) <= '9' &&
+            *(m+3) == ' ')
+        {
+            priorCoverage = cl._coverage;
+            _cloudnumber = _cloudnumber + 1;
+            i = 0;
+        }
+        else
+            return false;
+    }
 
     m += i;
 
     if (!strncmp(m, "///", 3))	// vis not measurable (e.g. because of heavy snowing)
+    {
+        m += 3, i = -1;
+        i = 60;
+    }
+    else if (!strncmp(m, "CB", 2))
+        m +=2, i = -1;
+    else if(!strncmp(m, "TCU", 3))
         m += 3, i = -1;
     else if (scanBoundary(&m))
     {
@@ -977,7 +1065,7 @@ bool ReWebMetar::scanSkyCondition()
         {
             cl._altitude = 120 * 100 * 0.3048;
             i = -1;
-            GfLogDebug("Cl.altitude = %.3f\n", cl._altitude);
+            GfLogInfo(" METAR Cl.altitude = %.3f\n", cl._altitude);
         }
         else
             return true;				// ignore single OVC/BKN/...
@@ -1003,7 +1091,7 @@ bool ReWebMetar::scanSkyCondition()
     else
         cl._altitude = 1500;
 
-    GfLogDebug("Alitude = %.3f i = %i\n", cl._altitude, i);
+    GfLogInfo(" METAR Altitude = %.3f i = %i\n", cl._altitude, i);
 
     const struct Token *a;
     if ((a = scanToken(&m, cloud_types)))
@@ -1017,6 +1105,12 @@ bool ReWebMetar::scanSkyCondition()
     if (!strncmp(m, "///", 3))
         m += 3;
 
+    if(!strncmp(m, "TCU", 3))
+        m += 3;
+
+    if(!strncmp(m, "CB", 2))
+        m += 2;
+
     if (!scanBoundary(&m))
         if (_cloudnumber < 1)
             return false;
@@ -1027,24 +1121,24 @@ bool ReWebMetar::scanSkyCondition()
     {
         _cloud1 = cl.getCoverage();
         _cloud_altitude1 = cl.getAltitude_m();
-        GfLogDebug("WebMetar Cloud 1 = %i - Cloud Altitude = %.3f\n", _cloud1, _cloud_altitude1);
+        GfLogInfo(" METAR Cloud 1 = %i - Cloud Altitude = %.3f\n", _cloud1, _cloud_altitude1);
     }
     else if(_cloudnumber == 2)
     {
         _cloud2 = cl.getCoverage();
         _cloud_altitude2 = cl.getAltitude_m();
-        GfLogDebug("WebMetar Cloud 2 = %i - Cloud Altitude = %.3f\n", _cloud2, _cloud_altitude2);
+        GfLogInfo(" METAR Cloud 2 = %i - Cloud Altitude = %.3f\n", _cloud2, _cloud_altitude2);
     }
     else if (_cloudnumber == 3)
     {
         _cloud3 = cl.getCoverage();
         _cloud_altitude3 = cl.getAltitude_m();
-        GfLogDebug("WebMetar Cloud 3 = %i - Cloud Altitude = %.3f\n", _cloud3, _cloud_altitude3);
+        GfLogInfo(" METAR Cloud 3 = %i - Cloud Altitude = %.3f\n", _cloud3, _cloud_altitude3);
     }
 
+    GfLogInfo(" METAR _m = %s\n", _m);
 
     _m = m;
-    _grpcount++;
 
     return true;
 }
@@ -1057,6 +1151,17 @@ bool ReWebMetar::scanTemperature()
     char *m = _m;
     int sign = 1, temp, dew;
 
+    /*std::string s = "M/0123456789";
+
+    for (int i=0; i<7; ++i)
+    {
+        if (*(m+i) == ' ')
+            break;
+
+        if (s.find(*(m+i)) == std::string::npos)
+            return true;        // nope, bail
+    }*/
+
     if (!strncmp(m, "XX/XX", 5))
     {		// not spec compliant!
         _m += 5;
@@ -1064,10 +1169,30 @@ bool ReWebMetar::scanTemperature()
         return scanBoundary(&_m);
     }
 
+    if (!strncmp(m, "/////", 5))
+    {
+        // sensor failure... assume standard temperature
+        _temp = 15.0;
+        _dewp = 3.0;
+        _m += 5;
+
+        GfLogInfo(" METAR standard temperature = %.2f - dew point = %.2f\n", _temp, _dewp);
+
+        return scanBoundary(&_m);
+    }
+
+    // maintenance flag
+    if (*m == 'M' && *(m+1) == ' ')
+    {
+        _m++;
+
+        return scanBoundary(&_m);
+    }
+
     if (*m == 'M')
         m++, sign = -1;
 
-    if (!scanNumber(&m, &temp, 2))
+    if (!scanNumber(&m, &temp, 1, 2))
         return false;
 
     temp *= sign;
@@ -1078,7 +1203,9 @@ bool ReWebMetar::scanTemperature()
     if (!scanBoundary(&m))
     {
         if (!strncmp(m, "XX", 2))	// not spec compliant!
-            m += 2, sign = 0, dew = temp;
+            m += 2, sign = 0, dew = temp - 10;
+        else if (!strncmp(m, "//", 2))	                // sensor failure... assume relative dew point
+            m += 2, sign = 0, dew = temp - 10;
         else
         {
             sign = 1;
@@ -1086,7 +1213,7 @@ bool ReWebMetar::scanTemperature()
             if (*m == 'M')
                 m++, sign = -1;
 
-            if (!scanNumber(&m, &dew, 2))
+            if (!scanNumber(&m, &dew, 1, 2))
                 return false;
         }
 
@@ -1099,8 +1226,8 @@ bool ReWebMetar::scanTemperature()
 
     _temp = temp;
     _m = m;
-    _grpcount++;
-    GfLogDebug("Temperature = %.3f - Dew point = %.3f\n", _temp, _dewp);
+
+    GfLogInfo(" METAR Temperature = %.3f - Dew point = %.3f\n", _temp, _dewp);
 
     return true;
 }
@@ -1114,6 +1241,8 @@ double ReWebMetar::getRelHumidity() const
     double dewp = pow(10.0, 7.5 * _dewp / (237.7 + _dewp));
     double temp = pow(10.0, 7.5 * _temp / (237.7 + _temp));
 
+    GfLogInfo(" METAR relative humidity = %.2f\n", dewp * 100 / temp);
+
     return dewp * 100 / temp;
 }
 
@@ -1124,32 +1253,34 @@ bool ReWebMetar::scanPressure()
     GfLogDebug("Start scan Pressure ...\n");
     char *m = _m;
     double factor;
-    int press, i;
     bool unitProvided = true;
     bool valueProvided = true;
-    //_pressure = 101300.0;
+    int press, i;
 
     if (*m == '\0')
     {
         _pressure = 101300.0;	// pressure not provided... assume standard pressure
+
         return true;
     }
 
     if (*m == 'A')
-        factor = 3386.388640341 / 100;
+    {
+        factor = 3386.388640341 / 100.0;
+        m++;
+    }
     else if (*m == 'Q')
-        factor = 100;
+    {
+        factor = 100.0;
+        m++;
+    }
     else
-        return false;
-    m++;
-
-    if (!scanNumber(&m, &press, 2))
-        return false;
-
-    press *= 100;
+        unitProvided = false;
 
     if (*m == ' ')	// ignore space
+    {
         m++;
+    }
 
     if (!strncmp(m, "////", 4))
     {
@@ -1169,20 +1300,24 @@ bool ReWebMetar::scanPressure()
 
             // sensor failure... assume standard pressure
             if (*(m - 1) == 'A')
+            {
                 press = 2992;
+            }
             else
+            {
                 press = 1013;
+            }
         }
-    }
 
-    if (press < 100)
-    {
-        // 2-digit pressure may have further data following
-        press *= 100;
-        if (!strncmp(m, "//", 2)) 	// not spec compliant!
-            m += 2;
-        else if (scanNumber(&m, &i, 2))
-            press += i;
+        if (press < 100)
+        {
+            press *= 100;
+
+            if (!strncmp(m, "//", 2)) 	// not spec compliant!
+                m += 2;
+            else if (scanNumber(&m, &i, 2))
+                press += i;
+        }
     }
 
     if (*m == ',' || *m == '=')	// ignore trailing comma, equals
@@ -1195,28 +1330,11 @@ bool ReWebMetar::scanPressure()
     if (!unitProvided)
         factor = (press > 2000 ? 3386.388640341 / 100.0 : 100.0);
 
-    _pressure = (press * factor);
+    _pressure = press * factor;
+    GfLogInfo(" METAR Pressure = %g\n", _pressure);
     _m = m;
 
     return true;
-
-    /*if (!strncmp(m, "//", 2))	// not spec compliant!
-        m += 2;
-    else if (scanNumber(&m, &i, 2))
-        press += i;
-    else
-        return false;
-
-    if (!scanBoundary(&m))
-        return false;
-
-    _pressure = press * factor;
-    _m = m;
-
-    GfLogDebug("Pressure = %.3f\n", _pressure);
-    _grpcount++;
-
-    return true;*/
 }
 
 static const char *runway_deposit[] =
@@ -1345,11 +1463,9 @@ bool ReWebMetar::scanRunwayReport()
     _runways[id]._friction_string = r._friction_string;
     _runways[id]._comment = r._comment;
     _m = m;
-    _grpcount++;
 
     return true;
 }
-
 
 // WS (ALL RWYS?|RWY ?\d\d[LCR]?)?
 bool ReWebMetar::scanWindShear()
@@ -1370,8 +1486,10 @@ bool ReWebMetar::scanWindShear()
         m += 3;
         if (!scanBoundary(&m))
             return false;
+
         if (strncmp(m, "RWY", 3))
             return false;
+
         m += 3;
 
         if (*m == 'S')
@@ -1523,6 +1641,8 @@ bool ReWebMetar::scanBoundary(char **s)
     while (isspace(**s))
         (*s)++;
 
+    GfLogDebug("Scan Boundary !!!\n");
+
     return true;
 }
 
@@ -1541,8 +1661,10 @@ int ReWebMetar::scanNumber(char **src, int *num, int min, int max)
             *num = *num * 10 + *s++ - '0';
     }
 
-    for (; i < max && isdigit(*s); i++)
+    for (i= 1; i < max && isdigit(*s); i++)
+    {
         *num = *num * 10 + *s++ - '0';
+    }
 
     *src = s;
 
@@ -1672,7 +1794,8 @@ void ReWebMetar::density()
         tas = 12334;
 
     _density = ((1 - ( 0.3783 * relhumidity * tas) / pressure) * pressure) / (287.058 * (temp + 273.15)) / 100;
-    GfLogDebug("Density = %.3f - relative humidity = %.3f\n", _density, relhumidity);
+    _relativehumidity = relhumidity;
+    GfLogDebug(" METAR Density = %.3f - relative humidity = %.3f\n", _density, _relativehumidity);
 }
 
 // find longest match of str in list
@@ -1717,13 +1840,13 @@ ReWebMetarCloud::Coverage ReWebMetarCloud::getCoverage( const std::string & cove
     return COVERAGE_NIL;
 }
 
-const char * ReWebMetarCloud::COVERAGE_NIL_STRING =		"nil";
-const char * ReWebMetarCloud::COVERAGE_CLEAR_STRING =		"clear";
+const char * ReWebMetarCloud::COVERAGE_NIL_STRING =		  "nil";
+const char * ReWebMetarCloud::COVERAGE_CLEAR_STRING =     "clear";
 const char * ReWebMetarCloud::COVERAGE_CIRRUS_STRING =    "cirrus";
-const char * ReWebMetarCloud::COVERAGE_FEW_STRING =		"few";
+const char * ReWebMetarCloud::COVERAGE_FEW_STRING =		  "few";
 const char * ReWebMetarCloud::COVERAGE_SCATTERED_STRING = "scattered";
-const char * ReWebMetarCloud::COVERAGE_BROKEN_STRING =	"broken";
-const char * ReWebMetarCloud::COVERAGE_OVERCAST_STRING =	"overcast";
+const char * ReWebMetarCloud::COVERAGE_BROKEN_STRING =	  "broken";
+const char * ReWebMetarCloud::COVERAGE_OVERCAST_STRING =  "overcast";
 
 void ReWebMetarVisibility::set(double dist, int dir, int mod, int tend)
 {
@@ -1734,5 +1857,7 @@ void ReWebMetarVisibility::set(double dist, int dir, int mod, int tend)
         _modifier = mod;
     if (tend != 1)
         _tendency = tend;
+
+    GfLogInfo(" METAR visibility set distance = %.2f - direction = %i - modifier = %i - tendency = %.2d\n", _distance, _direction, _modifier, _tendency);
 }
 

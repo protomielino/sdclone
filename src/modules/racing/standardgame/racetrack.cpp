@@ -703,7 +703,10 @@ reTrackInitRealWeather(void)
                 trackLocal->winddir = (_wind_range_from + _wind_range_to) / 2;
             }
         }
-        else if (webMetar->getWindRangeFrom() == -1)
+        else
+            trackLocal->winddir = webMetar->getWindDir();
+
+        if (webMetar->getWindRangeFrom() == -1)
         {
             _wind_range_from = _wind_range_to = trackLocal->winddir;
         }
@@ -752,8 +755,8 @@ reTrackInitRealWeather(void)
         else
             trackLocal->dewp = (tdble)(webMetar->getDewpoint_C());
 
-        if (webMetar->getPressure_hPa() == WebMetarNaN)
-            trackLocal->airpressure = (tdble)(30.0 * 3386.388640341);
+        if (webMetar->getPressure_hPa() == WebMetarNaN )
+            trackLocal->airpressure = (tdble)(101300.0);
         else
             trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
@@ -763,6 +766,8 @@ reTrackInitRealWeather(void)
             trackLocal->airdensity = 1.219f;
         else
             trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
+
+        trackLocal->relativehumidity = (tdble)(webMetar->getRelativeHumidity());
 
         if (ReInfo->s->_features & RM_FEATURE_WETTRACK && (!strcmp(ReInfo->track->category, "speedway")) == 0)
         {
@@ -778,36 +783,33 @@ reTrackInitRealWeather(void)
 
             if (trackLocal->hail > 0)
                 trackLocal->water = trackLocal->hail;
-
-            trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
         }
         else
         {
             trackLocal->rain = TR_RAIN_NONE;
             trackLocal->snow = TR_RAIN_NONE;
             trackLocal->hail = TR_RAIN_NONE;
-            trackLocal->relativehumidity = TR_RAIN_NONE;
             trackLocal->water = TR_RAIN_NONE;
         }
 
         trackLocal->config = 0;
 
-        GfLogInfo("Visibility = %.3f\n", trackLocal->visibility);
-        GfLogInfo("Wind Speed = %.3f\n", trackLocal->windspeed);
-        GfLogInfo("Wind direction = %.3f\n", trackLocal->winddir);
-        GfLogInfo("Air Temperature = %.3f\n", trackLocal->airtemperature);
-        GfLogInfo("Dew point = %.3f\n", trackLocal->dewp);
-        GfLogInfo("Air pressure = %.3f\n", trackLocal->airpressure);
+        GfLogInfo("Visibility = %.2f\n", trackLocal->visibility);
+        GfLogInfo("Wind Speed = %.2f\n", trackLocal->windspeed);
+        GfLogInfo("Wind direction = %.2f\n", trackLocal->winddir);
+        GfLogInfo("Air Temperature = %.2f\n", trackLocal->airtemperature);
+        GfLogInfo("Dew point = %.2f\n", trackLocal->dewp);
+        GfLogInfo("Air pressure = %.2f\n", trackLocal->airpressure);
         GfLogInfo("Air Density = %.3f\n", trackLocal->airdensity);
         GfLogInfo("Rain = %i\n", trackLocal->rain);
         GfLogInfo("Snow = %i\n", trackLocal->snow);
         GfLogInfo("Hail = %i\n", trackLocal->hail);
         GfLogInfo("Water track = %d\n", trackLocal->water);
-        GfLogInfo("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
+        GfLogInfo("Relative Humidity = %.2f\n", trackLocal->relativehumidity);
 
         ReTrackUpdate();
-        delete webMetar;
-        webMetar = NULL;
+        //delete webMetar;
+        //webMetar = NULL;
     }
 }
 
@@ -1523,5 +1525,6 @@ ReTrackShutdown(void)
         delete webMetar;
         webMetar = 0;
     }
+
     return 0;
 }
