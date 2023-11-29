@@ -131,7 +131,17 @@ void init_args(int argc, char **argv)
             fprintf(stderr, "invalid +es %s\n", argv[2]);
             exit(1);
         }
+        if (argc < 4)
+        {
+            fprintf(stderr, "missing input file name\n");
+            exit(1);
+        }
         InputFileName = argv[3];
+        if (argc < 5)
+        {
+            fprintf(stderr, "missing output file name\n");
+            exit(1);
+        }
         OutputFileName = argv[4];
     }
     else if (!strcmp(argv[1], "+et"))

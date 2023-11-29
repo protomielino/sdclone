@@ -60,6 +60,7 @@
 #define MAT      "mat"
 #define REFS     "refs"
 #define CREASE   "crease"
+#define SUBDIV   "subdiv"
 
 ob_t::ob_t() :
 kids(0),
@@ -252,6 +253,7 @@ int doSurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doMat(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doSubdiv(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 
 void computeSaveAC3D(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
 void computeSaveOBJ(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
@@ -275,6 +277,7 @@ verbaction_t verbTab[] =
 { MAT, doMat },
 { REFS, doRefs },
 { CREASE, doCrease },
+{ SUBDIV, doSubdiv, },
 { "END", NULL } };
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
@@ -1089,6 +1092,12 @@ int doGetData(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &material
 }
 
 int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
+{
+    dataFound = false;
+    return (0);
+}
+
+int doSubdiv(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     dataFound = false;
     return (0);
