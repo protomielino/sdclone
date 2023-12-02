@@ -61,6 +61,9 @@
 #define REFS     "refs"
 #define CREASE   "crease"
 #define SUBDIV   "subdiv"
+#define FOLDED   "folded"
+#define HIDDEN   "hidden"
+#define LOCKED   "locked"
 
 ob_t::ob_t() :
 kids(0),
@@ -254,6 +257,9 @@ int doMat(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doSubdiv(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doFolded(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doHidden(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doLocked(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 
 void computeSaveAC3D(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
 void computeSaveOBJ(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
@@ -277,7 +283,10 @@ verbaction_t verbTab[] =
 { MAT, doMat },
 { REFS, doRefs },
 { CREASE, doCrease },
-{ SUBDIV, doSubdiv, },
+{ SUBDIV, doSubdiv },
+{ FOLDED, doFolded },
+{ HIDDEN, doHidden },
+{ LOCKED, doLocked },
 { "END", NULL } };
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
@@ -1098,6 +1107,24 @@ int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials
 }
 
 int doSubdiv(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
+{
+    dataFound = false;
+    return (0);
+}
+
+int doFolded(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
+{
+    dataFound = false;
+    return (0);
+}
+
+int doHidden(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
+{
+    dataFound = false;
+    return (0);
+}
+
+int doLocked(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     dataFound = false;
     return (0);

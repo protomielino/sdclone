@@ -328,7 +328,18 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         }
         else if (token == "shad")
         {
-
+        }
+        else if (token == "subdiv")
+        {
+        }
+        else if (token == "folded")
+        {
+        }
+        else if (token == "hidden")
+        {
+        }
+        else if (token == "locked")
+        {
         }
         else if (token == "texrep")
         {

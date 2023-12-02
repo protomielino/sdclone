@@ -381,6 +381,10 @@ static Tag object_tags [] =
   { "kids"    , do_kids     },
   { "crease"  , do_ignore   },
   { "shader"  , do_ignore   },
+  { "folded"  , do_ignore   },
+  { "subdiv"  , do_ignore   },
+  { "hidden"  , do_ignore   },
+  { "locked"  , do_ignore   },
   { 0, 0 }
 } ;
 
