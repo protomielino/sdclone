@@ -3152,41 +3152,42 @@ void normalMap(std::list<ob_t> &objects)
     double y_max = -99999;
     double z_max = -99999;
 
-    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
+    for (const auto &object : objects)
     {
-        if (it->canSkip())
+        if (object.type != "poly" || object.numvert < 3)
             continue;
 
-        for (int j = 0; j < it->numvert; j++)
+        for (int j = 0; j < object.numvert; j++)
         {
-            if (it->vertex[j].x > x_max)
-                x_max = it->vertex[j].x;
-            if (it->vertex[j].x < x_min)
-                x_min = it->vertex[j].x;
+            if (object.vertex[j].x > x_max)
+                x_max = object.vertex[j].x;
+            if (object.vertex[j].x < x_min)
+                x_min = object.vertex[j].x;
 
-            if (it->vertex[j].y > y_max)
-                y_max = it->vertex[j].y;
-            if (it->vertex[j].y < y_min)
-                y_min = it->vertex[j].y;
+            if (object.vertex[j].y > y_max)
+                y_max = object.vertex[j].y;
+            if (object.vertex[j].y < y_min)
+                y_min = object.vertex[j].y;
 
-            if (it->vertex[j].z > z_max)
-                z_max = it->vertex[j].z;
-            if (it->vertex[j].z < z_min)
-                z_min = it->vertex[j].z;
+            if (object.vertex[j].z > z_max)
+                z_max = object.vertex[j].z;
+            if (object.vertex[j].z < z_min)
+                z_min = object.vertex[j].z;
         }
     }
 
-    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
+    for (auto &object : objects)
     {
-        if (it->canSkip())
+        if (object.type != "poly" || object.numvert < 3)
             continue;
-        printf("normalMap : handling %s\n", it->name.c_str());
-        for (int i = 0; i < it->numvert; i++)
+
+        printf("normalMap : handling %s\n", object.name.c_str());
+        for (int i = 0; i < object.numvert; i++)
         {
-            it->textarray[i].u = (it->vertex[i].x - x_min) / (x_max - x_min);
-            it->textarray[i].v = (it->vertex[i].y - y_min) / (y_max - y_min);
+            object.textarray[i].u = (object.vertex[i].x - x_min) / (x_max - x_min);
+            object.textarray[i].v = (object.vertex[i].y - y_min) / (y_max - y_min);
         }
-        it->texture = shadowtexture;
+        object.texture = shadowtexture;
     }
 }
 
