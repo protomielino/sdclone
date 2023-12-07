@@ -67,6 +67,7 @@ static std::string strTireSet("New tires");
 static std::string strFrontWing("Front wing");
 static std::string strRearWing("Rear wing");
 static std::string strPenalty("Next pit type");
+static std::string strTireCompounds("Tyre compound");
 
 static const osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
 static const osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
@@ -1632,6 +1633,29 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             else
             {
                 value1 << "NO";
+            }
+            break;
+        case DI_COMPOUND_SET:
+            description = strTireCompounds;
+            if(item->setup->desired_value == 1)
+            {
+                value1 << "SOFT";
+            }
+            else if (item->setup->desired_value == 2)
+            {
+                value1 << "MEDIUM";
+            }
+            else if (item->setup->desired_value == 3)
+            {
+                value1 << "HARD";
+            }
+            else if (item->setup->desired_value == 4)
+            {
+                value1 << "WET";
+            }
+            else if (item->setup->desired_value == 5)
+            {
+                value1 << "EXTREME WET";
             }
             break;
         case DI_FRONT_WING_ANGLE:
