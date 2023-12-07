@@ -127,6 +127,16 @@ void SDSelectCamera(void *vp)
     screens->changeCamera(t);
 }
 
+void SDSelectCameraTemporaryOn(void *vp)//temporary select a different camera
+{
+    screens->changeCameraTemporaryOn();
+}
+
+void SDSelectCameraTemporaryOff(void *vp)//temporary select a different camera
+{
+    screens->changeCameraTemporaryOff();
+}
+
 void SDSetZoom(void *vp)
 {
     long t = (long)vp;
@@ -327,6 +337,16 @@ int refresh(tSituation *s)
                       frameInfo.fInstFps, frameInfo.fAvgFps);
     }
     adaptScreenSize();
+
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    
+    //switch to look back camera if requested by the driver
+    if (curCar->_lookback == true){
+        SDSelectCameraTemporaryOn((void*)0);
+    }else{
+        SDSelectCameraTemporaryOff((void*)0);
+    }
+    
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
     double X = eye[0];
@@ -335,6 +355,7 @@ int refresh(tSituation *s)
     render->UpdateSky(s->currentTime, s->accelTime, X, Y);
 
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+
     int drawDriver = cam->getDrawDriver();
     int drawCurrent = cam->getDrawCurrent();
     cars->updateCars(s, curCar, drawCurrent, drawDriver);
@@ -345,7 +366,6 @@ int refresh(tSituation *s)
     screens->update(s, &frameInfo, osg::Vec4f(render->getFogColor(),1.0f));
 
     //refresh the hud
-    //tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     hud.Refresh(s, &frameInfo, curCar, Clouds, Rain, TimeOfDay);
 
     return 0;

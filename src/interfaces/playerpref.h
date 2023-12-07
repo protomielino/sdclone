@@ -136,6 +136,8 @@
 #define HM_ATT_R_GLANCE_MIN     "right glance min"
 #define HM_ATT_R_GLANCE_MAX     "right glance max"
 
+#define HM_ATT_CAM_LOOKBACK   "camera look back"
+
 #define HM_ATT_DASHB_NEXT       "dashboard next item"
 #define HM_ATT_DASHB_NEXT_MIN   "dashboard next item min"
 #define HM_ATT_DASHB_NEXT_MAX   "dashboard next item max"
@@ -212,7 +214,8 @@ typedef enum {
 #define CMD_DASHB_PREV 25
 #define CMD_DASHB_INC 26
 #define CMD_DASHB_DEC 27
+#define CMD_LOOKBACK 28
 
-#define CMD_END_OF_LIST 27	/* Change this to same value as last item */
+#define CMD_END_OF_LIST 28	/* Change this to same value as last item */
 
 #endif /* _PLAYERPREF_H_ */

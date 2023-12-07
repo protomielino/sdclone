@@ -53,6 +53,8 @@ public:
     void InitCars(tSituation *s);
     void update(tSituation *s,SDFrameInfo* fi, osg::Vec4f(colorfog));
     void changeCamera(long p);
+    void changeCameraTemporaryOn();
+    void changeCameraTemporaryOff();
     void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
     void toggleHUD();
     void toggleHUDwidget(const std::string &widget);

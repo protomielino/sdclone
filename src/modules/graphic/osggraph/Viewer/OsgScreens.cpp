@@ -230,6 +230,42 @@ void SDScreens::changeCamera(long p)
     }
 }
 
+int prevCamList=0;
+int prevCamNum=0;
+bool usingRearCam = false;
+void SDScreens::changeCameraTemporaryOn()
+{
+	//if we are already on rear cam do nothing
+	if(usingRearCam) return;
+
+	int newCamList = 0;
+	int newCamNum = 0;
+	GfLogInfo("Switching camera\n");
+
+	//remember the currently selected cameras
+	int camList,camNum;
+	getActiveView()->getCameras()->getIntSelectedListAndCamera(&camList,&camNum);
+	GfLogInfo("Previous cam was %i %i \n",camList,camNum);
+
+	//temporary switch to this the rear view one
+	newCamList = 0; //(see osgcamera.cpp for reference)
+	newCamNum = 5;
+	prevCamList = camList;
+	prevCamNum = camNum; 
+
+    this->getActiveView()->getCameras()->selectCamera(newCamList,newCamNum);
+    usingRearCam = true;
+}
+
+void SDScreens::changeCameraTemporaryOff()
+{
+	//if we are already not on rear cam do nothing
+	if(!usingRearCam) return;
+    this->getActiveView()->getCameras()->selectCamera(prevCamList,prevCamNum);
+    usingRearCam = false;
+}
+
+
 void SDScreens::toggleHUD()
 {
     hud.ToggleHUD();

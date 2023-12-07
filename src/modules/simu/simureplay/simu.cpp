@@ -196,6 +196,7 @@ SimUpdate(tSituation *s, double deltaTime)
 			memcpy(&pTgtCar->pub, &pSrcCar->pub, sizeof(tPublicCar));
 			pTgtCar->_glance = 0;
 			pTgtCar->_oldglance = 0;
+			pTgtCar->_lookback = false;
 #endif
 
 #if 1

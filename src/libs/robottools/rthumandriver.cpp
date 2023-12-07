@@ -201,6 +201,7 @@ const static int hboxChanges[] = {   0x02, // 0b00000010,  // R
 
 static int preGear = 0;
 
+/*self note: apparently these should follow thew order of definition of the cmd definitions (see playerpref.h)*/
 static const tControlCmd CmdControlRef[] = {
     {HM_ATT_UP_SHFT,    GFCTRL_TYPE_JOY_BUT,       0, HM_ATT_UP_SHFT_MIN,    0.0, 0.0, HM_ATT_UP_SHFT_MAX,    1.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_DN_SHFT,    GFCTRL_TYPE_JOY_BUT,       1, HM_ATT_DN_SHFT_MIN,    0.0, 0.0, HM_ATT_DN_SHFT_MAX,    1.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
@@ -230,7 +231,8 @@ static const tControlCmd CmdControlRef[] = {
     {HM_ATT_DASHB_NEXT ,GFCTRL_TYPE_NOT_AFFECTED, -1, HM_ATT_DASHB_NEXT_MIN, 0.0, 0.0, HM_ATT_DASHB_NEXT_MAX, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_DASHB_PREV ,GFCTRL_TYPE_NOT_AFFECTED, -1, HM_ATT_DASHB_PREV_MIN, 0.0, 0.0, HM_ATT_DASHB_PREV_MAX, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_DASHB_INC  ,GFCTRL_TYPE_NOT_AFFECTED, -1, HM_ATT_DASHB_INC_MIN,  0.0, 0.0, HM_ATT_DASHB_INC_MAX,  0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
-    {HM_ATT_DASHB_DEC  ,GFCTRL_TYPE_NOT_AFFECTED, -1, HM_ATT_DASHB_DEC_MIN,  0.0, 0.0, HM_ATT_DASHB_DEC_MAX,  0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0}
+    {HM_ATT_DASHB_DEC  ,GFCTRL_TYPE_NOT_AFFECTED, -1, HM_ATT_DASHB_DEC_MIN,  0.0, 0.0, HM_ATT_DASHB_DEC_MAX,  0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
+    {HM_ATT_CAM_LOOKBACK,GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
 };
 
 static const int NbCmdControl = sizeof(CmdControlRef) / sizeof(CmdControlRef[0]);
@@ -725,6 +727,10 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
     // Set up glancing
     car->_oldglance = 0;
     car->_glance = 0;
+    
+    // Set default for looking back command
+    car->_lookback = false;
+
 
     //GfOut("SteerCmd : Left : sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
     //	  cmd[CMD_LEFTSTEER].sens, cmd[CMD_LEFTSTEER].spdSens, cmd[CMD_LEFTSTEER].deadZone);
@@ -1325,6 +1331,32 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
         car->_glance = 0;
     }
 
+    //look back camera command
+    if (
+        (//if the look back camera button is pressed
+            (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LOOKBACK].val]) //if is a joypad button check if the button is pressed
+            || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_LOOKBACK].val]) //if is a mouse button check if the button is pressed
+            || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LOOKBACK].val)].state)//if is a keyboard key check if the key is pressed
+            || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LOOKBACK].deadZone != 0)//if it's a joypad axis check if the axis is not at rest position (0)
+        ) 
+        ||
+        (//or if both glance left and glance right buttons are pressed simultaneously
+            ((cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_RIGHTGLANCE].val])
+                || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_RIGHTGLANCE].val])
+                || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state)
+                || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_RIGHTGLANCE].deadZone != 0))
+            &&
+            ((cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LEFTGLANCE].val])
+                || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_LEFTGLANCE].val])
+                || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LEFTGLANCE].val)].state)
+                || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LEFTGLANCE].deadZone != 0))
+            )
+        )
+    {
+        car->_lookback=true;
+    }else{
+        car->_lookback=false;
+    }
 
     // dashboard handling
     if ((cmd[CMD_DASHB_NEXT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_DASHB_NEXT].val])

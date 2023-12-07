@@ -293,6 +293,7 @@ typedef struct {
     tPosd	corner[4];
     tdble       glance;         /* Glance angle degrees, left -ve, right +ve */
     tdble       oldglance;
+    bool        lookback;       /*if true temporary enable the look back camera*/
 } tPublicCar;
 /* structure access */
 #define _DynGC		pub.DynGC
@@ -319,6 +320,7 @@ typedef struct {
 #define _posMat		pub.posMat
 #define _glance		pub.glance
 #define _oldglance	pub.oldglance
+#define _lookback	pub.lookback
 
 /** Dynamic wheel information */
 typedef struct {

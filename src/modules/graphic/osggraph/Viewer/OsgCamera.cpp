@@ -801,6 +801,61 @@ public:
     }
 };
 
+// cGrCarCamBehindReverse ================================================================
+
+class SDCarCamBehindReverseFlipped : public SDPerspCamera
+{
+public:
+    SDCarCamBehindReverseFlipped (SDView *myscreen, int id, int drawCurr, int drawBG,
+                           float myfovy, float myfovymin, float myfovymax,
+                           float myfnear, float myffar = 1500.0,
+                           float myfogstart = 1400.0, float myfogend = 1500.0)
+        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 0,
+                        myfovy, myfovymin, myfovymax,
+                        myfnear, myffar, myfogstart, myfogend) {}
+
+    void update(tCarElt *car, tSituation *s)
+    {
+        sgVec3 P, p;
+        float offset = 0;
+
+        p[0] = car->_bonnetPos_x - (car->_dimension_x/2);
+        p[1] = car->_bonnetPos_y;
+        p[2] = car->_bonnetPos_z;
+        sgXformPnt3(p, car->_posMat);
+
+        //our eye (camera) position
+        eye[0] = p[0];
+        eye[1] = p[1];
+        eye[2] = p[2];
+
+        // Compute offset angle and bezel compensation)
+        if (viewOffset)
+        {
+            offset += getSpanAngle();
+        }
+
+        P[0] = car->_bonnetPos_x + (car->_dimension_x/2) - 100 + 30.0 * cos(offset);
+        P[1] = car->_bonnetPos_y + 30.0 * sin(offset);
+        P[2] = car->_bonnetPos_z;
+        sgXformPnt3(P, car->_posMat);
+
+        //where the camera will be pointing at
+        center[0] = P[0];
+        center[1] = P[1];
+        center[2] = P[2];
+
+        up[0] = car->_posMat[2][0];
+        up[1] = car->_posMat[2][1];
+        up[2] = car->_posMat[2][2];
+
+        speed[0] =car->pub.DynGCg.vel.x;
+        speed[1] =car->pub.DynGCg.vel.y;
+        speed[2] =car->pub.DynGCg.vel.z;
+    }
+};
+
+
 // cGrCarCamFront ================================================================
 
 class SDCarCamFront : public SDPerspCamera
@@ -1925,6 +1980,21 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                    fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                    fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
                                                    ));
+    id++;
+    /* TODO BUG F2 = just behind the car; camera looking back  */
+    cameras[0].push_back(new SDCarCamBehindReverseFlipped(myscreen,
+                                                   id,
+                                                   1,	/* drawCurr */
+                                                   1,	/* drawBG  */
+                                                   67.5f,	/* fovy */
+                                                   10.0f,	/* fovymin */
+                                                   95.0f,	/* fovymax */
+                                                   0.3f,	/* near */
+                                                   fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                   fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                   fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                   ));
+
 
     /* F3 - 3rd Person Views - cameras index 1*/
     id=0;
