@@ -354,8 +354,6 @@ int refresh(tSituation *s)
     double Z = eye[2];
     render->UpdateSky(s->currentTime, s->accelTime, X, Y);
 
-    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
-
     int drawDriver = cam->getDrawDriver();
     int drawCurrent = cam->getDrawCurrent();
     cars->updateCars(s, curCar, drawCurrent, drawDriver);
