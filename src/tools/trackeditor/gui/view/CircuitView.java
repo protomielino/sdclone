@@ -137,6 +137,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	private ObjShapeObject		objectShape						= null;
 	/** offset between mouse click position and object position */
 	private Point2D.Double		objectOffset					= new Point2D.Double();
+	private String				objectName						= null;
 	
 	private ObjShapeRelief		reliefShape						= null;
 	private int					reliefPointIndex				= 0;
@@ -1046,6 +1047,28 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			{
 				case STATE_NONE :
 				{
+					// must check for a object under the mouse
+					Segment obj = findObjAtMousePos();
+					
+					if (obj != null)
+					{
+						if (obj.getType().equals("graphic object") ||
+							obj.getType().equals("object") ||
+							obj.getType().equals("rgt") ||
+							obj.getType().equals("lft") ||
+							obj.getType().equals("str"))
+						{
+							objectName = new String(obj.getName());
+							invalidate();
+							repaint();
+						}						
+					}
+					else if (objectName != null)
+					{
+						objectName = null;
+						invalidate();
+						repaint();
+					}					
 				}
 					break;
 
@@ -1134,6 +1157,32 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			invalidate();
 			repaint();
 		}
+		
+		if (editorFrame.getCursorNames())
+		{
+			// must check for a object under the mouse
+			Segment obj = findObjAtMousePos();
+			
+			if (obj != null)
+			{
+				if (obj.getType().equals("graphic object") ||
+					obj.getType().equals("object") ||
+					obj.getType().equals("rgt") ||
+					obj.getType().equals("lft") ||
+					obj.getType().equals("str"))
+				{
+					objectName = new String(obj.getName());
+					invalidate();
+					repaint();
+				}						
+			}
+			else if (objectName != null)
+			{
+				objectName = null;
+				invalidate();
+				repaint();
+			}					
+		}	
 	}
 
 	//	/** input events management */
@@ -1587,7 +1636,15 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				graphics.drawString(coordinates, r.x + 10, r.y + 20);
 			}
 		}
-
+		
+		if (editorFrame.getCursorNames())
+		{
+			if (objectName != null)
+			{
+				graphics.drawString(objectName, r.x + 10, r.y + 40);			
+			}
+		}
+		
 		if (editorFrame.getTrackData() != null && editorFrame.getTrackData().getSegments() != null)
 		{
 			if (boundingRectangle == null)
