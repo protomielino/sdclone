@@ -2160,6 +2160,8 @@ evalUnit (char *unit, tdble *dest, int invert)
     coeff = 1000.0f; /* N */
     } else if (strcmp(unit, "cc") == 0) {
     coeff = 0.001f; /* l */
+    } else if (strcmp(unit, "ci") == 0) {
+    coeff = 0.0163871f; /* l */	    
     } else if (strcmp(unit, "C") == 0) {
         if (invert)
             *dest -= ZEROC; /* Kelvin to Celsius */
