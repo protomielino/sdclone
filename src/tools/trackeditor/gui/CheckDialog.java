@@ -48,6 +48,10 @@ public class CheckDialog extends JDialog
 	private EditorFrame			editorFrame		= null;
 	private Vector<Surface>		defaultSurfaces	= null;
 	private Vector<TrackObject>	defaultObjects	= null;
+	private Boolean				doubleSided		= false;
+	private Boolean				flatShaded		= false;
+	private Boolean				multipleTextures = false;
+	private String				texture			= null;
 	private String				dataDirectory	= null;
 	private TrackData			trackData		= null;
 
@@ -807,6 +811,11 @@ public class CheckDialog extends JDialog
 	}
 	private void checkTrackObject(TrackObject trackObject, String type)
 	{
+		doubleSided = false;
+		flatShaded = false;
+		multipleTextures = false;
+		texture = null;
+		
 		String	object = trackObject.getObject();
 
 		if (!hasText(object))
@@ -857,7 +866,7 @@ public class CheckDialog extends JDialog
 				{
 					if (name.contains(" "))
 					{
-						textArea.append("Object file " + file.toString() + " : material \"" + name + "\" has space in name\n");					
+						textArea.append("Object file " + file.toString() + " : material \"" + name + "\" has space in name\n");
 					}
 				}
 			}
@@ -870,6 +879,21 @@ public class CheckDialog extends JDialog
 				{
 					checkKid(file, root.getKids().get(i));
 				}
+			}
+			
+			if (doubleSided)
+			{
+				textArea.append("Object file " + file.toString() + " : has double sided surface\n");
+			}
+			
+			if (flatShaded)
+			{
+				textArea.append("Object file " + file.toString() + " : has flat shaded surface\n");
+			}
+			
+			if (multipleTextures)
+			{
+				textArea.append("Object file " + file.toString() + " : has multiple textures\n");				
 			}
 		}
 		catch (Ac3dException e)
@@ -899,6 +923,16 @@ public class CheckDialog extends JDialog
 
 			Set<Integer> types = new HashSet<Integer>();
 			Set<Integer> mats = new HashSet<Integer>();
+			String objectTexture = object.getTexture();
+			
+			if (texture == null)
+			{
+				texture = objectTexture;
+			}
+			else if (objectTexture != null && !texture.equals(objectTexture))
+			{
+				multipleTextures = true;
+			}
 
 			for (int i = 0; i < object.getSurfaces().size(); i++)
 			{
@@ -911,6 +945,16 @@ public class CheckDialog extends JDialog
 
 				types.add(surface.getSurf());
 				mats.add(surface.getMat());
+				
+				if (surface.isDoubleSided())
+				{
+					doubleSided = true;
+				}
+				
+				if (surface.isFlatShaded())
+				{
+					flatShaded = true;
+				}
 			}
 
 			if (types.size() > 1)
