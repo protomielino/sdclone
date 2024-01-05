@@ -98,7 +98,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.6.0.34", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.6.0.35", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -138,9 +138,9 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("m", "materials", /* bHasValue = */ false);
 
     // Help on specific options.
-    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge] [-m|--materials]");
-    addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
-    addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]] [-dt|--dumptrack]");
+    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|--bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge] [-m|--materials]");
+    addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|--split] [-S|--splitall]");
+    addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|--height4 <#hs>]] [-dt|--dumptrack]");
     addOptionsHelpSyntaxLine("[-i xml_path] [-o ac_path]");
 
     addOptionsHelpExplainLine("<cat>    : track category (road, speedway, dirt...)");
@@ -221,7 +221,7 @@ bool Application::parseOptions()
         {
             TrackCategory = itOpt->strValue;
         }
-        else if (itOpt->strLongName == "steps4")
+        else if (itOpt->strLongName == "height4")
         {
             HeightSteps = strtol(itOpt->strValue.c_str(), nullptr, 0);
         }
