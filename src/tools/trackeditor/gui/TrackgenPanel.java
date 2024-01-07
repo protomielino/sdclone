@@ -99,10 +99,22 @@ public class TrackgenPanel extends JDialog implements Runnable
 		String trackName = path.substring(path.lastIndexOf(sep) + 1);
 		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
 		String name = " -n " + trackName;
-		String args = " -a" + category + name;
+		String args = category + name;
 		
 		if (additionalArgs != null)
+		{
 			args = args + additionalArgs;
+
+			// don't create everything for race line
+			if (!args.contains("-r"))
+			{
+				args += " -a";
+			}
+		}
+		else
+		{
+			args += " -a";
+		}
 
 		System.out.println(args);
 
