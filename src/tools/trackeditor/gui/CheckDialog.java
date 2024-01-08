@@ -965,9 +965,31 @@ public class CheckDialog extends JDialog
 				types.add(surface.getSurf());
 				mats.add(surface.getMat());
 				
-				if (surface.isDoubleSided())
+				if (surface.isDoubleSided() && objectTexture != null)
 				{
-					doubleSided = true;
+					File textureFile = findTextureFile(objectTexture);
+					if (objectTexture.endsWith(".rgba"))
+					{
+					}
+					else if (objectTexture.endsWith(".rgb"))
+					{
+						doubleSided = true;
+					}
+					else if (textureFile != null && objectTexture.endsWith(".png"))
+					{
+						try
+						{
+							BufferedImage image = ImageIO.read(textureFile);
+
+							if (!image.getColorModel().hasAlpha())
+							{
+								doubleSided = true;
+							}
+						}
+						catch (Exception e)
+						{
+						}
+					}
 				}
 				
 				if (surface.isFlatShaded())
