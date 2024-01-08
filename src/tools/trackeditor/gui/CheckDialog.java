@@ -6,6 +6,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,6 +17,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -50,8 +52,7 @@ public class CheckDialog extends JDialog
 	private Vector<TrackObject>	defaultObjects	= null;
 	private Boolean				doubleSided		= false;
 	private Boolean				flatShaded		= false;
-	private Boolean				multipleTextures = false;
-	private String				texture			= null;
+	private Set<String> 		textures 		= new HashSet<String>();
 	private String				dataDirectory	= null;
 	private TrackData			trackData		= null;
 
@@ -813,8 +814,7 @@ public class CheckDialog extends JDialog
 	{
 		doubleSided = false;
 		flatShaded = false;
-		multipleTextures = false;
-		texture = null;
+		textures.clear();
 		
 		String	object = trackObject.getObject();
 
@@ -851,13 +851,13 @@ public class CheckDialog extends JDialog
 		{
 			e.printStackTrace();
 		}
-		
+
 		Ac3d ac3dFile = new Ac3d();
 
 		try
 		{
 			ac3dFile.read(file);
-			
+
 			for (Ac3dMaterial material : ac3dFile.getMaterials())
 			{
 				String name = material.getName();
@@ -880,20 +880,43 @@ public class CheckDialog extends JDialog
 					checkKid(file, root.getKids().get(i));
 				}
 			}
-			
+
 			if (doubleSided)
 			{
 				textArea.append("Object file " + file.toString() + " : has double sided surface\n");
 			}
-			
+
 			if (flatShaded)
 			{
 				textArea.append("Object file " + file.toString() + " : has flat shaded surface\n");
 			}
-			
-			if (multipleTextures)
+
+			if (textures.size() > 1)
 			{
-				textArea.append("Object file " + file.toString() + " : has multiple textures\n");				
+				int hasAlpha = 0;
+				for (String filename : textures)
+				{
+					File textureFile = findTextureFile(filename);
+					if (filename.endsWith(".rgba"))
+					{
+						hasAlpha++;
+					}
+					else if (textureFile != null && filename.endsWith(".png"))
+					{
+						BufferedImage image = ImageIO.read(textureFile);
+
+						if (image.getColorModel().hasAlpha())
+						{
+							hasAlpha++;
+						}
+					}
+				}
+
+				// check for more than one of either alpha or non-alpha textures
+				if (hasAlpha == 0 || hasAlpha == textures.size() || (textures.size() - hasAlpha > 1) || hasAlpha > 1)
+				{
+					textArea.append("Object file " + file.toString() + " : has multiple textures\n");
+				}
 			}
 		}
 		catch (Ac3dException e)
@@ -924,14 +947,10 @@ public class CheckDialog extends JDialog
 			Set<Integer> types = new HashSet<Integer>();
 			Set<Integer> mats = new HashSet<Integer>();
 			String objectTexture = object.getTexture();
-			
-			if (texture == null)
+
+			if (objectTexture != null)
 			{
-				texture = objectTexture;
-			}
-			else if (objectTexture != null && !texture.equals(objectTexture))
-			{
-				multipleTextures = true;
+				textures.add(objectTexture);
 			}
 
 			for (int i = 0; i < object.getSurfaces().size(); i++)
