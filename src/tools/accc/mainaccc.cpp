@@ -58,7 +58,7 @@ double smooth_angle = 70.0;
 
 void usage(void)
 {
-    fprintf(stderr, "Ac3d Compiler $Revision: 1.4.7 $\n");
+    fprintf(stderr, "Ac3d Compiler $Revision: 1.4.8 $\n");
     fprintf(stderr, "Usage: accc [option] <inputfile> <outputfile> [dist][-order \"orderstring\"]<\n");
     fprintf(stderr, "+o: ac3d to ac3d : the result file is optimized\n");
     fprintf(stderr, "                   in using groups by zone of track\n");
@@ -93,6 +93,7 @@ void usage(void)
     fprintf(stderr, "     -d1 <val> : the distance of group 1 in tkmn\n");
     fprintf(stderr, "     -S <val> : the distance of splitting for TERRAIN* objects\n");
     fprintf(stderr, "     -es : for extended ac3d file format for strips\n");
+    fprintf(stderr, "     -et : for extended ac3d file format for triangles\n");
     fprintf(stderr, "     -nts : no texture split (for debug)\n");
 }
 
@@ -193,6 +194,12 @@ void init_args(int argc, char **argv)
             if (!strcmp(argv[i], "-es"))
             {
                 extendedStrips = true;
+                continue;
+            }
+
+            if (!strcmp(argv[i], "-et"))
+            {
+                extendedTriangles = true;
                 continue;
             }
 
