@@ -1562,12 +1562,6 @@ int printOb(FILE *ofile, ob_t &object)
     if (object.numsurf == 0)
         return 0;
 
-    if (!extendedStrips && !normalMapping)
-    {
-        if (!(isobjectacar && collapseObject))
-            stripifyOb(ofile, &object, false);
-    }
-
     object.saved = true;
     fprintf(ofile, "OBJECT poly\n");
     fprintf(ofile, "name \"%s\"\n", object.name.c_str());
@@ -1595,10 +1589,7 @@ int printOb(FILE *ofile, ob_t &object)
     fprintf(ofile, "numvert %d\n", object.numvert);
     for (int i = 0; i < object.numvert; i++)
     {
-        if ((typeConvertion == _AC3DTOAC3DS
-                && (extendedStrips || extendedTriangles))
-                || typeConvertion == _AC3DTOAC3DGROUP
-                || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
+        if (extendedStrips || extendedTriangles)
         {
             fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", object.vertex[i].x,
                 object.vertex[i].z, -object.vertex[i].y, object.snorm[i].x,
