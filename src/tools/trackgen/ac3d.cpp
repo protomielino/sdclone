@@ -792,7 +792,7 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     if (all && locked)
         fout << "locked" << std::endl;
     if (all && folded)
-        fout << "foulded" << std::endl;
+        fout << "folded" << std::endl;
     if (!vertices.empty())
     {
         fout << "numvert " << vertices.size() << std::endl;
