@@ -154,8 +154,17 @@ public class SegmentSlider extends JPanel
 			{
 				public void changedUpdate(DocumentEvent e)
 				{
+					textChanged(e);
 				}
 				public void insertUpdate(DocumentEvent e)
+				{
+					textChanged(e);
+				}
+				public void removeUpdate(DocumentEvent e)
+				{
+					textChanged(e);
+				}
+				private void textChanged(DocumentEvent e)
 				{
 					Runnable doHighlight = new Runnable()
 					{
@@ -170,8 +179,13 @@ public class SegmentSlider extends JPanel
 								{
 									try
 									{
+										double oldValue = value;
 										double tmp = Double.parseDouble(getTextField().getText());
 										setValueInternal(tmp);
+										if (Math.abs(oldValue - value) >= resolution)
+										{
+											valueChanged();
+										}
 									}
 									catch (Exception ex)
 									{
@@ -186,9 +200,6 @@ public class SegmentSlider extends JPanel
 						}
 					};
 					SwingUtilities.invokeLater(doHighlight);
-				}
-				public void removeUpdate(DocumentEvent e)
-				{
 				}
 			});
 			textField.addKeyListener(new KeyAdapter()
