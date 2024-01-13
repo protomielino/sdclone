@@ -3407,25 +3407,51 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 		}
 
-		if (me.isControlDown() && editorFrame.getCurrentObjectMap() != -1 && editorFrame.getCurrentObjectColor() != 0)
+		if (me.isControlDown() && editorFrame.getCurrentObjectColor() != 0)
 		{
-			ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
 			Point2D.Double real = new Point2D.Double();
 			screenToReal(me, real);
 
-			int imageXY[] = { 0, 0 };
-			realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
-			
-			ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
-			
-			objectMap.addObject(object);
-			Undo.add(new UndoAddObject(objectMap, object));
-			editorFrame.setCurrentObjectColor(object.getRGB());
-			editorFrame.documentIsModified = true;
-			redrawCircuit();
-			return;
+			if (editorFrame.isCurrentObjectGraphic())
+			{
+				// TODO fix name
+				String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()); // this is wrong
+
+				for (GraphicObject object : editorFrame.getGraphicObjects())
+				{
+					if (object.getName().equals(name))
+					{
+						name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+						break;
+					}
+				}
+
+				GraphicObject	object = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+				editorFrame.getGraphicObjects().add(object);
+				Undo.add(new UndoAddGraphicObject(editorFrame.getGraphicObjects(), object));
+				editorFrame.setCurrentObjectColor(object.getColor());
+				editorFrame.documentIsModified = true;
+				redrawCircuit();
+				return;
+			}
+			else if (editorFrame.getCurrentObjectMap() != -1)
+			{
+				ObjectMap objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
+
+				int imageXY[] = { 0, 0 };
+				realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
+
+				ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
+
+				objectMap.addObject(object);
+				Undo.add(new UndoAddObject(objectMap, object));
+				editorFrame.setCurrentObjectColor(object.getRGB());
+				editorFrame.documentIsModified = true;
+				redrawCircuit();
+				return;
+			}
 		}
-		
+
 		PasteAction pasteAction = new PasteAction("Paste Object", null, "Paste object.");
 
 		JPopupMenu menu = new JPopupMenu();
