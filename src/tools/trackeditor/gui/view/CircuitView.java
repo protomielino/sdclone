@@ -713,7 +713,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				objectDragging = true;
 				objectShape = (ObjShapeObject) obj;
 				Undo.add(new UndoEditObject(findObjectMap(objectShape), objectShape));
-				
+
 				Point2D.Double real = new Point2D.Double(0, 0);
 				screenToReal(e, real);
 				objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
@@ -727,7 +727,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					if (graphicObject.getShape() == objectShape)
 					{
 						Undo.add(new UndoEditGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
-
+	
 						Point2D.Double real = new Point2D.Double(0, 0);
 						screenToReal(e, real);
 						objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
@@ -774,9 +774,43 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (selectedShape != null)
 			{
-				if (showObjects && (selectedShape.getType().equals("str") || selectedShape.getType().equals("lft") || selectedShape.getType().equals("rgt")))
+				if (showObjects && 
+					(selectedShape.getType().equals("str") || selectedShape.getType().equals("lft") || selectedShape.getType().equals("rgt")) ||
+					(e.isShiftDown() && (selectedShape.getType().equals("object") || selectedShape.getType().equals("graphic object"))))
 				{
-					noObjectSelected(e);
+					if (selectedShape.getType().equals("str") || selectedShape.getType().equals("lft") || selectedShape.getType().equals("rgt"))
+					{
+						noObjectSelected(e);
+					}
+					else if (selectedShape.getType().equals("object"))
+					{
+						objectDragging = false;
+						objectShape = (ObjShapeObject) selectedShape;
+						Undo.add(new UndoDeleteObject(findObjectMap(objectShape), objectShape));					
+						findObjectMap(objectShape).removeObject(objectShape);
+						selectedShape = null;
+						objectShape = null;
+						invalidate();
+						repaint();
+						editorFrame.documentIsModified = true;
+					}
+					else if (selectedShape.getType().equals("graphic object"))
+					{
+						for (GraphicObject graphicObject : editorFrame.getGraphicObjects())
+						{
+							if (graphicObject.getShape() == selectedShape)
+							{
+								objectDragging = false;
+								Undo.add(new UndoDeleteGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
+								editorFrame.getGraphicObjects().remove(graphicObject);
+								selectedShape = null;
+								invalidate();
+								repaint();
+								editorFrame.documentIsModified = true;
+								break;
+							}
+						}
+					}
 				}
 				else
 				{
