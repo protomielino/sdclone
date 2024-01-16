@@ -61,6 +61,7 @@ public class SegmentSlider extends JPanel
 	private String			attr;
 	private double			min;
 	private double			max;
+	private double			defaultValue;
 	private double			resolution		= Double.NaN;
 	private String			method;
 	private Object			parent;
@@ -70,22 +71,24 @@ public class SegmentSlider extends JPanel
 	/**
 	 *  
 	 */
-	public SegmentSlider(double min, double max, double resolution)
+	public SegmentSlider(double min, double max, double defaultValue, double resolution)
 	{
 		super();
 		this.min = min;
 		this.max = max;
+		this.defaultValue = defaultValue;
 		this.resolution = resolution;
 		initialize();
 		this.parent = this.getParent();
 		new SliderLink();
 	}
 
-	public SegmentSlider(double min, double max, double resolution, double value, String section, String attr, String method, boolean optional)
+	public SegmentSlider(double min, double max, double defaultValue, double resolution, double value, String section, String attr, String method, boolean optional)
 	{
 		super();
 		this.min = min;
 		this.max = max;
+		this.defaultValue = defaultValue;
 		this.resolution = resolution;
 		this.value = value;
 		this.section = section;
@@ -398,7 +401,7 @@ public class SegmentSlider extends JPanel
 		{
 			getTextField().setText("");
 			getTextField().setEnabled(false);
-			setSliderValue(min);
+			setSliderValue(defaultValue);
 			getSlider().setEnabled(false);
 			if (optional)
 				checkBox.setSelected(false);
@@ -446,7 +449,7 @@ public class SegmentSlider extends JPanel
 		if (Double.isNaN(val))
 		{
 			getTextField().setText("");
-			setSliderValue(min);
+			setSliderValue(defaultValue);
 			if (optional)
 				checkBox.setSelected(false);
 		}
@@ -565,7 +568,7 @@ public class SegmentSlider extends JPanel
 			{
 				if (Double.isNaN(value))
 				{
-					value = min;
+					value = defaultValue;
 				}
 				if (oldValue != value)
 				{
@@ -584,7 +587,7 @@ public class SegmentSlider extends JPanel
 				{
 					getTextField().setText("");
 					getTextField().setEnabled(false);
-					setSliderValue(min);
+					setSliderValue(defaultValue);
 					getSlider().setEnabled(false);
 					valueChanged();
 				}
