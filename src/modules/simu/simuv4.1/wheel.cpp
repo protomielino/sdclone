@@ -911,9 +911,14 @@ void SimWheelUpdateTire(tCar *car, int index)
 
 	tdble lockMod = 0;
 	
-	if (slipRatio < -0.9 && sqrt(car->airSpeed2) > 0)
+	//if (slipRatio < -0.9 && sqrt(car->airSpeed2) > 0)
+	if (slipRatio <= 1 && slipRatio > 0)
 	{
-		lockMod = ((fabs(wheel->tireSlip) * wheel->longHeatFactor) * 2500) * SimDeltaTime;
+		lockMod = (slipRatio) * (longForce) * fabs(wheelSpeed) * SimDeltaTime;
+	}
+	else if (slipRatio > 1)
+	{
+		lockMod = (1) * (longForce) * fabs(wheelSpeed) * 0.020 * SimDeltaTime;
 	}
 
     // Calculate energy loss of the tire (convection, convection model approximation from papers,
@@ -954,7 +959,7 @@ void SimWheelUpdateTire(tCar *car, int index)
 	wheel->Ttire -= ((wheel->coolingFactor) * (fabs(wheel->Ttire - Tair) * SimDeltaTime));
 
 	// Effect of temperature on live tire pressure
-    wheel->currentPressure = wheel->Ttire / wheel->Tinit * wheel->pressure;
+    wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
 
     // Wear
     double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * normalForce
@@ -965,7 +970,9 @@ void SimWheelUpdateTire(tCar *car, int index)
         wheel->currentWear = 1.0f;
 
     // Graining
-    tdble grainTemperature = (wheel->Topt - wheel->Tinit) * 3.0f / 4.0f + wheel->Tinit;
+	// Note that we use the TRACK temp and not the initial tire temp
+	// if the initial tire temp is higher (tire warmers, for example)
+    tdble grainTemperature = (wheel->Topt - Tair) * 3.0f / 4.0f + Tair;
     tdble deltaGraining = (grainTemperature - wheel->Ttire) * deltaWear;
     if (deltaGraining > 0.0f)
     {
@@ -984,9 +991,13 @@ void SimWheelUpdateTire(tCar *car, int index)
 
 	// Temperature window. 
     tdble di;
+	
+	// Racing tires typically have a roughly 10-20C window
+	// where they achieve most of their optimal grip. This
+	// is a slightly simplified implementation.
 	if (wheel->Ttire < (wheel->Topt - 20))
 	{
-		di = (wheel->Ttire - wheel->Topt - 20) / (wheel->Topt - wheel->Tinit);
+		di = (wheel->Ttire - wheel->Topt - 20) / (wheel->Topt - Tair);
 	}
 	else if (wheel->Ttire <= wheel->Topt)
 	{
@@ -994,7 +1005,7 @@ void SimWheelUpdateTire(tCar *car, int index)
 	}
 	else
 	{
-		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - wheel->Tinit);
+		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - Tair);
 	}
 
     wheel->currentGripFactor =  ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f) * (1.0f - wheel->currentGraining / 10.0f);
