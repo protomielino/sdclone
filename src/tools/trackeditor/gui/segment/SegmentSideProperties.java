@@ -112,8 +112,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	private SegmentSlider		barrierWidthSlider		= null;
 	private SegmentSlider		borderHeightSlider		= null;
 
-	private boolean				setSource				= false;
-
 	/**
 	 *
 	 */
@@ -326,7 +324,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					if (style == "none")
 						style = null;
 					side.setBorderStyle(style);
-					if (setSource || !styleChanged)
+					if (!styleChanged)
 					{
 						return;
 					}
@@ -493,7 +491,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					if (style == "none")
 						style = null;
 					side.setBarrierStyle(style);
-					if (setSource || !styleChanged)
+					if (!styleChanged)
 					{
 						return;
 					}
@@ -686,8 +684,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 	public void setSide(Segment segment, SegmentSide side)
 	{
-		setSource = true;
-
 		this.side = side;
 
 		// update side
@@ -860,8 +856,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 		this.validate();
 		this.repaint();
-
-		setSource = false;
 	}
 
 	private void checkBorderPlan(Segment segment, SegmentSide side)
@@ -1233,11 +1227,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	 */
 	public void sliderChanged(SegmentSlider slider)
 	{
-		// ignore when triggered by setSide
-		if (setSource)
-		{
-			return;
-		}
 		Interpreter line = new Interpreter();
 		String command = "";
 

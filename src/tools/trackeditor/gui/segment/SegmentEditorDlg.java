@@ -65,8 +65,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	EditorFrame						editorFrame;
 	public boolean					dirty						= false;
 
-	private boolean					setSource					= false;
-
 	private JPanel					jContentPane				= null;	//  @jve:decl-index=0:visual-constraint="377,10"
 
 	private JTabbedPane				jTabbedPane					= null;
@@ -681,8 +679,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 	public void setShape(Segment shape)
 	{
-		setSource = true;
-
 		this.shape = shape;
 		addSurface(roadSurfaceVector, shape.getSurface());
 		this.getRightPanel().setSide(shape, shape.getRight());
@@ -773,8 +769,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		}
 		this.validate();
 		this.repaint();
-		
-		setSource = false;
 	}
 
 	public void update()
@@ -887,11 +881,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	 */
 	public void sliderChanged(SegmentSlider slider)
 	{
-		// ignore when triggered by setShape
-		if (setSource)
-		{
-			return;
-		}
 		// TODO I don't know if this is the best way to fix this but it works
 		if (slider.getMethod() == null || slider.getMethod().isEmpty())
 			return;
