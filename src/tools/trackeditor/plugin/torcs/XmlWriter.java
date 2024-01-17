@@ -303,28 +303,15 @@ public class XmlWriter
 			}
 			addContent(segment, "marks", ((Curve) shape).getMarks());
 		}
-		if (!Double.isNaN(shape.getHeightStartLeft()) &&
-			!Double.isNaN(shape.getHeightStartRight()) &&
-			shape.getHeightStartLeft() == shape.getHeightStartRight())
-		{
-			addContent(segment, "z start", "m", shape.getHeightStartLeft());
-		}
-		else
-		{
-			addContent(segment, "z start left", "m", shape.getHeightStartLeft());
-			addContent(segment, "z start right", "m", shape.getHeightStartRight());
-		}
-		if (!Double.isNaN(shape.getHeightEndLeft()) &&
-			!Double.isNaN(shape.getHeightEndRight()) &&
-			shape.getHeightEndLeft() == shape.getHeightEndRight())
-		{
-			addContent(segment, "z end", "m", shape.getHeightEndLeft());
-		}
-		else
-		{
-			addContent(segment, "z end left", "m", shape.getHeightEndLeft());
-			addContent(segment, "z end right", "m", shape.getHeightEndRight());
-		}
+		
+		addContent(segment, "z start", "m", shape.getHeightStart());
+		addContent(segment, "z start left", "m", shape.getHeightStartLeft());
+		addContent(segment, "z start right", "m", shape.getHeightStartRight());
+
+		addContent(segment, "z end", "m", shape.getHeightEnd());
+		addContent(segment, "z end left", "m", shape.getHeightEndLeft());
+		addContent(segment, "z end right", "m", shape.getHeightEndRight());
+
 		addContent(segment, "grade", "%", shape.getGrade());
 		addContent(segment, "banking start", "deg", shape.getBankingStart());
 		addContent(segment, "banking end", "deg", shape.getBankingEnd());

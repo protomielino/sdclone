@@ -83,8 +83,10 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	private SegmentSlider			endTangentSlider			= null;
 	private SegmentSlider			bankingStartSlider			= null;
 	private SegmentSlider			bankingEndSlider			= null;
+	private SegmentSlider			heightStartSlider			= null;
 	private SegmentSlider			heightStartLeftSlider		= null;
 	private SegmentSlider			heightStartRightSlider		= null;
+	private SegmentSlider			heightEndSlider				= null;
 	private SegmentSlider			heightEndLeftSlider			= null;
 	private SegmentSlider			heightEndRightSlider		= null;
 	private SegmentSlider			profilStepsSlider			= null;
@@ -228,7 +230,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	 */
 	private void initialize()
 	{
-		this.setSize(850, 536);
+		this.setSize(960, 536);
 		Point p = editorFrame.getLocation();
 		p.x = editorFrame.getProject().getSegmentEditorX();
 		p.y = editorFrame.getProject().getSegmentEditorY();
@@ -310,8 +312,10 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			centerPanel.add(getBankingStartSlider(), null);
 			centerPanel.add(getBankingEndSlider(), null);
 			centerPanel.add(getEndTangentSlider(), null);
+			centerPanel.add(getHeightStartSlider(), null);
 			centerPanel.add(getHeightStartLeftSlider(), null);
 			centerPanel.add(getHeightStartRightSlider(), null);
+			centerPanel.add(getHeightEndSlider(), null);
 			centerPanel.add(getHeightEndLeftSlider(), null);
 			centerPanel.add(getHeightEndRightSlider(), null);
 			centerPanel.add(getGroupButton(), null);
@@ -505,6 +509,21 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		return bankingEndSlider;
 	}
 	/**
+	 * This method initializes heightStartSlider
+	 *
+	 * @return gui.SegmentSlider
+	 */
+	private SegmentSlider getHeightStartSlider()
+	{
+		if (heightStartSlider == null)
+		{
+			heightStartSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStart(), "Height", "Start", "HeightStart", true);
+			heightStartSlider.setBounds(610, 64, 50, 390);
+			heightStartSlider.addSliderListener(this);
+		}
+		return heightStartSlider;
+	}
+	/**
 	 * This method initializes heightStartLeftSlider
 	 *
 	 * @return gui.SegmentSlider
@@ -514,7 +533,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartLeftSlider == null)
 		{
 			heightStartLeftSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStartLeft(), "L Height", "Start", "HeightStartLeft", true);
-			heightStartLeftSlider.setBounds(610, 64, 50, 390);
+			heightStartLeftSlider.setBounds(665, 64, 50, 390);
 			heightStartLeftSlider.addSliderListener(this);
 		}
 		return heightStartLeftSlider;
@@ -529,10 +548,25 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartRightSlider == null)
 		{
 			heightStartRightSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStartRight(), "R Height", "Start", "HeightStartRight", true);
-			heightStartRightSlider.setBounds(665, 64, 50, 390);
+			heightStartRightSlider.setBounds(720, 64, 50, 390);
 			heightStartRightSlider.addSliderListener(this);
 		}
 		return heightStartRightSlider;
+	}
+	/**
+	 * This method initializes heightEndSlider
+	 *
+	 * @return gui.SegmentSlider
+	 */
+	private SegmentSlider getHeightEndSlider()
+	{
+		if (heightEndSlider == null)
+		{
+			heightEndSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEnd(), "Height", "End", "HeightEnd", true);
+			heightEndSlider.setBounds(775, 64, 50, 390);
+			heightEndSlider.addSliderListener(this);
+		}
+		return heightEndSlider;
 	}
 	/**
 	 * This method initializes heightEndLeftSlider
@@ -544,7 +578,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndLeftSlider == null)
 		{
 			heightEndLeftSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEndLeft(), "L Height", "End", "HeightEndLeft", true);
-			heightEndLeftSlider.setBounds(720, 64, 50, 390);
+			heightEndLeftSlider.setBounds(830, 64, 50, 390);
 			heightEndLeftSlider.addSliderListener(this);
 		}
 		return heightEndLeftSlider;
@@ -559,7 +593,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndRightSlider == null)
 		{
 			heightEndRightSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEndRight(), "R Height", "End", "HeightEndRight", true);
-			heightEndRightSlider.setBounds(775, 64, 50, 390);
+			heightEndRightSlider.setBounds(885, 64, 50, 390);
 			heightEndRightSlider.addSliderListener(this);
 		}
 		return heightEndRightSlider;
@@ -606,7 +640,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (marksTextField == null)
 		{
 			marksTextField = new JTextField();
-			marksTextField.setBounds(510, 5, 315, 23);
+			marksTextField.setBounds(510, 5, 425, 23);
 			marksTextField.addKeyListener(new KeyAdapter()
 			{
 				public void keyReleased(KeyEvent e)
@@ -630,7 +664,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (commentTextField == null)
 		{
 			commentTextField = new JTextField();
-			commentTextField.setBounds(510, 33, 315, 23);
+			commentTextField.setBounds(510, 33, 425, 23);
 			commentTextField.addKeyListener(new KeyAdapter()
 			{
 				public void keyReleased(KeyEvent e)
@@ -752,8 +786,10 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			this.getEndTangentSlider().setValue(shape.getProfilEndTangent());
 			this.getBankingStartSlider().setValue(shape.getBankingStart());
 			this.getBankingEndSlider().setValue(shape.getBankingEnd());
+			this.getHeightStartSlider().setValue(shape.getHeightStart());
 			this.getHeightStartLeftSlider().setValue(shape.getHeightStartLeft());
 			this.getHeightStartRightSlider().setValue(shape.getHeightStartRight());
+			this.getHeightEndSlider().setValue(shape.getHeightEnd());
 			this.getHeightEndLeftSlider().setValue(shape.getHeightEndLeft());
 			this.getHeightEndRightSlider().setValue(shape.getHeightEndRight());
 			this.getProfileStepsSlider().setValue(shape.getProfilSteps());
@@ -915,6 +951,82 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		}
 		editorFrame.documentIsModified = true;
 		dirty = true;
+	}
+
+	public void checkBoxChanged(SegmentSlider slider)
+	{
+		if (slider.getSection().equals("Height") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightStartLeftSlider.getValue()))
+				{
+					heightStartLeftSlider.setValue(Double.NaN);
+				}
+				if (!Double.isNaN(heightStartRightSlider.getValue()))
+				{
+					heightStartRightSlider.setValue(Double.NaN);
+				}
+			}
+		}
+		else if (slider.getSection().equals("L Height") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightStartSlider.getValue()))
+				{
+					slider.setValue(heightStartSlider.getValue());
+					heightStartSlider.setValue(Double.NaN);
+				}
+			}
+		}
+		else if (slider.getSection().equals("R Height") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightStartSlider.getValue()))
+				{
+					slider.setValue(heightStartSlider.getValue());
+					heightStartSlider.setValue(Double.NaN);
+				}
+			}
+		}
+		else if (slider.getSection().equals("Height") && slider.getAttr().equals("End"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightEndLeftSlider.getValue()))
+				{
+					heightEndLeftSlider.setValue(Double.NaN);
+				}
+				if (!Double.isNaN(heightEndRightSlider.getValue()))
+				{
+					heightEndRightSlider.setValue(Double.NaN);
+				}
+			}
+		}
+		else if (slider.getSection().equals("L Height") && slider.getAttr().equals("End"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightEndSlider.getValue()))
+				{
+					slider.setValue(heightEndSlider.getValue());
+					heightEndSlider.setValue(Double.NaN);
+				}
+			}
+		}
+		else if (slider.getSection().equals("R Height") && slider.getAttr().equals("End"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				if (!Double.isNaN(heightEndSlider.getValue()))
+				{
+					slider.setValue(heightEndSlider.getValue());
+					heightEndSlider.setValue(Double.NaN);
+				}
+			}
+		}
 	}
 
 	protected void processWindowEvent(WindowEvent e)

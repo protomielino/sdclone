@@ -924,28 +924,13 @@ public class XmlReader
 
         shape.setSurface(getAttrStrValue(seg, "surface"));
 
-        double z = getAttrNumValue(seg, "z start", "m");
-        if (Double.isNaN(z))
-        {
-            shape.setHeightStartLeft(getAttrNumValue(seg, "z start left", "m"));
-            shape.setHeightStartRight(getAttrNumValue(seg, "z start right", "m"));
-        }
-        else
-        {
-            shape.setHeightStartLeft(z);
-            shape.setHeightStartRight(z);
-        }
-        z = getAttrNumValue(seg, "z end", "m");
-        if (Double.isNaN(z))
-        {
-            shape.setHeightEndLeft(getAttrNumValue(seg, "z end left", "m"));
-            shape.setHeightEndRight(getAttrNumValue(seg, "z end right", "m"));
-        }
-        else
-        {
-            shape.setHeightEndLeft(z);
-            shape.setHeightEndRight(z);
-        }
+        shape.setHeightStart(getAttrNumValue(seg, "z start", "m"));
+        shape.setHeightStartLeft(getAttrNumValue(seg, "z start left", "m"));
+        shape.setHeightStartRight(getAttrNumValue(seg, "z start right", "m"));
+
+        shape.setHeightEnd(getAttrNumValue(seg, "z end", "m"));
+        shape.setHeightEndLeft(getAttrNumValue(seg, "z end left", "m"));
+        shape.setHeightEndRight(getAttrNumValue(seg, "z end right", "m"));
 
         shape.setGrade(getAttrNumValue(seg, "grade", "%"));
         shape.setBankingStart(getAttrNumValue(seg, "banking start", "deg"));

@@ -29,4 +29,5 @@ package gui.segment;
 public interface SliderListener
 {
 	public void sliderChanged(SegmentSlider slider);
+	public void checkBoxChanged(SegmentSlider slider);
 }

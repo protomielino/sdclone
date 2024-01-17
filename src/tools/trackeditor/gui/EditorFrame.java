@@ -735,10 +735,7 @@ public class EditorFrame extends JFrame
 
         shape = new Straight();
         shape.setLength(100);
-        shape.setHeightStartLeft(0);
-        shape.setHeightStartRight(0);
-        shape.setHeightEndLeft(0);
-        shape.setHeightEndRight(0);
+        shape.setHeightStart(0);
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
@@ -748,10 +745,6 @@ public class EditorFrame extends JFrame
         ((Curve)shape).setRadiusStart(100);
         ((Curve)shape).setRadiusEnd(100);
         ((Curve)shape).setArcDeg(180);
-        shape.setHeightStartLeft(0);
-        shape.setHeightStartRight(0);
-        shape.setHeightEndLeft(0);
-        shape.setHeightEndRight(0);
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
@@ -759,10 +752,6 @@ public class EditorFrame extends JFrame
 
         shape = new Straight();
         shape.setLength(100);
-        shape.setHeightStartLeft(0);
-        shape.setHeightStartRight(0);
-        shape.setHeightEndLeft(0);
-        shape.setHeightEndRight(0);
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
@@ -772,10 +761,7 @@ public class EditorFrame extends JFrame
         ((Curve)shape).setRadiusStart(100);
         ((Curve)shape).setRadiusEnd(100);
         ((Curve)shape).setArcDeg(180);
-        shape.setHeightStartLeft(0);
-        shape.setHeightStartRight(0);
-        shape.setHeightEndLeft(0);
-        shape.setHeightEndRight(0);
+        shape.setHeightEnd(0);
         shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();

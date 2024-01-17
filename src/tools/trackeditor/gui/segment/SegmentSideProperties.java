@@ -1251,4 +1251,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		parent.update();
 	}
 
+	public void checkBoxChanged(SegmentSlider slider)
+	{
+	}	
 } //  @jve:decl-index=0:visual-constraint="42,-30"

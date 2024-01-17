@@ -360,6 +360,16 @@ public class SegmentSlider extends JPanel
 		}
 	}
 
+	public boolean isCheckBoxSelected()
+	{
+		return checkBox.isSelected();
+	}
+
+	public void setCheckBoxSelected(boolean state)
+	{
+		checkBox.setSelected(state);
+	}
+
 	/**
 	 * @return Returns the method.
 	 */
@@ -529,6 +539,19 @@ public class SegmentSlider extends JPanel
 		}
 	}
 
+	private void checkboxChanged()
+    {
+		if (sliderListeners != null)
+		{
+			Vector<SliderListener> listeners = sliderListeners;
+			int count = listeners.size();
+			for (int i = 0; i < count; i++)
+			{
+				listeners.elementAt(i).checkBoxChanged(this);
+			}
+		}
+	}
+
 	/** *** Inner class SliderLink****** */
 	class SliderLink
 	{
@@ -565,6 +588,8 @@ public class SegmentSlider extends JPanel
 
 		public void checkBoxChanged()
 		{
+			checkboxChanged();
+			
 			double	oldValue = value;
 			if (checkBox.isSelected())
 			{

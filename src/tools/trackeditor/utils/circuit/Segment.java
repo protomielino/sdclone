@@ -64,8 +64,11 @@ public class Segment implements Cloneable
 	protected double		length					= Double.NaN;
 	protected String		surface					= null;
 
+	protected double		heightStart				= Double.NaN;
 	protected double		heightStartLeft			= Double.NaN;
 	protected double		heightStartRight		= Double.NaN;
+
+	protected double		heightEnd				= Double.NaN;
 	protected double		heightEndLeft			= Double.NaN;
 	protected double		heightEndRight			= Double.NaN;
 
@@ -121,8 +124,10 @@ public class Segment implements Cloneable
 		comment = segment.comment;
 		length = segment.length;
 		surface = segment.surface;
+		heightStart = segment.heightStart;
 		heightStartLeft = segment.heightStartLeft;
 		heightStartRight = segment.heightStartRight;
+		heightEnd = segment.heightEnd;
 		heightEndLeft = segment.heightEndLeft;
 		heightEndRight = segment.heightEndRight;
 		grade = segment.grade;
@@ -364,6 +369,15 @@ public class Segment implements Cloneable
 	{
 	}
 
+	public double getHeightStart()
+	{
+		return heightStart;
+	}
+	public void setHeightStart(double heightStart)
+	{
+		this.heightStart = heightStart;
+	}
+
 	/**
 	 * @return Returns the heightStartLeft.
 	 */
@@ -394,6 +408,16 @@ public class Segment implements Cloneable
 	{
 		this.heightStartRight = heightStartRight;
 	}
+
+	public double getHeightEnd()
+	{
+		return heightEnd;
+	}
+	public void setHeightEnd(double heightEnd)
+	{
+		this.heightEnd = heightEnd;
+	}
+
 	/**
 	 * @return Returns the heightEndLeft.
 	 */
@@ -718,8 +742,10 @@ public class Segment implements Cloneable
 			s.comment = this.comment;
 			s.length = this.length;
 			s.surface = this.surface;
+			s.heightStart = this.heightStart;
 			s.heightStartLeft = this.heightStartLeft;
 			s.heightStartRight = this.heightStartRight;
+			s.heightEnd = this.heightEnd;
 			s.heightEndLeft = this.heightEndLeft;
 			s.heightEndRight = this.heightEndRight;
 			s.grade = this.grade;
@@ -1709,6 +1735,13 @@ public class Segment implements Cloneable
     public void inheritProperties(Segment previousShape)
     {
 		setSurface(previousShape.getSurface());
+		
+		if (!Double.isNaN(previousShape.getHeightEnd()))
+		{
+			setHeightStart(previousShape.getHeightEnd());
+			setHeightEnd(previousShape.getHeightEnd());
+		}
+
 		if (!Double.isNaN(previousShape.getHeightEndLeft()))
 		{
 			setHeightStartLeft(previousShape.getHeightEndLeft());
