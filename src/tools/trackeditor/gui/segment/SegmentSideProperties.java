@@ -49,8 +49,6 @@ import bsh.Interpreter;
  */
 public class SegmentSideProperties extends JPanel implements SliderListener
 {
-	private SegmentEditorDlg	editor;
-	private Segment				segment;
 	private SegmentSide			side;
 	private SegmentEditorDlg	parent;
 
@@ -644,15 +642,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		return borderHeightSlider;
 	}
 
-	/**
-	 * @param editor
-	 *            The editor to set.
-	 */
-	public void setEditor(SegmentEditorDlg editor)
-	{
-		this.editor = editor;
-	}
-
 	public void update()
 	{
 	}
@@ -699,7 +688,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		setSource = true;
 
-		this.segment = segment;
 		this.side = side;
 
 		// update side
