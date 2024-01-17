@@ -62,10 +62,9 @@ public class SegmentSlider extends JPanel
 	private double			min;
 	private double			max;
 	private double			defaultValue;
-	private double			resolution		= Double.NaN;
+	private double			resolution;
 	private String			method;
-	private Object			parent;
-	private double			value;
+	private double			value			= Double.NaN;;
 	private NumberFormat	nf;
 
 	/**
@@ -79,7 +78,6 @@ public class SegmentSlider extends JPanel
 		this.defaultValue = defaultValue;
 		this.resolution = resolution;
 		initialize();
-		this.parent = this.getParent();
 		new SliderLink();
 	}
 
@@ -96,7 +94,6 @@ public class SegmentSlider extends JPanel
 		this.method = method;
 		this.optional = optional;
 		initialize();
-		this.parent = this.getParent();
 		new SliderLink();
 		setValue(value);
 		setOptional(optional);
