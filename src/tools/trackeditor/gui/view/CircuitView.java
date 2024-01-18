@@ -652,12 +652,30 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		newShape.getLeft().setBarrierWidth(oldShape.getLeft().getBarrierWidth());
 		newShape.getRight().setBarrierWidth(oldShape.getRight().getBarrierWidth());
 
-		if (!Double.isNaN(oldShape.getHeightStart()) && !Double.isNaN(oldShape.getHeightEnd()))
+		double heightStart = oldShape.getHeightStart();
+		
+		if (!Double.isNaN(heightStart) && !Double.isNaN(oldShape.getHeightEnd()))
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEnd());
-			double leftHeight = oldShape.getHeightStart() + (oldShape.getHeightEnd() - oldShape.getHeightStart()) * splitPoint;
+			double leftHeight = heightStart + (oldShape.getHeightEnd() - heightStart) * splitPoint;
 			newShape.setHeightStart(leftHeight);
 			oldShape.setHeightEnd(leftHeight);
+		}
+
+		if (!Double.isNaN(heightStart) && !Double.isNaN(oldShape.getHeightEndLeft()))
+		{								
+			newShape.setHeightEnd(oldShape.getHeightEndLeft());
+			double leftHeight = heightStart + (oldShape.getHeightEndLeft() - heightStart) * splitPoint;
+			newShape.setHeightStartLeft(leftHeight);
+			oldShape.setHeightEndLeft(leftHeight);
+		}
+
+		if (!Double.isNaN(heightStart) && !Double.isNaN(oldShape.getHeightEndRight()))
+		{								
+			newShape.setHeightEnd(oldShape.getHeightEndRight());
+			double leftHeight = heightStart + (oldShape.getHeightEndRight() - heightStart) * splitPoint;
+			newShape.setHeightStartRight(leftHeight);
+			oldShape.setHeightEndRight(leftHeight);
 		}
 
 		if (!Double.isNaN(oldShape.getHeightStartLeft()) && !Double.isNaN(oldShape.getHeightEndLeft()))
@@ -668,10 +686,26 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			oldShape.setHeightEndLeft(leftHeight);
 		}
 
+		if (!Double.isNaN(oldShape.getHeightStartLeft()) && !Double.isNaN(oldShape.getHeightEnd()))
+		{								
+			newShape.setHeightEnd(oldShape.getHeightEnd());
+			double leftHeight = oldShape.getHeightStartLeft() + (oldShape.getHeightEnd() - oldShape.getHeightStartLeft()) * splitPoint;
+			newShape.setHeightStartLeft(leftHeight);
+			oldShape.setHeightEndLeft(leftHeight);
+		}
+
 		if (!Double.isNaN(oldShape.getHeightStartRight()) && !Double.isNaN(oldShape.getHeightEndRight()))
 		{								
 			newShape.setHeightEndRight(oldShape.getHeightEndRight());
 			double rightHeight = oldShape.getHeightStartRight() + (oldShape.getHeightEndRight() - oldShape.getHeightStartRight()) * splitPoint;
+			newShape.setHeightStartRight(rightHeight);
+			oldShape.setHeightEndRight(rightHeight);
+		}
+
+		if (!Double.isNaN(oldShape.getHeightStartRight()) && !Double.isNaN(oldShape.getHeightEnd()))
+		{								
+			newShape.setHeightEnd(oldShape.getHeightEnd());
+			double rightHeight = oldShape.getHeightStartRight() + (oldShape.getHeightEnd() - oldShape.getHeightStartRight()) * splitPoint;
 			newShape.setHeightStartRight(rightHeight);
 			oldShape.setHeightEndRight(rightHeight);
 		}
