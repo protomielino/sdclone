@@ -905,8 +905,9 @@ void SimWheelUpdateTire(tCar *car, int index)
     tdble energyGain =  normalForce * wheelSpeed * SimDeltaTime * hysteresis;
 
 	// Modifiers for energy input from lateral and longitudinal forces.
-	latMod = ((lateralForce - absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
-	longMod = ((longForce - absForce2) * wheel->longHeatFactor) * SimDeltaTime * 0.0008;
+	latMod = ((lateralForce * absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
+	longMod = ((longForce * absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
+
 	tdble energyMod = (latMod + longMod);
 
 	tdble lockMod = 0;
