@@ -283,13 +283,13 @@ public class XmlReader
             return;
 
         Vector<Camera> cameraData = new Vector<Camera>();
-        List<Element> sections = cameras.getChildren();
-        Iterator<Element> it = sections.iterator();
+        List<?> sections = cameras.getChildren();
+        Iterator<?> it = sections.iterator();
         while (it.hasNext())
         {
             Camera cam = new Camera();
 
-            Element camera = it.next();
+            Element camera = (Element) it.next();
             cam.setName(camera.getAttribute("name").getValue());
             cam.setComment(getAttrStrValue(camera, "comment"));
             cam.setSegment(getAttrStrValue(camera, "segment"));
@@ -316,13 +316,13 @@ public class XmlReader
             return;
 
         Vector<TrackLight> lightData = new Vector<TrackLight>();
-        List<Element> sections = lights.getChildren();
-        Iterator<Element> it = sections.iterator();
+        List<?> sections = lights.getChildren();
+        Iterator<?> it = sections.iterator();
         while (it.hasNext())
         {
             TrackLight lit = new TrackLight();
 
-            Element light = it.next();
+            Element light = (Element) it.next();
             lit.setName(light.getAttribute("name").getValue());
 
             Element corner = getChildWithName(light, "topleft");
@@ -367,13 +367,13 @@ public class XmlReader
             return;
 
         Vector<Sector> sectorData = new Vector<Sector>();
-        List<Element> sections = sectors.getChildren();
-        Iterator<Element> it = sections.iterator();
+        List<?> sections = sectors.getChildren();
+        Iterator<?> it = sections.iterator();
         while (it.hasNext())
         {
             Sector sector = new Sector();
 
-            Element element = it.next();
+            Element element = (Element) it.next();
             sector.setName(element.getAttribute("name").getValue());
             sector.setComment(getAttrStrValue(element, "comment"));
             sector.setDistanceFromStart(getAttrNumValue(element, "distance from start", "m"));
@@ -456,13 +456,13 @@ public class XmlReader
 
     private void getSurfaces(Element surfaces, Vector<Surface> surfaceData)
     {
-        List<Element> sections = surfaces.getChildren();
-        Iterator<Element> it = sections.iterator();
+        List<?> sections = surfaces.getChildren();
+        Iterator<?> it = sections.iterator();
         while (it.hasNext())
         {
             Surface surf = new Surface();
 
-            Element surface = it.next();
+            Element surface = (Element) it.next();
             surf.setName(surface.getAttribute("name").getValue());
             surf.setColorR1(getAttrNumValue(surface, "color R1"));
             surf.setColorG1(getAttrNumValue(surface, "color G1"));
@@ -513,13 +513,13 @@ public class XmlReader
      */
     private void getObjects(Element objects, Vector<TrackObject> objectData)
     {
-        List<Element> sections = objects.getChildren();
-        Iterator<Element> it = sections.iterator();
+        List<?> sections = objects.getChildren();
+        Iterator<?> it = sections.iterator();
         while (it.hasNext())
         {
             TrackObject obj = new TrackObject();
 
-            Element object = it.next();
+            Element object = (Element) it.next();
             obj.setName(object.getAttribute("name").getValue());
             obj.setObject(getAttrStrValue(object, "object"));
             obj.setColor(getAttrIntValue(object, "color"));
@@ -631,10 +631,10 @@ public class XmlReader
 	        if (objects != null)
 	        {
 	        	Vector<GraphicObject>	graphicObjects = new Vector<GraphicObject>();
-	        	Iterator<Element> it = objects.getChildren().iterator();
+	        	Iterator<?> it = objects.getChildren().iterator();
 	        	while (it.hasNext())
 	        	{
-	        		Element el = it.next();
+	        		Element el = (Element) it.next();
 	        		GraphicObject object = new GraphicObject(el.getAttribute("name").getValue(),
 	        				getAttrIntValue(el, "color"),
 	        				new Point2D.Double(getAttrNumValue(el, "x"), getAttrNumValue(el, "y")));
@@ -650,12 +650,12 @@ public class XmlReader
 	        if (objectMaps != null)
 	        {
 		        Vector<ObjectMap> objMap = new Vector<ObjectMap>();
-		        Iterator<Element> it = objectMaps.getChildren().iterator();
+		        Iterator<?> it = objectMaps.getChildren().iterator();
 		        while (it.hasNext())
 		        {
                     ObjectMap obj = new ObjectMap();
 
-		            Element el = it.next();
+		            Element el = (Element) it.next();
 		            obj.setName(el.getAttribute("name").getValue());
 
 		            try
@@ -690,12 +690,12 @@ public class XmlReader
         if (environment != null)
         {
             Vector<EnvironmentMapping> envMap = new Vector<EnvironmentMapping>();
-	        Iterator<Element> it = environment.getChildren().iterator();
+	        Iterator<?> it = environment.getChildren().iterator();
 	        while (it.hasNext())
 	        {
 	            EnvironmentMapping env = new EnvironmentMapping();
 
-	            Element el = it.next();
+	            Element el = (Element) it.next();
 	            env.setName(el.getAttribute("name").getValue());
 
 	            env.setEnvMapImage(getAttrStrValue(el, "env map image"));
@@ -817,7 +817,7 @@ public class XmlReader
 
     private synchronized void setSegments(Element mainTrack)
     {
-    	List<Element> segments;
+    	List<?> segments;
     	
         if (editorFrame.getTrackData().getHeader().getVersion() == 3)
             segments = getChildWithName(mainTrack, "segments").getChildren();
@@ -828,14 +828,14 @@ public class XmlReader
             return;
 
         SegmentVector trackData = new SegmentVector();
-        Iterator<Element> it;
+        Iterator<?> it;
         Segment prev = null;
         Segment shape = null;
 
         it = segments.iterator();
         while (it.hasNext())
         {
-            Element e = it.next();
+            Element e = (Element) it.next();
             String type = getAttrStrValue(e, "type");
             if (type.equals("str"))
             {
@@ -1014,19 +1014,19 @@ public class XmlReader
     {
         Element out = null;
         int count = 0;
-        List<Element> all = element.getChildren();
-        Iterator<Element> it;
+        List<?> all = element.getChildren();
+        Iterator<?> it;
         it = all.iterator();
 
         while (it.hasNext()
-                && !it.next().getAttribute("name").getValue()
+                && !((Element) it.next()).getAttribute("name").getValue()
                         .equals(name))
         {
             count++;
         }
         if (count < all.size())
         {
-            out = all.get(count);
+            out = (Element) all.get(count);
         }
         return out;
     }
