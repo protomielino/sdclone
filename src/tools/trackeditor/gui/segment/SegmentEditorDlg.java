@@ -959,11 +959,19 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightStartLeftSlider.getValue()))
+				double startLeft = heightStartLeftSlider.getValue();
+				double startRight = heightStartRightSlider.getValue();
+				
+				if (!Double.isNaN(startLeft) &&!Double.isNaN(startRight) && startLeft == startRight)
+				{
+					heightStartSlider.setValue(startLeft);
+				}
+				
+				if (!Double.isNaN(startLeft))
 				{
 					heightStartLeftSlider.setValue(Double.NaN);
 				}
-				if (!Double.isNaN(heightStartRightSlider.getValue()))
+				if (!Double.isNaN(startRight))
 				{
 					heightStartRightSlider.setValue(Double.NaN);
 				}
@@ -995,11 +1003,19 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightEndLeftSlider.getValue()))
+				double endLeft = heightEndLeftSlider.getValue();
+				double endRight = heightEndRightSlider.getValue();
+				
+				if (!Double.isNaN(endLeft) &&!Double.isNaN(endRight) && endLeft == endRight)
+				{
+					heightEndSlider.setValue(endLeft);
+				}
+				
+				if (!Double.isNaN(endLeft))
 				{
 					heightEndLeftSlider.setValue(Double.NaN);
 				}
-				if (!Double.isNaN(heightEndRightSlider.getValue()))
+				if (!Double.isNaN(endRight))
 				{
 					heightEndRightSlider.setValue(Double.NaN);
 				}
