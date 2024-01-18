@@ -676,10 +676,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			oldShape.setHeightEndRight(rightHeight);
 		}
 
-		if (!Double.isNaN(oldShape.getBankingStart()) && !Double.isNaN(oldShape.getBankingEnd()))
-		{								
+		double bankingStart = getBankingStart(oldShape);
+		
+		if (!Double.isNaN(bankingStart) && !Double.isNaN(oldShape.getBankingEnd()))
+		{
 			newShape.setBankingEnd(oldShape.getBankingEnd());
-			double banking = oldShape.getBankingStart() + (oldShape.getBankingEnd() - oldShape.getBankingStart()) * splitPoint;
+			double banking = bankingStart + (oldShape.getBankingEnd() - bankingStart) * splitPoint;
 			newShape.setBankingStart(banking);
 			oldShape.setBankingEnd(banking);
 		}
@@ -695,6 +697,28 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		newShape.setGrade(oldShape.getGrade());
 		newShape.setSurface(oldShape.getSurface());
+	}
+
+	private double getBankingStart(Segment shape)
+	{
+		double banking = shape.getBankingStart();
+		
+		if (!Double.isNaN(banking))
+		{
+			return banking;
+		}
+
+		if (!Double.isNaN(shape.getHeightStart()))
+		{
+			return 0; // flat
+		}
+
+		if (!Double.isNaN(shape.getHeightStartLeft()) && !Double.isNaN(shape.getHeightStartRight()))
+		{
+			return Math.atan2(shape.getHeightStartLeft() - shape.getHeightStartRight(), editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
+		}
+		
+		return Double.NaN;
 	}
 
 	private ObjectMap findObjectMap(ObjShapeObject object)
