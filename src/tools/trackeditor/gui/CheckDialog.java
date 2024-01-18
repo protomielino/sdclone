@@ -436,10 +436,38 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Previous height end left : " + previousHeightEndLeft + " doesn't match " + heightStartLeft + "\n");
 				}
+				else if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStartLeft)
+				{
+					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStartLeft + "\n");
+				} 
 
 				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStartRight)
 				{
 					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStartRight + "\n");
+				}
+				else if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStartRight)
+				{
+					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStartRight + "\n");
+				}
+			}
+			else if (previous != null && hasHeightStart)
+			{
+				if (!Double.isNaN(previousHeightEndLeft) && previousHeightEndLeft != heightStart)
+				{
+					textArea.append(segmentInfo + "Previous height end left : " + previousHeightEndLeft + " doesn't match " + heightStart + "\n");
+				}
+				else if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStart)
+				{
+					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStart + "\n");
+				} 
+
+				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStart)
+				{
+					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStart + "\n");
+				}
+				else if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStart)
+				{
+					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStart + "\n");
 				}
 			}
 			else if (next == null && hasHeightEndLeftRight)
@@ -455,6 +483,7 @@ public class CheckDialog extends JDialog
 				}
 			}
 
+			previousHeightEnd = heightEnd;
 			previousHeightEndLeft = heightEndLeft;
 			previousHeightEndRight = heightEndRight;
 		}
