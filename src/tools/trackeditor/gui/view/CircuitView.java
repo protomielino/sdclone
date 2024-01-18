@@ -652,6 +652,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		newShape.getLeft().setBarrierWidth(oldShape.getLeft().getBarrierWidth());
 		newShape.getRight().setBarrierWidth(oldShape.getRight().getBarrierWidth());
 
+		if (!Double.isNaN(oldShape.getHeightStart()) && !Double.isNaN(oldShape.getHeightEnd()))
+		{								
+			newShape.setHeightEnd(oldShape.getHeightEnd());
+			double leftHeight = oldShape.getHeightStart() + (oldShape.getHeightEnd() - oldShape.getHeightStart()) * splitPoint;
+			newShape.setHeightStart(leftHeight);
+			oldShape.setHeightEnd(leftHeight);
+		}
+
 		if (!Double.isNaN(oldShape.getHeightStartLeft()) && !Double.isNaN(oldShape.getHeightEndLeft()))
 		{								
 			newShape.setHeightEndLeft(oldShape.getHeightEndLeft());
