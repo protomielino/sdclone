@@ -665,20 +665,20 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndLeft())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEndLeft());
-			double leftHeight = heightStart + (oldShape.getHeightEndLeft() - heightStart) * splitPoint;
-			newShape.setHeightStartLeft(leftHeight);
-			oldShape.setHeightEndLeft(leftHeight);
+			double splitHeight = heightStart + (oldShape.getHeightEndLeft() - heightStart) * splitPoint;
+			newShape.setHeightStartLeft(splitHeight);
+			oldShape.setHeightEndLeft(splitHeight);
 		}
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndRight())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEndRight());
-			double leftHeight = heightStart + (oldShape.getHeightEndRight() - heightStart) * splitPoint;
-			newShape.setHeightStartRight(leftHeight);
-			oldShape.setHeightEndRight(leftHeight);
+			double splitHeight = heightStart + (oldShape.getHeightEndRight() - heightStart) * splitPoint;
+			newShape.setHeightStartRight(splitHeight);
+			oldShape.setHeightEndRight(splitHeight);
 		}
 
-		double bankingStart = getBankingStart(oldShape);
+		double bankingStart = oldShape.getValidBankingStart(editorFrame);
 		
 		if (!Double.isNaN(bankingStart) && oldShape.hasBankingEnd())
 		{
@@ -699,28 +699,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		newShape.setGrade(oldShape.getGrade());
 		newShape.setSurface(oldShape.getSurface());
-	}
-
-	private double getBankingStart(Segment shape)
-	{
-		double banking = shape.getBankingStart();
-		
-		if (!Double.isNaN(banking))
-		{
-			return banking;
-		}
-
-		if (!Double.isNaN(shape.getHeightStart()))
-		{
-			return 0; // flat
-		}
-
-		if (!Double.isNaN(shape.getHeightStartLeft()) && !Double.isNaN(shape.getHeightStartRight()))
-		{
-			return Math.atan2(shape.getHeightStartLeft() - shape.getHeightStartRight(), editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
-		}
-		
-		return Double.NaN;
 	}
 
 	private ObjectMap findObjectMap(ObjShapeObject object)

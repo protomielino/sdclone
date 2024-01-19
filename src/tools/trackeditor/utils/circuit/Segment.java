@@ -1789,7 +1789,7 @@ public class Segment implements Cloneable
     {
     	Segment previous = this;
 
-    	// try to get missing attribute from previous segments first
+    	// try to get missing attribute from previous segments
         while (previous != null)
     	{
             if (previous.hasHeightStart())
@@ -1826,7 +1826,7 @@ public class Segment implements Cloneable
     {
     	Segment previous = this;
 
-    	// try to get missing attribute from previous segments first
+    	// try to get missing attribute from previous segments
         while (previous != null)
     	{
             if (previous.hasHeightStartLeft())
@@ -1859,7 +1859,7 @@ public class Segment implements Cloneable
     {
     	Segment previous = this;
 
-    	// try to get missing attribute from previous segments first
+    	// try to get missing attribute from previous segments
         while (previous != null)
     	{
             if (previous.hasHeightStartRight())
@@ -1882,6 +1882,61 @@ public class Segment implements Cloneable
             else if (previous.hasHeightEnd())
             {
             	return previous.heightEnd;
+            }
+    	}
+
+        return Double.NaN;
+    }
+
+    public double getValidBankingStart(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+
+    	// try to get missing attribute from previous segments
+        while (previous != null)
+    	{
+            if (previous.hasBankingStart())
+    		{
+                return previous.bankingStart;
+    		}
+            else if (previous.hasHeightStart())
+    		{
+                return 0; // flat
+    		}
+            else if (previous.hasHeightStartLeft() && previous.hasHeightStartRight())
+            {
+            	if (previous.heightStartLeft == previous.heightStartRight)
+            	{
+            		return 0; // flat
+            	}
+            	else
+            	{
+        			return Math.atan2(previous.heightStartLeft - previous.heightStartRight, editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
+            	}
+            }
+            previous = previous.previousShape;
+            if (previous == null)
+        	{
+                break;
+            }
+            if (previous.hasBankingEnd())
+    		{
+                return previous.bankingEnd;
+    		}
+            else if (previous.hasHeightEnd())
+    		{
+                return 0; // flat
+    		}
+            else if (previous.hasHeightEndLeft() && previous.hasHeightEndRight())
+            {
+            	if (previous.heightEndLeft == previous.heightEndRight)
+            	{
+            		return 0; // flat
+            	}
+            	else
+            	{
+        			return Math.atan2(previous.heightEndLeft - previous.heightEndRight, editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
+            	}
             }
     	}
 
