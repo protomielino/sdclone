@@ -454,6 +454,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						SegmentVector data = editorFrame.getTrackData().getSegments();
 						int pos = data.indexOf(handledShape);
 						double splitPoint = 0.5;
+						double profilStepsLength = handledShape.getValidProfilStepsLength(editorFrame);
 						switch (handledShape.getType())
 						{
 							case "lft":
@@ -465,7 +466,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								double rStart = oldShape.getRadiusStart();
 								double rEnd = oldShape.getRadiusEnd();
 								double L = (rStart + rEnd) / 2.0 * oldShape.getArcDeg();
-								double nbSteps = (int)(L / 4.0 + 0.5) + 1;
+								double nbSteps = (int)(L / profilStepsLength + 0.5) + 1;
 								double stepLength = L / nbSteps;
 								double deltaRadiusStep = (rEnd - rStart) / (nbSteps - 1.0);
 								double tmpAngle = 0.0;
@@ -495,7 +496,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								newShape2.setRadiusEnd(rEnd);
 								newShape2.setRadiusStart(tmpRadius);
 								splitSegment(oldShape, newShape2, splitPoint);
-								newShape2.setProfilStepsLength(4.0);
+								newShape2.setProfilStepsLength(oldShape.getProfilStepsLength());
 								int count2 = Editor.getProperties().getCurveNameCount() + 1;
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
@@ -512,7 +513,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								double rStart = oldShape.getRadiusStart();
 								double rEnd = oldShape.getRadiusEnd();
 								double L = (rStart + rEnd) / 2.0 * oldShape.getArcDeg();
-								double nbSteps = (int)(L / 4.0 + 0.5) + 1;
+								double nbSteps = (int)(L / profilStepsLength + 0.5) + 1;
 								double stepLength = L / nbSteps;
 								final double deltaRadiusStep = (rEnd - rStart) / (nbSteps - 1.0);
 								double tmpAngle = 0.0;
@@ -542,7 +543,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								newShape2.setRadiusEnd(rEnd);
 								newShape2.setRadiusStart(tmpRadius);
 								splitSegment(oldShape, newShape2, splitPoint);
-								newShape2.setProfilStepsLength(4.0);
+								newShape2.setProfilStepsLength(oldShape.getProfilStepsLength());
 								int count2 = Editor.getProperties().getCurveNameCount() + 1;
 								Editor.getProperties().setCurveNameCount(count2);
 								newShape2.setName("curve " + count2);
@@ -568,6 +569,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 									}
 								}
 								splitSegment(oldShape, newShape3, splitPoint);
+								newShape3.setProfilStepsLength(oldShape.getProfilStepsLength());
 								int count3 = Editor.getProperties().getStraightNameCount() + 1;
 								Editor.getProperties().setStraightNameCount(count3);
 								newShape3.setName("straight " + count3);

@@ -877,18 +877,13 @@ public class Segment implements Cloneable
 		return surf;
 	}
 
+	// this is not inherited
     public double getValidProfilStepsLength(EditorFrame editorFrame)
     {
-        Segment previous = this;
-        double	length;
-        while (previous != null)
+        double	length = profilStepsLength;
+		if (hasProfilStepsLength())
 		{
-			length = profilStepsLength;
-			if (!Double.isNaN(profilStepsLength))
-			{
-				return length;
-			}
-			previous = previous.previousShape;
+			return length;
 		}
 
         length = editorFrame.getTrackData().getMainTrack().getProfilStepsLength();
