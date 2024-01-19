@@ -377,6 +377,10 @@ public class Segment implements Cloneable
 	{
 		this.heightStart = heightStart;
 	}
+	public boolean hasHeightStart()
+	{
+		return !Double.isNaN(heightStart);
+	}
 
 	/**
 	 * @return Returns the heightStartLeft.
@@ -393,6 +397,11 @@ public class Segment implements Cloneable
 	{
 		this.heightStartLeft = heightStartLeft;
 	}
+	public boolean hasHeightStartLeft()
+	{
+		return !Double.isNaN(heightStartLeft);
+	}
+	
 	/**
 	 * @return Returns the heightStartRight.
 	 */
@@ -408,6 +417,10 @@ public class Segment implements Cloneable
 	{
 		this.heightStartRight = heightStartRight;
 	}
+	public boolean hasHeightStartRight()
+	{
+		return !Double.isNaN(heightStartRight);
+	}
 
 	public double getHeightEnd()
 	{
@@ -416,6 +429,10 @@ public class Segment implements Cloneable
 	public void setHeightEnd(double heightEnd)
 	{
 		this.heightEnd = heightEnd;
+	}
+	public boolean hasHeightEnd()
+	{
+		return !Double.isNaN(heightEnd);
 	}
 
 	/**
@@ -433,6 +450,11 @@ public class Segment implements Cloneable
 	{
 		this.heightEndLeft = heightEndLeft;
 	}
+	public boolean hasHeightEndLeft()
+	{
+		return !Double.isNaN(heightEndLeft);
+	}
+	
 	/**
 	 * @return Returns the heightEndRight.
 	 */
@@ -448,6 +470,11 @@ public class Segment implements Cloneable
 	{
 		this.heightEndRight = heightEndRight;
 	}
+	public boolean hasHeightEndRight()
+	{
+		return !Double.isNaN(heightEndRight);
+	}
+	
 	/**
 	 * @return Returns the grade.
 	 */
@@ -478,6 +505,11 @@ public class Segment implements Cloneable
 	{
 		this.bankingStart = bankingStart;
 	}
+	public boolean hasBankingStart()
+	{
+		return !Double.isNaN(bankingStart);
+	}
+	
 	/**
 	 * @return Returns the bankingEnd.
 	 */
@@ -493,6 +525,11 @@ public class Segment implements Cloneable
 	{
 		this.bankingEnd = bankingEnd;
 	}
+	public boolean hasBankingEnd()
+	{
+		return !Double.isNaN(bankingEnd);
+	}
+	
 	/**
 	 * @return Returns the profil.
 	 */
@@ -523,6 +560,7 @@ public class Segment implements Cloneable
 	{
 		this.profilSteps = profilSteps;
 	}
+	
 	/**
 	 * @return Returns the profilStepsLength.
 	 */
@@ -538,6 +576,11 @@ public class Segment implements Cloneable
 	{
 		this.profilStepsLength = profilStepsLength;
 	}
+	public boolean hasProfilStepsLength()
+	{
+		return !Double.isNaN(profilStepsLength);
+	}
+	
 	/**
 	 * @return Returns the profilStartTangent.
 	 */
@@ -553,6 +596,11 @@ public class Segment implements Cloneable
 	{
 		this.profilStartTangent = profilStartTangent;
 	}
+	public boolean hasProfilStartTangent()
+	{
+		return !Double.isNaN(profilStartTangent);
+	}
+	
 	/**
 	 * @return Returns the profilEndTangent.
 	 */
@@ -568,6 +616,11 @@ public class Segment implements Cloneable
 	{
 		this.profilEndTangent = profilEndTangent;
 	}
+	public boolean hasProfilEndTangent()
+	{
+		return !Double.isNaN(profilEndTangent);
+	}
+
 	/**
 	 * @return Returns the profilStartTangentLeft.
 	 */
@@ -1731,7 +1784,110 @@ public class Segment implements Cloneable
 
         return value;
     }
-   
+
+    public double getValidHeightStart()
+    {
+    	Segment previous = this;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            if (previous.hasHeightStart())
+    		{
+                return previous.heightStart;
+    		}
+            else if (previous.hasHeightStartLeft() && 
+            		 previous.hasHeightStartRight() && 
+            		 previous.heightStartLeft == previous.heightStartRight)
+            {
+            	return previous.heightStartLeft;
+            }
+            previous = previous.previousShape;
+            if (previous == null)
+        	{
+                break;
+            }
+            if (previous.hasHeightEnd())
+    		{
+                return previous.heightEnd;
+    		}
+            else if (previous.hasHeightEndLeft() && 
+            		 previous.hasHeightEndRight() && 
+            		 previous.heightEndLeft == previous.heightEndRight)
+            {
+            	return previous.heightEnd;
+            }
+    	}
+
+        return Double.NaN;
+    }
+
+    public double getValidHeightStartLeft()
+    {
+    	Segment previous = this;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            if (previous.hasHeightStartLeft())
+    		{
+                return previous.heightStartLeft;
+    		}
+            else if (previous.hasHeightStart())
+            {
+            	return previous.heightStart;
+            }
+            previous = previous.previousShape;
+            if (previous == null)
+        	{
+                break;
+            }
+            if (previous.hasHeightEndLeft())
+    		{
+                return previous.heightEndLeft;
+    		}
+            else if (previous.hasHeightEnd())
+            {
+            	return previous.heightEnd;
+            }
+    	}
+
+        return Double.NaN;
+    }
+
+    public double getValidHeightStartRight()
+    {
+    	Segment previous = this;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            if (previous.hasHeightStartRight())
+    		{
+                return previous.heightStartRight;
+    		}
+            else if (previous.hasHeightStart())
+            {
+            	return previous.heightStart;
+            }
+            previous = previous.previousShape;
+            if (previous == null)
+        	{
+                break;
+            }
+            if (previous.hasHeightEndRight())
+    		{
+                return previous.heightEndRight;
+    		}
+            else if (previous.hasHeightEnd())
+            {
+            	return previous.heightEnd;
+            }
+    	}
+
+        return Double.NaN;
+    }
+
     public void inheritProperties(Segment previousShape)
     {
 		setSurface(previousShape.getSurface());
