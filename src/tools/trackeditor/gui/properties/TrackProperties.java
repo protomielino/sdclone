@@ -649,14 +649,21 @@ public class TrackProperties extends PropertyPanel
             getEditorFrame().documentIsModified = true;
         }
 
-		if (isDifferent((String) surfaceComboBox.getSelectedItem(),
-            getEditorFrame().getTrackData().getMainTrack().getSurface(), stringResult))
+        if (isDifferent((String) surfaceComboBox.getSelectedItem(),
+        	getEditorFrame().getTrackData().getMainTrack().getSurface(), stringResult))
+        {
+        	getEditorFrame().getTrackData().getMainTrack().setSurface(stringResult.getValue());
+        	getEditorFrame().documentIsModified = true;
+        }
+
+		if (isDifferent((String) profilComboBox.getSelectedItem(),
+	        getEditorFrame().getTrackData().getMainTrack().getProfil(), stringResult))
 		{
-			getEditorFrame().getTrackData().getMainTrack().setSurface(stringResult.getValue());
+			getEditorFrame().getTrackData().getMainTrack().setProfil(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 
-        if (isDifferent(profilStepsLengthTextField.getText(),
+		if (isDifferent(profilStepsLengthTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().setProfilStepsLength(doubleResult.getValue());
