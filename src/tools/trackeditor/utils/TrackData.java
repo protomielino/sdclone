@@ -23,6 +23,7 @@ package utils;
 import java.util.Vector;
 
 import utils.circuit.Camera;
+import utils.circuit.Curve;
 import utils.circuit.Graphic;
 import utils.circuit.GraphicObject;
 import utils.circuit.Header;
@@ -31,6 +32,7 @@ import utils.circuit.MainTrack;
 import utils.circuit.ObjectMap;
 import utils.circuit.Reliefs;
 import utils.circuit.Sector;
+import utils.circuit.Segment;
 import utils.circuit.StartingGrid;
 import utils.circuit.Surface;
 import utils.circuit.TerrainGeneration;
@@ -246,4 +248,190 @@ public final class TrackData
 	{
 		return getGraphic().getTerrainGeneration().getGraphicObjects();
 	}
+
+    public void calculateSegmentValues()
+    {
+    	double width = mainTrack.getWidth();
+    	boolean hasGrade = false;
+
+		for (int i = 0; i < segments.size(); i++)
+		{
+			Segment segment = segments.get(i);
+			boolean hasSpline = (segment.hasProfil() && segment.getProfil().equals("spline")) ||
+					mainTrack.getProfil() == null ||
+					mainTrack.getProfil().equals("spline");
+
+			if (i == 0)
+			{
+				segment.setCalculatedHeightStart(0);
+				segment.setCalculatedHeightStartLeft(0);
+				segment.setCalculatedHeightStartRight(0);
+				segment.setCalculatedHeightEnd(0);
+				segment.setCalculatedHeightEndLeft(0);
+				segment.setCalculatedHeightEndRight(0);
+				segment.setCalculatedGrade(0);
+				segment.setCalculatedBankingStart(0);
+				segment.setCalculatedBankingEnd(0);
+				segment.setCalculatedStartTangent(0);
+				segment.setCalculatedEndTangent(0);
+				segment.setCalculatedStartTangentLeft(0);
+				segment.setCalculatedEndTangentLeft(0);
+				segment.setCalculatedStartTangentRight(0);
+				segment.setCalculatedEndTangentRight(0);
+			}
+			else
+			{
+				Segment previous = segment.getPreviousShape();
+
+				segment.setCalculatedHeightStartLeft(previous.getCalculatedHeightEndLeft());
+				segment.setCalculatedHeightStartRight(previous.getCalculatedHeightEndRight());
+				segment.setCalculatedHeightEndLeft(previous.getCalculatedHeightEndLeft());
+				segment.setCalculatedHeightEndRight(previous.getCalculatedHeightEndRight());
+				segment.setCalculatedHeightStart(previous.getCalculatedHeightEnd());
+				segment.setCalculatedHeightEnd(previous.getCalculatedHeightEnd());
+				segment.setCalculatedGrade(previous.getCalculatedGrade());
+				segment.setCalculatedBankingStart(previous.getCalculatedBankingEnd());
+				segment.setCalculatedBankingEnd(previous.getCalculatedBankingEnd());
+
+				segment.setCalculatedStartTangentLeft(previous.getCalculatedEndTangentLeft());
+				segment.setCalculatedStartTangentRight(previous.getCalculatedEndTangentRight());
+
+				if (hasSpline)
+				{
+					segment.setCalculatedStartTangent(previous.getCalculatedStartTangent());
+					segment.setCalculatedEndTangent(previous.getCalculatedEndTangent());
+					segment.setCalculatedStartTangentLeft(previous.getCalculatedStartTangentLeft());
+					segment.setCalculatedEndTangentLeft(previous.getCalculatedEndTangentLeft());
+					segment.setCalculatedStartTangentRight(previous.getCalculatedStartTangentRight());
+					segment.setCalculatedEndTangentRight(previous.getCalculatedEndTangentRight());
+				}
+			}
+
+			double length;
+			if (segment.getType().equals("str"))
+			{
+				length = segment.getLength();
+			}
+			else
+			{
+				Curve curve = (Curve) segment;
+				double radiusEnd;
+
+				if (curve.hasRadiusEnd())
+					radiusEnd = curve.getRadiusEnd();
+				else
+					radiusEnd = curve.getRadiusStart();
+
+	            length = ((curve.getRadiusStart() + radiusEnd) / 2.0 * curve.getArcRad());
+			}
+
+			if (segment.hasHeightStartLeft())
+				segment.setCalculatedHeightStartLeft(segment.getHeightStartLeft());
+
+			if (segment.hasHeightStartRight())
+				segment.setCalculatedHeightStartRight(segment.getHeightStartRight());
+
+			if (segment.hasHeightEndLeft())
+				segment.setCalculatedHeightEndLeft(segment.getHeightEndLeft());
+
+			if (segment.hasHeightEndRight())
+				segment.setCalculatedHeightEndRight(segment.getHeightEndRight());
+
+			if (segment.hasGrade())
+			{
+				hasGrade = true;
+				segment.setCalculatedGrade(segment.getGrade());
+			}
+
+			if (segment.hasHeightStart())
+			{
+				segment.setCalculatedHeightStart(segment.getHeightStart());
+				segment.setCalculatedHeightStartLeft(segment.getHeightStart());
+				segment.setCalculatedHeightStartRight(segment.getHeightStart());
+			}
+			else
+			{
+				segment.setCalculatedHeightStart((segment.getCalculatedHeightStartLeft() + segment.getCalculatedHeightStartRight()) / 2);
+			}
+
+			if (segment.hasHeightEnd())
+			{
+				segment.setCalculatedHeightEnd(segment.getHeightEnd());
+				segment.setCalculatedHeightEndLeft(segment.getHeightEnd());
+				segment.setCalculatedHeightEndRight(segment.getHeightEnd());
+				segment.setCalculatedGrade(((segment.getCalculatedHeightEnd() - segment.getCalculatedHeightStart()) / length) * 100);
+			}
+			else if (hasGrade)
+			{
+				segment.setCalculatedHeightEnd(segment.getCalculatedHeightStart() + (length * (segment.getCalculatedGrade() / 100)));
+			}
+			else
+			{
+				segment.setCalculatedHeightEnd((segment.getCalculatedHeightEndLeft() + segment.getCalculatedHeightEndRight()) / 2);
+			}
+
+			if (segment.hasBankingStart())
+			{
+				segment.setCalculatedBankingStart(segment.getBankingStart());
+			}
+			else
+			{
+			    segment.setCalculatedBankingStart(Math.toDegrees(Math.atan2(segment.getCalculatedHeightStartLeft() - segment.getCalculatedHeightStartRight(), width)));
+			}
+
+			if (segment.hasBankingEnd())
+			{
+				segment.setCalculatedBankingEnd(segment.getBankingEnd());
+			}
+			else
+			{
+				segment.setCalculatedBankingEnd(Math.toDegrees(Math.atan2(segment.getCalculatedHeightEndLeft() - segment.getCalculatedHeightEndRight(), width)));
+			}
+
+			double dz = Math.tan(Math.toRadians(segment.getCalculatedBankingStart())) * width / 2;
+			segment.setCalculatedHeightStartLeft(segment.getCalculatedHeightStart() + dz);
+			segment.setCalculatedHeightStartRight(segment.getCalculatedHeightStart() - dz);
+			dz = Math.tan(Math.toRadians(segment.getCalculatedBankingEnd())) * width / 2;
+			segment.setCalculatedHeightEndLeft(segment.getCalculatedHeightEnd() + dz);
+			segment.setCalculatedHeightEndRight(segment.getCalculatedHeightEnd() - dz);
+
+			if (hasSpline)
+			{
+				if (segment.hasProfilStartTangentLeft())
+					segment.setCalculatedStartTangentLeft(segment.getProfilStartTangentLeft());
+				if (segment.hasProfilEndTangentLeft())
+					segment.setCalculatedEndTangentLeft(segment.getProfilEndTangentLeft());
+				if (segment.hasProfilStartTangentRight())
+					segment.setCalculatedStartTangentRight(segment.getProfilStartTangentRight());
+				if (segment.hasProfilEndTangentRight())
+					segment.setCalculatedEndTangentRight(segment.getProfilEndTangentRight());
+
+				if (segment.hasProfilStartTangent())
+				{
+					segment.setCalculatedStartTangent(segment.getProfilStartTangent());
+					segment.setCalculatedStartTangentLeft(segment.getProfilStartTangent());
+					segment.setCalculatedStartTangentRight(segment.getProfilStartTangent());
+				}
+				if (segment.hasProfilEndTangent())
+				{
+					segment.setCalculatedEndTangent(segment.getProfilEndTangent());
+					segment.setCalculatedEndTangentLeft(segment.getProfilEndTangent());
+					segment.setCalculatedEndTangentRight(segment.getProfilEndTangent());
+				}
+			}
+			else
+			{
+				segment.setCalculatedStartTangentLeft((segment.getCalculatedHeightEndLeft() - segment.getCalculatedHeightStartLeft()) / length);
+				segment.setCalculatedEndTangentLeft((segment.getCalculatedHeightEndLeft() - segment.getCalculatedHeightStartLeft()) / length);
+
+				segment.setCalculatedStartTangentRight((segment.getCalculatedHeightEndRight() - segment.getCalculatedHeightStartRight()) / length);
+				segment.setCalculatedEndTangentRight((segment.getCalculatedHeightEndRight() - segment.getCalculatedHeightStartRight()) / length);
+				
+				segment.setCalculatedStartTangent((segment.getCalculatedStartTangentLeft() + segment.getCalculatedStartTangentRight()) / 2);
+				segment.setCalculatedEndTangent((segment.getCalculatedEndTangentLeft() + segment.getCalculatedEndTangentRight()) / 2);
+			}
+		}
+
+		//segments.dumpCalculated("");
+    }
 }

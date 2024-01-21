@@ -212,6 +212,7 @@ public class XmlReader
         setCameras(root);
         setMainTrack(root);
         setSectors(root);
+        editorFrame.getTrackData().calculateSegmentValues();
     }
 
     private synchronized void setMainTrack(Element root)
@@ -1165,7 +1166,7 @@ public class XmlReader
                 			}
                 			else if (expectedUnit.equals("rad") && actualUnit.equals("deg"))
                 			{
-                				out = out * Math.PI / 180.0;
+                				out = Math.toRadians(out);
                 			}
                 			else if (expectedUnit.equals("s") && (actualUnit.equals("hour") || actualUnit.equals("hours")))
                 			{

@@ -133,7 +133,7 @@ public class Curve extends Segment
 		 */
 		
 		// calc turn length
-		double arc = arcDeg * Math.PI / 180;
+		double arc = getArcRad();
 		length = arc * (radiusStart + radiusEnd) / 2;
 		nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
 
@@ -427,14 +427,14 @@ public class Curve extends Segment
 	 */
 	public double getArcRad()
 	{
-		return arcDeg * Math.PI / 180;
+		return Math.toRadians(arcDeg);
 	}
 	/**
 	 * @param arc The arc to set.
 	 */
 	public void setArcRad(double arcRad)
 	{
-		this.arcDeg = arcRad * 180 / Math.PI;
+		this.arcDeg = Math.toDegrees(arcRad);
 	}
 	/**
 	 * @return Returns the arc.
@@ -457,6 +457,11 @@ public class Curve extends Segment
 	{
 		return radiusEnd;
 	}
+	public boolean hasRadiusEnd()
+	{
+		return !Double.isNaN(radiusEnd);
+	}
+
 	/**
 	 * @param radiusEnd The radiusEnd to set.
 	 */

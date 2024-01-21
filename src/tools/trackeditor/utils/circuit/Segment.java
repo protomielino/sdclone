@@ -86,6 +86,23 @@ public class Segment implements Cloneable
 	protected double		profilStartTangentRight	= Double.NaN;
 	protected double		profilEndTangentRight	= Double.NaN;
 
+	// calculated values
+	protected double		calculatedHeightStart 		= Double.NaN;
+	protected double		calculatedHeightStartLeft 	= Double.NaN;
+	protected double		calculatedHeightStartRight 	= Double.NaN;
+	protected double		calculatedHeightEnd			= Double.NaN;
+	protected double		calculatedHeightEndLeft		= Double.NaN;
+	protected double		calculatedHeightEndRight 	= Double.NaN;
+	protected double		calculatedGrade 			= Double.NaN;
+	protected double		calculatedBankingStart 		= Double.NaN;
+	protected double		calculatedBankingEnd 		= Double.NaN;
+	protected double		calculatedStartTangent		= Double.NaN;
+	protected double		calculatedEndTangent		= Double.NaN;
+	protected double		calculatedStartTangentLeft	= Double.NaN;
+	protected double		calculatedEndTangentLeft	= Double.NaN;
+	protected double		calculatedStartTangentRight	= Double.NaN;
+	protected double		calculatedEndTangentRight	= Double.NaN;
+
 	// shape to be drawn
 	public Point2D.Double	points[];
 	public Point2D.Double	trPoints[];
@@ -474,7 +491,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(heightEndRight);
 	}
-	
+
 	/**
 	 * @return Returns the grade.
 	 */
@@ -490,6 +507,11 @@ public class Segment implements Cloneable
 	{
 		this.grade = grade;
 	}
+	public boolean hasGrade()
+	{
+		return !Double.isNaN(grade);
+	}
+
 	/**
 	 * @return Returns the bankingStart.
 	 */
@@ -545,6 +567,11 @@ public class Segment implements Cloneable
 	{
 		this.profil = profil;
 	}
+	public boolean hasProfil()
+	{
+		return profil != null;
+	}
+
 	/**
 	 * @return Returns the profilSteps.
 	 */
@@ -559,6 +586,10 @@ public class Segment implements Cloneable
 	public void setProfilSteps(double profilSteps)
 	{
 		this.profilSteps = profilSteps;
+	}
+	public boolean hasProfilSteps()
+	{
+		return !Double.isNaN(profilSteps);
 	}
 	
 	/**
@@ -636,6 +667,11 @@ public class Segment implements Cloneable
 	{
 		this.profilStartTangentLeft = profilStartTangentLeft;
 	}
+	public boolean hasProfilStartTangentLeft()
+	{
+		return !Double.isNaN(profilStartTangentLeft);
+	}
+
 	/**
 	 * @return Returns the profilEndTangentLeft.
 	 */
@@ -651,6 +687,11 @@ public class Segment implements Cloneable
 	{
 		this.profilEndTangentLeft = profilEndTangentLeft;
 	}
+	public boolean hasProfilEndTangentLeft()
+	{
+		return !Double.isNaN(profilEndTangentLeft);
+	}
+
 	/**
 	 * @return Returns the profilStartTangentRight.
 	 */
@@ -666,6 +707,11 @@ public class Segment implements Cloneable
 	{
 		this.profilStartTangentRight = profilStartTangentRight;
 	}
+	public boolean hasProfilStartTangentRight()
+	{
+		return !Double.isNaN(profilStartTangentRight);
+	}
+
 	/**
 	 * @return Returns the profilEndTangentRight.
 	 */
@@ -680,6 +726,10 @@ public class Segment implements Cloneable
 	public void setProfilEndTangentRight(double profilEndTangentRight)
 	{
 		this.profilEndTangentRight = profilEndTangentRight;
+	}
+	public boolean hasProfilEndTangentRight()
+	{
+		return !Double.isNaN(profilEndTangentRight);
 	}
 
 	/**
@@ -854,6 +904,141 @@ public class Segment implements Cloneable
     {
         return dy;
     }
+
+	public double getCalculatedHeightStart()
+	{
+		return calculatedHeightStart;
+	}
+	public void setCalculatedHeightStart(double calculatedHeightStart)
+	{
+		this.calculatedHeightStart = calculatedHeightStart;
+	}
+
+	public double getCalculatedHeightStartLeft()
+	{
+		return calculatedHeightStartLeft;
+	}
+	public void setCalculatedHeightStartLeft(double calculatedHeightStartLeft)
+	{
+		this.calculatedHeightStartLeft = calculatedHeightStartLeft;
+	}
+
+	public double getCalculatedHeightStartRight()
+	{
+		return calculatedHeightStartRight;
+	}
+	public void setCalculatedHeightStartRight(double calculatedHeightStartRight)
+	{
+		this.calculatedHeightStartRight = calculatedHeightStartRight;
+	}
+
+	public double getCalculatedHeightEnd()
+	{
+		return calculatedHeightEnd;
+	}
+	public void setCalculatedHeightEnd(double calculatedHeightEnd)
+	{
+		this.calculatedHeightEnd = calculatedHeightEnd;
+	}
+
+	public double getCalculatedHeightEndLeft()
+	{
+		return calculatedHeightEndLeft;
+	}
+	public void setCalculatedHeightEndLeft(double calculatedHeightEndLeft)
+	{
+		this.calculatedHeightEndLeft = calculatedHeightEndLeft;
+	}
+
+	public double getCalculatedHeightEndRight()
+	{
+		return calculatedHeightEndRight;
+	}
+	public void setCalculatedHeightEndRight(double calculatedHeightEndRight)
+	{
+		this.calculatedHeightEndRight = calculatedHeightEndRight;
+	}
+
+	public double getCalculatedGrade()
+	{
+		return calculatedGrade;
+	}
+	public void setCalculatedGrade(double calculatedGrade)
+	{
+		this.calculatedGrade = calculatedGrade;
+	}
+
+	public double getCalculatedBankingStart()
+	{
+		return calculatedBankingStart;
+	}
+	public void setCalculatedBankingStart(double calculatedBankingStart)
+	{
+		this.calculatedBankingStart = calculatedBankingStart;
+	}
+
+	public double getCalculatedBankingEnd()
+	{
+		return calculatedBankingEnd;
+	}
+	public void setCalculatedBankingEnd(double calculatedBankingEnd)
+	{
+		this.calculatedBankingEnd = calculatedBankingEnd;
+	}
+
+	public double getCalculatedStartTangent()
+	{
+		return calculatedStartTangent;
+	}
+	public void setCalculatedStartTangent(double calculatedStartTangent)
+	{
+		this.calculatedStartTangent = calculatedStartTangent;
+	}
+
+	public double getCalculatedEndTangent()
+	{
+		return calculatedEndTangent;
+	}
+	public void setCalculatedEndTangent(double calculatedEndTangent)
+	{
+		this.calculatedEndTangent = calculatedEndTangent;
+	}
+
+	public double getCalculatedStartTangentLeft()
+	{
+		return calculatedStartTangentLeft;
+	}
+	public void setCalculatedStartTangentLeft(double calculatedStartTangentLeft)
+	{
+		this.calculatedStartTangentLeft = calculatedStartTangentLeft;
+	}
+
+	public double getCalculatedEndTangentLeft()
+	{
+		return calculatedEndTangentLeft;
+	}
+	public void setCalculatedEndTangentLeft(double calculatedEndTangentLeft)
+	{
+		this.calculatedEndTangentLeft = calculatedEndTangentLeft;
+	}
+
+	public double getCalculatedStartTangentRight()
+	{
+		return calculatedStartTangentRight;
+	}
+	public void setCalculatedStartTangentRight(double calculatedStartTangentRight)
+	{
+		this.calculatedStartTangentRight = calculatedStartTangentRight;
+	}
+
+	public double getCalculatedEndTangentRight()
+	{
+		return calculatedEndTangentRight;
+	}
+	public void setCalculatedEndTangentRight(double calculatedEndTangentRight)
+	{
+		this.calculatedEndTangentRight = calculatedEndTangentRight;
+	}
 
 	public String getValidSurface(EditorFrame editorFrame)
 	{
@@ -1906,7 +2091,7 @@ public class Segment implements Cloneable
             	}
             	else
             	{
-        			return Math.atan2(previous.heightStartLeft - previous.heightStartRight, editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
+        			return Math.toDegrees(Math.atan2(previous.heightStartLeft - previous.heightStartRight, editorFrame.getTrackData().getMainTrack().getWidth()));
             	}
             }
             previous = previous.previousShape;
@@ -1930,7 +2115,7 @@ public class Segment implements Cloneable
             	}
             	else
             	{
-        			return Math.atan2(previous.heightEndLeft - previous.heightEndRight, editorFrame.getTrackData().getMainTrack().getWidth()) * 180.0 / Math.PI;
+        			return Math.toDegrees(Math.atan2(previous.heightEndLeft - previous.heightEndRight, editorFrame.getTrackData().getMainTrack().getWidth()));
             	}
             }
     	}
@@ -2036,6 +2221,27 @@ public class Segment implements Cloneable
 		right.setSideEndWidth(getValidRightSideEndWidth(editorFrame));
 		right.setSideSurface(getValidRightSideSurface(editorFrame));
 		right.setSideBankingType(getValidRightSideBankingType(editorFrame));
+	}
+
+	public void dumpCalculated(String indent)
+	{
+		System.out.println(indent + "name                        : " + name);
+		System.out.println(indent + "type                        : " + type);
+		System.out.println(indent + "calculatedHeightStart       : " + calculatedHeightStart);
+		System.out.println(indent + "calculatedHeightStartLeft   : " + calculatedHeightStartLeft);
+		System.out.println(indent + "calculatedHeightStartRight  : " + calculatedHeightStartRight);
+		System.out.println(indent + "calculatedHeightEnd         : " + calculatedHeightEndLeft);
+		System.out.println(indent + "calculatedHeightEndLeft     : " + calculatedHeightEndLeft);
+		System.out.println(indent + "calculatedHeightEndRight    : " + calculatedHeightEndRight);
+		System.out.println(indent + "calculatedGrade             : " + calculatedGrade);
+		System.out.println(indent + "calculatedBankingStart      : " + calculatedBankingStart);
+		System.out.println(indent + "calculatedBankingEnd        : " + calculatedBankingEnd);
+		System.out.println(indent + "calculatedStartTangent      : " + calculatedStartTangent);
+		System.out.println(indent + "calculatedStartTangentLeft  : " + calculatedStartTangentLeft);
+		System.out.println(indent + "calculatedStartTangentRight : " + calculatedStartTangentRight);
+		System.out.println(indent + "calculatedEndTangent        : " + calculatedEndTangent);
+		System.out.println(indent + "calculatedEndTangentLeft    : " + calculatedEndTangentLeft);
+		System.out.println(indent + "calculatedEndTangentRight   : " + calculatedEndTangentRight);
 	}
 
 	public void dump(String indent)

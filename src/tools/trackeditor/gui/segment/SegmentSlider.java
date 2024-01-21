@@ -66,7 +66,7 @@ public class SegmentSlider extends JPanel
 	private double			defaultValue;
 	private double			resolution;
 	private String			method;
-	private double			value			= Double.NaN;;
+	private double			value			= Double.NaN;
 	private NumberFormat	nf;
 
 	/**

@@ -959,88 +959,112 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				double startLeft = heightStartLeftSlider.getValue();
-				double startRight = heightStartRightSlider.getValue();
+				shape.setHeightStart(shape.getCalculatedHeightStart());
+				slider.setValue(shape.getHeightStart());
 				
-				if (!Double.isNaN(startLeft) &&!Double.isNaN(startRight) && startLeft == startRight)
-				{
-					heightStartSlider.setValue(startLeft);
-				}
+				shape.setHeightStartLeft(Double.NaN);
+				heightStartLeftSlider.setValue(shape.getHeightStartLeft());
 				
-				if (!Double.isNaN(startLeft))
-				{
-					heightStartLeftSlider.setValue(Double.NaN);
-				}
-				if (!Double.isNaN(startRight))
-				{
-					heightStartRightSlider.setValue(Double.NaN);
-				}
+				shape.setHeightStartRight(Double.NaN);
+				heightStartRightSlider.setValue(shape.getHeightStartRight());
 			}
 		}
 		else if (slider.getSection().equals("L Height") && slider.getAttr().equals("Start"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightStartSlider.getValue()))
-				{
-					slider.setValue(heightStartSlider.getValue());
-					heightStartSlider.setValue(Double.NaN);
-				}
+				shape.setHeightStartLeft(shape.getCalculatedHeightStartLeft());
+				slider.setValue(shape.getHeightStartLeft());
+				
+				shape.setHeightStart(Double.NaN);
+				heightStartSlider.setValue(shape.getHeightStart());
 			}
 		}
 		else if (slider.getSection().equals("R Height") && slider.getAttr().equals("Start"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightStartSlider.getValue()))
-				{
-					slider.setValue(heightStartSlider.getValue());
-					heightStartSlider.setValue(Double.NaN);
-				}
+				shape.setHeightStartRight(shape.getCalculatedHeightStartRight());
+				slider.setValue(shape.getHeightStartRight());
+
+				shape.setHeightStart(Double.NaN);
+				heightStartSlider.setValue(shape.getHeightStart());
 			}
 		}
 		else if (slider.getSection().equals("Height") && slider.getAttr().equals("End"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				double endLeft = heightEndLeftSlider.getValue();
-				double endRight = heightEndRightSlider.getValue();
+				shape.setHeightEnd(shape.getCalculatedHeightEnd());
+				slider.setValue(shape.getHeightEnd());
 				
-				if (!Double.isNaN(endLeft) &&!Double.isNaN(endRight) && endLeft == endRight)
-				{
-					heightEndSlider.setValue(endLeft);
-				}
+				shape.setHeightEndLeft(Double.NaN);
+				heightEndLeftSlider.setValue(shape.getHeightEndLeft());
 				
-				if (!Double.isNaN(endLeft))
-				{
-					heightEndLeftSlider.setValue(Double.NaN);
-				}
-				if (!Double.isNaN(endRight))
-				{
-					heightEndRightSlider.setValue(Double.NaN);
-				}
+				shape.setHeightEndRight(Double.NaN);
+				heightEndRightSlider.setValue(shape.getHeightEndRight());
 			}
 		}
 		else if (slider.getSection().equals("L Height") && slider.getAttr().equals("End"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightEndSlider.getValue()))
-				{
-					slider.setValue(heightEndSlider.getValue());
-					heightEndSlider.setValue(Double.NaN);
-				}
+				shape.setHeightEndLeft(shape.getCalculatedHeightEndLeft());
+				slider.setValue(shape.getHeightEndLeft());
+				
+				shape.setHeightEnd(Double.NaN);
+				heightEndSlider.setValue(shape.getHeightEnd());
 			}
 		}
 		else if (slider.getSection().equals("R Height") && slider.getAttr().equals("End"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				if (!Double.isNaN(heightEndSlider.getValue()))
-				{
-					slider.setValue(heightEndSlider.getValue());
-					heightEndSlider.setValue(Double.NaN);
-				}
+				shape.setHeightEndRight(shape.getCalculatedHeightEndRight());
+				slider.setValue(shape.getHeightEndRight());
+				
+				shape.setHeightEnd(Double.NaN);
+				heightEndSlider.setValue(shape.getHeightEnd());
+			}
+		}
+		else if (slider.getSection().equals("Grade") && slider.getAttr().equals(""))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setGrade(shape.getCalculatedGrade());
+				slider.setValue(shape.getGrade());
+			}
+		}
+		else if (slider.getSection().equals("Banking") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setBankingStart(shape.getCalculatedBankingStart());
+				slider.setValue(shape.getBankingStart());
+			}
+		}
+		else if (slider.getSection().equals("Banking") && slider.getAttr().equals("End"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setBankingEnd(shape.getCalculatedBankingEnd());
+				slider.setValue(shape.getBankingEnd());
+			}
+		}
+		else if (slider.getSection().equals("Tangent") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setProfilStartTangent(shape.getCalculatedStartTangent());
+				slider.setValue(shape.getProfilStartTangent());
+			}
+		}
+		else if (slider.getSection().equals("Tangent") && slider.getAttr().equals("End"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setProfilEndTangent(shape.getCalculatedEndTangent());
+				slider.setValue(shape.getProfilEndTangent());
 			}
 		}
 	}

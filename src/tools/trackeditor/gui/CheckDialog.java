@@ -373,7 +373,7 @@ public class CheckDialog extends JDialog
 			{
 				textArea.append(segmentInfo + "Banking start angle and banking from heights\n");
 
-				double bankingFromHeights = Math.atan2(heightStartLeft - heightStartRight, width) * 180.0 / Math.PI;
+				double bankingFromHeights = Math.toDegrees(Math.atan2(heightStartLeft - heightStartRight, width));
 
 				if (bankingStart != bankingFromHeights)
 				{
@@ -405,7 +405,7 @@ public class CheckDialog extends JDialog
 			{
 				textArea.append(segmentInfo + "Banking end angle and banking from heights\n");
 
-				double bankingFromHeights = Math.atan2(heightEndLeft - heightEndRight, width) * 180.0 / Math.PI;
+				double bankingFromHeights = Math.toDegrees(Math.atan2(heightEndLeft - heightEndRight, width));
 
 				if (bankingEnd != bankingFromHeights)
 				{

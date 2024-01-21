@@ -655,7 +655,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		newShape.getRight().setBarrierWidth(oldShape.getRight().getBarrierWidth());
 
 		double heightStart = oldShape.getValidHeightStart();
-		
+
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEnd())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEnd());
@@ -681,7 +681,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 
 		double bankingStart = oldShape.getValidBankingStart(editorFrame);
-		
+
 		if (!Double.isNaN(bankingStart) && oldShape.hasBankingEnd())
 		{
 			newShape.setBankingEnd(oldShape.getBankingEnd());
@@ -690,13 +690,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			oldShape.setBankingEnd(banking);
 		}
 
-		if (!Double.isNaN(oldShape.getProfilStartTangent()) && !Double.isNaN(oldShape.getProfilEndTangent()))
+		if (oldShape.hasProfilStartTangent() || oldShape.hasProfilEndTangent())
 		{
 			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
-			// TODO calculate the slope at the split point
-			double tangent = oldShape.getProfilStartTangent() + (oldShape.getProfilEndTangent() - oldShape.getProfilStartTangent()) * splitPoint;
-			newShape.setProfilStartTangent(tangent);
-			oldShape.setProfilEndTangent(tangent);
+			newShape.setProfilStartTangent(oldShape.getCalculatedGrade());
+			oldShape.setProfilEndTangent(oldShape.getCalculatedGrade());
 		}
 
 		newShape.setGrade(oldShape.getGrade());
@@ -2166,6 +2164,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (editorFrame.getTrackData() == null)
 			return;
 
+		editorFrame.getTrackData().calculateSegmentValues();
+		
 		SegmentVector track = editorFrame.getTrackData().getSegments();
 		
 		if (track == null)
