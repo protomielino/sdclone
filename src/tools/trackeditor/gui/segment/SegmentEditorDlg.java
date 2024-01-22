@@ -1067,6 +1067,14 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				slider.setValue(shape.getProfilEndTangent());
 			}
 		}
+		else if (slider.getSection().equals("Steps") && slider.getAttr().equals("Len"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setProfilStepsLength(shape.getValidProfilStepsLength(editorFrame));
+				slider.setValue(shape.getProfilStepsLength());
+			}
+		}
 	}
 
 	protected void processWindowEvent(WindowEvent e)
