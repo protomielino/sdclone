@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -55,6 +57,7 @@ public class CheckDialog extends JDialog
 	private Set<String> 		textures 		= new HashSet<String>();
 	private String				dataDirectory	= null;
 	private TrackData			trackData		= null;
+	private Map<String,Boolean>	imageHasAlpha	= new HashMap<String, Boolean>();
 
 	public CheckDialog(EditorFrame editorFrame)
 	{
@@ -1054,9 +1057,13 @@ public class CheckDialog extends JDialog
 					{
 						try
 						{
-							BufferedImage image = ImageIO.read(textureFile);
+							if (!imageHasAlpha.containsKey(textureFile.getAbsolutePath()))
+							{
+								BufferedImage image = ImageIO.read(textureFile);
+								imageHasAlpha.put(textureFile.getAbsolutePath(), image.getColorModel().hasAlpha());
+							}
 
-							if (!image.getColorModel().hasAlpha())
+							if (imageHasAlpha.get(textureFile.getAbsolutePath()))
 							{
 								doubleSided = true;
 							}
