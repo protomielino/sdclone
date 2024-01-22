@@ -365,6 +365,7 @@ if(OPTION_SDL2_MIXER)
                                                -DSDL2MIXER_OPUS:BOOL=OFF 
                                                -DSDL2MIXER_FLAC:BOOL=OFF
                                                -DSDL2MIXER_MOD:BOOL=OFF
+                                               -DSDL2MIXER_WAVPACK:BOOL=OFF
                                                -DSDL2MIXER_MIDI_FLUIDSYNTH:BOOL=OFF)
    ExternalProject_Add(${SDL2_MIXER_PROJECT}
       URL ${SDL2_MIXER_URL}
