@@ -131,11 +131,18 @@ public class Curve extends Segment
 		 * 
 		 * 
 		 */
-		
+
 		// calc turn length
 		double arc = getArcRad();
 		length = arc * (radiusStart + radiusEnd) / 2;
-		nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
+		if (hasProfilSteps())
+		{
+			nbSteps = getProfilSteps();
+		}
+		else
+		{
+			nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
+		}
 
 		trackStartDist += length;
 

@@ -937,7 +937,7 @@ public class XmlReader
         shape.setBankingStart(getAttrNumValue(seg, "banking start", "deg"));
         shape.setBankingEnd(getAttrNumValue(seg, "banking end", "deg"));
         shape.setProfil(getAttrStrValue(seg, "profil"));
-        shape.setProfilSteps(getAttrNumValue(seg, "profil steps"));
+        shape.setProfilSteps(getAttrIntValue(seg, "profil steps"));
         shape.setProfilStepsLength(getAttrNumValue(seg, "profil steps length", "m"));
         shape.setProfilStartTangent(getAttrNumValue(seg, "profil start tangent", "%"));
         shape.setProfilEndTangent(getAttrNumValue(seg, "profil end tangent", "%"));

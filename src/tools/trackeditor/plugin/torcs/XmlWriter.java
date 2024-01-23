@@ -316,7 +316,7 @@ public class XmlWriter
 		addContent(segment, "banking start", "deg", shape.getBankingStart());
 		addContent(segment, "banking end", "deg", shape.getBankingEnd());
 		addContent(segment, "profil", shape.getProfil());
-		addContent(segment, "profil steps", "m", shape.getProfilSteps());
+		addContent(segment, "profil steps", null, shape.getProfilSteps());
 		addContent(segment, "profil steps length", "m", shape.getProfilStepsLength());
 		addContent(segment, "profil start tangent", "%", shape.getProfilStartTangent());
 		addContent(segment, "profil end tangent", "%", shape.getProfilEndTangent());

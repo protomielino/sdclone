@@ -77,7 +77,7 @@ public class Segment implements Cloneable
 	protected double		bankingEnd				= Double.NaN;
 
 	protected String		profil					= null;
-	protected double		profilSteps				= Double.NaN;
+	protected int			profilSteps				= Integer.MAX_VALUE;
 	protected double		profilStepsLength		= Double.NaN;
 	protected double		profilStartTangent		= Double.NaN;
 	protected double		profilEndTangent		= Double.NaN;
@@ -575,7 +575,7 @@ public class Segment implements Cloneable
 	/**
 	 * @return Returns the profilSteps.
 	 */
-	public double getProfilSteps()
+	public int getProfilSteps()
 	{
 		return profilSteps;
 	}
@@ -583,13 +583,13 @@ public class Segment implements Cloneable
 	 * @param profilSteps
 	 *            The profilSteps to set.
 	 */
-	public void setProfilSteps(double profilSteps)
+	public void setProfilSteps(int profilSteps)
 	{
 		this.profilSteps = profilSteps;
 	}
 	public boolean hasProfilSteps()
 	{
-		return !Double.isNaN(profilSteps);
+		return profilSteps != Integer.MAX_VALUE;
 	}
 	
 	/**

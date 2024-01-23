@@ -68,6 +68,7 @@ public class SegmentSlider extends JPanel
 	private String			method;
 	private double			value			= Double.NaN;
 	private NumberFormat	nf;
+	private boolean			integerFormat	= false;
 
 	/**
 	 *  
@@ -109,7 +110,6 @@ public class SegmentSlider extends JPanel
 		nf = NumberFormat.getNumberInstance(Locale.US);
 		nf.setMaximumFractionDigits(3);
 		nf.setMinimumFractionDigits(1);
-		nf.setGroupingUsed(false);
 
 		attLabel = new JLabel();
 		sectionLabel = new JLabel();
@@ -129,6 +129,17 @@ public class SegmentSlider extends JPanel
 		this.add(attLabel, null);
 		this.add(getTextField(), null);
 		this.add(getSlider(), null);
+	}
+
+	public void setIntegerFormat()
+	{
+		integerFormat = true;
+		nf.setMaximumFractionDigits(0);
+		nf.setMinimumFractionDigits(0);
+	}
+	public boolean getIntegerFormat()
+	{
+		return integerFormat;
 	}
 
 	private void setSliderValue(double value)
@@ -211,7 +222,7 @@ public class SegmentSlider extends JPanel
 					char c = e.getKeyChar();
 
 					// check for valid digit or a single decimal point
-					if (!(Character.isDigit(c) || (c == '.' && !textField.getText().contains("."))))
+					if (!(Character.isDigit(c) || (!integerFormat && (c == '.' && !textField.getText().contains(".")))))
 					{
 						e.consume();
 						return;
@@ -397,6 +408,11 @@ public class SegmentSlider extends JPanel
 	 */
 	public double getValue()
 	{
+		if (integerFormat && Double.isNaN(value))
+		{
+			return Integer.MAX_VALUE;
+		}
+
 		return value;
 	}
 	/**
@@ -405,8 +421,16 @@ public class SegmentSlider extends JPanel
 	 */
 	public void setValue(double val)
 	{
-		value = val;
-		if (Double.isNaN(val))
+		if (integerFormat && val == Integer.MAX_VALUE)
+		{
+			value = Double.NaN;
+		}
+		else
+		{
+			value = val;
+		}
+
+		if (Double.isNaN(value))
 		{
 			getTextField().setText("");
 			getTextField().setEnabled(false);

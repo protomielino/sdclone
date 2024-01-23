@@ -457,7 +457,11 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (profilStepsSlider == null)
 		{
-			profilStepsSlider = new SegmentSlider(0, 100, 0, 0.001, shape.getProfilSteps(), "Steps", "", "ProfilSteps", true);
+			int minSteps = 1;
+			if (!shape.getType().equals("str"))
+				minSteps = 2;
+			profilStepsSlider = new SegmentSlider(minSteps, 100, 1, 1, shape.getProfilSteps(), "Steps", "", "ProfilSteps", true);
+			profilStepsSlider.setIntegerFormat();
 			profilStepsSlider.setBounds(390, 64, 50, 390);
 			profilStepsSlider.addSliderListener(this);
 		}
@@ -930,10 +934,20 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 			String method = slider.getMethod();
 
-			if (Double.isNaN(slider.getValue()))
-				command = "shape.set" + method + "(Double.NaN)";
+			if (slider.getIntegerFormat())
+			{
+				if (slider.getValue() == Integer.MAX_VALUE)
+					command = "shape.set" + method + "(Integer.MAX_VALUE)";
+				else
+					command = "shape.set" + method + "(" + (int) slider.getValue() + ")";
+			}
 			else
-				command = "shape.set" + method + "(" + slider.getValue() + ")";
+			{
+				if (Double.isNaN(slider.getValue()))
+					command = "shape.set" + method + "(Double.NaN)";
+				else
+					command = "shape.set" + method + "(" + slider.getValue() + ")";
+			}
 
 			line.eval(command);
 			shape = (Segment) line.get("shape");
@@ -1071,8 +1085,52 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			if (slider.isCheckBoxSelected())
 			{
-				shape.setProfilStepsLength(shape.getValidProfilStepsLength(editorFrame));
+				double stepsLength;
+				if (shape.hasProfilSteps())
+				{
+					double length;
+					if (!shape.getType().equals("str"))
+					{
+						Curve curve = (Curve) shape;
+						length = curve.getArcRad() * (curve.getRadiusStart() + curve.getRadiusEnd()) / 2;
+					}
+					else
+					{
+						length = shape.getLength();
+					}
+					stepsLength = length / shape.getProfilSteps();
+				}
+				else
+				{
+					stepsLength = shape.getValidProfilStepsLength(editorFrame);
+				}
+				shape.setProfilStepsLength(stepsLength);
 				slider.setValue(shape.getProfilStepsLength());
+
+				shape.setProfilSteps(Integer.MAX_VALUE);
+				profilStepsSlider.setValue(shape.getProfilSteps());
+			}
+		}
+		else if (slider.getSection().equals("Steps") && slider.getAttr().equals(""))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				double length;
+				if (!shape.getType().equals("str"))
+				{
+					Curve curve = (Curve) shape;
+					length = curve.getArcRad() * (curve.getRadiusStart() + curve.getRadiusEnd()) / 2;
+				}
+				else
+				{
+					length = shape.getLength();
+				}
+				int steps = (int) (length / shape.getValidProfilStepsLength(editorFrame) + 0.5);
+				shape.setProfilSteps(steps);
+				slider.setValue(shape.getProfilSteps());
+
+				shape.setProfilStepsLength(Double.NaN);
+				profilStepsLengthSlider.setValue(shape.getProfilStepsLength());
 			}
 		}
 	}
