@@ -1200,26 +1200,40 @@ public class XmlReader
         return out;
     }
 
-    public synchronized int getAttrIntValue(Element element,
-            String name)
+    public synchronized int getAttrIntValue(Element element, String name)
     {
-        int out = Integer.MAX_VALUE;
-        Element e = getChildWithName(element, name);
-        if (e != null)
-        {
-            if (e.getName().equals("attnum"))
-            {
-                try
-                {
-                    out = Integer.decode(e.getAttributeValue("val"));
-                }
-                catch (NumberFormatException exception)
-                {
-                	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
-                	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-        return out;
+    	int out = Integer.MAX_VALUE;
+    	Element e = getChildWithName(element, name);
+    	if (e != null)
+    	{
+    		if (e.getName().equals("attnum"))
+    		{
+    			try
+    			{
+    				out = Integer.decode(e.getAttributeValue("val"));
+    			}
+    			catch (NumberFormatException exception1)
+    			{
+    				try
+    				{
+    					double value = Double.parseDouble(e.getAttributeValue("val"));
+
+    					if (Math.floor(value) != value)
+    					{
+    						String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+    						JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
+    					}
+
+    					out = (int) value;
+    				}
+    				catch (NumberFormatException exception2)
+    				{
+    					String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
+    					JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
+    				}
+    			}
+    		}
+    	}
+    	return out;
     }
 }
