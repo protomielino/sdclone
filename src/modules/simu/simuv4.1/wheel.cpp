@@ -993,16 +993,24 @@ void SimWheelUpdateTire(tCar *car, int index)
 	// Temperature window. 
     tdble di;
 	
+	// Ratio modifier for when temp is under minimal optimal
+	// operating temp (f.e. below 70 C for a 90 deg optimal)
+	tdble diRatio;
+	if (wheel->Ttire < wheel->Topt - 20)
+	{
+		diRatio = (wheel->Ttire - Tair) / (Tair - (wheel->Ttire - 20)) * 0.125;
+	}
+
 	// Racing tires typically have a roughly 10-20C window
-	// where they achieve most of their optimal grip. This
-	// is a slightly simplified implementation.
+	// where they achieve most of their optimal grip.
+	// When within this "ideal window", grip changes are less extreme.
 	if (wheel->Ttire < (wheel->Topt - 20))
 	{
-		di = (wheel->Ttire - wheel->Topt - 20) / (wheel->Topt - Tair);
+		di = ((wheel->Ttire - wheel->Topt - 20) / (wheel->Topt - Tair)) + diRatio;
 	}
 	else if (wheel->Ttire <= wheel->Topt)
 	{
-		di = 0.0;
+		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - (wheel->Topt - 20)) * 0.125;
 	}
 	else
 	{
