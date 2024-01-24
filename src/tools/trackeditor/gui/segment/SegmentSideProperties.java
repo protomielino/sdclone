@@ -557,7 +557,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (barrierHeightSlider == null)
 		{
-			barrierHeightSlider = new SegmentSlider(0, 50, 0, 0.001, side.getBarrierHeight(), "Height", "", "BarrierHeight", true);
+			barrierHeightSlider = new SegmentSlider(0, 50, 0, 0.001, side.getBarrierHeight(), "Height", "", "BarrierHeight", true, false);
 			barrierHeightSlider.setBounds(52, 25, 50, 290);
 			barrierHeightSlider.addSliderListener(this);
 		}
@@ -573,7 +573,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (sideStartWidthSlider == null)
 		{
-			sideStartWidthSlider = new SegmentSlider(0, 100, 0, 0.001, side.getSideStartWidth(), "Width", "Start", "SideStartWidth", true);
+			sideStartWidthSlider = new SegmentSlider(0, 100, 0, 0.001, side.getSideStartWidth(), "Width", "Start", "SideStartWidth", true, false);
 			sideStartWidthSlider.setBounds(358, 25, 50, 290);
 			sideStartWidthSlider.addSliderListener(this);
 		}
@@ -588,7 +588,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (borderWidthSlider == null)
 		{
-			borderWidthSlider = new SegmentSlider(0, 5, 0, 0.001, side.getBorderWidth(), "Width", "", "BorderWidth", true);
+			borderWidthSlider = new SegmentSlider(0, 5, 0, 0.001, side.getBorderWidth(), "Width", "", "BorderWidth", true, false);
 			borderWidthSlider.setBounds(720, 25, 50, 290);
 			borderWidthSlider.addSliderListener(this);
 		}
@@ -603,7 +603,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (sideEndWidthSlider == null)
 		{
-			sideEndWidthSlider = new SegmentSlider(0, 100, 0, 0.001, side.getSideEndWidth(), "Width", "End", "SideEndWidth", true);
+			sideEndWidthSlider = new SegmentSlider(0, 100, 0, 0.001, side.getSideEndWidth(), "Width", "End", "SideEndWidth", true, false);
 			sideEndWidthSlider.setBounds(413, 25, 50, 290);
 			sideEndWidthSlider.addSliderListener(this);
 		}
@@ -618,7 +618,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (barrierWidthSlider == null)
 		{
-			barrierWidthSlider = new SegmentSlider(0, 50, 0, 0.001, side.getBarrierWidth(), "Width", "", "BarrierWidth", true);
+			barrierWidthSlider = new SegmentSlider(0, 50, 0, 0.001, side.getBarrierWidth(), "Width", "", "BarrierWidth", true, false);
 			barrierWidthSlider.setBounds(107, 25, 50, 290);
 			barrierWidthSlider.addSliderListener(this);
 		}
@@ -633,7 +633,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (borderHeightSlider == null)
 		{
-			borderHeightSlider = new SegmentSlider(0, 5, 0, 0.001, side.getBorderHeight(), "Height", "", "BorderHeight", true);
+			borderHeightSlider = new SegmentSlider(0, 5, 0, 0.001, side.getBorderHeight(), "Height", "", "BorderHeight", true, false);
 			borderHeightSlider.setBounds(665, 25, 50, 290);
 			borderHeightSlider.addSliderListener(this);
 		}

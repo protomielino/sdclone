@@ -84,7 +84,7 @@ public class SegmentSlider extends JPanel
 		new SliderLink();
 	}
 
-	public SegmentSlider(double min, double max, double defaultValue, double resolution, double value, String section, String attr, String method, boolean optional)
+	public SegmentSlider(double min, double max, double defaultValue, double resolution, double value, String section, String attr, String method, boolean optional, boolean integerFormat)
 	{
 		super();
 		this.min = min;
@@ -96,6 +96,7 @@ public class SegmentSlider extends JPanel
 		this.attr = attr;
 		this.method = method;
 		this.optional = optional;
+		this.integerFormat = integerFormat;
 		initialize();
 		new SliderLink();
 		setValue(value);
@@ -108,9 +109,18 @@ public class SegmentSlider extends JPanel
 	private void initialize()
 	{
 		nf = NumberFormat.getNumberInstance(Locale.US);
-		nf.setMaximumFractionDigits(3);
-		nf.setMinimumFractionDigits(1);
-
+		nf.setGroupingUsed(false);
+		if (integerFormat)
+		{
+			nf.setMaximumFractionDigits(0);
+			nf.setMinimumFractionDigits(0);
+		}
+		else
+		{
+			nf.setMaximumFractionDigits(3);
+			nf.setMinimumFractionDigits(1);			
+		}
+		
 		attLabel = new JLabel();
 		sectionLabel = new JLabel();
 		this.setLayout(new SegmentSliderLayout());
@@ -131,12 +141,6 @@ public class SegmentSlider extends JPanel
 		this.add(getSlider(), null);
 	}
 
-	public void setIntegerFormat()
-	{
-		integerFormat = true;
-		nf.setMaximumFractionDigits(0);
-		nf.setMinimumFractionDigits(0);
-	}
 	public boolean getIntegerFormat()
 	{
 		return integerFormat;
