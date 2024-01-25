@@ -37,13 +37,13 @@ public class ObjShapeHandle extends Segment
 	{
 		if (points == null)
 		{
-			points = new Point2D.Double[1]; // 1 points in 2D
+			points = new Point3D[1]; // 1 points in 2D
 			for (int i = 0; i < points.length; i++)
-				points[i] = new Point2D.Double();
+				points[i] = new Point3D();
 
-			trPoints = new Point2D.Double[1];
+			trPoints = new Point3D[1];
 			for (int i = 0; i < trPoints.length; i++)
-				trPoints[i] = new Point2D.Double();
+				trPoints[i] = new Point3D();
 		}
 
 		points[0].x = location.getX();

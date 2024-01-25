@@ -104,8 +104,8 @@ public class Segment implements Cloneable
 	protected double		calculatedEndTangentRight	= Double.NaN;
 
 	// shape to be drawn
-	public Point2D.Double	points[];
-	public Point2D.Double	trPoints[];
+	public Point3D			points[];
+	public Point3D			trPoints[];
 
 	// datas for fast 'draw' process
 	int						xToDraw[]			= new int[4];
@@ -879,14 +879,14 @@ public class Segment implements Cloneable
     /**
      * @return Returns the points.
      */
-    public Point2D.Double[] getPoints()
+    public Point3D[] getPoints()
     {
         return points;
     }
     /**
      * @param points The points to set.
      */
-    public void setPoints(Point2D.Double[] points)
+    public void setPoints(Point3D[] points)
     {
         this.points = points;
     }

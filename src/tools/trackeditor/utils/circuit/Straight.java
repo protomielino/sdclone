@@ -89,6 +89,7 @@ public class Straight extends Segment
 		double currentY = Editor.getProperties().getCurrentY();
 		double currentA = Editor.getProperties().getCurrentA();
 		double showArrows = Editor.getProperties().getShowArrows();
+		double profilStepsLength = getValidProfilStepsLength(editorFrame);
 		double trackWidth = editorFrame.getTrackData().getMainTrack().getWidth();
 		double leftBorderWidth = getValidLeftBorderWidth(editorFrame);
 		double rightBorderWidth = getValidRightBorderWidth(editorFrame);
@@ -99,145 +100,170 @@ public class Straight extends Segment
 		double leftBarrierWidth = getValidLeftBarrierWidth(editorFrame);
 		double rightBarrierWidth = getValidRightBarrierWidth(editorFrame);
 
-		if (points == null || points.length != 4 * (7 + (showArrows > 0.0 ? 1 : 0)))
+		int nbSteps = 1;
+		if (hasProfilSteps())
 		{
-			points = new Point2D.Double[4 * (7 + (showArrows > 0.0 ? 1 : 0))]; 
-			for (int i = 0; i < points.length; i++)
-				points[i] = new Point2D.Double();
-
-			trPoints = new Point2D.Double[4 * (7 + (showArrows > 0.0 ? 1 : 0))];
-			for (int i = 0; i < trPoints.length; i++)
-				trPoints[i] = new Point2D.Double();
+			nbSteps = getProfilSteps();
 		}
-		double cos = Math.cos(currentA) * length;
-		double sin = Math.sin(currentA) * length;
+		else
+		{
+			nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
+		}
+		double stepLength = length / nbSteps;
+
+		if (points == null || points.length != 4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps)
+		{
+			points = new Point3D[4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps];
+
+			for (int i = 0; i < points.length; i++)
+				points[i] = new Point3D();
+
+			trPoints = new Point3D[4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps];
+			for (int i = 0; i < trPoints.length; i++)
+				trPoints[i] = new Point3D();
+		}
+
+		int currentSubSeg = 0;
+		double leftSideDeltaStep = (leftSideEndWidth - leftSideStartWidth) / nbSteps;
+		double rightSideDeltaStep = (rightSideEndWidth - rightSideStartWidth) / nbSteps;
+
+		double cos = Math.cos(currentA) * stepLength;
+		double sin = Math.sin(currentA) * stepLength;
 
 		double cosTransLeft = Math.cos(currentA + Math.PI / 2);
 		double sinTransLeft = Math.sin(currentA + Math.PI / 2);
 
-		// track
-		points[0].x = currentX + cosTransLeft * trackWidth / 2;
-		points[0].y = currentY + sinTransLeft * trackWidth / 2;
-
-		points[1].x = points[0].x + cos;
-		points[1].y = points[0].y + sin;
-
-		points[3].x = currentX - cosTransLeft * trackWidth / 2;
-		points[3].y = currentY - sinTransLeft * trackWidth / 2;
-
-		points[2].x = points[3].x + cos;
-		points[2].y = points[3].y + sin;
-
-		// left border
-
-		points[4].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth);
-		points[4].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth);
-
-		points[5].x = points[4].x + cos;
-		points[5].y = points[4].y + sin;
-
-		points[7].x = points[0].x;
-		points[7].y = points[0].y;
-
-		points[6].x = points[1].x;
-		points[6].y = points[1].y;
-
-		// left side
-
-		points[8].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth);
-		points[8].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth);
-
-		points[9].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth);
-		points[9].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth);
-
-		points[10].x = points[5].x;
-		points[10].y = points[5].y;
-
-		points[11].x = points[4].x;
-		points[11].y = points[4].y;
-		
-		// left barrier
-
-		points[12].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + leftBarrierWidth);
-		points[12].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + leftBarrierWidth);
-
-		points[13].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth + leftBarrierWidth);
-		points[13].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideEndWidth + leftBarrierWidth);
-
-		points[15].x = points[8].x;
-		points[15].y = points[8].y;
-
-		points[14].x = points[9].x;
-		points[14].y = points[9].y;
-	
-		// right border
-
-		points[16].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
-		points[16].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
-
-		points[17].x = points[16].x + cos;
-		points[17].y = points[16].y + sin;
-
-		points[19].x = points[3].x;
-		points[19].y = points[3].y;
-
-		points[18].x = points[2].x;
-		points[18].y = points[2].y;
-
-		// right side
-
-		points[20].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
-		points[20].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth);
-
-		points[21].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
-		points[21].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth);
-
-		points[22].x = points[17].x;
-		points[22].y = points[17].y;
-
-		points[23].x = points[16].x;
-		points[23].y = points[16].y;
-
-		// right barrier
-
-		points[24].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + rightBarrierWidth);
-		points[24].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + rightBarrierWidth);
-
-		points[25].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth + rightBarrierWidth);
-		points[25].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideEndWidth + rightBarrierWidth);
-
-		points[27].x = points[20].x;
-		points[27].y = points[20].y;
-
-		points[26].x = points[21].x;
-		points[26].y = points[21].y;
-	
-		if (showArrows > 0.0)
+		for (int nStep = 0; nStep < nbSteps; nStep++)
 		{
-			// arrow
-			points[28].x = currentX + cosTransLeft * trackWidth / 2;
-			points[28].y = currentY + sinTransLeft * trackWidth / 2;
+			// track
+			points[currentSubSeg + 0].x = currentX + cosTransLeft * trackWidth / 2;
+			points[currentSubSeg + 0].y = currentY + sinTransLeft * trackWidth / 2;
 
-			points[29].x = points[0].x + cos - (cosTransLeft * trackWidth / 2) * 0.99999;
-			points[29].y = points[0].y + sin - (sinTransLeft * trackWidth / 2) * 0.99999;
+			points[currentSubSeg + 1].x = points[currentSubSeg + 0].x + cos;
+			points[currentSubSeg + 1].y = points[currentSubSeg + 0].y + sin;
 
-			points[31].x = currentX - cosTransLeft * trackWidth / 2;
-			points[31].y = currentY - sinTransLeft * trackWidth / 2;
+			points[currentSubSeg + 3].x = currentX - cosTransLeft * trackWidth / 2;
+			points[currentSubSeg + 3].y = currentY - sinTransLeft * trackWidth / 2;
 
-			points[30].x = points[23].x + cos + (cosTransLeft * trackWidth / 2) * 0.99999;
-			points[30].y = points[23].y + sin + (sinTransLeft * trackWidth / 2) * 0.99999;
+			points[currentSubSeg + 2].x = points[currentSubSeg + 3].x + cos;
+			points[currentSubSeg + 2].y = points[currentSubSeg + 3].y + sin;
+
+			// left border
+
+			points[currentSubSeg + 4].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth);
+			points[currentSubSeg + 4].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth);
+
+			points[currentSubSeg + 5].x = points[currentSubSeg + 4].x + cos;
+			points[currentSubSeg + 5].y = points[currentSubSeg + 4].y + sin;
+
+			points[currentSubSeg + 7].x = points[currentSubSeg + 0].x;
+			points[currentSubSeg + 7].y = points[currentSubSeg + 0].y;
+
+			points[currentSubSeg + 6].x = points[currentSubSeg + 1].x;
+			points[currentSubSeg + 6].y = points[currentSubSeg + 1].y;
+
+			// left side
+
+			points[currentSubSeg + 8].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * nStep));
+			points[currentSubSeg + 8].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * nStep));
+
+			points[currentSubSeg + 9].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * (nStep + 1)));
+			points[currentSubSeg + 9].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * (nStep + 1)));
+
+			points[currentSubSeg + 10].x = points[currentSubSeg + 5].x;
+			points[currentSubSeg + 10].y = points[currentSubSeg + 5].y;
+
+			points[currentSubSeg + 11].x = points[currentSubSeg + 4].x;
+			points[currentSubSeg + 11].y = points[currentSubSeg + 4].y;
+
+			// left barrier
+
+			points[currentSubSeg + 12].x = currentX + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * nStep) + leftBarrierWidth);
+			points[currentSubSeg + 12].y = currentY + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * nStep) + leftBarrierWidth);
+
+			points[currentSubSeg + 13].x = currentX + cos + cosTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * (nStep + 1)) + leftBarrierWidth);
+			points[currentSubSeg + 13].y = currentY + sin + sinTransLeft * (trackWidth / 2 + leftBorderWidth + leftSideStartWidth + (leftSideDeltaStep * (nStep + 1)) + leftBarrierWidth);
+
+			points[currentSubSeg + 15].x = points[currentSubSeg + 8].x;
+			points[currentSubSeg + 15].y = points[currentSubSeg + 8].y;
+
+			points[currentSubSeg + 14].x = points[currentSubSeg + 9].x;
+			points[currentSubSeg + 14].y = points[currentSubSeg + 9].y;
+
+			// right border
+
+			points[currentSubSeg + 16].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
+			points[currentSubSeg + 16].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth);
+
+			points[currentSubSeg + 17].x = points[currentSubSeg + 16].x + cos;
+			points[currentSubSeg + 17].y = points[currentSubSeg + 16].y + sin;
+
+			points[currentSubSeg + 19].x = points[currentSubSeg + 3].x;
+			points[currentSubSeg + 19].y = points[currentSubSeg + 3].y;
+
+			points[currentSubSeg + 18].x = points[currentSubSeg + 2].x;
+			points[currentSubSeg + 18].y = points[currentSubSeg + 2].y;
+
+			// right side
+
+			points[currentSubSeg + 20].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * nStep));
+			points[currentSubSeg + 20].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * nStep));
+
+			points[currentSubSeg + 21].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * (nStep + 1)));
+			points[currentSubSeg + 21].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * (nStep + 1)));
+
+			points[currentSubSeg + 22].x = points[currentSubSeg + 17].x;
+			points[currentSubSeg + 22].y = points[currentSubSeg + 17].y;
+
+			points[currentSubSeg + 23].x = points[currentSubSeg + 16].x;
+			points[currentSubSeg + 23].y = points[currentSubSeg + 16].y;
+
+			// right barrier
+
+			points[currentSubSeg + 24].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * nStep) + rightBarrierWidth);
+			points[currentSubSeg + 24].y = currentY - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * nStep) + rightBarrierWidth);
+
+			points[currentSubSeg + 25].x = currentX + cos - cosTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * (nStep + 1)) + rightBarrierWidth);
+			points[currentSubSeg + 25].y = currentY + sin - sinTransLeft * (trackWidth / 2 + rightBorderWidth + rightSideStartWidth + (rightSideDeltaStep * (nStep + 1)) + rightBarrierWidth);
+
+			points[currentSubSeg + 27].x = points[currentSubSeg + 20].x;
+			points[currentSubSeg + 27].y = points[currentSubSeg + 20].y;
+
+			points[currentSubSeg + 26].x = points[currentSubSeg + 21].x;
+			points[currentSubSeg + 26].y = points[currentSubSeg + 21].y;
+
+			if (showArrows > 0.0)
+			{
+				// arrow
+				points[currentSubSeg + 28].x = currentX + cosTransLeft * trackWidth / 2;
+				points[currentSubSeg + 28].y = currentY + sinTransLeft * trackWidth / 2;
+
+				points[currentSubSeg + 29].x = points[currentSubSeg + 0].x + cos - (cosTransLeft * trackWidth / 2) * 0.99999;
+				points[currentSubSeg + 29].y = points[currentSubSeg + 0].y + sin - (sinTransLeft * trackWidth / 2) * 0.99999;
+
+				points[currentSubSeg + 31].x = currentX - cosTransLeft * trackWidth / 2;
+				points[currentSubSeg + 31].y = currentY - sinTransLeft * trackWidth / 2;
+
+				points[currentSubSeg + 30].x = points[currentSubSeg + 23].x + cos + (cosTransLeft * trackWidth / 2) * 0.99999;
+				points[currentSubSeg + 30].y = points[currentSubSeg + 23].y + sin + (sinTransLeft * trackWidth / 2) * 0.99999;
+
+				currentSubSeg += 32;
+			}
+			else
+			{
+				currentSubSeg += 28;
+			}
+
+			// move track center
+			this.dx = cos;
+			this.dy = sin;
+			currentX += cos;
+			currentY += sin;
 		}
-		// move track center
-		this.dx = cos;
-		this.dy = sin;
-		currentX += cos;
-		currentY += sin;
 
 		endTrackCenter.setLocation(currentX, currentY);
 		endTrackAlpha = startTrackAlpha;
 
-		//System.out.println("X = "+tmpX+" , Y = "+tmpY+" , Length = "+this.length);
-		
 		Editor.getProperties().setCurrentA(currentA);
 		Editor.getProperties().setCurrentX(currentX);
 		Editor.getProperties().setCurrentY(currentY);

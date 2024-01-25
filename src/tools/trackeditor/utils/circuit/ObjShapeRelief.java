@@ -124,13 +124,13 @@ public class ObjShapeRelief extends Segment
 			xToDraw	= new int[vertices.size()];
 			yToDraw = new int[vertices.size()];
 
-			points = new Point2D.Double[vertices.size()];
+			points = new Point3D[vertices.size()];
 			for (int i = 0; i < points.length; i++)
-				points[i] = new Point2D.Double();
+				points[i] = new Point3D();
 
-			trPoints = new Point2D.Double[vertices.size()];
+			trPoints = new Point3D[vertices.size()];
 			for (int i = 0; i < trPoints.length; i++)
-				trPoints[i] = new Point2D.Double();
+				trPoints[i] = new Point3D();
 		}
 
 		for (int i = 0; i < points.length; i++)

@@ -108,6 +108,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/circuit/ObjectData.java
          utils/circuit/ObjectMap.java
          utils/circuit/Pits.java
+	 utils/circuit/Point3D.java
          utils/circuit/Reliefs.java
          utils/circuit/Sector.java
          utils/circuit/Segment.java
