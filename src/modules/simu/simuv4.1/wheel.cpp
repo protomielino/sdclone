@@ -890,6 +890,7 @@ void SimWheelUpdateTire(tCar *car, int index)
 	tdble slipRatio = wheel->spinVel * wheel->radius;
 	tdble latMod = 0;
 	tdble longMod = 0;
+	tdble minOptTemp = wheel->Topt - 20;
 
     tdble wheelSpeed = fabs(wheel->spinVel * wheel->radius);
     tdble deltaTemperature = wheel->Ttire - Tair;
@@ -996,21 +997,18 @@ void SimWheelUpdateTire(tCar *car, int index)
 	// Ratio modifier for when temp is under minimal optimal
 	// operating temp (f.e. below 70 C for a 90 deg optimal)
 	tdble diRatio;
-	if (wheel->Ttire < wheel->Topt - 20)
-	{
-		diRatio = (wheel->Ttire - Tair) / (Tair - (wheel->Ttire - 20)) * 0.125;
-	}
+	diRatio = (wheel->Ttire - Tair) / (Tair - minOptTemp) * 0.125;
 
 	// Racing tires typically have a roughly 10-20C window
 	// where they achieve most of their optimal grip.
 	// When within this "ideal window", grip changes are less extreme.
 	if (wheel->Ttire < (wheel->Topt - 20))
 	{
-		di = ((wheel->Ttire - wheel->Topt - 20) / (wheel->Topt - Tair)) + diRatio;
+		di = ((wheel->Ttire - minOptTemp) / (minOptTemp - Tair)) + diRatio;
 	}
 	else if (wheel->Ttire <= wheel->Topt)
 	{
-		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - (wheel->Topt - 20)) * 0.125;
+		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - minOptTemp) * 0.125;
 	}
 	else
 	{
