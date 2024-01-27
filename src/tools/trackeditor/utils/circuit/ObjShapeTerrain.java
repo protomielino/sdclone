@@ -41,9 +41,9 @@ public class ObjShapeTerrain extends Segment
 			for (int i = 0; i < points.length; i++)
 				points[i] = new Point3D();
 
-			trPoints = new Point3D[4];
+			trPoints = new Point2D.Double[4];
 			for (int i = 0; i < trPoints.length; i++)
-				trPoints[i] = new Point3D();
+				trPoints[i] = new Point2D.Double();
 		}
 
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();

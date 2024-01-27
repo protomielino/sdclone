@@ -105,7 +105,7 @@ public class Segment implements Cloneable
 
 	// shape to be drawn
 	public Point3D			points[];
-	public Point3D			trPoints[];
+	public Point2D.Double	trPoints[];
 
 	// datas for fast 'draw' process
 	int						xToDraw[]			= new int[4];
@@ -2268,6 +2268,21 @@ public class Segment implements Cloneable
 		System.out.println(indent + "  name          : " + name);
 		System.out.println(indent + "  type          : " + type);
 		System.out.println(indent + "  count         : " + count);
+		System.out.println(indent + "  calculatedHeightStart       : " + calculatedHeightStart);
+		System.out.println(indent + "  calculatedHeightStartLeft   : " + calculatedHeightStartLeft);
+		System.out.println(indent + "  calculatedHeightStartRight  : " + calculatedHeightStartRight);
+		System.out.println(indent + "  calculatedHeightEnd         : " + calculatedHeightEndLeft);
+		System.out.println(indent + "  calculatedHeightEndLeft     : " + calculatedHeightEndLeft);
+		System.out.println(indent + "  calculatedHeightEndRight    : " + calculatedHeightEndRight);
+		System.out.println(indent + "  calculatedGrade             : " + calculatedGrade);
+		System.out.println(indent + "  calculatedBankingStart      : " + calculatedBankingStart);
+		System.out.println(indent + "  calculatedBankingEnd        : " + calculatedBankingEnd);
+		System.out.println(indent + "  calculatedStartTangent      : " + calculatedStartTangent);
+		System.out.println(indent + "  calculatedStartTangentLeft  : " + calculatedStartTangentLeft);
+		System.out.println(indent + "  calculatedStartTangentRight : " + calculatedStartTangentRight);
+		System.out.println(indent + "  calculatedEndTangent        : " + calculatedEndTangent);
+		System.out.println(indent + "  calculatedEndTangentLeft    : " + calculatedEndTangentLeft);
+		System.out.println(indent + "  calculatedEndTangentRight   : " + calculatedEndTangentRight);
 		if (points != null)
 		{
 			System.out.println(indent + "  points        : " + points.length);
