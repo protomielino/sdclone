@@ -834,10 +834,20 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			this.getProfileStepsSlider().setValue(shape.getProfilSteps());
 			this.getProfileStepsLengthSlider().setValue(shape.getProfilStepsLength());
 			if (shape.getProfil() == null || shape.getProfil().isEmpty())
+			{
 				getProfileButton().setSelected("none");
+			}
 			else
+			{
 				getProfileButton().setSelected(shape.getProfil());
-
+			}
+			if (shape.getValidProfil(editorFrame).equals("linear"))
+			{
+				this.getStartTangentSlider().setEnabled(false);
+				this.getEndTangentSlider().setEnabled(false);
+				this.getEndTangentLeftSlider().setEnabled(false);
+				this.getEndTangentRightSlider().setEnabled(false);
+			}
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -939,9 +949,32 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	public void profileChanged()
 	{
 		if (getProfileButton().getSelected().isEmpty() || getProfileButton().getSelected() == "none")
+		{
 			shape.setProfil("");
+		}
 		else
+		{
 			shape.setProfil(getProfileButton().getSelected());
+		}
+		
+		if (shape.getValidProfil(editorFrame).equals("linear"))
+		{
+			shape.setProfilStartTangent(Double.NaN);
+			shape.setProfilEndTangent(Double.NaN);
+			shape.setProfilEndTangentLeft(Double.NaN);
+			shape.setProfilEndTangentRight(Double.NaN);
+			this.getStartTangentSlider().setEnabled(false);
+			this.getEndTangentSlider().setEnabled(false);
+			this.getEndTangentLeftSlider().setEnabled(false);
+			this.getEndTangentRightSlider().setEnabled(false);
+		}
+		else
+		{
+			this.getStartTangentSlider().setEnabled(true);
+			this.getEndTangentSlider().setEnabled(true);
+			this.getEndTangentLeftSlider().setEnabled(true);
+			this.getEndTangentRightSlider().setEnabled(true);
+		}
 		editorFrame.documentIsModified = true;
 	}
 

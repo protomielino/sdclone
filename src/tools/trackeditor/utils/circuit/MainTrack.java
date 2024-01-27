@@ -5,6 +5,7 @@ public class MainTrack
 	public static final	double	DEFAULT_WIDTH				= 10;
 	public static final	String	DEFAULT_SURFACE				= "asphalt2-lines";
 	public static final	double	DEFAULT_PROFIL_STEPS_LENGTH	= 4;
+	public static final	String  DEFAULT_PROFIL				= "spline";
 
 	private double				width						= Double.NaN;
 	private String				surface						= null;

@@ -1063,21 +1063,37 @@ public class Segment implements Cloneable
 	}
 
 	// this is not inherited
-    public double getValidProfilStepsLength(EditorFrame editorFrame)
-    {
-        double	length = profilStepsLength;
+	public String getValidProfil(EditorFrame editorFrame)
+	{
+		if (hasProfil())
+		{
+			return getProfil();
+		}
+
+		if (editorFrame.getTrackData().getMainTrack().getProfil() != null)
+		{
+			return editorFrame.getTrackData().getMainTrack().getProfil();
+		}
+
+		return MainTrack.DEFAULT_PROFIL;
+	}
+
+	// this is not inherited
+	public double getValidProfilStepsLength(EditorFrame editorFrame)
+	{
+		double	length = profilStepsLength;
 		if (hasProfilStepsLength())
 		{
 			return length;
 		}
 
-        length = editorFrame.getTrackData().getMainTrack().getProfilStepsLength();
-        if (Double.isNaN(length))
-        {
-            length = MainTrack.DEFAULT_PROFIL_STEPS_LENGTH;
-        }
-        return length;
-    }
+		length = editorFrame.getTrackData().getMainTrack().getProfilStepsLength();
+		if (Double.isNaN(length))
+		{
+			length = MainTrack.DEFAULT_PROFIL_STEPS_LENGTH;
+		}
+		return length;
+	}
 
     public double getValidLeftBarrierWidth(EditorFrame editorFrame)
     {
