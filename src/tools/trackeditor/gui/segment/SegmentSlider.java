@@ -192,7 +192,16 @@ public class SegmentSlider extends JPanel
 							try
 							{
 								String s = document.getText(0, document.getLength());
-								if (!s.equals(""))
+								if (s.equals("-") || s.equals(""))
+								{
+									double oldValue = value;
+									setValueInternal(defaultValue);
+									if (Math.abs(oldValue - value) >= resolution)
+									{
+										valueChanged();
+									}
+								}
+								else if (!s.equals(""))
 								{
 									try
 									{
@@ -225,8 +234,8 @@ public class SegmentSlider extends JPanel
 				{
 					char c = e.getKeyChar();
 
-					// check for valid digit or a single decimal point
-					if (!(Character.isDigit(c) || (!integerFormat && (c == '.' && !textField.getText().contains(".")))))
+					// check for valid digit or a single decimal point or a minus when negative number allowed
+					if (!(Character.isDigit(c) || (min < 0 && c == '-') || (!integerFormat && (c == '.' && !textField.getText().contains(".")))))
 					{
 						e.consume();
 						return;
@@ -520,7 +529,7 @@ public class SegmentSlider extends JPanel
 		value = val;
 		setSliderValue(value);
 		double textValue = 0;
-		if (!getTextField().getText().equals(""))
+		if (!getTextField().getText().equals("") && !getTextField().getText().equals("-"))
 		{
 			try
 			{
@@ -676,14 +685,21 @@ public class SegmentSlider extends JPanel
 		{
 			if (!getTextField().getText().equals(""))
 			{
-				try
+				if (getTextField().getText().equals("-"))
 				{
-					double tmp = Double.parseDouble(getTextField().getText());
-					setValueInternal(tmp);
+					setValueInternal(defaultValue);
 				}
-				catch (Exception e)
+				else
 				{
-					e.printStackTrace();
+					try
+					{
+						double tmp = Double.parseDouble(getTextField().getText());
+						setValueInternal(tmp);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}
