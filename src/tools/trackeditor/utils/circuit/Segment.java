@@ -2288,7 +2288,7 @@ public class Segment implements Cloneable
 			System.out.println(indent + "  points        : " + points.length);
 			for (int i = 0; i < points.length; i++)
 			{
-				System.out.println(indent + "    points[" + i + "] " + points[i].x + ", " + points[i].y);
+				System.out.println(indent + "    points[" + i + "] " + points[i].x + ", " + points[i].y + ", " + points[i].z);
 			}
 		}
 		else
