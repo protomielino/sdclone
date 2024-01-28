@@ -69,7 +69,7 @@ public class Straight extends Segment
 			// don't use barrier points
 			if ((i >= 12 && i <= 15) || (i >= 24 && i <= 27))
 				continue;
-			
+
 			if (minX > points[i].x)
 				minX = points[i].x;
 			if (maxX < points[i].x)
@@ -99,6 +99,10 @@ public class Straight extends Segment
 		double rightSideEndWidth = getValidRightSideEndWidth(editorFrame);
 		double leftBarrierWidth = getValidLeftBarrierWidth(editorFrame);
 		double rightBarrierWidth = getValidRightBarrierWidth(editorFrame);
+		double leftStartHeight = this.getCalculatedHeightStartLeft();
+		double rightStartHeight = this.getCalculatedHeightStartRight();
+		double leftEndHeight = this.getCalculatedHeightEndLeft();
+		double rightEndHeight = this.getCalculatedHeightEndRight();
 
 		int nbSteps = 1;
 		if (hasProfilSteps())
@@ -127,11 +131,29 @@ public class Straight extends Segment
 		double leftSideDeltaStep = (leftSideEndWidth - leftSideStartWidth) / nbSteps;
 		double rightSideDeltaStep = (rightSideEndWidth - rightSideStartWidth) / nbSteps;
 
+		double leftHeightDeltaStep = (leftEndHeight - leftStartHeight) / nbSteps;
+		double rightHeightDeltaStep = (rightEndHeight - rightStartHeight) / nbSteps;
+
 		double cos = Math.cos(currentA) * stepLength;
 		double sin = Math.sin(currentA) * stepLength;
 
 		double cosTransLeft = Math.cos(currentA + Math.PI / 2);
 		double sinTransLeft = Math.sin(currentA + Math.PI / 2);
+
+		boolean linear = getValidProfil(editorFrame).equals("linear");
+
+		double T1l = getCalculatedStartTangentLeft() * getLength();
+		double T2l = getCalculatedEndTangentLeft() * getLength();
+		double tl = 0.0;
+		double dtl = 1.0 / nbSteps;
+		double T1r = getCalculatedStartTangentRight() * getLength();
+		double T2r = getCalculatedEndTangentRight() * getLength();
+		double tr = 0.0;
+		double dtr = 1.0 / nbSteps;
+		double curzsl = leftStartHeight;
+		double curzsr = rightStartHeight;
+		double curzel = leftStartHeight;
+		double curzer = rightStartHeight;
 
 		for (int nStep = 0; nStep < nbSteps; nStep++)
 		{
@@ -147,6 +169,30 @@ public class Straight extends Segment
 
 			points[currentSubSeg + 2].x = points[currentSubSeg + 3].x + cos;
 			points[currentSubSeg + 2].y = points[currentSubSeg + 3].y + sin;
+
+			if (linear)
+			{
+				points[currentSubSeg + 0].z = leftStartHeight + leftHeightDeltaStep * nStep;
+				points[currentSubSeg + 1].z = leftStartHeight + leftHeightDeltaStep * (nStep + 1);
+				points[currentSubSeg + 2].z = rightStartHeight + rightHeightDeltaStep * (nStep + 1);
+				points[currentSubSeg + 3].z = rightStartHeight + rightHeightDeltaStep * nStep;
+			}
+			else
+			{
+				tl += dtl;
+				tr += dtr;
+
+				curzsl = curzel;
+				curzel = trackSpline(leftStartHeight, leftEndHeight, T1l, T2l, tl);
+
+				curzsr = curzer;
+				curzer = trackSpline(rightStartHeight, rightEndHeight, T1r, T2r, tr);
+
+				points[currentSubSeg + 0].z = curzsl;
+				points[currentSubSeg + 1].z = curzel;
+				points[currentSubSeg + 2].z = curzer;
+				points[currentSubSeg + 3].z = curzsr;
+			}
 
 			// left border
 
@@ -273,12 +319,12 @@ public class Straight extends Segment
 	{
 	}
 
-	
+
 	public Object clone()
 	{
 		Straight s;
 		s = (Straight) super.clone();
-		
+
 		return s; // return the clone
 	}
 

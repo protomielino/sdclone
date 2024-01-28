@@ -308,6 +308,21 @@ public class Segment implements Cloneable
 		return false;
 	}
 
+	public double trackSpline(double p0, double p1, double t0, double t1, double t)
+	{
+	    double t2, t3;
+	    double h0, h1, h2, h3;
+
+	    t2 = t * t;
+	    t3 = t * t2;
+	    h1 = 3 * t2 - 2 * t3;
+	    h0 = 1 - h1;
+	    h2 = t3 - 2 * t2 + t;
+	    h3 = t3 - t2;
+
+	    return h0 * p0 + h1 * p1 + h2 * t0 + h3 * t1;
+	}
+
 	public Rectangle2D.Double getBounds()
 	{
 		if (points == null || points.length == 0)
@@ -2239,99 +2254,119 @@ public class Segment implements Cloneable
 		right.setSideBankingType(getValidRightSideBankingType(editorFrame));
 	}
 
-	public void dumpCalculated(String indent)
-	{
-		System.out.println(indent + "name                        : " + name);
-		System.out.println(indent + "type                        : " + type);
-		System.out.println(indent + "calculatedHeightStart       : " + calculatedHeightStart);
-		System.out.println(indent + "calculatedHeightStartLeft   : " + calculatedHeightStartLeft);
-		System.out.println(indent + "calculatedHeightStartRight  : " + calculatedHeightStartRight);
-		System.out.println(indent + "calculatedHeightEnd         : " + calculatedHeightEndLeft);
-		System.out.println(indent + "calculatedHeightEndLeft     : " + calculatedHeightEndLeft);
-		System.out.println(indent + "calculatedHeightEndRight    : " + calculatedHeightEndRight);
-		System.out.println(indent + "calculatedGrade             : " + calculatedGrade);
-		System.out.println(indent + "calculatedBankingStart      : " + calculatedBankingStart);
-		System.out.println(indent + "calculatedBankingEnd        : " + calculatedBankingEnd);
-		System.out.println(indent + "calculatedStartTangent      : " + calculatedStartTangent);
-		System.out.println(indent + "calculatedStartTangentLeft  : " + calculatedStartTangentLeft);
-		System.out.println(indent + "calculatedStartTangentRight : " + calculatedStartTangentRight);
-		System.out.println(indent + "calculatedEndTangent        : " + calculatedEndTangent);
-		System.out.println(indent + "calculatedEndTangentLeft    : " + calculatedEndTangentLeft);
-		System.out.println(indent + "calculatedEndTangentRight   : " + calculatedEndTangentRight);
-	}
-
 	public void dump(String indent)
 	{
+		dump(indent, true, true, true, true);
+	}
+
+	public void dump(String indent, boolean dumpCalculated, boolean dumpPoints, boolean dumpTrPoints, boolean dumpToDraw)
+	{
 		System.out.println(indent + "Segment");
-		System.out.println(indent + "  previousShape : " + (previousShape != null ? previousShape.name : "null"));
-		System.out.println(indent + "  nextShape     : " + (nextShape != null ? nextShape.name : "null"));
-		System.out.println(indent + "  name          : " + name);
-		System.out.println(indent + "  type          : " + type);
-		System.out.println(indent + "  count         : " + count);
-		System.out.println(indent + "  calculatedHeightStart       : " + calculatedHeightStart);
-		System.out.println(indent + "  calculatedHeightStartLeft   : " + calculatedHeightStartLeft);
-		System.out.println(indent + "  calculatedHeightStartRight  : " + calculatedHeightStartRight);
-		System.out.println(indent + "  calculatedHeightEnd         : " + calculatedHeightEndLeft);
-		System.out.println(indent + "  calculatedHeightEndLeft     : " + calculatedHeightEndLeft);
-		System.out.println(indent + "  calculatedHeightEndRight    : " + calculatedHeightEndRight);
-		System.out.println(indent + "  calculatedGrade             : " + calculatedGrade);
-		System.out.println(indent + "  calculatedBankingStart      : " + calculatedBankingStart);
-		System.out.println(indent + "  calculatedBankingEnd        : " + calculatedBankingEnd);
-		System.out.println(indent + "  calculatedStartTangent      : " + calculatedStartTangent);
-		System.out.println(indent + "  calculatedStartTangentLeft  : " + calculatedStartTangentLeft);
-		System.out.println(indent + "  calculatedStartTangentRight : " + calculatedStartTangentRight);
-		System.out.println(indent + "  calculatedEndTangent        : " + calculatedEndTangent);
-		System.out.println(indent + "  calculatedEndTangentLeft    : " + calculatedEndTangentLeft);
-		System.out.println(indent + "  calculatedEndTangentRight   : " + calculatedEndTangentRight);
+		System.out.println(indent + "  previousShape               : " + (previousShape != null ? previousShape.name : "null"));
+		System.out.println(indent + "  nextShape                   : " + (nextShape != null ? nextShape.name : "null"));
+		System.out.println(indent + "  name                        : " + name);
+		System.out.println(indent + "  type                        : " + type);
+		System.out.println(indent + "  count                       : " + count);
+		System.out.println(indent + "  length                      : " + length);
+		System.out.println(indent + "  surface                     : " + surface);
+		System.out.println(indent + "  heightStart                 : " + heightStart);
+		System.out.println(indent + "  heightStartLeft             : " + heightStartLeft);
+		System.out.println(indent + "  heightStartRight            : " + heightStartRight);
+		System.out.println(indent + "  heightEnd                   : " + heightEnd);
+		System.out.println(indent + "  heightEndLeft               : " + heightEndLeft);
+		System.out.println(indent + "  heightEndRight              : " + heightEndRight);
+		System.out.println(indent + "  grade                       : " + grade);
+		System.out.println(indent + "  bankingStart                : " + bankingStart);
+		System.out.println(indent + "  bankingEnd                  : " + bankingEnd);
+		System.out.println(indent + "  profil                      : " + profil);
+		System.out.println(indent + "  profilSteps                 : " + profilSteps);
+		System.out.println(indent + "  profilStepsLength           : " + profilStepsLength);
+		System.out.println(indent + "  profilStartTangent          : " + profilStartTangent);
+		System.out.println(indent + "  profilEndTangent            : " + profilEndTangent);
+		System.out.println(indent + "  profilStartTangentLeft      : " + profilStartTangentLeft);
+		System.out.println(indent + "  profilEndTangentLeft        : " + profilEndTangentLeft);
+		System.out.println(indent + "  profilStartTangentRight     : " + profilStartTangentRight);
+		System.out.println(indent + "  profilEndTangentRight       : " + profilEndTangentRight);
+		if (dumpCalculated)
+		{
+			System.out.println(indent + "  calculatedHeightStart       : " + calculatedHeightStart);
+			System.out.println(indent + "  calculatedHeightStartLeft   : " + calculatedHeightStartLeft);
+			System.out.println(indent + "  calculatedHeightStartRight  : " + calculatedHeightStartRight);
+			System.out.println(indent + "  calculatedHeightEnd         : " + calculatedHeightEndLeft);
+			System.out.println(indent + "  calculatedHeightEndLeft     : " + calculatedHeightEndLeft);
+			System.out.println(indent + "  calculatedHeightEndRight    : " + calculatedHeightEndRight);
+			System.out.println(indent + "  calculatedGrade             : " + calculatedGrade);
+			System.out.println(indent + "  calculatedBankingStart      : " + calculatedBankingStart);
+			System.out.println(indent + "  calculatedBankingEnd        : " + calculatedBankingEnd);
+			System.out.println(indent + "  calculatedStartTangent      : " + calculatedStartTangent);
+			System.out.println(indent + "  calculatedStartTangentLeft  : " + calculatedStartTangentLeft);
+			System.out.println(indent + "  calculatedStartTangentRight : " + calculatedStartTangentRight);
+			System.out.println(indent + "  calculatedEndTangent        : " + calculatedEndTangent);
+			System.out.println(indent + "  calculatedEndTangentLeft    : " + calculatedEndTangentLeft);
+			System.out.println(indent + "  calculatedEndTangentRight   : " + calculatedEndTangentRight);
+		}
+
 		if (points != null)
 		{
-			System.out.println(indent + "  points        : " + points.length);
-			for (int i = 0; i < points.length; i++)
+			System.out.println(indent + "  points                      : " + points.length);
+			if (dumpPoints)
 			{
-				System.out.println(indent + "    points[" + i + "] " + points[i].x + ", " + points[i].y + ", " + points[i].z);
+				for (int i = 0; i < points.length; i++)
+				{
+					System.out.println(indent + "    points[" + i + "] " +
+									   String.format("%12.7f", points[i].x) + ", " +
+									   String.format("%12.7f", points[i].y) + ", " +
+									   String.format("%12.7f", points[i].z));
+				}
 			}
 		}
 		else
 		{
-			System.out.println(indent + "  points        : null");
+			System.out.println(indent + "  points                      : null");
 		}
 		if (trPoints != null)
 		{
-			System.out.println(indent + "  trPoints      : " + trPoints.length);
-			for (int i = 0; i < trPoints.length; i++)
+			System.out.println(indent + "  trPoints                    : " + trPoints.length);
+			if (dumpTrPoints)
 			{
-				System.out.println(indent + "    trPoints[" + i + "] " + trPoints[i].x + ", " + trPoints[i].y);
+				for (int i = 0; i < trPoints.length; i++)
+				{
+					System.out.println(indent + "    trPoints[" + i + "] " + trPoints[i].x + ", " + trPoints[i].y);
+				}
 			}
 		}
 		else
 		{
-			System.out.println(indent + "  trPoints      : null");
+			System.out.println(indent + "  trPoints                    : null");
 		}
-		if (xToDraw != null)
+		if (dumpToDraw)
 		{
-			System.out.println(indent + "  xToDraw      : " + xToDraw.length);
-			for (int i = 0; i < xToDraw.length; i++)
+			if (xToDraw != null)
 			{
-				System.out.println(indent + "    xToDraw[" + i + "] " + xToDraw[i]);
+				System.out.println(indent + "  xToDraw                     : " + xToDraw.length);
+				for (int i = 0; i < xToDraw.length; i++)
+				{
+					System.out.println(indent + "    xToDraw[" + i + "] " + xToDraw[i]);
+				}
+			}
+			else
+			{
+				System.out.println(indent + "  xToDraw                     : null");
+			}
+			if (yToDraw != null)
+			{
+				System.out.println(indent + "  yToDraw                     : " + yToDraw.length);
+				for (int i = 0; i < yToDraw.length; i++)
+				{
+					System.out.println(indent + "    yToDraw[" + i + "] " + yToDraw[i]);
+				}
+			}
+			else
+			{
+				System.out.println(indent + "  yToDraw                     : null");
 			}
 		}
-		else
-		{
-			System.out.println(indent + "  xToDraw      : null");
-		}
-		if (yToDraw != null)
-		{
-			System.out.println(indent + "  yToDraw      : " + yToDraw.length);
-			for (int i = 0; i < yToDraw.length; i++)
-			{
-				System.out.println(indent + "    yToDraw[" + i + "] " + yToDraw[i]);
-			}
-		}
-		else
-		{
-			System.out.println(indent + "  yToDraw      : null");
-		}
-		System.out.println(indent + "  dx           : " + dx);
-		System.out.println(indent + "  dy           : " + dy);
+		System.out.println(indent + "  dx                          : " + dx);
+		System.out.println(indent + "  dy                          : " + dy);
 	}
 }

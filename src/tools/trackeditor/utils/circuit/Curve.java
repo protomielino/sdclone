@@ -93,7 +93,7 @@ public class Curve extends Segment
 			// don't use barrier points
 			if ((i >= 12 && i <= 15) || (i >= 24 && i <= 27))
 				continue;
-			
+
 			if (minX > points[i].x)
 				minX = points[i].x;
 			if (maxX < points[i].x)
@@ -124,13 +124,10 @@ public class Curve extends Segment
 		double	rightSideEndWidth = getValidRightSideEndWidth(editorFrame);
 		double	leftBarrierWidth = getValidLeftBarrierWidth(editorFrame);
 		double	rightBarrierWidth = getValidRightBarrierWidth(editorFrame);
-		
-		/**  
-		 * 
-		 * New code
-		 * 
-		 * 
-		 */
+		double	leftStartHeight = this.getCalculatedHeightStartLeft();
+		double	rightStartHeight = this.getCalculatedHeightStartRight();
+		double	leftEndHeight = this.getCalculatedHeightEndLeft();
+		double	rightEndHeight = this.getCalculatedHeightEndRight();
 
 		// calc turn length
 		double arc = getArcRad();
@@ -162,9 +159,13 @@ public class Curve extends Segment
 					tmpRadius += deltaRadiusStep;
 				}
 				stepLength *= arc / tmpAngle;
-			} else
+			}
+			else
+			{
 				deltaRadiusStep = (radiusEnd - radiusStart) / nbSteps;
-		} else
+			}
+		}
+		else
 		{
 			deltaRadiusStep = 0;
 		}
@@ -172,7 +173,7 @@ public class Curve extends Segment
 		if (points == null || points.length != 4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps)
 		{
 			points = new Point3D[4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps];
-			
+
 			for (int i = 0; i < points.length; i++)
 				points[i] = new Point3D();
 
@@ -187,6 +188,24 @@ public class Curve extends Segment
 
 		double leftSideDeltaStep = (leftSideEndWidth - leftSideStartWidth) / nbSteps;
 		double rightSideDeltaStep = (rightSideEndWidth - rightSideStartWidth) / nbSteps;
+
+		double leftHeightDeltaStep = (leftEndHeight - leftStartHeight) / nbSteps;
+		double rightHeightDeltaStep = (rightEndHeight - rightStartHeight) / nbSteps;
+
+		boolean linear = getValidProfil(editorFrame).equals("linear");
+
+		double T1l = getCalculatedStartTangentLeft() * getLength();
+		double T2l = getCalculatedEndTangentLeft() * getLength();
+		double tl = 0.0;
+		double dtl = 1.0 / nbSteps;
+		double T1r = getCalculatedStartTangentRight() * getLength();
+		double T2r = getCalculatedEndTangentRight() * getLength();
+		double tr = 0.0;
+		double dtr = 1.0 / nbSteps;
+		double curzsl = leftStartHeight;
+		double curzsr = rightStartHeight;
+		double curzel = leftStartHeight;
+		double curzer = rightStartHeight;
 
 		int currentSubSeg = 0;
 
@@ -204,7 +223,8 @@ public class Curve extends Segment
 				xCenter = currentX - cosTrans * curRadius;
 				yCenter = currentY - sinTrans * curRadius;
 				thisStepArc = -stepLength / curRadius;
-			} else
+			}
+			else
 			{
 				xCenter = currentX + cosTrans * curRadius;
 				yCenter = currentY + sinTrans * curRadius;
@@ -212,8 +232,9 @@ public class Curve extends Segment
 			}
 
 			if (nStep == 0)
-				//                center.setLocation( xCenter, -yCenter );
+			{
 				center.setLocation(xCenter, yCenter);
+			}
 
 			double cos = Math.cos(thisStepArc);
 			double sin = Math.sin(thisStepArc);
@@ -240,6 +261,30 @@ public class Curve extends Segment
 			y = points[currentSubSeg + 3].y - yCenter;
 			points[currentSubSeg + 2].x = x * cos - y * sin + xCenter;
 			points[currentSubSeg + 2].y = y * cos + x * sin + yCenter;
+
+			if (linear)
+			{
+				points[currentSubSeg + 0].z = leftStartHeight + leftHeightDeltaStep * nStep;
+				points[currentSubSeg + 1].z = leftStartHeight + leftHeightDeltaStep * (nStep + 1);
+				points[currentSubSeg + 2].z = rightStartHeight + rightHeightDeltaStep * (nStep + 1);
+				points[currentSubSeg + 3].z = rightStartHeight + rightHeightDeltaStep * nStep;
+			}
+			else
+			{
+				tl += dtl;
+				tr += dtr;
+
+				curzsl = curzel;
+				curzel = trackSpline(leftStartHeight, leftEndHeight, T1l, T2l, tl);
+
+				curzsr = curzer;
+				curzer = trackSpline(rightStartHeight, rightEndHeight, T1r, T2r, tr);
+
+				points[currentSubSeg + 0].z = curzsl;
+				points[currentSubSeg + 1].z = curzel;
+				points[currentSubSeg + 2].z = curzer;
+				points[currentSubSeg + 3].z = curzsr;
+			}
 
 			currentSubSeg += 4;
 
@@ -286,7 +331,7 @@ public class Curve extends Segment
 			currentSubSeg += 4;
 
 			// left barrier
-			
+
 			points[currentSubSeg + 0].x = currentX + cosTransLeft
 					* ((trackWidth / 2) + leftBorderWidth + leftSideStartWidth + leftBarrierWidth + (leftSideDeltaStep * nStep));
 			points[currentSubSeg + 0].y = currentY + sinTransLeft
@@ -304,7 +349,7 @@ public class Curve extends Segment
 			points[currentSubSeg + 2].y = points[currentSubSeg - 2].y;
 
 			currentSubSeg += 4;
-			
+
 			// right border
 
 			points[currentSubSeg + 0].x = currentX - cosTransLeft * (trackWidth / 2 + rightBorderWidth);
@@ -350,9 +395,9 @@ public class Curve extends Segment
 			points[currentSubSeg + 2].y = y * cos + x * sin + yCenter;
 
 			currentSubSeg += 4;
-			
+
 			// right barrier
-			
+
 			points[currentSubSeg + 0].x = currentX - cosTransLeft
 					* ((trackWidth / 2) + rightBorderWidth + rightSideStartWidth + rightBarrierWidth + (rightSideDeltaStep * nStep));
 			points[currentSubSeg + 0].y = currentY - sinTransLeft
@@ -414,21 +459,16 @@ public class Curve extends Segment
 			endTrackAlpha += EPMath.PI_MUL_2;
 		while (endTrackAlpha > Math.PI)
 			endTrackAlpha -= EPMath.PI_MUL_2;
-		
+
 		Editor.getProperties().setCurrentA(currentA);
 		Editor.getProperties().setCurrentX(currentX);
 		Editor.getProperties().setCurrentY(currentY);
 	}
-	
-	
-//	public void draw(Graphics g, AffineTransform affineTransform)
-//	{
-//		calcShape();
-//	}
 
 	public void drag(Point2D.Double dragDelta)
 	{
 	}
+
 	/**
 	 * @return Returns the arc.
 	 */
@@ -501,7 +541,7 @@ public class Curve extends Segment
 	{
 		this.marks = marks;
 	}
-	
+
 	public Object clone()
 	{
 		Curve s;
@@ -509,7 +549,7 @@ public class Curve extends Segment
 		s.arcDeg = this.arcDeg;
 		s.radiusStart = this.radiusStart;
 		s.radiusEnd = this.radiusEnd;
-		
+
 		return s; // return the clone
 	}
 }

@@ -846,18 +846,24 @@ public class XmlReader
                 shape = new Curve(type, null);
             }
             shape = setSegment(e, shape, prev);
-            try
-            {
-                shape.calcShape(editorFrame);
-            } catch (Exception e1)
-            {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
             trackData.add(shape);
             prev = shape;
         }
+
         editorFrame.getTrackData().setSegments(trackData);
+        editorFrame.getTrackData().calculateSegmentValues();
+
+        for (Segment segment : editorFrame.getTrackData().getSegments())
+        {
+            try
+            {
+                segment.calcShape(editorFrame);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     private synchronized Segment setSegment(Element seg, Segment shape,
