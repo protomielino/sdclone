@@ -215,7 +215,8 @@ public class SegmentSlider extends JPanel
 									}
 									catch (Exception ex)
 									{
-										ex.printStackTrace();
+										// restore the old value
+										getTextField().setText(nf.format(value));
 									}
 								}
 							}
@@ -234,8 +235,8 @@ public class SegmentSlider extends JPanel
 				{
 					char c = e.getKeyChar();
 
-					// check for valid digit or a single decimal point or a minus when negative number allowed
-					if (!(Character.isDigit(c) || (min < 0 && c == '-') || (!integerFormat && (c == '.' && !textField.getText().contains(".")))))
+					// check for valid digit or a single decimal point or a single minus when negative number allowed
+					if (!(Character.isDigit(c) || (min < 0 && c == '-' && !textField.getText().contains("-")) || (!integerFormat && (c == '.' && !textField.getText().contains(".")))))
 					{
 						e.consume();
 						return;
