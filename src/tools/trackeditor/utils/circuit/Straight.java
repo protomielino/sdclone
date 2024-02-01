@@ -104,7 +104,6 @@ public class Straight extends Segment
 		double leftEndHeight = this.getCalculatedHeightEndLeft();
 		double rightEndHeight = this.getCalculatedHeightEndRight();
 
-		int nbSteps = 1;
 		if (hasProfilSteps())
 		{
 			nbSteps = getProfilSteps();
@@ -113,7 +112,7 @@ public class Straight extends Segment
 		{
 			nbSteps = (int) (length / profilStepsLength + 0.5) + 1;
 		}
-		double stepLength = length / nbSteps;
+		stepLength = length / nbSteps;
 
 		if (points == null || points.length != 4 * (7 + (showArrows > 0.0 ? 1 : 0)) * nbSteps)
 		{
@@ -318,7 +317,6 @@ public class Straight extends Segment
 	public void drag(Point2D.Double dragDelta)
 	{
 	}
-
 
 	public Object clone()
 	{

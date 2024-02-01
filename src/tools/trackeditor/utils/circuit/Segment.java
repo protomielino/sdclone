@@ -59,6 +59,8 @@ public class Segment implements Cloneable
 	public Point2D.Double	startTrackCenter		= new Point2D.Double();
 	public Point2D.Double	endTrackCenter			= new Point2D.Double();
 	public double			distFromCircuitStart;
+	public int				nbSteps					= 0;
+	public double			stepLength;
 
 	// All datas
 	protected double		length					= Double.NaN;
@@ -140,6 +142,8 @@ public class Segment implements Cloneable
 		type = segment.type;
 		comment = segment.comment;
 		length = segment.length;
+		nbSteps = segment.nbSteps;
+		stepLength = segment.stepLength;
 		surface = segment.surface;
 		heightStart = segment.heightStart;
 		heightStartLeft = segment.heightStartLeft;
@@ -859,6 +863,8 @@ public class Segment implements Cloneable
 			s.type = this.type;
 			s.comment = this.comment;
 			s.length = this.length;
+			s.nbSteps = this.nbSteps;
+			s.stepLength = this.stepLength;
 			s.surface = this.surface;
 			s.heightStart = this.heightStart;
 			s.heightStartLeft = this.heightStartLeft;
@@ -2268,6 +2274,8 @@ public class Segment implements Cloneable
 		System.out.println(indent + "  type                        : " + type);
 		System.out.println(indent + "  count                       : " + count);
 		System.out.println(indent + "  length                      : " + length);
+		System.out.println(indent + "  nbSteps                     : " + nbSteps);
+		System.out.println(indent + "  stepLength                  : " + stepLength);
 		System.out.println(indent + "  surface                     : " + surface);
 		System.out.println(indent + "  heightStart                 : " + heightStart);
 		System.out.println(indent + "  heightStartLeft             : " + heightStartLeft);

@@ -41,7 +41,6 @@ public class Curve extends Segment
 	protected double		radiusStart;
 	protected double 		radiusEnd;
 
-	int						nbSteps;
 	public Point2D.Double	center = new Point2D.Double();
 
 	protected String		marks;
@@ -72,8 +71,6 @@ public class Curve extends Segment
 		super.copyTo(_shape);
 
 		Curve shape = (Curve) _shape;
-
-		shape.nbSteps = nbSteps;
 
 		return shape;
 	}
@@ -142,9 +139,9 @@ public class Curve extends Segment
 		}
 
 		trackStartDist += length;
+		stepLength = length / nbSteps;
 
 		double deltaRadiusStep;
-		double stepLength = length / nbSteps;
 
 		if (radiusEnd != radiusStart)
 		{
