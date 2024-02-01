@@ -29,6 +29,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.MutableDouble;
+import utils.MutableString;
 import utils.circuit.Camera;
 
 /**

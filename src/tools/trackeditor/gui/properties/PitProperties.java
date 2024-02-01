@@ -37,6 +37,9 @@ import javax.swing.JTextField;
 
 import gui.EditorFrame;
 import utils.DoubleValue;
+import utils.MutableDouble;
+import utils.MutableInteger;
+import utils.MutableString;
 import utils.SegmentVector;
 import utils.SurfaceComboBox;
 import utils.circuit.Pits;

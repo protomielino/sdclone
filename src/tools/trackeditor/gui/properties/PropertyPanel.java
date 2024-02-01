@@ -5,6 +5,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.MutableDouble;
+import utils.MutableInteger;
+import utils.MutableString;
 
 public class PropertyPanel extends JPanel
 {
@@ -194,65 +197,7 @@ public class PropertyPanel extends JPanel
 		return null;
 	}
 
-	public class MutableString
-	{
-		private String value;
 
-		public MutableString()
-		{
-			this.value = null;
-		}
-
-		public String getValue()
-		{
-			return value;
-		}
-
-		public void setValue(String value)
-		{
-			this.value = value;
-		}
-	}
-
-	public class MutableDouble
-	{
-		private double value;
-
-		public MutableDouble()
-		{
-			this.value = Double.NaN;
-		}
-
-		public double getValue()
-		{
-			return value;
-		}
-
-		public void setValue(double value)
-		{
-			this.value = value;
-		}
-	}
-
-	public class MutableInteger
-	{
-		private int value;
-
-		public MutableInteger()
-		{
-			this.value = Integer.MAX_VALUE;
-		}
-
-		public int getValue()
-		{
-			return value;
-		}
-
-		public void setValue(int value)
-		{
-			this.value = value;
-		}
-	}
 
 	protected void addLabel(JPanel panel, int index, JLabel label, String text, int length)
 	{

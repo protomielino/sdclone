@@ -48,6 +48,7 @@ import javax.swing.table.TableColumn;
 import gui.EditorFrame;
 import gui.TrackObjectDialog;
 import utils.Editor;
+import utils.MutableString;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectData;
 import utils.circuit.ObjectMap;

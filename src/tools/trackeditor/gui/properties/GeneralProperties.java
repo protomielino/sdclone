@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.MutableString;
 
 /**
  * @author babis

@@ -25,6 +25,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.MutableDouble;
+import utils.MutableInteger;
+import utils.MutableString;
 
 /**
  * @author Robert Reif

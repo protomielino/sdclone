@@ -81,6 +81,9 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/Editor.java
          utils/EditorPoint.java
          utils/GroupButtonLayout.java
+         utils/MutableDouble.java
+         utils/MutableInteger.java
+         utils/MutableString.java
          utils/Project.java
          utils/Properties.java
          utils/SegmentSliderLayout.java

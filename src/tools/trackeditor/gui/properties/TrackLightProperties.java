@@ -34,6 +34,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.MutableDouble;
+import utils.MutableInteger;
+import utils.MutableString;
 import utils.circuit.TrackLight;
 
 /**

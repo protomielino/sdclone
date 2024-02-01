@@ -33,6 +33,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.MutableDouble;
+import utils.MutableString;
 
 /**
  * @author babis

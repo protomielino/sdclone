@@ -21,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import gui.EditorFrame;
+import utils.MutableString;
 import utils.circuit.ObjShapeRelief;
 import utils.circuit.Reliefs;
 
