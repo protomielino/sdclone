@@ -43,6 +43,7 @@ import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -77,13 +78,19 @@ import utils.Project;
 import utils.Properties;
 import utils.SegmentVector;
 import utils.TrackData;
+import utils.ac3d.Ac3d;
+import utils.ac3d.Ac3dMaterial;
+import utils.ac3d.Ac3dObject;
+import utils.ac3d.Ac3dSurface;
 import utils.circuit.Curve;
 import utils.circuit.GraphicObject;
 import utils.circuit.MainTrack;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Pits;
+import utils.circuit.Point3D;
 import utils.circuit.Reliefs;
+import utils.circuit.Sector;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
@@ -646,6 +653,8 @@ public class EditorFrame extends JFrame
 		updateRecentFiles(projectFileName);
 		
 		setTitle(originalTitle + " - Project: " + projectFileName);
+
+		//writeTrack();
 	}
 
 	/**
@@ -2997,6 +3006,131 @@ public class EditorFrame extends JFrame
 		view.redrawCircuit();
 		this.validate();
 		this.repaint();
+	}
+
+	public void writeTrack()
+	{
+		if (trackData == null)
+		{
+			message("No track", "Can't write track.");
+			return;
+		}
+		String filename = Editor.getProperties().getPath() + sep + trackData.getHeader().getName() + "-track.ac";
+
+		Ac3d track = new Ac3d();
+		Ac3dMaterial material = new Ac3dMaterial("");
+
+		material.setRgb(new double[] { 0.4, 0.4, 0.4} );
+		material.setAmb(new double[] { 0.8, 0.8, 0.8 } );
+		material.setEmis(new double[] { 0.4, 0.4, 0.4 } );
+		material.setSpec(new double[] { 0.5, 0.5, 0.5 } );
+		material.setShi(50);
+		material.setTrans(0);
+
+		Ac3dObject world = new Ac3dObject("world", 3);
+
+		track.getMaterials().add(material);
+		track.setRoot(world);
+		
+		Ac3dObject group = new Ac3dObject("group", 5);
+		group.setName("track");
+		world.addKid(group);
+
+		for (Segment segment : trackData.getSegments())
+		{
+			Ac3dObject object = new Ac3dObject("poly", 0);
+
+			object.setName(segment.getName());
+
+			Surface trackSurface = null;
+
+			for (Surface surface : trackData.getSurfaces())
+			{
+				if (surface.getName().equals(segment.getSurface()))
+				{
+					trackSurface = surface;
+					break;
+				}
+			}
+
+			if (trackSurface == null)
+			{
+				for (Surface surface : defaultSurfaces)
+				{
+					trackSurface = surface;
+					break;
+				}
+			}
+
+			if (trackSurface != null) 
+			{
+				object.setTexture(trackSurface.getTextureName());
+			}
+
+			int steps;
+			if (segment.hasProfilSteps())
+			{
+				steps = segment.getProfilSteps();
+			}
+			else
+			{
+				steps = (int) (segment.getLength() / segment.getValidProfilStepsLength(this) + 0.5) + 1;
+			}
+
+			int stride = segment.points.length / steps;
+
+			for (int i = 0; i < steps; i++)
+			{
+				int offset = i * stride;
+
+				if (i == 0)
+				{
+					object.getVertices().add(new double[] { segment.getPoints()[0].x, segment.getPoints()[0].z, -segment.getPoints()[0].y } );
+					object.getVertices().add(new double[] { segment.getPoints()[3].x, segment.getPoints()[3].z, -segment.getPoints()[3].y } );
+				}
+
+				object.getVertices().add(new double[] { segment.getPoints()[offset + 1].x, segment.getPoints()[offset + 1].z, -segment.getPoints()[offset + 1].y } );
+				object.getVertices().add(new double[] { segment.getPoints()[offset + 2].x, segment.getPoints()[offset + 2].z, -segment.getPoints()[offset + 2].y } );
+			}
+
+			for (int i = 0; i < steps; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					Ac3dSurface surface = new Ac3dSurface();
+
+					surface.setPolygon();
+					surface.setSingleSided();
+					surface.setSmoothShaded();
+					surface.setMat(0);
+
+					if (j == 0)
+					{
+						surface.addRef((i * 2) + 0, 0.0, 0.0);
+						surface.addRef((i * 2) + 1, 0.0, 0.0);
+						surface.addRef((i * 2) + 2, 0.0, 0.0);
+					}
+					else
+					{
+						surface.addRef((i * 2) + 2, 0.0, 0.0);
+						surface.addRef((i * 2) + 1, 0.0, 0.0);
+						surface.addRef((i * 2) + 3, 0.0, 0.0);
+					}
+					object.addSurface(surface);
+				}
+			}
+
+			group.addKid(object);
+		}
+
+		try
+		{
+			track.write(filename);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	//	 Exit when window close
