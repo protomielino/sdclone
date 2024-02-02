@@ -305,6 +305,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mouseClicked(MouseEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
 			screenToReal(e, clickPoint);
@@ -716,6 +719,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mousePressed(MouseEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		if (e.getButton() == MouseEvent.BUTTON3)
 		{
 			Segment obj = findObjAtMousePos();
@@ -925,6 +931,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mouseReleased(MouseEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
 			switch (currentState)
@@ -987,6 +996,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mouseDragged(MouseEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		if (e.getModifiers() == 4)
 		{
 			if (objectShape != null && objectDragging == true)
@@ -1079,6 +1091,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mouseMoved(MouseEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		screenToReal(e, mousePoint);
 
 		if (editorFrame.getCursorCoordinates())
@@ -1194,6 +1209,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		screenToReal(e, mousePoint);
 
 		getParent().dispatchEvent(e);
@@ -1668,6 +1686,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	public void paint(Graphics g)
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		graphics = g;
 
 		// visible part of screen in pixels
@@ -1677,7 +1698,37 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		{
 			if (editorFrame.getTrackData() != null)
 			{
-				String coordinates = String.format("x: %.3f y: %.3f",  + mousePoint.x, + mousePoint.y);
+				String coordinates = null;
+
+				// must check for a object under the mouse
+				Segment obj = findObjAtMousePos();
+
+				if (obj != null)
+				{
+					if (obj.getType().equals("rgt") ||
+						obj.getType().equals("lft") ||
+						obj.getType().equals("str"))
+					{
+						double height = obj.getHeightAt(editorFrame, mousePoint.x, mousePoint.y);
+						coordinates = String.format("x: %.3f y: %.3f z: %.3f", mousePoint.x, mousePoint.y, height);
+/*
+						MutableDouble height = new MutableDouble();
+						MutableDouble slopeLeft = new MutableDouble();
+						MutableDouble slopeRight = new MutableDouble();
+						if (obj.getHeightAndSlopeAt(editorFrame, mousePoint.x, mousePoint.y, height, slopeLeft, slopeRight))
+						{
+							double slope = (slopeLeft.getValue() + slopeRight.getValue()) / 2.0;
+
+							coordinates = String.format("x: %.3f y: %.3f z: %.3f slope: %.3f", mousePoint.x, mousePoint.y, height.getValue(), slope);
+						}
+*/
+					}
+				}
+
+				if (coordinates == null)
+				{
+					coordinates = String.format("x: %.3f y: %.3f", mousePoint.x, mousePoint.y);
+				}
 
 				graphics.drawString(coordinates, r.x + 10, r.y + 20);
 			}

@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import gui.EditorFrame;
+import utils.Editor;
+import utils.MutableDouble;
 
 /**
  * @author Patrice Espie , Charalampos Alexopoulos
@@ -2258,6 +2260,153 @@ public class Segment implements Cloneable
 		right.setSideEndWidth(getValidRightSideEndWidth(editorFrame));
 		right.setSideSurface(getValidRightSideSurface(editorFrame));
 		right.setSideBankingType(getValidRightSideBankingType(editorFrame));
+	}
+
+	public double getGradeAt(EditorFrame editorFrame, double splitPoint)
+	{
+		int splitStep = (int) (splitPoint * nbSteps);
+		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
+		double startZ = (points[splitSubSeg].z + points[splitSubSeg + 3].z) / 2;
+		double endZ = (points[splitSubSeg + 1].z + points[splitSubSeg + 2].z) / 2;
+
+		return ((endZ - startZ) / stepLength) * 100;
+	}
+
+	public double getGradeAtLeft(EditorFrame editorFrame, double splitPoint)
+	{
+		int splitStep = (int) (splitPoint * nbSteps);
+		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
+		double startZ = points[splitSubSeg].z;
+		double endZ = points[splitSubSeg + 1].z;
+
+		return ((endZ - startZ) / stepLength) * 100;
+	}
+
+	public double getGradeAtRight(EditorFrame editorFrame, double splitPoint)
+	{
+		int splitStep = (int) (splitPoint * nbSteps);
+		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
+		double startZ = points[splitSubSeg + 3].z;
+		double endZ = points[splitSubSeg + 2].z;
+
+		return ((endZ - startZ) / stepLength) * 100;
+	}
+
+	// from https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+	private static final double EPSILON = 0.0000001;
+
+	public static boolean rayIntersectsTriangle(Point3D rayOrigin,
+												Point3D rayVector,
+												Point3D vertex0,
+												Point3D vertex1,
+												Point3D vertex2,
+												Point3D outIntersectionPoint)
+	{
+		Point3D edge1 = new Point3D();
+		Point3D edge2 = new Point3D();
+		Point3D h = new Point3D();
+		Point3D s = new Point3D();
+		Point3D q = new Point3D();
+		double a, f, u, v;
+		edge1.sub(vertex1, vertex0);
+		edge2.sub(vertex2, vertex0);
+		h.cross(rayVector, edge2);
+		a = edge1.dot(h);
+
+		if (a > -EPSILON && a < EPSILON)
+		{
+			return false;    // This ray is parallel to this triangle.
+		}
+
+		f = 1.0 / a;
+		s.sub(rayOrigin, vertex0);
+		u = f * (s.dot(h));
+
+		if (u < 0.0 || u > 1.0)
+		{
+			return false;
+		}
+
+		q.cross(s, edge1);
+		v = f * rayVector.dot(q);
+
+		if (v < 0.0 || u + v > 1.0)
+		{
+			return false;
+		}
+
+		// At this stage we can compute t to find out where the intersection point is on the line.
+		double t = f * edge2.dot(q);
+		if (t > EPSILON) // ray intersection
+		{
+			outIntersectionPoint.set(0.0, 0.0, 0.0);
+			outIntersectionPoint.scaleAdd(t, rayVector, rayOrigin);
+			return true;
+		}
+		else // This means that there is a line intersection but not a ray intersection.
+		{
+			return false;
+		}
+	}
+
+	public double getHeightAt(EditorFrame editorFrame, double x, double y)
+	{
+		if (points == null)
+			return 0.0;
+
+		Point3D rayOrigin = new Point3D(x, y, -1000.0);
+		Point3D rayVector = new Point3D(0.0, 0.0, 1.0);
+		Point3D intersectionPoint = new Point3D();
+
+		int stride = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0));
+
+		for (int i = 0; i < points.length; i += stride)
+		{
+			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 1], points[i + 2], intersectionPoint))
+			{
+				return intersectionPoint.z;
+			}
+			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 2], points[i + 3], intersectionPoint))
+			{
+				return intersectionPoint.z;
+			}
+		}
+
+		return 0.0;
+	}
+
+	public boolean getHeightAndSlopeAt(EditorFrame editorFrame, double x, double y, MutableDouble height, MutableDouble slopeLeft, MutableDouble slopeRight)
+	{
+		if (points == null)
+			return false;
+
+		Point3D rayOrigin = new Point3D(x, y, -1000.0);
+		Point3D rayVector = new Point3D(0.0, 0.0, 1.0);
+		Point3D intersectionPoint = new Point3D();
+
+		int stride = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0));
+
+		for (int i = 0; i < points.length; i += stride)
+		{
+			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 1], points[i + 2], intersectionPoint))
+			{
+				height.setValue(intersectionPoint.z);
+				double at = (((i / stride) * stepLength) + (stepLength / 2)) / length;
+				slopeLeft.setValue(getGradeAtLeft(editorFrame, at));
+				slopeRight.setValue(getGradeAtRight(editorFrame, at));
+				return true;
+			}
+			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 2], points[i + 3], intersectionPoint))
+			{
+				height.setValue(intersectionPoint.z);
+				double at = (((i / stride) * stepLength) + (stepLength / 2)) / length;
+				slopeLeft.setValue(getGradeAtLeft(editorFrame, at));
+				slopeRight.setValue(getGradeAtRight(editorFrame, at));
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void dump(String indent)
