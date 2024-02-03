@@ -1232,7 +1232,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		screenToReal(e, mousePoint);
 
-		getParent().dispatchEvent(e);
+		if (e.isControlDown())
+		{
+			int n = e.getWheelRotation();
+			for ( int i = 0; i < Math.abs( n ); i++ )
+			{
+				if ( n < 0 )
+					incZoomFactor();
+				else
+					decZoomFactor();
+			}
+		}
+		else
+		{
+			getParent().dispatchEvent(e);
+		}
 
 		if (editorFrame.getCursorCoordinates())
 		{
@@ -1268,15 +1282,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	}
 
 	//	/** input events management */
-	//	/*
-	//	 * public void mouseWheelMoved( MouseWheelEvent e ) { int n =
-	//	 * e.getWheelRotation();
-	//	 *
-	//	 * for ( int i = 0; i < Math.abs( n ); i++ ) { if ( n < 0 )
-	// incZoomFactor();
-	//	 * else decZoomFactor(); } }
-	//	 */
-	//
 	//	/**
 	//	 * Drags end of handledShape (straight segment)
 	//	 *
