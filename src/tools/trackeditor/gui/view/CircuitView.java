@@ -45,6 +45,7 @@ import javax.swing.event.PopupMenuListener;
 
 import utils.Editor;
 import utils.EditorPoint;
+import utils.MutableDouble;
 import utils.SegmentVector;
 import utils.circuit.Curve;
 import utils.circuit.GraphicObject;
@@ -1709,9 +1710,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						obj.getType().equals("lft") ||
 						obj.getType().equals("str"))
 					{
-						double height = obj.getHeightAt(editorFrame, mousePoint.x, mousePoint.y);
-						coordinates = String.format("x: %.3f y: %.3f z: %.3f", mousePoint.x, mousePoint.y, height);
-/*
 						MutableDouble height = new MutableDouble();
 						MutableDouble slopeLeft = new MutableDouble();
 						MutableDouble slopeRight = new MutableDouble();
@@ -1719,9 +1717,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						{
 							double slope = (slopeLeft.getValue() + slopeRight.getValue()) / 2.0;
 
-							coordinates = String.format("x: %.3f y: %.3f z: %.3f slope: %.3f", mousePoint.x, mousePoint.y, height.getValue(), slope);
+							coordinates = String.format("x: %.3f y: %.3f z: %.3f grade: %.3f", mousePoint.x, mousePoint.y, height.getValue(), slope);
 						}
-*/
 					}
 				}
 

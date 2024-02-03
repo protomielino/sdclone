@@ -88,9 +88,7 @@ import utils.circuit.MainTrack;
 import utils.circuit.ObjShapeObject;
 import utils.circuit.ObjectMap;
 import utils.circuit.Pits;
-import utils.circuit.Point3D;
 import utils.circuit.Reliefs;
-import utils.circuit.Sector;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
@@ -654,7 +652,7 @@ public class EditorFrame extends JFrame
 		
 		setTitle(originalTitle + " - Project: " + projectFileName);
 
-		//writeTrack();
+		writeTrack();
 	}
 
 	/**

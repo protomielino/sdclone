@@ -141,12 +141,12 @@ public class Straight extends Segment
 
 		boolean linear = getValidProfil(editorFrame).equals("linear");
 
-		double T1l = getCalculatedStartTangentLeft() * getLength();
-		double T2l = getCalculatedEndTangentLeft() * getLength();
+		double T1l = (getCalculatedStartTangentLeft() / 100.0)  * getLength();
+		double T2l = (getCalculatedEndTangentLeft() / 100.0) * getLength();
 		double tl = 0.0;
 		double dtl = 1.0 / nbSteps;
-		double T1r = getCalculatedStartTangentRight() * getLength();
-		double T2r = getCalculatedEndTangentRight() * getLength();
+		double T1r = (getCalculatedStartTangentRight() / 100.0) * getLength();
+		double T2r = (getCalculatedEndTangentRight() / 100.0) * getLength();
 		double tr = 0.0;
 		double dtr = 1.0 / nbSteps;
 		double curzsl = leftStartHeight;
