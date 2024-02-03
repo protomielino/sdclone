@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +41,8 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -146,6 +149,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	private boolean				reliefDragging					= false;
 	private Point2D.Double		reliefOffset					= new Point2D.Double();
 
+	/** mouse presses point */
+	private Point 				origin							= new Point();
 	/** mouse pressed point, in meters */
 	Point2D.Double				clickPoint						= new Point2D.Double(0, 0);
 	/** mouse current point, in meters */
@@ -739,6 +744,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		if (editorFrame.getTrackData() == null)
 			return;
+		
+		origin = e.getPoint();
 
 		if (e.getButton() == MouseEvent.BUTTON3)
 		{
@@ -1017,7 +1024,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (editorFrame.getTrackData() == null)
 			return;
 
-		if (e.getModifiers() == 4)
+		if (e.getModifiers() == 4) // right button
 		{
 			if (objectShape != null && objectDragging == true)
 			{
@@ -1081,6 +1088,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				invalidate();
 				repaint();
 			}	
+		}
+		else if (e.getModifiers() == 8) // middle button
+		{
+			JViewport viewPort = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
+			if (viewPort != null)
+			{
+				int deltaX = origin.x - e.getX();
+				int deltaY = origin.y - e.getY();
+
+				Rectangle view = viewPort.getViewRect();
+				view.x += deltaX;
+				view.y += deltaY;
+
+				scrollRectToVisible(view);
+			}
 		}
 		else
 		{
