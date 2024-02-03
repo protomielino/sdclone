@@ -628,6 +628,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
 		double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
+		double gradeAtSplitPoint = oldShape.getGradeAt(editorFrame, splitPoint);
+		double gradeAtSplitPointLeft = oldShape.getGradeAtLeft(editorFrame, splitPoint);
+		double gradeAtSplitPointRight = oldShape.getGradeAtRight(editorFrame, splitPoint);
 
 		newShape.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
 		newShape.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
@@ -697,8 +700,22 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (oldShape.hasProfilStartTangent() || oldShape.hasProfilEndTangent())
 		{
 			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
-			newShape.setProfilStartTangent(oldShape.getCalculatedGrade());
-			oldShape.setProfilEndTangent(oldShape.getCalculatedGrade());
+			newShape.setProfilStartTangent(gradeAtSplitPoint);
+			oldShape.setProfilEndTangent(gradeAtSplitPoint);
+		}
+
+		if (oldShape.hasProfilStartTangentLeft() || oldShape.hasProfilEndTangentLeft())
+		{
+			newShape.setProfilEndTangentLeft(oldShape.getProfilEndTangentLeft());
+			newShape.setProfilStartTangentLeft(gradeAtSplitPointLeft);
+			oldShape.setProfilEndTangentLeft(gradeAtSplitPointLeft);
+		}
+
+		if (oldShape.hasProfilStartTangentRight() || oldShape.hasProfilEndTangentRight())
+		{
+			newShape.setProfilEndTangentRight(oldShape.getProfilEndTangentRight());
+			newShape.setProfilStartTangentRight(gradeAtSplitPointRight);
+			oldShape.setProfilEndTangentRight(gradeAtSplitPointRight);
 		}
 
 		newShape.setGrade(oldShape.getGrade());

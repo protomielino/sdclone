@@ -652,7 +652,7 @@ public class EditorFrame extends JFrame
 		
 		setTitle(originalTitle + " - Project: " + projectFileName);
 
-		writeTrack();
+		//writeTrack();
 	}
 
 	/**
