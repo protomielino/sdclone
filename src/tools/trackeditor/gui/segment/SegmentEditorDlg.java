@@ -554,7 +554,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightStartSlider == null)
 		{
-			heightStartSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStart(), "Height", "Start", "HeightStart", true, false);
+			heightStartSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStart(), "Height", "Start", "HeightStart", true, false);
 			heightStartSlider.setBounds(720, 64, 50, 390);
 			heightStartSlider.addSliderListener(this);
 		}
@@ -569,7 +569,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightStartLeftSlider == null)
 		{
-			heightStartLeftSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStartLeft(), "L Height", "Start", "HeightStartLeft", true, false);
+			heightStartLeftSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStartLeft(), "L Height", "Start", "HeightStartLeft", true, false);
 			heightStartLeftSlider.setBounds(775, 64, 50, 390);
 			heightStartLeftSlider.addSliderListener(this);
 		}
@@ -584,7 +584,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightStartRightSlider == null)
 		{
-			heightStartRightSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightStartRight(), "R Height", "Start", "HeightStartRight", true, false);
+			heightStartRightSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStartRight(), "R Height", "Start", "HeightStartRight", true, false);
 			heightStartRightSlider.setBounds(830, 64, 50, 390);
 			heightStartRightSlider.addSliderListener(this);
 		}
@@ -599,7 +599,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightEndSlider == null)
 		{
-			heightEndSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEnd(), "Height", "End", "HeightEnd", true, false);
+			heightEndSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEnd(), "Height", "End", "HeightEnd", true, false);
 			heightEndSlider.setBounds(885, 64, 50, 390);
 			heightEndSlider.addSliderListener(this);
 		}
@@ -614,7 +614,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightEndLeftSlider == null)
 		{
-			heightEndLeftSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEndLeft(), "L Height", "End", "HeightEndLeft", true, false);
+			heightEndLeftSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEndLeft(), "L Height", "End", "HeightEndLeft", true, false);
 			heightEndLeftSlider.setBounds(940, 64, 50, 390);
 			heightEndLeftSlider.addSliderListener(this);
 		}
@@ -629,7 +629,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (heightEndRightSlider == null)
 		{
-			heightEndRightSlider = new SegmentSlider(0, 200, 0, 0.001, shape.getHeightEndRight(), "R Height", "End", "HeightEndRight", true, false);
+			heightEndRightSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEndRight(), "R Height", "End", "HeightEndRight", true, false);
 			heightEndRightSlider.setBounds(995, 64, 50, 390);
 			heightEndRightSlider.addSliderListener(this);
 		}
