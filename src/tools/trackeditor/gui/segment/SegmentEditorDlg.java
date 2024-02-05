@@ -80,6 +80,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 	private SegmentSlider			gradeSlider					= null;
 	private SegmentSlider			startTangentSlider			= null;
+	private SegmentSlider			startTangentLeftSlider		= null;
+	private SegmentSlider			startTangentRightSlider		= null;
 	private SegmentSlider			endTangentSlider			= null;
 	private SegmentSlider			endTangentLeftSlider		= null;
 	private SegmentSlider			endTangentRightSlider		= null;
@@ -232,7 +234,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	 */
 	private void initialize()
 	{
-		this.setSize(1070, 536);
+		this.setSize(1180, 536);
 		Point p = editorFrame.getLocation();
 		p.x = editorFrame.getProject().getSegmentEditorX();
 		p.y = editorFrame.getProject().getSegmentEditorY();
@@ -311,6 +313,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			centerPanel.add(getLengthSlider(), null);
 			centerPanel.add(getGradeSlider(), null);
 			centerPanel.add(getStartTangentSlider(), null);
+			centerPanel.add(getStartTangentLeftSlider(), null);
+			centerPanel.add(getStartTangentRightSlider(), null);
 			centerPanel.add(getBankingStartSlider(), null);
 			centerPanel.add(getBankingEndSlider(), null);
 			centerPanel.add(getEndTangentSlider(), null);
@@ -438,6 +442,36 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		return startTangentSlider;
 	}
 	/**
+	 * This method initializes startTangentLeftSlider
+	 *
+	 * @return gui.SegmentSlider
+	 */
+	private SegmentSlider getStartTangentLeftSlider()
+	{
+		if (startTangentLeftSlider == null)
+		{
+			startTangentLeftSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilStartTangentLeft(), "L Tan", "Start", "ProfilStartTangentLeft", true, false);
+			startTangentLeftSlider.setBounds(335, 64, 50, 390);
+			startTangentLeftSlider.addSliderListener(this);
+		}
+		return startTangentLeftSlider;
+	}
+	/**
+	 * This method initializes startTangentRightSlider
+	 *
+	 * @return gui.SegmentSlider
+	 */
+	private SegmentSlider getStartTangentRightSlider()
+	{
+		if (startTangentRightSlider == null)
+		{
+			startTangentRightSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilStartTangentRight(), "R Tan", "Start", "ProfilStartTangentRight", true, false);
+			startTangentRightSlider.setBounds(390, 64, 50, 390);
+			startTangentRightSlider.addSliderListener(this);
+		}
+		return startTangentRightSlider;
+	}
+	/**
 	 * This method initializes endTangentSlider
 	 *
 	 * @return gui.SegmentSlider
@@ -447,7 +481,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (endTangentSlider == null)
 		{
 			endTangentSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilEndTangent(), "Tangent", "End", "ProfilEndTangent", true, false);
-			endTangentSlider.setBounds(335, 64, 50, 390);
+			endTangentSlider.setBounds(445, 64, 50, 390);
 			endTangentSlider.addSliderListener(this);
 		}
 		return endTangentSlider;
@@ -461,8 +495,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (endTangentLeftSlider == null)
 		{
-			endTangentLeftSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilEndTangentLeft(), "L Tangent", "End", "ProfilEndTangentLeft", true, false);
-			endTangentLeftSlider.setBounds(390, 64, 50, 390);
+			endTangentLeftSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilEndTangentLeft(), "L Tan", "End", "ProfilEndTangentLeft", true, false);
+			endTangentLeftSlider.setBounds(500, 64, 50, 390);
 			endTangentLeftSlider.addSliderListener(this);
 		}
 		return endTangentLeftSlider;
@@ -476,8 +510,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (endTangentRightSlider == null)
 		{
-			endTangentRightSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilEndTangentRight(), "R Tangent", "End", "ProfilEndTangentRight", true, false);
-			endTangentRightSlider.setBounds(445, 64, 50, 390);
+			endTangentRightSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getProfilEndTangentRight(), "R Tan", "End", "ProfilEndTangentRight", true, false);
+			endTangentRightSlider.setBounds(555, 64, 50, 390);
 			endTangentRightSlider.addSliderListener(this);
 		}
 		return endTangentRightSlider;
@@ -495,7 +529,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			if (!shape.getType().equals("str"))
 				minSteps = 2;
 			profilStepsSlider = new SegmentSlider(minSteps, 100, 1, 1, shape.getProfilSteps(), "Steps", "", "ProfilSteps", true, true);
-			profilStepsSlider.setBounds(500, 64, 50, 390);
+			profilStepsSlider.setBounds(610, 64, 50, 390);
 			profilStepsSlider.addSliderListener(this);
 		}
 		return profilStepsSlider;
@@ -510,7 +544,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (profilStepsLengthSlider == null)
 		{
 			profilStepsLengthSlider = new SegmentSlider(0, 100, 0, 0.001, shape.getProfilStepsLength(), "Steps", "Len", "ProfilStepsLength", true, false);
-			profilStepsLengthSlider.setBounds(555, 64, 50, 390);
+			profilStepsLengthSlider.setBounds(665, 64, 50, 390);
 			profilStepsLengthSlider.addSliderListener(this);
 		}
 		return profilStepsLengthSlider;
@@ -525,7 +559,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (bankingStartSlider == null)
 		{
 			bankingStartSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getBankingStart(), "Banking", "Start", "BankingStart", true, false);
-			bankingStartSlider.setBounds(610, 64, 50, 390);
+			bankingStartSlider.setBounds(720, 64, 50, 390);
 			bankingStartSlider.addSliderListener(this);
 		}
 		return bankingStartSlider;
@@ -540,7 +574,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (bankingEndSlider == null)
 		{
 			bankingEndSlider = new SegmentSlider(-45, 45, 0, 0.001, shape.getBankingEnd(), "Banking", "End", "BankingEnd", true, false);
-			bankingEndSlider.setBounds(665, 64, 50, 390);
+			bankingEndSlider.setBounds(775, 64, 50, 390);
 			bankingEndSlider.addSliderListener(this);
 		}
 		return bankingEndSlider;
@@ -555,7 +589,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartSlider == null)
 		{
 			heightStartSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStart(), "Height", "Start", "HeightStart", true, false);
-			heightStartSlider.setBounds(720, 64, 50, 390);
+			heightStartSlider.setBounds(830, 64, 50, 390);
 			heightStartSlider.addSliderListener(this);
 		}
 		return heightStartSlider;
@@ -570,7 +604,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartLeftSlider == null)
 		{
 			heightStartLeftSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStartLeft(), "L Height", "Start", "HeightStartLeft", true, false);
-			heightStartLeftSlider.setBounds(775, 64, 50, 390);
+			heightStartLeftSlider.setBounds(885, 64, 50, 390);
 			heightStartLeftSlider.addSliderListener(this);
 		}
 		return heightStartLeftSlider;
@@ -585,7 +619,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartRightSlider == null)
 		{
 			heightStartRightSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightStartRight(), "R Height", "Start", "HeightStartRight", true, false);
-			heightStartRightSlider.setBounds(830, 64, 50, 390);
+			heightStartRightSlider.setBounds(940, 64, 50, 390);
 			heightStartRightSlider.addSliderListener(this);
 		}
 		return heightStartRightSlider;
@@ -600,7 +634,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndSlider == null)
 		{
 			heightEndSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEnd(), "Height", "End", "HeightEnd", true, false);
-			heightEndSlider.setBounds(885, 64, 50, 390);
+			heightEndSlider.setBounds(995, 64, 50, 390);
 			heightEndSlider.addSliderListener(this);
 		}
 		return heightEndSlider;
@@ -615,7 +649,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndLeftSlider == null)
 		{
 			heightEndLeftSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEndLeft(), "L Height", "End", "HeightEndLeft", true, false);
-			heightEndLeftSlider.setBounds(940, 64, 50, 390);
+			heightEndLeftSlider.setBounds(1050, 64, 50, 390);
 			heightEndLeftSlider.addSliderListener(this);
 		}
 		return heightEndLeftSlider;
@@ -630,7 +664,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndRightSlider == null)
 		{
 			heightEndRightSlider = new SegmentSlider(-200, 650, 0, 0.001, shape.getHeightEndRight(), "R Height", "End", "HeightEndRight", true, false);
-			heightEndRightSlider.setBounds(995, 64, 50, 390);
+			heightEndRightSlider.setBounds(1105, 64, 50, 390);
 			heightEndRightSlider.addSliderListener(this);
 		}
 		return heightEndRightSlider;
@@ -820,6 +854,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			
 			this.getGradeSlider().setValue(shape.getGrade());
 			this.getStartTangentSlider().setValue(shape.getProfilStartTangent());
+			this.getStartTangentLeftSlider().setValue(shape.getProfilStartTangentLeft());
+			this.getStartTangentRightSlider().setValue(shape.getProfilStartTangentRight());
 			this.getEndTangentSlider().setValue(shape.getProfilEndTangent());
 			this.getEndTangentLeftSlider().setValue(shape.getProfilEndTangentLeft());
 			this.getEndTangentRightSlider().setValue(shape.getProfilEndTangentRight());
@@ -844,6 +880,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			if (shape.getValidProfil(editorFrame).equals("linear"))
 			{
 				this.getStartTangentSlider().setEnabled(false);
+				this.getStartTangentLeftSlider().setEnabled(false);
+				this.getStartTangentRightSlider().setEnabled(false);
 				this.getEndTangentSlider().setEnabled(false);
 				this.getEndTangentLeftSlider().setEnabled(false);
 				this.getEndTangentRightSlider().setEnabled(false);
@@ -964,6 +1002,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			shape.setProfilEndTangentLeft(Double.NaN);
 			shape.setProfilEndTangentRight(Double.NaN);
 			this.getStartTangentSlider().setEnabled(false);
+			this.getStartTangentLeftSlider().setEnabled(false);
+			this.getStartTangentRightSlider().setEnabled(false);
 			this.getEndTangentSlider().setEnabled(false);
 			this.getEndTangentLeftSlider().setEnabled(false);
 			this.getEndTangentRightSlider().setEnabled(false);
@@ -971,6 +1011,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		else
 		{
 			this.getStartTangentSlider().setEnabled(true);
+			this.getStartTangentLeftSlider().setEnabled(true);
+			this.getStartTangentRightSlider().setEnabled(true);
 			this.getEndTangentSlider().setEnabled(true);
 			this.getEndTangentLeftSlider().setEnabled(true);
 			this.getEndTangentRightSlider().setEnabled(true);
@@ -1139,6 +1181,34 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			{
 				shape.setProfilStartTangent(shape.getCalculatedStartTangent());
 				slider.setValue(shape.getProfilStartTangent());
+				
+				shape.setProfilStartTangentLeft(Double.NaN);
+				startTangentLeftSlider.setValue(shape.getProfilStartTangentLeft());
+				
+				shape.setProfilStartTangentRight(Double.NaN);
+				startTangentRightSlider.setValue(shape.getProfilStartTangentRight());
+			}
+		}
+		else if (slider.getSection().equals("L Tan") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setProfilStartTangentLeft(shape.getCalculatedStartTangentLeft());
+				slider.setValue(shape.getProfilStartTangentLeft());
+				
+				shape.setProfilStartTangent(Double.NaN);
+				startTangentSlider.setValue(shape.getProfilStartTangent());
+			}
+		}
+		else if (slider.getSection().equals("R Tan") && slider.getAttr().equals("Start"))
+		{
+			if (slider.isCheckBoxSelected())
+			{
+				shape.setProfilStartTangentRight(shape.getCalculatedStartTangentRight());
+				slider.setValue(shape.getProfilStartTangentRight());
+				
+				shape.setProfilStartTangent(Double.NaN);
+				startTangentSlider.setValue(shape.getProfilStartTangent());
 			}
 		}
 		else if (slider.getSection().equals("Tangent") && slider.getAttr().equals("End"))
@@ -1155,7 +1225,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				endTangentRightSlider.setValue(shape.getProfilEndTangentRight());
 			}
 		}
-		else if (slider.getSection().equals("L Tangent") && slider.getAttr().equals("End"))
+		else if (slider.getSection().equals("L Tan") && slider.getAttr().equals("End"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
@@ -1166,7 +1236,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				endTangentSlider.setValue(shape.getProfilEndTangent());
 			}
 		}
-		else if (slider.getSection().equals("R Tangent") && slider.getAttr().equals("End"))
+		else if (slider.getSection().equals("R Tan") && slider.getAttr().equals("End"))
 		{
 			if (slider.isCheckBoxSelected())
 			{
