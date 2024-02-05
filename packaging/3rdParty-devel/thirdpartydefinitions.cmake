@@ -162,11 +162,11 @@ set(ZLIB_HASH SHA256=9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b7
 
 # libpng
 message(STATUS "Note special path handling (version in path) AND hard-coded 'libpng16'")
-set(PNG_VERSION 1.6.41)
+set(PNG_VERSION 1.6.42)
 set(PNG_PROJECT libpng-${PNG_VERSION})
 set(PNG_FILE ${PNG_PROJECT}.tar.gz)
 set(PNG_URL https://sourceforge.net/projects/libpng/files/libpng16/${PNG_VERSION}/${PNG_FILE}/download)
-set(PNG_HASH SHA256=f00a11840f60616bdced9056d0f4cf2e4897697db039f15ce911704f957d3c5d)
+set(PNG_HASH SHA256=eaa27b655f2cd37a3677372d7dfc646263401ef79d4f433345f24429ec60334a)
 
 # freetype
 message(STATUS "Note special path handling (version in path) AND hard-coded 'freetype2'")
