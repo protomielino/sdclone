@@ -42,6 +42,8 @@ import utils.MutableDouble;
 
 public class Segment implements Cloneable
 {
+	public enum Where { LEFT, CENTER, RIGHT }
+
 	private Vector<SegmentSideListener>	segmentListeners	= new Vector<SegmentSideListener>();
 
 	// neighbours
@@ -2262,36 +2264,6 @@ public class Segment implements Cloneable
 		right.setSideBankingType(getValidRightSideBankingType(editorFrame));
 	}
 
-	public double getGradeAt(EditorFrame editorFrame, double splitPoint)
-	{
-		int splitStep = (int) (splitPoint * nbSteps);
-		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
-		double startZ = (points[splitSubSeg].z + points[splitSubSeg + 3].z) / 2;
-		double endZ = (points[splitSubSeg + 1].z + points[splitSubSeg + 2].z) / 2;
-
-		return ((endZ - startZ) / stepLength) * 100;
-	}
-
-	public double getGradeAtLeft(EditorFrame editorFrame, double splitPoint)
-	{
-		int splitStep = (int) (splitPoint * nbSteps);
-		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
-		double startZ = points[splitSubSeg].z;
-		double endZ = points[splitSubSeg + 1].z;
-
-		return ((endZ - startZ) / stepLength) * 100;
-	}
-
-	public double getGradeAtRight(EditorFrame editorFrame, double splitPoint)
-	{
-		int splitStep = (int) (splitPoint * nbSteps);
-		int splitSubSeg = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0)) * splitStep;
-		double startZ = points[splitSubSeg + 3].z;
-		double endZ = points[splitSubSeg + 2].z;
-
-		return ((endZ - startZ) / stepLength) * 100;
-	}
-
 	// from https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	private static final double EPSILON = 0.0000001;
 
@@ -2349,33 +2321,7 @@ public class Segment implements Cloneable
 		}
 	}
 
-	public double getHeightAt(EditorFrame editorFrame, double x, double y)
-	{
-		if (points == null)
-			return 0.0;
-
-		Point3D rayOrigin = new Point3D(x, y, -1000.0);
-		Point3D rayVector = new Point3D(0.0, 0.0, 1.0);
-		Point3D intersectionPoint = new Point3D();
-
-		int stride = 4 * (7 + (Editor.getProperties().getShowArrows() > 0.0 ? 1 : 0));
-
-		for (int i = 0; i < points.length; i += stride)
-		{
-			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 1], points[i + 2], intersectionPoint))
-			{
-				return intersectionPoint.z;
-			}
-			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 2], points[i + 3], intersectionPoint))
-			{
-				return intersectionPoint.z;
-			}
-		}
-
-		return 0.0;
-	}
-
-	public boolean getHeightAndSlopeAt(EditorFrame editorFrame, double x, double y, MutableDouble height, MutableDouble slopeLeft, MutableDouble slopeRight)
+	public boolean getHeightAndSlopeAt(double x, double y, MutableDouble height, MutableDouble slopeLeft, MutableDouble slopeRight)
 	{
 		if (points == null)
 			return false;
@@ -2392,21 +2338,86 @@ public class Segment implements Cloneable
 			{
 				height.setValue(intersectionPoint.z);
 				double at = (((i / stride) * stepLength) + (stepLength / 2)) / length;
-				slopeLeft.setValue(getGradeAtLeft(editorFrame, at));
-				slopeRight.setValue(getGradeAtRight(editorFrame, at));
+				slopeLeft.setValue(getTangentAt(at, Segment.Where.LEFT));
+				slopeRight.setValue(getTangentAt(at, Segment.Where.RIGHT));
 				return true;
 			}
 			if (rayIntersectsTriangle(rayOrigin, rayVector, points[i + 0], points[i + 2], points[i + 3], intersectionPoint))
 			{
 				height.setValue(intersectionPoint.z);
 				double at = (((i / stride) * stepLength) + (stepLength / 2)) / length;
-				slopeLeft.setValue(getGradeAtLeft(editorFrame, at));
-				slopeRight.setValue(getGradeAtRight(editorFrame, at));
+				slopeLeft.setValue(getTangentAt(at, Segment.Where.LEFT));
+				slopeRight.setValue(getTangentAt(at, Segment.Where.RIGHT));
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	public double getHeightAt(double splitPoint, Where where)
+	{
+		double zStart = 0.0;
+		double zEnd = 0.0;
+		double tanStart = 0.0;
+		double tanEnd = 0.0;
+
+		switch (where)
+		{
+		case LEFT:
+			zStart = getCalculatedHeightStartLeft();
+			zEnd = getCalculatedHeightEndLeft();
+			tanStart = getCalculatedStartTangentLeft() / 100.0;
+			tanEnd = getCalculatedEndTangentLeft() / 100.0;
+			break;
+		case CENTER:
+			zStart = getCalculatedHeightStart();
+			zEnd = getCalculatedHeightEnd();
+			tanStart = getCalculatedStartTangent() / 100.0;
+			tanEnd = getCalculatedEndTangent() / 100.0;
+			break;
+		case RIGHT:
+			zStart = getCalculatedHeightStartRight();
+			zEnd = getCalculatedHeightEndRight();
+			tanStart = getCalculatedStartTangentRight() / 100.0;
+			tanEnd = getCalculatedEndTangentRight() / 100.0;
+			break;
+		}
+
+		return trackSpline(zStart, zEnd, tanStart, tanEnd, splitPoint);
+	}
+
+	public double getTangentAt(double splitPoint, Where where)
+	{
+		double t2 = splitPoint * splitPoint;
+		double zStart = 0.0;
+		double zEnd = 0.0;
+		double tanStart = 0.0;
+		double tanEnd = 0.0;
+
+		switch (where)
+		{
+		case LEFT:
+			zStart = getCalculatedHeightStartLeft();
+			zEnd = getCalculatedHeightEndLeft();
+			tanStart = getCalculatedStartTangentLeft() / 100.0;
+			tanEnd = getCalculatedEndTangentLeft() / 100.0;
+			break;
+		case CENTER:
+			zStart = getCalculatedHeightStart();
+			zEnd = getCalculatedHeightEnd();
+			tanStart = getCalculatedStartTangent() / 100.0;
+			tanEnd = getCalculatedEndTangent() / 100.0;
+			break;
+		case RIGHT:
+			zStart = getCalculatedHeightStartRight();
+			zEnd = getCalculatedHeightEndRight();
+			tanStart = getCalculatedStartTangentRight() / 100.0;
+			tanEnd = getCalculatedEndTangentRight() / 100.0;
+			break;
+		}
+
+		return 100 * (3 * t2 * (2 * zStart - 2 * zEnd + tanStart * length + tanEnd * length) + 2 * splitPoint * (-3 * zStart + 3 * zEnd - 2 * tanStart * length - tanEnd * length) + (tanStart * length)) / length;
 	}
 
 	public void dump(String indent)

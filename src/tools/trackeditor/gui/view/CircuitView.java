@@ -633,9 +633,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		double leftSide2 = oldShape.getLeft().getSideStartWidth() + (oldShape.getLeft().getSideEndWidth() - oldShape.getLeft().getSideStartWidth()) * splitPoint;
 		double rightSide2 = oldShape.getRight().getSideStartWidth() + (oldShape.getRight().getSideEndWidth() - oldShape.getRight().getSideStartWidth()) * splitPoint;
-		double gradeAtSplitPoint = oldShape.getGradeAt(editorFrame, splitPoint);
-		double gradeAtSplitPointLeft = oldShape.getGradeAtLeft(editorFrame, splitPoint);
-		double gradeAtSplitPointRight = oldShape.getGradeAtRight(editorFrame, splitPoint);
+
+		double heightAtSplitPoint = oldShape.getHeightAt(splitPoint, Segment.Where.CENTER);
+		double heightAtSplitPointLeft = oldShape.getHeightAt(splitPoint, Segment.Where.LEFT);
+		double heightAtSplitPointRight = oldShape.getHeightAt(splitPoint, Segment.Where.RIGHT);
+
+		double gradeAtSplitPoint = oldShape.getTangentAt(splitPoint, Segment.Where.CENTER);
+		double gradeAtSplitPointLeft = oldShape.getTangentAt(splitPoint, Segment.Where.LEFT);
+		double gradeAtSplitPointRight = oldShape.getTangentAt(splitPoint, Segment.Where.RIGHT);
 
 		newShape.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
 		newShape.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
@@ -671,25 +676,22 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEnd())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEnd());
-			double splitHeight = heightStart + (oldShape.getHeightEnd() - heightStart) * splitPoint;
-			newShape.setHeightStart(splitHeight);
-			oldShape.setHeightEnd(splitHeight);
+			newShape.setHeightStart(heightAtSplitPoint);
+			oldShape.setHeightEnd(heightAtSplitPoint);
 		}
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndLeft())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEndLeft());
-			double splitHeight = heightStart + (oldShape.getHeightEndLeft() - heightStart) * splitPoint;
-			newShape.setHeightStartLeft(splitHeight);
-			oldShape.setHeightEndLeft(splitHeight);
+			newShape.setHeightStartLeft(heightAtSplitPointLeft);
+			oldShape.setHeightEndLeft(heightAtSplitPointLeft);
 		}
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndRight())
 		{								
 			newShape.setHeightEnd(oldShape.getHeightEndRight());
-			double splitHeight = heightStart + (oldShape.getHeightEndRight() - heightStart) * splitPoint;
-			newShape.setHeightStartRight(splitHeight);
-			oldShape.setHeightEndRight(splitHeight);
+			newShape.setHeightStartRight(heightAtSplitPointRight);
+			oldShape.setHeightEndRight(heightAtSplitPointRight);
 		}
 
 		double bankingStart = oldShape.getValidBankingStart(editorFrame);
@@ -701,26 +703,34 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setBankingStart(banking);
 			oldShape.setBankingEnd(banking);
 		}
-
-		if (oldShape.hasProfilStartTangent() || oldShape.hasProfilEndTangent())
+		
+		if (gradeAtSplitPointLeft == gradeAtSplitPointRight)
 		{
-			newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
-			newShape.setProfilStartTangent(gradeAtSplitPoint);
-			oldShape.setProfilEndTangent(gradeAtSplitPoint);
+			if (oldShape.getCalculatedStartTangent() != gradeAtSplitPoint ||
+				oldShape.getCalculatedEndTangent() != gradeAtSplitPoint)
+			{
+				newShape.setProfilEndTangent(oldShape.getProfilEndTangent());
+				newShape.setProfilStartTangent(gradeAtSplitPoint);
+				oldShape.setProfilEndTangent(gradeAtSplitPoint);
+			}
 		}
-
-		if (oldShape.hasProfilStartTangentLeft() || oldShape.hasProfilEndTangentLeft())
+		else
 		{
-			newShape.setProfilEndTangentLeft(oldShape.getProfilEndTangentLeft());
-			newShape.setProfilStartTangentLeft(gradeAtSplitPointLeft);
-			oldShape.setProfilEndTangentLeft(gradeAtSplitPointLeft);
-		}
-
-		if (oldShape.hasProfilStartTangentRight() || oldShape.hasProfilEndTangentRight())
-		{
-			newShape.setProfilEndTangentRight(oldShape.getProfilEndTangentRight());
-			newShape.setProfilStartTangentRight(gradeAtSplitPointRight);
-			oldShape.setProfilEndTangentRight(gradeAtSplitPointRight);
+			if (oldShape.getCalculatedStartTangentLeft() != gradeAtSplitPointLeft ||
+				oldShape.getCalculatedEndTangentLeft() != gradeAtSplitPointLeft)
+			{
+				newShape.setProfilEndTangentLeft(oldShape.getProfilEndTangentLeft());
+				newShape.setProfilStartTangentLeft(gradeAtSplitPointLeft);
+				oldShape.setProfilEndTangentLeft(gradeAtSplitPointLeft);
+			}
+			
+			if (oldShape.getCalculatedStartTangentRight() != gradeAtSplitPointRight ||
+				oldShape.getCalculatedEndTangentRight() != gradeAtSplitPointRight)
+			{
+				newShape.setProfilEndTangentRight(oldShape.getProfilEndTangentRight());
+				newShape.setProfilStartTangentRight(gradeAtSplitPointRight);
+				oldShape.setProfilEndTangentRight(gradeAtSplitPointRight);
+			}
 		}
 
 		newShape.setGrade(oldShape.getGrade());
@@ -1757,7 +1767,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						MutableDouble height = new MutableDouble();
 						MutableDouble slopeLeft = new MutableDouble();
 						MutableDouble slopeRight = new MutableDouble();
-						if (obj.getHeightAndSlopeAt(editorFrame, mousePoint.x, mousePoint.y, height, slopeLeft, slopeRight))
+						if (obj.getHeightAndSlopeAt(mousePoint.x, mousePoint.y, height, slopeLeft, slopeRight))
 						{
 							double slope = (slopeLeft.getValue() + slopeRight.getValue()) / 2.0;
 
