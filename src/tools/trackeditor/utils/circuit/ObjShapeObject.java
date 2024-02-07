@@ -138,6 +138,11 @@ public class ObjShapeObject extends Segment
 		calcShape(location);
 	}
 
+	public boolean contains(Point2D.Double point)
+	{
+		return boundingRectangle.contains(point.x, point.y);
+	}
+
 	public void calcShape(Point2D.Double location)
 	{
 		this.location.x = location.x;
@@ -165,6 +170,8 @@ public class ObjShapeObject extends Segment
 
 		points[3].x = this.location.getX() - width / 2;
 		points[3].y = this.location.getY() + height / 2;
+
+		setBounds();
 	}
 	
 	public void dump(String indent)

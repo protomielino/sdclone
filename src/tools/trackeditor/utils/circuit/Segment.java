@@ -120,6 +120,8 @@ public class Segment implements Cloneable
 	double dx;
 	double dy;
 
+	protected Rectangle2D.Double	boundingRectangle	= new Rectangle2D.Double(0, 0, 0, 0);
+
 	public Segment()
 	{
 		this(null);
@@ -333,8 +335,13 @@ public class Segment implements Cloneable
 
 	public Rectangle2D.Double getBounds()
 	{
+		return boundingRectangle;
+	}
+
+	protected void setBounds()
+	{
 		if (points == null || points.length == 0)
-			return (new Rectangle2D.Double(0, 0, 0, 0));
+			return;
 
 		double minX = Double.MAX_VALUE;
 		double maxX = -Double.MAX_VALUE;
@@ -353,7 +360,7 @@ public class Segment implements Cloneable
 				maxY = points[i].y;
 		}
 
-		return (new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY));
+		boundingRectangle.setRect(minX, minY, maxX - minX, maxY - minY);
 	}
 
 	public void calcShape(EditorFrame editorFrame) throws Exception

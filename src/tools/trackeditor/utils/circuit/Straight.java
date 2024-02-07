@@ -54,10 +54,18 @@ public class Straight extends Segment
 		Straight straight = (Straight) segment;
 	}
 
-	public Rectangle2D.Double getBounds()
+	public boolean contains(Point2D.Double point)
+	{
+		if (!boundingRectangle.contains(point.x, point.y))
+			return false;
+
+		return super.contains(point);
+	}
+
+	protected void setBounds()
 	{
 		if (points == null || points.length == 0)
-			return (new Rectangle2D.Double(0, 0, 0, 0));
+			return;
 
 		double minX = Double.MAX_VALUE;
 		double maxX = -Double.MAX_VALUE;
@@ -80,7 +88,7 @@ public class Straight extends Segment
 				maxY = points[i].y;
 		}
 
-		return (new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY));
+		boundingRectangle.setRect(minX, minY, maxX - minX, maxY - minY);
 	}
 
 	public void calcShape(EditorFrame editorFrame) throws Exception
@@ -308,6 +316,8 @@ public class Straight extends Segment
 
 		endTrackCenter.setLocation(currentX, currentY);
 		endTrackAlpha = startTrackAlpha;
+
+		setBounds();
 
 		Editor.getProperties().setCurrentA(currentA);
 		Editor.getProperties().setCurrentX(currentX);
