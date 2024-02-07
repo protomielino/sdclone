@@ -216,8 +216,8 @@ set(GLM_URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.g
 set(GLM_HASH SHA256=e51f6c89ff33b7cfb19daafb215f293d106cd900f8d681b9b1295312ccadbd23)
 
 # TinyGLTF 
-set(TINYGLTF_VERSION 2.8.20)
+set(TINYGLTF_VERSION 2.8.21)
 set(TINYGLTF_PROJECT TinyGLTF-${TINYGLTF_VERSION})
 set(TINYGLTF_FILE ${TINYGLTF_PROJECT}.tar.gz)
 set(TINYGLTF_URL https://github.com/syoyo/tinygltf/archive/refs/tags/v${TINYGLTF_VERSION}.tar.gz)
-set(TINYGLTF_HASH SHA256=5cce8e0216d2552742aa8cce1541c5f243a04b97159ca14b937851db14e50dc6)
+set(TINYGLTF_HASH SHA256=e567257d7addde58b0a483832cbaa5dd8f15e5bcaee6f023831e215d1a2c0502)
