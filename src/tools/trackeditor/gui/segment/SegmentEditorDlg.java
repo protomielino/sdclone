@@ -342,7 +342,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (radiusStartSlider == null)
 		{
-			radiusStartSlider = new SegmentSlider(1, 1000, 1, 0.001);
+			radiusStartSlider = new SegmentSlider(1, 1000, Double.NaN, 0.001);
 			radiusStartSlider.setBounds(115, 64, 50, 390);
 			radiusStartSlider.setSection("Radius");
 			radiusStartSlider.setAttr("Start");
@@ -363,7 +363,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (radiusEndSlider == null)
 		{
-			radiusEndSlider = new SegmentSlider(1, 1000, 1, 0.001);
+			radiusEndSlider = new SegmentSlider(1, 1000, Double.NaN, 0.001);
 			radiusEndSlider.setBounds(170, 64, 50, 390);
 			radiusEndSlider.setSection("Radius");
 			radiusEndSlider.setAttr("End");
@@ -384,7 +384,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (arcSlider == null)
 		{
-			arcSlider = new SegmentSlider(1, 360, 1, 0.001);
+			arcSlider = new SegmentSlider(1, 360, Double.NaN, 0.001);
 			arcSlider.setBounds(60, 64, 50, 390);
 			arcSlider.setSection("Arc");
 			arcSlider.setAttr("");
