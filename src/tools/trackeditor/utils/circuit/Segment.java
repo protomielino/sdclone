@@ -122,6 +122,39 @@ public class Segment implements Cloneable
 
 	protected Rectangle2D.Double	boundingRectangle	= new Rectangle2D.Double(0, 0, 0, 0);
 
+	protected static final int	TRACK_START_LEFT			= 0;
+	protected static final int	TRACK_END_LEFT				= 1;
+	protected static final int	TRACK_END_RIGHT				= 2;
+	protected static final int	TRACK_START_RIGHT			= 3;
+	protected static final int	LEFT_BORDER_START_LEFT		= 4;
+	protected static final int	LEFT_BORDER_END_LEFT		= 5;
+	protected static final int	LEFT_BORDER_END_RIGHT		= 6;
+	protected static final int	LEFT_BORDER_START_RIGHT		= 7;
+	protected static final int	LEFT_SIDE_START_LEFT		= 8;
+	protected static final int	LEFT_SIDE_END_LEFT			= 9;
+	protected static final int	LEFT_SIDE_END_RIGHT			= 10;
+	protected static final int	LEFT_SIDE_START_RIGHT		= 11;
+	protected static final int	LEFT_BARRIER_START_LEFT		= 12;
+	protected static final int	LEFT_BARRIER_END_LEFT		= 13;
+	protected static final int	LEFT_BARRIER_END_RIGHT		= 14;
+	protected static final int	LEFT_BARRIER_START_RIGHT	= 15;
+	protected static final int	RIGHT_BORDER_START_RIGHT	= 16;
+	protected static final int	RIGHT_BORDER_END_RIGHT		= 17;
+	protected static final int	RIGHT_BORDER_END_LEFT		= 18;
+	protected static final int	RIGHT_BORDER_START_LEFT		= 19;
+	protected static final int	RIGHT_SIDE_START_RIGHT		= 20;
+	protected static final int	RIGHT_SIDE_END_RIGHT		= 21;
+	protected static final int	RIGHT_SIDE_END_LEFT			= 22;
+	protected static final int	RIGHT_SIDE_START_LEFT		= 23;
+	protected static final int	RIGHT_BARRIER_START_RIGHT	= 24;
+	protected static final int	RIGHT_BARRIER_END_RIGHT		= 25;
+	protected static final int	RIGHT_BARRIER_END_LEFT		= 26;
+	protected static final int	RIGHT_BARRIER_START_LEFT	= 27;
+	protected static final int	ARROW_START_LEFT			= 28;
+	protected static final int	ARROW_END_LEFT				= 29;
+	protected static final int	ARROW_END_RIGHT				= 30;
+	protected static final int	ARROW_START_RIGHT			= 31;
+
 	public Segment()
 	{
 		this(null);
@@ -274,7 +307,7 @@ public class Segment implements Cloneable
 
 	// adapted from: https://web.archive.org/web/20130126163405/http://geomalgorithms.com/a03-_inclusion.html
 	// Copyright 2000 softSurfer, 2012 Dan Sunday
-	private double isLeft(Point2D.Double P0, Point2D.Double P1, Point2D.Double P2)
+	protected double isLeft(Point2D.Double P0, Point2D.Double P1, Point2D.Double P2)
 	{
 		return ((P1.x - P0.x) * (P2.y - P0.y) - (P2.x -  P0.x) * (P1.y - P0.y));
 	}

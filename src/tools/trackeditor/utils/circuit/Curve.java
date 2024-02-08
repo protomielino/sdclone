@@ -21,8 +21,6 @@
 package utils.circuit;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
 import gui.EditorFrame;
 import utils.Editor;
 
