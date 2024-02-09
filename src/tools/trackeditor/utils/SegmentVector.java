@@ -134,7 +134,18 @@ public class SegmentVector extends Vector<Segment>
 			get(i).dump(indent + "    ");
 		}
     }
-	
+
+	public void dumpCalculated(String indent)
+	{
+		System.out.println(indent + "Track Segments");
+
+		for (int i = 0; i < size(); i++)
+		{
+			System.out.println(indent + "  segment[" + i + "]");
+			get(i).dump(indent + "    ", true, false, false, false);
+		}
+	}
+
 	public void dumpLinks()
 	{
 		for (int i = 0; i < size(); i++)

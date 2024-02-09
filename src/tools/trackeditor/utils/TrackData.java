@@ -293,16 +293,14 @@ public final class TrackData
 				segment.setCalculatedBankingStart(previous.getCalculatedBankingEnd());
 				segment.setCalculatedBankingEnd(previous.getCalculatedBankingEnd());
 
+				segment.setCalculatedStartTangent(previous.getCalculatedEndTangent());
 				segment.setCalculatedStartTangentLeft(previous.getCalculatedEndTangentLeft());
 				segment.setCalculatedStartTangentRight(previous.getCalculatedEndTangentRight());
 
 				if (hasSpline)
 				{
-					segment.setCalculatedStartTangent(previous.getCalculatedStartTangent());
 					segment.setCalculatedEndTangent(previous.getCalculatedEndTangent());
-					segment.setCalculatedStartTangentLeft(previous.getCalculatedStartTangentLeft());
 					segment.setCalculatedEndTangentLeft(previous.getCalculatedEndTangentLeft());
-					segment.setCalculatedStartTangentRight(previous.getCalculatedStartTangentRight());
 					segment.setCalculatedEndTangentRight(previous.getCalculatedEndTangentRight());
 				}
 			}
