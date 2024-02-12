@@ -136,7 +136,8 @@ extern float SimAirPressure;
 extern float SimAirDensity;
 
 /// return a number drawn uniformly from [0,1]
-inline float urandom() {
+inline float urandom()
+{
     return ((((float)rand()-1)/((float)RAND_MAX)));
 }
 

@@ -94,6 +94,7 @@ SimAeroConfig(tCar *car)
 
     float max_lift = MaximumLiftGivenDrag (0.5f * rho * Cx * FrntArea, FrntArea);
     float current_lift = 2.0f * (car->aero.Clift[0] + car->aero.Clift[1]);
+
     if (current_lift > max_lift)
     {
         if (car->features & FEAT_LIMITEDGROUNDEFFECT)
@@ -152,36 +153,49 @@ SimAeroUpdate(tCar *car, tSituation *s)
     airSpeed = car->DynGC.vel.x;
     spdang = atan2(car->DynGCg.vel.y, car->DynGCg.vel.x);
 
-    if (airSpeed > 10.0) {
-        for (i = 0; i < s->_ncars; i++) {
-            if (i == car->carElt->index) {
+    if (airSpeed > 10.0)
+    {
+        for (i = 0; i < s->_ncars; i++)
+        {
+            if (i == car->carElt->index)
+            {
                 continue;
             }
+
             otherCar = &(SimCarTable[i]);
             otherYaw = otherCar->DynGCg.pos.az;
             tmpsdpang = spdang - atan2(y - otherCar->DynGCg.pos.y, x - otherCar->DynGCg.pos.x);
             FLOAT_NORM_PI_PI(tmpsdpang);
             dyaw = yaw - otherYaw;
             FLOAT_NORM_PI_PI(dyaw);
+
             if ((otherCar->DynGC.vel.x > 10.0) &&
-                (fabs(dyaw) < 0.1396)) {
-                if (fabs(tmpsdpang) > 2.9671) {	    /* 10 degrees */
+                (fabs(dyaw) < 0.1396))
+            {
+                if (fabs(tmpsdpang) > 2.9671)
+                {	    /* 10 degrees */
                     /* behind another car */
                     tmpas = (tdble) (1.0 - exp(- 2.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) /
                                       (otherCar->aero.Cd * otherCar->DynGC.vel.x)));
-                    if (tmpas < dragK) {
+                    if (tmpas < dragK)
+                    {
                         dragK = tmpas;
                     }
-                } else if (fabs(tmpsdpang) < 0.1396) {	    /* 8 degrees */
+                }
+                else if (fabs(tmpsdpang) < 0.1396)
+                {	    /* 8 degrees */
                     /* before another car [not sure how much the drag should be reduced in this case. In no case it should be lowered more than 50% I think. - Christos] */
                     tmpas = (tdble) (1.0 - 0.5f * exp(- 8.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) / (car->aero.Cd * car->DynGC.vel.x)));
-                    if (tmpas < dragK) {
+
+                    if (tmpas < dragK)
+                    {
                         dragK = tmpas;
                     }
                 }
             }
         }
     }
+
     car->airSpeed2 = airSpeed * airSpeed;
     tdble v2 = car->airSpeed2;
 
@@ -339,8 +353,11 @@ SimWingConfig(tCar *car, int index)
     }
     else if (wing->WingType == 2)
     {
-        if (wing->AR > 0.001) wing->Kz1 = (tdble) (2 * PI * wing->AR / (wing->AR + 2));
-            else wing->Kz1 = (tdble)(2 * PI);
+        if (wing->AR > 0.001)
+        	wing->Kz1 = (tdble) (2 * PI * wing->AR / (wing->AR + 2));
+        else
+        wing->Kz1 = (tdble)(2 * PI);
+
         wing->Kx = (tdble) (0.5 * rho * area);
         wing->Kz2 = 1.05f;
         wing->Kz3 = 0.05f;
@@ -357,18 +374,24 @@ SimWingReConfig(tCar *car, int index)
     tWing  *wing = &(car->wing[index]);
     tCarSetupItem *angle = &(car->carElt->setup.wingAngle[index]);
 
-    if (angle->changed) {
+    if (angle->changed)
+    {
     wing->angle = MIN(angle->max,MAX(angle->min,angle->desired_value));
     angle->value = wing->angle;
 
-    if (wing->WingType == 0) {
-        if (index==1) {
+    if (wing->WingType == 0)
+    {
+        if (index==1)
+        {
         car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
         }
-    } else if (wing->WingType == 1) {
+    }
+    else if (wing->WingType == 1)
+    {
         tWing  *otherwing = &(car->wing[1-index]);
         car->aero.Cd = (tdble)(car->aero.CdBody - wing->Kx*sin(wing->angle - wing->AoAatZRad) - otherwing->Kx*sin(otherwing->angle - otherwing->AoAatZRad));
     }
+
      angle->changed = false;
     }
 }
@@ -379,12 +402,14 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     tWing  *wing = &(car->wing[index]);
 
     /* return with 0 if no wing present */
-    if (wing->WingType == -1) {
+    if (wing->WingType == -1)
+    {
         wing->forces.x = wing->forces.z = 0.0f;
         return;
     }
 
-    if (index == 1) {
+    if (index == 1)
+    {
         // Check wing angle controller
         if (car->ctrl->wingControlMode == 2)
             // Update wing angle
@@ -424,8 +449,11 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         }
         else if (aoa > 0)
         {
-        if (aoa < wing->AoStall) wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
-        else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+        if (aoa < wing->AoStall)
+        	wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
+        else
+        	wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+
         if (aoa < wing->AoStall - wing->Stallw)
             {x = (tdble)0.0;}
         else
@@ -433,12 +461,16 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
             x = aoa - wing->AoStall + wing->Stallw;
             x = x * x / (x * x + wing->Stallw * wing->Stallw);
         }
+
         wing->forces.z = -(1-x) * wing->Kz1 * (aoa - wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) + wing->Kz3);
         }
         else if (aoa > -PI_2)
         {
-        if (aoa > -wing->AoStall) wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
-        else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+        if (aoa > -wing->AoStall)
+        	wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
+        else
+        	wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+
         if (aoa > -wing->AoStall + wing->Stallw)
             {x = (tdble)0.0;}
         else
@@ -446,12 +478,16 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
             x = aoa + wing->AoStall - wing->Stallw;
             x = x * x / (x * x + wing->Stallw * wing->Stallw);
         }
+
         wing->forces.z = -(1-x) * wing->Kz1 * (aoa - wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3);
         }
         else
         {
-        if (aoa < wing->AoStall - PI) wing->forces.x = (tdble) (wing->Kx1 * (PI + aoa) * (PI + aoa) + wing->Kx2);
-        else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+        if (aoa < wing->AoStall - PI)
+        	wing->forces.x = (tdble) (wing->Kx1 * (PI + aoa) * (PI + aoa) + wing->Kx2);
+        else
+        	wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+
         if (aoa < wing->AoStall - wing->Stallw - PI)
             {x = (tdble)0.0;}
         else
@@ -459,6 +495,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
             x = (tdble) (aoa - wing->AoStall + wing->Stallw + PI);
             x = x * x / (x * x + wing->Stallw * wing->Stallw);
         }
+
         wing->forces.z = (tdble) (-(1-x) * wing->Kz1 * (aoa + wing->AoAatZero + PI) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3));
         }
 
@@ -467,7 +504,8 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         {
         if (wing->forces.x > 0.0)
             wing->forces.x += (tdble) (wing->forces.z * wing->forces.z / (wing->AR * 2.8274)); //0.9*PI
-        else wing->forces.x -= (tdble) (wing->forces.z * wing->forces.z / (wing->AR * 2.8274));
+        else
+        	wing->forces.x -= (tdble) (wing->forces.z * wing->forces.z / (wing->AR * 2.8274));
         }
 
         /* then multiply with 0.5*rho*area and the square of velocity */
@@ -513,4 +551,3 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     else
         wing->forces.x = wing->forces.z = 0.0f;
 }
-

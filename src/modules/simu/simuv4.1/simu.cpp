@@ -28,7 +28,6 @@
 
 #include "sim.h"
 
-
 tCar *SimCarTable = 0;
 
 tdble SimDeltaTime;
@@ -320,9 +319,11 @@ SimInstantReConfig(tCar *car)
     {
         setup = (car->ctrl->setupChangeCmd->setup);
     }
-    else return;
+    else
+        return;
 
-    switch (car->ctrl->setupChangeCmd->type) {
+    switch (car->ctrl->setupChangeCmd->type)
+    {
         case DI_BRAKE_REPARTITION:
             SimBrakeSystemReConfig(car);
             break;

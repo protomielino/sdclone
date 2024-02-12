@@ -20,13 +20,15 @@
 #ifndef _ENGINE_H_
 #define _ENGINE_H_
 
-typedef struct {
+typedef struct
+{
     tdble rads;
     tdble a;
     tdble b;
 } tEngineCurveElem;
 
-typedef struct {
+typedef struct
+{
     tdble		maxTq;
 	tdble       maxPw;
 	tdble       rpmMaxPw;
@@ -60,6 +62,3 @@ typedef struct
 } tEngine;
 
 #endif /* _ENGINE_H_ */ 
-
-
-

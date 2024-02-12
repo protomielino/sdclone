@@ -17,8 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
 #include <cstring>
 #include <cstdio>
 
@@ -99,27 +97,32 @@ SimCarConfig(tCar *car)
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_FIXEDWHEELFORCE, VAL_NO);
-    if (strcmp(enabling, VAL_YES) == 0) {
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
         car->features = car->features | FEAT_FIXEDWHEELFORCE;
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
-    if (strcmp(enabling, VAL_YES) == 0) {
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
         car->features = car->features | FEAT_TCLINSIMU;
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
-    if (strcmp(enabling, VAL_YES) == 0) {
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
         car->features = car->features | FEAT_ABSINSIMU;
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
-    if (strcmp(enabling, VAL_YES) == 0) {
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
         car->features = car->features | FEAT_ESPINSIMU;
     }
 
     enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_LIMITEDGROUNDEFFECT, VAL_NO);
-    if (strcmp(enabling, VAL_YES) == 0) {
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
         car->features = car->features | FEAT_LIMITEDGROUNDEFFECT;
     }
 
@@ -190,7 +193,9 @@ SimCarConfig(tCar *car)
     /* configure components */
     tCarSetupItem *setupSpring;
     tdble K[4], Kfheave, Krheave;
-    for (i = 0; i < 4; i++) {
+
+    for (i = 0; i < 4; i++)
+    {
         setupSpring = &(car->carElt->setup.suspSpring[i]);
         setupSpring->desired_value = setupSpring->min = setupSpring-> max = 175000.0f;
         GfParmGetNumWithLimits(hdle, SuspSect[i], PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
@@ -198,6 +203,7 @@ SimCarConfig(tCar *car)
         setupSpring->stepsize = 1000;
         K[i] = setupSpring->desired_value;
     }
+
     setupSpring = &(car->carElt->setup.heaveSpring[0]);
     setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
     GfParmGetNumWithLimits(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
@@ -225,11 +231,13 @@ SimCarConfig(tCar *car)
     car->wheel[REAR_RGT].weight0 = wr0 * gcrl * K[REAR_RGT] / (K[REAR_RGT] + 0.5f*Krheave);
     car->wheel[REAR_LFT].weight0 = wr0 * (1 - gcrl) * K[REAR_LFT] / (K[REAR_LFT] + 0.5f*Krheave);
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++)
+    {
         SimAxleConfig(car, i);
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
+    {
         SimWheelConfig(car, i);
     }
 
@@ -238,7 +246,9 @@ SimCarConfig(tCar *car)
     SimSteerConfig(car);
     SimBrakeSystemConfig(car);
     SimAeroConfig(car);
-    for (i = 0; i < 2; i++) {
+
+    for (i = 0; i < 2; i++)
+    {
         SimWingConfig(car, i);
     }
 
@@ -252,11 +262,13 @@ SimCarConfig(tCar *car)
     carElt->_dimension = car->dimension;
     carElt->_statGC = car->statGC;
     carElt->_tank = car->tank;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
+    {
         carElt->priv.wheel[i].relPos = car->wheel[i].relPos;
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
+    {
         car->wheel[i].staticPos.x -= car->statGC.x;
         car->wheel[i].staticPos.y -= car->statGC.y;
     }
@@ -287,8 +299,10 @@ SimCarConfig(tCar *car)
     car->corner[REAR_LFT].pos.z = 0;
 
     /* set wing positions */
-    if (car->features & FEAT_AEROTOCG) {
-        for (i = 0; i < 2; i++) {
+    if (car->features & FEAT_AEROTOCG)
+    {
+        for (i = 0; i < 2; i++)
+        {
             car->wing[i].staticPos.x -= car->statGC.x;
             car->wing[i].staticPos.y -= car->statGC.y;
             car->wing[i].staticPos.z -= car->statGC.z;
@@ -306,7 +320,9 @@ SimCarConfig(tCar *car)
         priv->dashboardInstant[i].type = DI_NONE;
         priv->dashboardInstant[i].setup = NULL;
     }
+
     i = 0;
+
     if (setup->brakeRepartition.min != setup->brakeRepartition.max)
     {
         priv->dashboardInstant[i].type = DI_BRAKE_REPARTITION;
