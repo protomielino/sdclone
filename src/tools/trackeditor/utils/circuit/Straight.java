@@ -21,6 +21,8 @@
 package utils.circuit;
 
 import java.awt.geom.Point2D;
+import java.io.PrintStream;
+
 import gui.EditorFrame;
 import utils.Editor;
 
@@ -375,4 +377,9 @@ public class Straight extends Segment
 		return s; // return the clone
 	}
 
+	public void dump(PrintStream printStream, String indent, boolean dumpCalculated, boolean dumpPoints, boolean dumpTrPoints, boolean dumpToDraw)
+	{
+		printStream.println(indent + "Straight");
+		super.dump(printStream, indent, dumpCalculated, dumpPoints, dumpTrPoints, dumpToDraw);
+	}
 }

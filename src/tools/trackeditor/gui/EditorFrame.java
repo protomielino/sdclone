@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -123,6 +124,8 @@ public class EditorFrame extends JFrame
 	ShowReliefsAction			showReliefsAction					= null;
 	MoveAction					moveAction							= null;
 	SubdivideAction 			subdivideAction						= null;
+	DumpTextAction 				dumpTextAction						= null;
+	DumpAC3DAction 				dumpAC3DAction						= null;	
 	HelpAction					helpAction							= null;
 	ImportAction				importAction						= null;
 	ExportAction				exportAction						= null;
@@ -187,7 +190,9 @@ public class EditorFrame extends JFrame
 	private JMenuItem			addLeftMenuItem						= null;
 	private JMenuItem			moveMenuItem						= null;
 	private JMenuItem			deleteMenuItem						= null;
-	private JMenuItem 			subdivideMenuItem					= null;
+	private JMenuItem 			subdivideMenuItem					= null;	
+	private JMenuItem 			dumpTextMenuItem					= null;
+	private JMenuItem 			dumpAC3DMenuItem					= null;	
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
 	private JMenuItem			showObjectsMenuItem					= null;
@@ -651,8 +656,6 @@ public class EditorFrame extends JFrame
 		updateRecentFiles(projectFileName);
 		
 		setTitle(originalTitle + " - Project: " + projectFileName);
-
-		//writeTrack();
 	}
 
 	/**
@@ -1091,6 +1094,9 @@ public class EditorFrame extends JFrame
 			segmentMenu.add(getMoveMenuItem());
 			segmentMenu.add(getDeleteMenuItem());
 			segmentMenu.add(getSubdivideMenuItem());
+			segmentMenu.addSeparator();
+			segmentMenu.add(getDumpTextMenuItem());
+			segmentMenu.add(getDumpAC3DMenuItem());
 		}
 		return segmentMenu;
 	}
@@ -1199,7 +1205,39 @@ public class EditorFrame extends JFrame
         }
         return subdivideMenuItem;
     }
-	/**
+
+    /**
+     * This method initializes dumpTextMenuItem
+     *
+     * @return javax.swing.JMenuItem
+     */
+    private JMenuItem getDumpTextMenuItem()
+    {
+    	if (dumpTextMenuItem == null)
+    	{
+    		dumpTextMenuItem = new JMenuItem();
+    		dumpTextMenuItem.setAction(dumpTextAction);
+    		dumpTextMenuItem.setIcon(null);
+    	}
+    	return dumpTextMenuItem;
+    }
+    /**
+     * This method initializes dumpAC3DMenuItem
+     *
+     * @return javax.swing.JMenuItem
+     */
+    private JMenuItem getDumpAC3DMenuItem()
+    {
+    	if (dumpAC3DMenuItem == null)
+    	{
+    		dumpAC3DMenuItem = new JMenuItem();
+    		dumpAC3DMenuItem.setAction(dumpAC3DAction);
+    		dumpAC3DMenuItem.setIcon(null);
+    	}
+    	return dumpAC3DMenuItem;
+    }
+
+    /**
 	 * This method initializes deleteMenuItem
 	 *
 	 * @return javax.swing.JMenuItem
@@ -2156,7 +2194,38 @@ public class EditorFrame extends JFrame
         checkButtons(toggleButtonSubdivide, CircuitView.STATE_SUBDIVIDE);
     }
 
-	void menuItemAddBackground_actionPerformed(ActionEvent e)
+    void dumpText_actionPerformed(ActionEvent e)
+    {
+    	if (trackData == null)
+    	{
+    		message("No track", "Nothing to dump.");
+    		return;
+    	}
+
+    	String fileName = Editor.getProperties().getPath();
+    	String trackName = fileName.substring(fileName.lastIndexOf(sep) + 1);
+    	fileName = fileName + sep + trackName + "-track.txt";
+    	try
+    	{
+    		FileOutputStream stream = new FileOutputStream(fileName);
+
+    		PrintStream printStream = new PrintStream(stream);
+    		trackData.getSegments().dump(printStream);
+    	}
+    	catch (Exception ex)
+    	{
+    		JOptionPane.showMessageDialog(this,
+    				"Couldn't write : " + fileName + "\n\n" + ex.getLocalizedMessage(),
+    				"Dump Segment Text", JOptionPane.ERROR_MESSAGE);
+    	}
+    }
+
+    void dumpAC3D_actionPerformed(ActionEvent e)
+    {
+    	writeTrack();
+    }
+
+    void menuItemAddBackground_actionPerformed(ActionEvent e)
 	{
 		if (trackData == null)
 		{
@@ -2316,6 +2385,8 @@ public class EditorFrame extends JFrame
 		redoAction = new RedoAction("Redo", createNavigationIcon("Redo24"), "Redo.", KeyEvent.VK_R);
 		deleteAction = new DeleteAction("Delete", createNavigationIcon("Cut24"), "Delete.", KeyEvent.VK_L);
 		subdivideAction = new SubdivideAction("Subdivide", createNavigationIcon("Subdivide24"), "Subdivide.", KeyEvent.VK_Q);
+		dumpTextAction = new DumpTextAction("Dump Text", null, "Dump segments to file.", null);
+		dumpAC3DAction = new DumpAC3DAction("Dump Ac3d", null, "Dumpsegements to AC3d file.", null);
 		zoomPlusAction = new ZoomPlusAction("Zoom in", createNavigationIcon("ZoomIn24"), "Zoom in.", KeyEvent.VK_M);
 		zoomOneAction = new ZoomOneAction("Zoom 1:1", createNavigationIcon("Zoom24"), "Zoom 1:1.", KeyEvent.VK_N);
 		zoomMinusAction = new ZoomMinusAction("Zoom out", createNavigationIcon("ZoomOut24"), "Zoom out.", KeyEvent.VK_O);
@@ -2400,7 +2471,35 @@ public class EditorFrame extends JFrame
             toggleButtonSubdivide_actionPerformed(e);
         }
     }
-	public class ZoomPlusAction extends AbstractAction
+
+    public class DumpTextAction extends AbstractAction
+    {
+    	public DumpTextAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+    	{
+    		super(text, icon);
+    		putValue(SHORT_DESCRIPTION, desc);
+    		putValue(MNEMONIC_KEY, mnemonic);
+    	}
+
+    	public void actionPerformed(final ActionEvent e) {
+    		dumpText_actionPerformed(e);
+    	}
+    }
+    public class DumpAC3DAction extends AbstractAction
+    {
+    	public DumpAC3DAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+    	{
+    		super(text, icon);
+    		putValue(SHORT_DESCRIPTION, desc);
+    		putValue(MNEMONIC_KEY, mnemonic);
+    	}
+
+    	public void actionPerformed(final ActionEvent e) {
+    		dumpAC3D_actionPerformed(e);
+    	}
+    }
+
+    public class ZoomPlusAction extends AbstractAction
 	{
 		public ZoomPlusAction(String text, ImageIcon icon, String desc, Integer mnemonic)
 		{
@@ -3013,7 +3112,9 @@ public class EditorFrame extends JFrame
 			message("No track", "Can't write track.");
 			return;
 		}
-		String filename = Editor.getProperties().getPath() + sep + trackData.getHeader().getName() + "-track.ac";
+		String filePath = Editor.getProperties().getPath();
+		String trackName = filePath.substring(filePath.lastIndexOf(sep) + 1);
+		String filename = Editor.getProperties().getPath() + sep + trackName + "-track.ac";
 
 		Ac3d track = new Ac3d();
 		Ac3dMaterial material = new Ac3dMaterial("");
@@ -3029,7 +3130,7 @@ public class EditorFrame extends JFrame
 
 		track.getMaterials().add(material);
 		track.setRoot(world);
-		
+
 		Ac3dObject group = new Ac3dObject("group", 5);
 		group.setName("track");
 		world.addKid(group);

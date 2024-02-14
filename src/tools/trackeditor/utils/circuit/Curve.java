@@ -21,6 +21,8 @@
 package utils.circuit;
 
 import java.awt.geom.Point2D;
+import java.io.PrintStream;
+
 import gui.EditorFrame;
 import utils.Editor;
 
@@ -556,5 +558,16 @@ public class Curve extends Segment
 		s.radiusEnd = this.radiusEnd;
 
 		return s; // return the clone
+	}
+
+	public void dump(PrintStream printStream, String indent, boolean dumpCalculated, boolean dumpPoints, boolean dumpTrPoints, boolean dumpToDraw)
+	{
+		printStream.println(indent + "Curve");
+		printStream.println(indent + "  arcDeg                      : " + arcDeg);
+		printStream.println(indent + "  radiusStart                 : " + radiusStart);
+		printStream.println(indent + "  radiusEnd                   : " + radiusEnd);
+		printStream.println(indent + "  center                      : " + center.x + ", " + center.y);
+		printStream.println(indent + "  marks                       : " + marks);
+		super.dump(printStream, indent, dumpCalculated, dumpPoints, dumpTrPoints, dumpToDraw);
 	}
 }

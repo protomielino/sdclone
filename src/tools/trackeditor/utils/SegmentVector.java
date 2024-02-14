@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.PrintStream;
 import java.util.Vector;
 
 import utils.circuit.Segment;
@@ -143,6 +144,15 @@ public class SegmentVector extends Vector<Segment>
 		{
 			System.out.println(indent + "  segment[" + i + "]");
 			get(i).dump(indent + "    ", true, false, false, false);
+		}
+	}
+
+	public void dump(PrintStream printStream)
+	{
+		for (int i = 0; i < size(); i++)
+		{
+			printStream.println("segment[" + i + "]");
+			get(i).dump(printStream, "    ", true, false, false, false);
 		}
 	}
 
