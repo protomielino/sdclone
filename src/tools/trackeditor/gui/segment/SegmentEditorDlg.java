@@ -528,7 +528,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			int minSteps = 1;
 			if (!shape.getType().equals("str"))
 				minSteps = 2;
-			profilStepsSlider = new SegmentSlider(minSteps, 100, 1, 1, shape.getProfilSteps(), "Steps", "", "ProfilSteps", true, true);
+			profilStepsSlider = new SegmentSlider(minSteps, 100, Double.NaN, 1, shape.getProfilSteps(), "Steps", "", "ProfilSteps", true, true);
 			profilStepsSlider.setBounds(610, 64, 50, 390);
 			profilStepsSlider.addSliderListener(this);
 		}
