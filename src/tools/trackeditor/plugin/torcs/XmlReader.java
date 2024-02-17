@@ -465,6 +465,7 @@ public class XmlReader
 
             Element surface = (Element) it.next();
             surf.setName(surface.getAttribute("name").getValue());
+            surf.setComment(getAttrStrValue(surface, "comment"));
             surf.setColorR1(getAttrNumValue(surface, "color R1"));
             surf.setColorG1(getAttrNumValue(surface, "color G1"));
             surf.setColorB1(getAttrNumValue(surface, "color B1"));

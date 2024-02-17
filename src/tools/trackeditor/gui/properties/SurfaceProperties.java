@@ -95,7 +95,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (addSurfaceButton == null)
 		{
 			addSurfaceButton = new JButton();
-			addSurfaceButton.setBounds(10, 731, 120, 25);
+			addSurfaceButton.setBounds(10, 758, 120, 25);
 			addSurfaceButton.setText("Add Surface");
 			addSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -124,7 +124,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (deleteSurfaceButton == null)
 		{
 			deleteSurfaceButton = new JButton();
-			deleteSurfaceButton.setBounds(140, 731, 120, 25);
+			deleteSurfaceButton.setBounds(140, 758, 120, 25);
 			deleteSurfaceButton.setText("Delete Surface");
 			deleteSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -150,7 +150,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (copySurfaceButton == null)
 		{
 			copySurfaceButton = new JButton();
-			copySurfaceButton.setBounds(270, 731, 120, 25);
+			copySurfaceButton.setBounds(270, 758, 120, 25);
 			copySurfaceButton.setText("Copy Surface");
 			copySurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -174,7 +174,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (pasteSurfaceButton == null)
 		{
 			pasteSurfaceButton = new JButton();
-			pasteSurfaceButton.setBounds(400, 731, 120, 25);
+			pasteSurfaceButton.setBounds(400, 758, 120, 25);
 			pasteSurfaceButton.setText("Paste Surface");
 			pasteSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -212,7 +212,7 @@ public class SurfaceProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 713);
+			tabbedPane.setBounds(10, 10, 510, 740);
 
 			Vector<Surface> surfaces;
 			if (defaultSurfaces)
@@ -237,6 +237,8 @@ public class SurfaceProperties extends PropertyPanel
 	{
 		private JLabel				nameLabel						= new JLabel();
 		private JTextField 			nameTextField					= new JTextField();
+		private JLabel				commentLabel					= new JLabel();
+		private JTextField 			commentTextField				= new JTextField();
 		private JLabel				colorR1Label					= new JLabel();
 		private JTextField			colorR1TextField				= new JTextField();
 		private JLabel				colorG1Label					= new JLabel();
@@ -308,67 +310,70 @@ public class SurfaceProperties extends PropertyPanel
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 180);
-			addLabel(this, 1, colorR1Label, "Color R1", 180);
-			addLabel(this, 2, colorG1Label, "Color G1", 180);
-			addLabel(this, 3, colorB1Label, "Color B1", 180);
-			addLabel(this, 4, colorR2Label, "Color R2", 180);
-			addLabel(this, 5, colorG2Label, "Color G2", 180);
-			addLabel(this, 6, colorB2Label, "Color B2", 180);
-			addLabel(this, 7, textureNameLabel, "Texture Name", 180);
-			addLabel(this, 8, textureTypeLabel, "Texture Type", 180);
-			addLabel(this, 9, textureSizeLabel, "Texture Size", 180);
-			addLabel(this, 10, textureRandomnessLabel, "Texture Randomness", 180);
-			addLabel(this, 11, textureLinkWithPreviousLabel, "Texture Link With Previous", 180);
-			addLabel(this, 12, textureStartOnBoundaryLabel, "Texture Start On Boundary", 180);
-			addLabel(this, 13, textureMipMapLabel, "Texture MipMap", 180);
-			addLabel(this, 14, frictionLabel, "Friction", 180);
-			addLabel(this, 15, frictionRainLabel, "Friction Rain", 180);
-			addLabel(this, 16, rollingResistanceLabel, "Rolling Resistance", 180);
-			addLabel(this, 17, rollingResistanceRainLabel, "Rolling Resistance Rain", 180);
-			addLabel(this, 18, bumpNameLabel, "Bump Name", 180);
-			addLabel(this, 19, bumpSizeLabel, "Bump Size", 180);
-			addLabel(this, 20, roughnessLabel, "Roughness", 180);
-			addLabel(this, 21, roughnessWavelengthLabel, "Roughness Wavelength", 180);
-			addLabel(this, 22, racelineNameLabel, "Raceline Name", 180);
-			addLabel(this, 23, damageLabel, "Damage", 180);
-			addLabel(this, 24, reboundLabel, "Rebound", 180);
+			addLabel(this, 1, commentLabel, "Comment", 180);
+			addLabel(this, 2, colorR1Label, "Color R1", 180);
+			addLabel(this, 3, colorG1Label, "Color G1", 180);
+			addLabel(this, 4, colorB1Label, "Color B1", 180);
+			addLabel(this, 5, colorR2Label, "Color R2", 180);
+			addLabel(this, 6, colorG2Label, "Color G2", 180);
+			addLabel(this, 7, colorB2Label, "Color B2", 180);
+			addLabel(this, 8, textureNameLabel, "Texture Name", 180);
+			addLabel(this, 9, textureTypeLabel, "Texture Type", 180);
+			addLabel(this, 10, textureSizeLabel, "Texture Size", 180);
+			addLabel(this, 11, textureRandomnessLabel, "Texture Randomness", 180);
+			addLabel(this, 12, textureLinkWithPreviousLabel, "Texture Link With Previous", 180);
+			addLabel(this, 13, textureStartOnBoundaryLabel, "Texture Start On Boundary", 180);
+			addLabel(this, 14, textureMipMapLabel, "Texture MipMap", 180);
+			addLabel(this, 15, frictionLabel, "Friction", 180);
+			addLabel(this, 16, frictionRainLabel, "Friction Rain", 180);
+			addLabel(this, 17, rollingResistanceLabel, "Rolling Resistance", 180);
+			addLabel(this, 18, rollingResistanceRainLabel, "Rolling Resistance Rain", 180);
+			addLabel(this, 19, bumpNameLabel, "Bump Name", 180);
+			addLabel(this, 20, bumpSizeLabel, "Bump Size", 180);
+			addLabel(this, 21, roughnessLabel, "Roughness", 180);
+			addLabel(this, 22, roughnessWavelengthLabel, "Roughness Wavelength", 180);
+			addLabel(this, 23, racelineNameLabel, "Raceline Name", 180);
+			addLabel(this, 24, damageLabel, "Damage", 180);
+			addLabel(this, 25, reboundLabel, "Rebound", 180);
 
 			addTextField(this, 0, nameTextField, surface.getName(), 190, 125);
-			addTextField(this, 1, colorR1TextField, surface.getColorR1(), 190, 125);
-			addTextField(this, 2, colorG1TextField, surface.getColorG1(), 190, 125);
-			addTextField(this, 3, colorB1TextField, surface.getColorB1(), 190, 125);
-			addTextField(this, 4, colorR2TextField, surface.getColorR2(), 190, 125);
-			addTextField(this, 5, colorG2TextField, surface.getColorG2(), 190, 125);
-			addTextField(this, 6, colorB2TextField, surface.getColorB2(), 190, 125);
-			addTextField(this, 7, textureNameTextField, surface.getTextureName(), 190, 220);
+			addTextField(this, 1, commentTextField, surface.getComment(), 190, 310);
+			addTextField(this, 2, colorR1TextField, surface.getColorR1(), 190, 125);
+			addTextField(this, 3, colorG1TextField, surface.getColorG1(), 190, 125);
+			addTextField(this, 4, colorB1TextField, surface.getColorB1(), 190, 125);
+			addTextField(this, 5, colorR2TextField, surface.getColorR2(), 190, 125);
+			addTextField(this, 6, colorG2TextField, surface.getColorG2(), 190, 125);
+			addTextField(this, 7, colorB2TextField, surface.getColorB2(), 190, 125);
+			addTextField(this, 8, textureNameTextField, surface.getTextureName(), 190, 220);
 
 			add(getTextureTypeComboBox(), null);
 			getTextureTypeComboBox().setSelectedItem(toNoneString(surface.getTextureType()));
 
-			addTextField(this, 9, textureSizeTextField, surface.getTextureSize(), 190, 125);
-			addTextField(this, 10, textureRandomnessTextField, surface.getTextureRandomness(), 190, 125);
+			addTextField(this, 10, textureSizeTextField, surface.getTextureSize(), 190, 125);
+			addTextField(this, 11, textureRandomnessTextField, surface.getTextureRandomness(), 190, 125);
 
 			add(getTextureLinkWithPreviousComboBox(), null);
 			getTextureLinkWithPreviousComboBox().setSelectedItem(toNoneString(surface.getTextureLinkWithPrevious()));
 			add(getTextureStartOnBoundaryComboBox(), null);
 			getTextureStartOnBoundaryComboBox().setSelectedItem(toNoneString(surface.getTextureStartOnBoundary()));
 
-			addTextField(this, 13, textureMipMapTextField, surface.getTextureMipMap(), 190, 125);
-			addTextField(this, 14, frictionTextField, surface.getFriction(), 190, 125);
-			addTextField(this, 15, frictionRainTextField, surface.getFrictionRain(), 190, 125);
-			addTextField(this, 16, rollingResistanceTextField, surface.getRollingResistance(), 190, 125);
-			addTextField(this, 17, rollingResistanceRainTextField, surface.getRollingResistanceRain(), 190, 125);
-			addTextField(this, 18, bumpNameTextField, surface.getBumpName(), 190, 220);
-			addTextField(this, 19, bumpSizeTextField, surface.getBumpSize(), 190, 125);
-			addTextField(this, 20, roughnessTextField, surface.getRoughness(), 190, 125);
-			addTextField(this, 21, roughnessWavelengthTextField, surface.getRoughnessWavelength(), 190, 125);
-			addTextField(this, 22, racelineNameTextField, surface.getRacelineName(), 190, 220);
-			addTextField(this, 23, damageTextField, surface.getDammage(), 190, 125);
-			addTextField(this, 24, reboundTextField, surface.getRebound(), 190, 125);
+			addTextField(this, 14, textureMipMapTextField, surface.getTextureMipMap(), 190, 125);
+			addTextField(this, 15, frictionTextField, surface.getFriction(), 190, 125);
+			addTextField(this, 16, frictionRainTextField, surface.getFrictionRain(), 190, 125);
+			addTextField(this, 17, rollingResistanceTextField, surface.getRollingResistance(), 190, 125);
+			addTextField(this, 18, rollingResistanceRainTextField, surface.getRollingResistanceRain(), 190, 125);
+			addTextField(this, 19, bumpNameTextField, surface.getBumpName(), 190, 220);
+			addTextField(this, 20, bumpSizeTextField, surface.getBumpSize(), 190, 125);
+			addTextField(this, 21, roughnessTextField, surface.getRoughness(), 190, 125);
+			addTextField(this, 22, roughnessWavelengthTextField, surface.getRoughnessWavelength(), 190, 125);
+			addTextField(this, 23, racelineNameTextField, surface.getRacelineName(), 190, 220);
+			addTextField(this, 24, damageTextField, surface.getDammage(), 190, 125);
+			addTextField(this, 25, reboundTextField, surface.getRebound(), 190, 125);
 
 			if (defaultSurfaces)
 			{
 				nameTextField.setEnabled(false);
+				commentTextField.setEnabled(false);
 				colorR1TextField.setEnabled(false);
 				colorG1TextField.setEnabled(false);
 				colorB1TextField.setEnabled(false);
@@ -408,7 +413,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "discrete", "continuous"};
 				textureTypeComboBox = new JComboBox<String>(items);
-				textureTypeComboBox.setBounds(190, 226, 125, 23);
+				textureTypeComboBox.setBounds(190, 253, 125, 23);
 			}
 			return textureTypeComboBox;
 		}
@@ -419,7 +424,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "yes", "no"};
 				textureLinkWithPreviousComboBox = new JComboBox<String>(items);
-				textureLinkWithPreviousComboBox.setBounds(190, 307, 125, 23);
+				textureLinkWithPreviousComboBox.setBounds(190, 334, 125, 23);
 			}
 			return textureLinkWithPreviousComboBox;
 		}
@@ -430,7 +435,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				String[] items = {"none", "yes", "no"};
 				textureStartOnBoundaryComboBox = new JComboBox<String>(items);
-				textureStartOnBoundaryComboBox.setBounds(190, 334, 125, 23);
+				textureStartOnBoundaryComboBox.setBounds(190, 361, 125, 23);
 			}
 			return textureStartOnBoundaryComboBox;
 		}
@@ -445,7 +450,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (textureNameButton == null)
 			{
 				textureNameButton = new JButton();
-				textureNameButton.setBounds(420, 198, 80, 25);
+				textureNameButton.setBounds(420, 225, 80, 25);
 				textureNameButton.setText("Browse");
 				textureNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -496,7 +501,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (bumpNameButton == null)
 			{
 				bumpNameButton = new JButton();
-				bumpNameButton.setBounds(420, 495, 80, 25);
+				bumpNameButton.setBounds(420, 522, 80, 25);
 				bumpNameButton.setText("Browse");
 				bumpNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -547,7 +552,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (racelineNameButton == null)
 			{
 				racelineNameButton = new JButton();
-				racelineNameButton.setBounds(420, 603, 80, 25);
+				racelineNameButton.setBounds(420, 630, 80, 25);
 				racelineNameButton.setText("Browse");
 				racelineNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -611,6 +616,12 @@ public class SurfaceProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), surface.getName(), stringResult))
             {
                 surface.setName(stringResult.getValue());
+                getEditorFrame().documentIsModified = true;
+            }
+
+            if (isDifferent(panel.commentTextField.getText(), surface.getComment(), stringResult))
+            {
+                surface.setComment(stringResult.getValue());
                 getEditorFrame().documentIsModified = true;
             }
 
@@ -782,6 +793,7 @@ public class SurfaceProperties extends PropertyPanel
 	private void setSurfaceFromPanel(Surface surface, SurfacePanel panel)
 	{
 		surface.setName(panel.nameTextField.getText());
+		surface.setComment(panel.commentTextField.getText());
 		surface.setColorR1(getDouble(panel.colorR1TextField.getText()));
 		surface.setColorG1(getDouble(panel.colorG1TextField.getText()));
 		surface.setColorB1(getDouble(panel.colorB1TextField.getText()));
@@ -808,6 +820,7 @@ public class SurfaceProperties extends PropertyPanel
 	private void setPanelFromSurface(Surface surface, SurfacePanel panel)
 	{
 		panel.nameTextField.setText(new String(surface.getName()));
+		panel.commentTextField.setText(new String(surface.getComment()));
 		setTextField(panel.colorR1TextField, surface.getColorR1());
 		setTextField(panel.colorG1TextField, surface.getColorG1());
 		setTextField(panel.colorB1TextField, surface.getColorB1());

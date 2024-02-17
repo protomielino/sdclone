@@ -478,6 +478,7 @@ public class XmlWriter
 			Element el = new Element("section");
 			el.setAttribute(new Attribute("name", surface.getName()));
 
+			addContent(el, "comment", surface.getComment());
 			addContent(el, "color R1", null, surface.getColorR1());
 			addContent(el, "color G1", null, surface.getColorG1());
 			addContent(el, "color B1", null, surface.getColorB1());

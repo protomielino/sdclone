@@ -2,6 +2,7 @@ package utils.circuit;
 
 public final class Surface {
     private String name						= null;
+    private String comment					= null;
     private double colorR1					= Double.NaN;
     private double colorG1					= Double.NaN;
     private double colorB1					= Double.NaN;
@@ -33,6 +34,14 @@ public final class Surface {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public double getColorR1() {
@@ -231,6 +240,7 @@ public final class Surface {
     {
 		System.out.println(indent + "Surface");
         System.out.println(indent + "  name                    : " + name);
+        System.out.println(indent + "  comment                 : " + comment);
         System.out.println(indent + "  colorR1                 : " + colorR1);
         System.out.println(indent + "  colorG1                 : " + colorG1);
         System.out.println(indent + "  colorB1                 : " + colorB1);

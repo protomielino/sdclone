@@ -123,6 +123,7 @@ public final class TrackObject {
     {
 		System.out.println(indent + "TrackObject");
 		System.out.println(indent + "  name            : " + name);
+		System.out.println(indent + "  comment         : " + comment);
 		System.out.println(indent + "  object          : " + object);
 		System.out.println(indent + "  color           : " + String.format("0x%06X", color));
 		System.out.println(indent + "  orientationType : " + orientationType);
