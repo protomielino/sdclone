@@ -523,6 +523,7 @@ public class XmlReader
             Element object = (Element) it.next();
             obj.setName(object.getAttribute("name").getValue());
             obj.setObject(getAttrStrValue(object, "object"));
+            obj.setComment(getAttrStrValue(object, "comment"));
             obj.setColor(getAttrIntValue(object, "color"));
             obj.setOrientationType(getAttrStrValue(object, "orientation type"));
             obj.setBorderDistance(getAttrNumValue(object, "border distance", "m"));

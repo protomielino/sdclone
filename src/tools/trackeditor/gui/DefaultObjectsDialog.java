@@ -22,7 +22,7 @@ public class DefaultObjectsDialog extends JDialog
 	private void initialize()
 	{
 		this.setContentPane(getObjectProperties());
-		this.setSize(550, 462);
+		this.setSize(550, 489);
 		Point p = new Point();
 		p.x = editorFrame.getProject().getDefaultObjectsDialogX();
 		p.y = editorFrame.getProject().getDefaultObjectsDialogY();

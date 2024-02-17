@@ -3,6 +3,7 @@ package utils.circuit;
 public final class TrackObject {
     private String name				= null;
     private String object			= null;
+    private String comment			= null;
     private int color				= Integer.MAX_VALUE;
     private String orientationType	= null;
     private double borderDistance	= Double.NaN;
@@ -24,6 +25,14 @@ public final class TrackObject {
 
 	public String getObject() {
 		return object;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public void setObject(String object) {

@@ -656,6 +656,7 @@ public class XmlWriter
 			el.setAttribute(new Attribute("name", object.getName()));
 
 			addContent(el, "object", object.getObject());
+			addContent(el, "comment", object.getComment());
 			addHexContent(el, "color", null, object.getColor());
 			addContent(el, "orientation type", object.getOrientationType());
 			addContent(el, "border distance", "m", object.getBorderDistance());
