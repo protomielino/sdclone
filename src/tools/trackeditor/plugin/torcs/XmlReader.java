@@ -641,6 +641,7 @@ public class XmlReader
 	        		GraphicObject object = new GraphicObject(el.getAttribute("name").getValue(),
 	        				getAttrIntValue(el, "color"),
 	        				new Point2D.Double(getAttrNumValue(el, "x"), getAttrNumValue(el, "y")));
+	        		object.setComment(getAttrStrValue(el, "comment"));
 	        		object.setOrientation(getAttrNumValue(el, "orientation", "deg"));
 	        		object.setHeight(getAttrNumValue(el, "height", "m"));
 	        		graphicObjects.add(object);

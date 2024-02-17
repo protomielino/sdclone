@@ -921,6 +921,7 @@ public class XmlWriter
 			Element el = new Element("section");
 			el.setAttribute(new Attribute("name", graphicObject.getName()));
 
+			addContent(el, "comment", graphicObject.getComment());
 			addHexContent(el, "color", null, graphicObject.getColor());
 			addContent(el, "x", "m", graphicObject.getX());
 			addContent(el, "y", "m", graphicObject.getY());

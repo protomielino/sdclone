@@ -827,7 +827,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            		{
 	            			ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));											
 							String name = getEditorFrame().getObjectColorName(datum.color) + "-" + data.size();
-		            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum.trackX, datum.trackY, Double.NaN, Double.NaN);
+		            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, null, datum.color, datum.trackX, datum.trackY, Double.NaN, Double.NaN);
 		            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
 	            			panel.model.removeRowAt(panel.table.convertRowIndexToModel(row));
 	            		}
@@ -866,7 +866,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            			{
 	            				ObjectData datum1 = data.elementAt(i);											
 								String name = getEditorFrame().getObjectColorName(datum.color) + "-" + size++;
-			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, datum.color, datum1.trackX, datum1.trackY, Double.NaN, Double.NaN);
+			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, null, datum.color, datum1.trackX, datum1.trackY, Double.NaN, Double.NaN);
 			            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
 	            			}	            			
 	            			for (int i = 0; i < toMove.size(); i++)

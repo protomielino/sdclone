@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import gui.properties.GraphicObjectData;
@@ -60,6 +61,9 @@ public class TrackObjectDialog extends JDialog
 
 	private JLabel						heightLabel				= new JLabel();
 	private JTextField					heightTextField			= new JTextField();
+
+	private JLabel						commentLabel			= new JLabel();
+	private JTextArea					commentTextArea			= new JTextArea();
 
 	private JButton						applyButton				= new JButton();
 	private JButton						cancelButton			= new JButton();
@@ -246,13 +250,30 @@ public class TrackObjectDialog extends JDialog
 		
 		return Double.NaN;
 	}
+	
+	private String getComment()
+	{
+		if (graphicObject != null)
+		{
+			return graphicObject.getComment();
+		}
+		else if (graphicObjectDatum != null)
+		{
+			if (graphicObjectDatum.comment != null)
+			{
+				return graphicObjectDatum.comment;
+			}
+		}
+		
+		return null;
+	}
 
 	private void initialize(int x, int y)
 	{
 		isGraphicObject = (objectShape != null && objectShape.getType().equals("graphic object")) || graphicObjectDatum != null;
 
 		setLayout(null);
-		setSize(320, 279);
+		setSize(320, 333);
 		setResizable(false);
 		if (objectData == null && graphicObjectDatum == null)
 		{
@@ -394,9 +415,17 @@ public class TrackObjectDialog extends JDialog
 			if (!Double.isNaN(getObjectHeight()))
 				heightTextField.setText("" + getObjectHeight());
 			heightTextField.setBounds(120, 172, 170, 23);
+			
+			commentLabel.setText("Comment");
+			commentLabel.setBounds(10, 199, 120, 23);
+			
+			commentTextArea.setText(getComment());
+			commentTextArea.setBounds(120, 199, 170, 50);
+			commentTextArea.setLineWrap(true);
+			commentTextArea.setWrapStyleWord(true);
 		}
 
-		applyButton.setBounds(50, 204, 70, 25);
+		applyButton.setBounds(50, 258, 70, 25);
 		applyButton.setText("Apply");
 		applyButton.addActionListener(new ActionListener()
 		{
@@ -406,7 +435,7 @@ public class TrackObjectDialog extends JDialog
 			}
 		});
 
-		cancelButton.setBounds(185, 204, 70, 25);
+		cancelButton.setBounds(185, 258, 70, 25);
 		cancelButton.setText("Cancel");
 		cancelButton.addActionListener(new ActionListener()
 		{
@@ -446,6 +475,8 @@ public class TrackObjectDialog extends JDialog
 			add(orientationTextField);
 			add(heightLabel);
 			add(heightTextField);
+			add(commentLabel);
+			add(commentTextArea);
 		}
 
 		add(applyButton);
@@ -613,7 +644,9 @@ public class TrackObjectDialog extends JDialog
 					JOptionPane.showMessageDialog(this, "Invalid height!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-			}			
+			}
+			
+			graphicObject.setComment(new String(commentTextArea.getText()));
 		}
 		else if (graphicObjectDatum != null)
 		{
@@ -666,7 +699,9 @@ public class TrackObjectDialog extends JDialog
 					JOptionPane.showMessageDialog(this, "Invalid height!\n\n" + e.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-			}			
+			}	
+			
+			graphicObjectDatum.comment = new String(commentTextArea.getText());
 		}
 
 		changed = true;

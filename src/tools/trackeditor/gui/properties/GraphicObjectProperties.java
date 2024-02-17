@@ -145,7 +145,7 @@ public class GraphicObjectProperties extends PropertyPanel
 				name = new String("Unknown");
 			}
 
-			data.add(new GraphicObjectData(name, object.getColor(), object.getX(), object.getY(), object.getOrientation(), object.getHeight()));
+			data.add(new GraphicObjectData(name, object.getComment(), object.getColor(), object.getX(), object.getY(), object.getOrientation(), object.getHeight()));
 		}
 	}
 
@@ -482,6 +482,12 @@ public class GraphicObjectProperties extends PropertyPanel
 			if (!datum.name.equals(object.getName()))
 			{
 				object.setName(datum.name);
+				getEditorFrame().documentIsModified = true;
+			}
+
+			if (!datum.comment.equals(object.getComment()))
+			{
+				object.setComment(datum.comment);
 				getEditorFrame().documentIsModified = true;
 			}
 

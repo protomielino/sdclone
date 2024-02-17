@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 public class GraphicObject
 {
 	private ObjShapeObject	shape		= null;
+	private String			comment		= null;
 
 	// TODO add more overrides here
 	private double 			orientation = Double.NaN;
@@ -23,7 +24,9 @@ public class GraphicObject
 	public Object clone()
 	{
 		GraphicObject object = new GraphicObject((ObjShapeObject) this.shape.clone());
+		object.comment = this.comment;
 		object.orientation = this.orientation;
+		object.height = this.height;
 		return object;
 	}
 
@@ -75,6 +78,16 @@ public class GraphicObject
 	public void setY(double y)
 	{
 		shape.setTrackLocationY(y);
+	}
+
+	public String getComment()
+	{
+		return comment;
+	}
+
+	public void setComment(String comment)
+	{
+		this.comment = comment;
 	}
 
 	public double getOrientation()
