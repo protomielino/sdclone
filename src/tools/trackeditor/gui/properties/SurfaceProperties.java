@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -229,6 +230,16 @@ public class SurfaceProperties extends PropertyPanel
 				Surface surface = surfaces.elementAt(i);
 				tabbedPane.addTab(surface.getName(), null, new SurfacePanel(surface), null);
 			}
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
+				{
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorSurfaceTab();
+
+					if (lastTab < tabbedPane.getTabCount())
+						tabbedPane.setSelectedIndex(lastTab);
+				}
+			});
 		}
 		return tabbedPane;
 	}
@@ -788,6 +799,8 @@ public class SurfaceProperties extends PropertyPanel
 				surfaces.add(surface);
 			}
 		}
+
+		getEditorFrame().getProject().setPropertiesEditorSurfaceTab(this.tabbedPane.getSelectedIndex());
 	}
 
 	private void setSurfaceFromPanel(Surface surface, SurfacePanel panel)

@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.DocumentEvent;
@@ -241,6 +242,16 @@ public class ObjectProperties extends PropertyPanel
 				TrackObject object = objects.elementAt(i);
 				tabbedPane.addTab(object.getName(), null, new ObjectPanel(object), null);
 			}
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
+				{
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorObjectTab();
+
+					if (lastTab < tabbedPane.getTabCount())
+						tabbedPane.setSelectedIndex(lastTab);
+				}
+			});
 		}
 		return tabbedPane;
 	}
@@ -798,6 +809,8 @@ public class ObjectProperties extends PropertyPanel
 				objects.add(object);
 			}
 		}
+
+		getEditorFrame().getProject().setPropertiesEditorObjectTab(this.tabbedPane.getSelectedIndex());
 	}
 	
 	private void setObjectFromPanel(TrackObject object, ObjectPanel panel)

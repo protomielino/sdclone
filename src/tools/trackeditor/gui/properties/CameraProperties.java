@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import gui.EditorFrame;
 import utils.MutableDouble;
@@ -144,6 +145,16 @@ public class CameraProperties extends PropertyPanel
 				Camera camera = cameras.elementAt(i);
 				tabbedPane.addTab(camera.getName(), null, new CameraPanel(camera), null);
 			}
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
+				{
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorCameraTab();
+
+					if (lastTab < tabbedPane.getTabCount())
+						tabbedPane.setSelectedIndex(lastTab);
+				}
+			});
 		}
 		return tabbedPane;
 	}
@@ -298,5 +309,7 @@ public class CameraProperties extends PropertyPanel
 				cameras.add(camera);
 			}
 		}
+
+		getEditorFrame().getProject().setPropertiesEditorCameraTab(this.tabbedPane.getSelectedIndex());
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

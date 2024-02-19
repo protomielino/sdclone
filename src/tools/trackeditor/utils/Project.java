@@ -49,6 +49,10 @@ public class Project
 	private int checkDialogY = 0;
 	private int checkDialogWidth = 0;
 	private int checkDialogHeight = 0;
+	private int propertiesEditorSurfaceTab = 0;
+	private int propertiesEditorObjectTab = 0;
+	private int propertiesEditorCameraTab = 0;
+	private int propertiesEditorLightTab = 0;
 	
 	public Project()
 	{
@@ -280,5 +284,45 @@ public class Project
 	public void setCheckDialogHeight(int checkDialogHeight)
 	{
 		this.checkDialogHeight = checkDialogHeight;
+	}
+
+	public int getPropertiesEditorSurfaceTab()
+	{
+		return propertiesEditorSurfaceTab;
+	}
+
+	public void setPropertiesEditorSurfaceTab(int propertiesEditorSurfaceTab)
+	{
+		this.propertiesEditorSurfaceTab = propertiesEditorSurfaceTab;
+	}
+
+	public int getPropertiesEditorObjectTab()
+	{
+		return propertiesEditorObjectTab;
+	}
+
+	public void setPropertiesEditorObjectTab(int propertiesEditorObjectTab)
+	{
+		this.propertiesEditorObjectTab = propertiesEditorObjectTab;
+	}
+
+	public int getPropertiesEditorCameraTab()
+	{
+		return propertiesEditorCameraTab;
+	}
+
+	public void setPropertiesEditorCameraTab(int propertiesEditorCameraTab)
+	{
+		this.propertiesEditorCameraTab = propertiesEditorCameraTab;
+	}
+
+	public int getPropertiesEditorLightTab()
+	{
+		return propertiesEditorLightTab;
+	}
+
+	public void setPropertiesEditorLightTab(int propertiesEditorLightTab)
+	{
+		this.propertiesEditorLightTab = propertiesEditorLightTab;
 	}
 }
