@@ -31,6 +31,7 @@ import javax.swing.table.TableColumn;
 
 import gui.EditorFrame;
 import gui.TrackObjectDialog;
+import utils.MutableString;
 import utils.circuit.GraphicObject;
 
 public class GraphicObjectProperties extends PropertyPanel
@@ -469,6 +470,7 @@ public class GraphicObjectProperties extends PropertyPanel
 	public void exit()
 	{
 		int minDataCount = Math.min(data.size(), graphicObjects.size());
+		MutableString stringResult = new MutableString();
 
 		if (data.size() != graphicObjects.size())
 		{
@@ -479,15 +481,15 @@ public class GraphicObjectProperties extends PropertyPanel
 			GraphicObjectData datum = data.get(j);
 			GraphicObject object = graphicObjects.get(j);
 
-			if (!datum.name.equals(object.getName()))
+			if (isDifferent(object.getName(), datum.name, stringResult))
 			{
-				object.setName(datum.name);
+				object.setName(stringResult.getValue());
 				getEditorFrame().documentIsModified = true;
 			}
 
-			if (!datum.comment.equals(object.getComment()))
+			if (isDifferent(object.getComment(), datum.comment, stringResult))
 			{
-				object.setComment(datum.comment);
+				object.setComment(stringResult.getValue());
 				getEditorFrame().documentIsModified = true;
 			}
 
