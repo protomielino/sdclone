@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 import gui.EditorFrame;
 import utils.Editor;
@@ -116,7 +117,13 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Lights", null, getTrackLightProperties(), null);
 			tabbedPane.addTab("Sectors", null, getSectorProperties(), null);			
 			tabbedPane.addTab("Image", null, getImageProperties(), null);			
-			tabbedPane.setSelectedIndex(editorFrame.getProject().getPropertiesEditorTab());
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
+				{
+					tabbedPane.setSelectedIndex(editorFrame.getProject().getPropertiesEditorTab());
+				}
+			});
 		}
 		return tabbedPane;
 	}
