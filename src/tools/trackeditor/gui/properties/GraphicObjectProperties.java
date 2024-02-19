@@ -77,7 +77,7 @@ public class GraphicObjectProperties extends PropertyPanel
 		if (graphicObjectTablePanel == null)
 		{
 			graphicObjectTablePanel = new GraphicObjectTablePanel(graphicObjects);
-			graphicObjectTablePanel.setBounds(10, 10, 485, 314);
+			graphicObjectTablePanel.setBounds(10, 10, 485, 341);
 		}
 		return graphicObjectTablePanel;
 	}

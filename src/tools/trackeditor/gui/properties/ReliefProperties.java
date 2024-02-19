@@ -52,7 +52,7 @@ public class ReliefProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 487, 280);
+			tabbedPane.setBounds(10, 10, 487, 307);
 
 			Reliefs reliefs = getEditorFrame().getReliefs();
 
@@ -69,7 +69,7 @@ public class ReliefProperties extends PropertyPanel
 		if (addReliefButton == null)
 		{
 			addReliefButton = new JButton();
-			addReliefButton.setBounds(10, 300, 130, 25);
+			addReliefButton.setBounds(10, 327, 130, 25);
 			addReliefButton.setText("Add Releif");
 			addReliefButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -100,7 +100,7 @@ public class ReliefProperties extends PropertyPanel
 		if (deleteReliefButton == null)
 		{
 			deleteReliefButton = new JButton();
-			deleteReliefButton.setBounds(155, 300, 140, 25);
+			deleteReliefButton.setBounds(155, 327, 140, 25);
 			deleteReliefButton.setText("Delete Relief");
 			deleteReliefButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -188,7 +188,7 @@ public class ReliefProperties extends PropertyPanel
 			if (reliefTablePanel == null)
 			{
 				reliefTablePanel = new ReliefTablePanel(vertices);
-				reliefTablePanel.setBounds(10, 64, 465, 180);
+				reliefTablePanel.setBounds(10, 64, 465, 207);
 			}
 			return reliefTablePanel;
 		}

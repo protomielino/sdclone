@@ -467,7 +467,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 393, 510, 362);
+			tabbedPane.setBounds(10, 393, 510, 389);
 
 			tabbedPane.addTab("Objects", null, new GraphicObjectProperties(getEditorFrame()));
 			tabbedPane.addTab("Object Maps", null, new ObjectMapProperties(getEditorFrame()));

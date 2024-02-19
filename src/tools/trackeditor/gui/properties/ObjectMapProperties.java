@@ -81,7 +81,7 @@ public class ObjectMapProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 487, 280);
+			tabbedPane.setBounds(10, 10, 487, 307);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getObjectMaps();
 
@@ -99,7 +99,7 @@ public class ObjectMapProperties extends PropertyPanel
 		if (addObjectMapButton == null)
 		{
 			addObjectMapButton = new JButton();
-			addObjectMapButton.setBounds(10, 300, 130, 25);
+			addObjectMapButton.setBounds(10, 327, 130, 25);
 			addObjectMapButton.setText("Add Object Map");
 			addObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -122,7 +122,7 @@ public class ObjectMapProperties extends PropertyPanel
 		if (deleteObjectMapButton == null)
 		{
 			deleteObjectMapButton = new JButton();
-			deleteObjectMapButton.setBounds(155, 300, 140, 25);
+			deleteObjectMapButton.setBounds(155, 327, 140, 25);
 			deleteObjectMapButton.setText("Delete Object Map");
 			deleteObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -417,7 +417,7 @@ public class ObjectMapProperties extends PropertyPanel
 			if (objectTablePanel == null)
 			{
 				objectTablePanel = new ObjectTablePanel(objectMap);
-				objectTablePanel.setBounds(10, 64, 465, 180);
+				objectTablePanel.setBounds(10, 64, 465, 207);
 			}
 			return objectTablePanel;
 		}
