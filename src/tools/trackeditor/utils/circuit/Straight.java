@@ -292,11 +292,11 @@ public class Straight extends Segment
 			points[currentSubSeg + RIGHT_BORDER_END_RIGHT].x = points[currentSubSeg + RIGHT_BORDER_START_RIGHT].x + cos;
 			points[currentSubSeg + RIGHT_BORDER_END_RIGHT].y = points[currentSubSeg + RIGHT_BORDER_START_RIGHT].y + sin;
 
-			points[currentSubSeg + RIGHT_BORDER_START_LEFT].x = points[currentSubSeg + 3].x;
-			points[currentSubSeg + RIGHT_BORDER_START_LEFT].y = points[currentSubSeg + 3].y;
+			points[currentSubSeg + RIGHT_BORDER_START_LEFT].x = points[currentSubSeg + TRACK_START_RIGHT].x;
+			points[currentSubSeg + RIGHT_BORDER_START_LEFT].y = points[currentSubSeg + TRACK_START_RIGHT].y;
 
-			points[currentSubSeg + RIGHT_BORDER_END_LEFT].x = points[currentSubSeg + 2].x;
-			points[currentSubSeg + RIGHT_BORDER_END_LEFT].y = points[currentSubSeg + 2].y;
+			points[currentSubSeg + RIGHT_BORDER_END_LEFT].x = points[currentSubSeg + TRACK_END_RIGHT].x;
+			points[currentSubSeg + RIGHT_BORDER_END_LEFT].y = points[currentSubSeg + TRACK_END_RIGHT].y;
 
 			// right side
 
@@ -329,14 +329,14 @@ public class Straight extends Segment
 			if (showArrows > 0.0)
 			{
 				// arrow
-				points[currentSubSeg + ARROW_START_LEFT].x = currentX + cosTransLeft * trackWidth / 2;
-				points[currentSubSeg + ARROW_START_LEFT].y = currentY + sinTransLeft * trackWidth / 2;
+				points[currentSubSeg + ARROW_START_LEFT].x = points[currentSubSeg + TRACK_START_LEFT].x;
+				points[currentSubSeg + ARROW_START_LEFT].y = points[currentSubSeg + TRACK_START_LEFT].y;
 
 				points[currentSubSeg + ARROW_END_LEFT].x = points[currentSubSeg + ARROW_START_LEFT].x + cos - (cosTransLeft * trackWidth / 2) * 0.99999;
 				points[currentSubSeg + ARROW_END_LEFT].y = points[currentSubSeg + ARROW_START_LEFT].y + sin - (sinTransLeft * trackWidth / 2) * 0.99999;
 
-				points[currentSubSeg + ARROW_START_RIGHT].x = currentX - cosTransLeft * trackWidth / 2;
-				points[currentSubSeg + ARROW_START_RIGHT].y = currentY - sinTransLeft * trackWidth / 2;
+				points[currentSubSeg + ARROW_START_RIGHT].x = points[currentSubSeg + TRACK_START_RIGHT].x;
+				points[currentSubSeg + ARROW_START_RIGHT].y = points[currentSubSeg + TRACK_START_RIGHT].y;
 
 				points[currentSubSeg + ARROW_END_RIGHT].x = points[currentSubSeg + ARROW_START_RIGHT].x + cos + (cosTransLeft * trackWidth / 2) * 0.99999;
 				points[currentSubSeg + ARROW_END_RIGHT].y = points[currentSubSeg + ARROW_START_RIGHT].y + sin + (sinTransLeft * trackWidth / 2) * 0.99999;
