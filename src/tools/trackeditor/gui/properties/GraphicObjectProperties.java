@@ -481,13 +481,13 @@ public class GraphicObjectProperties extends PropertyPanel
 			GraphicObjectData datum = data.get(j);
 			GraphicObject object = graphicObjects.get(j);
 
-			if (isDifferent(object.getName(), datum.name, stringResult))
+			if (isDifferent(datum.name, object.getName(), stringResult))
 			{
 				object.setName(stringResult.getValue());
 				getEditorFrame().documentIsModified = true;
 			}
 
-			if (isDifferent(object.getComment(), datum.comment, stringResult))
+			if (isDifferent(datum.comment, object.getComment(), stringResult))
 			{
 				object.setComment(stringResult.getValue());
 				getEditorFrame().documentIsModified = true;
