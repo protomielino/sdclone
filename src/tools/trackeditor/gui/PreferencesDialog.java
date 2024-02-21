@@ -35,6 +35,7 @@ public class PreferencesDialog extends JDialog
 	private JCheckBox			interactiveFixesCheckBox	= null;
 	private JCheckBox			cursorCoordinatesCheckBox	= null;
 	private JCheckBox			cursorNamesCheckBox			= null;
+	private JCheckBox			checkDefaultObjectsCheckBox	= null;
 	private JButton				okButton					= null;
 	private JButton				cancelButton				= null;
 
@@ -98,6 +99,7 @@ public class PreferencesDialog extends JDialog
 			jPanel.add(getInteractiveFixesCheckBox(), null);
 			jPanel.add(getCursorCoordinatesCheckBox(), null);
 			jPanel.add(getCursorNamesCheckBox(), null);
+			jPanel.add(getCheckDefaultObjectsCheckBox(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
 		}
@@ -301,6 +303,18 @@ public class PreferencesDialog extends JDialog
 		return cursorNamesCheckBox;
 	}
 
+	private JCheckBox getCheckDefaultObjectsCheckBox()
+	{
+		if (checkDefaultObjectsCheckBox == null)
+		{
+			checkDefaultObjectsCheckBox = new JCheckBox();
+			checkDefaultObjectsCheckBox.setBounds(200, 205, 290, 23);
+			checkDefaultObjectsCheckBox.setText("Check Default Objects");
+			checkDefaultObjectsCheckBox.setSelected(editorFrame.getCheckDefaultObjects());
+		}
+		return checkDefaultObjectsCheckBox;
+	}
+
 	private JButton getOkButton()
 	{
 		if (okButton == null)
@@ -392,6 +406,11 @@ public class PreferencesDialog extends JDialog
 	public boolean getCursorNames()
 	{
 		return getCursorNamesCheckBox().isSelected();
+	}
+
+	public boolean getCheckDefaultObjects()
+	{
+		return getCheckDefaultObjectsCheckBox().isSelected();
 	}
 
 	protected void processWindowEvent(WindowEvent e)

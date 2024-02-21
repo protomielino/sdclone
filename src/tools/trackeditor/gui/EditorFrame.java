@@ -246,6 +246,8 @@ public class EditorFrame extends JFrame
 	private final static String	CURSOR_COORDINATES					= "CursorCoordinates";
 	private boolean				cursorNames							= false;
 	private final static String	CURSOR_NAMES						= "CursorNames";
+	private boolean				checkDefaultObjects					= false;
+	private final static String	CHECK_DEFAULT_OBJECTS				= "CheckDefaultObjects";
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
@@ -388,6 +390,7 @@ public class EditorFrame extends JFrame
 		interactiveFixes = preferences.getBoolean(INTERACTIVE_FIXES, false);
 		cursorCoordinates = preferences.getBoolean(CURSOR_COORDINATES, false);
 		cursorNames = preferences.getBoolean(CURSOR_NAMES, false);
+		checkDefaultObjects = preferences.getBoolean(CHECK_DEFAULT_OBJECTS, false);
 
 		if (dataDirectory == null)
 		{
@@ -544,6 +547,18 @@ public class EditorFrame extends JFrame
 		cursorNames = value;
 
 		preferences.putBoolean(CURSOR_NAMES, cursorNames);
+	}
+
+	public boolean getCheckDefaultObjects()
+	{
+		return checkDefaultObjects;
+	}
+
+	public void setCheckDefaultObjects(boolean value)
+	{
+		checkDefaultObjects = value;
+
+		preferences.putBoolean(CHECK_DEFAULT_OBJECTS, checkDefaultObjects);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -1410,6 +1425,7 @@ public class EditorFrame extends JFrame
 			setInteractiveFixes(preferencesDialog.getInteractiveFixes());
 			setCursorCoordinates(preferencesDialog.getCursorCoordinates());
 			setCursorNames(preferencesDialog.getCursorNames());
+			setCheckDefaultObjects(preferencesDialog.getCheckDefaultObjects());
 			readDefaultSurfaces();
 			readDefaultObjects();
 			view.redrawCircuit();

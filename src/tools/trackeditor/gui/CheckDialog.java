@@ -1194,9 +1194,13 @@ public class CheckDialog extends JDialog
 		{
 			checkTrackObject(trackData.getObjects().get(i), "Track");
 		}
-		for (int i = 0; i < defaultObjects.size(); i++)
+
+		if (editorFrame.getCheckDefaultObjects())
 		{
-			checkTrackObject(defaultObjects.get(i), "Default");
+			for (int i = 0; i < defaultObjects.size(); i++)
+			{
+				checkTrackObject(defaultObjects.get(i), "Default");
+			}
 		}
 	}
 	private File findTextureFile(String texture)
