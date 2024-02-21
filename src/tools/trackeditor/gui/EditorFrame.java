@@ -2347,6 +2347,20 @@ public class EditorFrame extends JFrame
 
 	private void exportAc3d(String additionalArgs)
 	{
+		//check for graphic objects with same name
+		Vector<GraphicObject> graphicObjects = trackData.getGraphicObjects();
+		for (int i = 0; i < graphicObjects.size() - 1; i++)
+		{
+			for (int j = i + 1; j < graphicObjects.size(); j++)
+			{
+				if (graphicObjects.get(i).getName().equals(graphicObjects.get(j).getName()))
+				{
+					JOptionPane.showMessageDialog(this, "Graphic Objects has duplicate name: " + graphicObjects.get(i).getName(), "Exporting AC3", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
+		}
+
 		String reliefBorder = getTrackData().getGraphic().getTerrainGeneration().getReliefBorder();
 		String newArgs = additionalArgs;
 		if (reliefBorder !=  null && reliefBorder.equals("yes"))
