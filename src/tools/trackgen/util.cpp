@@ -180,7 +180,7 @@ getTrackAngle(tTrack *Track, void *TrackHandle, float x, float y)
     curPos.toStart+=0.001;
     RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOMIDDLE);
     angle=90.0-atan2f(x2-x3,y2-y3)*180/PI;
-    printf("calculated angle%g\n",angle);
+    printf("calculated angle: %g\n",angle);
     RtTrackGlobal2Local(seg, x, y, &objPos, 0);
     if ( objPos.toMiddle < 0 ) {angle-=180.0;}
     return angle;

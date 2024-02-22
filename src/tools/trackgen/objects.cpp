@@ -217,11 +217,13 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             float           z = 0;
             tdble           orientation = 0;
             tdble           height = 0;
+            std::string     name;
             
             if (individual)
             {
                 orientation = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0);
                 height = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_HEIGHT, "m", 0);
+                name = GfParmListGetCurEltName(trackHandle, TRK_SECT_TERRAIN_OBJECTS);
             }
 
             Ac3d obj(curObj.ac3d);
@@ -284,14 +286,25 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
 
                     if (z == -1000000.0f)
                     {
-                        printf("WARNING: failed to find elevation for object %s: x: %g y: %g z: %g (track x: %g track y: %g)\n",
-                            curObj.fileName.c_str(), x, y, z, x - trackOffsetX, y - trackOffsetY);
+                        if (individual)
+                        {
+                            printf("WARNING: failed to find elevation object: %s x: %g y: %g (track x: %g track y: %g)\n",
+                                name.c_str(), x, y, x - trackOffsetX, y - trackOffsetY);
+                        }
+                        else
+                        {
+                            printf("WARNING: failed to find elevation object: %s x: %g y: %g (track x: %g track y: %g)\n",
+                                curObj.fileName.c_str(), x, y, x - trackOffsetX, y - trackOffsetY);
+                        }
                         return;
                     }
                 }
             }
 
-            printf("placing object %s: x: %g y: %g z: %g \n", curObj.fileName.c_str(), x, y, z);
+            if (individual)
+                printf("placing object: %s x: %g y: %g z: %g \n", name.c_str(), x, y, z);
+            else
+                printf("placing object: %s x: %g y: %g z: %g \n", curObj.fileName.c_str(), x, y, z);
             m.makeRotation(angle + orientation, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
             obj.transform(m);
 
