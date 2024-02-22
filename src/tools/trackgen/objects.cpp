@@ -70,6 +70,7 @@ struct objdef
     tdble           scaleMin = 0;
     tdble           scaleMax = 0;
     std::string     fileName;
+    std::string     name;
 };
 
 std::vector<objdef> objects;
@@ -114,6 +115,8 @@ InitObjects(tTrack *track, void *TrackHandle)
             GfError("Missing %s in section %s/%s", TRK_ATT_OBJECT, TRK_SECT_OBJECTS, GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS));
             exit(1);
         }
+
+        curObj->name = GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS);
 
         char filename[1024];
         if (!GetFilename(objName, modelPath.c_str(), filename, sizeof(filename)))
@@ -225,6 +228,8 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
                 height = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_HEIGHT, "m", 0);
                 name = GfParmListGetCurEltName(trackHandle, TRK_SECT_TERRAIN_OBJECTS);
             }
+            else
+                name = curObj.name;
 
             Ac3d obj(curObj.ac3d);
 
@@ -288,13 +293,13 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
                     {
                         if (individual)
                         {
-                            printf("WARNING: failed to find elevation object: %s x: %g y: %g (track x: %g track y: %g)\n",
+                            printf("WARNING: failed to find elevation for individual object: %s x: %g y: %g (track x: %g track y: %g)\n",
                                 name.c_str(), x, y, x - trackOffsetX, y - trackOffsetY);
                         }
                         else
                         {
-                            printf("WARNING: failed to find elevation object: %s x: %g y: %g (track x: %g track y: %g)\n",
-                                curObj.fileName.c_str(), x, y, x - trackOffsetX, y - trackOffsetY);
+                            printf("WARNING: failed to find elevation for object map object: %s x: %g y: %g (track x: %g track y: %g)\n",
+                                name.c_str(), x, y, x - trackOffsetX, y - trackOffsetY);
                         }
                         return;
                     }
@@ -302,9 +307,9 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             }
 
             if (individual)
-                printf("placing object: %s x: %g y: %g z: %g \n", name.c_str(), x, y, z);
+                printf("placing individual object: %s x: %g y: %g z: %g \n", name.c_str(), x, y, z);
             else
-                printf("placing object: %s x: %g y: %g z: %g \n", curObj.fileName.c_str(), x, y, z);
+                printf("placing object map object: %s x: %g y: %g z: %g \n", name.c_str(), x, y, z);
             m.makeRotation(angle + orientation, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0));
             obj.transform(m);
 
