@@ -53,6 +53,7 @@ public class Project
 	private int propertiesEditorObjectTab = 0;
 	private int propertiesEditorCameraTab = 0;
 	private int propertiesEditorLightTab = 0;
+	private int propertiesEditorTerrainTab = 0;
 	
 	public Project()
 	{
@@ -324,5 +325,15 @@ public class Project
 	public void setPropertiesEditorLightTab(int propertiesEditorLightTab)
 	{
 		this.propertiesEditorLightTab = propertiesEditorLightTab;
+	}
+
+	public int getPropertiesEditorTerrainTab()
+	{
+		return propertiesEditorTerrainTab;
+	}
+
+	public void setPropertiesEditorTerrainTab(int propertiesEditorTerrainTab)
+	{
+		this.propertiesEditorTerrainTab = propertiesEditorTerrainTab;
 	}
 }

@@ -33,6 +33,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import gui.EditorFrame;
@@ -472,6 +473,16 @@ public class TerrainProperties extends PropertyPanel
 			tabbedPane.addTab("Objects", null, new GraphicObjectProperties(getEditorFrame()));
 			tabbedPane.addTab("Object Maps", null, new ObjectMapProperties(getEditorFrame()));
 			tabbedPane.addTab("Reliefs", null, new ReliefProperties(getEditorFrame()));
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
+				{
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorTerrainTab();
+
+					if (lastTab < tabbedPane.getTabCount())
+						tabbedPane.setSelectedIndex(lastTab);
+				}
+			});
 		}
 		return tabbedPane;
 	}
@@ -606,5 +617,7 @@ public class TerrainProperties extends PropertyPanel
 		Component component2 = tabbedPane.getComponentAt(2);
 		ReliefProperties properties2 = (ReliefProperties)component2;
 		properties2.exit();
+
+		getEditorFrame().getProject().setPropertiesEditorTerrainTab(this.tabbedPane.getSelectedIndex());
 	}
  } //  @jve:decl-index=0:visual-constraint="10,10"
