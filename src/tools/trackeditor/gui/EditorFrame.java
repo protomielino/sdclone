@@ -3115,6 +3115,8 @@ public class EditorFrame extends JFrame
 				"Read Track", JOptionPane.ERROR_MESSAGE);				
 		}
 		refresh();
+		
+		setTitle(originalTitle + " - Project: " + file.getAbsolutePath());
 	}
 
     /**
