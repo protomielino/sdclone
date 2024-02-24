@@ -3063,8 +3063,10 @@ public class EditorFrame extends JFrame
 		fc.setApproveButtonMnemonic(0);
 		fc.setDialogTitle("Import track from Xml");
 		fc.setVisible(true);
-		fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
-		//fc.setCurrentDirectory(new File("/usr/share/games/torcs/tracks"));
+		String trackDir = preferences.get(SD_DATA_DIRECTORY, null);
+		if (trackDir == null)
+			trackDir = System.getProperty("user.dir");
+		fc.setCurrentDirectory(new File(trackDir + "/tracks"));
 		CustomFileFilter filter = new CustomFileFilter();
 		
 		filter.addValid(".xml");
