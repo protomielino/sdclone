@@ -478,9 +478,14 @@ public class TerrainProperties extends PropertyPanel
 				public void run()
 				{
 					int lastTab = getEditorFrame().getProject().getPropertiesEditorTerrainTab();
-
+					if (lastTab == -1 && tabbedPane.getTabCount() > 0)
+					{
+						lastTab = 0;
+					}
 					if (lastTab < tabbedPane.getTabCount())
+					{
 						tabbedPane.setSelectedIndex(lastTab);
+					}
 				}
 			});
 		}

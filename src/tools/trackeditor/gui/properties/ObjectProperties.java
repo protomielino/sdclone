@@ -247,9 +247,14 @@ public class ObjectProperties extends PropertyPanel
 				public void run()
 				{
 					int lastTab = getEditorFrame().getProject().getPropertiesEditorObjectTab();
-
+					if (lastTab == -1 && tabbedPane.getTabCount() > 0)
+					{
+						lastTab = 0;
+					}
 					if (lastTab < tabbedPane.getTabCount())
+					{
 						tabbedPane.setSelectedIndex(lastTab);
+					}
 				}
 			});
 		}

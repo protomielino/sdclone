@@ -234,10 +234,15 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				public void run()
 				{
-					int lastTab = getEditorFrame().getProject().getPropertiesEditorSurfaceTab();
-
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorSurfaceTab();					
+					if (lastTab == -1 && tabbedPane.getTabCount() > 0)
+					{
+						lastTab = 0;
+					}
 					if (lastTab < tabbedPane.getTabCount())
+					{
 						tabbedPane.setSelectedIndex(lastTab);
+					}
 				}
 			});
 		}

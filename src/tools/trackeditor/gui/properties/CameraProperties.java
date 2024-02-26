@@ -150,9 +150,14 @@ public class CameraProperties extends PropertyPanel
 				public void run()
 				{
 					int lastTab = getEditorFrame().getProject().getPropertiesEditorCameraTab();
-
+					if (lastTab == -1 && tabbedPane.getTabCount() > 0)
+					{
+						lastTab = 0;
+					}
 					if (lastTab < tabbedPane.getTabCount())
+					{
 						tabbedPane.setSelectedIndex(lastTab);
+					}
 				}
 			});
 		}
