@@ -626,7 +626,10 @@ public class EditorFrame extends JFrame
 		fc.setApproveButtonMnemonic(0);
 		fc.setDialogTitle("Project path selection");
 		fc.setVisible(true);
-		fc.setCurrentDirectory(new File(System.getProperty("user.dir") +sep+ "tracks"));
+		String trackDir = preferences.get(SD_DATA_DIRECTORY, null);
+		if (trackDir == null)
+			trackDir = System.getProperty("user.dir");
+		fc.setCurrentDirectory(new File(trackDir + sep + "tracks"));
 		CustomFileFilter filter = new CustomFileFilter();
 		filter.addValid(".prj.xml");
 		filter.setDescription("*.prj.xml");
@@ -3066,7 +3069,7 @@ public class EditorFrame extends JFrame
 		String trackDir = preferences.get(SD_DATA_DIRECTORY, null);
 		if (trackDir == null)
 			trackDir = System.getProperty("user.dir");
-		fc.setCurrentDirectory(new File(trackDir + "/tracks"));
+		fc.setCurrentDirectory(new File(trackDir + sep + "tracks"));
 		CustomFileFilter filter = new CustomFileFilter();
 		
 		filter.addValid(".xml");
