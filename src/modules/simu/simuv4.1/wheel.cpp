@@ -914,6 +914,15 @@ void SimWheelUpdateTire(tCar *car, int index)
 		slip = slip;
 	}
 
+	if (normalForce >= wheel->opLoad * 2)
+	{
+		normalForce = wheel->opLoad * 2;
+	}
+	else 
+	{
+		normalForce = normalForce;
+	}
+
     // Calculate factor for energy which is turned into heat, according papers this seems to be pretty constant
     // for a specific construction and constant slip (empiric value with model validation, called hysteresis).
     // A value of 0.1 is available in papers, so for 10% slip I head for 0.1, where 0.05 come from rolling and
@@ -1004,7 +1013,7 @@ void SimWheelUpdateTire(tCar *car, int index)
     wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
 
     // Wear
-    double deltaWear = (wheel->currentPressure - SimAirPressure) * skidSlip * wheelSpeed * SimDeltaTime * normalForce
+    double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * normalForce
             * wheel->wearFactor * 0.00000000000009;
 
     wheel->currentWear += deltaWear;
