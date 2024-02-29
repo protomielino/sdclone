@@ -305,6 +305,8 @@ void SimWheelConfig(tCar *car, int index)
     carElt->_tyreT_out(index) = wheel->Ttire;
     carElt->_tyreCondition(index) = 1.0;
     carElt->_tyreTreadDepth(index) = wheel->treadDepth;
+	carElt->_tyreCurrentPressure(index) = wheel->pressure;
+	carElt->_tyreCompound(index) = wheel->tireSet;
 
     wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
     wheel->mfB = Ca / wheel->mfC;
@@ -660,7 +662,7 @@ void SimWheelUpdateForce(tCar *car, int index)
     mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * wheel->forces.z / wheel->opLoad));
 
     //temperature and degradation
-    if (car->features & FEAT_TIRETEMPDEG)
+	if (car->features & FEAT_TIRETEMPDEG)
     {
         tireCond = wheel->currentGripFactor;
         mu *= tireCond;
@@ -875,15 +877,16 @@ void SimUpdateFreeWheels(tCar *car, int axlenb)
 
 void SimWheelUpdateTire(tCar *car, int index)
 {
-    if (car->carElt->info.skillLevel <= 3)
-    {
-        return;
-    }
+	if (car->carElt->info.skillLevel <= 3)
+	{
+		return;
+	}
 
     tWheel *wheel = &(car->wheel[index]);
 
     tdble normalForce = wheel->forces.z;
     tdble slip = wheel->tireSlip;
+	tdble skidSlip = wheel->tireSlip;
 	tdble lateralForce = fabs(wheel->forces.y);
 	tdble longForce = fabs(wheel->forces.x);
 	tdble absForce2 = fabs(normalForce * 0.5);
@@ -895,6 +898,17 @@ void SimWheelUpdateTire(tCar *car, int index)
     tdble wheelSpeed = fabs(wheel->spinVel * wheel->radius);
     tdble deltaTemperature = wheel->Ttire - Tair;
 
+	// Normalize slip. Not realistic, but prevents extreme spiking when high wheelspin occurs
+	// when trying to recover from bumpy surfaces such as gravel traps.
+	if (slip >= 1)
+	{
+		slip = 1;
+	}
+	else
+	{
+		slip = slip;
+	}
+
     // Calculate factor for energy which is turned into heat, according papers this seems to be pretty constant
     // for a specific construction and constant slip (empiric value with model validation, called hysteresis).
     // A value of 0.1 is available in papers, so for 10% slip I head for 0.1, where 0.05 come from rolling and
@@ -904,6 +918,27 @@ void SimWheelUpdateTire(tCar *car, int index)
 
     // Calculate energy input for the tire
     tdble energyGain =  normalForce * wheelSpeed * SimDeltaTime * hysteresis;
+
+	// Normalize lateral and longitudinal forces if they peak too far past the operating threshold.
+	// This is done to (slightly) even out tire heating so huge differences in tire pressure are not necessary
+	// for cars with a lot of weight on one axle or the other.
+	if (lateralForce >= wheel->opLoad * 2)
+	{
+		lateralForce = wheel->opLoad * 2;
+	}
+	else
+	{
+		lateralForce = lateralForce;
+	}
+
+	if (longForce >= wheel->opLoad * 2)
+	{
+		longForce = wheel->opLoad * 2;
+	}
+	else
+	{
+		longForce = lateralForce;
+	}
 
 	// Modifiers for energy input from lateral and longitudinal forces.
 	latMod = ((lateralForce * absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
@@ -964,7 +999,7 @@ void SimWheelUpdateTire(tCar *car, int index)
     wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
 
     // Wear
-    double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * normalForce
+    double deltaWear = (wheel->currentPressure - SimAirPressure) * skidSlip * wheelSpeed * SimDeltaTime * normalForce
             * wheel->wearFactor * 0.00000000000009;
 
     wheel->currentWear += deltaWear;
