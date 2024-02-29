@@ -187,6 +187,7 @@ private:
 
     // Configuration file constants
     double mFuelperMeter;
+	double driver_aggromult;
     int    mPitDamage;
     double mPitGripFactor;
     double mPitEntryMargin;

@@ -19,6 +19,7 @@
 #include "Vec2.h"
 #include "Vec2d.h"
 #include "Utils.h"
+#include "driver.h"
 
 #include <portability.h>
 

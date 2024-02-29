@@ -48,8 +48,8 @@ Driver::Driver(int index) :
     mRain(0),
     driver_aggression(1.0),
     mGarage(false),
-    mFrontCollMargin(6.0),
-    mOvtMargin(2.0)
+    mFrontCollMargin(6.0 - driver_aggression),
+    mOvtMargin(2.0 - driver_aggression)
 
 {
     // Names assigned in constructor for VS 2013 compatibility
@@ -139,6 +139,18 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     mClothFactor = param.getNum("private", "clothoidfactor");
     mVMaxK = param.getNum("private", "vmaxk");
     mVMaxKFactor = param.getNum("private", "vmaxkfactor");
+	driver_aggromult = param.getNum("private", "Aggression Mult");
+
+	// Track and car-specific Aggression multiplier,
+	// to make certain car classes overtake more aggressively
+	if (driver_aggromult == NULL)
+	{
+		driver_aggromult = 0.0;
+	}
+
+	//get "angry" with increasing time
+	double anger_limit;
+	anger_limit = 0;
 
     if (mVMaxK == 0.0)
         mVMaxK = 0.0018;
@@ -768,7 +780,7 @@ double Driver::getBrake(double maxspeed) const
         brakepedal = 0.0;
     }
 
-    brakepedal *= driver_aggression;
+    //brakepedal *= driver_aggression;
 
     return brakepedal;
 }
@@ -798,11 +810,11 @@ double Driver::getAccel(double maxspeed)
 
     if (m[LET_PASS])
     {
-        accel *= 0.5;
+        accel *= 0.5 + (driver_aggression * 0.25);
     }
     else if (mOpps.mateFrontAside())
     {
-        accel *= 0.7;
+        accel *= 0.7 + (driver_aggression * 0.25);
     }
 
     // LR tire friction unbalanced (grass on border)
@@ -1010,7 +1022,7 @@ void Driver::updateLetPass()
     {
         if (mOpps.oppNear() != mOpps.oppLetPass())
         {
-            if (fabs(mOpps.oppNear()->dist()) < 3.0)
+            if (fabs(mOpps.oppNear()->dist()) < 3.0 - driver_aggression)
             {
                 m[LET_PASS] = false;
 
@@ -1022,7 +1034,7 @@ void Driver::updateLetPass()
     // Check for bad conditions
     if (!m[LET_PASS])
     {
-        if (m[DRIVING_FAST] || mCar.v() > mOpps.oppLetPass()->v() + 5.0)
+        if (m[DRIVING_FAST] || mCar.v() > mOpps.oppLetPass()->v() + 5.0 - driver_aggression)
         {
             return;
         }
@@ -1063,7 +1075,7 @@ void Driver::setDrvPath(PathType path)
                     double dist = mOpps.oppNear()->dist();
 
                     if ((dist < 100.0 && dist > 10)
-                            || (dist <= 10 && dist >= 0.0 && fabs(mOpps.oppNear()->sideDist()) > 4.0)
+                            || (dist <= 10 && dist >= 0.0 && fabs(mOpps.oppNear()->sideDist()) > 4.0 - driver_aggression)
                             || (dist < 0.0))
                     {
                         return;
@@ -1176,10 +1188,10 @@ bool Driver::overtakeOpponent()
     double maxdist = std::min(50.0, mFrontCollMargin + 5.0 + mCar.v());
     double dist = mOpps.oppNear()->dist();
     if (dist < maxdist && dist > mOvtMargin / 2.0
-            && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 5.0)))
+            && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 2.0)))
     {
-        if ((((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())) && (!mOpps.oppNear()->teamMate() || mOpps.oppNear()->backMarker()))
-             || (m[OVERTAKE] && dist < mFrontCollMargin + 10.0 && mCar.v() > mOpps.oppNear()->v() - 2.0)
+        if ((((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())))
+             || (m[OVERTAKE] && dist < mFrontCollMargin + 8.0 && mCar.v() > mOpps.oppNear()->v() - 4.0 - (driver_aggression))
              || (mOpps.oppNear()->v() < 20.0 && dist < mFrontCollMargin + 20.0))
                 && (!(!m[OVERTAKE] && m[DRIVING_FAST])))
         {
@@ -1193,14 +1205,14 @@ bool Driver::overtakeOpponent()
         m[OVERTAKE] = false;
     }
     // If aside always overtake
-    if (dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -3.0
-            && (fabs(mOpps.oppNear()->sideDist()) < 4.0 || mDrvPath != PATH_O))
+    if (dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -4.0 - (driver_aggression)
+            && (fabs(mOpps.oppNear()->sideDist()) < 4.0 + driver_aggression || mDrvPath != PATH_O))
     {
         m[OVERTAKE] = true;
     }
 
     // If in front and on raceline stay there
-    if (dist < 0.0 && mDrvPath == PATH_O)
+    if (dist < -5.0 && mDrvPath == PATH_O)
     {
         m[OVERTAKE] = false;
     }
@@ -1216,14 +1228,15 @@ void Driver::updateOvertakePath()
     }
 
     // Normal overtaking
-    if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 0.5)
-            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 10.0))
+    if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 1.0 - (driver_aggression * 0.1))
+            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 2.5 - (driver_aggression)))
     {
         // Stay on your side when there is enough space
         double righttomiddle = mPath[PATH_R].toMiddle(mOpps.oppNear()->fromStart());
         double lefttomiddle = mPath[PATH_L].toMiddle(mOpps.oppNear()->fromStart());
-        bool rightfree = fabs(righttomiddle - mOpps.oppNear()->toMiddle()) > 3.0;
-        bool leftfree = fabs(lefttomiddle - mOpps.oppNear()->toMiddle()) > 3.0;
+        bool rightfree = fabs(righttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 + driver_aggression * 2;
+        bool leftfree = fabs(lefttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 + driver_aggression * 2;
+
         if (mOpps.oppNear()->leftOfMe())
         {
             if (!(rightfree || leftfree))
@@ -1489,12 +1502,12 @@ void Driver::updateDrivingFast()
     }
     else
     {
-        factor = 0.9;
+        factor = 1.50;
     }
 
     if (mDrvPath == PATH_O)
     {
-        m[DRIVING_FAST] = mCar.v() > factor * pathSpeed(mOvertakePath);
+        m[DRIVING_FAST] = mCar.v() * (1 + (driver_aggression*0.1)) > factor * pathSpeed(mOvertakePath);
     }
     else
     {
@@ -1516,17 +1529,17 @@ double Driver::frontCollFactor(Opponent* opp)
     {
         if ((m[OVERTAKE] || mCar.v() - opp->v() < 10.0) && !m[DRIVING_FAST])
         {
-            factor = 0.5;
+            factor = 0.5 + (driver_aggression * 0.1);
         }
 
         if (mCar.v() - opp->v() > 10.0 && m[DRIVING_FAST])
         {
-            factor = 1.5;
+            factor = 1.5 + (driver_aggression * 0.1);
         }
 
         if (fabs(opp->angle()) > 1.5 || fabs(opp->v()) < 2.0)
         {
-            factor = 2.0;
+            factor = 2.0 + (driver_aggression * 0.1);
         }
 
         if (mCar.v() < 2.0)
@@ -1547,16 +1560,18 @@ void Driver::calcMaxspeed()
         if (mDrvPath != PATH_O)
         {
             mMaxspeed = pathSpeed(PATH_R) + 0.5 * (mLRTargetPortion + 1.0) * (pathSpeed(PATH_L) - pathSpeed(PATH_R));
+			mMaxspeed *= 1 + ((driver_aggression) * driver_aggromult);
         }
         else
         {
             mMaxspeed = pathSpeed(mDrvPath);
+			//mMaxspeed *= 1 + (driver_aggression * 0.01);
         }
 
         // Special cases
         if (mPit.pitstop())
         {
-            mMaxspeed = mPitEntrySpeed; // pre pit entry
+            mMaxspeed = mPitEntrySpeed * 0.75; // pre pit entry
         }
 
         if (fabs(mCar.angToTrack()) > 1.0)
