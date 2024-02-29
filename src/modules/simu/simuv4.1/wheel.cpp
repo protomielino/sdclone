@@ -662,11 +662,16 @@ void SimWheelUpdateForce(tCar *car, int index)
     mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * wheel->forces.z / wheel->opLoad));
 
     //temperature and degradation
-	if (car->features & FEAT_TIRETEMPDEG)
+	if (car->features & FEAT_TIRETEMPDEG && car->carElt->_skillLevel > 3)
     {
         tireCond = wheel->currentGripFactor;
         mu *= tireCond;
     }
+	else
+	{
+		tireCond = 1;
+		mu *= tireCond;
+	}
 
     F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * (1.0f + 0.05f * sin((-wheel->staticPos.ax + camberDelta) * 18.0f));	/* coeff */
 
