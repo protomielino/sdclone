@@ -531,37 +531,46 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						getBarrierWidthSlider().setValue(side.getBarrierWidth());
 						break;
 					case "fence":
-						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
-						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
-						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-						getBarrierSurfaceComboBox().setEnabled(true);
-						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
-						getBarrierHeightSlider().setEnabled(true);
-						getBarrierHeightSlider().setValue(side.getBarrierHeight());
-						getBarrierWidthSlider().setEnabled(true);
-						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						if (!oldStyle.equals("fence1") && !oldStyle.equals("fence2"))
+						{
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+							getBarrierSurfaceComboBox().setEnabled(true);
+							getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+							getBarrierHeightSlider().setEnabled(true);
+							getBarrierHeightSlider().setValue(side.getBarrierHeight());
+							getBarrierWidthSlider().setEnabled(true);
+							getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						}
 						break;
 					case "fence1":
-						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
-						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
-						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-						getBarrierSurfaceComboBox().setEnabled(true);
-						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
-						getBarrierHeightSlider().setEnabled(true);
-						getBarrierHeightSlider().setValue(side.getBarrierHeight());
-						getBarrierWidthSlider().setEnabled(true);
-						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						if (!oldStyle.equals("fence") && !oldStyle.equals("fence2"))
+						{
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+							getBarrierSurfaceComboBox().setEnabled(true);
+							getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+							getBarrierHeightSlider().setEnabled(true);
+							getBarrierHeightSlider().setValue(side.getBarrierHeight());
+							getBarrierWidthSlider().setEnabled(true);
+							getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						}
 						break;
 					case "fence2":
-						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
-						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
-						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
-						getBarrierSurfaceComboBox().setEnabled(true);
-						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
-						getBarrierHeightSlider().setEnabled(true);
-						getBarrierHeightSlider().setValue(side.getBarrierHeight());
-						getBarrierWidthSlider().setEnabled(true);
-						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						if (!oldStyle.equals("fence") && !oldStyle.equals("fence1"))
+						{
+							side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+							side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+							side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+							getBarrierSurfaceComboBox().setEnabled(true);
+							getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+							getBarrierHeightSlider().setEnabled(true);
+							getBarrierHeightSlider().setValue(side.getBarrierHeight());
+							getBarrierWidthSlider().setEnabled(true);
+							getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						}
 						break;
 					}
 					parent.sideChanged();
