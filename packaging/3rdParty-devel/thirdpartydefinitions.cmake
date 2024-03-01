@@ -209,11 +209,11 @@ set(SQLITE3_URL https://www.sqlite.org/2024/${SQLITE3_FILE})
 set(SQLITE3_HASH SHA256=5592243caf28b2cdef41e6ab58d25d653dfc53deded8450eb66072c929f030c4)
 
 # GLM
-set(GLM_VERSION 1.0.0)
+set(GLM_VERSION 1.0.1)
 set(GLM_PROJECT glm-${GLM_VERSION})
 set(GLM_FILE ${GLM_PROJECT},tar.gz)
 set(GLM_URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.gz)
-set(GLM_HASH SHA256=e51f6c89ff33b7cfb19daafb215f293d106cd900f8d681b9b1295312ccadbd23)
+set(GLM_HASH SHA256=9f3174561fd26904b23f0db5e560971cbf9b3cbda0b280f04d5c379d03bf234c)
 
 # TinyGLTF 
 set(TINYGLTF_VERSION 2.8.21)
