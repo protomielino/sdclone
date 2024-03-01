@@ -248,6 +248,7 @@
 #define TRK_VAL_WALL                "wall"
 #define TRK_VAL_CURB                "curb"
 #define TRK_VAL_FENCE               "fence"
+#define TRK_VAL_FENCE1              "fence1"
 #define TRK_VAL_NO_BARRIER          "no barrier"
 
 
@@ -324,9 +325,11 @@ enum tSegStyle
 	TR_PLAN        = 0,      /**< Flat (border only) */
 	TR_CURB        = 1,      /**< Curb (border only) */
 	TR_WALL        = 2,      /**< Wall (border and barrier) */
-	TR_FENCE       = 3,      /**< Fence (no width) (barrier only) */
+	TR_FENCE       = 3,      /**< Fence (no width) (barrier only) (2 sided geometry) (texture mirrored on back side) */
 	TR_PITBUILDING = 4,      /**< Pit building wall (barrier only) */
-	TR_NO_BARRIER  = 5       /**< No Barrier (barrier only) */
+	TR_NO_BARRIER  = 5,      /**< No Barrier (barrier only) */
+	TR_FENCE1      = 6,      /**< Fence (no width) (barrier only) (1 sided geometry) (same texture on both sides) */
+	TR_FENCE2      = 7,      /**< Fence (no width) (barrier only) (1 sided geometry) (different texture on each side) */
 };
 
 /** Barrier */

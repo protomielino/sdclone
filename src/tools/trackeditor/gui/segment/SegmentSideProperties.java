@@ -75,7 +75,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 			"barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector		= new Vector<String>();
-	private String[]			barrierStyleItems		= {"none", "no barrier", "wall", "fence"};
+	private String[]			barrierStyleItems		= {"none", "no barrier", "wall", "fence", "fence1"};
 	private String[]			barrierSurfaceItems		=
 														{"barrier", "barrier2", "barrier-turn", "barrier-grille",
 			"wall", "wall2", "tire-wall", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both",
@@ -541,6 +541,17 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 						getBarrierWidthSlider().setEnabled(true);
 						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
 						break;
+					case "fence1":
+						side.setBarrierSurface(SegmentSide.DEFAULT_BARRIER_FENCE_SURFACE);
+						side.setBarrierHeight(SegmentSide.DEFAULT_BARRIER_FENCE_HEIGHT);
+						side.setBarrierWidth(SegmentSide.DEFAULT_BARRIER_FENCE_WIDTH);
+						getBarrierSurfaceComboBox().setEnabled(true);
+						getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+						getBarrierHeightSlider().setEnabled(true);
+						getBarrierHeightSlider().setValue(side.getBarrierHeight());
+						getBarrierWidthSlider().setEnabled(true);
+						getBarrierWidthSlider().setValueFrozen(side.getBarrierWidth());
+						break;
 					}
 					parent.sideChanged();
 				}
@@ -801,6 +812,9 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 					checkBarrierWall(segment, side);
 					break;
 				case "fence":
+					checkBarrierFence(segment, side);
+					break;
+				case "fence1":
 					checkBarrierFence(segment, side);
 					break;
 				case "plan":

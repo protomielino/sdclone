@@ -38,7 +38,7 @@ static const char *SectSide[2] = {TRK_SECT_RSIDE, TRK_SECT_LSIDE};
 static const char *SectBorder[2] = {TRK_SECT_RBORDER, TRK_SECT_LBORDER};
 static const char *SectBarrier[2] = {TRK_SECT_RBARRIER, TRK_SECT_LBARRIER};
 
-static const char *ValStyle[] = {TRK_VAL_PLAN, TRK_VAL_CURB, TRK_VAL_WALL, TRK_VAL_FENCE, TRK_VAL_FENCE};
+static const char *ValStyle[] = {TRK_VAL_PLAN, TRK_VAL_CURB, TRK_VAL_WALL, TRK_VAL_FENCE, TRK_VAL_FENCE, TRK_VAL_FENCE1};
 
 static tdble sideEndWidth[2];
 static tdble sideStartWidth[2];
@@ -186,6 +186,11 @@ static void InitSides(void *TrackHandle, tTrack *theTrack)
             barrierStyle[side] = TR_FENCE;
             barrierWidth[side] = 0;
         }
+        else if (strcmp(style, TRK_VAL_FENCE1) == 0)
+        {
+            barrierStyle[side] = TR_FENCE1;
+            barrierWidth[side] = 0;
+        }
         else
         {
             barrierStyle[side] = TR_WALL;
@@ -272,6 +277,11 @@ static void AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int
             if (strcmp(style, TRK_VAL_FENCE) == 0)
             {
                 barrierStyle[side] = TR_FENCE;
+                barrierWidth[side] = 0;
+            }
+            else if (strcmp(style, TRK_VAL_FENCE1) == 0)
+            {
+                barrierStyle[side] = TR_FENCE1;
                 barrierWidth[side] = 0;
             }
             else if (strcmp(style, TRK_VAL_WALL) == 0)
