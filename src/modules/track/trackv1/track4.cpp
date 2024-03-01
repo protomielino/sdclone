@@ -191,6 +191,11 @@ static void InitSides(void *TrackHandle, tTrack *theTrack)
             barrierStyle[side] = TR_FENCE1;
             barrierWidth[side] = 0;
         }
+        else if (strcmp(style, TRK_VAL_FENCE2) == 0)
+        {
+            barrierStyle[side] = TR_FENCE2;
+            barrierWidth[side] = 0;
+        }
         else
         {
             barrierStyle[side] = TR_WALL;
@@ -282,6 +287,11 @@ static void AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int
             else if (strcmp(style, TRK_VAL_FENCE1) == 0)
             {
                 barrierStyle[side] = TR_FENCE1;
+                barrierWidth[side] = 0;
+            }
+            else if (strcmp(style, TRK_VAL_FENCE2) == 0)
+            {
+                barrierStyle[side] = TR_FENCE2;
                 barrierWidth[side] = 0;
             }
             else if (strcmp(style, TRK_VAL_WALL) == 0)

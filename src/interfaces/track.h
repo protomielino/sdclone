@@ -249,6 +249,7 @@
 #define TRK_VAL_CURB                "curb"
 #define TRK_VAL_FENCE               "fence"
 #define TRK_VAL_FENCE1              "fence1"
+#define TRK_VAL_FENCE2              "fence2"
 #define TRK_VAL_NO_BARRIER          "no barrier"
 
 
