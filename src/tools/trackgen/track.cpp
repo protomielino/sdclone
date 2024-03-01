@@ -827,22 +827,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, .33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(-texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(-texLen, .33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                             break;
                         case 1:
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                            SETPOINT(texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(-texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(-texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             break;
                         case 2:
                             if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_WALL) ||
                                 (mseg->prev->rside->style == TR_WALL && (mseg->prev->rside->height < seg->height || mseg->prev->rside->width < seg->width)))
                             {
-                                SETPOINT(texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                                SETPOINT(texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                                SETPOINT(-texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                                SETPOINT(-texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                             }
-                            SETPOINT(texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
-                            SETPOINT(texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(-texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(-texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             break;
                         }
                         break;
@@ -909,22 +909,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1001,24 +1001,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1096,24 +1096,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1172,21 +1172,21 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(-texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(-texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
                         break;
                     case 1:
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                        SETPOINT(texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(-texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(-texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         break;
                     case 2:
-                        SETPOINT(texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(-texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(-texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_WALL) ||
                             (mseg->next->rside->style == TR_WALL && (mseg->next->rside->height < seg->height || mseg->next->rside->width < seg->width))))
                         {
-                            SETPOINT(texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                            SETPOINT(texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                            SETPOINT(-texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                            SETPOINT(-texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         }
                         break;
                     }
