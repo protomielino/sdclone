@@ -342,7 +342,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
         {
             float dammage = (float)((CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[carElt->_skillLevel]));
             dammage *= (float)(MIN(1.5, dammage / 500.0));
-            if (dammage < 10)
+            if (dammage < 100)
                 dammage = 0;
             car[i]->dammage += (int)(dammage);
         }
@@ -365,7 +365,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
             car[i]->VelColl.az = car[i]->DynGCg.vel.az + js * rpsign[i] * rpn[i] * car[i]->Iinv.z * ROT_K;
         }
 
-        static float VELMAX = 3.0f;
+        static float VELMAX = 2.25f;
         if (fabs(car[i]->VelColl.az) > VELMAX)
         {
             car[i]->VelColl.az = (tdble)(SIGN(car[i]->VelColl.az) * VELMAX);

@@ -104,6 +104,8 @@ typedef struct
 	tdble longHeatFactorC[6];		// Factor to adjust longtudinal friction heating for compounds 
 	tdble tireSpeedCoolFactor;		// Factor to adjust air speed cooling constant. Should be close to 1.0 for most cars.
 	tdble tireSpeedCoolFactorC[6];	// Factor to adjust air speed cooling constant per compound.
+	tdble tireTreadDrainFactor;		// Factor to adjust effective drain speed
+	tdble tireTreadDrainFactorC[6];		// Factor to adjust effective drain speed per compound
     tdble wearFactor;				// Factor to adjust the wear (model fitting), usually close to 1.0.
     tdble wearFactorC[6];               // Factor to adjust the wear for compounds
 

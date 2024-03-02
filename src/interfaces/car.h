@@ -771,6 +771,7 @@ typedef struct CarElt
 #define PRM_ALIGNTQFACTOR	"aligning torque factor"
 #define PRM_OPTTEMP			"optimal temperature"
 #define PRM_INITTEMP		"initial temperature"
+#define PRM_TREADDRAINSPD	"tread water drain speed"
 #define PRM_WEAR		    "wear"
 
 /* Compounds */
@@ -946,6 +947,12 @@ typedef struct CarElt
 #define VAL_DIFF_VISCOUS_COUPLER "VISCOUS COUPLER"
 #define VAL_DIFF_15WAY_LSD	"1.5 WAY LSD"
 #define VAL_DIFF_ELECTRONIC_LSD	"ELECTRONIC LSD"
+
+/* Fuel types */
+#define PRM_FUEL_TYPE		"Fuel Type"
+#define VAL_FUEL_BASIC		"Basic"
+#define VAL_FUEL_PETROL		"Petrol"
+#define VAL_FUEL_ELECTRIC	"Electric"
 
 typedef enum
 {
