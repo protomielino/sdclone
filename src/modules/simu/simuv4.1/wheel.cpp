@@ -910,14 +910,20 @@ void SimWheelUpdateTire(tCar *car, int index)
     tdble wheelSpeed = fabs(wheel->spinVel * wheel->radius);
     tdble deltaTemperature = wheel->Ttire - Tair;
 	tdble drainRate;
+	tdble drainCooling;
+	tdble hyperWearRatio;
 
+	// Tire Tread Drain Factor is a very simple/abstract approximation of a tire's ability
+	// to drain water from the tire as it passes through a wet surface.
 	if (SimRain > 0)
 	{
 		drainRate = wheel->tireTreadDrainFactor / SimRain;
+		drainCooling = SimRain / (wheel->tireTreadDrainFactor + 1);
 	}
 	else
 	{
 		drainRate = 1;
+		drainCooling = 0;
 	}
 
 	// Normalize slip. Not realistic, but prevents extreme spiking when high wheelspin occurs
@@ -994,7 +1000,7 @@ void SimWheelUpdateTire(tCar *car, int index)
     // Calculate energy loss of the tire (convection, convection model approximation from papers,
     // 5.9f + airspeed*3.7f [W/(meter*meter*Kelvin)]). Because the model is linear it is reasonable to apply
     // it to the whole tire at once (no subdivision in elements).
-    tdble energyLoss = (5.9f + wheelSpeed * 3.7f) * deltaTemperature * wheel->tireConvectionSurface * SimDeltaTime * (1 + (wheel->tireSpeedCoolFactor * 1.5));
+    tdble energyLoss = (5.9f + wheelSpeed * 3.7f) * deltaTemperature * wheel->tireConvectionSurface * SimDeltaTime * (1 + (wheel->tireSpeedCoolFactor * 1.5) + (drainCooling * 4));
 
     tdble deltaEnergy = (lockMod + energyMod + energyGain) - energyLoss;
 
@@ -1031,9 +1037,18 @@ void SimWheelUpdateTire(tCar *car, int index)
 	// Effect of temperature on live tire pressure
     wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
 
+	// Tire wear penalty when tire tread temp is far past optimal
+	if (wheel->Ttire > wheel->Topt + 20)
+	{
+		hyperWearRatio = 1 + (((wheel->Ttire - wheel->Topt + 20) / 2) * 0.5);
+	}
+	else
+	{
+		hyperWearRatio = 1;
+	}
     // Wear
     double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * normalForce
-            * wheel->wearFactor * 0.00000000000009;
+            * wheel->wearFactor * (hyperWearRatio) * 0.00000000000009;
 
     wheel->currentWear += deltaWear;
     if (wheel->currentWear > 1.0f)
