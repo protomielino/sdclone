@@ -772,6 +772,7 @@ typedef struct CarElt
 #define PRM_OPTTEMP			"optimal temperature"
 #define PRM_INITTEMP		"initial temperature"
 #define PRM_TREADDRAINSPD	"tread water drain speed"
+#define PRM_MUWET			"mu wet"
 #define PRM_WEAR		    "wear"
 
 /* Compounds */

@@ -140,25 +140,33 @@ void SimWheelConfig(tCar *car, int index)
     tireheight            = GfParmGetNum(hdle, WheelSect[index], PRM_TIREHEIGHT, (char*)NULL, -1.0f);
     tireratio             = GfParmGetNum(hdle, WheelSect[index], PRM_TIRERATIO, (char*)NULL, 0.75f);
     wheel->mu             = GfParmGetNum(hdle, WheelSect[index], PRM_MU, (char*)NULL, 1.0f);
+	wheel->muWet		  = GfParmGetNum(hdle, WheelSect[index], PRM_MUWET, (char*)NULL, 1.0f);
 
     if (car->features & FEAT_COMPOUNDS)
     {
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
         wheel->muC[1] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[1] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[1]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
         wheel->muC[2] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[2] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[2]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
         wheel->muC[3] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[3] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[3]);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
         wheel->muC[4] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[4] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[4] * 1.05);
 
         sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
         wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[5] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[5] * 1.05);
         GfLogInfo("# Simu MU compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
-                  wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]);
+                  wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]); 
+		GfLogInfo("# Simu MU WET compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
+					  wheel->muWetC[1], wheel->muWetC[2], wheel->muWetC[3], wheel->muWetC[4], wheel->muWetC[5]);
 
         /*if(SimRain < 1)
         {
@@ -197,6 +205,7 @@ void SimWheelConfig(tCar *car, int index)
     {
         wheel->tireSet = MIN(setupCompound->max, MAX(setupCompound->min, setupCompound->desired_value));
         wheel->mu = wheel->muC[wheel->tireSet];
+		wheel->muWet = wheel->muWetC[wheel->tireSet];
         wheel->hysteresisFactor = wheel->hysteresisFactorC[wheel->tireSet];
 		wheel->coolingFactor = wheel->coolingFactorC[wheel->tireSet];
 		wheel->latHeatFactor = wheel->latHeatFactorC[wheel->tireSet];
@@ -426,6 +435,7 @@ void SimWheelReConfig(tCar *car, int index)
         setupCompound->value = wheel->tireSet;
         setupCompound->changed = false;
         wheel->mu = wheel->muC[wheel->tireSet];
+		wheel->muWet = wheel->muWetC[wheel->tireSet];
         wheel->Tinit = wheel->TinitC[wheel->tireSet];
         wheel->Topt = wheel->ToptC[wheel->tireSet];
         wheel->hysteresisFactor = wheel->hysteresisFactorC[wheel->tireSet];
@@ -681,6 +691,13 @@ void SimWheelUpdateForce(tCar *car, int index)
 		mu *= tireCond;
 	}
 
+	// wet weather mu modifier
+	// using SimRain is incorrect for surface wetness, so this should be changed
+	if (car->features & FEAT_COMPOUNDS)
+	{
+		mu += ((SimRain / 3)*(wheel->muWet - wheel->mu));
+	}
+
     F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * (1.0f + 0.05f * sin((-wheel->staticPos.ax + camberDelta) * 18.0f));	/* coeff */
 
     /* aligning torque for force feedback */
@@ -912,6 +929,10 @@ void SimWheelUpdateTire(tCar *car, int index)
 	tdble drainRate;
 	tdble drainCooling;
 	tdble hyperWearRatio;
+	double gripLoss50 = 0.99;
+	double gripLoss75 = 0.95;
+	double gripLoss100 = 0.80;
+	bool isPunctured = false;
 
 	// Tire Tread Drain Factor is a very simple/abstract approximation of a tire's ability
 	// to drain water from the tire as it passes through a wet surface.
@@ -1099,6 +1120,38 @@ void SimWheelUpdateTire(tCar *car, int index)
 	}
 
     wheel->currentGripFactor =  ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f) * (1.0f - wheel->currentGraining / 10.0f);
+
+	// Tire grip drop-off from wear
+	if (isPunctured = false)
+	{
+		if (wheel->currentWear < 0.25)
+		{
+			wheel->currentGripFactor *= 1;
+		}
+		else if ((wheel->currentWear >= 0.25) && (wheel->currentWear < 0.5))
+		{
+			wheel->currentGripFactor *= 1 - (((wheel->currentWear - 0.25) / 0.5) * (1 - gripLoss50));
+		}
+		else if ((wheel->currentWear >= 0.5) && (wheel->currentWear < 0.75))
+		{
+			wheel->currentGripFactor *= gripLoss50 - (((wheel->currentWear - 0.5) / 0.25) * (1 - gripLoss75));
+		}
+		else
+		{
+			wheel->currentGripFactor *= gripLoss75 - (((wheel->currentWear - 0.75) / 0.25) * (1 - gripLoss100));
+		}
+	}
+
+	// Simulate tire punctures. Drop the grip to 50% 
+	// because metal-on-ground (ie. rim on road) contact 
+	// still generates some traction, just not a lot.
+	if (wheel->currentWear >= 1.0)
+	{
+		wheel->currentGripFactor = 0.5;
+		wheel->currentPressure = 0.0;
+		isPunctured = true;
+	}
+
     car->carElt->_tyreCondition(index) = wheel->currentGripFactor;
     car->carElt->_tyreT_in(index) = wheel->Ttire;
     car->carElt->_tyreT_mid(index) = wheel->Ttire;

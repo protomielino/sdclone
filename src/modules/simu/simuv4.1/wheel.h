@@ -66,6 +66,8 @@ typedef struct
     tdble  	radius;
     tdble  	mu;
     tdble   muC[6];     /* mu for compounds */
+	tdble  	muWet;		/* mu in wet weather */
+	tdble   muWetC[6];  /* wet weather mu for compounds */
     tdble  	I;       	/* I = inertial moment of the wheel */
     tdble  	curI;       /* Current inertia for the wheel (including transmission) */
     tdble	mfC;		/* Magic Formula C coeff */
