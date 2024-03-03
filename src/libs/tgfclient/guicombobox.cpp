@@ -139,16 +139,19 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	// Warning: All the arrow images are supposed to be the same size.
 	// TODO: Make image files customizable.
 	gfuiGrButtonInit(&combobox->leftButton,
-					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
-					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
+					 "data/img/arrowleft-disabled.png", "data/img/arrowleft-normal.png",
+					 "data/img/arrowleft-focused.png", "data/img/arrowleft-pushed.png",
 					 x, y, arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP,	 (void*)(long)(object->id), gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
-					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
-					 "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
+					 "data/img/arrowright-disabled.png", "data/img/arrowright-normal.png",
+					 "data/img/arrowright-focused.png", "data/img/arrowright-pushed.png",
 					 x + width - combobox->leftButton.width, y,
 					 arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP, (void*)(long)(object->id), gfuiRightArrow, 0, 0, 0);
+					 
+
+
 
 	// Compute total height (text or buttons)
 	int height = gfuiFont[font]->getHeight();
@@ -174,7 +177,19 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	gfuiLabelInit(&combobox->label, pszText, maxlen,
 				  x + combobox->leftButton.width, yl,
 				  width - 2 * combobox->leftButton.width, GFUI_ALIGN_HC,
-				  font, 0, fgColor, 0, fgFocusColor, 0, 0, 0);
+				  font, 0, fgColor, 0, fgFocusColor, "", 0, 0, 0);
+
+	//add a new "fake" button (it's only purpose is to serve as a background image for the label)
+	/*todo :we should implement a proper way to style this*/
+	gfuiGrButtonInit(&combobox->backgroundButton,
+					 "data/img/label-background.png"/*disabled*/, "data/img/label-background.png"/*normal*/,
+					 "data/img/label-background.png"/*focused */, "data/img/label-background.png"/*pushed*/,
+					 x + arrowsWidth, //x placement
+					 y, //y placement
+					 width - 2 * combobox->leftButton.width, //width
+					 arrowsHeight, //height: same as the arrows
+					 GFUI_MIRROR_NONE, 
+					 GFUI_MOUSE_UP, (void*)(long)(object->id), 0, 0, 0, 0);
 
 	// Add the combo control to the display list.
     gfuiAddObject(screen, object);
@@ -185,10 +200,12 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 void
 gfuiDrawCombobox(tGfuiObject *obj)
 {
+	gfuiGrButtonDraw(&obj->u.combobox.backgroundButton, obj->state, obj->focus);
 	gfuiLabelDraw(&obj->u.combobox.label,
 				  obj->focus ? obj->u.combobox.label.fgFocusColor : obj->u.combobox.label.fgColor);
 	gfuiGrButtonDraw(&obj->u.combobox.leftButton, obj->state, obj->focus);
 	gfuiGrButtonDraw(&obj->u.combobox.rightButton, obj->state, obj->focus);
+
 }
 
 static tGfuiCombobox*

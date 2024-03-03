@@ -73,6 +73,13 @@ typedef struct
 
     bool masked;    // show asterisks instead of text
 
+    //background image properies
+    GLuint bgImg;
+    int bgImgPaddingTop;
+    int bgImgPaddingBottom;
+    int bgImgPaddingLeft;
+    int bgImgPaddingRight;
+
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
@@ -206,6 +213,7 @@ typedef struct
     tGfuiLabel	label;
     tGfuiGrButton	leftButton;
     tGfuiGrButton	rightButton;
+    tGfuiGrButton	backgroundButton;
     void *scr;
     tComboBoxInfo *pInfo;
 
@@ -401,6 +409,7 @@ extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
                           int x, int y, int width, int align, int font,
                           const float *bgColor, const float *fgColor,
                           const float *bgFocusColor, const float *fgFocusColor,
+                          std::string  bgImgUrl,
                           void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern void gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
                              const char *focused, const char *pushed,

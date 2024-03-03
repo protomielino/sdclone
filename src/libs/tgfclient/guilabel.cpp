@@ -91,6 +91,7 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
               int x, int y, int width, int align, int font,
               const float *bgColor, const float *fgColor,
               const float *bgFocusColor, const float *fgFocusColor,
+              std::string bgImgUrl,
               void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     if (maxlen <= 0)
@@ -115,8 +116,10 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     label->userDataOnFocus = userDataOnFocus;
     label->onFocus = onFocus;
     label->onFocusLost = onFocusLost;
-
-    // GfLogDebug("gfuiLabelInit('%s', font %d) : height=%d\n", text, font, gfuiFont[font]->getHeight());
+    
+    if (!bgImgUrl.empty()){
+		label->bgImg = GfTexReadTexture(bgImgUrl.c_str());
+	}
 }
 
 /** Create a new label
@@ -144,6 +147,11 @@ int
 GfuiLabelCreate(void *scr, const char *text, int font, int x, int y,
                 int width, int align, int maxlen,
                 const float *fgColor, const float *fgFocusColor,
+                std::string backgrounImageUrl,
+                int bgImgPaddingTop,
+                int bgImgPaddingBottom,
+                int bgImgPaddingLeft,
+                int bgImgPaddingRight,
                 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiLabel	*label;
@@ -160,7 +168,13 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y,
     gfuiLabelInit(label, text, maxlen, x, y, width, align, font,
                   screen->bgColor.toFloatRGBA(), fgColor,
                   screen->bgColor.toFloatRGBA(), fgFocusColor,
+                  backgrounImageUrl,
                   userDataOnFocus, onFocus, onFocusLost);
+                  
+    label->bgImgPaddingTop = bgImgPaddingTop;
+    label->bgImgPaddingBottom = bgImgPaddingBottom;
+    label->bgImgPaddingLeft = bgImgPaddingLeft;
+    label->bgImgPaddingRight = bgImgPaddingRight;
 
     width = label->width;
     const int height = gfuiFont[font]->getHeight();
@@ -390,6 +404,41 @@ gfuiDrawLabel(tGfuiObject *obj)
         glVertex2i(obj->xmax, obj->ymin);
         glEnd();
     }
+    
+    //draw the bg image
+	if (label->bgImg)
+	{
+		const int x1 = obj->xmin - label->bgImgPaddingLeft;
+		const int x2 = obj->xmax + label->bgImgPaddingRight;
+		const int y1 = obj->ymin - label->bgImgPaddingBottom;
+		const int y2 = obj->ymax + label->bgImgPaddingTop;
+
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glColor3f(1.0, 1.0, 1.0); //set color to mix with image
+
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, label->bgImg);
+		glBegin(GL_QUADS);
+
+		glTexCoord2f(0.0, 0.0);
+		glVertex2i(x1, y1);
+
+		glTexCoord2f(0.0, 1.0);
+		glVertex2i(x1, y2);
+
+		glTexCoord2f(1.0, 1.0);
+		glVertex2i(x2, y2);
+
+		glTexCoord2f(1.0, 0.0);
+		glVertex2i(x2, y1);
+
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 
     // Draw the label text itself.
     gfuiLabelDraw(label, obj->focus ? label->fgFocusColor : label->fgColor);
@@ -404,5 +453,7 @@ gfuiReleaseLabel(tGfuiObject *obj)
 
     freez(label->userDataOnFocus);
     free(label->text);
+	GfTexFreeTexture(label->bgImg);
     free(obj);
+
 }

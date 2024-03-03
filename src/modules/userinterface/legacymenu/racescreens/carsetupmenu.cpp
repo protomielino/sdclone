@@ -34,6 +34,7 @@ This file deals with car setup
 
 #include "carsetupmenu.h"
 
+int currentFocusedIndex=0;
 
 // callback functions
 
@@ -92,6 +93,31 @@ void CarSetupMenu::onComboCallback(tComboBoxInfo *pInfo)
 
     pCarSetupMenu->onCombo(pInfo);
 }
+void CarSetupMenu::onPlusCallback(void *pInfo)
+{    
+    // Get the CarSetupMenu instance from call-back user data.
+    ComboCallbackData* pInfoDer = static_cast<ComboCallbackData*>(pInfo);
+    
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu::ComboCallbackData *>(pInfoDer)->menu;
+    int ctrlIndex = (pInfoDer)->index;
+    pCarSetupMenu->onPlus(ctrlIndex);
+}
+void CarSetupMenu::onMinusCallback(void *pInfo)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    ComboCallbackData* pInfoDer = static_cast<ComboCallbackData*>(pInfo);
+    
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu::ComboCallbackData *>(pInfoDer)->menu;
+    int ctrlIndex = (pInfoDer)->index;
+    pCarSetupMenu->onMinus(ctrlIndex);
+}
+/*
+void CarSetupMenu::onIncDecButtonFocusCallback(void *pIndex)
+{
+    GfLogInfo("Focused Index %i \n", pIndex);
+	currentFocusedIndex = (int)(long)pIndex;
+}
+*/
 
 // member functions
 
@@ -186,6 +212,36 @@ void CarSetupMenu::onCombo(tComboBoxInfo *pInfo)
     att.strValue = pInfo->vecChoices[pInfo->nPos];
 }
 
+void CarSetupMenu::onPlus(int ctrlIndex)
+{
+	attribute &att = items[currentPage][ctrlIndex];
+	if (att.type == "edit")
+	{
+		//increase the attribute value by it's precision, dont exceed max value
+		att.value = att.value+att.precision;
+		if (att.value > att.maxValue){
+			att.value = att.maxValue;
+		}
+	}
+    // Update the GUI.
+    updateControls();
+}
+
+void CarSetupMenu::onMinus(int ctrlIndex)
+{
+	attribute &att = items[currentPage][ctrlIndex];
+	if (att.type == "edit")
+	{
+		//decrease the attribute value by it's precision, dont exceed min value
+		att.value = att.value-att.precision;
+		if (att.value < att.minValue){
+			att.value = att.minValue;
+		}
+	}
+    // Update the GUI.
+    updateControls();
+}
+
 void CarSetupMenu::readCurrentPage()
 {
     for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
@@ -258,6 +314,8 @@ void CarSetupMenu::updateControls()
         if (att.label.empty())
         {
             GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+            GfuiVisibilitySet(getMenuHandle(), att.buttonPlusId, GFUI_INVISIBLE);
+            GfuiVisibilitySet(getMenuHandle(), att.buttonMinusId, GFUI_INVISIBLE);
             GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
         }
         else
@@ -265,16 +323,22 @@ void CarSetupMenu::updateControls()
             if (att.type == "edit")
             {
                 GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_VISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonPlusId, GFUI_VISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonMinusId, GFUI_VISIBLE);
                 GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
             }
             else if (att.type == "combo")
             {
                 GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonPlusId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonMinusId, GFUI_INVISIBLE);
                 GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_VISIBLE);
             }
             else
             {
                 GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonPlusId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.buttonMinusId, GFUI_INVISIBLE);
                 GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
             }
 
@@ -287,9 +351,17 @@ void CarSetupMenu::updateControls()
                     GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
 
                     if (att.minValue == att.maxValue)
+                    {
                         GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+                        GfuiEnable(getMenuHandle(), att.buttonPlusId, GFUI_DISABLE);
+                        GfuiEnable(getMenuHandle(), att.buttonMinusId, GFUI_DISABLE);
+                    }
                     else
+                    {
                         GfuiEnable(getMenuHandle(), att.editId, GFUI_ENABLE);
+                        GfuiEnable(getMenuHandle(), att.buttonPlusId, GFUI_ENABLE);
+                        GfuiEnable(getMenuHandle(), att.buttonMinusId, GFUI_ENABLE);
+                    }
                 }
                 else if (att.type == "combo")
                 {
@@ -310,6 +382,8 @@ void CarSetupMenu::updateControls()
                 {
                     GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
                     GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+					GfuiEnable(getMenuHandle(), att.buttonPlusId, GFUI_DISABLE);
+					GfuiEnable(getMenuHandle(), att.buttonMinusId, GFUI_DISABLE);
                 }
                 else if (att.type == "combo")
                 {
@@ -393,6 +467,8 @@ void CarSetupMenu::loadSettings()
             att.editId = getDynamicControlId(std::string("Edit" + strIndex).c_str());
             att.comboId = getDynamicControlId(std::string("Combo" + strIndex).c_str());
             att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + strIndex).c_str());
+            att.buttonPlusId = getDynamicControlId(std::string("EditButtonPlus" + strIndex).c_str());
+            att.buttonMinusId = getDynamicControlId(std::string("EditButtonMinus" + strIndex).c_str());
             att.type = GfParmGetStr(hparmItems, strSection.c_str(), "type", "");
             att.section = GfParmGetStr(hparmItems, strSection.c_str(), "section", "");
             att.param = GfParmGetStr(hparmItems, strSection.c_str(), "param", "");
@@ -459,6 +535,10 @@ void CarSetupMenu::loadSettings()
                     att.comboId = getDynamicControlId(std::string("Combo" + strIndex).c_str());
                 if (!att.defaultLabelId)
                     att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + strIndex).c_str());
+                if (!att.buttonPlusId)
+                    att.buttonPlusId = getDynamicControlId(std::string("EditButtonPlus" + strIndex).c_str());
+                if (!att.buttonMinusId)
+                    att.buttonMinusId = getDynamicControlId(std::string("EditButtonMinus" + strIndex).c_str());
             }
         }
 
@@ -584,6 +664,11 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
         std::string strIndex(std::to_string(index));
         createLabelControl(std::string("Label" + strIndex).c_str());
         createEditControl(std::string("Edit" + strIndex).c_str(), this, NULL, NULL);
+
+		//add plus and minus (increase/decrease) buttons for the edit
+		createButtonControl(std::string("EditButtonMinus" + strIndex).c_str(), &comboCallbackData[index], onMinusCallback);
+		createButtonControl(std::string("EditButtonPlus" + strIndex).c_str(), &comboCallbackData[index], onPlusCallback);
+        
         createComboboxControl(std::string("Combo" + strIndex).c_str(), &comboCallbackData[index], onComboCallback);
         createLabelControl(std::string("DefaultLabel" + strIndex).c_str());
     }

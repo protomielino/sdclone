@@ -120,7 +120,7 @@ GfuiEditboxCreate(void *scr, const char *text, int font,
 
     tGfuiLabel* label = &(editbox->label);
     gfuiLabelInit(label, text, maxlen, x + NHPadding, y + NVPadding,
-                  width - 2 * NHPadding, align, font, 0, 0, 0, 0, 0, 0, 0);
+                  width - 2 * NHPadding, align, font, 0, 0, 0, 0, "", 0, 0, 0);
 
     maxlen = label->maxlen;
 

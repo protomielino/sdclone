@@ -461,6 +461,11 @@ TGFCLIENT_API void GfuiDrawString(const char* text, float* fgColor, int font,
 TGFCLIENT_API int GfuiLabelCreate(void* scr, const char* text,
                                   int font, int x, int y, int width, int hAlign, int maxlen,
                                   const float* fgColor = 0, const float* fgFocusColor = 0,
+									std::string backgrounImageUrl="",
+									int bgImgPaddingTop = 0,
+									int bgImgPaddingBottom = 0,
+									int bgImgPaddingLeft = 0,
+									int bgImgPaddingRight = 0,
                                   void* userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0);
 
 TGFCLIENT_API void GfuiSetTipPosition(int x,int y);

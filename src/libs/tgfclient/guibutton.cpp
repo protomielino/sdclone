@@ -292,7 +292,7 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
 	button->imgHeight = 0;
 
 	gfuiLabelInit(&button->label, text, 0, x + NHTxtPadding, y + NVTxtPadding,
-				  width - 2 * NHTxtPadding, textHAlign, font, 0, 0, 0, 0, 0, 0, 0);
+				  width - 2 * NHTxtPadding, textHAlign, font, 0, 0, 0, 0, "", 0, 0, 0);
 	
     if (width <= 0)
 		width = button->label.width + 2*NHTxtPadding;
@@ -451,7 +451,7 @@ gfuiDrawButton(tGfuiObject *obj)
 		glVertex2i(obj->xmax, obj->ymax);
 		glVertex2i(obj->xmax, obj->ymin);
 		glVertex2i(obj->xmin, obj->ymin);
-		glEnd();	
+		glEnd();
 	}//if (bgColor && button->bShowBox)
 
 	// Draw the image if any, according to the state/focus.

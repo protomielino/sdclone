@@ -166,17 +166,17 @@ gfuiMenuGetAlignment(const char* pszHAlign) //, const char* pszVAlign)
 
     // if (pszVAlign)
     // {
-    // 	strAlign += '.';
-    // 	strAlign += pszVAlign;
-    // 	if (!pszVAlign || strlen(pszVAlign) == 0)
-    // 		strAlign += "bottom"; // Default bottom alignment
+    //     strAlign += '.';
+    //     strAlign += pszVAlign;
+    //     if (!pszVAlign || strlen(pszVAlign) == 0)
+    //         strAlign += "bottom"; // Default bottom alignment
 
-    // 	const TMapAlign::const_iterator itAlign = MapAlign.find(strAlign);
+    //     const TMapAlign::const_iterator itAlign = MapAlign.find(strAlign);
 
-    // 	if (itAlign != MapAlign.end())
-    // 		return (*itAlign).second;
-    // 	else
-    // 		return GFUI_ALIGN_HL_VB; // Default alignment.
+    //     if (itAlign != MapAlign.end())
+    //         return (*itAlign).second;
+    //     else
+    //         return GFUI_ALIGN_HL_VB; // Default alignment.
     // }
     // else
     {
@@ -366,9 +366,22 @@ createLabel(void* hscr, void* hparm, const char* pszPath,
         onFocus = onFocusShowTip;
         onFocusLost = onFocusLostHideTip;
     }
+    
+    /*BACKGROUND IMAGE FOR THE LABEL AND RELATIVE PADDING (the padding will extend the image size around the actual label width / height*/
+    std::string backgrounImageUrl = GfParmGetStr(hparm, pszPath, GFMNU_ATTR_BG_IMAGE, "");
+    int bgImgPaddingTop =    (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_TOP, NULL, 0);
+    int bgImgPaddingBottom = (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_BOTTOM, NULL, 0);
+    int bgImgPaddingLeft =   (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_LEFT, NULL, 0);
+    int bgImgPaddingRight =  (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_RIGHT, NULL, 0);
 
     int labelId = GfuiLabelCreate(hscr, pszText, nFontId, nX, nY, nWidth, nAlign, nMaxLen,
-                                  aColor, aFocusColor, userDataOnFocus, onFocus, onFocusLost);
+                                  aColor, aFocusColor, 
+                                  backgrounImageUrl,
+                                  bgImgPaddingTop,
+                                  bgImgPaddingBottom,
+                                  bgImgPaddingLeft,
+                                  bgImgPaddingRight,
+                                  userDataOnFocus, onFocus, onFocusLost);
 
     return labelId;
 }

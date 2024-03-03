@@ -86,6 +86,11 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 #define GFMNU_ATTR_IMAGE_PUSHED "pushed image"
 
 #define GFMNU_ATTR_BG_IMAGE "bg image"
+#define GFMNU_ATTR_BG_IMAGE_PADDING_TOP "bg image padding top"
+#define GFMNU_ATTR_BG_IMAGE_PADDING_BOTTOM "bg image padding bottom"
+#define GFMNU_ATTR_BG_IMAGE_PADDING_LEFT "bg image padding left"
+#define GFMNU_ATTR_BG_IMAGE_PADDING_RIGHT "bg image padding right"
+
 
 #define GFMNU_ATTR_IMAGE_X "image x"
 #define GFMNU_ATTR_IMAGE_Y "image y"

@@ -47,6 +47,8 @@ public:
         int         editId;
         int         comboId;
         int         defaultLabelId;
+        int         buttonPlusId;
+        int         buttonMinusId;
         bool        exists;
         tdble       value;
         tdble       minValue;
@@ -83,6 +85,8 @@ public:
     static void onPreviousCallback(void *pMenu);
     static void onNextCallback(void *pMenu);
     static void onComboCallback(tComboBoxInfo *pInfo);
+    static void onPlusCallback(void *pInfo);
+    static void onMinusCallback(void *pInfo);
 
 private:
 
@@ -101,6 +105,8 @@ private:
     void onPrevious();
     void onNext();
     void onCombo(tComboBoxInfo *pInfo);
+    void onPlus(int ctrlIndex);
+    void onMinus(int ctrlIndex);
 
     // The target race.
     const GfRace *_pRace;
