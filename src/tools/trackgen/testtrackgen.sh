@@ -52,6 +52,7 @@ check development no-barrier-testtrack
 check development showroom
 check development straight-10
 check development testtrack
+check dirt dirt-5
 check dirt mixed-2
 check road e-track-4
 check speedway a-speedway
