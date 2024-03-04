@@ -611,7 +611,7 @@ public class CheckDialog extends JDialog
 								{
 									Ac3dSurface	surface = object.getSurfaces().get(j);
 
-									if (surface.isLine())
+									if (surface.isOpenLine())
 									{
 										double[] firstVertex = object.getVertices().get(0);
 										double[] lastVertex = object.getVertices().get(object.getVertices().size() - 1);

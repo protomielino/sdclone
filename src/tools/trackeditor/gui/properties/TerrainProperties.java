@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -43,6 +44,7 @@ import utils.MutableInteger;
 import utils.MutableString;
 import utils.SurfaceComboBox;
 import utils.ac3d.Ac3dException;
+import utils.circuit.Reliefs;
 import utils.circuit.Surface;
 import utils.circuit.TerrainGeneration;
 
@@ -91,15 +93,15 @@ public class TerrainProperties extends PropertyPanel
 	private final String sep = System.getProperty("file.separator");
 
 	private String[]			roadSurfaceItems			=
-	{"asphalt-lines", "asphalt-l-left", "asphalt-l-right",
-     "asphalt-l-both", "asphalt-pits", "asphalt", "dirt", "dirt-b", "asphalt2", "road1", "road1-pits",
-     "road1-asphalt", "asphalt-road1", "b-road1", "b-road1-l2", "b-road1-l2p", "concrete", "concrete2",
-     "concrete3", "b-asphalt", "b-asphalt-l1", "b-asphalt-l1p", "asphalt2-lines", "asphalt2-l-left",
-     "asphalt2-l-right", "asphalt2-l-both", "grass", "grass3", "grass5", "grass6", "grass7", "gravel", "sand3",
-     "sand", "curb-5cm-r", "curb-5cm-l", "curb-l", "tar-grass3-l", "tar-grass3-r", "tar-sand", "b-road1-grass6",
-     "b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2", "b-asphalt-grass7",
-     "b-asphalt-grass7-l1", "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1",
-     "barrier", "barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
+		{"asphalt-lines", "asphalt-l-left", "asphalt-l-right",
+				"asphalt-l-both", "asphalt-pits", "asphalt", "dirt", "dirt-b", "asphalt2", "road1", "road1-pits",
+				"road1-asphalt", "asphalt-road1", "b-road1", "b-road1-l2", "b-road1-l2p", "concrete", "concrete2",
+				"concrete3", "b-asphalt", "b-asphalt-l1", "b-asphalt-l1p", "asphalt2-lines", "asphalt2-l-left",
+				"asphalt2-l-right", "asphalt2-l-both", "grass", "grass3", "grass5", "grass6", "grass7", "gravel", "sand3",
+				"sand", "curb-5cm-r", "curb-5cm-l", "curb-l", "tar-grass3-l", "tar-grass3-r", "tar-sand", "b-road1-grass6",
+				"b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2", "b-asphalt-grass7",
+				"b-asphalt-grass7-l1", "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1",
+				"barrier", "barrier2", "barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>	roadSurfaceVector				= new Vector<String>(Arrays.asList(roadSurfaceItems));
 
 	/**
@@ -109,7 +111,7 @@ public class TerrainProperties extends PropertyPanel
 	{
 		super(editorFrame);
 		initialize();
-    }
+	}
 
 	/**
 	 * This method initializes this
@@ -174,7 +176,7 @@ public class TerrainProperties extends PropertyPanel
 		if (orientationComboBox == null)
 		{
 			String[] items =
-			{"none", "clockwise", "counter-clockwise"};
+				{"none", "clockwise", "counter-clockwise"};
 			orientationComboBox = new JComboBox<String>(items);
 			orientationComboBox.setBounds(140, 118, 125, 23);
 			String orientation = getEditorFrame().getTerrainGeneration().getOrientation();
@@ -237,9 +239,9 @@ public class TerrainProperties extends PropertyPanel
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
 	{
-        Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
-        for (int i = 0; i < surfaces.size(); i++)
-        {
+		Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
+		for (int i = 0; i < surfaces.size(); i++)
+		{
 			String surface = surfaces.elementAt(i).getName();
 			if (surface != null)
 			{
@@ -257,7 +259,7 @@ public class TerrainProperties extends PropertyPanel
 					surfaceVector.add(surface);
 				}
 			}
-        }
+		}
 		Collections.sort(surfaceVector);
 	}
 
@@ -382,6 +384,31 @@ public class TerrainProperties extends PropertyPanel
 			if (pathToFile.equals(Editor.getProperties().getPath()))
 				fileName = fileName.substring(index + 1);
 			reliefFileTextField.setText(fileName);
+
+			Reliefs reliefs = new Reliefs();
+
+			try
+			{
+				reliefs.setFileName(fileName);
+				tabbedPane.remove(2);
+				tabbedPane.addTab("Reliefs", null, new ReliefProperties(getEditorFrame(), reliefs));
+				tabbedPane.setSelectedIndex(2);
+			}
+			catch (IOException e)
+			{
+				String msg = fileName + " : Can't read input file!";
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+			}
+			catch (Ac3dException e)
+			{
+				String msg = fileName + " : " + e.getLocalizedMessage();
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+			}
+			catch (Exception e)
+			{
+				String msg = fileName + " : " + e.getLocalizedMessage();
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -572,23 +599,29 @@ public class TerrainProperties extends PropertyPanel
 				getEditorFrame().getTerrainGeneration().setReliefFile(stringResult.getValue());
 			}
 			catch (IOException e)
-			{				
+			{
+				String msg = stringResult.getValue() + " : Can't read input file!";
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
 			}
 			catch (Ac3dException e)
-			{				
+			{
+				String msg = stringResult.getValue() + " : " + e.getLocalizedMessage();
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
 			}
 			catch (Exception e)
-			{				
+			{
+				String msg = stringResult.getValue() + " : " + e.getLocalizedMessage();
+				JOptionPane.showMessageDialog(getEditorFrame(), msg, "Relief File", JOptionPane.ERROR_MESSAGE);
 			}
 			getEditorFrame().documentIsModified = true;
 		}
 
-        if (isDifferent(reliefBorderComboBox.getSelectedItem().toString(),
-        	getEditorFrame().getTerrainGeneration().getReliefBorder(), stringResult))
-        {
-        	getEditorFrame().getTerrainGeneration().setReliefBorder(stringResult.getValue());
-            getEditorFrame().documentIsModified = true;
-        }
+		if (isDifferent(reliefBorderComboBox.getSelectedItem().toString(),
+			getEditorFrame().getTerrainGeneration().getReliefBorder(), stringResult))
+		{
+			getEditorFrame().getTerrainGeneration().setReliefBorder(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
 
 		if (isDifferent((String) surfaceComboBox.getSelectedItem(),
 			getEditorFrame().getTerrainGeneration().getSurface(), stringResult))
@@ -604,12 +637,12 @@ public class TerrainProperties extends PropertyPanel
 			getEditorFrame().documentIsModified = true;
 		}
 
-        if (isDifferent(useObjectMaterialsComboBox.getSelectedItem().toString(),
-            getEditorFrame().getTerrainGeneration().getUseObjectMaterials(), stringResult))
-        {
-            getEditorFrame().getTerrainGeneration().setUseObjectMaterials(stringResult.getValue());
-            getEditorFrame().documentIsModified = true;
-        }
+		if (isDifferent(useObjectMaterialsComboBox.getSelectedItem().toString(),
+			getEditorFrame().getTerrainGeneration().getUseObjectMaterials(), stringResult))
+		{
+			getEditorFrame().getTerrainGeneration().setUseObjectMaterials(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
 
 		Component component0 = tabbedPane.getComponentAt(0);
 		GraphicObjectProperties properties0 = (GraphicObjectProperties)component0;
@@ -625,4 +658,4 @@ public class TerrainProperties extends PropertyPanel
 
 		getEditorFrame().getProject().setPropertiesEditorTerrainTab(this.tabbedPane.getSelectedIndex());
 	}
- } //  @jve:decl-index=0:visual-constraint="10,10"
+} //  @jve:decl-index=0:visual-constraint="10,10"

@@ -13,7 +13,7 @@ public class ObjShapeRelief extends Segment
 	private static int			POINT_DIAMETER	= POINT_RADIUS * 2;
 
 	public enum ReliefType { Interior, Exterior };
-	public enum LineType { Polygon, Polyline };
+	public enum LineType { Closed, Open };
 
 	private ReliefType			reliefType;
 	private String				reliefName = new String();
@@ -24,7 +24,7 @@ public class ObjShapeRelief extends Segment
 	{
 		super("relief");
 		this.reliefType = ReliefType.Interior;
-		this.lineType = LineType.Polyline;
+		this.lineType = LineType.Open;
 	}
 
 	public ObjShapeRelief(String name, ReliefType reliefType, LineType lineType, Vector<double[]> vertices)
@@ -87,13 +87,13 @@ public class ObjShapeRelief extends Segment
 	{
 		return reliefType == ReliefType.Exterior;
 	}
-	public boolean isPolygon()
+	public boolean isClosed()
 	{
-		return lineType == LineType.Polygon;
+		return lineType == LineType.Closed;
 	}
-	public boolean isPolyline()
+	public boolean isOpen()
 	{
-		return lineType == LineType.Polyline;
+		return lineType == LineType.Open;
 	}	
 	public Vector<double[]> getVertices() {
 		return vertices;
@@ -190,7 +190,7 @@ public class ObjShapeRelief extends Segment
 				g.fillOval(xToDraw[i] - POINT_RADIUS, yToDraw[i] - POINT_RADIUS, POINT_DIAMETER, POINT_DIAMETER);
 			}
 
-			if (lineType == LineType.Polygon)
+			if (lineType == LineType.Closed)
 			{
 				g.drawPolygon(xToDraw, yToDraw, points.length);
 			}
@@ -327,8 +327,8 @@ public class ObjShapeRelief extends Segment
 		super.dump(indent);
 
 		System.out.println(indent + "  ObjShapeRelief");	
-		System.out.println(indent + "    reliefType       : " + (isInterior() ? "Interior" : "Exterior"));
-		System.out.println(indent + "    lineType         : " + (isPolyline() ? "Polyline" : "Polygon"));
+		System.out.println(indent + "    reliefType       : " + reliefType.toString());
+		System.out.println(indent + "    lineType         : " + lineType.toString());
 		System.out.println(indent + "    vertices         : " + vertices.size());
 		for (int i = 0; i < vertices.size(); i++)
 		{

@@ -92,7 +92,7 @@ public class Reliefs
 					for (int j = 0; j < object.getSurfaces().size(); j++)
 					{
 						Ac3dSurface	surface = object.getSurfaces().get(j);
-						ObjShapeRelief.LineType lineType = surface.isLine() ? ObjShapeRelief.LineType.Polyline : ObjShapeRelief.LineType.Polygon;
+						ObjShapeRelief.LineType lineType = surface.isOpenLine() ? ObjShapeRelief.LineType.Open : ObjShapeRelief.LineType.Closed;
 						Vector<double[]> vertices = new Vector<double[]>();
 							
 						for (int k = 0; k < surface.getRefs().size(); k++)
@@ -158,13 +158,13 @@ public class Reliefs
 
 			Ac3dSurface surface = new Ac3dSurface();
 
-			if (relief.isPolygon())
+			if (relief.isClosed())
 			{
 				surface.setClosedLine();
 			}
 			else
 			{
-				surface.setLine();
+				surface.setOpenLine();
 			}
 
 			for (int j = 0; j < relief.getVertices().size(); j++)

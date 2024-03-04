@@ -30,10 +30,19 @@ public class ReliefProperties extends PropertyPanel
 	private JTabbedPane		tabbedPane			= null;
 	private JButton			addReliefButton		= null;
 	private JButton			deleteReliefButton	= null;
+	private Reliefs			reliefs				= null;
 
 	ReliefProperties(EditorFrame editorFrame)
 	{
 		super(editorFrame);
+		reliefs = getEditorFrame().getReliefs();
+		initialize();
+	}
+
+	ReliefProperties(EditorFrame editorFrame, Reliefs reliefs)
+	{
+		super(editorFrame);
+		this.reliefs = reliefs;
 		initialize();
 	}
 
@@ -54,12 +63,10 @@ public class ReliefProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 487, 307);
 
-			Reliefs reliefs = getEditorFrame().getReliefs();
-
 			for (int i = 0; i < reliefs.getReliefs().size(); i++)
 			{
 				tabbedPane.addTab("relief " + String.valueOf(i + 1), null, new ReliefPanel(reliefs.getReliefs().get(i)), null);
-	        }
+			}
 		}
 		return tabbedPane;
 	}
@@ -76,17 +83,16 @@ public class ReliefProperties extends PropertyPanel
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
 					ObjShapeRelief relief = new ObjShapeRelief();
-					Reliefs reliefs = getEditorFrame().getReliefs();
 
 					// add points
 					Rectangle2D.Double boundingRectangle = getEditorFrame().getBoundingRectangle();
 					double center[] = { boundingRectangle.width / 2, boundingRectangle.height / 2 };
 					double offset = tabbedPane.getTabCount() * 50;
 					relief.setReliefType(ObjShapeRelief.ReliefType.Interior);
-					relief.setLineType(ObjShapeRelief.LineType.Polyline);
+					relief.setLineType(ObjShapeRelief.LineType.Open);
 					relief.addVertex(new double[] { center[0] - 50, 0, -(center[1] + offset) });
 					relief.addVertex(new double[] { center[0] + 50, 0, -(center[1] + offset) });
-					
+
 					tabbedPane.addTab("relief " + String.valueOf(reliefs.getReliefs().size() + 1), null, new ReliefPanel(relief), null);
 					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				}
@@ -123,7 +129,7 @@ public class ReliefProperties extends PropertyPanel
 		private JLabel				lineTypeLabel			= new JLabel();
 		private JComboBox<String>	lineTypeComboBox		= null;
 		private ReliefTablePanel	reliefTablePanel		= null;
-		
+
 		private final String[] 		reliefTypes 			= {"interior", "exterior"};
 		private int					reliefTypeIndex			= 0;
 		private final String[] 		lineTypes 				= {"closed", "open"};
@@ -134,7 +140,7 @@ public class ReliefProperties extends PropertyPanel
 		{
 			super();
 			reliefTypeIndex = reliefShape.isInterior() ? 0 : 1;
-			lineTypeIndex = reliefShape.isPolygon() ? 0 : 1;
+			lineTypeIndex = reliefShape.isClosed() ? 0 : 1;
 			for (int i = 0; i < reliefShape.getVertices().size(); i++)
 			{
 				vertices.add(new double[] { reliefShape.getVertices().get(i)[0], reliefShape.getVertices().get(i)[1], reliefShape.getVertices().get(i)[2]});
@@ -194,18 +200,18 @@ public class ReliefProperties extends PropertyPanel
 		}
 
 		class ReliefTableModel extends AbstractTableModel
-	    {
-	        private final String[] 		columnNames = { null, "X", "Y", "Z" };
-	        private final Class<?>[] 	columnClass = new Class[]
-	        {
-	        	Integer.class, Double.class, Double.class, Double.class
-	        };
+		{
+			private final String[] 		columnNames = { null, "X", "Y", "Z" };
+			private final Class<?>[] 	columnClass = new Class[]
+					{
+							Integer.class, Double.class, Double.class, Double.class
+					};
 			private Vector<double[]> vertices = null;
 
-	        ReliefTableModel(Vector<double[]> vertices)
+			ReliefTableModel(Vector<double[]> vertices)
 			{
-	        	this.vertices = vertices;
-	        }
+				this.vertices = vertices;
+			}
 
 			public int getRowCount()
 			{
@@ -217,24 +223,24 @@ public class ReliefProperties extends PropertyPanel
 				return columnNames.length;
 			}
 
-	        public String getColumnName(int columnIndex)
-	        {
-	            return columnNames[columnIndex];
-	        }
+			public String getColumnName(int columnIndex)
+			{
+				return columnNames[columnIndex];
+			}
 
-	        public Class<?> getColumnClass(int columnIndex)
-	        {
-	            return columnClass[columnIndex];
-	        }
+			public Class<?> getColumnClass(int columnIndex)
+			{
+				return columnClass[columnIndex];
+			}
 
-	        public boolean isCellEditable(int row, int columnIndex)
-	        {
-	        	if (columnIndex == 1 || columnIndex == 2 || columnIndex == 3)
-	        	{
-	        		return true;
-	        	}
-	        	return false;
-	        }
+			public boolean isCellEditable(int row, int columnIndex)
+			{
+				if (columnIndex == 1 || columnIndex == 2 || columnIndex == 3)
+				{
+					return true;
+				}
+				return false;
+			}
 
 			public Object getValueAt(int rowIndex, int columnIndex)
 			{
@@ -258,15 +264,15 @@ public class ReliefProperties extends PropertyPanel
 				{
 				case 1:
 					vertices.get(rowIndex)[0] = (Double) value;
-			        fireTableCellUpdated(rowIndex, columnIndex);
+					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
 				case 2:
 					vertices.get(rowIndex)[2] = -(Double) value;
-			        fireTableCellUpdated(rowIndex, columnIndex);
+					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
 				case 3:
 					vertices.get(rowIndex)[1] = (Double) value;
-			        fireTableCellUpdated(rowIndex, columnIndex);
+					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
 				}
 			}
@@ -276,67 +282,67 @@ public class ReliefProperties extends PropertyPanel
 				vertices.removeElementAt(row);
 				fireTableRowsDeleted(row - 1, vertices.size() - 1);
 			}
-	    }
+		}
 
 		class ReliefTablePanel extends JPanel
 		{
-	        JTable 				table		= null;
-	        JScrollPane 		scrollPane	= null;
-	        ReliefTableModel	model		= null;
+			JTable 				table		= null;
+			JScrollPane 		scrollPane	= null;
+			ReliefTableModel	model		= null;
 
-	        public ReliefTablePanel(Vector<double[]> vertices)
+			public ReliefTablePanel(Vector<double[]> vertices)
 			{
-		        super(new GridLayout(1,0));
+				super(new GridLayout(1,0));
 
-		        model = new ReliefTableModel(vertices);
-		        table = new JTable(model);
-		        scrollPane = new JScrollPane(table);
-		        table.getColumnModel().getColumn(0).setPreferredWidth(25);
-		        table.setAutoCreateRowSorter(true);
-		        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-		        
-		        JPopupMenu popupMenu = new JPopupMenu();
-		        JMenuItem deleteItem = new JMenuItem("Delete Row");
-		        table.addMouseListener(new MouseAdapter()
-		        {
-		        	public void mouseClicked(MouseEvent me)
-		        	{
-		        		if (SwingUtilities.isRightMouseButton(me) == true)
-		        		{
-		        			int row = table.rowAtPoint(me.getPoint());
-		        			if (table.getSelectedRow() != row)
-		        			{
-		        				table.setRowSelectionInterval(row, row);
-		        			}
-		        		}
-		        	}
-		        });
-		        deleteItem.addActionListener(new ActionListener()
-		        {
-		            public void actionPerformed(ActionEvent e)
-		            {
-		            	int row = table.getSelectedRow();
-		            	if (row != -1)
-		            	{
-		            		if (JOptionPane.showConfirmDialog(null, "Delete this row?", "Delete Row", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-		            		{
-		            			model.removeRowAt(table.convertRowIndexToModel(row));
-		            		}
-		            	}
-		            }
-		        });
-		        popupMenu.add(deleteItem);
-		        table.setComponentPopupMenu(popupMenu);
-		        
-		        add(scrollPane);
-		    }
+				model = new ReliefTableModel(vertices);
+				table = new JTable(model);
+				scrollPane = new JScrollPane(table);
+				table.getColumnModel().getColumn(0).setPreferredWidth(25);
+				table.setAutoCreateRowSorter(true);
+				table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
+				JPopupMenu popupMenu = new JPopupMenu();
+				JMenuItem deleteItem = new JMenuItem("Delete Row");
+				table.addMouseListener(new MouseAdapter()
+				{
+					public void mouseClicked(MouseEvent me)
+					{
+						if (SwingUtilities.isRightMouseButton(me) == true)
+						{
+							int row = table.rowAtPoint(me.getPoint());
+							if (table.getSelectedRow() != row)
+							{
+								table.setRowSelectionInterval(row, row);
+							}
+						}
+					}
+				});
+				deleteItem.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						int row = table.getSelectedRow();
+						if (row != -1)
+						{
+							if (JOptionPane.showConfirmDialog(null, "Delete this row?", "Delete Row", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+							{
+								model.removeRowAt(table.convertRowIndexToModel(row));
+							}
+						}
+					}
+				});
+				popupMenu.add(deleteItem);
+				table.setComponentPopupMenu(popupMenu);
+
+				add(scrollPane);
+			}
 		}
 	}
 
 	public void exit()
 	{
 		MutableString stringResult = new MutableString();
-        Reliefs reliefs = getEditorFrame().getReliefs();
+		Reliefs reliefs = getEditorFrame().getReliefs();
 		int minReliefCount = Math.min(reliefs.getReliefs().size(), tabbedPane.getTabCount());
 		if (reliefs.getReliefs().size() != tabbedPane.getTabCount())
 		{
@@ -356,46 +362,46 @@ public class ReliefProperties extends PropertyPanel
 			String lineType = panel.lineTypes[panel.lineTypeIndex];
 			if (isDifferent(panel.lineTypeComboBox.getSelectedItem().toString(), lineType, stringResult))
 			{
-				relief.setLineType(stringResult.getValue().equals(panel.lineTypes[0]) ? ObjShapeRelief.LineType.Polygon : ObjShapeRelief.LineType.Polyline);
+				relief.setLineType(stringResult.getValue().equals(panel.lineTypes[0]) ? ObjShapeRelief.LineType.Closed : ObjShapeRelief.LineType.Open);
 				reliefs.setChanged(true);
 				getEditorFrame().documentIsModified = true;
 			}
 
 			int minVertexCount = Math.min(panel.vertices.size(), relief.getVertices().size());
 
-    		if (panel.vertices.size() != relief.getVertices().size())
-    		{
-    			getEditorFrame().documentIsModified = true;
-    			reliefs.setChanged(true);
-    		}
-    		for (int j = 0; j < minVertexCount; j++)
-    		{
-    			for (int k = 0; k < 3; k++)
-    			{
-    				if (panel.vertices.get(j)[k] != relief.getVertices().get(j)[k])
-    				{
-    					relief.getVertices().get(j)[k] = panel.vertices.get(j)[k];
-    					getEditorFrame().documentIsModified = true;
-    					reliefs.setChanged(true);
-    				}
-    			}
-    		}
-    		if (panel.vertices.size() < relief.getVertices().size())
-    		{
-    			// need to trim vertices
-    			while (relief.getVertices().size() > panel.vertices.size())
-    			{
-    				relief.deleteVertexAt(relief.getVertices().size() - 1);
-    			}
-    		}
-    		else if (relief.getVertices().size() < panel.vertices.size())
-    		{
-    			// need to add to vertices
-    			while (relief.getVertices().size() < panel.vertices.size())
-    			{
-    				relief.addVertex(panel.vertices.get(relief.getVertices().size()));
-    			}
-    		}
+			if (panel.vertices.size() != relief.getVertices().size())
+			{
+				getEditorFrame().documentIsModified = true;
+				reliefs.setChanged(true);
+			}
+			for (int j = 0; j < minVertexCount; j++)
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					if (panel.vertices.get(j)[k] != relief.getVertices().get(j)[k])
+					{
+						relief.getVertices().get(j)[k] = panel.vertices.get(j)[k];
+						getEditorFrame().documentIsModified = true;
+						reliefs.setChanged(true);
+					}
+				}
+			}
+			if (panel.vertices.size() < relief.getVertices().size())
+			{
+				// need to trim vertices
+				while (relief.getVertices().size() > panel.vertices.size())
+				{
+					relief.deleteVertexAt(relief.getVertices().size() - 1);
+				}
+			}
+			else if (relief.getVertices().size() < panel.vertices.size())
+			{
+				// need to add to vertices
+				while (relief.getVertices().size() < panel.vertices.size())
+				{
+					relief.addVertex(panel.vertices.get(relief.getVertices().size()));
+				}
+			}
 		}
 		if (reliefs.getReliefs().size() > tabbedPane.getTabCount())
 		{
@@ -410,11 +416,11 @@ public class ReliefProperties extends PropertyPanel
 			// need to add to reliefs
 			while (reliefs.getReliefs().size() < tabbedPane.getTabCount())
 			{
-	            ReliefPanel panel = (ReliefPanel) tabbedPane.getComponentAt(reliefs.getReliefs().size());
-	            ObjShapeRelief shape = new ObjShapeRelief();
-	            shape.setReliefType(panel.reliefTypeComboBox.getSelectedItem().toString().equals("interior") ? ObjShapeRelief.ReliefType.Interior : ObjShapeRelief.ReliefType.Exterior);
-	            shape.setLineType(panel.lineTypeComboBox.getSelectedItem().toString().equals("closed") ? ObjShapeRelief.LineType.Polygon : ObjShapeRelief.LineType.Polyline);
-	            shape.setVertices(panel.vertices);
+				ReliefPanel panel = (ReliefPanel) tabbedPane.getComponentAt(reliefs.getReliefs().size());
+				ObjShapeRelief shape = new ObjShapeRelief();
+				shape.setReliefType(panel.reliefTypeComboBox.getSelectedItem().toString().equals("interior") ? ObjShapeRelief.ReliefType.Interior : ObjShapeRelief.ReliefType.Exterior);
+				shape.setLineType(panel.lineTypeComboBox.getSelectedItem().toString().equals("closed") ? ObjShapeRelief.LineType.Closed : ObjShapeRelief.LineType.Open);
+				shape.setVertices(panel.vertices);
 				reliefs.getReliefs().add(shape);
 			}
 		}

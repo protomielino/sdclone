@@ -31,7 +31,7 @@ public class Ac3dSurface
 	public static final int SURFACE_TYPE_MASK			= 0x0f;
 	public static final int SURFACE_TYPE_POLYGON		= 0x00;
 	public static final int SURFACE_TYPE_CLOSED_LINE	= 0x01;
-	public static final int SURFACE_TYPE_LINE			= 0x02;
+	public static final int SURFACE_TYPE_OPEN_LINE		= 0x02;
 
 	public static final int	SHADED_MASK					= 0x10;
 	public static final int SHADED_FLAT					= 0x00;
@@ -80,20 +80,20 @@ public class Ac3dSurface
 		}
 	}
 	
-	public boolean isLine()
+	public boolean isOpenLine()
 	{
-		return (surf & SURFACE_TYPE_MASK) == SURFACE_TYPE_LINE;
+		return (surf & SURFACE_TYPE_MASK) == SURFACE_TYPE_OPEN_LINE;
 	}
 
-	public void setLine()
+	public void setOpenLine()
 	{
 		if (surf == null)
 		{
-			surf = SURFACE_TYPE_LINE;
+			surf = SURFACE_TYPE_OPEN_LINE;
 		}
 		else
 		{
-			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_LINE;
+			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_OPEN_LINE;
 		}
 	}
 
