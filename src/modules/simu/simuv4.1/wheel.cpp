@@ -1122,7 +1122,7 @@ void SimWheelUpdateTire(tCar *car, int index)
     wheel->currentGripFactor =  ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f) * (1.0f - wheel->currentGraining / 10.0f);
 
 	// Tire grip drop-off from wear
-	if (isPunctured = false)
+	if (isPunctured == false)
 	{
 		if (wheel->currentWear < 0.25)
 		{
