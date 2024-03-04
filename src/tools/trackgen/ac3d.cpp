@@ -925,7 +925,7 @@ void Ac3d::Object::removeUnusedVertices()
                 for (auto &ref : surface.refs)
                 {
                     if (ref.index == originalIndex)
-                        ref.index = i;
+                        ref.index = static_cast<int>(i);
                 }
             }
             i++;
