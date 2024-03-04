@@ -912,7 +912,7 @@ void Ac3d::Object::removeUnusedVertices()
         }
     }
     int originalIndex = 0;
-    for (int i = 0; i < vertices.size(); originalIndex++)
+    for (size_t i = 0; i < vertices.size(); originalIndex++)
     {
         if (usedIndex.find(originalIndex) == usedIndex.end())
         {
