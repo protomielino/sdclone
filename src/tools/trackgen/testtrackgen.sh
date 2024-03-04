@@ -56,5 +56,6 @@ check dirt dirt-5
 check dirt mixed-2
 check road e-track-4
 check speedway a-speedway
+chech speedway e-track-5
 
 rm -rf temp_dir
