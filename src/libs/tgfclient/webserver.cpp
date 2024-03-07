@@ -593,8 +593,6 @@ int WebServer::updateAsyncStatus()
 
             curl_multi_remove_handle(this->multi_handle, eh);
             curl_easy_cleanup(eh);
-            /* then cleanup the formpost chain */
-            //curl_formfree(formpost);
         }
         else
         {
@@ -613,9 +611,6 @@ int WebServer::addAsyncRequest(const std::string &data)
     this->readConfiguration();   
 
     CURL* curl = NULL;
-    struct curl_httppost *formpost=NULL;
-    struct curl_httppost *lastptr=NULL;
-
     curl = curl_easy_init();
 
     if(curl)
@@ -634,19 +629,26 @@ int WebServer::addAsyncRequest(const std::string &data)
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
         //prepare the form-post to be sent to the server
-        curl_formadd(&formpost,
-                   &lastptr,
-                   CURLFORM_COPYNAME, "data", //the field name where the data will be stored
-                   CURLFORM_COPYCONTENTS, data.c_str(), //the actual data
-                   CURLFORM_END);
+        curl_mime *mime;
+        curl_mimepart *part;
+
+        // Build an HTTP form with a single field named "data"
+        mime = curl_mime_init(curl);
+        part = curl_mime_addpart(mime);
+        curl_mime_data(part, data.c_str(), CURL_ZERO_TERMINATED);
+        curl_mime_name(part, "data");
 
         //inform curl to send the form-post
-        curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
     }
 
     //add the request to the queque
     curl_multi_add_handle(this->multi_handle, curl);
+    
+    //cleanup
+    curl_easy_cleanup(easy);
+    curl_mime_free(mime);
 
     //pending request
     webserverState=WEBSERVER_SENDING;
