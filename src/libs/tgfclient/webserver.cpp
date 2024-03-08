@@ -641,9 +641,6 @@ int WebServer::addAsyncRequest(const std::string &data)
         //inform curl to send the form-post
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
-        //cleanup
-        curl_mime_free(mime);
-
     }
 
     //add the request to the queque
@@ -651,9 +648,6 @@ int WebServer::addAsyncRequest(const std::string &data)
     
     //pending request
     webserverState=WEBSERVER_SENDING;
-    
-    //cleanup
-    curl_easy_cleanup(curl);
 
     return 0;
 }
