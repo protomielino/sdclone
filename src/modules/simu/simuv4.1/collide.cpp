@@ -365,7 +365,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
             car[i]->VelColl.az = car[i]->DynGCg.vel.az + js * rpsign[i] * rpn[i] * car[i]->Iinv.z * ROT_K;
         }
 
-        static float VELMAX = 2.25f;
+        static float VELMAX = 2.0f;
         if (fabs(car[i]->VelColl.az) > VELMAX)
         {
             car[i]->VelColl.az = (tdble)(SIGN(car[i]->VelColl.az) * VELMAX);

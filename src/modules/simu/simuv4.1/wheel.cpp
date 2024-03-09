@@ -997,7 +997,7 @@ void SimWheelUpdateTire(tCar *car, int index)
 	}
 	else
 	{
-		longForce = lateralForce;
+		longForce = longForce;
 	}
 
 	// Modifiers for energy input from lateral and longitudinal forces.
@@ -1142,14 +1142,22 @@ void SimWheelUpdateTire(tCar *car, int index)
 		}
 	}
 
-	// Simulate tire punctures. Drop the grip to 50% 
+	// Simulate tire punctures. Drop the grip to a low % 
 	// because metal-on-ground (ie. rim on road) contact 
 	// still generates some traction, just not a lot.
 	if (wheel->currentWear >= 1.0)
 	{
-		wheel->currentGripFactor = 0.5;
+		if (isPunctured == false)
+		{
+			wheel->relPos.z += (wheel->radius)*(-0.25);
+		}
+		wheel->currentGripFactor = 0.25;
 		wheel->currentPressure = 0.0;
 		isPunctured = true;
+	}
+	else
+	{
+		isPunctured = false;
 	}
 
     car->carElt->_tyreCondition(index) = wheel->currentGripFactor;
