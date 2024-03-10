@@ -738,8 +738,6 @@ void SDHUD::changeImageVertex(osg::Geometry *geom,
     float startTriangleAngleCapacity = 45.0f - std::fmod( fromAngle, 45.0f );
 
     //determine the angle we can use for final triangle (in case the start is not at his 0 angle)
-    float finalTriangleAngleCapacity = std::fmod( toAngle , 45.0f );
-
     //determine how many triangles we will need to process
     int trianglesNeeded = ceil((currValueAngle - startTriangleAngleCapacity) / 45)+1;
 
@@ -782,8 +780,8 @@ void SDHUD::changeImageVertex(osg::Geometry *geom,
         }
 
         //vale per tutti gli altri angoli (se è zero resta zero, se è maggiore di 45 uso 45)
-        if((startTriangle <= endTriangle ) && (triangleIdx > startTriangle)
-            || (startTriangle > endTriangle )  && (triangleIdx > startTriangle || triangleIdx <= endTriangle))
+        if( ((startTriangle <= endTriangle ) && (triangleIdx > startTriangle))
+            || ((startTriangle > endTriangle )  && (triangleIdx > startTriangle || triangleIdx <= endTriangle)) )
         {
             if(angleRangeToBeUsed <= 45.0)
             {
@@ -1068,7 +1066,6 @@ void SDHUD::changeImagePosition(osg::Geometry *geom,
 
     //adapt the geometry
     {
-        //osg::Vec3Array* vertices = new osg::Vec3Array;
         osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
 
         //change the position
@@ -1111,7 +1108,6 @@ void SDHUD::changeImageTexture(osg::Geometry *geom,
 
     // setup texture
     osg::Image* myImg = osgDB::readImageFile(newTextureUrl);
-    osg::TextureRectangle* myTexture = new osg::TextureRectangle;
     texture->setImage(myImg);
 }
 
@@ -1500,12 +1496,9 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     // Parse control messages if they include ABS / TCS / SPD
     for (int i = 0; i < 4; i++)
     {
-        if (currCar->_msgCmd[i])
-        {
-            abs = abs || strstr(currCar->_msgCmd[i], "ABS");
-            tcs = tcs || strstr(currCar->_msgCmd[i], "TCS");
-            spd = spd || strstr(currCar->_msgCmd[i], "Speed Limiter On");
-        }
+        abs = abs || strstr(currCar->_msgCmd[i], "ABS");
+        tcs = tcs || strstr(currCar->_msgCmd[i], "TCS");
+        spd = spd || strstr(currCar->_msgCmd[i], "Speed Limiter On");
     }
 
     hudImgElements["abs-icon"]->setNodeMask(abs ? NODE_MASK_ALL : NODE_MASK_NONE);
@@ -1794,7 +1787,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         tireNameText.str("");
         //set the current tire temp (internally the tire temp is in KPA *1000 so we wanto to convert it ot PSI)
         temp << currCar->_tyreCurrentPressure(i) * 0.145038 / 1000;
-        //temp << "25.8";
         tireNameText << "tire-" << tireName.str().c_str()  << "-pressures";
         hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
 
@@ -1973,9 +1965,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         float intermediaterpm = 0.0f;
         float intermediatetorque = 0.0f;
 
-        //make sure there is enough space in our vector match the new maxrpm (we will have a datapoint for each rpm)
-        //horsepowerPoints.resize((int)currCar->_enginerpmMax+1);
-
         //get the data points
         //we do this one time (when a new car is selected)
         if (carHasChanged)
@@ -2009,9 +1998,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                     //GfLogInfo("Intermediate Point %i - rpm %i - torque %f \n", 0, (int)intermediaterpm, intermediatetorque);
 
                     // insert the horsepower value at the given rpm
-                    //auto position = horsepowerPoints.begin() + intermediaterpm;
                     float value = intermediatetorque * intermediaterpm;
-                    //horsepowerPoints.insert(position, value);
                     horsepowerPoints.push_back(value);
                 }
                 //insert the poin value
@@ -2385,19 +2372,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         mousePrevPosY = mouse->Y;
 
         //move it to the correct position
-        float newScale = 1.0;
-        float moveX = 0.0;
-        float moveY = 0.0;
-        //move mode
-        if (true){
-            moveX = (float)mouseDragX * (float)hudScreenW /640;
-            moveY = (float)mouseDragY * (float)hudScreenH /480;
-        }
-        //scale mode
-        if (true){
-
-        }
-
+        float moveX = (float)mouseDragX * (float)hudScreenW /640;
+        float moveY = (float)mouseDragY * (float)hudScreenH /480;
 
     //start doing hud things
         std::string selectedWidgetGroupPath = "widgets/" + selectedWidgetGroup;
@@ -2416,7 +2392,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
                 if ( hudTextElements.find(widgetName) != hudTextElements.end() )
                 {
-                    osg::BoundingBox editedwidgetBB = hudTextElements[widgetName.c_str()]->getBoundingBox();
                     osg::Vec3 textPosition = hudTextElements[widgetName.c_str()]->getPosition();
                     textPosition[0]=textPosition[0]+moveX;
                     textPosition[1]=textPosition[1]+moveY;
@@ -2424,7 +2399,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 }
                 else if ( hudImgElements.find(widgetName) != hudImgElements.end() )
                 {
-                    //widgetBoundingBox = hudImgElements[widgetName]->getBoundingBox();
                     osg::BoundingBox editedwidgetBB = hudImgElements[widgetName.c_str()]->getBoundingBox();
                     changeImagePosition(
                         hudImgElements[widgetName.c_str()],
@@ -2508,7 +2482,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         hudImgElements["edithud-background"]->setUseDisplayList(false);
 
         //move all the other pieces of the edithudWidget
-        osg::Vec3Array* targetVertices = dynamic_cast<osg::Vec3Array*>(hudImgElements["edithud-background"]->getVertexArray());
+        //osg::Vec3Array* targetVertices = dynamic_cast<osg::Vec3Array*>(hudImgElements["edithud-background"]->getVertexArray());
         std::vector<std::string> edithudWidgets;
         std::string currWidget;
         //edithudWidgets.push_back("edithud-background");
@@ -2528,9 +2502,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             {
                 recalculateImageWidgetPosition("edithudWidget",edithudWidgets[i],hudScale);
             }
-    //        else if ( hudGraphElements.find(widgetName) != hudGraphElements.end() )
-    //        {
-    //        }
         }
     }
 }
@@ -2974,9 +2945,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             //start preparing the image
                             std::string myFilename = GetDataDir();
-                            //std::string myUrl = "data/img/osg-hud/tachometerv2-on.png";
-                            //myFilename.append(myUrl);
                             myFilename.append(url);
+
                             //check that the image file exist
                             if (!GfFileExists(myFilename.c_str()))
                             {
@@ -2987,11 +2957,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             osg::Image* myImg = osgDB::readImageFile(myFilename);
                             osg::TextureRectangle* myTexture = new osg::TextureRectangle;
                             myTexture->setImage(myImg);
-                            //get image size
+
                             //get image dimensions
                             float width = myImg->s();
                             float height = myImg->t();
-
 
                             //set the position
                             //find the referenceObj bounding box
@@ -3106,7 +3075,6 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             (*colors)[7].set(1.0f,1.0f,1.0f,1.0f);
                             myGeometry->setColorArray(colors);
                             myGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-
 
                             // draw the vertices as quads
                             myGeometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, myVertices->size()));
@@ -3406,9 +3374,6 @@ void SDHUD::saveWidgetGroupPosition(std::string widgetGroupName)
 
             if ( positionRefObj.find("screen") == 0 ){
 
-                //get current position (bounding box)
-                osg::BoundingBox myObjBb = getBoundigBoxFromWidgetName(widgetsName);
-
                 //convert the modification to the resolution used in the config file
                 float modifierVertical = ((float)mouseTotalDragY / (float)hudScreenH * 1024);
                 float modifierHorizontal = ((float)mouseTotalDragX / (float)hudScreenW * 1280);
@@ -3505,7 +3470,6 @@ void SDHUD::setWidgetsGroupsVisibilityForcedON()
             if (widgetGroupName.find("mouseWidget")!=std::string::npos){
                 continue;
             }
-            //hudElementsVisibilityStatus["boardWidget"] =
             hudWidgets[widgetGroupName]->setNodeMask(1);
 
         } while (GfParmListSeekNext(paramHandle, "widgets") == 0);
