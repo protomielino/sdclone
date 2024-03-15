@@ -187,6 +187,8 @@ void SimWheelConfig(tCar *car, int index)
     wheel->lfMax          = GfParmGetNum(hdle, WheelSect[index], PRM_LOADFMAX, (char*)NULL, 1.6f);
     wheel->lfMin          = GfParmGetNum(hdle, WheelSect[index], PRM_LOADFMIN, (char*)NULL, 0.8f);
     wheel->AlignTqFactor  = GfParmGetNum(hdle, WheelSect[index], PRM_ALIGNTQFACTOR, (char*)NULL, 0.6f);
+	wheel->LatMuFactor	  = GfParmGetNum(hdle, WheelSect[index], PRM_LATMUFACTOR, (char*)NULL, 1.0f);
+	wheel->LongMuFactor	  = GfParmGetNum(hdle, WheelSect[index], PRM_LONGMUFACTOR, (char*)NULL, 1.0f);
     wheel->mass           = GfParmGetNum(hdle, WheelSect[index], PRM_MASS, (char*)NULL, 20.0f);
 
     wheel->lfMin = MIN(0.9f, wheel->lfMin);
@@ -721,8 +723,9 @@ void SimWheelUpdateForce(tCar *car, int index)
     if (s > 0.000001f)
     {
         // wheel axis based
-        Ft -= F * sx / s;
-        Fn -= F * sy / s;
+		// MuFactor modifies grip based on axis - sx for longitudinal, sy for lateral
+		Ft -= F * (sx * wheel->LongMuFactor) / s;
+        Fn -= F * (sy * wheel->LatMuFactor) / s;
     }
     else
     {

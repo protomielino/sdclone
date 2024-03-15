@@ -774,6 +774,8 @@ typedef struct CarElt
 #define PRM_TREADDRAINSPD	"tread water drain speed"
 #define PRM_MUWET			"mu wet"
 #define PRM_WEAR		    "wear"
+#define PRM_LATMUFACTOR		"lateral mu factor"
+#define PRM_LONGMUFACTOR	"longitudinal mu factor"
 
 /* Compounds */
 #define SECT_SOFT            "soft"
@@ -948,12 +950,6 @@ typedef struct CarElt
 #define VAL_DIFF_VISCOUS_COUPLER "VISCOUS COUPLER"
 #define VAL_DIFF_15WAY_LSD	"1.5 WAY LSD"
 #define VAL_DIFF_ELECTRONIC_LSD	"ELECTRONIC LSD"
-
-/* Fuel types */
-#define PRM_FUEL_TYPE		"Fuel Type"
-#define VAL_FUEL_BASIC		"Basic"
-#define VAL_FUEL_PETROL		"Petrol"
-#define VAL_FUEL_ELECTRIC	"Electric"
 
 typedef enum
 {
