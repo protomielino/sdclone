@@ -873,11 +873,15 @@ static void xmlStartElement (void *userData , const char *name, const char **att
         if (curParam->min > curParam->valnum)
         {
             if (TraceLoggersAvailable)
-                GfLogWarning("Param '%s' : Loaded value (%f) < min (%f); fixing the min\n",
-                         shortName, curParam->valnum, curParam->min);
+                GfLogWarning("Param '%s' %s at line %lu : Loaded value (%f) < min (%f); fixing the min\n",
+                    shortName, parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name,
+                    XML_GetCurrentLineNumber(parmHandle->parser),
+                    curParam->valnum, curParam->min);
             else
-                fprintf(stderr,"Param '%s' : Loaded value (%f) < min (%f); fixing the min\n",
-                         shortName, curParam->valnum, curParam->min);
+                fprintf(stderr,"Param '%s' %s at line %lu : Loaded value (%f) < min (%f); fixing the min\n",
+                    shortName, parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name,
+                    XML_GetCurrentLineNumber(parmHandle->parser),
+                    curParam->valnum, curParam->min);
 
             curParam->min = curParam->valnum;
         }
@@ -885,11 +889,15 @@ static void xmlStartElement (void *userData , const char *name, const char **att
         if (curParam->max < curParam->valnum)
         {
             if (TraceLoggersAvailable)
-                GfLogWarning("Param '%s' : Loaded value (%f) > max (%f); fixing the max\n",
-                         shortName, curParam->valnum, curParam->max);
+                GfLogWarning("Param '%s' %s at line %lu : Loaded value (%f) > max (%f); fixing the max\n",
+                    shortName, parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name,
+                    XML_GetCurrentLineNumber(parmHandle->parser),
+                    curParam->valnum, curParam->max);
             else
-                fprintf(stderr,"Param '%s' : Loaded value (%f) > max (%f); fixing the max\n",
-                         shortName, curParam->valnum, curParam->max);
+                fprintf(stderr,"Param '%s' %s at line %lu : Loaded value (%f) > max (%f); fixing the max\n",
+                    shortName, parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name,
+                    XML_GetCurrentLineNumber(parmHandle->parser),
+                    curParam->valnum, curParam->max);
 
             curParam->max = curParam->valnum;
         }
