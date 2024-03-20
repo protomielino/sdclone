@@ -1139,11 +1139,13 @@ parseXml (struct parmHandle *parmHandle, char *buf, int len, int done)
     if (!XML_Parse(parmHandle->parser, buf, len, done))
     {
         if (TraceLoggersAvailable)
-            GfLogError ("parseXml: %s at line %lu\n",
+            GfLogError ("parseXml: %s %s at line %lu\n",
+                (parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name),
                 (char*)XML_ErrorString (XML_GetErrorCode (parmHandle->parser)),
                 XML_GetCurrentLineNumber (parmHandle->parser));
         else
-            fprintf (stderr,"parseXml: %s at line %lu\n",
+            fprintf (stderr,"parseXml: %s %s at line %lu\n",
+                (parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name),
                 (char*)XML_ErrorString (XML_GetErrorCode (parmHandle->parser)),
                 XML_GetCurrentLineNumber (parmHandle->parser));
         return 1;
