@@ -1302,6 +1302,10 @@ void GfuiMenuScreen::addShortcut(int key, const char* descr, void* userData,
     GfuiAddKey(menuHdle, key, descr, userData, onKeyPressed, onKeyReleased);
 }
 
+tdble GfuiMenuScreen::getNumProperty(const char *pszName, tdble nDefVal, const char *pszUnit)
+{
+    return GfParmGetNum(xmlDescParmHdle, GFMNU_SECT_PROPERTIES, pszName, pszUnit, nDefVal);
+}
 
 int GfuiMenuScreen::getDynamicControlId(const char* pszName) const
 {

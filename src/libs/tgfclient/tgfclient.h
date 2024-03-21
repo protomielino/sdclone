@@ -399,6 +399,8 @@ public:
     void addShortcut(int key, const char* descr, void* userData,
                      tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 
+    tdble getNumProperty(const char *pszName, tdble nDefVal, const char *pszUnit = nullptr);
+
     bool closeXMLDescriptor();
 
     void runMenu();
