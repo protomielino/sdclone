@@ -325,17 +325,32 @@ TGFCLIENT_API void GfuiSwapBuffers(void);
 class TGFCLIENT_API GfuiMenuScreen
 {
 public:
-    GfuiMenuScreen(const char* pszXMLDescFile);
+    GfuiMenuScreen(const char* pszXMLDescFile) : strXMLDescFileName(pszXMLDescFile)
+    {
+    }
+
     virtual ~GfuiMenuScreen();
 
     void createMenu(float* bgColor = 0,
                     void* userDataOnActivate = 0, tfuiCallback onActivate = 0,
                     void* userDataOnDeactivate = 0, tfuiCallback onDeactivate = 0,
                     int mouseAllowed = 0);
-    void setMenuHandle(void* hdle);
-    void* getMenuHandle() const;
-    void setPreviousMenuHandle(void* hdle);
-    void* getPreviousMenuHandle() const;
+    void setMenuHandle(void* hdle)
+    {
+        menuHdle = hdle;
+    }
+    void* getMenuHandle() const
+    {
+        return menuHdle;
+    }
+    void setPreviousMenuHandle(void* hdle)
+    {
+        prevMenuHdle = hdle;
+    }
+    void* getPreviousMenuHandle() const
+    {
+        return prevMenuHdle;
+    }
 
     bool openXMLDescriptor();
 
@@ -389,7 +404,11 @@ public:
     void runMenu();
 
 private:
-    struct gfuiMenuPrivateData* m_priv;
+    void *menuHdle = nullptr;
+    void *prevMenuHdle = nullptr;
+    std::string strXMLDescFileName;
+    void *xmlDescParmHdle = nullptr;
+    std::map<std::string, int> mapControlIds;
 };
 
 /* Mouse management */

@@ -1013,32 +1013,11 @@ GfuiMenuGetStrProperty(void* hparm, const char* pszName, const char* pszDefVal)
 //===================================================================================
 // GfuiMenuScreen class implementation
 
-struct gfuiMenuPrivateData
-{
-    void* menuHdle;
-    void* prevMenuHdle;
-    std::string strXMLDescFileName;
-    void* xmlDescParmHdle;
-    std::map<std::string, int> mapControlIds;
-};
-
-
-GfuiMenuScreen::GfuiMenuScreen(const char* pszXMLDescFile)
-: m_priv(new gfuiMenuPrivateData)
-{
-    m_priv->menuHdle = 0;
-    m_priv->prevMenuHdle = 0;
-    m_priv->strXMLDescFileName = pszXMLDescFile;
-    m_priv->xmlDescParmHdle = 0;
-    m_priv->prevMenuHdle = 0;
-}
-
 GfuiMenuScreen::~GfuiMenuScreen()
 {
     closeXMLDescriptor();
-    if (m_priv->menuHdle)
-        GfuiScreenRelease(m_priv->menuHdle);
-    delete m_priv;
+    if (menuHdle)
+        GfuiScreenRelease(menuHdle);
 }
 
 void GfuiMenuScreen::createMenu(float* bgColor,
@@ -1046,42 +1025,22 @@ void GfuiMenuScreen::createMenu(float* bgColor,
                                 void* userDataOnDeactivate, tfuiCallback onDeactivate,
                                 int mouseAllowed)
 {
-    m_priv->menuHdle = GfuiScreenCreate(bgColor, userDataOnActivate, onActivate,
+    menuHdle = GfuiScreenCreate(bgColor, userDataOnActivate, onActivate,
                                           userDataOnDeactivate, onDeactivate, mouseAllowed);
-}
-
-void GfuiMenuScreen::setMenuHandle(void* hdle)
-{
-    m_priv->menuHdle = hdle;
-}
-
-void* GfuiMenuScreen::getMenuHandle() const
-{
-    return m_priv->menuHdle;
-}
-
-void GfuiMenuScreen::setPreviousMenuHandle(void* hdle)
-{
-    m_priv->prevMenuHdle = hdle;
-}
-
-void* GfuiMenuScreen::getPreviousMenuHandle() const
-{
-    return m_priv->prevMenuHdle;
 }
 
 bool GfuiMenuScreen::openXMLDescriptor()
 {
-    m_priv->xmlDescParmHdle = GfuiMenuLoad(m_priv->strXMLDescFileName.c_str());
-    return m_priv->xmlDescParmHdle != 0;
+    xmlDescParmHdle = GfuiMenuLoad(strXMLDescFileName.c_str());
+    return xmlDescParmHdle != 0;
 }
 
 bool GfuiMenuScreen::closeXMLDescriptor()
 {
-    if (m_priv->xmlDescParmHdle)
+    if (xmlDescParmHdle)
     {
-        GfParmReleaseHandle(m_priv->xmlDescParmHdle);
-        m_priv->xmlDescParmHdle = 0;
+        GfParmReleaseHandle(xmlDescParmHdle);
+        xmlDescParmHdle = 0;
         return true;
     }
     return false;
@@ -1089,28 +1048,28 @@ bool GfuiMenuScreen::closeXMLDescriptor()
 
 bool GfuiMenuScreen::createStaticControls()
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return false;
 
-    return m_priv->menuHdle && m_priv->xmlDescParmHdle
-           && ::GfuiMenuCreateStaticControls(m_priv->menuHdle, m_priv->xmlDescParmHdle);
+    return menuHdle && xmlDescParmHdle
+           && ::GfuiMenuCreateStaticControls(menuHdle, xmlDescParmHdle);
 }
 
 int GfuiMenuScreen::createButtonControl(const char* pszName,
                                         void* userDataOnPush, tfuiCallback onPush,
                                         void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateButtonControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateButtonControl(menuHdle, xmlDescParmHdle, pszName,
                                           userDataOnPush, onPush,
                                           userDataOnFocus, onFocus, onFocusLost);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1128,20 +1087,20 @@ int GfuiMenuScreen::createTextButtonControl(const char* pszName, void* userDataO
                                             int x, int y, int width, int font, int textHAlign,
                                             const float* fgColor, const float* fgFocusColor, const float* fgPushedColor)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateTextButtonControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateTextButtonControl(menuHdle, xmlDescParmHdle, pszName,
                                               userDataOnPush, onPush,
                                               userDataOnFocus, onFocus, onFocusLost,
                                               bFromTemplate,
                                               text, tip, x, y, width, font, textHAlign,
                                               fgColor, fgFocusColor, fgPushedColor);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1157,19 +1116,19 @@ int GfuiMenuScreen::createImageButtonControl(const char* pszName,
                                              const char* tip,
                                              int x, int y, int width, int height)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateImageButtonControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateImageButtonControl(menuHdle, xmlDescParmHdle, pszName,
                                                userDataOnPush, onPush,
                                                userDataOnFocus, onFocus, onFocusLost,
                                                bFromTemplate,
                                                tip, x, y, width, height);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1180,15 +1139,15 @@ int GfuiMenuScreen::createImageButtonControl(const char* pszName,
 
 int GfuiMenuScreen::createStaticImageControl(const char* pszName)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateStaticImageControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName);
+            ::GfuiMenuCreateStaticImageControl(menuHdle, xmlDescParmHdle, pszName);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1202,18 +1161,18 @@ int GfuiMenuScreen::createLabelControl(const char* pszName, bool bFromTemplate,
                                        int nFontId, int nWidth, int nHAlignId, int nMaxLen,
                                        const float* aFgColor, const float* aFgFocusColor)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateLabelControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateLabelControl(menuHdle, xmlDescParmHdle, pszName,
                                          bFromTemplate, pszText, nX, nY,
                                          nFontId, nWidth, nHAlignId,
                                          nMaxLen, aFgColor, aFgFocusColor);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1226,16 +1185,16 @@ int GfuiMenuScreen::createEditControl(const char* pszName,
                                       void* userDataOnFocus, tfuiCallback onFocus,
                                       tfuiCallback onFocusLost)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateEditControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateEditControl(menuHdle, xmlDescParmHdle, pszName,
                               userDataOnFocus, onFocus, onFocusLost);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1247,16 +1206,16 @@ int GfuiMenuScreen::createEditControl(const char* pszName,
 int GfuiMenuScreen::createScrollListControl(const char* pszName,
                                             void* userData, tfuiCallback onSelect)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateScrollListControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateScrollListControl(menuHdle, xmlDescParmHdle, pszName,
                                               userData, onSelect);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1268,16 +1227,16 @@ int GfuiMenuScreen::createScrollListControl(const char* pszName,
 int GfuiMenuScreen::createComboboxControl(const char* pszName,
                                           void* userData, tfuiComboboxCallback onChange)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateComboboxControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateComboboxControl(menuHdle, xmlDescParmHdle, pszName,
                                             userData, onChange);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1289,16 +1248,16 @@ int GfuiMenuScreen::createComboboxControl(const char* pszName,
 int GfuiMenuScreen::createCheckboxControl(const char* pszName,
                                           void* userData, tfuiCheckboxCallback onChange)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateCheckboxControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName,
+            ::GfuiMenuCreateCheckboxControl(menuHdle, xmlDescParmHdle, pszName,
                                             userData, onChange);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1309,15 +1268,15 @@ int GfuiMenuScreen::createCheckboxControl(const char* pszName,
 
 int GfuiMenuScreen::createProgressbarControl(const char* pszName)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return -1;
 
-    if (m_priv->mapControlIds.find(pszName) == m_priv->mapControlIds.end())
+    if (mapControlIds.find(pszName) == mapControlIds.end())
     {
         const int nCtrlId =
-            ::GfuiMenuCreateProgressbarControl(m_priv->menuHdle, m_priv->xmlDescParmHdle, pszName);
+            ::GfuiMenuCreateProgressbarControl(menuHdle, xmlDescParmHdle, pszName);
         if (nCtrlId >= 0)
-            m_priv->mapControlIds[pszName] = nCtrlId;
+            mapControlIds[pszName] = nCtrlId;
 
         return nCtrlId;
     }
@@ -1328,33 +1287,33 @@ int GfuiMenuScreen::createProgressbarControl(const char* pszName)
 
 void GfuiMenuScreen::addDefaultShortcuts()
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return;
 
-    GfuiMenuDefaultKeysAdd(m_priv->menuHdle);
+    GfuiMenuDefaultKeysAdd(menuHdle);
 }
 
 void GfuiMenuScreen::addShortcut(int key, const char* descr, void* userData,
                                  tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return;
 
-    GfuiAddKey(m_priv->menuHdle, key, descr, userData, onKeyPressed, onKeyReleased);
+    GfuiAddKey(menuHdle, key, descr, userData, onKeyPressed, onKeyReleased);
 }
 
 
 int GfuiMenuScreen::getDynamicControlId(const char* pszName) const
 {
-    std::map<std::string, int>::const_iterator iterCtrlId = m_priv->mapControlIds.find(pszName);
+    std::map<std::string, int>::const_iterator iterCtrlId = mapControlIds.find(pszName);
 
-    return iterCtrlId == m_priv->mapControlIds.end() ? -1 : (*iterCtrlId).second;
+    return iterCtrlId == mapControlIds.end() ? -1 : (*iterCtrlId).second;
 }
 
 void GfuiMenuScreen::runMenu()
 {
-    if (!m_priv->xmlDescParmHdle && !openXMLDescriptor())
+    if (!xmlDescParmHdle && !openXMLDescriptor())
         return;
 
-    GfuiScreenActivate(m_priv->menuHdle);
+    GfuiScreenActivate(menuHdle);
 }
