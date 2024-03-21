@@ -107,10 +107,15 @@ private:
 	float	_fBezelComp;
 	float	_fScreenDist;
 
+	int	_nSpansplitIndex;
+
+	int	_nBezelCompID;
+	int	_nScreenDistId;
+	int	_nArcRatioID;
 
 #ifndef NoMaxRefreshRate
 	//! Currently selected max. refresh rate (Hz).
-	int _nMaxRefreshRate;
+	int	_nMaxRefreshRate;
 #endif	
 };
 

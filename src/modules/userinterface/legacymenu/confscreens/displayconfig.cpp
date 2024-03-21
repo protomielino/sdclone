@@ -38,15 +38,6 @@ static const int AMaxRefreshRates[] = { 0, 30, 40, 50, 60, 75, 85, 100, 120, 150
 static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefreshRates[0]);
 #endif	
 
-// The unique DisplayMenu instance.
-static DisplayMenu* PDisplayMenu = 0;
-
-static int	SpansplitIndex = 0;
-
-static int sBezelCompID;
-static int sScreenDistId;
-static int sArcRatioID;
-
 
 // Call-backs ================================================================
 void DisplayMenu::onActivate(void *pDisplayMenu)
@@ -96,15 +87,15 @@ void DisplayMenu::onChangeMonitorType(tComboBoxInfo *pInfo)
 void DisplayMenu::onChangeSpansplit(tComboBoxInfo *pInfo)
 {
  	// Get the DisplayMenu instance from call-back user data.
-	//DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
+	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
 
-	SpansplitIndex = pInfo->nPos;
+	pMenu->_nSpansplitIndex = pInfo->nPos;
 }
 
 void DisplayMenu::onChangeBezelComp(void *pDisplayMenu)
 {
     DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
-    char* val = GfuiEditboxGetString(PDisplayMenu->getMenuHandle(), sBezelCompID);
+    char* val = GfuiEditboxGetString(pMenu->getMenuHandle(), pMenu->_nBezelCompID);
     sscanf(val, "%g", &pMenu->_fBezelComp);
     if (pMenu->_fBezelComp > 150.0f)
         pMenu->_fBezelComp = 150.0f;
@@ -113,13 +104,13 @@ void DisplayMenu::onChangeBezelComp(void *pDisplayMenu)
 
     char buf[32];
     sprintf(buf, "%g", pMenu->_fBezelComp);
-    GfuiEditboxSetString(pMenu->getMenuHandle(), sBezelCompID, buf);
+    GfuiEditboxSetString(pMenu->getMenuHandle(), pMenu->_nBezelCompID, buf);
 }
 
 void DisplayMenu::onChangeScreenDist(void *pDisplayMenu)
 {
     DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
-    char* val = GfuiEditboxGetString(PDisplayMenu->getMenuHandle(), sScreenDistId);
+    char* val = GfuiEditboxGetString(pMenu->getMenuHandle(), pMenu->_nScreenDistId);
     sscanf(val, "%g", &pMenu->_fScreenDist);
     if (pMenu->_fScreenDist > 25.0f)
         pMenu->_fScreenDist = 25.0f;
@@ -128,23 +119,23 @@ void DisplayMenu::onChangeScreenDist(void *pDisplayMenu)
 
     char buf[32];
     sprintf(buf, "%g", pMenu->_fScreenDist);
-    GfuiEditboxSetString(pMenu->getMenuHandle(), sScreenDistId, buf);
+    GfuiEditboxSetString(pMenu->getMenuHandle(), pMenu->_nScreenDistId, buf);
 }
 
 void DisplayMenu::onChangeArcRatio(void *pDisplayMenu)
 {
 	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
 
-	char* val = GfuiEditboxGetString(PDisplayMenu->getMenuHandle(), sArcRatioID);
+	char* val = GfuiEditboxGetString(pMenu->getMenuHandle(), pMenu->_nArcRatioID);
 	sscanf(val, "%g", &pMenu->_fArcRatio);
-	if (PDisplayMenu->_fArcRatio > 2.0f)
-		PDisplayMenu->_fArcRatio = 2.0f;
-	else if (PDisplayMenu->_fArcRatio < 0.0f)
-		PDisplayMenu->_fArcRatio = 0.0f;
+	if (pMenu->_fArcRatio > 2.0f)
+		pMenu->_fArcRatio = 2.0f;
+	else if (pMenu->_fArcRatio < 0.0f)
+		pMenu->_fArcRatio = 0.0f;
 
 	char buf[32];
-	sprintf(buf, "%g", PDisplayMenu->_fArcRatio);
-	GfuiEditboxSetString(PDisplayMenu->getMenuHandle(), sArcRatioID, buf);
+	sprintf(buf, "%g", pMenu->_fArcRatio);
+	GfuiEditboxSetString(pMenu->getMenuHandle(), pMenu->_nArcRatioID, buf);
 }
 
 void DisplayMenu::onChangeMenuDisplay(tComboBoxInfo *pInfo)
@@ -247,19 +238,19 @@ void DisplayMenu::updateControls()
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eDisplayType);
 
 	nControlId = getDynamicControlId("SpanSplitsCombo");
-	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, SpansplitIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _nSpansplitIndex);
 
 	nControlId = getDynamicControlId("StartupDisplayCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _nMenuDisplay);
 
-	sprintf(buf, "%g", PDisplayMenu->_fBezelComp);
-	GfuiEditboxSetString(getMenuHandle(), sBezelCompID, buf);
+	sprintf(buf, "%g", _fBezelComp);
+	GfuiEditboxSetString(getMenuHandle(), _nBezelCompID, buf);
 
-	sprintf(buf, "%g", PDisplayMenu->_fScreenDist);
-	GfuiEditboxSetString(getMenuHandle(), sScreenDistId, buf);
+	sprintf(buf, "%g", _fScreenDist);
+	GfuiEditboxSetString(getMenuHandle(), _nScreenDistId, buf);
 
-	sprintf(buf, "%g", PDisplayMenu->_fArcRatio);
-	GfuiEditboxSetString(getMenuHandle(), sArcRatioID, buf);
+	sprintf(buf, "%g", _fArcRatio);
+	GfuiEditboxSetString(getMenuHandle(), _nArcRatioID, buf);
 
 #ifndef NoMaxRefreshRate
 	nControlId = getDynamicControlId("MaxRefreshRateCombo");
@@ -363,12 +354,12 @@ void DisplayMenu::loadGraphicSettings()
 	const char *pszSpanSplit =
 		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
 
-	SpansplitIndex = 0;
+	_nSpansplitIndex = 0;
 	for (int i = 0; i < NbSpansplitValues; i++)
 	{
 		if (!strcmp(pszSpanSplit, SpansplitValues[i]))
 		{
-			SpansplitIndex = i;
+			_nSpansplitIndex = i;
 			break;
 		}
 	}
@@ -417,7 +408,7 @@ void DisplayMenu::storeGraphicSettings() const
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, MonitorTypes[_eDisplayType]);
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, SpansplitValues[SpansplitIndex]);
+    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, SpansplitValues[_nSpansplitIndex]);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", _fBezelComp);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, _fScreenDist);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, _fArcRatio);
@@ -630,9 +621,9 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 		GfuiEnable(getMenuHandle(),nMenuDisplayComboId,GFUI_DISABLE);
 	}
 
-	sBezelCompID = createEditControl("bezelcompedit", this, NULL, onChangeBezelComp);
-	sScreenDistId = createEditControl("screendistedit", this, NULL, onChangeScreenDist);
-	sArcRatioID = createEditControl("arcratioedit", this, NULL, onChangeArcRatio);
+	_nBezelCompID = createEditControl("bezelcompedit", this, NULL, onChangeBezelComp);
+	_nScreenDistId = createEditControl("screendistedit", this, NULL, onChangeScreenDist);
+	_nArcRatioID = createEditControl("arcratioedit", this, NULL, onChangeArcRatio);
 
 
 #ifndef NoMaxRefreshRate
@@ -685,6 +676,9 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	return true;
 }
 
+// The unique DisplayMenu instance.
+static DisplayMenu *PDisplayMenu = 0;
+
 /** Create and activate the display options menu screen.
     @ingroup	screen
     @param	precMenu	previous menu to return to
@@ -707,5 +701,5 @@ void* DisplayMenuInit(void *pPreviousMenu)
 void DisplayMenuRelease(void)
 {
 	delete PDisplayMenu;
-   PDisplayMenu = NULL;
+	PDisplayMenu = NULL;
 }
