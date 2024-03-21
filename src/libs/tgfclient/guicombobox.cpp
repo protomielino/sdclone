@@ -381,9 +381,6 @@ gfuiReleaseCombobox(tGfuiObject *obj)
 
 	tGfuiLabel	*label;
     label = &(obj->u.combobox.label);
-	freez(label->userDataOnFocus);
     free(label->text);
-
-	freez(obj->u.combobox.userDataOnFocus);
     free(obj);
 }

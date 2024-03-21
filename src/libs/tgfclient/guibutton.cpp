@@ -754,7 +754,6 @@ gfuiReleaseButton(tGfuiObject *obj)
 
 	tGfuiLabel *label = &(button->label);
 
-	freez(button->userDataOnFocus);
 	free(label->text);
 	free(obj);
 }//gfuiReleaseButton
@@ -774,6 +773,5 @@ gfuiReleaseGrButton(tGfuiObject *obj)
 	GfTexFreeTexture(button->focused);
 	GfTexFreeTexture(button->pushed);
 
-	freez(button->userDataOnFocus);
 	free(obj);
 }//gfuiReleaseGrButton

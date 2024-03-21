@@ -451,7 +451,6 @@ gfuiReleaseLabel(tGfuiObject *obj)
 
     label = &(obj->u.label);
 
-    freez(label->userDataOnFocus);
     free(label->text);
 	GfTexFreeTexture(label->bgImg);
     free(obj);

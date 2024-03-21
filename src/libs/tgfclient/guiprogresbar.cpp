@@ -125,7 +125,6 @@ gfuiReleaseProgressbar(tGfuiObject *obj)
 
 	progress = &(obj->u.progressbar);
 	GfTexFreeTexture(progress->fgImage);
-	freez(progress->userDataOnFocus);
 
 	free(obj);
 }
