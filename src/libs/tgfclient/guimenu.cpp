@@ -1304,6 +1304,9 @@ void GfuiMenuScreen::addShortcut(int key, const char* descr, void* userData,
 
 tdble GfuiMenuScreen::getNumProperty(const char *pszName, tdble nDefVal, const char *pszUnit)
 {
+    if (!xmlDescParmHdle && !openXMLDescriptor())
+        return nDefVal;
+
     return GfParmGetNum(xmlDescParmHdle, GFMNU_SECT_PROPERTIES, pszName, pszUnit, nDefVal);
 }
 
