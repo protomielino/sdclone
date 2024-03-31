@@ -252,6 +252,8 @@ main(int argc, char *argv[])
 		GfData::shutdown();
 	}
 
+	GfParmReleaseHandle(hREParams);
+
 	// Done with the app instance.
 	const std::string strAppName(pApp->name());
 	delete pApp;
