@@ -779,6 +779,11 @@ void GfScrShutdown(void)
     GLContext = NULL;
     SDL_DestroyWindow(GfuiWindow);
     GfuiWindow = NULL;
+    if(PScreenSurface)
+    {
+        SDL_FreeSurface(PScreenSurface);
+        PScreenSurface = NULL;
+    }
 
     // Shutdown SDL video sub-system.
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
