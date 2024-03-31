@@ -52,6 +52,8 @@ gfuiInitButton(void)
 	snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_IMAGEBUTTON);
 	NHImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 0.0);
 	NVImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0, 0.0);
+
+	GfParmReleaseHandle(hparmScr);
 }
 
 /** Initialize an image button.

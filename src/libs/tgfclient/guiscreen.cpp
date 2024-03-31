@@ -189,6 +189,9 @@ ScreenSizeVector GfScrGetCustomWindowSizes()
       }
       while (GfParmListSeekNext(hparmScreen, GFSCR_SECT_WIN_MODES) == 0);
    }
+
+   GfParmReleaseHandle(hparmScreen);
+
    return vecSizes;
 }
 

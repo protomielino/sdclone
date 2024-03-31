@@ -49,6 +49,8 @@ gfuiInitEditbox(void)
     snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_EDITBOX);
     NHPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 10.0);
     NVPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0,  5.0);
+
+    GfParmReleaseHandle(hparmScr);
 }
 
 /* recalc cursorx with cursorIdx */
