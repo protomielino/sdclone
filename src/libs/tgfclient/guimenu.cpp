@@ -1310,6 +1310,76 @@ tdble GfuiMenuScreen::getNumProperty(const char *pszName, tdble nDefVal, const c
     return GfParmGetNum(xmlDescParmHdle, GFMNU_SECT_PROPERTIES, pszName, pszUnit, nDefVal);
 }
 
+void GfuiMenuScreen::setLabelText(int id, const char *text)
+{
+    GfuiLabelSetText(menuHdle, id, text);
+}
+
+void GfuiMenuScreen::setLabelText(int id, const std::string &text)
+{
+    GfuiLabelSetText(menuHdle, id, text.c_str());
+}
+
+void GfuiMenuScreen::setLabelText(int id, int value)
+{
+    GfuiLabelSetText(menuHdle, id, std::to_string(value).c_str());
+}
+
+void GfuiMenuScreen::setLabelText(int id, float value)
+{
+    GfuiLabelSetText(menuHdle, id, std::to_string(value).c_str());
+}
+
+const char *GfuiMenuScreen::getEditboxText(int id) const
+{
+    return GfuiEditboxGetString(menuHdle, id);
+}
+
+void GfuiMenuScreen::setEditboxText(int id, const char *text)
+{
+    GfuiEditboxSetString(menuHdle, id, text);
+}
+
+void GfuiMenuScreen::setEditboxText(int id, const std::string &text)
+{
+    GfuiEditboxSetString(menuHdle, id, text.c_str());
+}
+
+void GfuiMenuScreen::setEditboxText(int id, int value)
+{
+    GfuiEditboxSetString(menuHdle, id, std::to_string(value).c_str());
+}
+
+void GfuiMenuScreen::setEditboxText(int id, float value)
+{
+    GfuiEditboxSetString(menuHdle, id, std::to_string(value).c_str());
+}
+
+unsigned int GfuiMenuScreen::addComboboxText(int id, const char *text)
+{
+    return GfuiComboboxAddText(menuHdle, id, text);
+}
+
+const char *GfuiMenuScreen::getComboboxText(int id) const
+{
+    return GfuiComboboxGetText(menuHdle, id);
+}
+
+void GfuiMenuScreen::setComboboxSelectedIndex(int id, unsigned int index)
+{
+    GfuiComboboxSetSelectedIndex(menuHdle, id, index);
+}
+
+void GfuiMenuScreen::setComboboxPosition(int id, unsigned int pos)
+{
+    GfuiComboboxSetPosition(menuHdle, id, pos);
+}
+
+int GfuiMenuScreen::setEnable(int id, bool state)
+{
+    return GfuiEnable(menuHdle, id, state ? GFUI_ENABLE : GFUI_DISABLE);
+}
+
 int GfuiMenuScreen::getDynamicControlId(const char* pszName) const
 {
     std::map<std::string, int>::const_iterator iterCtrlId = mapControlIds.find(pszName);

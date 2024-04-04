@@ -401,6 +401,24 @@ public:
 
     tdble getNumProperty(const char *pszName, tdble nDefVal, const char *pszUnit = nullptr);
 
+    void setLabelText(int id, const char *text);
+    void setLabelText(int id, const std::string &text);
+    void setLabelText(int id, int value);
+    void setLabelText(int id, float value);
+
+    const char *getEditboxText(int id) const;
+    void setEditboxText(int id, const char *text);
+    void setEditboxText(int id, const std::string &text);
+    void setEditboxText(int id, int value);
+    void setEditboxText(int id, float value);
+
+    unsigned int addComboboxText(int id, const char *text);
+    const char *getComboboxText(int id) const;
+    void setComboboxSelectedIndex(int id, unsigned int index);
+    void setComboboxPosition(int id, unsigned int pos);
+
+    int setEnable(int id, bool state);
+
     bool closeXMLDescriptor();
 
     void runMenu();
