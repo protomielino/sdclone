@@ -776,6 +776,7 @@ public class XmlWriter
 		addContent(element, "longitude", "deg", editorFrame.getTrackData().getLocalInfo().getLongitude());
 		addContent(element, "climat", null, editorFrame.getTrackData().getLocalInfo().getClimat());
 		addContent(element, "precipitation", null, editorFrame.getTrackData().getLocalInfo().getPrecipitation());
+		addContent(element, "best lap", null, editorFrame.getTrackData().getLocalInfo().getBestLap());
 
 		return element;
 	}
@@ -807,9 +808,35 @@ public class XmlWriter
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Graphic"));
 
-		addContent(element, "3d description", trackname + ".ac");
+		if (editorFrame.getTrackData().getGraphic().getDescription() == null)
+			addContent(element, "3d description", trackname + ".ac");
+		else
+			addContent(element, "3d description", editorFrame.getTrackData().getGraphic().getDescription());
 		addContent(element, "3d description night", editorFrame.getTrackData().getGraphic().getDescriptionNight());
 		addContent(element, "3d description rain+night", editorFrame.getTrackData().getGraphic().getDescriptionRainNight());
+
+		addContent(element, "3d separate objects", editorFrame.getTrackData().getGraphic().getSeparateObjects());
+		addContent(element, "3d terrain", editorFrame.getTrackData().getGraphic().getTerrainObjects());
+		addContent(element, "3d road", editorFrame.getTrackData().getGraphic().getRoadObjects());
+		addContent(element, "3d road2", editorFrame.getTrackData().getGraphic().getRoad2Objects());
+		addContent(element, "3d trees", editorFrame.getTrackData().getGraphic().getTreesObjects());
+		addContent(element, "3d building", editorFrame.getTrackData().getGraphic().getBuildingObjects());
+		addContent(element, "3d house", editorFrame.getTrackData().getGraphic().getHouseObjects());
+		addContent(element, "3d cars", editorFrame.getTrackData().getGraphic().getCarsObjects());
+		addContent(element, "3d truck", editorFrame.getTrackData().getGraphic().getTruckObjects());
+		addContent(element, "3d tribunes", editorFrame.getTrackData().getGraphic().getTribunesObjects());
+		addContent(element, "3d pub", editorFrame.getTrackData().getGraphic().getPubObjects());
+		addContent(element, "3d decors", editorFrame.getTrackData().getGraphic().getDecorsObjects());
+		addContent(element, "3d water", editorFrame.getTrackData().getGraphic().getWaterObjects());
+		addContent(element, "3d grass", editorFrame.getTrackData().getGraphic().getGrassObjects());
+		addContent(element, "3d sand", editorFrame.getTrackData().getGraphic().getSandObjects());
+		addContent(element, "3d rock", editorFrame.getTrackData().getGraphic().getRockObjects());
+		addContent(element, "3d curb", editorFrame.getTrackData().getGraphic().getCurbObjects());
+		addContent(element, "3d fence", editorFrame.getTrackData().getGraphic().getFenceObjects());
+		addContent(element, "3d barrier", editorFrame.getTrackData().getGraphic().getBarrierObjects());
+		addContent(element, "3d wall", editorFrame.getTrackData().getGraphic().getWallObjects());
+		addContent(element, "3d environment", editorFrame.getTrackData().getGraphic().getEnvironmentObjects());
+
 		addContent(element, "background image", editorFrame.getTrackData().getGraphic().getBackgroundImage());
 		addContent(element, "background type", null, editorFrame.getTrackData().getGraphic().getBackgroundType());
 		addContent(element, "background color R", null, editorFrame.getTrackData().getGraphic().getBackgroundColorR());

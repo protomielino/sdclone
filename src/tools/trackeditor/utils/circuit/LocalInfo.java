@@ -14,6 +14,7 @@ public class LocalInfo {
 	private double longitude				= Double.NaN;
 	private int    climat					= Integer.MAX_VALUE;
 	private double precipitation			= Double.NaN;
+	private double bestLap					= Double.NaN;
 
 	public String getStation() {
 		return station;
@@ -87,6 +88,12 @@ public class LocalInfo {
 	public void setPrecipitation(double precipitation) {
 		this.precipitation = precipitation;
 	}
+	public double getBestLap() {
+		return bestLap;
+	}
+	public void setBestLap(double bestLap) {
+		this.bestLap = bestLap;
+	}
 
 	public void dump(String indent)
     {
@@ -103,5 +110,6 @@ public class LocalInfo {
 		System.out.println(indent + "  longitude             : " + longitude);
 		System.out.println(indent + "  climat                : " + climat);
 		System.out.println(indent + "  precipitation         : " + precipitation);
+		System.out.println(indent + "  bestLap               : " + bestLap);
     }
 }

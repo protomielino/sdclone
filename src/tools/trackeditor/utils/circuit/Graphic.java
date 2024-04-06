@@ -6,6 +6,29 @@ public class Graphic {
     private String 						description				= null;
     private String 						descriptionNight		= null;
     private String 						descriptionRainNight	= null;
+
+    private String 						separateObjects			= null;
+    private String 						terrainObjects			= null;
+    private String 						roadObjects				= null;
+    private String 						road2Objects			= null;
+    private String 						treesObjects			= null;
+    private String 						buildingObjects			= null;
+    private String 						houseObjects			= null;
+    private String 						carsObjects				= null;
+    private String 						truckObjects			= null;
+    private String 						tribunesObjects			= null;
+    private String 						pubObjects				= null;
+    private String 						decorsObjects			= null;
+    private String 						waterObjects			= null;
+    private String 						grassObjects			= null;
+    private String 						sandObjects				= null;
+    private String 						rockObjects				= null;
+    private String 						curbObjects				= null;
+    private String 						fenceObjects			= null;
+    private String 						barrierObjects			= null;
+    private String 						wallObjects				= null;
+    private String 						environmentObjects		= null;
+
     private String 						backgroundImage			= null;
     private int							backgroundType			= Integer.MAX_VALUE;
     private double 						backgroundColorR		= Double.NaN;
@@ -46,6 +69,132 @@ public class Graphic {
 	}
 	public void setDescriptionRainNight(String descriptionRaiNight) {
 		this.descriptionRainNight = descriptionRaiNight;
+	}
+	public String getSeparateObjects() {
+		return separateObjects;
+	}
+	public void setSeparateObjects(String separateObjects) {
+		this.separateObjects = separateObjects;
+	}
+	public String getTerrainObjects() {
+		return terrainObjects;
+	}
+	public void setTerrainObjects(String terrainObjects) {
+		this.terrainObjects = terrainObjects;
+	}
+	public String getRoadObjects() {
+		return roadObjects;
+	}
+	public void setRoadObjects(String roadObjects) {
+		this.roadObjects = roadObjects;
+	}
+	public String getRoad2Objects() {
+		return road2Objects;
+	}
+	public void setRoad2Objects(String road2Objects) {
+		this.road2Objects = road2Objects;
+	}
+	public String getTreesObjects() {
+		return treesObjects;
+	}
+	public void setTreesObjects(String treesObjects) {
+		this.treesObjects = treesObjects;
+	}
+	public String getBuildingObjects() {
+		return buildingObjects;
+	}
+	public void setBuildingObjects(String buildingObjects) {
+		this.buildingObjects = buildingObjects;
+	}
+	public String getHouseObjects() {
+		return houseObjects;
+	}
+	public void setHouseObjects(String houseObjects) {
+		this.houseObjects = houseObjects;
+	}
+	public String getCarsObjects() {
+		return carsObjects;
+	}
+	public void setCarsObjects(String carsObjects) {
+		this.carsObjects = carsObjects;
+	}
+	public String getTruckObjects() {
+		return truckObjects;
+	}
+	public void setTruckObjects(String truckObjects) {
+		this.truckObjects = truckObjects;
+	}
+	public String getTribunesObjects() {
+		return tribunesObjects;
+	}
+	public void setTribunesObjects(String tribunesObjects) {
+		this.tribunesObjects = tribunesObjects;
+	}
+	public String getPubObjects() {
+		return pubObjects;
+	}
+	public void setPubObjects(String pubObjects) {
+		this.pubObjects = pubObjects;
+	}
+	public String getDecorsObjects() {
+		return decorsObjects;
+	}
+	public void setDecorsObjects(String decorsObjects) {
+		this.decorsObjects = decorsObjects;
+	}
+	public String getWaterObjects() {
+		return waterObjects;
+	}
+	public void setWaterObjects(String waterObjects) {
+		this.waterObjects = waterObjects;
+	}
+	public String getGrassObjects() {
+		return grassObjects;
+	}
+	public void setGrassObjects(String grassObjects) {
+		this.grassObjects = grassObjects;
+	}
+	public String getSandObjects() {
+		return sandObjects;
+	}
+	public void setSandObjects(String sandObjects) {
+		this.sandObjects = sandObjects;
+	}
+	public String getRockObjects() {
+		return rockObjects;
+	}
+	public void setRockObjects(String rockObjects) {
+		this.rockObjects = rockObjects;
+	}
+	public String getCurbObjects() {
+		return curbObjects;
+	}
+	public void setCurbObjects(String curbObjects) {
+		this.curbObjects = curbObjects;
+	}
+	public String getFenceObjects() {
+		return fenceObjects;
+	}
+	public void setFenceObjects(String fenceObjects) {
+		this.fenceObjects = fenceObjects;
+	}
+	public String getBarrierObjects() {
+		return barrierObjects;
+	}
+	public void setBarrierObjects(String barrierObjects) {
+		this.barrierObjects = barrierObjects;
+	}
+	public String getWallObjects() {
+		return wallObjects;
+	}
+	public void setWallObjects(String wallObjects) {
+		this.wallObjects = wallObjects;
+	}
+	public String getEnvironmentObjects() {
+		return environmentObjects;
+	}
+	public void setEnvironmentObjects(String environmentObjects) {
+		this.environmentObjects = environmentObjects;
 	}
 	public String getBackgroundImage() {
 		return backgroundImage;
