@@ -60,6 +60,8 @@ public class LocalInfoProperties extends PropertyPanel
 	private JTextField	climatTextField					= new JTextField();
 	private JLabel		precipitationLabel				= new JLabel();
 	private JTextField	precipitationTextField			= new JTextField();
+	private JLabel		bestLapLabel					= new JLabel();
+	private JTextField	bestLapTextField				= new JTextField();
 
 	/**
 	 *
@@ -92,6 +94,7 @@ public class LocalInfoProperties extends PropertyPanel
 		addLabel(this, 9, longitudeLabel, "Longitude", 150);
 		addLabel(this, 10, climatLabel, "Climate", 150);
 		addLabel(this, 11, precipitationLabel, "Precipitation", 150);
+		addLabel(this, 12, bestLapLabel, "Best Lap", 150);
 
 		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 125);
 		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 125);
@@ -105,6 +108,7 @@ public class LocalInfoProperties extends PropertyPanel
 		addTextField(this, 9, longitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getLongitude(), 170, 125);
 		addTextField(this, 10, climatTextField, getEditorFrame().getTrackData().getLocalInfo().getClimat(), 170, 125);
 		addTextField(this, 11, precipitationTextField, getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), 170, 125);
+		addTextField(this, 12, bestLapTextField, getEditorFrame().getTrackData().getLocalInfo().getBestLap(), 170, 125);
 	}
 
 	/**
@@ -197,6 +201,13 @@ public class LocalInfoProperties extends PropertyPanel
 			getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), doubleResult))
 		{
 			getEditorFrame().getTrackData().getLocalInfo().setPrecipitation(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(bestLapTextField.getText(),
+			getEditorFrame().getTrackData().getLocalInfo().getBestLap(), doubleResult))
+		{
+			getEditorFrame().getTrackData().getLocalInfo().setBestLap(doubleResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 	}

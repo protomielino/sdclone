@@ -555,6 +555,29 @@ public class XmlReader
         data.setDescription(getAttrStrValue(graphic, "3d description"));
         data.setDescriptionNight(getAttrStrValue(graphic, "3d description night"));
         data.setDescriptionRainNight(getAttrStrValue(graphic, "3d description rain+night"));
+        
+        data.setSeparateObjects(getAttrStrValue(graphic, "3d separate objects"));
+        data.setTerrainObjects(getAttrStrValue(graphic, "3d terrain"));
+        data.setRoadObjects(getAttrStrValue(graphic, "3d road"));
+        data.setRoad2Objects(getAttrStrValue(graphic, "3d road2"));
+        data.setTreesObjects(getAttrStrValue(graphic, "3d trees"));
+        data.setBuildingObjects(getAttrStrValue(graphic, "3d building"));
+        data.setHouseObjects(getAttrStrValue(graphic, "3d house"));
+        data.setCarsObjects(getAttrStrValue(graphic, "3d cars"));
+        data.setTruckObjects(getAttrStrValue(graphic, "3d truck"));
+        data.setTribunesObjects(getAttrStrValue(graphic, "3d tribunes"));
+        data.setPubObjects(getAttrStrValue(graphic, "3d pub"));
+        data.setDecorsObjects(getAttrStrValue(graphic, "3d decors"));
+        data.setWaterObjects(getAttrStrValue(graphic, "3d water"));
+        data.setGrassObjects(getAttrStrValue(graphic, "3d grass"));
+        data.setSandObjects(getAttrStrValue(graphic, "3d sand"));
+        data.setRockObjects(getAttrStrValue(graphic, "3d rock"));
+        data.setCurbObjects(getAttrStrValue(graphic, "3d curb"));
+        data.setFenceObjects(getAttrStrValue(graphic, "3d fence"));
+        data.setBarrierObjects(getAttrStrValue(graphic, "3d barrier"));
+        data.setWallObjects(getAttrStrValue(graphic, "3d wall"));
+        data.setEnvironmentObjects(getAttrStrValue(graphic, "3d environment"));
+        
         data.setBackgroundImage(getAttrStrValue(graphic, "background image"));
         data.setBackgroundType(getAttrIntValue(graphic, "background type"));
         data.setBackgroundColorR(getAttrNumValue(graphic, "background color R"));
@@ -609,7 +632,7 @@ public class XmlReader
 	    		}
 	    		catch (IOException e)
 	    		{
-	        		String msg = path.getFileName() + " : Can't read input file!";
+	        		String msg = path.getFileName() + " : " + e.getLocalizedMessage();
 	            	JOptionPane.showMessageDialog(editorFrame, msg, "Relief File", JOptionPane.ERROR_MESSAGE);
 	    		}
 	    		catch (Ac3dException e)

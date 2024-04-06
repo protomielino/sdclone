@@ -1751,7 +1751,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		if (editorFrame.getCursorCoordinates())
 		{
-			if (editorFrame.getTrackData() != null)
+			if (editorFrame.getTrackData() != null && editorFrame.getTrackData().getSegments() != null)
 			{
 				String coordinates = null;
 
