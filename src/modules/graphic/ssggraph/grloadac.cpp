@@ -257,8 +257,9 @@ static ssgState *get_simple_state ( _ssgMaterial *mat )
   }
   else if (isacar || isawheel)
   {
-      st->enable  ( GL_BLEND );
-      st->setOpaque () ;
+	  st->enable(GL_CULL_FACE);
+      st->enable( GL_BLEND );
+      st->setOpaque();
   }
   else if ( mat->rgb[3] < 0.99 )
   {
