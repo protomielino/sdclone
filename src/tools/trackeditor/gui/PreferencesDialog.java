@@ -36,6 +36,7 @@ public class PreferencesDialog extends JDialog
 	private JCheckBox			cursorCoordinatesCheckBox	= null;
 	private JCheckBox			cursorNamesCheckBox			= null;
 	private JCheckBox			checkDefaultObjectsCheckBox	= null;
+	private JCheckBox			carsSportsRacingCheckBox	= null;
 	private JButton				okButton					= null;
 	private JButton				cancelButton				= null;
 
@@ -48,7 +49,7 @@ public class PreferencesDialog extends JDialog
 	
 	private void initialize()
 	{
-		this.setSize(600, 307); //285);
+		this.setSize(600, 334);
 		this.setContentPane(getJPanel());
 		this.setModal(true);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -100,6 +101,7 @@ public class PreferencesDialog extends JDialog
 			jPanel.add(getCursorCoordinatesCheckBox(), null);
 			jPanel.add(getCursorNamesCheckBox(), null);
 			jPanel.add(getCheckDefaultObjectsCheckBox(), null);
+			jPanel.add(getCarsSportsRacingCheckBox(), null);
 			jPanel.add(getOkButton(), null);
 			jPanel.add(getCancelButton(), null);
 		}
@@ -315,12 +317,24 @@ public class PreferencesDialog extends JDialog
 		return checkDefaultObjectsCheckBox;
 	}
 
+	private JCheckBox getCarsSportsRacingCheckBox()
+	{
+		if (carsSportsRacingCheckBox == null)
+		{
+			carsSportsRacingCheckBox = new JCheckBox();
+			carsSportsRacingCheckBox.setBounds(200, 227, 290, 23);
+			carsSportsRacingCheckBox.setText("Cars Sports Racing Support");
+			carsSportsRacingCheckBox.setSelected(editorFrame.getCarsSportsRacing());
+		}
+		return carsSportsRacingCheckBox;
+	}
+
 	private JButton getOkButton()
 	{
 		if (okButton == null)
 		{
 			okButton = new JButton();
-			okButton.setBounds(160, 232, 78, 25);
+			okButton.setBounds(160, 259, 78, 25);
 			okButton.setText("Ok");
 			okButton.addActionListener(new ActionListener()
 			{
@@ -338,7 +352,7 @@ public class PreferencesDialog extends JDialog
 		if (cancelButton == null)
 		{
 			cancelButton = new JButton();
-			cancelButton.setBounds(350, 232, 78, 25);
+			cancelButton.setBounds(350, 259, 78, 25);
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new ActionListener()
 			{
@@ -411,6 +425,11 @@ public class PreferencesDialog extends JDialog
 	public boolean getCheckDefaultObjects()
 	{
 		return getCheckDefaultObjectsCheckBox().isSelected();
+	}
+
+	public boolean getCarsSportsRacing()
+	{
+		return getCarsSportsRacingCheckBox().isSelected();
 	}
 
 	protected void processWindowEvent(WindowEvent e)

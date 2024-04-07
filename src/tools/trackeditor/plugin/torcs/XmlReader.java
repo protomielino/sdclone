@@ -430,6 +430,7 @@ public class XmlReader
         data.setLongitude(getAttrNumValue(element, "longitude", "deg"));
         data.setClimat(getAttrIntValue(element, "climat"));
         data.setPrecipitation(getAttrNumValue(element, "precipitation"));
+        data.setBestLap(getAttrNumValue(element, "best lap"));
 
         editorFrame.getTrackData().setLocalInfo(data);
     }

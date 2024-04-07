@@ -44,12 +44,6 @@ import utils.MutableString;
  */
 public class GraphicProperties extends PropertyPanel
 {
-	private JLabel				descriptionLabel				= new JLabel();
-	private JTextField			descriptionTextField			= new JTextField();
-	private JLabel				descriptionNightLabel			= new JLabel();
-	private JTextField			descriptionNightTextField		= new JTextField();
-	private JLabel				descriptionRainNightLabel		= new JLabel();
-	private JTextField			descriptionRainNightTextField	= new JTextField();
 	private JLabel				backgroundImageLabel			= new JLabel();
 	private JTextField			backgroundImageTextField		= new JTextField();
 	private JLabel				backgroundTypeLabel				= new JLabel();
@@ -111,53 +105,47 @@ public class GraphicProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, descriptionLabel, "Description", 150);
-		addLabel(this, 1, descriptionNightLabel, "Description Night", 150);
-		addLabel(this, 2, descriptionRainNightLabel, "Description Rain Night", 150);
-		addLabel(this, 3, backgroundImageLabel, "Background Image", 150);
-		addLabel(this, 4, backgroundTypeLabel, "Background Type", 150);
-		addLabel(this, 5, backgroundColorRLabel, "Background Color R", 150);
-		addLabel(this, 6, backgroundColorGLabel, "Background Color G", 150);
-		addLabel(this, 7, backgroundColorBLabel, "Background Color B", 150);
-		addLabel(this, 8, ambientColorRLabel, "Ambient Color R", 150);
-		addLabel(this, 9, ambientColorGLabel, "Ambient Color G", 150);
-		addLabel(this, 10, ambientColorBLabel, "Ambient Color B", 150);
-		addLabel(this, 11, diffuseColorRLabel, "Diffuse Color R", 150);
-		addLabel(this, 12, diffuseColorGLabel, "Diffuse Color G", 150);
-		addLabel(this, 13, diffuseColorBLabel, "Diffuse Color B", 150);
-		addLabel(this, 14, specularColorRLabel, "Specular Color R", 150);
-		addLabel(this, 15, specularColorGLabel, "Specular Color G", 150);
-		addLabel(this, 16, specularColorBLabel, "Specular Color B", 150);
-		addLabel(this, 17, lightPositionXLabel, "Light Position X", 150);
-		addLabel(this, 18, lightPositionYLabel, "Light Position Y", 150);
-		addLabel(this, 19, lightPositionZLabel, "Light Position Z", 150);
-		addLabel(this, 20, shininessLabel, "Shininess", 150);
-		addLabel(this, 21, fovFactorLabel, "Fov Factor", 150);
+		addLabel(this, 0, backgroundImageLabel, "Background Image", 150);
+		addLabel(this, 1, backgroundTypeLabel, "Background Type", 150);
+		addLabel(this, 2, backgroundColorRLabel, "Background Color R", 150);
+		addLabel(this, 3, backgroundColorGLabel, "Background Color G", 150);
+		addLabel(this, 4, backgroundColorBLabel, "Background Color B", 150);
+		addLabel(this, 5, ambientColorRLabel, "Ambient Color R", 150);
+		addLabel(this, 6, ambientColorGLabel, "Ambient Color G", 150);
+		addLabel(this, 7, ambientColorBLabel, "Ambient Color B", 150);
+		addLabel(this, 8, diffuseColorRLabel, "Diffuse Color R", 150);
+		addLabel(this, 9, diffuseColorGLabel, "Diffuse Color G", 150);
+		addLabel(this, 10, diffuseColorBLabel, "Diffuse Color B", 150);
+		addLabel(this, 11, specularColorRLabel, "Specular Color R", 150);
+		addLabel(this, 12, specularColorGLabel, "Specular Color G", 150);
+		addLabel(this, 13, specularColorBLabel, "Specular Color B", 150);
+		addLabel(this, 14, lightPositionXLabel, "Light Position X", 150);
+		addLabel(this, 15, lightPositionYLabel, "Light Position Y", 150);
+		addLabel(this, 16, lightPositionZLabel, "Light Position Z", 150);
+		addLabel(this, 17, shininessLabel, "Shininess", 150);
+		addLabel(this, 18, fovFactorLabel, "Fov Factor", 150);
 
-		addTextField(this, 0, descriptionTextField, getEditorFrame().getTrackData().getGraphic().getDescription(), 160, 200);
-		addTextField(this, 1, descriptionNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), 160, 200);
-		addTextField(this, 2, descriptionRainNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), 160, 200);
-		addTextField(this, 3, backgroundImageTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), 160, 275);
+		addTextField(this, 0, backgroundImageTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), 160, 275);
 
 		add(getBackgroundTypeComboBox(), null);
 
-		addTextField(this, 5, backgroundColorRTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), 160, 125);
-		addTextField(this, 6, backgroundColorGTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), 160, 125);
-		addTextField(this, 7, backgroundColorBTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), 160, 125);
-		addTextField(this, 8, ambientColorRTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), 160, 125);
-		addTextField(this, 9, ambientColorGTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), 160, 125);
-		addTextField(this, 10, ambientColorBTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), 160, 125);
-		addTextField(this, 11, diffuseColorRTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), 160, 125);
-		addTextField(this, 12, diffuseColorGTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), 160, 125);
-		addTextField(this, 13, diffuseColorBTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), 160, 125);
-		addTextField(this, 14, specularColorRTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), 160, 125);
-		addTextField(this, 15, specularColorGTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), 160, 125);
-		addTextField(this, 16, specularColorBTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), 160, 125);
-		addTextField(this, 17, lightPositionXTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionX(), 160, 125);
-		addTextField(this, 18, lightPositionYTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionY(), 160, 125);
-		addTextField(this, 19, lightPositionZTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), 160, 125);
-		addTextField(this, 20, shininessTextField, getEditorFrame().getTrackData().getGraphic().getShininess(), 160, 125);
-		addTextField(this, 21, fovFactorTextField, getEditorFrame().getTrackData().getGraphic().getFovFactor(), 160, 125);
+		addTextField(this, 2, backgroundColorRTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), 160, 125);
+		addTextField(this, 3, backgroundColorGTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), 160, 125);
+		addTextField(this, 4, backgroundColorBTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), 160, 125);
+		addTextField(this, 5, ambientColorRTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), 160, 125);
+		addTextField(this, 6, ambientColorGTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), 160, 125);
+		addTextField(this, 7, ambientColorBTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), 160, 125);
+		addTextField(this, 8, diffuseColorRTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), 160, 125);
+		addTextField(this, 9, diffuseColorGTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), 160, 125);
+		addTextField(this, 10, diffuseColorBTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), 160, 125);
+		addTextField(this, 11, specularColorRTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), 160, 125);
+		addTextField(this, 12, specularColorGTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), 160, 125);
+		addTextField(this, 13, specularColorBTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), 160, 125);
+		addTextField(this, 14, lightPositionXTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionX(), 160, 125);
+		addTextField(this, 15, lightPositionYTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionY(), 160, 125);
+		addTextField(this, 16, lightPositionZTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), 160, 125);
+		addTextField(this, 17, shininessTextField, getEditorFrame().getTrackData().getGraphic().getShininess(), 160, 125);
+		addTextField(this, 18, fovFactorTextField, getEditorFrame().getTrackData().getGraphic().getFovFactor(), 160, 125);
 
 		add(getBackgroundImageButton(), null);
 	}
@@ -174,7 +162,7 @@ public class GraphicProperties extends PropertyPanel
 			String[] types = {"none", "0", "2", "4"};
 			backgroundTypeComboBox = new JComboBox<String>();
 			backgroundTypeComboBox.setModel(new DefaultComboBoxModel<String>(types));
-			backgroundTypeComboBox.setBounds(160, 118, 125, 23);
+			backgroundTypeComboBox.setBounds(160, 37, 125, 23);
 			int value = getEditorFrame().getTrackData().getGraphic().getBackgroundType();
 			if (value != Integer.MAX_VALUE)
 				backgroundTypeComboBox.setSelectedItem(String.valueOf(value));
@@ -192,7 +180,7 @@ public class GraphicProperties extends PropertyPanel
 		if (backgroundImageButton == null)
 		{
 			backgroundImageButton = new JButton();
-			backgroundImageButton.setBounds(440, 90, 80, 25);
+			backgroundImageButton.setBounds(440, 9, 80, 25);
 			backgroundImageButton.setText("Browse");
 			backgroundImageButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -240,27 +228,6 @@ public class GraphicProperties extends PropertyPanel
 	{
 		MutableString stringResult = new MutableString();
 		MutableDouble doubleResult = new MutableDouble();
-
-		if (isDifferent(descriptionTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getDescription(), stringResult))
-		{
-			getEditorFrame().getTrackData().getGraphic().setDescription(stringResult.getValue());
-			getEditorFrame().documentIsModified = true;
-		}
-
-		if (isDifferent(descriptionNightTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), stringResult))
-		{
-			getEditorFrame().getTrackData().getGraphic().setDescriptionNight(stringResult.getValue());
-			getEditorFrame().documentIsModified = true;
-		}
-
-		if (isDifferent(descriptionRainNightTextField.getText(),
-			getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), stringResult))
-		{
-			getEditorFrame().getTrackData().getGraphic().setDescriptionRainNight(stringResult.getValue());
-			getEditorFrame().documentIsModified = true;
-		}
 
 		if (isDifferent(backgroundImageTextField.getText(),
 			getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), stringResult))

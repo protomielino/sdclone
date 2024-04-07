@@ -248,6 +248,8 @@ public class EditorFrame extends JFrame
 	private final static String	CURSOR_NAMES						= "CursorNames";
 	private boolean				checkDefaultObjects					= false;
 	private final static String	CHECK_DEFAULT_OBJECTS				= "CheckDefaultObjects";
+	private boolean				carsSportsRacing					= false;
+	private final static String	CARS_SPORTS_RACING					= "CarsSportsRacing";
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
@@ -391,6 +393,7 @@ public class EditorFrame extends JFrame
 		cursorCoordinates = preferences.getBoolean(CURSOR_COORDINATES, false);
 		cursorNames = preferences.getBoolean(CURSOR_NAMES, false);
 		checkDefaultObjects = preferences.getBoolean(CHECK_DEFAULT_OBJECTS, false);
+		carsSportsRacing = preferences.getBoolean(CARS_SPORTS_RACING, false);
 
 		if (dataDirectory == null)
 		{
@@ -559,6 +562,18 @@ public class EditorFrame extends JFrame
 		checkDefaultObjects = value;
 
 		preferences.putBoolean(CHECK_DEFAULT_OBJECTS, checkDefaultObjects);
+	}
+
+	public boolean getCarsSportsRacing()
+	{
+		return carsSportsRacing;
+	}
+
+	public void setCarsSportsRacing(boolean value)
+	{
+		carsSportsRacing = value;
+
+		preferences.putBoolean(CARS_SPORTS_RACING, carsSportsRacing);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -1430,6 +1445,7 @@ public class EditorFrame extends JFrame
 			setCursorCoordinates(preferencesDialog.getCursorCoordinates());
 			setCursorNames(preferencesDialog.getCursorNames());
 			setCheckDefaultObjects(preferencesDialog.getCheckDefaultObjects());
+			setCarsSportsRacing(preferencesDialog.getCarsSportsRacing());
 			readDefaultSurfaces();
 			readDefaultObjects();
 			view.redrawCircuit();

@@ -94,7 +94,6 @@ public class LocalInfoProperties extends PropertyPanel
 		addLabel(this, 9, longitudeLabel, "Longitude", 150);
 		addLabel(this, 10, climatLabel, "Climate", 150);
 		addLabel(this, 11, precipitationLabel, "Precipitation", 150);
-		addLabel(this, 12, bestLapLabel, "Best Lap", 150);
 
 		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 125);
 		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 125);
@@ -108,7 +107,12 @@ public class LocalInfoProperties extends PropertyPanel
 		addTextField(this, 9, longitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getLongitude(), 170, 125);
 		addTextField(this, 10, climatTextField, getEditorFrame().getTrackData().getLocalInfo().getClimat(), 170, 125);
 		addTextField(this, 11, precipitationTextField, getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), 170, 125);
-		addTextField(this, 12, bestLapTextField, getEditorFrame().getTrackData().getLocalInfo().getBestLap(), 170, 125);
+		
+		if (getEditorFrame().getCarsSportsRacing())
+		{
+			addLabel(this, 12, bestLapLabel, "Best Lap", 150);
+			addTextField(this, 12, bestLapTextField, getEditorFrame().getTrackData().getLocalInfo().getBestLap(), 170, 125);
+		}
 	}
 
 	/**
@@ -204,11 +208,14 @@ public class LocalInfoProperties extends PropertyPanel
 			getEditorFrame().documentIsModified = true;
 		}
 
-		if (isDifferent(bestLapTextField.getText(),
-			getEditorFrame().getTrackData().getLocalInfo().getBestLap(), doubleResult))
+		if (getEditorFrame().getCarsSportsRacing())
 		{
-			getEditorFrame().getTrackData().getLocalInfo().setBestLap(doubleResult.getValue());
-			getEditorFrame().documentIsModified = true;
+			if (isDifferent(bestLapTextField.getText(),
+				getEditorFrame().getTrackData().getLocalInfo().getBestLap(), doubleResult))
+			{
+				getEditorFrame().getTrackData().getLocalInfo().setBestLap(doubleResult.getValue());
+				getEditorFrame().documentIsModified = true;
+			}
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

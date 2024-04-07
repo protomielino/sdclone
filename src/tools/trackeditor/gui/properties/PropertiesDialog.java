@@ -57,6 +57,7 @@ public class PropertiesDialog extends JDialog
 	private LocalInfoProperties		localInfoProperties		= null;
 	private StartingGridProperties	startingGridProperties	= null;
 	private GraphicProperties		graphicProperties		= null;
+	private Graphic3DProperties		graphic3DProperties		= null;
 	private SurfaceProperties		surfaceProperties		= null;
 	private EnvMapProperties		envMapProperties		= null;
 	private ObjectProperties		objectProperties		= null;
@@ -110,6 +111,7 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Local Info", null, getLocalInfoProperties(), null);
 			tabbedPane.addTab("Grid", null, getStartingGridProperties(), null);
 			tabbedPane.addTab("Graphic", null, getGraphicProperties(), null);
+			tabbedPane.addTab("Graphic 3D", null, getGraphic3DProperties(), null);
 			tabbedPane.addTab("Env Map", null, getEnvMapProperties(), null);
 			tabbedPane.addTab("Surfaces", null, getSurfaceProperties(), null);
 			tabbedPane.addTab("Objects", null, getObjectProperties(), null);
@@ -305,7 +307,18 @@ public class PropertiesDialog extends JDialog
 			graphicProperties = new GraphicProperties(editorFrame);
 		}
 		return graphicProperties;
-	}
+	}	
+	/**
+	 * This method initializes graphic3DProperties
+	 *
+	 * @return gui.properties.GraphiceDProperties
+	 */
+	private Graphic3DProperties getGraphic3DProperties() {
+		if (graphic3DProperties == null) {
+			graphic3DProperties = new Graphic3DProperties(editorFrame);
+		}
+		return graphic3DProperties;
+	}	
 	/**
 	 * This method initializes envMapProperties
 	 *
@@ -405,6 +418,7 @@ public class PropertiesDialog extends JDialog
 		this.localInfoProperties.exit();
 		this.startingGridProperties.exit();
 		this.graphicProperties.exit();
+		this.graphic3DProperties.exit();
 		this.envMapProperties.exit();
 		this.surfaceProperties.exit();
 		this.objectProperties.exit();
