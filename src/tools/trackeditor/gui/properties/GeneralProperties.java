@@ -40,6 +40,8 @@ public class GeneralProperties extends PropertyPanel
 {
 	private JLabel				nameLabel				= new JLabel();
 	private JTextField			nameTextField			= new JTextField();
+	private JLabel				shortNameLabel			= new JLabel();
+	private JTextField			shortNameTextField		= new JTextField();
 	private JLabel				categoryLabel			= new JLabel();
 	private JComboBox<String>	categoryComboBox		= null;
 	private JLabel				subcategoryLabel		= new JLabel();
@@ -78,26 +80,28 @@ public class GeneralProperties extends PropertyPanel
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
 		addLabel(this, 0, nameLabel, "Name", 110);
-		addLabel(this, 1, categoryLabel, "Category", 110);
-		addLabel(this, 2, subcategoryLabel, "Subcategory", 110);
-		addLabel(this, 3, versionLabel, "Version", 110);
-		addLabel(this, 4, skyVersionLabel, "Sky Version", 110);
-		addLabel(this, 5, authorLabel, "Author", 80);
-		addLabel(this, 6, emailLabel, "Email", 80);
-		addLabel(this, 7, copyrightLabel, "Copyright", 80);
-		addLabel(this, 8, descriptionLabel, "Description", 80);
+		addLabel(this, 1, shortNameLabel, "Short Name", 110);
+		addLabel(this, 2, categoryLabel, "Category", 110);
+		addLabel(this, 3, subcategoryLabel, "Subcategory", 110);
+		addLabel(this, 4, versionLabel, "Version", 110);
+		addLabel(this, 5, skyVersionLabel, "Sky Version", 110);
+		addLabel(this, 6, authorLabel, "Author", 80);
+		addLabel(this, 7, emailLabel, "Email", 80);
+		addLabel(this, 8, copyrightLabel, "Copyright", 80);
+		addLabel(this, 9, descriptionLabel, "Description", 80);
 
 		addTextField(this, 0, nameTextField, getEditorFrame().getTrackData().getHeader().getName(), 130, 200);
+		addTextField(this, 1, shortNameTextField, getEditorFrame().getTrackData().getHeader().getShortName(), 130, 200);
 
 		add(getCategoryComboBox(), null);
 		add(getSubcategoryComboBox(), null);
 		add(getVersionComboBox(), null);
 		add(getSkyVersionComboBox(), null);
 
-		addTextField(this, 5, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 435);
-		addTextField(this, 6, emailTextField, getEditorFrame().getTrackData().getHeader().getEmail(), 85, 435);
-		addTextField(this, 7, copyrightTextField, getEditorFrame().getTrackData().getHeader().getCopyright(), 85, 435);
-		addTextField(this, 8, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 435);
+		addTextField(this, 6, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 435);
+		addTextField(this, 7, emailTextField, getEditorFrame().getTrackData().getHeader().getEmail(), 85, 435);
+		addTextField(this, 8, copyrightTextField, getEditorFrame().getTrackData().getHeader().getCopyright(), 85, 435);
+		addTextField(this, 9, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 435);
 	}
 
 	/**
@@ -111,7 +115,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			categoryComboBox = new JComboBox<String>(items);
-			categoryComboBox.setBounds(130, 37, 125, 23);
+			categoryComboBox.setBounds(130, 64, 125, 23);
 			categoryComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getCategory());
 			categoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -151,7 +155,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "short", "long"};
 			subcategoryComboBox = new JComboBox<String>(items);
-			subcategoryComboBox.setBounds(130, 64, 125, 23);
+			subcategoryComboBox.setBounds(130, 91, 125, 23);
 			String subcategory = getEditorFrame().getTrackData().getHeader().getSubcategory();
 			if (subcategory == null)
 				subcategory = "none";
@@ -183,7 +187,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"3", "4", "5"};
 			versionComboBox = new JComboBox<String>(items);
-			versionComboBox.setBounds(130, 91, 125, 23);
+			versionComboBox.setBounds(130, 118, 125, 23);
 			versionComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getVersion() + "");
 		}
 		return versionComboBox;
@@ -200,7 +204,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "1"};
 			skyVersionComboBox = new JComboBox<String>(items);
-			skyVersionComboBox.setBounds(130, 118, 125, 23);
+			skyVersionComboBox.setBounds(130, 145, 125, 23);
 			int version = getEditorFrame().getTrackData().getHeader().getSkyVersion();
 			String stringVersion;
 			if (version == Integer.MAX_VALUE)
@@ -224,6 +228,12 @@ public class GeneralProperties extends PropertyPanel
 		if (isDifferent(nameTextField.getText(), getEditorFrame().getTrackData().getHeader().getName(), stringResult))
 		{
 			getEditorFrame().getTrackData().getHeader().setName(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(shortNameTextField.getText(), getEditorFrame().getTrackData().getHeader().getShortName(), stringResult))
+		{
+			getEditorFrame().getTrackData().getHeader().setShortName(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 

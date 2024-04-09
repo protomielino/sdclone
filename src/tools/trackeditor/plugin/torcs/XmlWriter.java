@@ -710,6 +710,7 @@ public class XmlWriter
 		header.setAttribute(name);
 
 		addContent(header, "name", editorFrame.getTrackData().getHeader().getName());
+		addContent(header, "short name", editorFrame.getTrackData().getHeader().getShortName());
 
 		if (editorFrame.getTrackData().getHeader().getCategory() != null)
 		{

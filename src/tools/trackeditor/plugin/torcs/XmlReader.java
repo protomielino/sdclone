@@ -257,6 +257,7 @@ public class XmlReader
             return;
 
         editorFrame.getTrackData().getHeader().setName(getAttrStrValue(header, "name"));
+        editorFrame.getTrackData().getHeader().setShortName(getAttrStrValue(header, "short name"));
         editorFrame.getTrackData().getHeader().setCategory(getAttrStrValue(header, "category"));
         editorFrame.getTrackData().getHeader().setSubcategory(getAttrStrValue(header, "subcategory"));
         editorFrame.getTrackData().getHeader().setVersion(getAttrIntValue(header, "version"));

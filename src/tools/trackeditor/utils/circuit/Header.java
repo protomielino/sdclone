@@ -2,6 +2,7 @@ package utils.circuit;
 
 public class Header {
 	private String	name		= null;
+	private String	shortName	= null;
 	private String	category	= "road";
 	private String	subcategory	= null;
 	private int		version		= 4;
@@ -25,6 +26,15 @@ public class Header {
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public String getShortName()
+	{
+		return shortName;
+	}
+	public void setShortName(String shortName)
+	{
+		this.shortName = shortName;
 	}
 
 	/**
@@ -147,6 +157,7 @@ public class Header {
     {
 		System.out.println(indent + "Header");
 		System.out.println(indent + "  name        : " + name);
+		System.out.println(indent + "  shortName   : " + shortName);
 		System.out.println(indent + "  category    : " + category);
 		System.out.println(indent + "  subcategory : " + subcategory);
 		System.out.println(indent + "  version     : " + version);
