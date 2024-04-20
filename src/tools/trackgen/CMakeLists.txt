@@ -42,7 +42,7 @@ ADD_PNG_LIBRARY(${_TARGET_NAME})
 
 ADD_SDL2_LIBRARY(${_TARGET_NAME})
 
-ADD_PLIB_LIBRARY(${_TARGET_NAME} sg ssg ul)
+ADD_PLIB_LIBRARY(${_TARGET_NAME} ssg sg ul)
 ADD_DL_LIBRARY(${_TARGET_NAME})
 
 # Needed when using the "MinGW Makefiles" CMake generator (but not with the "MSYS Makefiles" one !?)
