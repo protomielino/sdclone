@@ -402,7 +402,8 @@ public class EditorFrame extends JFrame
 					"load the default surfaces, textures and objects.\n" +
 					"Make sure you have write permission if you intend to edit or add\n" +
 					"tracks in this directory.\n\n" +
-					"You may need to specify the bin directory where sd2-trackgen is\n" +
+					"You may need to specify the bin directory where " + 
+					(getCarsSportsRacing() ? "csr-trackgen" : "sd2-trackgen") + " is\n" +
 					"located if it is not in your executable path.",
 					"First Time Setup",
 					JOptionPane.INFORMATION_MESSAGE);
