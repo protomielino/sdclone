@@ -48,7 +48,8 @@ public class DeltaPanel extends JDialog implements Runnable
 {
 	private final static String sep	= System.getProperty("file.separator");
     private EditorFrame editorFrame;
-    private Thread ac3d;
+    private Thread ac3d = null;
+    private String errorMessage = null;
 
     private JPanel jPanel = null;
     private JLabel nameLabel = null;
@@ -103,7 +104,19 @@ public class DeltaPanel extends JDialog implements Runnable
 
     public synchronized void run()
     {
+		nameLabel.setText(null);
+		authorLabel.setText(null);
+		fileNameLabel.setText(null);
+		lengthLabel.setText(null);
+		widthLabel.setText(null);
+		xSizeLabel.setText(null);
+		ySizeLabel.setText(null);
+		deltaXLabel.setText(null);
+		deltaYLabel.setText(null);
+		deltaAngLabel.setText(null);
+		
 		finish = false;
+		errorMessage = null;
 		waitLabel.setText("Calculating track data. Please wait...");
 		String path = Editor.getProperties().getPath();
 		String trackName = path.substring(path.lastIndexOf(sep) + 1);
@@ -169,9 +182,13 @@ public class DeltaPanel extends JDialog implements Runnable
 			/* Clean-up */
 			proc.destroy();
 		} catch (IOException e1) {
-			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Delta Dialog", JOptionPane.ERROR_MESSAGE);
+			errorMessage = e1.getLocalizedMessage();
+			this.waitLabel.setText("Calculation failed");
 		}
-		this.waitLabel.setText("Calculation finished");
+		if (errorMessage == null)
+		{
+			this.waitLabel.setText("Calculation finished");
+		}
 		finish = true;
 		notifyAll();
     }
@@ -323,6 +340,9 @@ public class DeltaPanel extends JDialog implements Runnable
 				    int out = JOptionPane.showConfirmDialog(null,msg,"Warning",options);
 				    if(out == JOptionPane.CANCEL_OPTION)
 				    {
+						getCalcButton().setEnabled(true);
+				        getAdjustButton().setEnabled(true);
+				        getLengthButton().setEnabled(true);		
 				        return;
 				    }
 				    adjust();
@@ -357,6 +377,9 @@ public class DeltaPanel extends JDialog implements Runnable
 				    int out = JOptionPane.showConfirmDialog(null,msg,"Warning",options);
 				    if(out == JOptionPane.CANCEL_OPTION)
 				    {
+						getCalcButton().setEnabled(true);
+				        getAdjustButton().setEnabled(true);
+				        getLengthButton().setEnabled(true);		
 				        return;
 				    }
 				    
@@ -397,6 +420,11 @@ public class DeltaPanel extends JDialog implements Runnable
         startTrackgen();
         waitTrackgen();
         
+        if (errorMessage != null)
+        {
+			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
+        }
+        
         this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);
         this.getLengthButton().setEnabled(true);
@@ -410,6 +438,15 @@ public class DeltaPanel extends JDialog implements Runnable
 	    finish = false;
 	    startTrackgen();
 	    waitTrackgen();
+
+        if (errorMessage != null)
+        {
+			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
+			getCalcButton().setEnabled(true);
+	        getAdjustButton().setEnabled(true);
+	        getLengthButton().setEnabled(true);		
+			return;
+        }
 	    try
 	    {
 	        String tmp = getJTextField().getText();
@@ -458,6 +495,14 @@ public class DeltaPanel extends JDialog implements Runnable
         finish = false;
 	    startTrackgen();
 	    waitTrackgen();
+        if (errorMessage != null)
+        {
+			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
+			getCalcButton().setEnabled(true);
+	        getAdjustButton().setEnabled(true);
+	        getLengthButton().setEnabled(true);		
+			return;
+        }
 	    double co = 360/(360+angle);
 	    
 		SegmentVector track = editorFrame.getTrackData().getSegments();
