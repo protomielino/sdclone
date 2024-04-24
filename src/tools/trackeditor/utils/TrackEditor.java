@@ -21,6 +21,7 @@
 package utils;
 
 import java.awt.Toolkit;
+import java.io.File;
 
 import javax.swing.UIManager;
 
@@ -41,9 +42,13 @@ import miscel.TCPopupEventQueue;
 public class TrackEditor
 {
 	private static EditorFrame gui;
+	
+	public static String executableName = null;
 
 	public static void main(String[] args)
 	{
+		executableName = new File(TrackEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+
 		Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TCPopupEventQueue());
 		
 		PlasticLookAndFeel.setCurrentTheme(new DesertBlue());

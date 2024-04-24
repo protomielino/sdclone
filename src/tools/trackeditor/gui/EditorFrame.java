@@ -79,6 +79,7 @@ import utils.Project;
 import utils.Properties;
 import utils.SegmentVector;
 import utils.TrackData;
+import utils.TrackEditor;
 import utils.ac3d.Ac3d;
 import utils.ac3d.Ac3dMaterial;
 import utils.ac3d.Ac3dObject;
@@ -393,7 +394,10 @@ public class EditorFrame extends JFrame
 		cursorCoordinates = preferences.getBoolean(CURSOR_COORDINATES, false);
 		cursorNames = preferences.getBoolean(CURSOR_NAMES, false);
 		checkDefaultObjects = preferences.getBoolean(CHECK_DEFAULT_OBJECTS, false);
-		carsSportsRacing = preferences.getBoolean(CARS_SPORTS_RACING, false);
+		if (TrackEditor.executableName.equals("csr-trackeditor"))
+			carsSportsRacing = true;
+		else
+			carsSportsRacing = preferences.getBoolean(CARS_SPORTS_RACING, false);
 
 		if (dataDirectory == null)
 		{
