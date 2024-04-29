@@ -2507,8 +2507,14 @@ public class Segment implements Cloneable
 		printStream.println(indent + "  nextShape                   : " + (nextShape != null ? nextShape.name : "null"));
 		printStream.println(indent + "  name                        : " + name);
 		printStream.println(indent + "  type                        : " + type);
+		printStream.println(indent + "  comment                     : " + comment);
 		printStream.println(indent + "  count                       : " + count);
 		printStream.println(indent + "  length                      : " + length);
+		printStream.println(indent + "  startTrackAlpha             : " + startTrackAlpha);
+		printStream.println(indent + "  endTrackAlpha               : " + endTrackAlpha);
+		printStream.println(indent + "  startTrackCenter            : " + startTrackCenter.x + " " + startTrackCenter.y);
+		printStream.println(indent + "  endTrackCenter              : " + endTrackCenter.x + " " + endTrackCenter.y);
+		printStream.println(indent + "  distFromCircuitStart        : " + distFromCircuitStart);
 		printStream.println(indent + "  nbSteps                     : " + nbSteps);
 		printStream.println(indent + "  stepLength                  : " + stepLength);
 		printStream.println(indent + "  surface                     : " + surface);

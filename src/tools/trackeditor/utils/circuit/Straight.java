@@ -203,6 +203,9 @@ public class Straight extends Segment
 		double curzel = leftStartHeight;
 		double curzer = rightStartHeight;
 
+		dx = 0;
+		dy = 0;
+
 		for (int nStep = 0; nStep < nbSteps; nStep++)
 		{
 			// track
@@ -349,8 +352,8 @@ public class Straight extends Segment
 			}
 
 			// move track center
-			this.dx = cos;
-			this.dy = sin;
+			dx += cos;
+			dy += sin;
 			currentX += cos;
 			currentY += sin;
 		}
