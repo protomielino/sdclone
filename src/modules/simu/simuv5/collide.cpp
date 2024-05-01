@@ -19,7 +19,7 @@
 
 #include "sim.h"
 
-#define CAR_DAMMAGE	0.1
+#define CAR_DAMMAGE    0.1
 
 
 void SimCarCollideZ(tCar *car)
@@ -119,6 +119,8 @@ void SimCarCollideXYScene(tCar *car)
     tDynPt *corner;
     tdble initDotProd;
     tdble dotProd, cx, cy, dotprod2;
+    tdble impactPointX, impactPointY, impactPointZ = 0.0;
+    sgVec3 v;
     tTrackBarrier *curBarrier;
     tdble dmg;
 
@@ -165,6 +167,11 @@ void SimCarCollideXYScene(tCar *car)
         // Corner position relative to center of gravity.
         cx = corner->pos.ax - car->DynGCg.pos.x;
         cy = corner->pos.ay - car->DynGCg.pos.y;
+
+        // Put the point of impact in a 3d vector
+        impactPointX = car->statGC.x + corner->pos.x;
+        impactPointY = car->statGC.y + corner->pos.y;
+        impactPointZ = car->statGC.z;
 
         car->blocked = 1;
         car->collision |= SEM_COLLISION;
@@ -220,16 +227,42 @@ void SimCarCollideXYScene(tCar *car)
             car->DynGCg.vel.y -= ny * dotProd;
         }
     }
+    
+    //detect collision
+    sgVec3 force;
+    force[0] = 0;
+    force[1] = 0;
+    force[2] = 0;
+
+    //point of collision
+    sgVec3 poc;
+    poc[0] = impactPointX;//corner->pos.x
+    poc[1] = impactPointY;//corner->pos.y
+    poc[2] = impactPointZ;//(urandom()-0.5)*2.0;
+    sgNormaliseVec3(force);
+
+    for (int i=0; i<3; i++) {
+        force[i]*=dmg;
+    }
+
+    //pu the collision data in our car
+    tCollisionState* collision_state = &car->carElt->priv.collision_state;
+    collision_state->collision_count++;
+    for (int i=0; i<3; i++) {
+        collision_state->pos[i] = poc[i];
+        collision_state->force[i] = (float)(0.0001*force[i]);
+    }
+
 }
 
 static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRef obj2, const DtCollData *collData)
 {
-    sgVec2 n;		// Collision normal delivered by solid: Global(point1) - Global(point2)
-    tCar *car[2];	// The cars.
-    sgVec2 p[2];	// Collision points delivered by solid, in body local coordinates.
-    sgVec2 r[2];	// Collision point relative to center of gravity.
-    sgVec2 vp[2];	// Speed of collision point in world coordinate system.
-    sgVec3 pt[2];	// Collision points in global coordinates.
+    sgVec2 n;        // Collision normal delivered by solid: Global(point1) - Global(point2)
+    tCar *car[2];    // The cars.
+    sgVec2 p[2];    // Collision points delivered by solid, in body local coordinates.
+    sgVec2 r[2];    // Collision point relative to center of gravity.
+    sgVec2 vp[2];    // Speed of collision point in world coordinate system.
+    sgVec3 pt[2];    // Collision points in global coordinates.
 
     int i;
 
@@ -270,7 +303,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
     sgNormaliseVec2(n);
 
-    sgVec2 rg[2];	// radius oriented in global coordinates, still relative to CG (rotated aroung CG).
+    sgVec2 rg[2];    // radius oriented in global coordinates, still relative to CG (rotated aroung CG).
 
     for (i = 0; i < 2; i++)
     {
@@ -342,7 +375,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
     rpsign[0] =  n[0]*rg[0][1] - n[1]*rg[0][0];
     rpsign[1] = -n[0]*rg[1][1] + n[1]*rg[1][0];
 
-    const float e = 1.0f;	// energy restitution
+    const float e = 1.0f;    // energy restitution
 
     float j = -(1.0f + e) * sgScalarProductVec2(v1ab, n) /
         ((car[0]->Minv + car[1]->Minv) +
@@ -442,9 +475,9 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
     if (isFixedObject(obj1) && isFixedObject(obj2))
         return;
 
-    tCar* car;		// The car colliding with the wall.
-    float nsign;	// Normal direction correction for collision plane.
-    sgVec2 p;		// Cars collision point delivered by solid.
+    tCar* car;        // The car colliding with the wall.
+    float nsign;    // Normal direction correction for collision plane.
+    sgVec2 p;        // Cars collision point delivered by solid.
 
     // TODO: If other movable objects are added which could collide with the wall, it will be
     // necessary to validate if the object is actually a car.
@@ -464,10 +497,10 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
         p[1] = (float) collData->point1[1];
     }
 
-    sgVec2 n;		// Collision normal delivered by solid, corrected such that it points away from the wall.
+    sgVec2 n;        // Collision normal delivered by solid, corrected such that it points away from the wall.
     n[0] = nsign * (float) collData->normal[0];
     n[1] = nsign * (float) collData->normal[1];
-    float pdist = sgLengthVec2(n);	// Distance of collision points.
+    float pdist = sgLengthVec2(n);    // Distance of collision points.
     sgNormaliseVec2(n);
 
     sgVec2 r;
@@ -475,8 +508,8 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
 
     tCarElt *carElt = car->carElt;
 
-    sgVec2 vp;		// Speed of car collision point in global frame of reference.
-    sgVec2 rg;		// raduis oriented in global coordinates, still relative to CG (rotated aroung CG).
+    sgVec2 vp;        // Speed of car collision point in global frame of reference.
+    sgVec2 rg;        // raduis oriented in global coordinates, still relative to CG (rotated aroung CG).
 
     float sina = sin(carElt->_yaw);
     float cosa = cos(carElt->_yaw);
@@ -508,7 +541,7 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
     // TODO: SIGN, scrap value?
     float rpsign = n[0]*rg[1] - n[1]*rg[0];
 
-    const float e = 1.0f;	// energy restitution
+    const float e = 1.0f;    // energy restitution
     float j = -(1.0f + e) * sgScalarProductVec2(vp, n) / (car->Minv + rp * rp * car->Iinv.z);
     const float ROT_K = 0.5f;
 

@@ -36,6 +36,7 @@
 #include "OsgMath.h"
 #include "OsgScreens.h"
 #include "OsgHUD.h"
+#include "OsgParticles.h"
 
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
@@ -52,6 +53,9 @@ int Rain, Clouds = 0;
 tdble TimeOfDay = 0.0f;
 
 SDHUD hud;
+
+SDParticleSystemManager ParticleManager;
+
 
 /*oid *getOptions()
 {
@@ -237,7 +241,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     nFPSTotalSeconds = 0;
 
     screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
-
+    
     GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	SDSetZoom, NULL);
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	SDSetZoom, NULL);
     GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	SDSetZoom, NULL);
@@ -346,6 +350,8 @@ int refresh(tSituation *s)
     }else{
         SDSelectCameraTemporaryOff((void*)0);
     }
+
+GfLogInfo("car x:%f y:%f z:%f\n", curCar->_pos_X, curCar->_pos_Y, curCar->_pos_Z);
     
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
@@ -365,6 +371,9 @@ int refresh(tSituation *s)
 
     //refresh the hud
     hud.Refresh(s, &frameInfo, curCar, Clouds, Rain, TimeOfDay);
+    
+    //update particles
+    ParticleManager.update(s);
 
     return 0;
 }
@@ -385,6 +394,9 @@ void shutdownCars(void)
         carLights = NULL;
         GfLogInfo("Delete carLights in OsgMain\n");
     }
+
+    //shutdown particles
+    ParticleManager.shutdown();
 
     // Trace final mean F/s.
     if (nFPSTotalSeconds > 0)
@@ -433,6 +445,9 @@ int  initCars(tSituation *s)
         grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
+    //initialize particles
+    ParticleManager.initialize(s);
+
     return 0;
 }
 
@@ -477,3 +492,5 @@ Camera * getCamera(void)
 {
     return screens->getActiveView()->getCamera();
 }
+
+

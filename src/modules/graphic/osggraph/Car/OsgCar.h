@@ -67,7 +67,7 @@ private :
 
     tCarElt     *car;
 
-    SDWheels    wheels;
+    //SDWheels    wheels;
     SDCarShader *shader;
     SDReflectionMapping *reflectionMapping;
     //SDBackFire *backfire;
@@ -80,6 +80,7 @@ private :
 public :
     SDCar(void);
     ~SDCar(void);
+
     osg::ref_ptr<osg::Node> loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader);
     bool isCar(const tCarElt*c) const;
 
@@ -95,6 +96,7 @@ public :
     SDReflectionMapping *getReflectionMap();
 
     int getReflectionMappingMethod() const;
+    osg::ref_ptr<osg::Group> getCarOsgGroup() { return this->carTransform; }
 
     tCarElt *getCar() { return car; }
     const tCarElt *getCar() const { return car; }
@@ -102,6 +104,8 @@ public :
     void markCarCurrent(const tCarElt *Car);
     void updateCar(tSituation *s, tCarElt *CurCar, int current, int driver);
     void updateShadingParameters(const osg::Matrixf &modelview);
+
+    SDWheels    wheels;
 };
 
 class SDCars
