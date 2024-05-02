@@ -39,7 +39,7 @@ static const char *SectBorder[2] = {TRK_SECT_RBORDER, TRK_SECT_LBORDER};
 static const char *SectBarrier[2] = {TRK_SECT_RBARRIER, TRK_SECT_LBARRIER};
 
 static const char *ValStyle[]= {
-#define X(x) [TR_##x] = TRK_VAL_##x,
+#define X(x) TRK_VAL_##x,
     TRACK_SEG_STYLES
 #undef X
 };
