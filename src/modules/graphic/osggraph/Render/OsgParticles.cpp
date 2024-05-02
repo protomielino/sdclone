@@ -30,9 +30,6 @@ SDParticleSystem::SDParticleSystem(osg::Group *mySceneRoot, osg::Group *myAttach
     sceneRoot = mySceneRoot;
     attachToObj = myAttachToObj;
     initialize();
-    
-    osgParticle::Particle ptemplate;
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 };
 SDParticleSystem::~SDParticleSystem(void){};
 

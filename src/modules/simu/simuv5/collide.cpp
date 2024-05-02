@@ -115,11 +115,10 @@ void SimCarCollideXYScene(tCar *car)
 {
     tTrackSeg *seg = car->trkPos.seg;
     tTrkLocPos trkpos;
-    int i;
     tDynPt *corner;
     tdble initDotProd;
     tdble dotProd, cx, cy, dotprod2;
-    tdble impactPointX, impactPointY, impactPointZ = 0.0;
+    tdble impactPointX = 0.0, impactPointY = 0.0, impactPointZ = 0.0;
     sgVec3 v;
     tTrackBarrier *curBarrier;
     tdble dmg;
@@ -130,7 +129,7 @@ void SimCarCollideXYScene(tCar *car)
     }
 
     corner = &(car->corner[0]);
-    for (i = 0; i < 4; i++, corner++)
+    for (int i = 0; i < 4; i++, corner++)
     {
         seg = car->trkPos.seg;
         RtTrackGlobal2Local(seg, corner->pos.ax, corner->pos.ay, &trkpos, TR_LPOS_TRACK);
