@@ -350,8 +350,6 @@ int refresh(tSituation *s)
     }else{
         SDSelectCameraTemporaryOff((void*)0);
     }
-
-GfLogInfo("car x:%f y:%f z:%f\n", curCar->_pos_X, curCar->_pos_Y, curCar->_pos_Z);
     
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
