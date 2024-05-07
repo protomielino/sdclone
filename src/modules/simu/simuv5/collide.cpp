@@ -131,6 +131,7 @@ void SimCarCollideXYScene(tCar *car)
     corner = &(car->corner[0]);
     for (int i = 0; i < 4; i++, corner++)
     {
+        dmg = 0.0f;
         seg = car->trkPos.seg;
         RtTrackGlobal2Local(seg, corner->pos.ax, corner->pos.ay, &trkpos, TR_LPOS_TRACK);
         seg = trkpos.seg;
@@ -206,10 +207,6 @@ void SimCarCollideXYScene(tCar *car)
         {
             dmg = (tdble) (curBarrier->surface->kDammage * fabs(0.5*dmgDotProd*dmgDotProd) * simDammageFactor[car->carElt->_skillLevel]);
             car->dammage += (int)dmg;
-        }
-        else
-        {
-            dmg = 0.0f;
         }
 
         dotProd *= curBarrier->surface->kRebound;
