@@ -113,7 +113,11 @@ public class GeneralProperties extends PropertyPanel
 	{
 		if (categoryComboBox == null)
 		{
-			String[] items = {"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
+			String[] items;
+			if (getEditorFrame().getCarsSportsRacing())
+				items = new String[] {"circuit", "development", "dirt", "grandprix", "road", "speedway"};
+			else
+				items = new String[] {"circuit", "development", "dirt", "gprix", "karting", "road", "speedway"};
 			categoryComboBox = new JComboBox<String>(items);
 			categoryComboBox.setBounds(130, 64, 125, 23);
 			categoryComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getCategory());
