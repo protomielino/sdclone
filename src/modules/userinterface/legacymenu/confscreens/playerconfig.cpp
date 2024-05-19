@@ -45,10 +45,34 @@ static const char *PlayerNamePrompt	= "-- Enter name --";
 static const char *NoPlayer = "-- No one --";
 static const char *HumanDriverModuleName  = "human";
 static const char *DefaultCarName  = "sc-lynx-220";
+static const char *DefaultCodeName = "PLA";
+static const char *DefaultNation = "FR";
 #ifdef WEBSERVER
 static const char *DefaultWebserverusername  = "username";
 static const char *DefaultWebserverpassword  = "password";
 #endif //WEBSERVER
+
+static const char *strNation[] = { "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW",
+                                 "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO",
+                                 "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CEFTA", "CF", "CG", "CH",
+                                 "CI", "CK", "CL", "CM", "CN", "CO", "CP", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE",
+                                 "DG", "DJ", "DK", "DM", "DO", "DZ", "EA", "EC", "EE", "EG", "EH", "ER", "ES", "ES-CT", "ES-GA",
+                                 "ES-PV", "ET", "EU", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GB-ENG", "GB-NIR", "GB-SCT",
+                                 "GB-WLS", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT",
+                                 "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "IC", "ID", "IE", "IL", "IM", "IN",
+                                 "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN",
+                                 "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV",
+                                 "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ",
+                                 "MR", "MS", "MT", "MU", "MV","MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI",
+                                 "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM",
+                                 "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC",
+                                 "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV",
+                                 "SX", "SY", "SZ", "TA", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TM", "TO",
+                                 "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "UN", "US", "UY", "UZ", "VA", "VC", "VE",
+                                 "VG", "VI", "VN", "VU", "WF", "WS", "WW", "XK", "XX", "YE", "YT", "ZA", "ZM", "ZW" };
+
+static int SelectedNation = 0;
+static const int NbNations = sizeof(strNation) / sizeof(strNation[0]);
 
 static const char *SkillLevelString[] = ROB_VALS_LEVEL;
 static const int NbSkillLevels = sizeof(SkillLevelString) / sizeof(SkillLevelString[0]);
@@ -66,6 +90,7 @@ static void	*PlayerHdle = NULL;
 static void	*GraphHdle = NULL;
 
 static int NameEditId;
+static int NationEditId;
 static int RaceNumEditId;
 static int GearChangeEditId;
 static int PitsEditId;
@@ -94,36 +119,38 @@ struct tPlayerInfo
 public:
 
     tPlayerInfo(const char *name = HumanDriverModuleName, const char *dispname = 0,
-                const char *defcarname = 0, int racenumber = 0, tSkillLevel skilllevel = ARCADE,
+                const char *codename = 0, const char *nation = 0,
+                const char *carname = 0, int racenumber = 0, tSkillLevel skilllevel = ARCADE,
                 float *color = 0,
                 tGearChangeMode gearchangemode = GEAR_MODE_AUTO, int autoreverse = 0,
                 int nbpitstops = 0
-                #ifdef WEBSERVER
+#ifdef WEBSERVER
                 ,
                 const char *webserverusername = 0,
                 const char *webserverpassword = 0,
                 int webserverenabled = 0
-                #endif //WEBSERVER
+#endif //WEBSERVER
                 )
     {
         _info.name = 0;
         setName(name);
         _info.dispname = 0;
         setDispName(dispname);
-        _defcarname = 0;
-        setDefaultCarName(defcarname);
+        setCodeName(codename);
+        setCarName(carname);
+        setNation(nation);
         _racenumber = racenumber;
         _gearchangemode = gearchangemode;
         _nbpitstops = nbpitstops;
         _skilllevel = skilllevel;
         _autoreverse = autoreverse;
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         _webserverusername = 0;
         setWebserverusername(webserverusername);
         _webserverpassword = 0;
         setWebserverpassword(webserverpassword);
         _webserverenabled = webserverenabled;
-        #endif //WEBSERVER
+#endif //WEBSERVER
         _color[0] = color ? color[0] : 1.0;
         _color[1] = color ? color[1] : 1.0;
         _color[2] = color ? color[2] : 0.5;
@@ -136,20 +163,21 @@ public:
         setName(src._info.name);
         _info.dispname = 0;
         setDispName(src._info.dispname);
-        _defcarname = 0;
-        setDefaultCarName(src._defcarname);
+        _codename = src._codename;
+        _nation = src._nation;
+        _carname = src._carname;
         _racenumber = src._racenumber;
         _gearchangemode = src._gearchangemode;
         _nbpitstops = src._nbpitstops;
         _skilllevel = src._skilllevel;
         _autoreverse = src._autoreverse;
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         _webserverusername = 0;
         setWebserverusername(src._webserverusername);
         _webserverpassword = 0;
         setWebserverpassword(src._webserverpassword);
         _webserverenabled = src._webserverenabled;
-        #endif //WEBSERVER
+#endif //WEBSERVER
         _color[0] = src._color[0];
         _color[1] = src._color[1];
         _color[2] = src._color[2];
@@ -158,18 +186,20 @@ public:
 
     const char *name()  const { return _info.name; };
     const char *dispName()  const { return _info.dispname; }
-    const char *defaultCarName()  const { return _defcarname; }
+    const char *codeName() const { return _codename.c_str(); }
+    const char *nation() const { return _nation.c_str(); }
+    const char *carName()  const { return _carname.c_str(); }
     int raceNumber() const { return _racenumber; }
     tGearChangeMode gearChangeMode() const { return _gearchangemode; }
     int nbPitStops() const { return _nbpitstops; }
     float color(int idx) const { return (idx >= 0 && idx < 4) ? _color[idx] : 0.0; }
     tSkillLevel skillLevel() const { return _skilllevel; }
     int autoReverse() const { return _autoreverse; }
-    #ifdef WEBSERVER
+#ifdef WEBSERVER
     const char *webserverusername()  const { return _webserverusername; }
     const char *webserverpassword()  const { return _webserverpassword; }
     int webserverenabled() const { return _webserverenabled; }
-    #endif //WEBSERVER
+#endif //WEBSERVER
 
     void setName(const char *name)
     {
@@ -189,17 +219,29 @@ public:
         _info.dispname = new char[strlen(dispname)+1];
         strcpy(_info.dispname, dispname); // Can't use strdup : free crashes in destructor !?
     }
-    void setDefaultCarName(const char *defcarname)
+    void setCarName(const char *carname)
     {
-        if (_defcarname)
-            delete[] _defcarname;
-        if (!defcarname || strlen(defcarname) == 0)
-            defcarname = DefaultCarName;
-        _defcarname = new char[strlen(defcarname)+1];
-        strcpy(_defcarname, defcarname); // Can't use strdup : free crashes in destructor !?
+        if (!carname || strlen(carname) == 0)
+            _carname = DefaultCarName;
+        else
+            _carname = carname;
+    }
+    void setCodeName(const char *codename)
+    {
+        if (codename == nullptr || strlen(codename) == 0)
+            _codename = DefaultCodeName;
+        else
+            _codename = codename;
+    }
+    void setNation(const char *nation)
+    {
+        if (nation == nullptr || strlen(nation) == 0)
+            _nation = DefaultNation;
+        else
+            _nation = nation;
     }
 
-    #ifdef WEBSERVER
+#ifdef WEBSERVER
     void setWebserverusername(const char *webserverusername)
     {
         if (_webserverusername)
@@ -219,7 +261,7 @@ public:
         strcpy(_webserverpassword, webserverpassword); // Can't use strdup : free crashes in destructor !?
     }
     void setWebserverEnabled(int webserverenabled) { _webserverenabled = webserverenabled; }
-    #endif //WEBSERVER
+#endif //WEBSERVER
 
     void setRaceNumber(int raceNumber) { _racenumber = raceNumber; }
     void setGearChangeMode(tGearChangeMode gearChangeMode) { _gearchangemode = gearChangeMode; }
@@ -233,16 +275,13 @@ public:
             delete[] _info.dispname;
         if (_info.name)
             delete[] _info.name;
-        if (_defcarname)
-            delete[] _defcarname;
 
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         if (_webserverusername)
             delete[] _webserverusername;
         if (_webserverpassword)
             delete[] _webserverpassword;
-        #endif //WEBSERVER
-
+#endif //WEBSERVER
     }
 
     // Gear change mode enum to string conversion
@@ -266,18 +305,20 @@ public:
 private:
 
     tInfo			_info;
-    char*			_defcarname;
+    std::string     _carname;
+    std::string     _codename;
+    std::string     _nation;
     int				_racenumber;
     tGearChangeMode	_gearchangemode;
     int				_nbpitstops;
     float			_color[4];
     tSkillLevel		_skilllevel;
     int				_autoreverse;
-    #ifdef WEBSERVER
+#ifdef WEBSERVER
     char*			_webserverusername;
     char*			_webserverpassword;
     int 			_webserverenabled;
-    #endif //WEBSERVER
+#endif //WEBSERVER
 };
 
 
@@ -322,6 +363,9 @@ refreshEditVal(void)
         GfuiEditboxSetString(ScrHandle, NameEditId, "");
         GfuiEnable(ScrHandle, NameEditId, GFUI_DISABLE);
 
+        GfuiEditboxSetString(ScrHandle, NationEditId, "");
+        GfuiEnable(ScrHandle, NationEditId, GFUI_DISABLE);
+
         GfuiEditboxSetString(ScrHandle, RaceNumEditId, "");
         GfuiEnable(ScrHandle, RaceNumEditId, GFUI_DISABLE);
 
@@ -337,7 +381,7 @@ refreshEditVal(void)
         GfuiLabelSetText(ScrHandle, AutoReverseEditId, "");
         GfuiEnable(ScrHandle, AutoReverseEditId, GFUI_DISABLE);
 
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         GfuiEditboxSetString(ScrHandle, WebUsernameEditId, "");
         GfuiEnable(ScrHandle, WebUsernameEditId, GFUI_DISABLE);
 
@@ -349,7 +393,7 @@ refreshEditVal(void)
 
         GfuiEnable(ScrHandle, WebServerTestLoginId, GFUI_DISABLE);
 
-        #endif //WEBSERVER
+#endif //WEBSERVER
 
     } else {
 
@@ -371,13 +415,16 @@ refreshEditVal(void)
         GfuiEditboxSetString(ScrHandle, PitsEditId, buf);
         GfuiEnable(ScrHandle, PitsEditId, GFUI_ENABLE);
 
+        GfuiLabelSetText(ScrHandle, NationEditId, (*CurrPlayer)->nation());
+        GfuiEnable(ScrHandle, NationEditId, GFUI_ENABLE);
+
         GfuiLabelSetText(ScrHandle, SkillEditId, SkillLevelString[(*CurrPlayer)->skillLevel()]);
         GfuiEnable(ScrHandle, SkillEditId, GFUI_ENABLE);
 
         GfuiLabelSetText(ScrHandle, AutoReverseEditId, Yn[(*CurrPlayer)->autoReverse()]);
         GfuiEnable(ScrHandle, AutoReverseEditId, GFUI_ENABLE);
 
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         snprintf(buf, sizeof(buf), "%s", (*CurrPlayer)->webserverusername());
         GfuiEditboxSetString(ScrHandle, WebUsernameEditId, buf);
         GfuiEnable(ScrHandle, WebUsernameEditId, GFUI_ENABLE);
@@ -390,9 +437,7 @@ refreshEditVal(void)
         GfuiEnable(ScrHandle, WebServerCheckboxId, GFUI_ENABLE);
 
         updateWebserverControls((*CurrPlayer)->webserverenabled());
-
-        #endif //WEBSERVER
-
+#endif //WEBSERVER
 
         if ((*CurrPlayer)->gearChangeMode() == GEAR_MODE_AUTO)
             autoRevVisible = GFUI_VISIBLE;
@@ -402,7 +447,6 @@ refreshEditVal(void)
     GfuiVisibilitySet(ScrHandle, AutoReverseLeftId, autoRevVisible);
     GfuiVisibilitySet(ScrHandle, AutoReverseEditId, autoRevVisible);
     GfuiVisibilitySet(ScrHandle, AutoReverseRightId, autoRevVisible);
-
 }
 
 static void
@@ -479,8 +523,9 @@ PutPlayerSettings(unsigned index)
     // Human driver params
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NAME, player->dispName());
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_SNAME, player->dispName());
-    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CODE, "PLA");
-    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CAR, player->defaultCarName());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CODE, player->codeName());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NATION, player->nation());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CAR, player->carName());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RACENUM, (char*)NULL, player->raceNumber());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RED, (char*)NULL, player->color(0));
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_GREEN, (char*)NULL, player->color(1));
@@ -493,11 +538,11 @@ PutPlayerSettings(unsigned index)
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_TRANS, player->gearChangeModeString());
     GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
-    #ifdef WEBSERVER
+ #ifdef WEBSERVER
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerUsername", player->webserverusername());
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerPassword", player->webserverpassword());
     GfParmSetNum(PrefHdle, drvSectionPath, "WebServerEnabled", (char*)NULL, player->webserverenabled());
-    #endif //WEBSERVER
+ #endif //WEBSERVER
 
 
     /* Allow neutral gear in sequential mode if neutral gear command not defined */
@@ -569,7 +614,6 @@ onCopyPlayer(void * /* dummy */)
     char sectionPath[128];
     char driverId[8];
     char newDriverId[8];
-
     tGearChangeMode gearChange;
 
     if (CurrPlayer != PlayersInfo.end()) {
@@ -591,7 +635,7 @@ onCopyPlayer(void * /* dummy */)
         
         //ovverryde the copied WebServer data (username password and enabled status) with the default settings
         
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         const char *str;
         char sstring[128];
         int webserverenabledval;
@@ -608,7 +652,7 @@ onCopyPlayer(void * /* dummy */)
         
         webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
         (*CurrPlayer)->setWebserverEnabled(webserverenabledval);
-        #endif //WEBSERVER
+#endif //WEBSERVER
 
         // Update preferences and drivers params (rename those after, add new).
         snprintf(sectionPath, sizeof(sectionPath), "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
@@ -697,6 +741,23 @@ onConfControls(void * /* dummy */ )
     }
 }
 
+static void
+GenerateLoadingNation(const char *nation)
+{
+    if (!nation)
+        nation = DefaultNation;
+
+    for (int i = 0; i < NbNations; i++)
+    {
+        if (strcmp(nation, strNation[i]) == 0)
+        {
+            SelectedNation = i;
+            GfLogInfo("Selected Nation = %i - %s\n", i, strNation[SelectedNation]);
+            break;
+        }
+    }
+}
+
 /* Load human driver (= player) info list (PlayersInfo) from preferences and human drivers files ;
    load associated scroll list */
 static int
@@ -706,6 +767,8 @@ GenPlayerList(void)
     int i;
     int j;
     const char *driver;
+    const char *cdriver;
+    const char *nation;
     const char *defaultCar;
     tSkillLevel skilllevel;
     const char *str;
@@ -739,6 +802,10 @@ GenPlayerList(void)
                     break;
                 }
             }
+            cdriver     = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_CODE, 0);
+            nation      = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_NATION, 0);
+            GenerateLoadingNation(nation);
+            nation      = strNation[SelectedNation];
             defaultCar  = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_CAR, 0);
             racenumber  = (int)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
             color[0]    = (float)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
@@ -746,12 +813,13 @@ GenPlayerList(void)
             color[2]    = (float)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_BLUE, (char*)NULL, 0.5);;
             color[3]    = 1.0;
             PlayersInfo.push_back(new tPlayerInfo(HumanDriverModuleName, // Driver module name
-                                                  driver,  // Player (display) name
+                                                  driver,     // Player (display) name
+                                                  cdriver,    // Code name player.
+                                                  nation,     // Nation player.
                                                   defaultCar, // Default car name.
                                                   racenumber, // Race number
                                                   skilllevel, // skill level
-                                                  color));  // Colors
-
+                                                  color));    // Colors
         }
     }
 
@@ -786,7 +854,7 @@ GenPlayerList(void)
             PlayersInfo[i]->setAutoReverse(1);
         }
 
-        #ifdef WEBSERVER
+#ifdef WEBSERVER
         str = GfParmGetStr(PrefHdle, sstring, "WebServerUsername", 0);
         PlayersInfo[i]->setWebserverusername(str);
 
@@ -795,10 +863,7 @@ GenPlayerList(void)
         
         webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
         PlayersInfo[i]->setWebserverEnabled(webserverenabledval);
-
-        #endif //WEBSERVER
-
-
+#endif //WEBSERVER
     }
 
     return 0;
@@ -998,6 +1063,34 @@ onChangeNum(void * /* dummy */)
 }
 
 static void
+onChangeNation(void *vp)
+{
+    if (CurrPlayer == PlayersInfo.end())
+    {
+        return;
+    }
+
+    if (vp == 0)
+    {
+        if (SelectedNation == 0)
+            SelectedNation = NbNations - 1;
+        else
+            SelectedNation -= 1;
+    }
+    else
+    {
+        if (SelectedNation == NbNations - 1)
+            SelectedNation = 0;
+        else
+            SelectedNation += 1;
+    }
+
+    (*CurrPlayer)->setNation(SelectedNation != -1 ? strNation[SelectedNation] : nullptr);
+
+    refreshEditVal();
+}
+
+static void
 onChangePits(void * /* dummy */)
 {
     char	*val;
@@ -1144,6 +1237,11 @@ PlayerConfigMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, param, "skillrightarrow", (void*)1, onChangeLevel);
     SkillEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "skilltext");
 
+    /* Player nationality "combobox" (left arrow, label, right arrow) */
+    GfuiMenuCreateButtonControl(ScrHandle, param, "nationleftarrow", (void *)0, onChangeNation);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "nationrightarrow", (void *)1, onChangeNation);
+    NationEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "nationtext");
+
     /* Races and pits numbers editboxes (Must they really stay here ?) */
     /* TODO: definitely should be moved from here to pre-race menus. kilo */
     RaceNumEditId = GfuiMenuCreateEditControl(ScrHandle, param, "racenumedit", NULL, NULL, onChangeNum);
@@ -1164,7 +1262,7 @@ PlayerConfigMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", NULL, onSavePlayerList);
     GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", NULL, onQuitPlayerConfig);
 
-    #ifdef WEBSERVER
+#ifdef WEBSERVER
     /* Web username and password editbox */
     WebUsernameEditId = GfuiMenuCreateEditControl(ScrHandle, param, "webusernameedit", NULL, NULL, onChangeWebserverusername);
     WebPasswordEditId = GfuiMenuCreateEditControl(ScrHandle, param, "webpasswordedit", NULL, NULL, onChangeWebserverpassword);
@@ -1174,10 +1272,7 @@ PlayerConfigMenuInit(void *prevMenu)
     
    	WebServerCheckboxId =
 	GfuiMenuCreateCheckboxControl(ScrHandle, param, "webservercheckbox", NULL, onChangeWebserverenabled);
-    
-    
-    #endif //WEBSERVER
-
+#endif //WEBSERVER
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(param);
@@ -1186,11 +1281,6 @@ PlayerConfigMenuInit(void *prevMenu)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept and save changes", NULL, onSavePlayerList, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel changes", NULL, onQuitPlayerConfig, NULL);
-    //     GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Car", (void*)0, ChangeCar, NULL);
-    //     GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Car", (void*)1, ChangeCar, NULL);
-    //     GfuiAddKey(ScrHandle, GFUIK_PAGEUP, "Previous Car Category", (void*)0, ChangeCat, NULL);
-    //     GfuiAddKey(ScrHandle, GFUIK_PAGEDOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
 
     return ScrHandle;
 }
-
