@@ -21,6 +21,8 @@
 #include "grSky.h"
 #include "grSphere.h"
 
+namespace ssggraph {
+
 static int grMoonOrbPreDraw( ssgEntity *e )
 {
     ssgLeaf *f = (ssgLeaf *)e;
@@ -153,3 +155,6 @@ bool cGrMoon::reposition(sgVec3 p, double angle, double moonrightAscension, doub
 
     return true;
 }
+
+} // namespace ssggraph
+

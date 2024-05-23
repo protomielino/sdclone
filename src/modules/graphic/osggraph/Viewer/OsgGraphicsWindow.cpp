@@ -26,6 +26,8 @@
 #include <osg/DeleteHandler>
 #include <osg/Version>
 
+namespace osggraph {
+
 namespace OSGUtil
 {
 
@@ -228,3 +230,6 @@ void OsgGraphicsWindowSDL2::raiseWindow()
 }
 
 }
+
+} // namespace osggraph
+

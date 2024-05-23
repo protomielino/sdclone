@@ -25,6 +25,8 @@
 #include "OsgBrake.h"
 #include "OsgMath.h"
 
+namespace osggraph {
+
 void SDBrakes::setCar(tCarElt * car_elt)
 {
     this->car = car_elt;
@@ -189,3 +191,6 @@ void SDBrakes::updateBrakes()
         //GfLogInfo("brake temp %i = %f\n", i, temp);
     }
 }
+
+} // namespace osggraph
+

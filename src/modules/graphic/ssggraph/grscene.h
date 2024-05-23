@@ -29,6 +29,7 @@
 #include <raceman.h> // tSituation
 #include "grmultitexstate.h"
 
+namespace ssggraph {
 
 extern int       grWrldX;
 extern int       grWrldY;
@@ -115,4 +116,7 @@ extern cDoV	PlayableDistanceOfView;
 extern cDoV	UnPlayableDistanceOfView;
 #endif //GUIONS
 
+} // namespace ssggraph
+
 #endif //_GRSCENE_H_
+

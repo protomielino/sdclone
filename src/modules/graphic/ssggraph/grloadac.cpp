@@ -50,6 +50,7 @@
 #include "grmain.h"
 #include "grtexture.h"	//doMipMap, cgrSimpleState, cgrMultiTexState
 
+namespace ssggraph {
 
 // API for transparently loading .ac/.acc files, gzip-compressed or not.
 #define FGETS(buf, len, file) gzgets(file, buf, len)
@@ -1443,3 +1444,6 @@ void grssgSetCurrentOptions(grssgLoaderOptions* options)
     ssgSetCurrentOptions(options);
     current_options = static_cast<grssgLoaderOptions*>(ssgGetCurrentOptions());
 }
+
+} // namespace ssggraph
+

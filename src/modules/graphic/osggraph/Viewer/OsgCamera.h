@@ -24,6 +24,8 @@
 #include <vector>
 #include <camera.h>
 
+namespace osggraph {
+
 #define GR_ZOOM_IN 	0
 #define GR_ZOOM_OUT 	1
 #define GR_ZOOM_MAX 	2
@@ -234,4 +236,7 @@ public:
     virtual void limitFov(void);
 };
 
+} // namespace osggraph
+
 #endif // _OSGCAMERA_H_
+

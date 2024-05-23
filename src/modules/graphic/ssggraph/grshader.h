@@ -145,6 +145,8 @@ extern PFNGLPROGRAMPARAMETER4FVNVPROC glProgramParameter4fvNV;
 #include <vector>
 #include <map>
 
+namespace ssggraph {
+
 class cgrShader
 {
 public:
@@ -200,4 +202,7 @@ protected:
 	static GLint nb_texture_unit;
 };
 
+} // namespace ssggraph
+
 #endif /* __SHADER_H__ */
+

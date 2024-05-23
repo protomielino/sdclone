@@ -20,6 +20,8 @@
 #include "plib/ul.h"
 #include "grSphere.h"
 
+namespace ssggraph {
+
 #define SGD_2PI      6.28318530717958647692
 
 ssgBranch *grMakeSphere(
@@ -116,4 +118,6 @@ ssgBranch *grMakeSphere(
 
   return sphere;
 }
+
+} // namespace ssggraph
 

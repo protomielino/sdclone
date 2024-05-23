@@ -20,6 +20,8 @@
 #include <math.h>
 #include "grSky.h"
 
+namespace ssggraph {
+
 // proportions of max dimensions fed to the build() routine
 static const float center_elev = 1.0f;
 
@@ -536,3 +538,6 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 
   return true;
 }
+
+} // namespace ssggraph
+

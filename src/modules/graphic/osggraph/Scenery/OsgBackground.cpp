@@ -24,6 +24,8 @@
 
 #include "OsgScenery.h"
 
+namespace osggraph {
+
 SDBackground::SDBackground(void) :
     _background(NULL),
     _backgroundTransform(NULL)
@@ -86,3 +88,6 @@ void SDBackground::reposition(double X, double Y, double Z)
     if(_backgroundTransform)
         _backgroundTransform->setMatrix(mat * T);
 }
+
+} // namespace osggraph
+

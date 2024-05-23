@@ -27,6 +27,8 @@
 #include <osg/StateSet>
 #include <osg/Depth>
 
+namespace osggraph {
+
 // Used for rise/set effects (flat earth - no rotation of skydome considered here )
 void calc_celestial_angles( const osg::Vec3f& body, const osg::Vec3f& view, double& angle, double& rotation )
 {
@@ -313,3 +315,6 @@ void SDSky::modify_vis( float alt, float time_factor )
 
     effective_visibility = effvis;
 }
+
+} // namespace osggraph
+

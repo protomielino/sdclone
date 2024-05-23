@@ -38,6 +38,8 @@
 #include "OsgCar.h"
 #include "OsgHUD.h"
 
+namespace osggraph {
+
 SDScreens::SDScreens() :
     root(NULL),
     prerenderRoot(NULL),
@@ -310,3 +312,6 @@ SDScreens::~SDScreens()
 
     delete debugHUD;
 }
+
+} // namespace osggraph
+

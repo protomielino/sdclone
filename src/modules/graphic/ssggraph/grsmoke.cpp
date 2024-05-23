@@ -31,6 +31,8 @@
 #include "dmalloc.h"
 #endif
 
+namespace ssggraph {
+
 static int      grSmokeMaxNumber;
 static double   grSmokeDeltaT;
 static double   grFireDeltaT;
@@ -717,3 +719,6 @@ cGrSmoke::Add(tCarElt *car, const int i, const double t,
 
     return ret;
 }//cGrSmoke::Add
+
+} // namespace ssggraph
+

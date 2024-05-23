@@ -24,6 +24,7 @@
 #include <osg/Group>
 #include <osg/StateSet>
 
+namespace osggraph {
 
 enum CarLightType
 {
@@ -83,4 +84,7 @@ public:
         { return state_sets[(int)type > 0 && (int)type < CAR_LIGHT_TYPE_COUNT ? type : 0]; }
 };
 
+} // namespace osggraph
+
 #endif
+

@@ -26,6 +26,8 @@
 #include "grscene.h"
 #include "grtexture.h"
 
+namespace ssggraph {
+
 float grGammaValue = 1.8;
 int grMipMap = 0;
 
@@ -378,3 +380,6 @@ Maximum is 10
  * a similar approach to find max, sum, avg or min value in an array.
  *
 */
+
+} // namespace ssggraph
+

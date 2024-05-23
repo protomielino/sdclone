@@ -20,6 +20,8 @@
 
 #include "OsgMath.h"
 
+namespace osggraph {
+
 void osgXformPnt3(osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat)
 {
 	float t0 = src[0];
@@ -95,5 +97,5 @@ void osgMakeCoordMat4 ( osgMat4 m, const float x, const float y, const float z, 
   m[3][3] =  SD_ONE ;
 }
 
-
+} // namespace osggraph
 

@@ -23,6 +23,8 @@
 #include <osg/Geometry>
 #include <car.h>
 
+namespace osggraph {
+
 class SDBrakes
 {
 private :
@@ -36,4 +38,7 @@ public :
     void updateBrakes();
 };
 
+} // namespace osggraph
+
 #endif /* _OSGBRAKE_H_ */
+

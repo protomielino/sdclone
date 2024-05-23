@@ -24,6 +24,8 @@
 
 #include "grtexture.h"
 
+namespace ssggraph {
+
 #if 1
 #define TRACE_GL(msg) { GLenum rc; if ((rc = glGetError()) != GL_NO_ERROR) GfLogWarning("%s %s\n", msg, gluErrorString(rc)); }
 #else
@@ -66,4 +68,7 @@ extern float grGetHOT(float x, float y);
 
 inline float urandom() { return(((float)rand() / (1.0 + (float)RAND_MAX)));}
 
-#endif /* _GRUTIL_H_ */ 
+} // namespace ssggraph
+
+#endif /* _GRUTIL_H_ */
+

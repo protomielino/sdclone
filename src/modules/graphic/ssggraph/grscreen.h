@@ -22,6 +22,8 @@
 #include <car.h>			//tCarElt
 #include "grcam.h"		//Cameras
 
+namespace ssggraph {
+
 class cGrBoard;
 class cGrFrameInfo;
 
@@ -101,4 +103,7 @@ class cGrScreen {
 		inline int getBoardWidth(void) { return boardWidth; }
 };
 
+} // namespace ssggraph
+
 #endif //_GRSCREEN_H_
+

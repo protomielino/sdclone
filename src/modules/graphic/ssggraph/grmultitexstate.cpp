@@ -29,6 +29,7 @@ extern PFNGLACTIVETEXTUREPROC glActiveTexture ;
 
 #include "grmultitexstate.h"
 
+namespace ssggraph {
 
 cgrMultiTexState::cgrMultiTexState(tfnTexScheme fnTexScheme)
 : cgrSimpleState(), _fnTexScheme(fnTexScheme)
@@ -231,4 +232,6 @@ void cgrMultiTexState::blend()
 	static const float aColor[4] = { 1.0, 1.0, 1.0, 1.0 };
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, aColor);
 }
+
+} // namespace ssggraph
 

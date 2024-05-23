@@ -20,8 +20,8 @@
 #ifndef OSGVECTORARRAYADAPTERH
 #define OSGVECTORARRAYADAPTERH 1
 
-namespace osggraph
-{
+namespace osggraph {
+
 template <typename Vector>
 class SDVectorArrayAdapter 
 {
@@ -49,5 +49,8 @@ private:
     const int _baseOffset;
     const int _rowOffset;
 };
-}
+
+} // namespace osggraph
+
 #endif
+

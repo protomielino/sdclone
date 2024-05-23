@@ -3,9 +3,13 @@
 
 typedef struct Situation tSituation;
 
+namespace ssggraph {
+
 void grTrackLightInit();
 void grTrackLightUpdate( tSituation *s );
 void grTrackLightShutdown();
+
+} // namespace ssggraph
 
 #endif //MK_TRACKLIGHT_H
 

@@ -27,8 +27,8 @@
 #include <osg/Array>
 #include <map>
 
-namespace osg
-{
+namespace osg {
+
 class AlphaFunc;
 class BlendFunc;
 class CullFace;
@@ -37,7 +37,10 @@ class ShadeModel;
 class Texture2D;
 class Texture3D;
 class TexEnv;
-}
+
+} // namepace osg
+
+namespace osggraph {
 
 // Return read-only instances of common OSG state attributes.
 class SDStateAttributeFactory
@@ -81,4 +84,8 @@ protected:
     osg::ref_ptr<osg::CullFace> _cullFaceBack;
     osg::ref_ptr<osg::Depth> _depthWritesDisabled;
 };
+
+} // namespace osggraph
+
 #endif
+

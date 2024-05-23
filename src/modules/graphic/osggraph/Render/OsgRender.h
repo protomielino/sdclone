@@ -30,6 +30,8 @@
 struct Situation;
 typedef Situation tSituation;
 
+namespace osggraph {
+
 class SDSky;
 class SDScenery;
 
@@ -120,5 +122,7 @@ public:
     osg::ref_ptr<osg::Group> getRoot() { return m_Root.get(); }
     const osg::Vec3f &getFogColor() const { return FogColor; }
 };
+
+} // namespace osggraph
 
 #endif //_OSGRENDER_H_

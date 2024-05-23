@@ -23,6 +23,8 @@
 #include "dmalloc.h"
 #endif
 
+namespace ssggraph {
+
 void ssgVtxTableShadow::copy_from ( ssgVtxTableShadow *src, int clone_flags )
 {
   ssgVtxTable::copy_from ( src, clone_flags ) ;
@@ -111,3 +113,6 @@ void ssgVtxTableShadow::draw_geometry ()
   glDisable(GL_POLYGON_OFFSET_FILL);
   glDepthMask(GL_TRUE);
 }
+
+} // namespace ssggraph
+

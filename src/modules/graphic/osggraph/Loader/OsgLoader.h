@@ -22,6 +22,8 @@
 #include "ReaderWriterACC.h"
 //#include "ReaderWriterACC2.h"
 
+namespace osggraph {
+
 class osgLoader
 {
 public:
@@ -36,3 +38,6 @@ protected:
     osg::ref_ptr<osgDB::ReaderWriter::Options> m_pOpt;
     ReaderWriterACC m_ACCReader;
 };
+
+} // namespace osggraph
+

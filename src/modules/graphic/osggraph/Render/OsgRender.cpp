@@ -49,6 +49,8 @@
 #include <glfeatures.h>         //gluXXX
 #include <robottools.h>         //RtXXX()
 
+namespace osggraph {
+
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
 #define NMaxStars	3000
@@ -1281,3 +1283,6 @@ osg::Vec4f SDRender::getSceneColor(void)
 {
     return Scene_ambiant;
 }
+
+} // namespace osggraph
+

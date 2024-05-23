@@ -22,6 +22,8 @@
 
 #include <math.h>
 
+namespace osggraph {
+
 #if defined (sgi)
 const float system_gamma = 2.0/1.7;
 
@@ -72,5 +74,8 @@ inline void sd_gamma_restore_c(float *color,
    *color = pow(*color, system/reff);
 };
 
+} // namespace osggraph
+
 #endif // _OSGCOLORS_H
+
 

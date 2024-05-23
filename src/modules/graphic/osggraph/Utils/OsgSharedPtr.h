@@ -22,6 +22,8 @@
 
 #include "OsgReferenced.h"
 
+namespace osggraph {
+
 template<typename T>
 class SDWeakPtr;
 
@@ -96,4 +98,7 @@ private:
   friend class SDWeakPtr;
 };
 
+} // namespace osggraph
+
 #endif
+

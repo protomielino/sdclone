@@ -38,6 +38,8 @@
 #include "OsgMain.h"
 #include "OsgNodeMask.h"
 
+namespace osggraph {
+
 static char path[1024];
 char 		buf[256];
 
@@ -2617,3 +2619,6 @@ void SDCameras::loadSpanValues()
     if (strcmp(pszMonitorType, GR_VAL_MONITOR_NONE) == 0)
         spanaspect = 1.0f;
 }
+
+} // namespace osggraph
+

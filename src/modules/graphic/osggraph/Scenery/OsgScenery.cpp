@@ -33,6 +33,8 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
+namespace osggraph {
+
 double SDScenery::grWrldX = 0.0;
 double SDScenery::grWrldY = 0.0;
 double SDScenery::grWrldZ = 0.0;
@@ -265,3 +267,6 @@ void SDScenery::update_tracklights(double currentTime, double totTime, int raceT
 {
     m_tracklights->update(currentTime, totTime, raceType);
 }
+
+} // namespace osggraph
+

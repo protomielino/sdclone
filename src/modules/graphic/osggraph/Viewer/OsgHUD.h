@@ -27,12 +27,14 @@
 
 #include <osg/Camera>
 
-class SDFrameInfo;
-
 namespace osgText
 {
     class Text;
 }
+
+namespace osggraph {
+
+class SDFrameInfo;
 
 class OSGPLOT
 {
@@ -195,4 +197,7 @@ public:
         }
 };
 
+} // namespace osggraph
+
 #endif //_OSGHUD_H_
+

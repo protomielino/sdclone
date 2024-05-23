@@ -32,6 +32,7 @@
 #include "grmultitexstate.h"	// cgrMultiTexState
 #include "loadsgi.h"	// ssgSGIHeader
 
+namespace ssggraph {
 
 extern int doMipMap(const char *tfname, int mipmap);
 
@@ -68,4 +69,7 @@ class cgrSGIHeader : public ssgSGIHeader
 
 };
 
+} // namespace ssggraph
+
 #endif // _GRTEXTURE_H_
+

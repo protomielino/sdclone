@@ -32,6 +32,8 @@
 #include "dmalloc.h"
 #endif
 
+namespace ssggraph {
+
 void ssgVtxTableCarlight::copy_from(ssgVtxTableCarlight *src, int clone_flags)
 {
 	ssgVtxTable::copy_from(src, clone_flags);
@@ -491,4 +493,5 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 	}
 }
 
+} // namespace ssggraph
 

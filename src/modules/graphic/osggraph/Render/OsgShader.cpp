@@ -31,6 +31,8 @@
 #include "OsgCar.h"
 #include "OsgSky.h"
 
+namespace osggraph {
+
 SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 {
     std::string TmpPath = GfDataDir();
@@ -83,3 +85,6 @@ void SDCarShader::update(const osg::Matrixf &view)
     lightPower->set(sun_color);
     ambientColor->set(scene_color);
 }
+
+} // namespace osggraph
+

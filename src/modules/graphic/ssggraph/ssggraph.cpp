@@ -73,7 +73,7 @@ SsgGraph::SsgGraph(const std::string& strShLibName, void* hShLibHandle)
     ssgInit();
 
     //Setup image loaders
-    grRegisterCustomSGILoader();
+    ssggraph::grRegisterCustomSGILoader();
 }
 
 SsgGraph::~SsgGraph()
@@ -87,54 +87,54 @@ SsgGraph::~SsgGraph()
 bool SsgGraph::loadTrack(tTrack* pTrack)
 {
     //GfLogDebug("SsgGraph::loadTrack\n");
-    return ::initTrack(pTrack) == 0;
+    return ssggraph::initTrack(pTrack) == 0;
 }
 
 bool SsgGraph::loadCars(tSituation* pSituation)
 {
     //GfLogDebug("SsgGraph::loadCars\n");
-    return ::initCars(pSituation) == 0;
+    return ssggraph::initCars(pSituation) == 0;
 }
 
 bool SsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
     //GfLogDebug("SsgGraph::setupView\n");
-    return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+    return ssggraph::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
 void SsgGraph::redrawView(tSituation* pSituation)
 {
-    ::refresh(pSituation);
+    ssggraph::refresh(pSituation);
 }
 
 // void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
 // {
-// 	::bendCar(index, poc, force, count);
+// 	ssggraph::bendCar(index, poc, force, count);
 // }
 
 void SsgGraph::unloadCars()
 {
     //GfLogDebug("SsgGraph::unloadCars\n");
-    ::shutdownCars();
+    ssggraph::shutdownCars();
 }
 
 void SsgGraph::unloadTrack()
 {
     //GfLogDebug("SsgGraph::unloadTrack\n");
-    ::shutdownTrack();
+    ssggraph::shutdownTrack();
 }
 
 void SsgGraph::shutdownView()
 {
     //GfLogDebug("SsgGraph::shutdownView\n");
-    ::shutdownView();
+    ssggraph::shutdownView();
 }
 
 
 Camera* SsgGraph::getCurCam()
 {
     Camera *cam = new Camera;
-    cGrCamera *gcam = grGetCurCamera();
+    ssggraph::cGrCamera *gcam = ssggraph::grGetCurCamera();
 
     cam->Centerv = gcam->getCenterv();
     cam->Upv = gcam->getUpv();
@@ -143,3 +143,4 @@ Camera* SsgGraph::getCurCam()
   
     return cam;
 }
+

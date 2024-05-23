@@ -26,10 +26,9 @@
 #include "OsgReferenced.h"
 #include "OsgMath.h"
 
-namespace osg
-{
-class DrawElementsUShort;
-}
+namespace osggraph {
+
+//class osg::DrawElementsUShort;
 
 class SDSkyDome : public osg::Referenced
 {
@@ -54,4 +53,7 @@ private:
     void makeDome(int rings, int bands, osg::DrawElementsUShort& elements);
 };
 
+} // namespace osggraph
+
 #endif // OSGSKYDOME_H
+

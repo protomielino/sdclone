@@ -31,14 +31,15 @@
 #include <osg/ShadeModel>
 #include <osg/PrimitiveSet>
 
-#include<tgf.h>
+#include <tgf.h>
 
 #include "OsgMath.h"
 #include "OsgVectorArrayAdapter.h"
 #include "OsgDome.h"
 
+namespace osggraph {
+
 using namespace osg;
-using namespace osggraph;
 
 static const float center_elev = 1.0;
 
@@ -144,7 +145,7 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     // generate the raw vertex data
 
     (*dome_vl)[0].set(0.0, 0.0, center_elev * vscale);
-    osggraph::SDVectorArrayAdapter<Vec3Array> vertices(*dome_vl, numBands, 1);
+    SDVectorArrayAdapter<Vec3Array> vertices(*dome_vl, numBands, 1);
 
     for ( int i = 0; i < numBands; ++i )
     {
@@ -232,7 +233,7 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
    const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf/45000);
 
    (*dome_cl)[0] = sky_color;
-   osggraph::SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
+   SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
    const double saif = sun_angle / SD_PI;
    static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
    const osg::Vec3f skyFogDelta = sky_color - fog_color;
@@ -302,3 +303,6 @@ bool SDSkyDome::reposition( const osg::Vec3f &p, double spin )
 
     return true;
 }
+
+} // namespace osggraph
+

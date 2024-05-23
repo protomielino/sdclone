@@ -47,6 +47,8 @@
 #include "OsgReflectionMapping.h"
 #include "OsgNodeMask.h"
 
+namespace osggraph {
+
 class SDRender;
 
 SDCar::SDCar(void) :
@@ -1046,3 +1048,6 @@ void SDCars::unLoad()
     this->cars_branch->removeChildren(0, cars_branch->getNumChildren());
     this->cars_branch = NULL;
 }
+
+} // namespace osggraph
+

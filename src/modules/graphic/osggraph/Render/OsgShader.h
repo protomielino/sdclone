@@ -19,6 +19,8 @@
 #ifndef _OSGSHADERS_H_
 #define _OSGSHADERS_H_
 
+namespace osggraph {
+
 class SDCar;
 
 class SDCarShader
@@ -48,5 +50,7 @@ public :
     SDCarShader(osg::Node *car, SDCar *c);
     void update(const osg::Matrixf &view);
 };
+
+} // namespace osggraph
 
 #endif //_OSGSHADERS_H_

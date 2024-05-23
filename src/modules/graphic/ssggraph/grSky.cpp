@@ -18,6 +18,8 @@
 
 #include "grSky.h"
 
+namespace ssggraph {
+
 // Used for rise/set effects (flat earth - no rotation of skydome considered here )
 void calc_celestial_angles( const sgVec3 body, const sgVec3 view, double& angle, double& rotation )
 {
@@ -395,4 +397,6 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 
     effective_visibility = effvis;
 }
+
+} // namespace ssggraph
 

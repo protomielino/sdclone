@@ -29,6 +29,8 @@
 #include "grscene.h"	//grWrldX
 #include "grutil.h"		//grGetHOT
 
+namespace ssggraph {
+
 static char path[1024];
 
 static float spanfovy;
@@ -2631,3 +2633,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
                                               );
     cam->add(&cams[c]);
 }
+
+} // namespace ssggraph
+

@@ -23,6 +23,8 @@
 
 #include <vector>
 
+namespace ssggraph {
+
 /**
  * Precipitation.
  */
@@ -107,4 +109,7 @@ public:
 
 extern cGrRain grRain;
 
+} // namespace ssggraph
+
 #endif // _GRRAIN_H
+

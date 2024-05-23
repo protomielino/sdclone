@@ -23,6 +23,7 @@
 
 #include "OsgScenery.h"
 
+namespace osggraph {
 
 class SDTrackLights::Internal
 {
@@ -300,3 +301,6 @@ void SDTrackLights::update(double currentTime, double totTime, int raceType)
 {
     if (internal) internal->update(currentTime, totTime, raceType);
 }
+
+} // namespace osggraph
+

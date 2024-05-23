@@ -32,15 +32,16 @@
 #include "grcam.h"
 #include <raceman.h>	//tSituation
 
-
 #ifdef WIN32
 // Multi-texturing functions : Under Windows, not present in gl.h or any other ;
 // you can only get them through a call to wglGetProcAddress at run-time.
 extern PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2fARB ;
 extern PFNGLMULTITEXCOORD2FVARBPROC    glMultiTexCoord2fvARB;
-extern PFNGLACTIVETEXTUREPROC       glActiveTexture ;
+extern PFNGLACTIVETEXTUREPROC          glActiveTexture ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
+
+namespace ssggraph {
 
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
@@ -96,4 +97,7 @@ class cGrFrameInfo
     unsigned nTotalFrames;  // Total nb of frames since initView
 };
 
+} // namespace ssggraph
+
 #endif /* _GRMAIN_H_ */
+

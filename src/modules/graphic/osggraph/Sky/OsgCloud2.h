@@ -31,6 +31,8 @@ using std::string;
 #include <osg/MatrixTransform>
 #include <osg/Switch>
 
+namespace osggraph {
+
 //class SDCloudField;
 
 class SDCloudLayer
@@ -130,5 +132,7 @@ private:
 
     osg::Vec2 base;
 };
+
+} // namespace osggraph
 
 #endif // _OSGCLOUD_H

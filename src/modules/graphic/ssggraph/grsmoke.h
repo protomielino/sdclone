@@ -28,6 +28,8 @@
 
 #include <list>
 
+namespace ssggraph {
+
 #define SMOKE_INIT_SIZE 0.2f
 #define MAX_SMOKE_LIFE  120
 #define MAX_SMOKE_NUMBER  300
@@ -119,4 +121,7 @@ extern void grAddSmoke(tCarElt *car, const double t);
 extern void grUpdateSmoke(const double t);
 extern void grShutdownSmoke();
 
+} // namespace ssggraph
+
 #endif //_GRSMOKE_H_
+

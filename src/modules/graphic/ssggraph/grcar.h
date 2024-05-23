@@ -30,6 +30,8 @@
 #include "grshader.h"   //cGrShader
 #endif
 
+namespace ssggraph {
+
 class cGrSkidmarks;
 class ssgVtxTableShadow;
 class cgrShader;
@@ -120,4 +122,8 @@ extern void grInitCommonState(void);
 extern void grPropagateDamage (tSituation *);
 extern void grDrawCarShadow(void);
 extern bool grShadowStatic;
+
+} // ssggraph
+
 #endif /* _GRCAR_H_ */
+

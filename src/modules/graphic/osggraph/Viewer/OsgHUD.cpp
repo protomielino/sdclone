@@ -50,6 +50,8 @@ extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 #include <string> //tolower
 #include <cctype> //tolower
 
+namespace osggraph {
+
 //string constants for dashboard
 static std::string strEmpty;
 static std::string strBrakeRep("F/R Brake Rep.");
@@ -3531,3 +3533,6 @@ SDHUD::~SDHUD()
     for (std::map<std::string, OSGPLOT * >::iterator it = hudGraphElements.begin(); it != hudGraphElements.end(); ++it)
         delete(it->second);
 }
+
+} // namespace osggraph
+

@@ -33,6 +33,8 @@
 #include "OsgSun.h"
 #include "OsgStars.h"
 
+namespace osggraph {
+
 using std::vector;
 
 class SDCloudLayer;
@@ -177,4 +179,7 @@ public:
     //virtual void set_3dCloudVisRange(float vis);
 };
 
+} // namespace osggraph
+
 #endif // _OSGSKY_H
+

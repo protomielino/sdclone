@@ -22,6 +22,8 @@
 
 #include <osg/Transform>
 
+namespace osggraph {
+
 class SDLightTransform: public osg::Transform
 {
 protected:
@@ -63,4 +65,7 @@ public :
     virtual bool computeWorldToLocalMatrix(osg::Matrix &matrix, osg::NodeVisitor *nv) const;
 };
 
+} // namespace osggraph
+
 #endif
+

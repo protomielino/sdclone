@@ -23,6 +23,7 @@
 #include <osgParticle/RandomRateCounter>
 #include <osgParticle/SectorPlacer>
 
+namespace osggraph {
 
 class SDParticleSystem
 {
@@ -59,4 +60,6 @@ public:
     void update(tSituation *s);
     void shutdown();
 };
+
+} // namespace osggraph
 

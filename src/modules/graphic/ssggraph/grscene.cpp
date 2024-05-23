@@ -37,6 +37,8 @@
 #include "grutil.h"
 #include "grrain.h"
 
+namespace ssggraph {
+
 // Uncomment to enable support for PNG logos for normal pit-building wall
 // (does not apply to the no-building pit, with the low wall, which already supports PNG).
 //#define PNG_LOGO_SUPPORT 1
@@ -787,3 +789,6 @@ void grLoadPitsIndicator(tdble x, tdble y, tdble z, char *buf, int Pitind)
     PitIndicatorLoc->addKid(desc);
     ThePits->addKid(PitIndicatorLoc);
 }
+
+} // namespace ssggraph
+

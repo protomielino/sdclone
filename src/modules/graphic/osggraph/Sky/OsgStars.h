@@ -22,6 +22,8 @@
 
 #include <osg/Array>
 
+namespace osggraph {
+
 class SDStars : public osg::Referenced
 {
     osg::ref_ptr<osg::Vec4Array> stars_cl;
@@ -41,4 +43,7 @@ public:
     bool repaint( double sun_angle, int num, const osg::Vec3d star_data[] );
 };
 
+} // namespace osggraph
+
 #endif // _OSGSTARS_H_
+

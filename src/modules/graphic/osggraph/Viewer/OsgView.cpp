@@ -31,6 +31,8 @@
 #include "OsgCar.h"
 #include "OsgNodeMask.h"
 
+namespace osggraph {
+
 static char buf[1024];
 static char path[1024];
 static char path2[1024];
@@ -304,3 +306,6 @@ void SDView::saveCamera()
     GfParmWriteFile(NULL, grHandle, "Graph");
     GfLogDebug("Written screen=%d camList=%d camNum=%d\n",id,camList,camNum);
 }
+
+} // namespace osggraph
+

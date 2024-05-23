@@ -70,46 +70,45 @@ OsgGraph::~OsgGraph()
 bool OsgGraph::loadTrack(tTrack* pTrack)
 {
     GfLogDebug("OsgGraph::loadTrack\n");
-    return ::initTrack(pTrack) == 0;
+    return osggraph::initTrack(pTrack) == 0;
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
     GfLogDebug("OsgGraph::loadCars\n");
-    return ::initCars(pSituation) == 0;
+    return osggraph::initCars(pSituation) == 0;
 }
 
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
     GfLogDebug("OsgGraph::setupView\n");
-    return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+    return osggraph::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
 void OsgGraph::redrawView(tSituation* pSituation)
 {
-    ::refresh(pSituation);
+    osggraph::refresh(pSituation);
 }
 
 void OsgGraph::unloadCars()
 {
     GfLogDebug("OsgGraph::unloadCars\n");
-    ::shutdownCars();
+    osggraph::shutdownCars();
 }
 
 void OsgGraph::unloadTrack()
 {
     GfLogDebug("OsgGraph::unloadTrack\n");
-    ::shutdownTrack();
+    osggraph::shutdownTrack();
 }
 
 void OsgGraph::shutdownView()
 {
     GfLogDebug("OsgGraph::shutdownView\n");
-    ::shutdownView();
+    osggraph::shutdownView();
 }
 
 Camera* OsgGraph::getCurCam() 
 {
-
-    return getCamera();
+    return osggraph::getCamera();
 }

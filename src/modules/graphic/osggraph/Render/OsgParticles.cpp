@@ -25,6 +25,8 @@
 #include "OsgRender.h"
 #include "OsgParticles.h"
 
+namespace osggraph {
+
 //particle systems, this will serve as a base for our particle effects
 SDParticleSystem::SDParticleSystem(osg::Group *mySceneRoot, osg::Group *myAttachToObj){
     sceneRoot = mySceneRoot;
@@ -285,4 +287,6 @@ void SDParticleSystemManager::shutdown(){
     this->tiresSmokeParticleSystems.resize(0);
     this->sparksParticleSystems.resize(0);
 };
+
+} // namespace osggraph
 

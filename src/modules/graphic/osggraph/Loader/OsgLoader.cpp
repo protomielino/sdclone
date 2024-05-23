@@ -24,6 +24,8 @@
 #include <osg/MatrixTransform>
 #include <osg/Node>
 
+namespace osggraph {
+
 osgLoader::osgLoader(void) :
     m_pOpt(new osgDB::ReaderWriter::Options())
 {
@@ -99,3 +101,6 @@ osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std
 
     return rot;
 }
+
+} // namespace osggraph
+

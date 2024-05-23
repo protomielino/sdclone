@@ -24,6 +24,8 @@
 #include <osg/MatrixTransform>
 #include <osg/Material>
 
+namespace osggraph {
+
 class SDMoon : public osg::Referenced
 {
     osg::ref_ptr<osg::MatrixTransform> moon_transform;
@@ -71,4 +73,7 @@ public:
 
 };
 
+} // namespace osggraph
+
 #endif // _OSGMOON_H
+

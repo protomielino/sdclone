@@ -34,6 +34,8 @@
 #include "OsgSun.h"
 #include "OsgMath.h"
 
+namespace osggraph {
+
 // Constructor
 SDSun::SDSun( void ) :
     visibility(-9999.0),
@@ -388,3 +390,6 @@ osg::Vec4f SDSun::get_scene_color() const
 {
     return osg::Vec4f((*sun_cl)[0][0], (*sun_cl)[0][1], (*sun_cl)[0][2], (*sun_cl)[0][3]);
 }
+
+} // namespace osggraph
+

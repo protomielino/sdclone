@@ -24,6 +24,8 @@
 #include <osg/Node>
 #include <osg/MatrixTransform>
 
+namespace osggraph {
+
 class SDSun : public osg::Referenced
 {
     osg::ref_ptr<osg::MatrixTransform> sun_transform;
@@ -81,5 +83,7 @@ public:
 
     const osg::Vec3f &getSunPosition() const {return sun_position;}
 };
+
+} // namespace osggraph
 
 #endif // _OSGSUN_H_

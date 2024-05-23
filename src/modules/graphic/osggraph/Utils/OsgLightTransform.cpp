@@ -22,6 +22,8 @@
 
 #include "OsgLightTransform.h"
 
+namespace osggraph {
+
 static const double minScale = 1e-6;
 
 
@@ -110,3 +112,6 @@ void SDLightTransform::accept(osg::NodeVisitor &nv)
         Transform::accept(nv);
     }
 }
+
+} // namespace osggraph
+

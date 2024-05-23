@@ -23,6 +23,7 @@
 
 #include <car.h>	//tCarElt
 
+namespace ssggraph {
 
 class ssgVtxTableCarlight : public ssgVtxTable
 {
@@ -106,4 +107,7 @@ extern void grLinkCarlights(tCarElt *car);
 extern void grUpdateCarlight(tCarElt *car, class cGrPerspCamera *curCam, int dispflag);
 extern void grShutdownCarlight(void);
 
+} // namespace ssggraph
+
 #endif	//_GRCARLIGHT_H_
+

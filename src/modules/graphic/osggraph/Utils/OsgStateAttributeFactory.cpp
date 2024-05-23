@@ -32,6 +32,8 @@
 
 #include <osg/Image>
 
+namespace osggraph {
+
 using namespace osg;
 
 SDStateAttributeFactory::SDStateAttributeFactory()
@@ -90,3 +92,6 @@ SDStateAttributeFactory::SDStateAttributeFactory()
 SDStateAttributeFactory::~SDStateAttributeFactory()
 {
 }
+
+} // namespace osggraph
+

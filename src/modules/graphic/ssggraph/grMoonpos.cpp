@@ -19,6 +19,8 @@
 #include <ctime>
 #include "grMoonpos.h"
 
+namespace ssggraph {
+
 // Position of the Moon first month 2012
 static const double MoonPositionDay[31] = { 232.25, 243.86, 255.47, 267.08, 278.69, 290.3, 301.91, 313.53, 325.13, 336.75, 348.36, 0,
                                         11.61, 23.22, 34.83, 46.44, 58.05, 69.66, 81.27, 92.88, 104.49, 116.10, 127.71, 139.32, 150.93,
@@ -54,5 +56,5 @@ double grUpdateMoonPos(double timeOfDay)
 
 }
 
-
+} // namespace ssggraph
 

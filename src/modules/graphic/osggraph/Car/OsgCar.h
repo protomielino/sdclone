@@ -31,6 +31,8 @@
 //#include "OsgBackFire.h"
 #include "OsgCarLight.h"
 
+namespace osggraph {
+
 class SDCarShader;
 class SDReflectionMapping;
 class SDWheels;
@@ -133,4 +135,7 @@ public :
 
 };
 
+} // namespace osggraph
+
 #endif /* _OSGCAR_H_ */
+

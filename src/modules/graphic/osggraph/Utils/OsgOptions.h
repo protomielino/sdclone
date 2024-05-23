@@ -22,6 +22,8 @@
 #ifndef _OSGOPTIONS_H_
 #define _OSGOPTIONS_H_
 
+namespace osggraph {
+
 class SDOptions
 {
 public:
@@ -62,4 +64,7 @@ private:
     bool    _NormalMap;
 };
 
+} // namespace osggraph
+
 #endif /* _OSGOPTIONS_H_ */
+

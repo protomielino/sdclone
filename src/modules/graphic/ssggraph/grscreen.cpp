@@ -32,6 +32,8 @@
 #include "grrain.h"
 #include "grutil.h"
 
+namespace ssggraph {
+
 static char buf[1024];
 static char path[1024];
 static char path2[1024];
@@ -632,3 +634,6 @@ void cGrScreen::initBoard(void)
     }
     board->initBoard ();
 }
+
+} // namespace ssggraph
+

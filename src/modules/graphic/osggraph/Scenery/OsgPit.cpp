@@ -26,6 +26,7 @@
 #include <robottools.h> // RtXXX
 #include <portability.h> // snprintf
 
+namespace osggraph {
 
 SDPit::SDPit(void)
 {
@@ -454,4 +455,6 @@ void SDPit::build(tTrack *track)
         break;
     }  // switch pits->type
 }  // SDPits::build
+
+} // namespace osggraph
 

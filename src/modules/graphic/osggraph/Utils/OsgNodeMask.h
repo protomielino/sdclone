@@ -20,6 +20,8 @@
 #ifndef _OSGNODEMASK_H
 #define _OSGNODEMASK_H 1
 
+namespace osggraph {
+
 #if ((_MSC_VER && _MSC_VER < 1700) || (__APPLE__))
 enum NodeMask
 #else
@@ -60,4 +62,7 @@ enum NodeMask : osg::Node::NodeMask
                                  | NODE_MASK_SHADOW_CAST_CURDRV,
 };
 
+} // namespace osggraph
+
 #endif // _OSGNODEMASK_H
+

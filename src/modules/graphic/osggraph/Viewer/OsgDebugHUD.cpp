@@ -8,6 +8,8 @@
 #include "OsgDebugHUD.h"
 #include "OsgNodeMask.h"
 
+namespace osggraph {
+
 SDDebugHUD::SDDebugHUD()
 {
     osg::Geometry* geom;
@@ -62,3 +64,6 @@ void SDDebugHUD::toggleHUD()
 SDDebugHUD::~SDDebugHUD()
 {
 }
+
+} // namespace osggraph
+

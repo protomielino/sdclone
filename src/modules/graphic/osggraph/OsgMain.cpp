@@ -38,6 +38,8 @@
 #include "OsgHUD.h"
 #include "OsgParticles.h"
 
+namespace osggraph {
+
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
@@ -491,4 +493,5 @@ Camera * getCamera(void)
     return screens->getActiveView()->getCamera();
 }
 
+} // namespace osggraph
 

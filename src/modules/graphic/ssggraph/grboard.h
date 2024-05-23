@@ -23,6 +23,8 @@
 #include <car.h>        // tCarElt
 #include <raceman.h>    // tSituation
 
+namespace ssggraph {
+
 class cGrTrackMap;
 class cGrFrameInfo;
 
@@ -120,4 +122,7 @@ private:
 extern void grInitBoardCar(tCarElt *car);
 extern void grShutdownBoardCar(void);
 
+} // namespace ssggraph
+
 #endif /* _GRBOARD_H_ */
+

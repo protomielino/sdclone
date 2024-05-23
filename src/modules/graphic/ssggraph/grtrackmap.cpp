@@ -31,6 +31,7 @@
 #include "grtrackmap.h"
 #include "grmain.h"	//grWinXXX
 
+namespace ssggraph {
 
 // The resolution in [m] to analyse turns.
 const float cGrTrackMap::RESOLUTION = 5.0;
@@ -794,3 +795,6 @@ void cGrTrackMap::initColors(const float *current_color,
       behindCarColor[i] = behind_color[i];
   }
 }
+
+} // namespace ssggraph
+

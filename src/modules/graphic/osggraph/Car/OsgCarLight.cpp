@@ -27,6 +27,7 @@
 #include "OsgCarLight.h"
 #include "OsgCar.h"
 
+namespace osggraph {
 
 osg::ref_ptr<osg::Node> SDCarLight::init(
     CarLightType car_light_type,
@@ -183,3 +184,6 @@ void SDCarLights::loadStates()
         state_sets[i] = state_set;
     }
 }
+
+} // namespace osggraph
+

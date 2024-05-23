@@ -27,6 +27,8 @@
 #include <osgDB/WriteFile>
 #include <osgDB/FileUtils>
 
+namespace osggraph {
+
 osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car_elt,void *handle)
 {
     this->car = car_elt;
@@ -300,3 +302,6 @@ void SDWheels::updateWheels()
             this->wheels_switches[i]->setSingleChildOn(j);
     }
 }
+
+} // namespace osggraph
+

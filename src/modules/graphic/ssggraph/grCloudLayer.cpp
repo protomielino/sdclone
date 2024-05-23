@@ -18,6 +18,8 @@
 
 #include "grSky.h"
 
+namespace ssggraph {
+
 /* Nautical Miles to Meters */
 #define GR_NM_TO_METER  1852.0000
 
@@ -503,3 +505,6 @@ void calc_gc_course_dist( const sgVec2& start, const sgVec2& dest, double *cours
         }
     }
 }
+
+} // namespace ssggraph
+

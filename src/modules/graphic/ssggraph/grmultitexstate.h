@@ -21,6 +21,7 @@
 
 #include "grsimplestate.h"	//cgrSimpleState
 
+namespace ssggraph {
 
 class cgrMultiTexState : public cgrSimpleState
 {
@@ -62,4 +63,7 @@ class cgrMultiTexState : public cgrSimpleState
 	tfnTexScheme _fnTexScheme;
 };
 
+} // namespace ssggraph
+
 #endif // __GRMULTITEXSTATE
+

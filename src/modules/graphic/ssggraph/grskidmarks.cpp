@@ -30,6 +30,8 @@
 #include "dmalloc.h"
 #endif
 
+namespace ssggraph {
+
 static ssgSimpleState *skidState = NULL;
 
 static int grSkidMaxStripByWheel;
@@ -412,4 +414,5 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 	}//for i
 }//cGrSkidmarks::Update
 
+} // namespace ssggraph
 

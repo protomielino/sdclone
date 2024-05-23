@@ -26,6 +26,8 @@
 #include "OsgMath.h"
 #include "OsgSphere.h"
 
+namespace osggraph {
+
 osg::Node* SDMakeSphere(double radius, int slices, int stacks)
 {
     float rho, drho, dtheta;
@@ -110,3 +112,6 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
 
     return geode;
 }
+
+} // namespace osggraph
+

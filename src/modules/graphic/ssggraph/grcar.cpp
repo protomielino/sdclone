@@ -32,6 +32,8 @@
 #include "grutil.h"
 #include "grcarlight.h"	//grUpdateCarlight
 
+namespace ssggraph {
+
 ssgBranch *CarsAnchorTmp = 0;
 
 bool grCompounds = false;
@@ -1718,3 +1720,6 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 void grDrawCarShadow(void)
 {
 }
+
+} // namespace ssggraph
+

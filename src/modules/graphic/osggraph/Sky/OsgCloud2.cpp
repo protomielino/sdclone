@@ -43,6 +43,8 @@
 //#include "OsgStateAttributeFactory.h"
 #include "OsgCloud.h"
 
+namespace osggraph {
+
 using namespace osg;
 
 static osg::ref_ptr<osg::StateSet> layer_states[SDCloudLayer::SD_MAX_CLOUD_COVERAGES];
@@ -567,3 +569,6 @@ void SDCloudLayer::set_enable3dClouds(bool enable)
         cloud_root->setChildValue(layer_root.get(), true);
     }
 }
+
+} // namespace osggraph
+

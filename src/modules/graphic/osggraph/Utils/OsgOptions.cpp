@@ -22,6 +22,8 @@
 #include "OsgMain.h"
 #include "OsgOptions.h"
 
+namespace osggraph {
+
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
 #define NMaxStars	3000
@@ -83,3 +85,6 @@ SDOptions::SDOptions(void) :
 SDOptions::~SDOptions(void)
 {
 }
+
+} // namespace osggraph
+

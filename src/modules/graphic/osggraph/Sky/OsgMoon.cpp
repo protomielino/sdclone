@@ -37,6 +37,8 @@
 #include "OsgSphere.h"
 #include "OsgMoon.h"
 
+namespace osggraph {
+
 // Constructor
 SDMoon::SDMoon( void ) :
     prev_moon_angle(-1)
@@ -148,3 +150,6 @@ bool SDMoon::reposition(osg::Vec3d p, double angle )
 
     return true;
 }
+
+} // namespace osggraph
+

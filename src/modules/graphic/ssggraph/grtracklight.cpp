@@ -12,6 +12,8 @@
 
 #include "grscene.h"
 
+namespace ssggraph {
+
 typedef struct LightInfo
 {
     int index;
@@ -331,4 +333,6 @@ void grTrackLightShutdown()
     /*delete lightBranch;*/ lightBranch = NULL;
     deleteStates();
 }
+
+} // namespace ssggraph
 

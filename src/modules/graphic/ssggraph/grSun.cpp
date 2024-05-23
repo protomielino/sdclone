@@ -21,6 +21,8 @@
 #include "grSky.h"
 #include "grSphere.h"
 
+namespace ssggraph {
+
 static float sun_exp2_punch_through;
 //static double visibility; // Never used.
 
@@ -400,3 +402,6 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
 
     return true;
 }
+
+} // namespace ssggraph
+

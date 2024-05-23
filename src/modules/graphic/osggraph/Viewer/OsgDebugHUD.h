@@ -19,6 +19,7 @@
 #ifndef _OSGDEBUGHUD_H_
 #define _OSGDEBUGHUD_H_
 
+namespace osggraph {
 
 class SDDebugHUD
 {
@@ -34,4 +35,7 @@ class SDDebugHUD
         inline osg::ref_ptr<osg::Camera> getRootCamera() { return HUD_camera; }
 };
 
+} // namespace osggraph
+
 #endif //_OSGDEBUGHUD_H_
+

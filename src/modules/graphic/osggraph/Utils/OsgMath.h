@@ -16,6 +16,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+#ifndef _OSGMATH_H_
+#define _OSGMATH_H_
+
 #include <portability.h>
 #include <cstdlib>
 
@@ -28,8 +32,7 @@
 #include <osg/Quat>
 #include <osg/Matrix>
 
-#ifndef _OSGMATH_H_
-#define _OSGMATH_H_
+namespace osggraph {
 
 #define SD_ZERO  0.0
 #define SD_HALF  0.5
@@ -114,5 +117,7 @@ inline double SDRandom(void)
 {
   return(rand() / (double)RAND_MAX);
 }
+
+} // namespace osggraph
 
 #endif /* _OSGMATH_H_ */

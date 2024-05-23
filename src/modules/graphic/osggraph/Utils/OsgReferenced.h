@@ -22,6 +22,8 @@
 
 #include "OsgAtomic.h"
 
+namespace osggraph {
+
 class SDReferenced
 {
 public:
@@ -47,4 +49,7 @@ private:
   mutable SDAtomic _refcount;
 };
 
+} // namespace osggraph
+
 #endif
+

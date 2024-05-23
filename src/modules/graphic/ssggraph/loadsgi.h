@@ -48,6 +48,8 @@
 	For further information visit http://plib.sourceforge.net
 */
 
+//namespace ssggraph {
+
 class ssgSGIHeader {
 	public:
 		unsigned short magic ;
@@ -90,4 +92,7 @@ class ssgSGIHeader {
 		unsigned int readInt ();
 };
 
+//} // namespace ssggraph
+
 #endif // _GRLOADSGI_H_
+

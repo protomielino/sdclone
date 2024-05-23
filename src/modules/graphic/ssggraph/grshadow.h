@@ -3,6 +3,8 @@
 
 #include <plib/ssg.h>	//ssgXXX
 
+namespace ssggraph {
+
 class ssgVtxTableShadow : public ssgVtxTable
 {
 protected:
@@ -50,4 +52,7 @@ public:
   virtual int save ( FILE *fd )  {return  ssgVtxTable::save(fd);}
 };
 
+} // namespace ssggraph
+
 #endif	//_GRSHADOW_H_
+

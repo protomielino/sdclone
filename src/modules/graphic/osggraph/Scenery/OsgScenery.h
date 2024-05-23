@@ -27,6 +27,8 @@
 
 #include <osg/Group>
 
+namespace osggraph {
+
 class	SDBackground;
 class   SDPit;
 //class   SDTrackLights;
@@ -152,4 +154,7 @@ public:
     osg::ref_ptr<osg::Group> getTracklight() { return m_tracklights->getTrackLight(); }
 };
 
+} // namespace osggraph
+
 #endif //_OSGSCENERY_H_
+ 

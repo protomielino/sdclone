@@ -31,6 +31,7 @@
 
 #include <vector>
 
+namespace ssggraph {
 
 #define MAX_RAIN_SLICE	1000
 static float rainpos[MAX_RAIN_SLICE];
@@ -211,3 +212,6 @@ void cGrRain::drawPrecipitation(int rain, double rain_norm, double pitch, double
 	if (rain > 0)
 		drawRain(pitch, roll, heading, hspeed, rain_norm, rain);
 }
+
+} // namespace ssggraph
+

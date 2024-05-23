@@ -26,6 +26,8 @@
 
 #include "OsgView.h"
 
+namespace osggraph {
+
 class SDDebugHUD;
 class SDReflectionMapping;
 
@@ -66,4 +68,7 @@ public:
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };
 
+} // namespace osggraph
+
 #endif //_OSGSCREENS_H_
+

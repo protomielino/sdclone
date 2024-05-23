@@ -24,6 +24,8 @@
 #include <graphic.h>
 #include <raceman.h>	//tSituation
 
+namespace osggraph {
+
 extern int m_Winx, m_Winy, m_Winw, m_Winh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
@@ -82,5 +84,7 @@ SDRender * getRender();
 SDCarLights * getCarLights();
 SDCars * getCars();
 SDScenery * getScenery();
+
+} // namespace osggraph
 
 #endif /* _OSGMAIN_H_ */

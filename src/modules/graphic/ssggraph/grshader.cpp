@@ -143,6 +143,8 @@ PFNGLLOADPROGRAMNVPROC glLoadProgramNV= NULL;
 PFNGLPROGRAMPARAMETER4FVNVPROC glProgramParameter4fvNV= NULL;
 #endif
 
+namespace ssggraph {
+
 bool cgrShader::VP_supported = false;
 bool cgrShader::FP_supported = false;
 bool cgrShader::GLSL_supported = false;
@@ -815,3 +817,6 @@ void cgrShader::Init(void)
 #endif
 	}
 }
+
+} // namespace ssggraph
+

@@ -22,6 +22,7 @@
 
 #include "grtexture.h" // doMipMap
 
+namespace ssggraph {
 
 // cgrSimpleState class ========================================================
 
@@ -48,3 +49,6 @@ void cgrSimpleState::setTexture(GLuint tex)
 	
 	ssgSimpleState::setTexture(tex);
 }
+
+} // namespace ssggraph
+

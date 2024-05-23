@@ -33,6 +33,8 @@
 #include "grloadac.h"     // grssgSetCurrentOptions
 #include "grscreen.h"
 
+namespace ssggraph {
+
 using std::string;
 
 static const string rgba[4] =
@@ -2359,4 +2361,6 @@ void cGrBoard::ReadDashColor(void *hdle, const string &color_name, float **color
         (*color)[i] = GfParmGetNum(hdle, buf, rgba[i].c_str(), NULL, 1.0);
     }
 }
+
+} // namespace ssggraph
 

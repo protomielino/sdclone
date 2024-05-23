@@ -30,6 +30,8 @@
 
 #include "OsgBrake.h"
 
+namespace osggraph {
+
 class SDWheels
 {
 private :
@@ -48,4 +50,7 @@ public :
     void updateWheels();
 };
 
+} // namespace osggraph
+
 #endif /* _OSGWHEEL_H_ */
+

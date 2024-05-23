@@ -30,6 +30,8 @@
 
 #include <car.h>
 
+namespace osggraph {
+
 SDReflectionMapping::SDReflectionMapping(SDCar *c):
     camerasRoot(NULL),
     reflectionMap(NULL),
@@ -152,3 +154,5 @@ void SDReflectionMapping::update()
 SDReflectionMapping::~SDReflectionMapping()
 {
 }
+
+} // namespace osggraph

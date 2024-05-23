@@ -20,6 +20,7 @@
 #ifndef _GRSSGEXT_H_
 #define _GRSSGEXT_H_
 
+namespace ssggraph {
 
 /* This file contains divergences from PLIB (but see also grloadac). */
 
@@ -67,5 +68,7 @@ public:
 
 };
 
+} // namespace ssggraph
 
-#endif /* _GRSSGEXT_H_ */ 
+#endif /* _GRSSGEXT_H_ */
+

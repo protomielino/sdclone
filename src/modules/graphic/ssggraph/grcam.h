@@ -28,6 +28,8 @@
 #include <float.h>
 #endif
 
+namespace ssggraph {
+
 class cGrCamera;
 class cGrScreen;
 
@@ -302,4 +304,7 @@ class cGrCarCamMirror : public cGrPerspCamera
 extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
                                        tdble fovFactor, tdble fixedFar = 0);
 
+} // namespace ssggraph
+
 #endif /* _GRCAM_H_ */
+

@@ -56,6 +56,9 @@
 
 // Pointer to the track data found in grscene.cpp.
 #include <track.h>
+
+namespace ssggraph {
+
 extern tTrack *grTrack;
 
 class cGrTrackMap
@@ -154,4 +157,7 @@ class cGrTrackMap
 		void checkAndSetMaximum(float &currentmax, float &value);
 };
 
+} // namespace ssggraph
+
 #endif // _GRTRACKMAP_H_
+

@@ -36,6 +36,8 @@
 #include "OsgStars.h"
 #include "OsgMath.h"
 
+namespace osggraph {
+
 // Constructor
 SDStars::SDStars( void ) : old_phase(-1)
 {
@@ -213,3 +215,6 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
 
     return true;
 }
+
+} // namespace osggraph
+

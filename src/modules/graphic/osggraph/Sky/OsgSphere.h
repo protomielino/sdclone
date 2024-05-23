@@ -20,4 +20,9 @@
 
 #include <osg/Node>
 
+namespace osggraph {
+
 osg::Node* SDMakeSphere(double radius, int slices, int stacks);
+
+} // namespace osggraph
+

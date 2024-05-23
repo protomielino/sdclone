@@ -22,6 +22,8 @@
 #include <osg/TextureCubeMap>
 #include <osg/Texture2D>
 
+namespace osggraph {
+
 #define REFLECTIONMAPPING_OFF 0
 #define REFLECTIONMAPPING_STATIC 1
 #define REFLECTIONMAPPING_HYBRID 2
@@ -53,4 +55,7 @@ public:
     void update();
 };
 
+} // namespace osggraph
+
 #endif //_OSGREFLECTIONMAPPING_H_
+

@@ -27,6 +27,8 @@
 
 #include <osg/FrontFace>
 
+namespace osggraph {
+
 class SDFrameInfo;
 
 class SDView
@@ -105,4 +107,7 @@ public:
     void deactivate();
 };
 
+} // namespace osggraph
+
 #endif //_OSGVIEWER_H_
+

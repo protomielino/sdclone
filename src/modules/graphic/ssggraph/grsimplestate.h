@@ -27,6 +27,7 @@
 
 #include <plib/ssg.h>	// ssgXXX
 
+namespace ssggraph {
 
 // Simple state (a ssgSimpleState with mipmapping).
 class cgrSimpleState : public ssgSimpleState
@@ -43,4 +44,7 @@ class cgrSimpleState : public ssgSimpleState
 	virtual void setTexture(GLuint tex);
 };
 
+} // namespace ssggraph
+
 #endif // _GRSIMPLESTATE_H_
+

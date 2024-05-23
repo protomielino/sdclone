@@ -24,6 +24,7 @@
 
 #include <plib/ssg.h>
 
+namespace ssggraph {
 
 class grssgLoaderOptions : public ssgLoaderOptions
 {
@@ -75,5 +76,7 @@ extern ssgEntity *grssgLoadAC3D(const char *fname, const grssgLoaderOptions* opt
 extern double carTrackRatioX;
 extern double carTrackRatioY;
 
+} // namespace ssggraph
 
-#endif /* _GRLOADAC_H_ */ 
+#endif /* _GRLOADAC_H_ */
+

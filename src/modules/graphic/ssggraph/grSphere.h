@@ -19,8 +19,12 @@
 #include <plib/sg.h>
 #include <plib/ssg.h>
 
+namespace ssggraph {
+
 // return a sphere object as an ssgBranch (connected to the specified ssgSimpleState)
 extern ssgBranch *grMakeSphere(ssgSimpleState *state, ssgColourArray *cl, 
 							   float radius, int slices, int stacks,
 							   ssgCallback predraw, ssgCallback postdraw );
+
+} // namespace ssggraph
 

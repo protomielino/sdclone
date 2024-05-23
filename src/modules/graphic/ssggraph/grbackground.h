@@ -20,11 +20,14 @@
 #ifndef _GRBACKGROUND_H_
 #define _GRBACKGROUND_H_
 
+struct Situation;
+
+namespace ssggraph {
+
 #define SGD_2PI      6.28318530717958647692
 
 class cGrCamera;
 class cGrBackgroundCam;
-struct Situation;
 
 void grUpdateLight(void);
 void grUpdateFogColor(double sol_angle);
@@ -45,4 +48,7 @@ extern void grShutdownBackground(void);
 extern unsigned grSkyDomeDistance; // 0 means no sky dome (static background).
 extern const tdble grSkyDomeNeutralFOVDistance;
 
+} // namespace ssggraph
+
 #endif //_GRBACKGROUND_H_
+

@@ -19,6 +19,8 @@
 #include "grSky.h"
 #include <tgf.h>
 
+namespace ssggraph {
+
 #define SD_2PI   6.28318530717958647692
 #define SD_PI_2  1.57079632679489661923
 
@@ -268,3 +270,6 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 
   return true;
 }
+
+} // namespace ssggraph
+

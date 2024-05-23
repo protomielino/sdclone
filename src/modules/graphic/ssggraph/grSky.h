@@ -23,6 +23,8 @@
 #include "plib/sg.h"
 #include "plib/ssg.h"
 
+namespace ssggraph {
+
 typedef struct
 {
     float *view_pos, *zero_elev, *view_up;
@@ -517,4 +519,7 @@ inline void grGammaRestoreC(float *color, float reff = 2.5, float system = syste
   *color = (float)pow(*color, system/reff);
 };
 
+} // namespace ssggraph
+
 #endif
+

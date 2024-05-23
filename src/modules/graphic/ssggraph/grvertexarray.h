@@ -3,6 +3,8 @@
 
 #include <plib/ssg.h>	//ssgXXX
 
+namespace ssggraph {
+
 class ssgGrVtxArray : public ssgVtxArray
 {
 protected:
@@ -49,4 +51,7 @@ public:
   virtual int save ( FILE *fd ) {return  ssgVtxArray::save(fd);}
 } ;
 
+} // namespace ssggraph
+
 #endif //_GRVTXARRAY_H
+

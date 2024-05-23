@@ -28,6 +28,7 @@
 
 #include "grutil.h"
 
+namespace ssggraph {
 
 int doMipMap(const char *tfname, int mipmap)
 {
@@ -505,3 +506,6 @@ bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
 
     return res;
 }
+
+} // namespace ssggraph
+

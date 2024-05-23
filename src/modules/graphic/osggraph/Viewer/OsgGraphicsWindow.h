@@ -25,6 +25,8 @@
 
 #include <osgViewer/GraphicsWindow>
 
+namespace osggraph {
+
 namespace OSGUtil
 {
 class OsgGraphicsWindowSDL2 : public osgViewer::GraphicsWindow
@@ -103,4 +105,7 @@ public:
 
 }
 
+} // namespace osggraph
+
 #endif /* OSGGRAPHICSWINDOW_H */
+

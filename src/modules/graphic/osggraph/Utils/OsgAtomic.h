@@ -20,6 +20,8 @@
 #ifndef OsgAtomic_H
 #define OsgAtomic_H
 
+namespace osggraph {
+
 #if defined(__GNUC__) && ((4 < __GNUC__)||(4 == __GNUC__ && 1 <= __GNUC_MINOR__)) && (defined(__x86_64__) || defined(__powerpc64__) || defined(__aarch64__))
 // No need to include something. Is a Compiler API ...
 # define SDATOMIC_USE_GCC4_BUILTINS
@@ -107,8 +109,6 @@ private:
   unsigned mValue;
 };
 
-namespace osggraph
-{
 // Typesafe wrapper around SGSwappable
 template <typename T>
 class Swappable : private SDAtomic
@@ -135,5 +135,8 @@ public:
                                            static_cast<unsigned>(newVal));
     }
 };
-}
+
+} // namespace osggraph
+
 #endif
+

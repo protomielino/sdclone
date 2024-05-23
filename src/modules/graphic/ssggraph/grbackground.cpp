@@ -34,6 +34,8 @@
 #include "grbackground.h"
 #include "grMoonpos.h"
 
+namespace ssggraph {
+
 // Some exported constants.
 const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a medium one.
 
@@ -1294,3 +1296,6 @@ void grUpdateFogColor(double sol_angle)
     //
     grGammaCorrectRGB( BaseFogColor );
 }
+
+} // namespace ssggraph
+

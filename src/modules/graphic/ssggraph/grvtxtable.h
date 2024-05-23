@@ -23,6 +23,7 @@
 
 #include "grmultitexstate.h"
 
+namespace ssggraph {
 
 class cgrVtxTable : public ssgVtxTable
 {
@@ -124,4 +125,7 @@ protected:
 
 };
 
+} // namespace ssggraph
+
 #endif //_GRVTXTABLE_H_
+

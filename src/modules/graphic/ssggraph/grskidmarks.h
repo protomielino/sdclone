@@ -41,6 +41,8 @@
 #include <plib/ssg.h>	//ssgXXX
 #include <car.h>			//tCarElt
 
+namespace ssggraph {
+
 class ssgVerterArray;
 class ssgVtxTableShadow;
 
@@ -86,4 +88,7 @@ public:
   cGrSkidStrip	strips[4];	//the strips of the four wheels
 };
 
+} // namespace ssggraph
+
 #endif //_GRSKIDMARKS_
+

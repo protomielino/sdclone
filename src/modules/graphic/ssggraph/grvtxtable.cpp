@@ -30,6 +30,8 @@
 #include "dmalloc.h"
 #endif
 
+namespace ssggraph {
+
 /* from grloadac.cpp (beuark!) */
 extern double shad_xmax;
 extern double shad_ymax;
@@ -765,3 +767,6 @@ ssgBase *cgrVtxTableCarPart::clone (int clone_flags)
 	b->copy_from(this, clone_flags);
 	return b;
 }
+
+} // namespace ssggraph
+

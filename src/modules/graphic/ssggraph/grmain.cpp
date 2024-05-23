@@ -43,6 +43,15 @@
 #include "grtracklight.h"
 #include "grbackground.h"
 
+ // TODO: Move this to glfeatures.
+#ifdef WIN32
+PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
+PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
+PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
+PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
+#endif
+
+namespace ssggraph {
 
 int grMaxTextureUnits = 0;
 
@@ -76,14 +85,6 @@ int grSpanSplit = 0;
 static int nCurrentScreenIndex = 0;
 
 static grssgLoaderOptions options(/*bDoMipMap*/true);
-
-// TODO: Move this to glfeatures.
-#ifdef WIN32
-PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
-PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
-PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
-PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
-#endif
 
 
 // Set up OpenGL features from user settings.
@@ -843,3 +844,6 @@ shutdownView(void)
 //	if (grCarInfo)
 //		grPropagateDamage (grCarInfo[index].carEntity, poc, force, count);
 //}
+
+} // namespace ssggraph
+
