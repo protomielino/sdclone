@@ -741,6 +741,7 @@ SimShutdown(void)
     for (ncar = 0; ncar < SimNbCars; ncar++) {
         car = &(SimCarTable[ncar]);
         SimEngineShutdown(car);
+	delete car->options;
     }
     free(SimCarTable);
     SimCarTable = 0;
