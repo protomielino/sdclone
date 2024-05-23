@@ -1097,6 +1097,8 @@ ReRaceCleanDrivers(void)
         free(robot);
         free(ReInfo->s->cars[i]->_curSplitTime);
         free(ReInfo->s->cars[i]->_bestSplitTime);
+        free(ReInfo->s->cars[i]->_currLapTimeAtTrackPosition);
+        free(ReInfo->s->cars[i]->_bestLapTimeAtTrackPosition);
     }
 
     RtTeamManagerRelease();
