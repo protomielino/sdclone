@@ -35,9 +35,8 @@ ssgBase *ssgVtxTableShadow::clone ( int clone_flags )
   b -> copy_from ( this, clone_flags ) ;
   return b ;
 }
-ssgVtxTableShadow::ssgVtxTableShadow ()
+ssgVtxTableShadow::ssgVtxTableShadow () : ssgVtxTableShadow(0,0)
 {
-  ssgVtxTableShadow(0,0);
 }
 
 
