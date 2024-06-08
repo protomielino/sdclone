@@ -54,7 +54,7 @@
 
 namespace acc3d
 {
-enum
+enum : unsigned
 {
     ObjectTypeNormal = 0,
     ObjectTypeGroup = 1,
@@ -63,6 +63,9 @@ enum
     SurfaceTypePolygon = 0,
     SurfaceTypeLineLoop = 1,
     SurfaceTypeLineStrip = 2,
+    SurfaceTypeTriangleFan = 3,
+    SurfaceTypeTriangleStrip = 4,
+    SurfaceTypeMask = 0xf,
 
     SurfaceShaded = 1<<4,
     SurfaceTwoSided = 1<<5
@@ -72,7 +75,6 @@ enum
 void setTranslucent(osg::StateSet* stateSet);
 std::string readString(std::istream& stream);
 void setAlphaClamp(osg::StateSet* stateSet,float clamp);
-unsigned int GetUVCount(unsigned flags);
 
 // Just a container to store an ac3d material
 class MaterialData
@@ -165,7 +167,6 @@ private:
     bool mTranslucent;
     bool mRepeat;
     float mAlphaClamp;
-    bool mCar;
 
 public:
     typedef std::map<std::string, osg::ref_ptr<osg::Image> > TextureImageMap;
@@ -416,7 +417,6 @@ public:
             stateSet->setTextureMode(3, GL_TEXTURE_2D, osg::StateAttribute::ON);
         }
 
-
         if (mTranslucent)
             setTranslucent(stateSet);
 
@@ -585,7 +585,6 @@ public:
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord3;
     }
 
-
     VertexIndex addRefData(unsigned i, const RefData& refData)
     {
         if (_vertices.size() <= i)
@@ -618,50 +617,39 @@ public:
     virtual osg::Geode* finalize(const MaterialData& material, const TextureData& textureData) = 0;
 
 protected:
+    bool isPolygon() const
+    {
+        return (_flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypePolygon;
+    }
+
     bool isLineLoop() const
     {
-        return (_flags & acc3d::SurfaceTypeLineLoop)!=0;
+        return (_flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeLineLoop;
     }
 
     bool isLineStrip() const
     {
-        return (_flags & acc3d::SurfaceTypeLineStrip)!=0;
-    }
-
-    bool isTwoSided() const
-    {
-        return (_flags & acc3d::SurfaceTwoSided)!=0;
-        //return true;
-    }
-
-    bool isSmooth() const
-    {
-        return (_flags & acc3d::SurfaceShaded)!=0;
-    }
-
-    bool isTriangleStrip() const
-    {
-        if (_flags == 0x14)
-            return true;
-
-        if(_flags == 0x24)
-            return true;
-
-        if (_flags == 0x34)
-            return true;
-
-        if (_flags == 0x44)
-            return true;
-
-        return false;
+        return (_flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeLineStrip;
     }
 
     bool isTriangleFan() const
     {
-        if (_flags == 0x30)
-            return true;
+        return (_flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeTriangleFan;
+    }
 
-        return false;
+    bool isTriangleStrip() const
+    {
+        return (_flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeTriangleStrip;
+    }
+
+    bool isTwoSided() const
+    {
+        return (_flags & acc3d::SurfaceTwoSided) != 0;
+    }
+
+    bool isSmooth() const
+    {
+        return (_flags & acc3d::SurfaceShaded) != 0;
     }
 
     osg::ref_ptr<osg::Geode> _geode;
@@ -803,7 +791,6 @@ private:
     std::vector<TriangleData> _triangles;
 
     std::vector<std::vector<VertexIndex> > _trianglestrips;
-    //std::vector<VertexIndex> _trianglestrip;
 
     struct QuadData
     {
@@ -1011,7 +998,8 @@ public:
         if (isTwoSided())
         {
             stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
-        } else
+        }
+        else
         {
             osg::CullFace* cullFace = new osg::CullFace;
             cullFace->setDataVariance(osg::Object::STATIC);
@@ -1154,7 +1142,8 @@ struct Bins
 {
     PrimitiveBin* getOrCreatePrimitiveBin(unsigned flags, VertexSet* vertexSet)
     {
-        if ((flags & acc3d::SurfaceTypeLineLoop) || (flags & acc3d::SurfaceTypeLineStrip))
+        if (((flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeLineLoop) ||
+            ((flags & acc3d::SurfaceTypeMask) == acc3d::SurfaceTypeLineStrip))
         {
             if (!lineBin.valid())
             {

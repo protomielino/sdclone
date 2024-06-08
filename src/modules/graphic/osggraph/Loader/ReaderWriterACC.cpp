@@ -422,7 +422,6 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
                     stream >> token2;
                     unsigned flags = strtol(token2.c_str(), NULL, 0);
-                    // unsigned v = flags &0xF;
 
                     stream >> token2;
                     if (token2 != "mat")
@@ -838,21 +837,4 @@ void setTranslucent(osg::StateSet* stateSet)
     stateSet->setAttribute(blendFunc);
     stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
     stateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-}
-
-unsigned int GetUVCount(unsigned flags)
-{
-    switch(flags)
-    {
-    case 0x14:
-        return 1;
-    case 0x24:
-        return 2;
-    case 0x34:
-        return 2;
-    case 0x44:
-        return 2;
-    }
-
-    return 0;
 }
