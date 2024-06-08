@@ -885,7 +885,7 @@ public:
         {
             if (isTriangleStrip())
             {
-                int index = _trianglestrips.size();
+                unsigned index = _trianglestrips.size();
                 _trianglestrips.resize(index+1);
                 for (unsigned i = 0; i < nRefs; ++i)
                 {
@@ -972,7 +972,8 @@ public:
     }
 
     void pushVertex(const VertexIndex& vertexIndex, osg::Vec3Array* vertexArray,
-                    osg::Vec3Array* normalArray, osg::Vec2Array* texcoordArray, osg::Vec2Array* texcoordArray1, osg::Vec2Array* texcoordArray2, osg::Vec2Array* texcoordArray3)
+                    osg::Vec3Array* normalArray, osg::Vec2Array* texcoordArray,
+                    osg::Vec2Array* texcoordArray1, osg::Vec2Array* texcoordArray2, osg::Vec2Array* texcoordArray3)
     {
         vertexArray->push_back(_vertexSet->getVertex(vertexIndex));
         normalArray->push_back(_vertexSet->getNormal(vertexIndex));
@@ -1203,8 +1204,7 @@ struct Bins
         }
         if (smoothSingleSurfaceBin.valid())
         {
-            osg::Geode *pGeode = smoothSingleSurfaceBin->finalize(material, textureData);
-            group->addChild(pGeode);
+            group->addChild(smoothSingleSurfaceBin->finalize(material, textureData));
         }
         if (flatDoubleSurfaceBin.valid())
         {
@@ -1233,9 +1233,18 @@ public:
     virtual osgDB::ReaderWriter::ReadResult readNode(std::istream& fin, const Options* options);
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/);
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,std::ostream& fout, const Options* opts);
-    void SetCar(bool b);
-    void SetSkin(const std::string& name);
-    void SetCarName(const std::string& name);
+    void SetCar(bool b)
+    {
+        m_bCar = b;
+    }
+    void SetSkin(const std::string& name)
+    {
+        m_skinName = name;
+    }
+    void SetCarName(const std::string& name)
+    {
+        m_CarName = name;
+    }
     osg::Node* readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options);
     osg::Node* readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData);
 

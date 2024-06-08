@@ -101,23 +101,6 @@ ReaderWriterACC::ReaderWriterACC() :
     m_bBlockTransparent(false)
 {
     osgDB::ReaderWriter::supportsExtension("acc", "SPEED DREAMS Database format");
-    m_skinName = "";
-
-}
-
-void ReaderWriterACC::SetCar(bool b)
-{
-    m_bCar = b;
-}
-
-void ReaderWriterACC::SetCarName(const std::string& name)
-{
-    m_CarName = name;
-}
-
-void ReaderWriterACC::SetSkin(const std::string& name)
-{
-    m_skinName = name;
 }
 
 osg::Node* ReaderWriterACC::readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options)
@@ -177,20 +160,19 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             /* osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: object name \""
             << type  << "\"5" << std::endl;*/
 
-            if (!m_bCar)
+            if (m_bCar)
+            {
+                group = m_opaqueGroup;
+            }
+            else // track
             {
                 group = new osg::Group();
                 group->setDataVariance(osg::Object::STATIC);
-            }
-            else
-            {
-                group = m_opaqueGroup;
             }
 
             if (type == "group")
             {
                 objectType = acc3d::ObjectTypeGroup;
-
             }
             else if (type == "world")
             {
@@ -210,6 +192,10 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             else if (type == "poly")
             {
                 objectType = acc3d::ObjectTypeNormal;
+            }
+            else if (type == "light")
+            {
+                objectType = acc3d::ObjectTypeLight;
             }
             else
                 objectType = acc3d::ObjectTypeNormal;
@@ -248,7 +234,6 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                 }
                 else
                     m_bBlockTransparent = true;
-
             }
             else
             {
@@ -274,7 +259,16 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             if (texname == "empty_texture_no_mapping")
                 texname.clear();
 
-            if (!m_bCar)
+            if (m_bCar)
+            {
+                    if (textureId == 0 && (m_skinName == "" || texname != m_CarName))
+                        texname0 = texname;
+                    else if (textureId == 0)
+                        texname0 = m_skinName+".png";
+
+                    GfLogDebug("TexName = %s\n", texname0.c_str());
+            }
+            else // track
             {
                 switch (textureId)
                 {
@@ -302,15 +296,6 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     << texname3  << "\"5" << std::endl;*/
                     break;
                 }
-            }
-            else
-            {
-                    if (textureId == 0 && (m_skinName == "" || texname != m_CarName))
-                        texname0 = texname;
-                    else if (textureId == 0)
-                        texname0 = m_skinName+".png";
-
-                    GfLogDebug("TexName = %s\n", texname0.c_str());
             }
             textureId++;
         }
@@ -591,8 +576,6 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         }
         else if (token == "kids")
         {
-            osg::Node *k = NULL;
-
             unsigned num;
             stream >> num;
             std::string line;
@@ -603,7 +586,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             {
                 for (unsigned n = 0; n < num; n++)
                 {
-                    k = readObject(stream, fileData, transform*parentTransform, textureData);
+                    osg::Node *k = readObject(stream, fileData, transform*parentTransform, textureData);
                     if (k == 0)
                     {
                         osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: error reading KIDS object" << std::endl;
