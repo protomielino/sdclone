@@ -23,9 +23,11 @@
 
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
+#include <osgViewer/ViewerEventHandlers>
 #include <osg/GraphicsContext>
 #include <osg/ValueObject>
 #include <osg/FrontFace>
+#include <osgGA/EventQueue>
 
 #include "OsgScreens.h"
 #if SDL_MAJOR_VERSION >= 2
@@ -52,7 +54,7 @@ SDScreens::SDScreens() :
      debugHUD = new SDDebugHUD();
 }
 
-    extern SDHUD hud;
+extern SDHUD hud;
 
 class CameraDrawnCallback : public osg::Camera::DrawCallback
 {
@@ -68,6 +70,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
+    osgViewer::StatsHandler *statsHandler = new osgViewer::StatsHandler();
+    statsHandler->setKeyEventTogglesOnScreenStats('?');
+    viewer->addEventHandler(statsHandler);
     viewer->setLightingMode( osg::View::NO_LIGHT );
     viewer->setThreadingModel( osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext );
 #if 1 //SDL_MAJOR_VERSION < 2
@@ -291,6 +296,11 @@ void SDScreens::toggleHUDdriverinput()
 void SDScreens::toggleHUDeditmode()
 {
     hud.ToggleHUDeditmode();
+}
+
+void SDScreens::toggleStats()
+{
+    viewer->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KeySymbol('?'));
 }
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)

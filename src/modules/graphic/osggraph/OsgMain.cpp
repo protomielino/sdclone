@@ -220,7 +220,10 @@ void SDMoveSeatForwardBackward(void *move)
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_x+=movement;
 }
-
+void SDToggleStats(void *vp)
+{
+    screens->toggleStats();
+}
 
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
@@ -261,6 +264,8 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
+
+    GfuiAddKey(screen, '?',            "Toggle OSG Stats",  (void *)0, SDToggleStats, NULL);
 
     GfuiAddKey(screen, '1',            "Toggle HUD laptimeWidget",     (void*)"laptimeWidget",     SDToggleHUDwidget, NULL);
     GfuiAddKey(screen, '2',            "Toggle HUD carinfoWidget",     (void*)"carinfoWidget,carstatusWidget", SDToggleHUDwidgets, NULL);

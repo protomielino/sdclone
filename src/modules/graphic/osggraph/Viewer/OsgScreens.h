@@ -64,6 +64,7 @@ public:
 
     void toggleHUDdriverinput();
     void toggleHUDeditmode();
+    void toggleStats();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };
