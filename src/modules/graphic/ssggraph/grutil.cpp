@@ -31,10 +31,14 @@ namespace ssggraph {
 float grGammaValue = 1.8;
 int grMipMap = 0;
 
-char *grFilePath;			// Multiple path (';' separated) used to search for files.
+static std::string grFilePath;		// Multiple path (';' separated) used to search for files.
 
+void grSetFilePath(const char *paths)
+{
+	grFilePath = paths;
+}
 
-int grGetFilename(const char *filename, const char *filepath, char *buf)
+static int grGetFilename(const char *filename, const char *filepath, char *buf)
 {
 	const char *c1, *c2;
 	int found = 0;
@@ -140,9 +144,9 @@ ssgState* grSsgLoadTexState(const char *img, int errIfNotFound)
 		s++;
 	}
 
-	if (!grGetFilename(s, grFilePath, buf)) {
+	if (!grGetFilename(s, grFilePath.c_str(), buf)) {
 		if (errIfNotFound)
-			GfLogError("Texture file %s not found in %s\n", s, grFilePath);
+			GfLogError("Texture file %s not found in %s\n", s, grFilePath.c_str());
 		return NULL;
 	}
 
@@ -201,9 +205,9 @@ cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexSche
 	else
 		s++;
 
-	if (!grGetFilename(s, grFilePath, buf)) {
+	if (!grGetFilename(s, grFilePath.c_str(), buf)) {
 		if (errIfNotFound)
-			GfLogError("Env. texture file %s not found in %s\n", s, grFilePath);
+			GfLogError("Env. texture file %s not found in %s\n", s, grFilePath.c_str());
 		return 0;
     }
 

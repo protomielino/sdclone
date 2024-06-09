@@ -504,7 +504,7 @@ grLoadBackground()
 
     snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
              grTrack->category, grTrack->internalname);
-    grFilePath = buf;
+    grSetFilePath(buf);
     grGammaValue = 1.8;
     grMipMap = 0;
 

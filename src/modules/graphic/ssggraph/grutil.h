@@ -52,9 +52,8 @@ namespace ssggraph {
 extern float grGammaValue;
 extern int	 grMipMap;
 
-extern char *grFilePath;	/* Multiple path (: separated) used to search for files */
+extern void grSetFilePath(const char *paths);	/* Multiple path (: separated) used to search for files */
 
-extern int grGetFilename(const char *filename, const char *filepath, char *buf);
 extern cgrMultiTexState* grSsgEnvTexState(const char *img,
 										  cgrMultiTexState::tfnTexScheme fnTexScheme,
 										  int errIfNotFound = TRUE);

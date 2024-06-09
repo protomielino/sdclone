@@ -1634,49 +1634,51 @@ void grInitBoardCar(tCarElt *car)
    2) driver level specified,
    3) car level specified,
    4) common textures */
-    grFilePath = (char*)malloc(nMaxTexPathSize);
+    char filePath[nMaxTexPathSize];
     int lg = 0;
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
                    GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
     if (bMasterModel)
-        lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
                        GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d;",
                    GfLocalDir(), car->_modName, car->_driverIndex);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
                    GfLocalDir(), car->_modName, car->_carName);
     if (bMasterModel)
-        lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
                        GfLocalDir(), car->_modName, car->_masterModel);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
                    GfLocalDir(), car->_modName);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
                    car->_modName, car->_driverIndex, car->_carName);
     if (bMasterModel)
-        lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
                        car->_modName, car->_driverIndex, car->_masterModel);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
                    car->_modName, car->_driverIndex);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
                    car->_modName, car->_carName);
     if (bMasterModel)
-        lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
                        car->_modName, car->_masterModel);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
     if (bMasterModel)
-        lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
 
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "data/textures");
 
+    grSetFilePath(filePath);
+    
     /* Tachometer --------------------------------------------------------- */
     tgrCarInstrument *curInst = &(carInfo->instrument[0]);
 
@@ -1762,8 +1764,6 @@ void grInitBoardCar(tCarElt *car)
     curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
     if (curInst->texture == 0)
         curInst->texture = (ssgSimpleState*)grSsgLoadTexState("speed360.rgb");
-
-    free(grFilePath);
 
     cleanup[nstate] = curInst->texture;
     nstate++;
