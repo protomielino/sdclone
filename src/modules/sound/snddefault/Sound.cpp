@@ -23,7 +23,7 @@
 
 
 /// Construct a sound.
-Sound::Sound(int flags, bool loop) : flags(flags), loop(loop)
+Sound::Sound(unsigned int flags, bool loop) : flags(flags), loop(loop)
 {
 }
 

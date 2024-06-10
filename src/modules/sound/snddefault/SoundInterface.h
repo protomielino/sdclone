@@ -121,7 +121,7 @@ class SoundInterface {
 
 	/// Add a new sample - must be defined in children classes
 	virtual Sound* addSample(const char* filename,
-							 int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
+							 unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 							 bool loop = false, bool static_pool = true) = 0;
 
 	/// initialised the pool of shared sources

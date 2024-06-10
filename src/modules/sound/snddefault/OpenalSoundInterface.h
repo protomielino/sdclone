@@ -63,7 +63,7 @@ class OpenalSoundInterface : public SoundInterface
 	OpenalSoundInterface & operator = (const OpenalSoundInterface &); // = delete;
 	virtual ~OpenalSoundInterface();
 	virtual void setNCars(int n_cars);
-	virtual Sound* addSample(const char* filename, int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
+	virtual Sound* addSample(const char* filename, unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 								  bool loop = false, bool static_pool = true);
 	virtual void update(CarSoundData** car_sound_data, int n_cars,
 						sgVec3 p_obs, sgVec3 u_obs, sgVec3 c_obs, sgVec3 a_obs);

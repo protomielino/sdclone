@@ -47,7 +47,7 @@ class PlibSoundInterface : public SoundInterface
 	virtual ~PlibSoundInterface();
 	virtual void setNCars(int n_cars);
 	virtual slScheduler* getScheduler();
-	virtual Sound* addSample(const char* filename, int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
+	virtual Sound* addSample(const char* filename, unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 							 bool loop = false, bool static_pool = true);
 	virtual void update(CarSoundData** car_sound_data, int n_cars,
 						sgVec3 p_obs, sgVec3 u_obs, sgVec3 c_obs = NULL, sgVec3 a_obs = NULL);

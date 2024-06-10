@@ -52,7 +52,7 @@ protected:
 public:
 	OpenalSound(const char* filename,
 				OpenalSoundInterface* sitf,
-				int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
+				unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 				bool loop = false, bool static_pool = true);
 	virtual ~OpenalSound();
 	virtual void setVolume(float vol);

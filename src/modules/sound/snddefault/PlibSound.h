@@ -26,15 +26,15 @@
 
 class PlibSound : public Sound {
 protected:
-	slSample* sample; ///< sample data
-	slEnvelope* volume_env; ///< volume envelope
-	slEnvelope* pitch_env; ///< pitch envelope
-	slEnvelope* lowpass_env; ///< low pass filter envelope
-	slScheduler* sched; ///< plib sl scheduler (see sl.h)
+	slSample* sample = nullptr; ///< sample data
+	slEnvelope* volume_env = nullptr; ///< volume envelope
+	slEnvelope* pitch_env = nullptr; ///< pitch envelope
+	slEnvelope* lowpass_env = nullptr; ///< low pass filter envelope
+	slScheduler* sched = nullptr; ///< plib sl scheduler (see sl.h)
 public:
 	PlibSound(slScheduler* sched,
 			  const char* filename,
-			  int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
+			  unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 			  bool loop = false);
 	PlibSound(const PlibSound &); // = delete;
 	PlibSound & operator = (const PlibSound &); // = delete;

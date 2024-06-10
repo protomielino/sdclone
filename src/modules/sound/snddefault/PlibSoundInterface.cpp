@@ -69,7 +69,7 @@ slScheduler* PlibSoundInterface::getScheduler()
 	return sched;
 }
 
-Sound* PlibSoundInterface::addSample(const char* filename, int flags, bool loop, bool static_pool)
+Sound* PlibSoundInterface::addSample(const char* filename, unsigned int flags, bool loop, bool static_pool)
 {
 	PlibSound* sound = new PlibSound(sched, filename, flags, loop);
     sound->setVolume(getGlobalGain());

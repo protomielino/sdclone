@@ -23,7 +23,7 @@
 
 /// Create a new PLib sound. It requires a scheduler to be set up
 /// and a filename to read data from.
-PlibSound::PlibSound(slScheduler* sched, const char* filename, int flags, bool loop)
+PlibSound::PlibSound(slScheduler* sched, const char* filename, unsigned int flags, bool loop)
 : Sound(flags, loop)
 {
 	this->sched = sched;
@@ -156,7 +156,6 @@ void PlibSound::update()
 	}
 	if (flags & ACTIVE_PITCH) {
 		pitch_env->setStep(0, 0.0f, pitch);
-
 	}
 	if (flags & ACTIVE_LP_FILTER) {
 		lowpass_env->setStep(0, 0.0f, lowpass);

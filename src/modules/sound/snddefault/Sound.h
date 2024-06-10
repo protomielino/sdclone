@@ -52,7 +52,7 @@ class Sound
  protected:
 
 	class SoundInterface* iface = nullptr; ///< Handler to the interface
-	int flags = 0; ///< Flags relating to what effects are to be used.
+	unsigned int flags = 0; ///< Flags relating to what effects are to be used.
 	float MAX_VOL = 1.0f; ///< Maximum volume
 	float volume = 0.0f; ///< Current volume
 	float pitch = 1.0f; ///< Current pitch
@@ -64,7 +64,7 @@ class Sound
  public:
 
 	/// Construct a sound.
-	Sound(int flags = (ACTIVE_VOLUME|ACTIVE_PITCH), bool loop = false);
+	Sound(unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH), bool loop = false);
 	
 	/// Destructor
 	virtual ~Sound();

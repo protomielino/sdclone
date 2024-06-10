@@ -24,7 +24,7 @@
 
 
 OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
-						 int flags, bool loop, bool static_pool)
+						 unsigned int flags, bool loop, bool static_pool)
 : Sound(flags, loop)
 , itf(sitf)
 , static_pool(static_pool)
