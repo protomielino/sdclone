@@ -51,22 +51,22 @@ class Sound
 {
  protected:
 
-	class SoundInterface* iface; ///< Handler to the interface
-	int flags; ///< Flags relating to what effects are to be used.
-	float MAX_VOL; ///< Maximum volume
-	float volume; ///< Current volume
-	float pitch; ///< Current pitch
-	float lowpass; ///< Current low pass filter
-	bool loop; ///< Whether it's a looping sound
-	bool playing; ///< Sound is playing
-    bool paused; ///< sound is paused
+	class SoundInterface* iface = nullptr; ///< Handler to the interface
+	int flags = 0; ///< Flags relating to what effects are to be used.
+	float MAX_VOL = 1.0f; ///< Maximum volume
+	float volume = 0.0f; ///< Current volume
+	float pitch = 1.0f; ///< Current pitch
+	float lowpass = 1.0f; ///< Current low pass filter
+	bool loop = false; ///< Whether it's a looping sound
+	bool playing = false; ///< Sound is playing
+	bool paused = false; ///< sound is paused
 
  public:
 
 	/// Construct a sound.
 	Sound(int flags = (ACTIVE_VOLUME|ACTIVE_PITCH), bool loop = false);
 	
-    /// Destructor
+	/// Destructor
 	virtual ~Sound();
 	
 	virtual void setVolume(float vol);
@@ -112,8 +112,8 @@ class SoundSource
 	sgVec3 p_src; ///< source position
 	sgVec3 u_src; ///< source velocity;
 	float a; ///< Environmental attenuation
-    float f; ///< Environmental frequency shift
-    float lp; ///< Environmental filtering
+	float f; ///< Environmental frequency shift
+	float lp; ///< Environmental filtering
 	SoundSource();
 	void update();
 	void setSource(sgVec3 p, sgVec3 u);

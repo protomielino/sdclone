@@ -26,23 +26,9 @@
 OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 						 int flags, bool loop, bool static_pool)
 : Sound(flags, loop)
+, static_pool(static_pool)
+, itf(sitf)
 {
-	this->static_pool = static_pool;
-	poolindex = -1;
-	itf = sitf;
-
-	MAX_DISTANCE = 10000.0f;
-	MAX_DISTANCE_LOW = 5.0f;
-	REFERENCE_DISTANCE = 5.0f;
-	ROLLOFF_FACTOR = 0.5f;
-
-	int i;
-	for (i = 0; i<3; i++) {
-		source_position[i] = 0.0f;
-		source_velocity[i] = 0.0f;
-		zeroes[i] = 0.0f;
-	}
-
 	GfLogTrace("OpenAL : Creating %s source from %s\n",
 			   static_pool ? "static" : "dynamic", filename);
 

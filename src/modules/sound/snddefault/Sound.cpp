@@ -23,17 +23,8 @@
 
 
 /// Construct a sound.
-Sound::Sound(int flags, bool loop)
+Sound::Sound(int flags, bool loop) : flags(flags), loop(loop)
 {
-	iface = nullptr;
-	this->flags = flags;
-	MAX_VOL = 1.0f;
-	volume = 0.0f;
-	pitch = 1.0f;
-	lowpass = 1.0f;
-	this->loop = loop;
-	playing = false;
-	paused = false;
 }
 
 /// Destructor

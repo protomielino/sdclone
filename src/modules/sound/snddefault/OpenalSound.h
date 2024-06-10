@@ -34,21 +34,21 @@ class OpenalSoundInterface;
 
 class OpenalSound : public Sound {
 protected:
-	ALuint buffer; ///< buffer id
-	ALuint source; ///< source id
-	ALfloat source_position[3]; ///< source position
-	ALfloat source_velocity[3]; ///< source velocity
-	ALfloat zeroes[3]; ///< just a vector of 0s
+	ALuint buffer = 0; ///< buffer id
+	ALuint source = 0; ///< source id
+	ALfloat source_position[3] = { 0.0f, 0.0f, 0.0f }; ///< source position
+	ALfloat source_velocity[3] = { 0.0f, 0.0f, 0.0f }; ///< source velocity
+	const ALfloat zeroes[3] = { 0.0f, 0.0f, 0.0f }; ///< just a vector of 0s
 	ALfloat back[6]; ///< direction of back
 	ALfloat front[6]; ///< direction of front 
-	ALfloat MAX_DISTANCE; ///< maximum allowed distance
-	ALfloat MAX_DISTANCE_LOW; ///< maximum allowed distance
-	ALfloat REFERENCE_DISTANCE; ///< reference distance for sound
-	ALfloat ROLLOFF_FACTOR; ///< how fast we need to roll off
-	int poolindex; ///< which pool the sound is assigned to
-	OpenalSoundInterface* itf; ///< Handle to the interface
-	bool static_pool;	///< dynamic or static source assignment?
-	bool is_enabled;	///< is it available at all?
+	ALfloat MAX_DISTANCE = 10000.0f; ///< maximum allowed distance
+	ALfloat MAX_DISTANCE_LOW = 5.0f; ///< maximum allowed distance
+	ALfloat REFERENCE_DISTANCE = 5.0f; ///< reference distance for sound
+	ALfloat ROLLOFF_FACTOR = 0.5f; ///< how fast we need to roll off
+	int poolindex = -1; ///< which pool the sound is assigned to
+	OpenalSoundInterface* itf = nullptr; ///< Handle to the interface
+	bool static_pool = true; ///< dynamic or static source assignment?
+	bool is_enabled = false; ///< is it available at all?
 public:
 	OpenalSound(const char* filename,
 				OpenalSoundInterface* sitf,
