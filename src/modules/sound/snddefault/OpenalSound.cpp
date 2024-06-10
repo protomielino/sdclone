@@ -26,8 +26,8 @@
 OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 						 int flags, bool loop, bool static_pool)
 : Sound(flags, loop)
-, static_pool(static_pool)
 , itf(sitf)
+, static_pool(static_pool)
 {
 	GfLogTrace("OpenAL : Creating %s source from %s\n",
 			   static_pool ? "static" : "dynamic", filename);

@@ -157,7 +157,7 @@ class SharedSourcePool {
 			return false;
 		}
 
-		bool isSourceActive(Sound* sound, int* index) {
+		bool isSourceActive(Sound* sound, int* index) const {
 			if (*index >= 0 && *index < nbsources &&
 				sound == pool[*index].currentOwner &&
 				true == pool[*index].in_use)
@@ -168,7 +168,7 @@ class SharedSourcePool {
 			}
 		}
 
-		int getNbSources(void) { return nbsources; }
+		int getNbSources(void) const { return nbsources; }
 
 	protected:
 		int nbsources;
