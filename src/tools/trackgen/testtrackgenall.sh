@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # the first argument is the path of sd2-trackgen
-trackgen=$1
-#trackgen=~/speed-dreams-code/release/bin/sd2-trackgen
+trackgen="sd2-trackgen"
+if [ $# -eq 1 ]; then
+    trackgen=$1
+fi
 
 temp_dir=$(mktemp -d -t trackgen.XXXXXXXX)
 

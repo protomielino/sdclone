@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # the first argument is the path of sd2-trackgen
-trackgen=$1
-#trackgen=~/speed-dreams-code/release/bin/sd2-trackgen
+trackgen="sd2-trackgen"
+if [ $# -eq 1 ]; then
+    trackgen=$1
+fi
 
 temp_dir=$(mktemp -d -t trackgen.XXXXXXXX)
 pwd=`pwd`
@@ -11,8 +13,11 @@ check () {
 	$trackgen -c $1 -n $2 $3 -i $pwd/../../../data/tracks/$1/$2 -o $temp_dir -a >& $temp_dir/$2.txt
 	status=$?
 	if [ $status -eq 0 ]; then
-		if  test -f "$pwd/../../../data/tracks/$1/$2/$2.ac"; then
+		if test -f "$pwd/../../../data/tracks/$1/$2/$2.ac"; then
 			diff $pwd/../../../data/tracks/$1/$2/$2.ac $temp_dir/$2.ac > $temp_dir/$2.ac.diff
+			[ $? -eq 0 ] && echo "$1/$2 GOOD" || echo "$1/$2 BAD"
+		elif test -f "$pwd/../../../data/tracks/$1/$2/$2-src.ac"; then
+			diff $pwd/../../../data/tracks/$1/$2/$2-src.ac $temp_dir/$2.ac > $temp_dir/$2.ac.diff
 			[ $? -eq 0 ] && echo "$1/$2 GOOD" || echo "$1/$2 BAD"
 		else
 			echo "$1 $2 no $2.ac file"
@@ -45,6 +50,9 @@ check () {
 }
 
 # add tracks here as they are updated
+#check circuit braga
+#check circuit dijon
+#check circuit jarama
 check circuit tuna
 check development barrier-testtrack
 check development border-testtrack
