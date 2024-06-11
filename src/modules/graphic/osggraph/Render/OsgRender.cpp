@@ -272,7 +272,7 @@ void SDRender::Init(tTrack *track)
     GfLogDebug("Graphic options : Shadow Quality : %u (%s)\n", QualityIndex, QualityValues[QualityIndex]);
     GfLogDebug("Graphic options : Shader Quality : %d (%s)\n", carsShader, ShadersValues[carsShader]);
 
-    NStars = NMaxStars;
+    NStars = 0; // TODO calculate based on time of day and weather
     if (AStarsData)
         delete [] AStarsData;
 
