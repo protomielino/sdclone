@@ -119,7 +119,6 @@ void SimCarCollideXYScene(tCar *car)
     tdble initDotProd;
     tdble dotProd, cx, cy, dotprod2;
     tdble impactPointX = 0.0, impactPointY = 0.0, impactPointZ = 0.0;
-    sgVec3 v;
     tTrackBarrier *curBarrier;
     tdble dmg;
 
@@ -221,34 +220,30 @@ void SimCarCollideXYScene(tCar *car)
             car->collpos.y = corner->pos.ay;
             car->DynGCg.vel.x -= nx * dotProd;
             car->DynGCg.vel.y -= ny * dotProd;
+    
+            //detect collision
+            sgVec3 force = { 0, 0, 0 };
+
+            //point of collision
+            sgVec3 poc;
+            poc[0] = impactPointX;//corner->pos.x
+            poc[1] = impactPointY;//corner->pos.y
+            poc[2] = impactPointZ;//(urandom()-0.5)*2.0;
+            sgNormaliseVec3(force);
+
+            for (int j = 0; j < 3; j++)
+                force[j] *= dmg;
+
+            //pu the collision data in our car
+            tCollisionState* collision_state = &car->carElt->priv.collision_state;
+            collision_state->collision_count++;
+            for (int j = 0; j < 3; j++)
+            {
+                collision_state->pos[j] = poc[j];
+                collision_state->force[j] = (float)(0.0001*force[j]);
+            }
         }
     }
-    
-    //detect collision
-    sgVec3 force;
-    force[0] = 0;
-    force[1] = 0;
-    force[2] = 0;
-
-    //point of collision
-    sgVec3 poc;
-    poc[0] = impactPointX;//corner->pos.x
-    poc[1] = impactPointY;//corner->pos.y
-    poc[2] = impactPointZ;//(urandom()-0.5)*2.0;
-    sgNormaliseVec3(force);
-
-    for (int i=0; i<3; i++) {
-        force[i]*=dmg;
-    }
-
-    //pu the collision data in our car
-    tCollisionState* collision_state = &car->carElt->priv.collision_state;
-    collision_state->collision_count++;
-    for (int i=0; i<3; i++) {
-        collision_state->pos[i] = poc[i];
-        collision_state->force[i] = (float)(0.0001*force[i]);
-    }
-
 }
 
 static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRef obj2, const DtCollData *collData)

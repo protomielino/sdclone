@@ -742,12 +742,11 @@ grInitShadow(tCarElt *car)
 }
 
 void
-grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt)
+grPropagateDamage (ssgEntity* l, const sgVec3 &poc, const sgVec3 &force, int cnt)
 {
     //showEntityType (l);
     if (l->isAKindOf (ssgTypeBranch()))
     {
-
         ssgBranch* br = (ssgBranch*) l;
 
         for (int i = 0 ; i < br -> getNumKids () ; i++ )
@@ -788,9 +787,9 @@ grPropagateDamage (tSituation *s)
     for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt* car = s->cars[i];
-        if (car->priv.collision_state.collision_count > 0)
+        tCollisionState* collision_state = &car->priv.collision_state;
+        if (collision_state->collision_count > 0)
         {
-            tCollisionState* collision_state = &car->priv.collision_state;
             grPropagateDamage(grCarInfo[car->index].carEntity,
                     collision_state->pos, collision_state->force, 0);
         }
