@@ -229,7 +229,6 @@ void SimCarCollideXYScene(tCar *car)
             poc[0] = impactPointX;//corner->pos.x
             poc[1] = impactPointY;//corner->pos.y
             poc[2] = impactPointZ;//(urandom()-0.5)*2.0;
-            sgNormaliseVec3(force);
 
             for (int j = 0; j < 3; j++)
                 force[j] *= dmg;
