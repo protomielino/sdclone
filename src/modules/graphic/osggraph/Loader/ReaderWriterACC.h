@@ -560,6 +560,11 @@ public:
         return _vertices[vertexIndex.vertexIndex]._vertex;
     }
 
+    bool hasNormal(const VertexIndex &vertexIndex) const
+    {
+        return !_vertices[vertexIndex.vertexIndex]._refs.empty();
+    }
+
     const osg::Vec3& getNormal(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].normal;
@@ -843,9 +848,42 @@ public:
     {
         unsigned nRefs = _refs.size();
 
+        if (isTriangleStrip()) // don't need to tessellate triangle strips
+        {
+            unsigned index = _trianglestrips.size();
+            _trianglestrips.resize(index + 1);
+            for (unsigned i = 0; i < nRefs; ++i)
+            {
+                RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2, _refs[i].texCoord3);
+                VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
+                _trianglestrips[index].push_back(vertexIndex);
+            }
+            return true;
+        }
+
+        // check for duplicate vertices
+        for (size_t i = 0; i < _refs.size(); ++i)
+        {
+            const osg::Vec3 &vertex1 = _vertexSet->getVertex(_refs[i].index);
+            const osg::Vec3 &vertex2 = _vertexSet->getVertex(_refs[(i + 1) % _refs.size()].index);
+            if (vertex1 == vertex2)
+            {
+                if (_refs.size() == 3) // degenerate triangle so give up
+                {
+                    osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected degenerate surface!" << std::endl;
+                    return false;
+                }
+                else // remove duplicate vertex and normal
+                {
+                    osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected surface with duplicate vertices!" << std::endl;
+                    // TODO delete the duplicate vertex
+                }
+            }
+        }
+
         // Compute the normal times the enclosed area.
         // During that check if the surface is convex. If so, put in the surface as such.
-        bool needTessellation = true;
+        bool needTessellation = false;
         osg::Vec3 prevEdgeNormal;
         osg::Vec3 weightedNormal(0, 0, 0);
         osg::Vec3 v0 = _vertexSet->getVertex(_refs[0].index);
@@ -883,18 +921,7 @@ public:
 
         if (needTessellation)
         {
-            if (isTriangleStrip())
-            {
-                unsigned index = _trianglestrips.size();
-                _trianglestrips.resize(index+1);
-                for (unsigned i = 0; i < nRefs; ++i)
-                {
-                    RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-                    VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
-                    _trianglestrips[index].push_back( vertexIndex );
-                }
-            }
-            else if (isTriangleFan())
+            if (isTriangleFan())
             {
                 //Convert fan to triangles
                 int i = 0;
