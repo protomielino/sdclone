@@ -22,6 +22,7 @@
 #include <osgViewer/View>
 #include <osgViewer/CompositeViewer>
 #include <osgViewer/Viewer>
+#include <osgUtil/Optimizer>
 
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
@@ -333,6 +334,15 @@ int refresh(tSituation *s)
     frameInfo.nTotalFrames++;
     const double dCurTime = GfTimeClock();
     const double dDeltaTime = dCurTime - fFPSPrevInstTime;
+    static bool ranOnce;
+
+    if (!ranOnce)
+    {
+        osgUtil::Optimizer optimizer;
+
+        optimizer.optimize(render->getRoot());
+        ranOnce = true;
+    }
 
     if (dDeltaTime > 1.0)
     {
