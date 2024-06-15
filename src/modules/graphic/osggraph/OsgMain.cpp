@@ -241,6 +241,8 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     frameInfo.fInstFps = 0.0;
     frameInfo.fAvgFps = 0.0;
+    frameInfo.fMinFps = 100000.0;
+    frameInfo.fMaxFps = 0.0;
     frameInfo.nInstFrames = 0;
     frameInfo.nTotalFrames = 0;
     fFPSPrevInstTime = GfTimeClock();
@@ -351,11 +353,15 @@ int refresh(tSituation *s)
         frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
         frameInfo.nInstFrames = 0;
         frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
+        if (frameInfo.fInstFps > frameInfo.fMaxFps)
+            frameInfo.fMaxFps = frameInfo.fInstFps;
+        if (frameInfo.nTotalFrames > 2 && frameInfo.fInstFps < frameInfo.fMinFps)
+            frameInfo.fMinFps = frameInfo.fInstFps;
 
         // Trace F/S every 5 seconds.
         if (nFPSTotalSeconds % 5 == 2)
-            GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
-                      frameInfo.fInstFps, frameInfo.fAvgFps);
+            GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f Minimum %.1f Maximum %.1f)\n",
+                      frameInfo.fInstFps, frameInfo.fAvgFps, frameInfo.fMinFps, frameInfo.fMaxFps);
     }
     adaptScreenSize();
 

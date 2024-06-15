@@ -2083,7 +2083,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 // debug info
     temp.str("");
-    temp << "FPS: " << frameInfo->fInstFps << " (AVG: " << frameInfo->fAvgFps << ")";
+    temp << "FPS: " << frameInfo->fInstFps << " (AVG: " << frameInfo->fAvgFps
+         << " MIN: " << frameInfo->fMinFps << " MAX: " << frameInfo->fMaxFps << ")";
     hudTextElements["debug-info"]->setText(temp.str());
 
 // delta best
