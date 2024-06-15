@@ -42,14 +42,16 @@
 #define SECT_SKILL                  "skill"
 #define PRV_SKILL_LEVEL             "level"
 #define PRV_SKILL_AGGRO             "aggression"
+#define PRV_SKILL_CONSI				"consistency"
 
 Driver::Driver(int index) :
     INDEX(index),
     mRain(0),
     driver_aggression(1.0),
     mGarage(false),
-    mFrontCollMargin(6.0 - driver_aggression),
-    mOvtMargin(2.0 - driver_aggression)
+    mFrontCollMargin(6.0),
+    mOvtMargin(2.0),
+	driver_consistency(0.2)
 
 {
     // Names assigned in constructor for VS 2013 compatibility
@@ -151,6 +153,9 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 	//get "angry" with increasing time
 	double anger_limit;
 	anger_limit = 0;
+
+	driver_consistMod = 0.0f;
+	modMult = 1;
 
     if (mVMaxK == 0.0)
         mVMaxK = 0.0018;
@@ -255,13 +260,15 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     {
         SkillDriver = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+		driver_consistency = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_CONSI, (char *)NULL, 0.0);
         GfParmReleaseHandle(skillHandle);
-        LogUSR.info( "# driver skill: %.2f - driver agression: %.3f\n", SkillDriver, driver_aggression);
+        LogUSR.info( "# driver skill: %.2f - driver aggression: %.3f\n", SkillDriver, driver_aggression);
         SkillDriver = MAX(0.95, 1.0 - 0.05 * SkillDriver);
         //driver_aggression /= driver_aggression;
         driver_aggression = MIN(1.0, MAX(0.7, 0.99 + driver_aggression));
+		driver_consistency = MAX(0.0, driver_consistency);
 
-        LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.3f\n", SkillGlobal, SkillDriver, driver_aggression);
+        LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver aggression: %.3f - driver consistency: %.3f\n", SkillGlobal, SkillDriver, driver_aggression, driver_consistency);
     }
     else
         LogUSR.info("Couldn't load : %s\n", buffer);
@@ -343,6 +350,7 @@ void Driver::Drive()
     updateDrivingFast();
     updateLetPass();
     updateOnCollision();
+	updateConsistMod();
     calcStateAndPath();
     calcOffsetAndYaw();
     calcMaxspeed();
@@ -658,7 +666,7 @@ double Driver::pitSpeed()
         pitspeed = mPit.speedLimit();
     }
 
-    if (pitdist < 2.0 * brakeDist(PATH_O, mCar.v(), 0.0))
+    if (pitdist < 3.0 * brakeDist(PATH_O, mCar.v(), 0.0))
     {
         pitspeed = 0.0;
     }
@@ -705,6 +713,7 @@ double Driver::brakeDist(PathType path, double speed, double allowedspeed)
         if (v2 <= allowedspeed)
         {
             totaldist += seglen * (v1 - allowedspeed) / (v1 - v2);
+			totaldist *= 1 + (getConsistMod() * 0.1);
 
             return 1.1 * totaldist;
         }
@@ -1553,19 +1562,19 @@ double Driver::frontCollFactor(Opponent* opp)
 
 void Driver::calcMaxspeed()
 {
-    switch (mDrvState)
+	switch (mDrvState)
     {
     case STATE_RACE:
     {
         if (mDrvPath != PATH_O)
         {
             mMaxspeed = pathSpeed(PATH_R) + 0.5 * (mLRTargetPortion + 1.0) * (pathSpeed(PATH_L) - pathSpeed(PATH_R));
-			mMaxspeed *= 1 + ((driver_aggression) * driver_aggromult);
+			mMaxspeed *= 1 + (((driver_aggression) * driver_aggromult)) - (getConsistMod() * 0.1);
         }
         else
         {
             mMaxspeed = pathSpeed(mDrvPath);
-			//mMaxspeed *= 1 + (driver_aggression * 0.01);
+			mMaxspeed *= 1 - (getConsistMod() * 0.1);
         }
 
         // Special cases
@@ -1662,6 +1671,30 @@ double Driver::controlSpeed(double accelerator, double maxspeed)
     accelerator += mSpeedController.sample(maxspeed - mCar.v(), mDeltaTime);
 
     return Utils::clip(accelerator, 0.0, 1.0);
+}
+
+void Driver::updateConsistMod()
+{
+	// Consistency modifier that has subtle random fluctuation.
+	double driver_consistModAdd = ((double)rand()/(RAND_MAX/driver_consistency) * 0.001) * modMult;
+
+	if (driver_consistMod > driver_consistency)
+	{
+		modMult = -1;
+	}
+
+	if (driver_consistMod < 0)
+	{
+		modMult = 1;
+	}
+
+	driver_consistMod += driver_consistModAdd;
+	// LogUSR.info(" # Consistency Mod = %.3f\n", driver_consistMod);
+}
+
+double Driver::getConsistMod()
+{
+	return driver_consistMod;
 }
 
 // Meteorology

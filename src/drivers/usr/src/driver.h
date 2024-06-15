@@ -95,6 +95,8 @@ private:
     void   calcOffsetAndYaw();
     double getSteerAngle(double steerlock);
     double controlSpeed(double accelerator, double maxspeed);
+	void updateConsistMod();
+	double getConsistMod();
 
     void	Meteorology(const tTrack *t);
     unsigned int GetWeather(const tTrack *t);
@@ -203,6 +205,9 @@ private:
     int    mRain;
 
     double driver_aggression;
+	double driver_consistency;
+	double driver_consistMod;
+	int modMult;
     double SkillGlobal;
     double SkillDriver;
     bool   pitsharing;

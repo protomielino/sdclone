@@ -64,14 +64,14 @@ void Opponent::update()
 
         // Detect backmarkers
         if ((mOppCar->_distRaced + mTrack->length / 2.0 < mCar->_distRaced)
-                || (mTeamMate && (mOppCar->_dammage > mCar->_dammage + 1000 || tiretempdiff > 20.0)))
+                || ((mOppCar->_dammage > mCar->_dammage + 1000 || tiretempdiff > 20.0)))
         {
             mBackMarker = true;
         }
 
         // Let opponent pass
         if ((mOppCar->_distRaced - mTrack->length / 2.0 > mCar->_distRaced  && tiretempdiff < 25.0)
-                || (mTeamMate && (mOppCar->_dammage < mCar->_dammage - 1000 || tiretempdiff < -20.0) && !mBackMarker))
+                || ((mOppCar->_dammage < mCar->_dammage - 1000 || tiretempdiff < -20.0) && !mBackMarker))
         {
             mLetpass = true;
         }
