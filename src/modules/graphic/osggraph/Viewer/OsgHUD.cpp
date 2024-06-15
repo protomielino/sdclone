@@ -2082,10 +2082,15 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
 // debug info
-    temp.str("");
-    temp << "FPS: " << frameInfo->fInstFps << " (AVG: " << frameInfo->fAvgFps
-         << " MIN: " << frameInfo->fMinFps << " MAX: " << frameInfo->fMaxFps << ")";
-    hudTextElements["debug-info"]->setText(temp.str());
+    if (frameInfo->fInstFps != 0)
+    {
+        temp.str("");
+        temp << "FPS: " << frameInfo->fInstFps << " (AVG: " << frameInfo->fAvgFps
+            << " MIN: " << frameInfo->fMinFps << " MAX: " << frameInfo->fMaxFps << ")";
+        hudTextElements["debug-info"]->setText(temp.str());
+    }
+    else
+        hudTextElements["debug-info"]->setText("");
 
 // delta best
     if (currCar->_bestLapTime != 0){

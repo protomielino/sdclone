@@ -331,11 +331,6 @@ void adaptScreenSize()
 
 int refresh(tSituation *s)
 {
-    // Compute F/S indicators every second.
-    frameInfo.nInstFrames++;
-    frameInfo.nTotalFrames++;
-    const double dCurTime = GfTimeClock();
-    const double dDeltaTime = dCurTime - fFPSPrevInstTime;
     static bool ranOnce;
 
     if (!ranOnce)
@@ -346,22 +341,37 @@ int refresh(tSituation *s)
         ranOnce = true;
     }
 
-    if (dDeltaTime > 1.0)
+    if (frameInfo.nTotalFrames < 2)
     {
-        ++nFPSTotalSeconds;
-        fFPSPrevInstTime = dCurTime;
-        frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
-        frameInfo.nInstFrames = 0;
-        frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
-        if (frameInfo.fInstFps > frameInfo.fMaxFps)
-            frameInfo.fMaxFps = frameInfo.fInstFps;
-        if (frameInfo.nTotalFrames > 2 && frameInfo.fInstFps < frameInfo.fMinFps)
-            frameInfo.fMinFps = frameInfo.fInstFps;
+        // skip first 2 frames
+        fFPSPrevInstTime = GfTimeClock();
+        frameInfo.nTotalFrames++;
+    }
+    else
+    {
+        // Compute F/S indicators every second.
+        frameInfo.nInstFrames++;
+        frameInfo.nTotalFrames++;
+        const double dCurTime = GfTimeClock();
+        const double dDeltaTime = dCurTime - fFPSPrevInstTime;
 
-        // Trace F/S every 5 seconds.
-        if (nFPSTotalSeconds % 5 == 2)
-            GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f Minimum %.1f Maximum %.1f)\n",
-                      frameInfo.fInstFps, frameInfo.fAvgFps, frameInfo.fMinFps, frameInfo.fMaxFps);
+        if (dDeltaTime > 1.0)
+        {
+            ++nFPSTotalSeconds;
+            fFPSPrevInstTime = dCurTime;
+            frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
+            frameInfo.nInstFrames = 0;
+            frameInfo.fAvgFps = (double)(frameInfo.nTotalFrames - 2) / nFPSTotalSeconds;
+            if (frameInfo.fInstFps > frameInfo.fMaxFps)
+                frameInfo.fMaxFps = frameInfo.fInstFps;
+            if (frameInfo.fInstFps < frameInfo.fMinFps)
+                frameInfo.fMinFps = frameInfo.fInstFps;
+
+            // Trace F/S every 5 seconds.
+            if (nFPSTotalSeconds % 5 == 2)
+                GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f Minimum %.1f Maximum %.1f)\n",
+                    frameInfo.fInstFps, frameInfo.fAvgFps, frameInfo.fMinFps, frameInfo.fMaxFps);
+        }
     }
     adaptScreenSize();
 
@@ -494,6 +504,9 @@ void shutdownTrack(void)
 
 void shutdownView(void)
 {
+    GfLogInfo("Frame rate (F/s) : Average %.1f Minimum %.1f Maximum %.1f\n",
+        frameInfo.fAvgFps, frameInfo.fMinFps, frameInfo.fMaxFps);
+
     if (screens)
     {
         delete screens;
