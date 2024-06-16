@@ -1610,108 +1610,111 @@ int printOb(FILE *ofile, ob_t &object)
             else
                 fprintf(ofile, "SURF 0x20\n");
             fprintf(ofile, "mat %d\n", object.attrMat);
-            fprintf(ofile, "refs 3\n");
-            /* GUIONS */
-            if (!multitex)
+            if (object.vertexarray.size() == 3)
             {
-                fprintf(ofile, "%d %.5f %.5f\n",
+                fprintf(ofile, "refs 3\n");
+                /* GUIONS */
+                if (!multitex)
+                {
+                    fprintf(ofile, "%d %.5f %.5f\n",
                         object.vertexarray[i * 3].indice,
                         object.textarray[object.vertexarray[i * 3].indice].u,
                         object.textarray[object.vertexarray[i * 3].indice].v);
-                fprintf(ofile, "%d %.5f %.5f\n",
+                    fprintf(ofile, "%d %.5f %.5f\n",
                         object.vertexarray[i * 3 + 1].indice,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].v);
-                fprintf(ofile, "%d %.5f %.5f\n",
+                    fprintf(ofile, "%d %.5f %.5f\n",
                         object.vertexarray[i * 3 + 2].indice,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].v);
-            }
-            else
-            {
-                fprintf(ofile, "%d %.5f %.5f",
+                }
+                else
+                {
+                    fprintf(ofile, "%d %.5f %.5f",
                         object.vertexarray[i * 3].indice,
                         object.textarray[object.vertexarray[i * 3].indice].u,
                         object.textarray[object.vertexarray[i * 3].indice].v);
 
-                if (object.hasTexture1())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture1())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3].indice].u,
                             object.textarray1[object.vertexarray[i * 3].indice].v);
-                else if (object.hasTexture2() || object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture2() || object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture2())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture2())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3].indice].u,
                             object.textarray2[object.vertexarray[i * 3].indice].v);
-                else if (object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture3())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture3())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray3[object.vertexarray[i * 3].indice].u,
                             object.textarray3[object.vertexarray[i * 3].indice].v);
-                fprintf(ofile, "\n");
+                    fprintf(ofile, "\n");
 
-                fprintf(ofile, "%d %.5f %.5f",
+                    fprintf(ofile, "%d %.5f %.5f",
                         object.vertexarray[i * 3 + 1].indice,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].v);
 
-                if (object.hasTexture1())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture1())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray1[object.vertexarray[i * 3 + 1].indice].v);
-                else if (object.hasTexture2() || object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture2() || object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture2())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture2())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray2[object.vertexarray[i * 3 + 1].indice].v);
-                else if (object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture3())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture3())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray3[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray3[object.vertexarray[i * 3 + 1].indice].v);
 
-                fprintf(ofile, "\n");
+                    fprintf(ofile, "\n");
 
-                fprintf(ofile, "%d %.5f %.5f",
+                    fprintf(ofile, "%d %.5f %.5f",
                         object.vertexarray[i * 3 + 2].indice,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].v);
 
-                if (object.hasTexture1())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture1())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3 + 2].indice].u,
                             object.textarray1[object.vertexarray[i * 3 + 2].indice].v);
-                else if (object.hasTexture2() || object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture2() || object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture2())
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture2())
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3 + 2].indice].u,
                             object.textarray2[object.vertexarray[i * 3 + 2].indice].v);
-                else if (object.hasTexture3())
-                    fprintf(ofile, " 0.000000 0.000000");
+                    else if (object.hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
 
-                if (object.hasTexture3())
-                {
-                    fprintf(ofile, " %.5f %.5f",
+                    if (object.hasTexture3())
+                    {
+                        fprintf(ofile, " %.5f %.5f",
                             object.textarray3[object.vertexarray[i * 3 + 2].indice].u,
                             object.textarray3[object.vertexarray[i * 3 + 2].indice].v);
-                    if (object.textarray3[object.vertexarray[i * 3 + 2].indice].u
+                        if (object.textarray3[object.vertexarray[i * 3 + 2].indice].u
                             != object.textarray1[object.vertexarray[i * 3 + 2].indice].u)
-                    {
-                        printf("error in text\n");
+                        {
+                            printf("error in text\n");
+                        }
                     }
-                }
 
-                fprintf(ofile, "\n");
+                    fprintf(ofile, "\n");
+                }
             }
         }
     }
@@ -3418,17 +3421,18 @@ void computeSaveAC3DStrip(const std::string &OutputFilename, std::list<ob_t> &ob
 void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
 {
     ob_t tobS;
-    static int oldva[10000];
+    static std::vector<int> oldva;
     int n = 0;
     const int numtri = ob1.numsurf + ob2.numsurf;
 
     printf("merging %s with %s  tri=%d\n", ob1.name.c_str(), ob2.name.c_str(), numtri);
-    memset(oldva, -1, sizeof(oldva));
+    oldva.resize(ob1.vertex.size() + ob2.vertex.size());
+    std::fill(oldva.begin(), oldva.end(), -1);
     tobS.numsurf = ob1.numsurf;
     tobS.vertexarray.resize(numtri * 3);
-    tobS.vertex.resize(numtri * 3);
-    tobS.norm.resize(numtri * 3);
-    tobS.snorm.resize(numtri * 3);
+    tobS.vertex.resize(ob1.vertex.size() + ob2.vertex.size());
+    tobS.norm.resize(ob1.norm.size() + ob2.norm.size());
+    tobS.snorm.resize(ob1.snorm.size() + ob2.snorm.size());
     tobS.textarray.resize(numtri * 3);
     tobS.textarray1.resize(numtri * 3);
     tobS.textarray2.resize(numtri * 3);
