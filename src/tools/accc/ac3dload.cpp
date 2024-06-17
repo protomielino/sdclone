@@ -1610,9 +1610,9 @@ int printOb(FILE *ofile, ob_t &object)
             else
                 fprintf(ofile, "SURF 0x20\n");
             fprintf(ofile, "mat %d\n", object.attrMat);
+            fprintf(ofile, "refs %zu\n", object.vertexarray.size());
             if (object.vertexarray.size() == 3)
             {
-                fprintf(ofile, "refs 3\n");
                 /* GUIONS */
                 if (!multitex)
                 {
