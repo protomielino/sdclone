@@ -1983,7 +1983,7 @@ static void draw_ac(Ac3d &ac3d, const char *name)
         if (curGrp.textures.empty())
             curGrp.textures.emplace_back(TexName);
         else
-            curGrp.textures[0] = TexName;
+            curGrp.textures[0].name = TexName;
 
         ac3d.addObject(curGrp);
         ac3d.stack.pop();

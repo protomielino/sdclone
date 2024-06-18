@@ -133,7 +133,28 @@ struct Ac3d
             std::array<V2d, 4>  coords;
 
             Ref() = default;
-            Ref(int index, double u, double v) : index(index) { coords[0] = { u, v }; }
+            Ref(int index, double u, double v) : index(index)
+            {
+                coords[0] = { u, v };
+            }
+            Ref(int index, double u, double v, double u1, double v1) : index(index)
+            {
+                coords[0] = { u, v };
+                coords[1] = { u1, v1 };
+            }
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2) : index(index)
+            {
+                coords[0] = { u, v };
+                coords[1] = { u1, v1 };
+                coords[2] = { u2, v2 };
+            }
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2, double u3, double v3) : index(index)
+            {
+                coords[0] = { u, v };
+                coords[1] = { u1, v1 };
+                coords[2] = { u2, v2 };
+                coords[3] = { u3, v3 };
+            }
         };
 
         enum SURF : int { 
@@ -251,12 +272,20 @@ struct Ac3d
 
     typedef std::map<size_t, size_t> MaterialMap;
 
+    struct Texture
+    {
+        Texture(const std::string &name) : name(name) { }
+        Texture(const std::string &name, const std::string &type) : name(name), type(type) { }
+        std::string name;
+        std::string type;
+    };
+
     struct Object
     {
         std::string		            type;
         std::string		            name;
         std::string		            data;
-        std::vector<std::string>    textures;
+        std::vector<Texture>        textures;
         v2                          texrep;
         v2                          texoff;
         Value<int>				    subdiv;

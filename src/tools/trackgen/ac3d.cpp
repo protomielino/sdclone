@@ -623,15 +623,10 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         }
         else if (tokens.at(0) == "texture")
         {
-            if (tokens.size() == 2)
-            {
-                if (textures.empty())
-                    textures.push_back(tokens.at(1));
-                else
-                    textures[0] = tokens.at(1);
-            }
+            if (tokens.size() > 2)
+                textures.emplace_back(tokens.at(1), tokens.at(2));
             else
-                textures.push_back(tokens.at(1));
+                textures.emplace_back(tokens.at(1));
         }
         else if (tokens.at(0) == "texrep")
         {
@@ -754,16 +749,24 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
     }
     for (size_t i = 0; i < std::min(textures.size(), size_t(4)); i++)
     {
-        if (textures.size() == 1)
-            fout << "texture \"" << textures[0] << "\"" << std::endl;
+        if (textures.size() == 1 && textures[0].type.empty())
+        {
+            fout << "texture \"" << textures[0].name << "\"" << std::endl;
+        }
         else
         {
             const std::string types[4] = { "base", "tiled", "skids", "shad" };
 
-            if (textures[i] == "empty_texture_no_mapping")
-                fout << "texture " << textures[i] << " " << types[i] << std::endl;
+            if (textures[i].name == "empty_texture_no_mapping")
+            {
+                fout << "texture " << textures[i].name << " "
+                     << (textures[i].type.empty() ? types[i] : textures[i].type) << std::endl;
+            }
             else
-                fout << "texture \"" << textures[i] << "\" " << types[i] << std::endl;
+            {
+                fout << "texture \"" << textures[i].name << "\" "
+                     << (textures[0].type.empty() ? types[i] : textures[i].type) << std::endl;
+            }
         }
     }
     if (texrep.initialized)
