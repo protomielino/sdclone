@@ -115,6 +115,7 @@ static int isawheel = FALSE;
 static int isawindow = FALSE;
 static int usestrip = FALSE;
 static int usegroup = FALSE;
+static int usemultitex = FALSE;
 static int inGroup = FALSE;
 
 static int numTexMaps;  // Number of active texture maps.
@@ -994,11 +995,20 @@ static int do_refs( char *s )
         t3tab[vtx][1]=tc3[1];
 
         if (tlist1)
+        {
             tlist1->add(tc1);
+            usemultitex = TRUE;
+        }
         if (tlist2)
+        {
             tlist2->add(tc2);
+            usemultitex = TRUE;
+        }
         if (tlist3)
+        {
             tlist3->add(tc3);
+            usemultitex = TRUE;
+        }
 
         vlist->add(vtab[vtx]);
         if (usenormal)
@@ -1325,7 +1335,8 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* optio
   {
     /*myssgFlatten(obj);*/
     ssgFlatten    ( obj ) ;
-    ssgStripify   ( model ) ;
+    if (!usemultitex)
+      ssgStripify   ( model ) ;
   }
 
   carTrackRatioX = (t_xmax-t_xmin)/(shad_xmax-shad_xmin);
@@ -1361,7 +1372,8 @@ ssgEntity *grssgCarWheelLoadAC3D ( const char *fname, const grssgLoaderOptions* 
   {
     /*myssgFlatten(obj);*/
     ssgFlatten    ( obj ) ;
-    ssgStripify   ( model ) ;
+    if (!usemultitex)
+      ssgStripify   ( model ) ;
   }
 
   return model ;
@@ -1392,7 +1404,8 @@ ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options 
   if (!usegroup && !usestrip)
   {
     ssgFlatten    ( obj ) ;
-    ssgStripify   ( model ) ;
+    if (!usemultitex)
+      ssgStripify   ( model ) ;
   }
 
   return model ;
