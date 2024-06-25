@@ -653,6 +653,7 @@ public class XmlReader
 	        data.getTerrainGeneration().setSurface(getAttrStrValue(terrain, "surface"));
 	        data.getTerrainGeneration().setRandomSeed(getAttrIntValue(terrain, "random seed"));
 	        data.getTerrainGeneration().setUseObjectMaterials(getAttrStrValue(terrain, "use object materials"));
+	        data.getTerrainGeneration().setTiledFile(getAttrStrValue(terrain, "tiled file"));
 
 	        Element objects = getChildWithName(terrain, "Objects");
 

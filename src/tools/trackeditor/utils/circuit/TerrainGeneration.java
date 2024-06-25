@@ -19,6 +19,7 @@ public class TerrainGeneration
 	public static final String		DEFAULT_SURFACE					= "grass";
 	public static final int			DEFAULT_RANDOM_SEED				= 1;
 	public static final String		DEFAULT_USE_OBJECT_MATERIALS	= "no";
+	public static final String		DEFAULT_TILED_FILE				= null;	
 
 	private double					trackStep						= Double.NaN;
 	private double					borderMargin					= Double.NaN;
@@ -34,6 +35,7 @@ public class TerrainGeneration
 	private String					surface							= null;
 	private int						randomSeed						= Integer.MAX_VALUE;
 	private String					useObjectMaterials				= null;
+	private String					tiledFile						= null;
 	private Vector<ObjectMap>		objectMaps						= new Vector<ObjectMap>();
 	private Vector<GraphicObject>	graphicObjects					= new Vector<GraphicObject>();
 
@@ -246,6 +248,15 @@ public class TerrainGeneration
 		this.useObjectMaterials = useObjectMaterials;
 	}
 
+	public String getTiledFile()
+	{
+		return tiledFile;
+	}
+	public void setTiledFile(String tiledFile)
+	{
+		this.tiledFile = tiledFile;
+	}
+
 	public Vector<GraphicObject> getGraphicObjects()
 	{
 		return graphicObjects;
@@ -272,6 +283,7 @@ public class TerrainGeneration
 		System.out.println(indent + "  surface              : " + surface);
 		System.out.println(indent + "  random seed          : " + randomSeed);
 		System.out.println(indent + "  use object materials : " + useObjectMaterials);
+		System.out.println(indent + "  tiled file           : " + tiledFile);		
 		System.out.println(indent + "  objectMaps           : " + objectMaps.size());
 		for (int i = 0; i < objectMaps.size(); i++)
 		{

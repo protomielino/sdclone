@@ -83,12 +83,15 @@ public class TerrainProperties extends PropertyPanel
 	private JLabel				randomSeedLabel				= new JLabel();
 	private JTextField			randomSeedTextField			= new JTextField();
 	private JLabel				useObjectMaterialsLabel		= new JLabel();
-	private JComboBox<String>	useObjectMaterialsComboBox	= null;
+	private JComboBox<String>	useObjectMaterialsComboBox	= null;	
+	private JLabel				tiledFileLabel				= new JLabel();
+	private JTextField			tiledFileTextField			= new JTextField();	
 	private JButton				defaultButton				= null;
 	private JButton				deleteButton				= null;
 	private JTabbedPane			tabbedPane					= null;
 	private JButton				elevationMapButton			= null;
 	private JButton				reliefFileButton			= null;
+	private JButton				tiledFileButton			= null;
 
 	private final String sep = System.getProperty("file.separator");
 
@@ -139,6 +142,7 @@ public class TerrainProperties extends PropertyPanel
 		addLabel(this, 11, surfaceLabel, "Surface", 120);
 		addLabel(this, 12, randomSeedLabel, "Random Seed", 120);
 		addLabel(this, 13, useObjectMaterialsLabel, "Use Object Materials", 120);
+		addLabel(this, 14, tiledFileLabel, "Tiled File", 120);
 
 		addTextField(this, 0, trackStepTextField, getEditorFrame().getTerrainGeneration().getTrackStep(), 140, 125);
 		addTextField(this, 1, borderMarginTextField, getEditorFrame().getTerrainGeneration().getBorderMargin(), 140, 125);
@@ -153,6 +157,7 @@ public class TerrainProperties extends PropertyPanel
 		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTerrainGeneration().getElevationMap(), 140, 295);
 		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTerrainGeneration().getReliefFile(), 140, 295);
 		addTextField(this, 12, randomSeedTextField, getEditorFrame().getTerrainGeneration().getRandomSeed(), 140, 125);
+		addTextField(this, 14, tiledFileTextField, getEditorFrame().getTerrainGeneration().getTiledFile(), 140, 295);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
@@ -162,6 +167,7 @@ public class TerrainProperties extends PropertyPanel
 		this.add(getReliefFileButton(), null);
 		this.add(getReliefBorderComboBox(), null);
 		this.add(getUseObjectMaterialsComboBox(), null);
+		this.add(getTiledFileButton(), null);
 		getReliefBorderComboBox().setSelectedItem(toNoneString(getEditorFrame().getTerrainGeneration().getReliefBorder()));
 		getUseObjectMaterialsComboBox().setSelectedItem(toNoneString(getEditorFrame().getTerrainGeneration().getUseObjectMaterials()));
 	}
@@ -413,6 +419,57 @@ public class TerrainProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes tiledFileButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getTiledFileButton()
+	{
+		if (tiledFileButton == null)
+		{
+			tiledFileButton = new JButton();
+			tiledFileButton.setBounds(440, 387, 80, 25);
+			tiledFileButton.setText("Browse");
+			tiledFileButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					tiledFile();
+				}
+			});
+		}
+		return tiledFileButton;
+	}
+
+	protected void tiledFile()
+	{
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
+		fc.setSelectedFiles(null);
+		fc.setSelectedFile(null);
+		fc.rescanCurrentDirectory();
+		fc.setApproveButtonMnemonic(0);
+		fc.setDialogTitle("Tiled file selection");
+		fc.setVisible(true);
+		fc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG images", "jpg");
+		fc.addChoosableFileFilter(filter);
+		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
+		int result = fc.showOpenDialog(this);
+		UIManager.put("FileChooser.readOnly", old);
+		if (result == JFileChooser.APPROVE_OPTION)
+		{
+			String fileName = fc.getSelectedFile().toString();
+			int index = fileName.lastIndexOf(sep);
+			String pathToFile = fileName.substring(0, index);
+			if (pathToFile.equals(Editor.getProperties().getPath()))
+				fileName = fileName.substring(index + 1);
+			tiledFileTextField.setText(fileName);
+		}
+	}	
+	
+	/**
 	 * This method initializes defaultButton
 	 *
 	 * @return javax.swing.JButton
@@ -495,7 +552,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 393, 510, 389);
+			tabbedPane.setBounds(10, 420, 510, 362);
 
 			tabbedPane.addTab("Objects", null, new GraphicObjectProperties(getEditorFrame()));
 			tabbedPane.addTab("Object Maps", null, new ObjectMapProperties(getEditorFrame()));
@@ -641,6 +698,13 @@ public class TerrainProperties extends PropertyPanel
 			getEditorFrame().getTerrainGeneration().getUseObjectMaterials(), stringResult))
 		{
 			getEditorFrame().getTerrainGeneration().setUseObjectMaterials(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
+		}
+
+		if (isDifferent(tiledFileTextField.getText(),
+			getEditorFrame().getTerrainGeneration().getTiledFile(), stringResult))
+		{
+			getEditorFrame().getTerrainGeneration().setTiledFile(stringResult.getValue());
 			getEditorFrame().documentIsModified = true;
 		}
 

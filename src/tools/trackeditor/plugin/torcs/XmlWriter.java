@@ -910,6 +910,7 @@ public class XmlWriter
 		addContent(element, "surface", editorFrame.getTerrainGeneration().getSurface());
 		addContent(element, "random seed", null, editorFrame.getTerrainGeneration().getRandomSeed());
 		addContent(element, "use object materials", editorFrame.getTerrainGeneration().getUseObjectMaterials());
+		addContent(element, "tiled file", editorFrame.getTerrainGeneration().getTiledFile());
 
 		element.addContent(getObjectMaps());
 		element.addContent(getGraphicObjects());
