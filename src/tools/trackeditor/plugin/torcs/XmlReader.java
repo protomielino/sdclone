@@ -670,6 +670,8 @@ public class XmlReader
 	        		object.setComment(getAttrStrValue(el, "comment"));
 	        		object.setOrientation(getAttrNumValue(el, "orientation", "deg"));
 	        		object.setHeight(getAttrNumValue(el, "height", "m"));
+	        		object.setUseMaterial(getAttrStrValue(el, "use material"));
+	        		
 	        		graphicObjects.add(object);
 	        	}
 	        	data.getTerrainGeneration().setGraphicObjects(graphicObjects);

@@ -62,6 +62,9 @@ public class TrackObjectDialog extends JDialog
 	private JLabel						heightLabel				= new JLabel();
 	private JTextField					heightTextField			= new JTextField();
 
+	private JLabel						useMaterialLabel		= new JLabel();
+	private JComboBox<String>			useMaterialComboBox		= null;
+
 	private JLabel						commentLabel			= new JLabel();
 	private JTextArea					commentTextArea			= new JTextArea();
 
@@ -251,6 +254,23 @@ public class TrackObjectDialog extends JDialog
 		return Double.NaN;
 	}
 	
+	private String getUseMaterial()
+	{
+		if (graphicObject != null)
+		{
+			return graphicObject.getUseMaterial();
+		}
+		else if (graphicObjectDatum != null)
+		{
+			if (graphicObjectDatum.useMaterial != null)
+			{
+				return graphicObjectDatum.useMaterial;
+			}
+		}
+		
+		return null;
+	}
+
 	private String getComment()
 	{
 		if (graphicObject != null)
@@ -273,7 +293,7 @@ public class TrackObjectDialog extends JDialog
 		isGraphicObject = (objectShape != null && objectShape.getType().equals("graphic object")) || graphicObjectDatum != null;
 
 		setLayout(null);
-		setSize(320, 333);
+		setSize(320, 360);
 		setResizable(false);
 		if (objectData == null && graphicObjectDatum == null)
 		{
@@ -353,6 +373,29 @@ public class TrackObjectDialog extends JDialog
 
 			nameTextField = new JTextField(getObjectName());
 			nameTextField.setBounds(120, 37, 170, 23);
+			
+			String[] items = {"none", "yes", "no"};
+			useMaterialComboBox = new JComboBox<String>(items);
+			useMaterialComboBox.setBounds(120, 199, 170, 23);
+			String useMaterial = getUseMaterial();
+			if (useMaterial == null)
+				useMaterial = "none";			
+			if (graphicObject != null)
+			{
+				graphicObject.setUseMaterial(useMaterial);
+			}
+			else if (graphicObjectDatum != null)
+			{
+				graphicObjectDatum.useMaterial = useMaterial;
+			}			
+			useMaterialComboBox.setSelectedItem(useMaterial);			
+			useMaterialComboBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					useMaterialComboBoxChanged();
+				}
+			});
 		}
 		else
 		{
@@ -416,16 +459,22 @@ public class TrackObjectDialog extends JDialog
 				heightTextField.setText("" + getObjectHeight());
 			heightTextField.setBounds(120, 172, 170, 23);
 			
+			useMaterialLabel.setText("Use Material");
+			useMaterialLabel.setBounds(10, 199, 120, 23);
+			
+			useMaterialComboBox.setSelectedItem(getUseMaterial());
+			useMaterialComboBox.setBounds(120, 199, 170, 23);
+			
 			commentLabel.setText("Comment");
-			commentLabel.setBounds(10, 199, 120, 23);
+			commentLabel.setBounds(10, 226, 120, 23);
 			
 			commentTextArea.setText(getComment());
-			commentTextArea.setBounds(120, 199, 170, 50);
+			commentTextArea.setBounds(120, 226, 170, 50);
 			commentTextArea.setLineWrap(true);
 			commentTextArea.setWrapStyleWord(true);
 		}
 
-		applyButton.setBounds(50, 258, 70, 25);
+		applyButton.setBounds(50, 285, 70, 25);
 		applyButton.setText("Apply");
 		applyButton.addActionListener(new ActionListener()
 		{
@@ -435,7 +484,7 @@ public class TrackObjectDialog extends JDialog
 			}
 		});
 
-		cancelButton.setBounds(185, 258, 70, 25);
+		cancelButton.setBounds(185, 285, 70, 25);
 		cancelButton.setText("Cancel");
 		cancelButton.addActionListener(new ActionListener()
 		{
@@ -475,6 +524,8 @@ public class TrackObjectDialog extends JDialog
 			add(orientationTextField);
 			add(heightLabel);
 			add(heightTextField);
+			add(useMaterialLabel);
+			add(useMaterialComboBox);
 			add(commentLabel);
 			add(commentTextArea);
 		}
@@ -497,6 +548,26 @@ public class TrackObjectDialog extends JDialog
 			return;
 		}
 		editorFrame.setCurrentObjectMap(objectMapComboBox.getSelectedIndex());
+	}
+	
+	private void useMaterialComboBoxChanged()
+	{
+		if (ignoreActions)
+			return;
+		if (useMaterialComboBox.getSelectedIndex() == -1)
+		{
+			JOptionPane.showMessageDialog(this, "No use material selected!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		String useMaterial = (String) useMaterialComboBox.getSelectedItem();
+		if (graphicObject != null)
+		{
+			graphicObject.setUseMaterial(useMaterial);
+		}
+		else if (graphicObjectDatum != null)
+		{
+			graphicObjectDatum.useMaterial = useMaterial;
+		}
 	}
 	
 	private void objectComboBoxChanged()
@@ -645,6 +716,15 @@ public class TrackObjectDialog extends JDialog
 					return;
 				}
 			}
+
+			if (useMaterialComboBox != null)
+			{
+				String useMaterialText = (String) useMaterialComboBox.getSelectedItem();
+				if (useMaterialText.equals("none"))
+					graphicObject.setUseMaterial(null);
+				else
+					graphicObject.setUseMaterial(new String(useMaterialText));
+			}
 			
 			graphicObject.setComment(new String(commentTextArea.getText()));
 		}
@@ -701,6 +781,7 @@ public class TrackObjectDialog extends JDialog
 				}
 			}	
 			
+			graphicObjectDatum.useMaterial = new String((String) useMaterialComboBox.getSelectedItem());			
 			graphicObjectDatum.comment = new String(commentTextArea.getText());
 		}
 

@@ -141,6 +141,7 @@
 #define TRK_ATT_SCALE               "scale"
 #define TRK_ATT_SCALE_MIN           "scale min"
 #define TRK_ATT_SCALE_MAX           "scale max"
+#define TRK_ATT_USE_MATERIAL        "use material"
 
 #define TRK_ATT_DH                  "delta height"
 #define TRK_ATT_DV                  "delta vert"

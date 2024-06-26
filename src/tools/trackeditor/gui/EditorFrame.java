@@ -20,6 +20,7 @@
  */
 package gui;
 
+import gui.properties.GraphicObjectData;
 import gui.properties.GraphicObjectProperties;
 import gui.properties.PropertiesDialog;
 import gui.splash.SplashScreen;
@@ -271,9 +272,18 @@ public class EditorFrame extends JFrame
 	private int 				currentObjectMap					= -1;
 	private int					currentObjectColor					= 0;
 	private boolean				currentObjectGraphic				= false;
+	private GraphicObjectData	currentGraphicObjectData			= null;
 
 	private GraphicObjectProperties	graphicObjectProperties			= null;
 	
+	public GraphicObjectData getCurrentGraphicObjectData() {
+		return currentGraphicObjectData;
+	}
+
+	public void setCurrentGraphicObjectData(GraphicObjectData currentGraphicObjectData) {
+		this.currentGraphicObjectData = currentGraphicObjectData;
+	}
+
 	public GraphicObjectProperties getGraphicObjectProperties() {
 		return graphicObjectProperties;
 	}

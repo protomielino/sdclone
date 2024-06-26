@@ -956,6 +956,7 @@ public class XmlWriter
 			addContent(el, "y", "m", graphicObject.getY());
 			addContent(el, "orientation", "deg", graphicObject.getOrientation());
 			addContent(el, "height", "m", graphicObject.getHeight());
+			addContent(el, "use material", graphicObject.getUseMaterial());
 
 			element.addContent(el);
 		}

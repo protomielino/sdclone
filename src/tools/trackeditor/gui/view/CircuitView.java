@@ -2,6 +2,7 @@ package gui.view;
 
 import gui.EditorFrame;
 import gui.TrackObjectDialog;
+import gui.properties.GraphicObjectData;
 import gui.segment.SegmentEditorDlg;
 
 import java.awt.BasicStroke;
@@ -2560,6 +2561,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				if (isGraphicObject)
 				{
 					editorFrame.setCurrentObjectGraphic(true);
+					for (GraphicObject object : editorFrame.getGraphicObjects())
+					{
+						if (object.getShape() == shape)
+						{
+							editorFrame.setCurrentGraphicObjectData(new GraphicObjectData(object));
+							break;
+						}
+					}
 				}
 				else
 				{
@@ -2572,6 +2581,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							if (shape == object)
 							{
 								editorFrame.setCurrentObjectMap(objectMapIndex);
+								editorFrame.setCurrentGraphicObjectData(new GraphicObjectData(object));
 								break;								
 							}
 						}
@@ -2586,7 +2596,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 		}
 
-		CopyAction copyAction = new CopyAction("Copy Object", null, "Edit object.");
+		CopyAction copyAction = new CopyAction("Copy Object", null, "Copy object.");
 
 		class EditAction extends AbstractAction
 		{
@@ -3059,15 +3069,27 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				editorFrame.setPasteObject(false);
 				
 				String name = editorFrame.getObjectColorName(shape.getRGB());
+				GraphicObject foundObject = null;
 				for (GraphicObject object : editorFrame.getGraphicObjects())
 				{
 					if (object.getName().equals(name))
 					{
 						name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+						foundObject = object;
 						break;
 					}
 				}
-				GraphicObject graphicObject = new GraphicObject(name, shape.getRGB(), shape.getTrackLocation());
+				GraphicObject graphicObject;
+				if (foundObject != null)
+				{
+					graphicObject = new GraphicObject(name, shape.getRGB(), shape.getTrackLocation(),
+						foundObject.getComment(), foundObject.getOrientation(), foundObject.getHeight(),
+						foundObject.getUseMaterial());
+				}
+				else
+				{
+					graphicObject = new GraphicObject(name, shape.getRGB(), shape.getTrackLocation());
+				}
 				editorFrame.getGraphicObjects().add(graphicObject);
 				ObjectMap	shapeObjectMap = null;
 				for (ObjectMap	objectMap : editorFrame.getObjectMaps())
@@ -3267,17 +3289,28 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		// TODO fix name
 		String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor());
-
+		GraphicObject foundObject = null;
 		for (GraphicObject object : editorFrame.getGraphicObjects())
 		{
 			if (object.getName().equals(name))
 			{
 				name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+				foundObject = object;
 				break;
 			}
 		}
 
-		GraphicObject	graphicObject = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+		GraphicObject	graphicObject;
+		if (foundObject != null)
+		{
+			graphicObject = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real,
+				foundObject.getComment(), foundObject.getOrientation(), foundObject.getHeight(),
+				foundObject.getUseMaterial());
+		}
+		else
+		{
+			graphicObject = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+		}
 
 		TrackObjectDialog	addObjectDialog = new TrackObjectDialog(editorFrame, graphicObject, me.getXOnScreen(), me.getYOnScreen());
 
@@ -3489,19 +3522,13 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				if (editorFrame.isCurrentObjectGraphic())
 				{
+					GraphicObjectData data = new GraphicObjectData(editorFrame.getCurrentGraphicObjectData());
 					// TODO fix name
-					String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()); // this is wrong
-
-					for (GraphicObject object : editorFrame.getGraphicObjects())
-					{
-						if (object.getName().equals(name))
-						{
-							name = new String(name + "-" + editorFrame.getGraphicObjects().size());
-							break;
-						}
-					}
-
-					GraphicObject	object = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+					String name = editorFrame.getObjectColorName(data.color); // this is wrong
+					data.name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+					data.trackX = real.x;
+					data.trackY = real.y;
+					GraphicObject object = new GraphicObject(data);
 					editorFrame.getGraphicObjects().add(object);
 					Undo.add(new UndoAddGraphicObject(editorFrame.getGraphicObjects(), object));
 				}
@@ -3530,19 +3557,13 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (editorFrame.isCurrentObjectGraphic())
 			{
+				GraphicObjectData data = new GraphicObjectData(editorFrame.getCurrentGraphicObjectData());
 				// TODO fix name
-				String name = editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()); // this is wrong
-
-				for (GraphicObject object : editorFrame.getGraphicObjects())
-				{
-					if (object.getName().equals(name))
-					{
-						name = new String(name + "-" + editorFrame.getGraphicObjects().size());
-						break;
-					}
-				}
-
-				GraphicObject	object = new GraphicObject(name, editorFrame.getCurrentObjectColor(), real);
+				String name = editorFrame.getObjectColorName(data.color); // this is wrong
+				data.name = new String(name + "-" + editorFrame.getGraphicObjects().size());
+				data.trackX = real.x;
+				data.trackY = real.y;
+				GraphicObject object = new GraphicObject(data);
 				editorFrame.getGraphicObjects().add(object);
 				Undo.add(new UndoAddGraphicObject(editorFrame.getGraphicObjects(), object));
 				editorFrame.setCurrentObjectColor(object.getColor());

@@ -2,7 +2,9 @@ package utils.circuit;
 
 import java.awt.geom.Point2D;
 
-public class GraphicObject
+import gui.properties.GraphicObjectData;
+
+public class GraphicObject implements Cloneable
 {
 	private ObjShapeObject	shape		= null;
 	private String			comment		= null;
@@ -10,10 +12,29 @@ public class GraphicObject
 	// TODO add more overrides here
 	private double 			orientation = Double.NaN;
 	private double			height		= Double.NaN;
+	private String			useMaterial	= null;
 
 	public GraphicObject(String name, int rgb, Point2D.Double location)
 	{
 		shape = new ObjShapeObject(name, rgb, location);
+	}
+	
+	public GraphicObject(String name, int rgb, Point2D.Double location, String comment, double orientation, double height, String useMaterial)
+	{
+		shape = new ObjShapeObject(name, rgb, location);
+		this.comment = comment;
+		this.orientation = orientation;
+		this.height = height;
+		this.useMaterial = useMaterial;
+	}
+	
+	public GraphicObject(GraphicObjectData data)
+	{
+		shape = new ObjShapeObject(data.name, data.color, new Point2D.Double(data.trackX, data.trackY));
+		comment = data.comment;
+		orientation = data.orientation;
+		height = data.height;
+		useMaterial = data.useMaterial;
 	}
 	
 	public GraphicObject(ObjShapeObject shape)
@@ -27,6 +48,7 @@ public class GraphicObject
 		object.comment = this.comment;
 		object.orientation = this.orientation;
 		object.height = this.height;
+		object.useMaterial = this.useMaterial;
 		return object;
 	}
 
@@ -80,6 +102,16 @@ public class GraphicObject
 		shape.setTrackLocationY(y);
 	}
 
+	public Point2D.Double getLocation()
+	{
+		return shape.getTrackLocation();
+	}
+	
+	public void setLocation(Point2D.Double location)
+	{
+		shape.setLocation(location);
+	}
+	
 	public String getComment()
 	{
 		return comment;
@@ -110,13 +142,24 @@ public class GraphicObject
 		this.height = height;
 	}
 
+	public String getUseMaterial()
+	{
+		return useMaterial;
+	}
+
+	public void setUseMaterial(String useMaterial)
+	{
+		this.useMaterial = useMaterial;
+	}
+
 	public void dump(String indent)
 	{
-		System.out.println(indent + "name        : " + getName());
-		System.out.println(indent + "color       : " + getColor());
-		System.out.println(indent + "x           : " + getX());
-		System.out.println(indent + "y           : " + getY());
-		System.out.println(indent + "orientation : " + getOrientation());
-		System.out.println(indent + "height      : " + getHeight());
+		System.out.println(indent + "name         : " + getName());
+		System.out.println(indent + "color        : " + getColor());
+		System.out.println(indent + "x            : " + getX());
+		System.out.println(indent + "y            : " + getY());
+		System.out.println(indent + "orientation  : " + getOrientation());
+		System.out.println(indent + "height       : " + getHeight());
+		System.out.println(indent + "use material : " + getUseMaterial());
 	}
 }

@@ -71,6 +71,7 @@ struct objdef
     tdble           scaleMax = 0;
     std::string     fileName;
     std::string     name;
+    bool            useMaterial = false;
 };
 
 std::vector<objdef> objects;
@@ -203,6 +204,15 @@ InitObjects(tTrack *track, void *TrackHandle)
             curObj->borderOriented = false;
         }
 
+        if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_USE_MATERIAL, ""), "yes") == 0)
+        {
+            curObj->useMaterial = true;
+        }
+        else
+        {
+            curObj->useMaterial = false;
+        }
+
         GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
     }
 }
@@ -319,7 +329,7 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             obj.splitByMaterial();
             obj.splitByUV();
 
-            objectsRoot.merge(obj, multipleMaterials);
+            objectsRoot.merge(obj, multipleMaterials || curObj.useMaterial);
 
             return;
         }

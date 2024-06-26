@@ -44,6 +44,7 @@ public class GraphicObjectProperties extends PropertyPanel
 	private final int 					TRACK_Y_INDEX			= 5;
 	private final int 					ORIENTATION_INDEX		= 6;
 	private final int 					HEIGHT_INDEX			= 7;
+	private final int 					USE_MATERIAL_INDEX		= 8;
 
 	private GraphicObjectTablePanel		graphicObjectTablePanel	= null;
 	private Vector<GraphicObject>		graphicObjects			= null;
@@ -146,16 +147,16 @@ public class GraphicObjectProperties extends PropertyPanel
 				name = new String("Unknown");
 			}
 
-			data.add(new GraphicObjectData(name, object.getComment(), object.getColor(), object.getX(), object.getY(), object.getOrientation(), object.getHeight()));
+			data.add(new GraphicObjectData(name, object.getComment(), object.getColor(), object.getX(), object.getY(), object.getOrientation(), object.getHeight(), object.getUseMaterial()));
 		}
 	}
 
 	class GraphicObjectTableModel extends AbstractTableModel
 	{
-		private final String[] 		columnNames = { null, "Name", "Object", "Color", "Track X", "Track Y", "Orientation", "Height" };
+		private final String[] 		columnNames = { null, "Name", "Object", "Color", "Track X", "Track Y", "Orientation", "Height", "Use Material" };
 		private final Class<?>[] 	columnClass = new Class[]
 				{
-						Integer.class, String.class, String.class, Integer.class, Double.class, Double.class, Double.class, Double.class
+						Integer.class, String.class, String.class, Integer.class, Double.class, Double.class, Double.class, Double.class, String.class
 				};
 		private Vector<GraphicObject>	graphicObjects = null;
 
@@ -224,6 +225,8 @@ public class GraphicObjectProperties extends PropertyPanel
 					return datum.height;
 				}
 				return null;
+			case USE_MATERIAL_INDEX:
+				return datum.useMaterial;
 			}
 			return null;
 		}
@@ -272,6 +275,10 @@ public class GraphicObjectProperties extends PropertyPanel
 				break;
 			case HEIGHT_INDEX:
 				datum.height = (Double) value;
+				fireTableCellUpdated(rowIndex, columnIndex);
+				break;
+			case USE_MATERIAL_INDEX:
+				datum.useMaterial = (String) value;
 				fireTableCellUpdated(rowIndex, columnIndex);
 				break;
 			}
@@ -355,6 +362,11 @@ public class GraphicObjectProperties extends PropertyPanel
 					}
 				}
 			});
+
+			TableColumn useMaterialColumn = table.getColumnModel().getColumn(USE_MATERIAL_INDEX);
+			String[] items = {"none", "yes", "no"};
+			JComboBox<String> useMaterialComboBox = new JComboBox<String>(items);
+			useMaterialColumn.setCellEditor(new DefaultCellEditor(useMaterialComboBox));	
 
 			add(scrollPane);
 		}
@@ -538,6 +550,20 @@ public class GraphicObjectProperties extends PropertyPanel
 				object.setHeight(datum.height);
 				getEditorFrame().documentIsModified = true;
 			}
+			
+			if (datum.useMaterial == null)
+			{
+				if (object.getUseMaterial() != null)
+				{
+					object.setUseMaterial(datum.useMaterial);
+					getEditorFrame().documentIsModified = true;
+				}
+			}
+			else if (!datum.useMaterial.equals(object.getUseMaterial()))
+			{
+				object.setUseMaterial(datum.useMaterial);
+				getEditorFrame().documentIsModified = true;
+			}
 		}
 
 		if (data.size() < graphicObjects.size())
@@ -565,6 +591,11 @@ public class GraphicObjectProperties extends PropertyPanel
 				if (datum.height != null && !Double.isNaN(datum.height))
 				{
 					graphicObjects.lastElement().setHeight(datum.height);
+				}
+				
+				if (datum.useMaterial != null && !datum.useMaterial.isBlank())
+				{
+					graphicObjects.lastElement().setUseMaterial(datum.useMaterial);
 				}
 			}
 		}
