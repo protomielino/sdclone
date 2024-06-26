@@ -468,7 +468,7 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 			if (curKey->key == key
 				&& (curKey->modifier == modifier
 				|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
-					&& isprint(key))
+					&& key < 127 && isprint(key))
 				))
 			{
 				if (curKey->onPress)
