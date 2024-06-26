@@ -124,6 +124,7 @@
 #define TRK_VAL_CLOCK               "clockwise"
 #define TRK_VAL_CCLOCK              "counter-clockwise"
 #define TRK_ATT_SURFRAND            "texture randomness"
+#define TRK_ATT_TILED               "tiled file"
 #define TRK_ATT_RELIEF              "relief file"
 #define TRK_ATT_RELIEF_BORDER       "relief border"
 #define TRK_ATT_ELEVATION           "elevation map"

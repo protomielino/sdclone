@@ -39,8 +39,8 @@
 #define CFG_FILE	"tools/trackgen/trackgen.xml"
 
 
-extern void GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, Ac3d &allAc3d, bool all, bool bump, bool raceline, bool bridge);
-extern void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline, bool bridge);
+extern void GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, Ac3d &allAc3d, bool all, bool bump, bool raceline, bool bridge, bool acc);
+extern void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline, bool bridge, bool acc);
 extern void generateRaceLine(tTrack* pTrack, const double SideDistExt, const double SideDistInt);
 extern double getTexureOffset(double length);
 

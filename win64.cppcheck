@@ -45,6 +45,8 @@
         <suppression>clang-tidy-cppcoreguidelines-owning-memory</suppression>
         <suppression>missingOverride</suppression>
         <suppression>clang-tidy-readability-implicit-bool-conversion</suppression>
+        <suppression>clang-tidy-modernize-use-std-print</suppression>
+        <suppression>clang-tidy-performance-avoid-endl</suppression>
     </suppressions>
     <tools>
         <tool>clang-tidy</tool>

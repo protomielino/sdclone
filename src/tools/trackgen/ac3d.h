@@ -69,6 +69,8 @@ struct Ac3d
         V3d operator+(const V3d &other) const;
         V3d operator-(const V3d &other) const;
         V3d operator/(double scalar) const;
+        V3d operator += (const V3d &other);
+        V3d operator /= (double scalar);
         double dot(const V3d &other) const;
         V3d cross(const V3d &other) const;
         double length() const;
@@ -124,6 +126,8 @@ struct Ac3d
         bool same(const Material &material) const;
     };
 
+    struct Object;
+
     struct Surface
     {
         struct Ref
@@ -137,18 +141,18 @@ struct Ac3d
             {
                 coords[0] = { u, v };
             }
-            Ref(int index, double u, double v, double u1, double v1) : index(index)
+            Ref(int index, double u, double v, double u1, double v1) : index(index), count(2)
             {
                 coords[0] = { u, v };
                 coords[1] = { u1, v1 };
             }
-            Ref(int index, double u, double v, double u1, double v1, double u2, double v2) : index(index)
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2) : index(index), count(3)
             {
                 coords[0] = { u, v };
                 coords[1] = { u1, v1 };
                 coords[2] = { u2, v2 };
             }
-            Ref(int index, double u, double v, double u1, double v1, double u2, double v2, double u3, double v3) : index(index)
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2, double u3, double v3) : index(index), count(4)
             {
                 coords[0] = { u, v };
                 coords[1] = { u1, v1 };
@@ -191,10 +195,14 @@ struct Ac3d
 
         Surface() = default;
         explicit Surface(std::ifstream &fin);
-        void write(std::ofstream &fout) const;
+        void write(std::ofstream &fout, const Object &object) const;
         bool isPolygon() const
         {
             return (surf & TypeMask) == Polygon;
+        }
+        bool isTriangleStrip() const
+        {
+            return (surf & TypeMask) == TriangleStrip;
         }
     };
 
@@ -311,7 +319,7 @@ struct Ac3d
         Object(const std::string &type, const std::string &name) : type(type), name(name) { }
         explicit Object(std::ifstream &fin);
         void parse(std::ifstream &fin, const std::string &objType);
-        void write(std::ofstream &fout, bool all) const;
+        void write(std::ofstream &fout, bool all, bool acc) const;
         void transform(const Matrix &matrix);
         void flipAxes(bool in);
         void splitBySURF();
@@ -324,6 +332,7 @@ struct Ac3d
         const BoundingSphere &getBoundingSphere() const;
         void remapMaterials(bool mergeMaterials, const MaterialMap &materialMap);
         void generateTriangles();
+        void generateNormals();
         void getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const;
         bool pointInside(const Surface &surface, double x, double y, double &z, V3d &normal) const;
     };
@@ -342,6 +351,7 @@ struct Ac3d
     void transform(const Matrix &matrix);
     void flipAxes(bool in);
     void generateTriangles();
+    void generateNormals();
     void splitBySURF();
     void splitByMaterial();
     void splitByUV();
@@ -349,6 +359,8 @@ struct Ac3d
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;
     static void tokenizeLine(const std::string &line, std::vector<std::string> &tokens);
+    std::vector<Ac3d::Object *> &getPolys(std::vector<Ac3d::Object *> &polys);
+    void getPolys(Object *object, std::vector<Ac3d::Object *> &polys);
 };
 
 #endif /* _AC3D_H_ */

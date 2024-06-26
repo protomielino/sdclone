@@ -50,6 +50,22 @@ Ac3d::V3d Ac3d::V3d::operator/(double scalar) const
     return V3d((*this)[0] / scalar, (*this)[1] / scalar, (*this)[2] / scalar);
 }
 
+Ac3d::V3d Ac3d::V3d::operator += (const V3d &other)
+{
+    (*this)[0] += other[0];
+    (*this)[1] += other[1];
+    (*this)[2] += other[2];
+    return *this;
+}
+
+Ac3d::V3d Ac3d::V3d::operator /= (double scalar)
+{
+    (*this)[0] /= scalar;
+    (*this)[1] /= scalar;
+    (*this)[2] /= scalar;
+    return *this;
+}
+
 double Ac3d::V3d::length() const
 {
     return sqrt((*this)[0] * (*this)[0] + (*this)[1] * (*this)[1] + (*this)[2] * (*this)[2]);
@@ -263,7 +279,7 @@ Ac3d::Surface::Surface(std::ifstream &fin)
     }
 }
 
-void Ac3d::Surface::write(std::ofstream &fout) const
+void Ac3d::Surface::write(std::ofstream &fout, const Object &object) const
 {
     fout << "SURF 0x" << std::hex << surf << std::dec << std::endl;
     fout << "mat " << mat << std::endl;
@@ -735,7 +751,7 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
     }
 }
 
-void Ac3d::Object::write(std::ofstream &fout, bool all) const
+void Ac3d::Object::write(std::ofstream &fout, bool all, bool acc) const
 {
     fout << "OBJECT " << type << std::endl;
     if (!name.empty())
@@ -747,36 +763,39 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
         fout << "data " << data.length() << std::endl;
         fout << data << std::endl;
     }
-    for (size_t i = 0; i < std::min(textures.size(), size_t(4)); i++)
+    if (type == "poly")
     {
-        if (textures.size() == 1 && textures[0].type.empty())
+        if (!acc && !textures.empty())
         {
             fout << "texture \"" << textures[0].name << "\"" << std::endl;
         }
         else
         {
-            const std::string types[4] = { "base", "tiled", "skids", "shad" };
+            for (size_t i = 0; i < textures.size(); i++)
+            {
+                const std::string types[4] = { "base", "tiled", "skids", "shad" };
 
-            if (textures[i].name == "empty_texture_no_mapping")
-            {
-                fout << "texture " << textures[i].name << " "
-                     << (textures[i].type.empty() ? types[i] : textures[i].type) << std::endl;
-            }
-            else
-            {
-                fout << "texture \"" << textures[i].name << "\" "
-                     << (textures[0].type.empty() ? types[i] : textures[i].type) << std::endl;
+                if (textures.size() > 2 && textures[i].name == "empty_texture_no_mapping")
+                {
+                    fout << "texture " << textures[i].name << " "
+                         << (textures[i].type.empty() ? types[i] : textures[i].type) << std::endl;
+                }
+                else
+                {
+                    fout << "texture \"" << textures[i].name << "\" "
+                         << (textures[0].type.empty() ? types[i] : textures[i].type) << std::endl;
+                }
             }
         }
+        if (texrep.initialized)
+            fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
+        if (texoff.initialized)
+            fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
+        if (all && subdiv.initalized)
+            fout << "subdiv " << subdiv.value << std::endl;
+        if (all && crease.initalized)
+            fout << "crease " << crease.value << std::endl;
     }
-    if (texrep.initialized)
-        fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
-    if (texoff.initialized)
-        fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
-    if (all && subdiv.initalized)
-        fout << "subdiv " << subdiv.value << std::endl;
-    if (all && crease.initalized)
-        fout << "crease " << crease.value << std::endl;
     if (rot.initialized)
     {
         fout << "rot "
@@ -796,26 +815,29 @@ void Ac3d::Object::write(std::ofstream &fout, bool all) const
         fout << "locked" << std::endl;
     if (all && folded)
         fout << "folded" << std::endl;
-    if (!vertices.empty())
+    if (type == "poly")
     {
-        fout << "numvert " << vertices.size() << std::endl;
-        for (size_t i = 0; i < vertices.size(); i++)
+        if (!vertices.empty())
         {
-            fout << vertices[i][0] << " " << vertices[i][1] << " " << vertices[i][2];
-            if (normals.size() == vertices.size())
-                fout << " " << normals[i][0] << " " << normals[i][1] << " " << normals[i][2];
-            fout << std::endl;
+            fout << "numvert " << vertices.size() << std::endl;
+            for (size_t i = 0; i < vertices.size(); i++)
+            {
+                fout << vertices[i][0] << " " << vertices[i][1] << " " << vertices[i][2];
+                if (normals.size() == vertices.size())
+                    fout << " " << normals[i][0] << " " << normals[i][1] << " " << normals[i][2];
+                fout << std::endl;
+            }
         }
-    }
-    if (!surfaces.empty())
-    {
-        fout << "numsurf " << surfaces.size() << std::endl;
-        for (const auto &surface : surfaces)
-            surface.write(fout);
+        if (!surfaces.empty())
+        {
+            fout << "numsurf " << surfaces.size() << std::endl;
+            for (const auto &surface : surfaces)
+                surface.write(fout, *this);
+        }
     }
     fout << "kids " << kids.size() << std::endl;
     for (const auto &kid : kids)
-        kid.write(fout, all);
+        kid.write(fout, all, acc);
 }
 
 void Ac3d::Object::transform(const Matrix &matrix)
@@ -1156,6 +1178,68 @@ void Ac3d::Object::generateTriangles()
     }
 }
 
+void Ac3d::Object::generateNormals()
+{
+    if (type == "poly")
+    {
+        if (normals.size() == vertices.size())
+            return;
+
+        /** for each vertex in this object **/
+        for (size_t i = 0; i < vertices.size(); i++)
+        {
+            V3d normal = { 0, 0, 0 };
+            size_t found = 0;
+
+            for (const auto &surface : surfaces)
+            {
+                if (surface.isPolygon())
+                {
+                    for (size_t j = 0; j < surface.refs.size(); j++)
+                    {
+                        if (surface.refs[j].index == i)
+                        {
+                            if (j < 3)
+                            {
+                                V3d p0 = vertices[surface.refs[0].index];
+                                V3d p1 = vertices[surface.refs[1].index];
+                                V3d p2 = vertices[surface.refs[2].index];
+                                V3d triNormal = ((p1 - p0).cross(p2 - p1));
+                                triNormal.normalize();
+                                normal += triNormal;
+                                found++;
+                            }
+                            else
+                            {
+                                V3d p0 = vertices[surface.refs[0].index];
+                                V3d p1 = vertices[surface.refs[j - 1].index];
+                                V3d p2 = vertices[surface.refs[j].index];
+                                V3d triNormal = ((p1 - p0).cross(p2 - p1));
+                                triNormal.normalize();
+                                normal += triNormal;
+                                found++;
+                            }
+                        }
+                    }
+                }
+                else if (surface.isTriangleStrip())
+                {
+                }
+            }
+            if (found > 0)
+            {
+                normal.normalize();
+            }
+            normals.push_back(normal);
+        }
+    }
+    else
+    {
+        for (auto &kid : kids)
+            kid.generateNormals();
+    }
+}
+
 void Ac3d::Object::getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const
 {
     if (getBoundingBox().pointInside(x, y))
@@ -1307,6 +1391,8 @@ void Ac3d::readFile(const std::string &fileName)
 
 void Ac3d::writeFile(const std::string &fileName, bool all) const
 {
+    bool acc = fileName.substr(fileName.find_last_of(".") + 1) == "acc";
+
     std::ofstream   fout(fileName);
 
     if (!fout)
@@ -1320,7 +1406,7 @@ void Ac3d::writeFile(const std::string &fileName, bool all) const
     for (const auto &material : materials)
         material.write(fout, versionC);
 
-    root.write(fout, all);
+    root.write(fout, all, acc);
 }
 
 void Ac3d::transform(const Matrix &matrix)
@@ -1387,6 +1473,11 @@ void Ac3d::flipAxes(bool in)
 void Ac3d::generateTriangles()
 {
     root.generateTriangles();
+}
+
+void Ac3d::generateNormals()
+{
+    root.generateNormals();
 }
 
 double Ac3d::getTerrainHeight(double x, double y) const
@@ -1463,4 +1554,22 @@ void Ac3d::splitByMaterial()
 void Ac3d::splitByUV()
 {
     root.splitByUV();
+}
+
+void Ac3d::getPolys(Object *object, std::vector<Ac3d::Object *> &polys)
+{
+    if (object->type == "poly")
+    {
+        polys.push_back(object);
+        return;
+    }
+    for (auto &kid : object->kids)
+        getPolys(&kid, polys);
+}
+
+std::vector<Ac3d::Object *> &Ac3d::getPolys(std::vector<Ac3d::Object *> &polys)
+{
+    getPolys(&root, polys);
+
+    return polys;
 }

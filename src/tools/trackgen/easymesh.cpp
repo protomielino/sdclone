@@ -2103,7 +2103,7 @@ void addSegment(int n0, int n1, int mark)
     @param
     @return	None.
 */
-static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool useBorder)
+static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool useBorder, bool acc)
 {
     bool startNeeded;
     int i, j, nbvert, maxVert;
@@ -2441,7 +2441,7 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
 }
 
 void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, Ac3d &allAc3d, bool all, int noElevation,
-                     bool useBorder)
+                     bool useBorder, bool acc)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, DEFAULT_TRACK_STEP);
     GfOut("Track step: %.2f\n", TrackStep);
@@ -2504,13 +2504,13 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
 
     if (GetTrackOrientation(track) == CLOCKWISE)
     {
-        GenerateMesh(track, true /* right */, true /* reverse */, false /* interior */, useBorder);
-        GenerateMesh(track, false /* left */, false /* normal */, true /* exterior */, useBorder);
+        GenerateMesh(track, true /* right */, true /* reverse */, false /* interior */, useBorder, acc);
+        GenerateMesh(track, false /* left */, false /* normal */, true /* exterior */, useBorder, acc);
     }
     else
     {
-        GenerateMesh(track, false /* left */, false /* normal */, false /* interior */, useBorder);
-        GenerateMesh(track, true /* right */, true /* reverse */, true /* exterior */, useBorder);
+        GenerateMesh(track, false /* left */, false /* normal */, false /* interior */, useBorder, acc);
+        GenerateMesh(track, true /* right */, true /* reverse */, true /* exterior */, useBorder, acc);
     }
 
     if (hasCur)

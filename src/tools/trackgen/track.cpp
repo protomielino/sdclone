@@ -76,6 +76,8 @@ static int GroupNb;
 
 static float *trackvertices;
 static float *tracktexcoord;
+static float *tracktexcoord1;
+static float *tracktexcoord2;
 static unsigned int *trackindices;
 
 static tdble TrackStep = DEFAULT_TRACK_STEP;
@@ -251,12 +253,42 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
     }
 }
 
+void SETPOINT(const tTexElt *curTexElt, int &nbvert, float t1, float t2, float x, float y, float z)
+{
+    if (*(curTexElt->name) != 0)
+    {
+        tracktexcoord[2 * nbvert] = t1;
+        tracktexcoord[2 * nbvert + 1] = t2;
+        trackvertices[3 * nbvert] = x;
+        trackvertices[3 * nbvert + 1] = y;
+        trackvertices[3 * nbvert + 2] = z;
+        trackindices[nbvert] = nbvert;
+        ++nbvert;
+    }
+}
+
+void SETPOINT2(const tTexElt *curTexElt, int &nbvert, float u, float v, float u2, float v2, float x, float y, float z)
+{
+    if (*(curTexElt->name) != 0)
+    {
+        tracktexcoord[2 * nbvert] = u;
+        tracktexcoord[2 * nbvert + 1] = v;
+        tracktexcoord2[2 * nbvert] = u2;
+        tracktexcoord2[2 * nbvert + 1] = v2;
+        trackvertices[3 * nbvert] = x;
+        trackvertices[3 * nbvert + 1] = y;
+        trackvertices[3 * nbvert + 2] = z;
+        trackindices[nbvert] = nbvert;
+        ++nbvert;
+    }
+}
+
 /** Bug fix:
     If width of border decreased, additional vertices are needed to avoid missing surfaces
     Implementation:
     Compares old end vertices and new start vertices, set startNeeded if one is different
 **/
-int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge)
+int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge, bool acc)
 {
     int i;
     tTrackSeg *seg;
@@ -284,6 +316,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tdble curTexOffset = 0;
     tdble curTexSeg;
     tdble curTexSize = 0;
+    tdble curTexSize2 = 0;
     tdble curHeight;
     Ac3d::Surface::SURF prevSurfType = Ac3d::Surface::PolygonSingleSidedSmooth;
     Ac3d::Surface::SURF curSurfType = Ac3d::Surface::PolygonSingleSidedSmooth; // shaded single sided polygon
@@ -291,8 +324,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tTexElt *curTexElt = nullptr;
     tTrackBarrier *curBarrier;
     tdble texLen;
+    tdble texLen2;
     tdble texStep;
+    tdble texStep2;
     tdble texMaxT = 0;
+    tdble texMaxT2 = 0;
     tTrackPitInfo *pits;
     static int GenTexId = 1;
     tdble runninglentgh;
@@ -346,14 +382,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     // wi2 = width / 2.0; // Never used.
 
     double rlWidthScale = 1.0;
+    double rlWidthScale2 = 1.0;
     double rlOffset = 0.0;
+    double rlOffset2 = 0.0;
 
     if (raceline)
     {
         double SideDistExt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLEXT, nullptr, 2.0);
         double SideDistInt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLINT, nullptr, 2.0);
-        rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, nullptr, 1.0);
-        rlOffset = (1.0 - 1.0 / rlWidthScale) / 2.0;
+        if (acc)
+        {
+            rlWidthScale2 = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, nullptr, 1.0);
+            rlOffset2 = (1.0 - 1.0 / rlWidthScale2) / 2.0;
+        }
+        else
+        {
+            rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, nullptr, 1.0);
+            rlOffset = (1.0 - 1.0 / rlWidthScale) / 2.0;
+        }
         generateRaceLine(Track, SideDistExt, SideDistInt);
     }
 
@@ -546,37 +592,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         theCurDispElt->nb = nbvert - theCurDispElt->start;                                                          \
     } while (0)
 
-#define SETPOINT(t1, t2, x, y, z)                                                                                   \
-    do                                                                                                              \
-    {                                                                                                               \
-        if (*(curTexElt->name) != 0)                                                                                \
-        {                                                                                                           \
-            tracktexcoord[2 * nbvert] = t1;                                                                         \
-            tracktexcoord[2 * nbvert + 1] = t2;                                                                     \
-            trackvertices[3 * nbvert] = x;                                                                          \
-            trackvertices[3 * nbvert + 1] = y;                                                                      \
-            trackvertices[3 * nbvert + 2] = z;                                                                      \
-            trackindices[nbvert] = nbvert;                                                                          \
-            ++nbvert;                                                                                               \
-        }                                                                                                           \
-    } while (0)
-
-#define SETPOINT2(t1, t2, x, y, z)                                                                                  \
-    do                                                                                                              \
-    {                                                                                                               \
-        if (*(curTexElt->name) != 0)                                                                                \
-        {                                                                                                           \
-            tracktexcoord[2 * nbvert] = t1;                                                                         \
-            tracktexcoord[2 * nbvert + 1] = t2;                                                                     \
-            trackvertices[3 * nbvert] = x;                                                                          \
-            trackvertices[3 * nbvert + 1] = y;                                                                      \
-            trackvertices[3 * nbvert + 2] = z;                                                                      \
-            trackindices[nbvert] = nbvert;                                                                          \
-            ++nbvert;                                                                                               \
-            printf("x=%f y=%f z=%f  u=%f v=%f\n", (tdble)(x), (tdble)(y), (tdble)(z), (tdble)(t1), (tdble)(t2));    \
-        }                                                                                                           \
-    } while (0)
-
     /* Count the number of vertice to allocate */
     nbvert = 0;
     for (i = 0, seg = Track->seg->next; i < Track->nseg; i++, seg = seg->next)
@@ -608,6 +623,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     trackindices = (unsigned int *)malloc(sizeof(unsigned int) * nbvert);
     trackvertices = (float *)malloc(sizeof(GLfloat) * (nbvert * 3));
     tracktexcoord = (float *)malloc(sizeof(GLfloat) * (nbvert * 2));
+    if (raceline && acc)
+        tracktexcoord2 = (float *)malloc(sizeof(GLfloat) * (nbvert * 2));
 
     nbvert = 0;
 
@@ -632,10 +649,14 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         if (raceline)
         {
             // Required if some smaller than width tiled texture is used.
-            curTexSize = seg->width;
+            if (acc)
+                curTexSize2 = seg->width;
+            else
+                curTexSize = seg->width;
         }
 
         texLen = curTexSeg / curTexSize;
+        texLen2 = curTexSeg / curTexSize2;
         if (startNeeded || (runninglentgh > LG_STEP_MAX))
         {
             NEWDISPLIST(false, "tkMn", i);
@@ -644,7 +665,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (raceline)
             {
                 // Required if some smaller than width tiled texture is used.
-                texMaxT = 1.0;
+                if (acc)
+                {
+                    texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
+                    texMaxT2 = 1.0;
+                }
+                else
+                    texMaxT = 1.0;
             }
             else
             {
@@ -652,10 +679,19 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
             }
 
-            double rlto = getTexureOffset(seg->lgfromstart) / rlWidthScale;
+            const double rlto = getTexureOffset(seg->lgfromstart) / rlWidthScale;
+            const double rlto2 = getTexureOffset(seg->lgfromstart) / rlWidthScale2;
 
-            SETPOINT(texLen, texMaxT - rlOffset + rlto, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-            SETPOINT(texLen, 0.0 + rlOffset + rlto, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+            if (raceline && acc)
+            {
+                SETPOINT2(curTexElt, nbvert, texLen, texMaxT, texLen2, texMaxT2 - rlOffset2 + rlto2, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                SETPOINT2(curTexElt, nbvert, texLen, 0.0, texLen2, 0.0 + rlOffset2 + rlto2, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+            }
+            else
+            {
+                SETPOINT(curTexElt, nbvert, texLen, texMaxT - rlOffset + rlto, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                SETPOINT(curTexElt, nbvert, texLen, 0.0 + rlOffset + rlto, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+            }
         }
 
         switch (seg->type)
@@ -663,23 +699,40 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         case TR_STR:
             ts = LMAX;
             texStep = LMAX / curTexSize;
+            texStep2 = LMAX / curTexSize2;
             trkpos.seg = seg;
             while (ts < seg->length)
             {
                 texLen += texStep;
+                texLen2 += texStep2;
                 trkpos.toStart = ts;
 
                 trkpos.toRight = width;
                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 
-                double rlto = getTexureOffset(seg->lgfromstart + ts) / rlWidthScale;
+                const double rlto = getTexureOffset(seg->lgfromstart + ts) / rlWidthScale;
+                const double rlto2 = getTexureOffset(seg->lgfromstart + ts) / rlWidthScale2;
 
-                SETPOINT(texLen, texMaxT - rlOffset + rlto, x, y, RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, texMaxT, texLen2, texMaxT2 - rlOffset2 + rlto2, x, y, RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT - rlOffset + rlto, x, y, RtTrackHeightL(&trkpos));
+                }
 
                 trkpos.toRight = 0;
                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 
-                SETPOINT(texLen, 0.0 + rlOffset + rlto, x, y, RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, 0.0, texLen2, 0.0 + rlOffset2 + rlto2, x, y, RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0 + rlOffset + rlto, x, y, RtTrackHeightL(&trkpos));
+                }
 
                 ts += LMAX;
             }
@@ -688,6 +741,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         case TR_LFT:
             step = LMAX / (seg->radiusr);
             texStep = step * seg->radius / curTexSize;
+            texStep2 = step * seg->radius / curTexSize2;
             anz = seg->angle[TR_ZS] + step;
             ts = step;
             radiusr = seg->radiusr;
@@ -696,16 +750,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             while (anz < seg->angle[TR_ZE])
             {
                 texLen += texStep;
+                texLen2 += texStep2;
                 trkpos.toStart = ts;
 
-                double rlto = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale;
+                const double rlto = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale;
+                const double rlto2 = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale2;
                 /* left */
                 trkpos.toRight = width;
-                SETPOINT(texLen, texMaxT - rlOffset + rlto, seg->center.x + radiusl * sin(anz), seg->center.y - radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, texMaxT, texLen2, texMaxT2 - rlOffset2 + rlto2, seg->center.x + radiusl * sin(anz), seg->center.y - radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT - rlOffset + rlto, seg->center.x + radiusl * sin(anz), seg->center.y - radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                }
 
                 /* right */
                 trkpos.toRight = 0;
-                SETPOINT(texLen, 0.0 + rlOffset + rlto, seg->center.x + radiusr * sin(anz), seg->center.y - radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, 0.0, texLen2, 0.0 + rlOffset2 + rlto2, seg->center.x + radiusr * sin(anz), seg->center.y - radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0 + rlOffset + rlto, seg->center.x + radiusr * sin(anz), seg->center.y - radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                }
 
                 ts += step;
                 anz += step;
@@ -715,6 +785,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         case TR_RGT:
             step = LMAX / (seg->radiusl);
             texStep = step * seg->radius / curTexSize;
+            texStep2 = step * seg->radius / curTexSize2;
             anz = seg->angle[TR_ZS] - step;
             ts = step;
             radiusr = seg->radiusr;
@@ -723,16 +794,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             while (anz > seg->angle[TR_ZE])
             {
                 texLen += texStep;
+                texLen2 += texStep2;
                 trkpos.toStart = ts;
 
-                double rlto = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale;
+                const double rlto = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale;
+                const double rlto2 = getTexureOffset(seg->lgfromstart + ts * seg->radius) / rlWidthScale2;
                 /* left */
                 trkpos.toRight = width;
-                SETPOINT(texLen, texMaxT - rlOffset + rlto, seg->center.x - radiusl * sin(anz), seg->center.y + radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, texMaxT, texLen2, texMaxT2 - rlOffset2 + rlto2, seg->center.x - radiusl * sin(anz), seg->center.y + radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT - rlOffset + rlto, seg->center.x - radiusl * sin(anz), seg->center.y + radiusl * cos(anz), RtTrackHeightL(&trkpos));
+                }
 
                 /* right */
                 trkpos.toRight = 0;
-                SETPOINT(texLen, 0 + rlOffset + rlto, seg->center.x - radiusr * sin(anz), seg->center.y + radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                if (raceline && acc)
+                {
+                    SETPOINT2(curTexElt, nbvert, texLen, 0, texLen2, 0 + rlOffset2 + rlto2, seg->center.x - radiusr * sin(anz), seg->center.y + radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                }
+                else
+                {
+                    SETPOINT(curTexElt, nbvert, texLen, 0 + rlOffset + rlto, seg->center.x - radiusr * sin(anz), seg->center.y + radiusr * cos(anz), RtTrackHeightL(&trkpos));
+                }
 
                 ts += step;
                 anz -= step;
@@ -741,16 +828,26 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             break;
         }
         texLen = (curTexSeg + seg->length) / curTexSize;
+        texLen2 = (curTexSeg + seg->length) / curTexSize2;
 
-        double rlto = getTexureOffset(seg->lgfromstart + seg->length) / rlWidthScale;
-        SETPOINT(texLen, texMaxT - rlOffset + rlto, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-        SETPOINT(texLen, 0 + rlOffset + rlto, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+        const double rlto = getTexureOffset(seg->lgfromstart + seg->length) / rlWidthScale;
+        const double rlto2 = getTexureOffset(seg->lgfromstart + seg->length) / rlWidthScale2;
+        if (raceline && acc)
+        {
+            SETPOINT2(curTexElt, nbvert, texLen, texMaxT, texLen2, texMaxT2 - rlOffset2 + rlto2, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+            SETPOINT2(curTexElt, nbvert, texLen, 0, texLen2, 0 + rlOffset2 + rlto2, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+        }
+        else
+        {
+            SETPOINT(curTexElt, nbvert, texLen, texMaxT - rlOffset + rlto, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+            SETPOINT(curTexElt, nbvert, texLen, 0 + rlOffset + rlto, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+        }
 
         startNeeded = false;
         runninglentgh += seg->length;
     }
 
-    if (raceline)
+    if (raceline && !acc)
     {
         CLOSEDISPLIST();
         printf("=== Indices really used = %d\n", nbvert);
@@ -798,8 +895,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_PLAN:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                         }
                         break;
                     case TR_CURB:
@@ -809,15 +906,15 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_CURB) ||
                                 (mseg->prev->rside->style == TR_CURB && (mseg->prev->rside->width != seg->width || mseg->prev->rside->height != seg->height)))
                             {
-                                SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z - 0.1);
-                                SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                                SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z - 0.1);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             }
-                            SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             break;
                         case 1:
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             break;
                         case 2:
                             break;
@@ -827,22 +924,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(-texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(-texLen, .33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, -texLen, .33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                             break;
                         case 1:
-                            SETPOINT(-texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                            SETPOINT(-texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             break;
                         case 2:
                             if (!mseg->prev->rside || (mseg->prev->rside->type2 != TR_RBORDER) || (mseg->prev->rside->style != TR_WALL) ||
                                 (mseg->prev->rside->style == TR_WALL && (mseg->prev->rside->height < seg->height || mseg->prev->rside->width < seg->width)))
                             {
-                                SETPOINT(-texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                                SETPOINT(-texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                                SETPOINT(curTexElt, nbvert, -texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                             }
-                            SETPOINT(-texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
-                            SETPOINT(-texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             break;
                         }
                         break;
@@ -876,10 +973,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             {
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -888,16 +985,16 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -909,22 +1006,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -965,11 +1062,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -979,17 +1076,17 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -1001,24 +1098,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1060,11 +1157,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -1074,17 +1171,17 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -1096,24 +1193,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(-texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(-texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1143,26 +1240,26 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 case TR_PLAN:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                     }
                     break;
                 case TR_CURB:
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_CURB) ||
                             (mseg->next->rside->style == TR_CURB && (mseg->next->rside->width != seg->width || mseg->next->rside->height != seg->height))))
                         {
-                            SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z - 0.1);
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z - 0.1);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         }
                         break;
                     case 1:
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         break;
                     case 2:
                         break;
@@ -1172,21 +1269,21 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(-texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(-texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
                         break;
                     case 1:
-                        SETPOINT(-texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                        SETPOINT(-texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         break;
                     case 2:
-                        SETPOINT(-texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
-                        SETPOINT(-texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         if (mseg->next->rside && ((mseg->next->rside->type2 != TR_RBORDER) || (mseg->next->rside->style != TR_WALL) ||
                             (mseg->next->rside->style == TR_WALL && (mseg->next->rside->height < seg->height || mseg->next->rside->width < seg->width))))
                         {
-                            SETPOINT(-texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                            SETPOINT(-texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                            SETPOINT(curTexElt, nbvert, -texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, -texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         }
                         break;
                     }
@@ -1270,8 +1367,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 width = RtTrackGetWidth(seg, ts);
                 texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
 
-                SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
             }
 
             switch (seg->type)
@@ -1290,11 +1387,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     ts += LMAX;
                     texLen += texStep;
@@ -1319,12 +1416,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     /* left */
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     /* right */
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     ts += step;
                     texLen += texStep;
@@ -1350,12 +1447,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     /* left */
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     /* right */
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     ts += step;
                     texLen += texStep;
@@ -1369,8 +1466,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             width = RtTrackGetWidth(seg, ts);
             texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
 
-            SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-            SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
 
             startNeeded = false;
             runninglentgh += seg->length;
@@ -1421,26 +1518,26 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_PLAN:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                         }
                         break;
                     case TR_CURB:
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                             break;
                         case 1:
                             if (!mseg->prev->lside || (mseg->prev->lside->type2 != TR_LBORDER) || (mseg->prev->lside->style != TR_CURB) ||
                                 (mseg->prev->lside->style == TR_CURB && (mseg->prev->lside->width != seg->width || mseg->prev->lside->height != seg->height)))
                             {
-                                SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                                SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z - 0.1);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                                SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z - 0.1);
                             }
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                            SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             break;
                         case 2:
                             break;
@@ -1453,19 +1550,19 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             if (!mseg->prev->lside || (mseg->prev->lside->type2 != TR_LBORDER) || (mseg->prev->lside->style != TR_WALL) ||
                                 (mseg->prev->lside->style == TR_WALL && (mseg->prev->lside->height < seg->height || mseg->prev->lside->width < seg->width)))
                             {
-                                SETPOINT(texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                                SETPOINT(texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen - seg->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                                SETPOINT(curTexElt, nbvert, texLen - seg->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             }
-                            SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
                             break;
                         case 1:
-                            SETPOINT(texLen, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
                             break;
                         case 2:
-                            SETPOINT(texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
-                            SETPOINT(texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                             break;
                         }
                         break;
@@ -1499,10 +1596,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             {
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -1511,16 +1608,16 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -1532,22 +1629,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1588,11 +1685,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -1601,18 +1698,18 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -1624,24 +1721,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1683,11 +1780,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                             }
                             break;
                         case TR_CURB:
@@ -1696,18 +1793,18 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             case 2:
                                 break;
@@ -1719,24 +1816,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             case 0:
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 1:
                                 /* left */
                                 trkpos.toRight = width;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 /* right */
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
                                 break;
                             case 2:
                                 trkpos.toRight = 0;
                                 RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                                SETPOINT(texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
-                                SETPOINT(texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
+                                SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, RtTrackHeightL(&trkpos) + seg->height);
+                                SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
                             break;
@@ -1766,25 +1863,25 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 case TR_PLAN:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                     }
                     break;
                 case TR_CURB:
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
                         break;
                     case 1:
-                        SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                        SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_CURB) ||
                             (mseg->next->lside->style == TR_CURB && (mseg->next->lside->height != seg->height || mseg->next->lside->width != seg->width))))
                         {
-                            SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                            SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z - 0.1);
+                            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z - 0.1);
                         }
                         break;
                     case 2:
@@ -1795,22 +1892,22 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                        SETPOINT(texLen, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
                         if (mseg->next->lside && ((mseg->next->lside->type2 != TR_LBORDER) || (mseg->next->lside->style != TR_WALL) ||
                             (mseg->next->lside->style == TR_WALL && (mseg->next->lside->height < seg->height || mseg->next->lside->width < seg->width))))
                         {
-                            SETPOINT(texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                            SETPOINT(texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                            SETPOINT(curTexElt, nbvert, texLen + seg->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                            SETPOINT(curTexElt, nbvert, texLen + seg->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         }
                         break;
                     case 1:
-                        SETPOINT(texLen, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
                         break;
                     case 2:
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + seg->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         break;
                     }
                     break;
@@ -1892,8 +1989,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 ts = 0;
                 width = RtTrackGetWidth(seg, ts);
                 texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
-                SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
             }
 
             switch (seg->type)
@@ -1912,11 +2009,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     ts += LMAX;
                     texLen += texStep;
@@ -1941,12 +2038,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     /* left */
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     /* right */
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     ts += step;
                     texLen += texStep;
@@ -1972,12 +2069,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     /* left */
                     trkpos.toRight = width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, texMaxT, x, y, RtTrackHeightL(&trkpos));
 
                     /* right */
                     trkpos.toRight = 0;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0, x, y, RtTrackHeightL(&trkpos));
+                    SETPOINT(curTexElt, nbvert, texLen, 0, x, y, RtTrackHeightL(&trkpos));
 
                     ts += step;
                     texLen += texStep;
@@ -1991,8 +2088,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             width = RtTrackGetWidth(seg, ts);
             texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
 
-            SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-            SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+            SETPOINT(curTexElt, nbvert, texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+            SETPOINT(curTexElt, nbvert, texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
 
             startNeeded = false;
             runninglentgh += seg->length;
@@ -2082,47 +2179,47 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 case TR_FENCE:
                     if (j == 0)
                     {
-                        SETPOINT(-texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                        SETPOINT(-texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                     }
                     break;
                 case TR_FENCE1:
                     if (j == 0)
                     {
-                        SETPOINT(-texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                        SETPOINT(-texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                     }
                     else if (j == 2)
                     {
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                     }
                     break;
                 case TR_FENCE2:
                     if (j == 0)
                     {
-                        SETPOINT(-texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                        SETPOINT(-texLen, 0.5, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.5, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                     }
                     else if (j == 2)
                     {
-                        SETPOINT(-texLen, 0.5, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                        SETPOINT(-texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.5, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                     }
                     break;
                 case TR_WALL:
                     switch (j)
                     {
                     case 0:
-                        SETPOINT(-texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
-                        SETPOINT(-texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
                         break;
                     case 1:
                         trkpos.toStart = 0;
                         trkpos.toRight = -curBarrier->width;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(-texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                        SETPOINT(-texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
                         break;
                     case 2:
                         trkpos.toStart = 0;
@@ -2130,11 +2227,11 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
                         if ((mseg->prev->barrier[0]->style != TR_WALL) || (mseg->prev->barrier[0]->height != curBarrier->height) || (mseg->prev->barrier[0]->width != curBarrier->width) || startPolygonNeeded)
                         {
-                            SETPOINT(-texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
-                            SETPOINT(-texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+                            SETPOINT(curTexElt, nbvert, -texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                         }
-                        SETPOINT(-texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
-                        SETPOINT(-texLen, 1.0, x, y, seg->vertex[TR_SR].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, seg->vertex[TR_SR].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, seg->vertex[TR_SR].z);
                         break;
                     }
                     break;
@@ -2169,52 +2266,52 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                         }
                         break;
                     case TR_WALL:
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2256,52 +2353,52 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                         }
                         break;
                     case TR_WALL:
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2345,52 +2442,52 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                         }
                         break;
                     case TR_WALL:
                         switch (j)
                         {
                         case 0:
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
-                            SETPOINT(-texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.33, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
                             trkpos.toRight = -curBarrier->width;
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(-texLen, 0.66, x, y, curHeight + curBarrier->height);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2418,54 +2515,54 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             case TR_FENCE:
                 if (j == 0)
                 {
-                    SETPOINT(-texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                    SETPOINT(-texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                 }
                 break;
             case TR_FENCE1:
                 if (j == 0)
                 {
-                    SETPOINT(-texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                    SETPOINT(-texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                 }
                 else if (j == 2)
                 {
-                    SETPOINT(texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
-                    SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                 }
                 break;
             case TR_FENCE2:
                 if (j == 0)
                 {
-                    SETPOINT(-texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                    SETPOINT(-texLen, 0.5, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.5, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                 }
                 else if (j == 2)
                 {
-                    SETPOINT(-texLen, 0.5, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
-                    SETPOINT(-texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.5, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                 }
                 break;
             case TR_WALL:
                 switch (j)
                 {
                 case 0:
-                    SETPOINT(-texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
-                    SETPOINT(-texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                     break;
                 case 1:
-                    SETPOINT(-texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.33, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
                     trkpos.toStart = ts;
                     trkpos.toRight = -curBarrier->width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(-texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
                     break;
                 case 2:
                     trkpos.toStart = ts;
                     trkpos.toRight = -curBarrier->width;
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(-texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
-                    SETPOINT(-texLen, 1.00, x, y, seg->vertex[TR_ER].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.66, x, y, seg->vertex[TR_ER].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 1.00, x, y, seg->vertex[TR_ER].z);
                     {
                         tTrackSeg *nextSide = mseg->next;
                         while (nextSide->rside)
@@ -2473,8 +2570,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         const bool endPolygonNeeded = std::fabs(xprev - nextSide->vertex[TR_SR].x) > 0.001 || std::fabs(yprev - nextSide->vertex[TR_SR].y) > 0.001;
                         if ((mseg->next->barrier[0]->style != TR_WALL) || (mseg->next->barrier[0]->height != curBarrier->height) || (mseg->next->barrier[0]->width != curBarrier->width) || endPolygonNeeded)
                         {
-                            SETPOINT(-texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
-                            SETPOINT(-texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
+                            SETPOINT(curTexElt, nbvert, -texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         }
                     }
                     break;
@@ -2572,32 +2669,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 case TR_FENCE:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                     }
                     break;
                 case TR_FENCE1:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                     }
                     else if (j == 2)
                     {
-                        SETPOINT(-texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                        SETPOINT(-texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                     }
                     break;
                 case TR_FENCE2:
                     if (j == 0)
                     {
-                        SETPOINT(texLen, 0.5, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.5, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                     }
                     else if (j == 2)
                     {
-                        SETPOINT(texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                        SETPOINT(texLen, 0.5, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.5, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                     }
                     break;
                 case TR_WALL:
@@ -2610,23 +2707,23 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
                         if ((mseg->prev->barrier[1]->style != TR_WALL) || (mseg->prev->barrier[1]->height != curBarrier->height) || (mseg->prev->barrier[1]->width != curBarrier->width) || startPolygonNeeded)
                         {
-                            SETPOINT(texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
-                            SETPOINT(texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen - curBarrier->width / curTexSize, 1.00, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                            SETPOINT(curTexElt, nbvert, texLen - curBarrier->width / curTexSize, 0.66, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                         }
-                        SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_SL].z);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
                         break;
                     case 1:
                         trkpos.toStart = 0;
                         trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, 0);
                         trkpos.seg = seg;
                         RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                        SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
                         break;
                     case 2:
-                        SETPOINT(texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
-                        SETPOINT(texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z + curBarrier->height);
+                        SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                         break;
                     }
                     break;
@@ -2662,32 +2759,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_WALL:
@@ -2696,20 +2793,20 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         case 0:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2751,32 +2848,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_WALL:
@@ -2785,20 +2882,20 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         case 0:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2841,32 +2938,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     case TR_FENCE:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         break;
                     case TR_FENCE1:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(-texLen, 0.0, x, y, curHeight);
-                            SETPOINT(-texLen, 1.0, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, -texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, -texLen, 1.0, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_FENCE2:
                         if (j == 0)
                         {
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.0, x, y, curHeight);
                         }
                         else if (j == 2)
                         {
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.5, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.5, x, y, curHeight + curBarrier->height);
                         }
                         break;
                     case TR_WALL:
@@ -2875,20 +2972,20 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         case 0:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 1.0, x, y, curHeight);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             break;
                         case 1:
                             trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.66, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, curHeight + curBarrier->height);
                             trkpos.toRight = RtTrackGetWidth(seg, ts);
                             RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
                             break;
                         case 2:
-                            SETPOINT(texLen, 0.33, x, y, curHeight + curBarrier->height);
-                            SETPOINT(texLen, 0, x, y, curHeight);
+                            SETPOINT(curTexElt, nbvert, texLen, 0.33, x, y, curHeight + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen, 0, x, y, curHeight);
                             break;
                         }
                         break;
@@ -2919,32 +3016,32 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             case TR_FENCE:
                 if (j == 0)
                 {
-                    SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                    SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                 }
                 break;
             case TR_FENCE1:
                 if (j == 0)
                 {
-                    SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                    SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                 }
                 else if (j == 2)
                 {
-                    SETPOINT(-texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                    SETPOINT(-texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, -texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, -texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
                 }
                 break;
             case TR_FENCE2:
                 if (j == 0)
                 {
-                    SETPOINT(texLen, 0.5, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                    SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.5, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                 }
                 else if (j == 2)
                 {
-                    SETPOINT(texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                    SETPOINT(texLen, 0.5, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 1.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.5, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
                 }
                 break;
             case TR_WALL:
@@ -2954,8 +3051,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     trkpos.toStart = ts;
                     trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 1.0, x, y, seg->vertex[TR_EL].z);
-                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 1.0, x, y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
                     {
                         tTrackSeg *nextSide = mseg->next;
                         while (nextSide->lside)
@@ -2963,8 +3060,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         const bool endPolygonNeeded = std::fabs(seg->vertex[TR_EL].x - nextSide->vertex[TR_SL].x) > 0.001 || std::fabs(seg->vertex[TR_EL].y - nextSide->vertex[TR_SL].y) > 0.001;
                         if ((mseg->next->barrier[1]->style != TR_WALL) || (mseg->next->barrier[1]->height != curBarrier->height) || (mseg->next->barrier[1]->width != curBarrier->width) || endPolygonNeeded)
                         {
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
-                            SETPOINT(texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                            SETPOINT(curTexElt, nbvert, texLen + curBarrier->width / curTexSize, 1.00, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                            SETPOINT(curTexElt, nbvert, texLen + curBarrier->width / curTexSize, 0.66, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
                         }
                     }
                     break;
@@ -2972,12 +3069,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     trkpos.toStart = ts;
                     trkpos.toRight = curBarrier->width + RtTrackGetWidth(seg, ts);
                     RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
-                    SETPOINT(texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
-                    SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.66, x, y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
                     break;
                 case 2:
-                    SETPOINT(texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
-                    SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.33, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z + curBarrier->height);
+                    SETPOINT(curTexElt, nbvert, texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                     break;
                 }
                 break;
@@ -3057,17 +3154,17 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     }
                     CHECKDISPLIST2(buf, 0, "TuMk", mseg->id);
 
-                    SETPOINT(0.0, 0.0, x, y, z);
-                    SETPOINT(1.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
-                    SETPOINT(0.0, 1.0, x, y, z + tmHeight);
-                    SETPOINT(1.0, 1.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
+                    SETPOINT(curTexElt, nbvert, 0.0, 0.0, x, y, z);
+                    SETPOINT(curTexElt, nbvert, 1.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
+                    SETPOINT(curTexElt, nbvert, 0.0, 1.0, x, y, z + tmHeight);
+                    SETPOINT(curTexElt, nbvert, 1.0, 1.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
 
                     CHECKDISPLIST2("back-sign", 0, "TuMk", mseg->id);
 
-                    SETPOINT(0.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
-                    SETPOINT(1.0, 0.0, x, y, z);
-                    SETPOINT(0.0, 1.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
-                    SETPOINT(1.0, 1.0, x, y, z + tmHeight);
+                    SETPOINT(curTexElt, nbvert, 0.0, 0.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z);
+                    SETPOINT(curTexElt, nbvert, 1.0, 0.0, x, y, z);
+                    SETPOINT(curTexElt, nbvert, 0.0, 1.0, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
+                    SETPOINT(curTexElt, nbvert, 1.0, 1.0, x, y, z + tmHeight);
 
                     printf("(%f, %f, %f), (%f, %f, %f)\n", x, y, z, x + tmWidth * normvec.x, y + tmWidth * normvec.y, z + tmHeight);
                 }
@@ -3101,28 +3198,28 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             y = seg->vertex[TR_SR].y - 0.1;
             z = seg->vertex[TR_SR].z;
 
-            SETPOINT(0, 0, x, y, z);
-            SETPOINT(0, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 0, x, y, z);
+            SETPOINT(curTexElt, nbvert, 0, 1, x, y, z + BR_HEIGHT_2);
 
             x += BR_WIDTH_0;
 
-            SETPOINT(1, 0, x, y, z);
-            SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 0, x, y, z);
+            SETPOINT(curTexElt, nbvert, 1, 1, x, y, z + BR_HEIGHT_2);
 
             y -= BR_WIDTH_1;
 
-            SETPOINT(2, 0, x, y, z);
-            SETPOINT(2, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 2, 0, x, y, z);
+            SETPOINT(curTexElt, nbvert, 2, 1, x, y, z + BR_HEIGHT_2);
 
             x -= BR_WIDTH_0;
 
-            SETPOINT(3, 0, x, y, z);
-            SETPOINT(3, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 3, 0, x, y, z);
+            SETPOINT(curTexElt, nbvert, 3, 1, x, y, z + BR_HEIGHT_2);
 
             y += BR_WIDTH_1;
 
-            SETPOINT(4, 0, x, y, z);
-            SETPOINT(4, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 4, 0, x, y, z);
+            SETPOINT(curTexElt, nbvert, 4, 1, x, y, z + BR_HEIGHT_2);
 
             NEWDISPLIST(false, "S1Bg", 0);
 
@@ -3142,58 +3239,58 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             y2 = seg->vertex[TR_SL].y + 0.1;
             z2 = seg->vertex[TR_SL].z;
 
-            SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(0, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 0, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 0, x2, y2, z2);
 
             x2 += BR_WIDTH_0;
 
-            SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(1, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 1, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 0, x2, y2, z2);
 
             y2 += BR_WIDTH_1;
 
-            SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(2, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 2, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 2, 0, x2, y2, z2);
 
             x2 -= BR_WIDTH_0;
 
-            SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(3, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 3, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 3, 0, x2, y2, z2);
 
             y2 -= BR_WIDTH_1;
 
-            SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(4, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 4, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 4, 0, x2, y2, z2);
 
             CHECKDISPLIST2("pylon2", 4, "S2Bg", 0);
 
-            SETPOINT(0, 1, x, y, z + BR_HEIGHT_1);
-            SETPOINT(0, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 0, 0, x, y, z + BR_HEIGHT_2);
 
             y -= BR_WIDTH_1;
 
-            SETPOINT(1, 1, x, y, z + BR_HEIGHT_1);
-            SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 0, x, y, z + BR_HEIGHT_2);
 
             x += BR_WIDTH_0;
 
-            SETPOINT(2, 1, x, y, z + BR_HEIGHT_1);
-            SETPOINT(2, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 2, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 2, 0, x, y, z + BR_HEIGHT_2);
 
             y += BR_WIDTH_1;
 
-            SETPOINT(3, 1, x, y, z + BR_HEIGHT_1);
-            SETPOINT(3, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 3, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 3, 0, x, y, z + BR_HEIGHT_2);
 
             x -= BR_WIDTH_0;
 
-            SETPOINT(3, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
-            SETPOINT(3, 0, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 3, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 3, 0, x, y, z + BR_HEIGHT_1);
 
             y -= BR_WIDTH_1;
 
-            SETPOINT(4, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
-            SETPOINT(4, 0, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 4, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 4, 0, x, y, z + BR_HEIGHT_1);
 
             y += BR_WIDTH_1; /* back to origin */
 
@@ -3201,56 +3298,56 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             y2 += BR_WIDTH_1;
 
-            SETPOINT(0, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
-            SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 0, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 0, 0, x2, y2, z + BR_HEIGHT_1);
 
             y2 -= BR_WIDTH_1;
 
-            SETPOINT(1, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
-            SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 0, x2, y2, z + BR_HEIGHT_1);
 
             x2 += BR_WIDTH_0;
 
-            SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 0, x2, y2, z + BR_HEIGHT_2);
 
             y2 += BR_WIDTH_1;
 
-            SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(2, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 2, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 2, 0, x2, y2, z + BR_HEIGHT_2);
 
             x2 -= BR_WIDTH_0;
 
-            SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(3, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 3, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 3, 0, x2, y2, z + BR_HEIGHT_2);
 
             y2 -= BR_WIDTH_1;
 
-            SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(4, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 4, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 4, 0, x2, y2, z + BR_HEIGHT_2);
 
             /* Middle on the bridge */
             CHECKDISPLIST2("pylon3", 4, "S4Bg", 2);
 
-            SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
-            SETPOINT(0, 0.25, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(1, 0.25, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 0, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 0.25, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 0.25, x, y, z + BR_HEIGHT_1);
 
             x += BR_WIDTH_0;
             x2 += BR_WIDTH_0;
 
-            SETPOINT(0, 0.5, x2, y2, z + BR_HEIGHT_1);
-            SETPOINT(1, 0.5, x, y, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 0, 0.5, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(curTexElt, nbvert, 1, 0.5, x, y, z + BR_HEIGHT_1);
 
-            SETPOINT(0, 0.75, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(1, 0.75, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 0.75, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 0.75, x, y, z + BR_HEIGHT_2);
 
             x -= BR_WIDTH_0;
             x2 -= BR_WIDTH_0;
 
-            SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
-            SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 0, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(curTexElt, nbvert, 1, 1, x, y, z + BR_HEIGHT_2);
         }
 
         /* draw the pits */
@@ -3278,24 +3375,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             x2 = x + PIT_TOP * normvec.x;
             y2 = y + PIT_TOP * normvec.y;
-            SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-            SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+            SETPOINT(curTexElt, nbvert, 1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+            SETPOINT(curTexElt, nbvert, 1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
 
             x2 = x;
             y2 = y;
-            SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+            SETPOINT(curTexElt, nbvert, 1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
 
             x2 = x - PIT_DEEP * normvec.x;
             y2 = y - PIT_DEEP * normvec.y;
-            SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+            SETPOINT(curTexElt, nbvert, 1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
 
             x2 = x;
             y2 = y;
-            SETPOINT(1.0, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 1.0, 0, x2, y2, z2);
 
             x2 = x - PIT_DEEP * normvec.x;
             y2 = y - PIT_DEEP * normvec.y;
-            SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 1.0 + PIT_DEEP, 0, x2, y2, z2);
 
             for (i = 0; i < pits->driversPitsNb; i++)
             {
@@ -3321,23 +3418,23 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 }
 
                 z3 = RtTrackHeightG(pits->driversPits[i].pos.seg, x3, y3);
-                SETPOINT(pits->len, 0, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-                SETPOINT(0, 0, x3, y3, z3 + PIT_HEIGHT - PIT_TOP);
+                SETPOINT(curTexElt, nbvert, pits->len, 0, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+                SETPOINT(curTexElt, nbvert, 0, 0, x3, y3, z3 + PIT_HEIGHT - PIT_TOP);
 
                 tdble dx = PIT_TOP * normvec.x;
                 tdble dy = PIT_TOP * normvec.y;
-                SETPOINT(pits->len, PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT - PIT_TOP);
-                SETPOINT(0, PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT - PIT_TOP);
-                SETPOINT(pits->len, 2 * PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
-                SETPOINT(0, 2 * PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
+                SETPOINT(curTexElt, nbvert, pits->len, PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT - PIT_TOP);
+                SETPOINT(curTexElt, nbvert, 0, PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT - PIT_TOP);
+                SETPOINT(curTexElt, nbvert, pits->len, 2 * PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
+                SETPOINT(curTexElt, nbvert, 0, 2 * PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
 
                 dx = -PIT_DEEP * normvec.x;
                 dy = -PIT_DEEP * normvec.y;
 
-                SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
-                SETPOINT(0, 2 * PIT_TOP + PIT_DEEP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
-                SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x2 + dx, y2 + dy, z2);
-                SETPOINT(0, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x3 + dx, y3 + dy, z3);
+                SETPOINT(curTexElt, nbvert, pits->len, 2 * PIT_TOP + PIT_DEEP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
+                SETPOINT(curTexElt, nbvert, 0, 2 * PIT_TOP + PIT_DEEP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
+                SETPOINT(curTexElt, nbvert, pits->len, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x2 + dx, y2 + dy, z2);
+                SETPOINT(curTexElt, nbvert, 0, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x3 + dx, y3 + dy, z3);
             } // for i
 
             startNeeded = true;
@@ -3362,24 +3459,24 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x, y);
             x2 = x + PIT_TOP * normvec.x;
             y2 = y + PIT_TOP * normvec.y;
-            SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
-            SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+            SETPOINT(curTexElt, nbvert, 1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+            SETPOINT(curTexElt, nbvert, 1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
 
             x2 = x - PIT_DEEP * normvec.x;
             y2 = y - PIT_DEEP * normvec.y;
-            SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+            SETPOINT(curTexElt, nbvert, 1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
 
             x2 = x;
             y2 = y;
-            SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+            SETPOINT(curTexElt, nbvert, 1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
 
             x2 = x - PIT_DEEP * normvec.x;
             y2 = y - PIT_DEEP * normvec.y;
-            SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 1.0 + PIT_DEEP, 0, x2, y2, z2);
 
             x2 = x;
             y2 = y;
-            SETPOINT(1.0, 0, x2, y2, z2);
+            SETPOINT(curTexElt, nbvert, 1.0, 0, x2, y2, z2);
             break; // TR_PIT_ON_TRACK_SIDE
         }
         case TR_PIT_NO_BUILDING:
@@ -3399,6 +3496,103 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     return 0;
 } // InitScene
 
+static void saveObject2(Ac3d &ac3d, tDispElt *aDispElt, char *name, bool bump, bool raceline, bool acc)
+{
+    int nb = aDispElt->nb;
+    int start = aDispElt->start;
+    char *texture = aDispElt->texture->name;
+    char *texture2 = aDispElt->texture->nameraceline;
+    const Ac3d::Surface::SURF surfType = aDispElt->surfType;
+
+    Ac3d::Object object;
+    object.type = "poly";
+    object.name = name;
+    object.textures.emplace_back(texture);
+    if (!(!acc || (!raceline || strncmp(name, "tkMn", 4))))
+    {
+        object.textures.emplace_back("empty_texture_no_mapping");
+        object.textures.emplace_back(texture2);
+    }
+
+    for (int i = 0; i < nb; i++)
+    {
+        const int index = 3 * (start + i);
+        object.vertices.emplace_back(trackvertices[index], trackvertices[index + 2], -trackvertices[index + 1]);
+    }
+
+    Ac3d::Surface   surface;
+    surface.surf = surfType;
+    surface.mat = 0;
+    if (object.textures.size() == 1)
+    {
+        surface.refs.emplace_back(0, tracktexcoord[2 * (start + 0)], tracktexcoord[2 * (start + 0) + 1]);
+        surface.refs.emplace_back(1, tracktexcoord[2 * (start + 1)], tracktexcoord[2 * (start + 1) + 1]);
+        surface.refs.emplace_back(2, tracktexcoord[2 * (start + 2)], tracktexcoord[2 * (start + 2) + 1]);
+    }
+    else if (object.textures.size() == 3)
+    {
+        surface.refs.emplace_back(0, tracktexcoord[2 * (start + 0)], tracktexcoord[2 * (start + 0) + 1], 0, 0, tracktexcoord2[2 * (start + 0)], tracktexcoord2[2 * (start + 0) + 1]);
+        surface.refs.emplace_back(1, tracktexcoord[2 * (start + 1)], tracktexcoord[2 * (start + 1) + 1], 0, 0, tracktexcoord2[2 * (start + 1)], tracktexcoord2[2 * (start + 1) + 1]);
+        surface.refs.emplace_back(2, tracktexcoord[2 * (start + 2)], tracktexcoord[2 * (start + 2) + 1], 0, 0, tracktexcoord2[2 * (start + 2)], tracktexcoord2[2 * (start + 2) + 1]);
+    }
+
+    object.surfaces.push_back(surface);
+
+    /* triangle strip conversion to triangles */
+    for (int i = 2; i < nb - 1; i++)
+    {
+        surface.surf = surfType;
+        surface.mat = 0;
+        surface.refs.clear();
+
+        if ((i % 2) == 0)
+        {
+            int index = i;
+            if (object.textures.size() == 1)
+            {
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+                index = i - 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+                index = i + 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            }
+            else if (object.textures.size() == 3)
+            {
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+                index = i - 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+                index = i + 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+            }
+        }
+        else
+        {
+            int index = i - 1;
+            if (object.textures.size() == 1)
+            {
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+                index = i;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+                index = i + 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1]);
+            }
+            else if (object.textures.size() == 3)
+            {
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+                index = i;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+                index = i + 1;
+                surface.refs.emplace_back(index, tracktexcoord[2 * (start + index)], tracktexcoord[2 * (start + index) + 1], 0, 0, tracktexcoord2[2 * (start + index)], tracktexcoord2[2 * (start + index) + 1]);
+            }
+        }
+
+        object.surfaces.push_back(surface);
+    }
+
+    ac3d.addObject(object);
+    ac3d.stack.pop();
+}
+
 static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name, Ac3d::Surface::SURF surfType)
 {
     Ac3d::Object object;
@@ -3408,7 +3602,7 @@ static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name,
 
     for (int i = 0; i < nb; i++)
     {
-        int index = 3 * (start + i);
+        const int index = 3 * (start + i);
         object.vertices.emplace_back(trackvertices[index], trackvertices[index + 2], -trackvertices[index + 1]);
     }
 
@@ -3454,7 +3648,7 @@ static void saveObject(Ac3d &ac3d, int nb, int start, char *texture, char *name,
     ac3d.stack.pop();
 }
 
-static void SaveMainTrack(Ac3d &ac3d, bool bump, bool raceline)
+static void SaveMainTrack(Ac3d &ac3d, bool bump, bool raceline, bool acc)
 {
     tDispElt *aDispElt;
     char buf[256];
@@ -3490,9 +3684,13 @@ static void SaveMainTrack(Ac3d &ac3d, bool bump, bool raceline)
                     {
                         saveObject(ac3d, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
                     }
-                    else if (raceline)
+                    else if (raceline && !acc)
                     {
                         saveObject(ac3d, aDispElt->nb, aDispElt->start, aDispElt->texture->nameraceline, buf, aDispElt->surfType);
+                    }
+                    else if (raceline && acc)
+                    {
+                        saveObject2(ac3d, aDispElt, buf, bump, raceline, acc);
                     }
                     else
                     {
@@ -3512,12 +3710,12 @@ static void SaveMainTrack(Ac3d &ac3d, bool bump, bool raceline)
     @param	TrackHandle	handle on the track description
     @return	none
 */
-void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge)
+void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge, bool acc)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
-    InitScene(Track, TrackHandle, bump, raceline, bridge);
+    InitScene(Track, TrackHandle, bump, raceline, bridge, acc);
 
     printf("Calculation finished\n");
 }
@@ -3529,12 +3727,12 @@ void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline, 
     @param	AllFd	fd of the merged file
     @return	none
 */
-void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, Ac3d &allAc3d, bool all, bool bump, bool raceline, bool bridge)
+void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, Ac3d &allAc3d, bool all, bool bump, bool raceline, bool bridge, bool acc)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
-    InitScene(Track, TrackHandle, bump, raceline, bridge);
+    InitScene(Track, TrackHandle, bump, raceline, bridge, acc);
 
     if (!outFile.empty())
     {
@@ -3544,7 +3742,7 @@ void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile,
         object.type = "group";
         object.name = "track";
         ac3d.addObject(object);
-        SaveMainTrack(ac3d, bump, raceline);
+        SaveMainTrack(ac3d, bump, raceline, acc);
         ac3d.writeFile(outFile, false);
     }
 
@@ -3554,7 +3752,7 @@ void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile,
         object.type = "group";
         object.name = "track";
         allAc3d.addObject(object);
-        SaveMainTrack(allAc3d, bump, raceline);
+        SaveMainTrack(allAc3d, bump, raceline, acc);
         allAc3d.stack.pop();
     }
 }

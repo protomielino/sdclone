@@ -432,15 +432,18 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
     inputPath.resize(inputPath.find_last_of('/'));
 
     Ac3d TerrainRoot;
-    try
+    if (!terrainFile.empty())
     {
-        TerrainRoot.readFile(terrainFile);
-        TerrainRoot.flipAxes(true);       // convert to track coordinate system
-    }
-    catch (const Ac3d::Exception &e)
-    {
-        GfOut("Reading terrain file %s: %s\n", terrainFile.c_str(), e.what());
-        exit(1);
+        try
+        {
+            TerrainRoot.readFile(terrainFile);
+            TerrainRoot.flipAxes(true);       // convert to track coordinate system
+        }
+        catch (const Ac3d::Exception &e)
+        {
+            GfOut("Reading terrain file %s: %s\n", terrainFile.c_str(), e.what());
+            exit(1);
+        }
     }
 
     Ac3d TrackRoot;

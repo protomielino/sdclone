@@ -76,10 +76,16 @@ class Application : public GfApplication
     bool MergeTerrain;
     int DoSaveElevation;
     bool Bridge;
+    bool Acc;
     bool DumpTrack;
     bool MultipleMaterials;
     std::string TrackXMLFilePath;   // Full path to track XML input file to read from (mainly for unittests)
     std::string TrackACFilePath;    // Full path to track AC output file to write into (mainly for unittests)
+
+    double x_min = DBL_MAX;
+    double y_min = DBL_MAX;
+    double x_max = DBL_MIN;
+    double y_max = DBL_MIN;
 
 public:
 
@@ -98,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.6.1.0", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.0", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -109,6 +115,7 @@ Application::Application()
 , MergeTerrain(true)
 , DoSaveElevation(-1)
 , Bridge(true)
+, Acc(false)
 , DumpTrack(false)
 , MultipleMaterials(false)
 {
@@ -136,10 +143,11 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("i", "inpath", /* bHasValue = */ true);
     registerOption("o", "outpath", /* bHasValue = */ true);
     registerOption("m", "materials", /* bHasValue = */ false);
+    registerOption("A", "acc", /* bHasValue = */ false);
 
     // Help on specific options.
     addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|--bump] [-r|--raceline] [-B|--noborder] [-nb|--nobridge] [-m|--materials]");
-    addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|--split] [-S|--splitall]");
+    addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|--split] [-S|--splitall] [-A|--acc]");
     addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|--height4 <#hs>]] [-dt|--dumptrack]");
     addOptionsHelpSyntaxLine("[-i xml_path] [-o ac_path]");
 
@@ -193,6 +201,11 @@ bool Application::parseOptions()
         else if (itOpt->strLongName == "raceline")
         {
             Raceline = true;
+        }
+        else if (itOpt->strLongName == "acc")
+        {
+            Acc = true;
+            TrackOnly = false;
         }
         else if (itOpt->strLongName == "split")
         {
@@ -306,7 +319,7 @@ int Application::generate()
     tTrack *Track = PiTrackLoader->load(trackdef, true);
 
     if (JustCalculate) {
-        CalculateTrack(Track, TrackHandle, Bump, Raceline, Bridge);
+        CalculateTrack(Track, TrackHandle, Bump, Raceline, Bridge, Acc);
         GfParmReleaseHandle(CfgHandle);
         GfParmReleaseHandle(TrackHandle);
         return EXIT_SUCCESS;
@@ -317,7 +330,7 @@ int Application::generate()
         dumpTrackSegs(Track);
 
     // Get the output file radix.
-    char	buf2[1024];
+    char	buf2[1024] = { 0 };
     if (TrackACFilePath.empty())
         snprintf(buf2, sizeof(buf2), "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
     else
@@ -348,10 +361,13 @@ int Application::generate()
         extName = "trk";
     }
 
-    sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
+    if (!Acc)
+        sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
+    else
+        buf2[0] = 0;
     std::string OutTrackName(buf2);
 
-    GenerateTrack(Track, TrackHandle, OutTrackName, allAc3d, all, Bump, Raceline, Bridge);
+    GenerateTrack(Track, TrackHandle, OutTrackName, allAc3d, all, Bump, Raceline, Bridge, Acc);
 
     if (TrackOnly) {
         GfParmReleaseHandle(CfgHandle);
@@ -365,11 +381,68 @@ int Application::generate()
         all = true;
     }
 
-    std::string OutMeshName(OutputFileName + "-msh.ac");
+    std::string OutMeshName;
+    if (!Acc)
+        OutMeshName = OutputFileName + "-msh.ac";
 
-    GenerateTerrain(Track, TrackHandle, OutMeshName, allAc3d, all, DoSaveElevation, UseBorder);
+    GenerateTerrain(Track, TrackHandle, OutMeshName, allAc3d, all, DoSaveElevation, UseBorder, Acc);
 
-    if (DoSaveElevation != -1) {
+    // add or set tiled texture uv coordinates for acc files with a tiled texture
+    const std::string TiledFile = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TILED, "");
+    if (Acc && !TiledFile.empty())
+    {
+        std::vector<Ac3d::Object *> polys;
+        
+        allAc3d.getPolys(polys);
+
+        for (auto *poly : polys)
+        {
+            for (const auto &vertex : poly->vertices)
+            {
+                if (vertex[0] > x_max)
+                    x_max = vertex[0];
+                else if (vertex[0] < x_min)
+                    x_min = vertex[0];
+
+                // flip vertices
+                if (-vertex[2] > y_max)
+                    y_max = vertex[2];
+                else if (-vertex[2] < y_min)
+                    y_min = vertex[2];
+            }
+        }
+
+        for (auto *poly : polys)
+        {
+            if (poly->textures.size() == 1)
+                poly->textures.emplace_back(TiledFile, "tiled");
+            else if (poly->textures.size() > 2)
+            {
+                poly->textures[1].name = TiledFile;
+                poly->textures[1].type = "tiled";
+            }
+
+            std::vector<Ac3d::V2d> uvs(poly->vertices.size());
+
+            for (size_t i = 0; i < poly->vertices.size(); i++)
+            {
+                uvs[i][0] = (poly->vertices[i][0] - x_min) / (x_max - x_min);
+                uvs[i][1] = (poly->vertices[i][1] - y_min) / (y_max - y_min);
+            }
+
+            for (auto &surf : poly->surfaces)
+            {
+                for (auto &ref : surf.refs)
+                {
+                    ref.coords[1] = uvs[ref.index];
+                    if (ref.count == 1)
+                        ref.count = 2;
+                }
+            }
+        }
+    }
+
+    if (!Acc && DoSaveElevation != -1) {
         if (all) {
             //Ac3dClose(outfd);
             allAc3d.writeFile(OutputFileName + ".ac", false);
@@ -413,7 +486,14 @@ int Application::generate()
 
     GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutTrackName, OutputFileName, MultipleMaterials);
 
-    allAc3d.writeFile(OutputFileName + ".ac", false);
+    if (!Acc)
+        allAc3d.writeFile(OutputFileName + ".ac", false);
+    else
+    {
+        allAc3d.generateNormals();
+        allAc3d.writeFile(OutputFileName + ".acc", false);
+    }
+
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);
 
