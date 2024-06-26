@@ -65,12 +65,14 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JLabel				waitLabel			= null;
 	private JScrollPane			errorsScrollPane	= null;
 	private JTextArea			errorsTextArea		= null;
+	private boolean				acc					= false;
 	
-	public TrackgenPanel(EditorFrame editorFrame, String additionalArgs)
+	public TrackgenPanel(EditorFrame editorFrame, String additionalArgs, boolean acc)
 	{
 		super();
 		this.editorFrame = editorFrame;
 		this.additionalArgs = additionalArgs;
+		this.acc = acc;
 		initialize();
 		ac3d.start();
 	}
@@ -100,20 +102,31 @@ public class TrackgenPanel extends JDialog implements Runnable
 		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
 		String name = " -n " + trackName;
 		String args = category + name;
-		
-		if (additionalArgs != null)
-		{
-			args = args + additionalArgs;
 
-			// don't create everything for race line
-			if (!args.contains("-r"))
+		if (acc)
+		{
+			if (additionalArgs != null)
 			{
-				args += " -a";
+				args = args + additionalArgs;
 			}
+			args += " --acc";
 		}
 		else
 		{
-			args += " -a";
+			if (additionalArgs != null)
+			{
+				args = args + additionalArgs;
+	
+				// don't create everything for race line
+				if (!args.contains("-r"))
+				{
+					args += " -a";
+				}
+			}
+			else
+			{
+				args += " -a";
+			}
 		}
 
 		System.out.println(args);
