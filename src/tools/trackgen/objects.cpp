@@ -426,7 +426,7 @@ Group(tTrack *track, void *TrackHandle, Ac3d::Object *Root, Ac3d::Object *GroupR
 } // end anonymous namespace
 
 void
-GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &terrainFile, const std::string &trackFile, const std::string &outputFile, bool multipleMaterials)
+GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &terrainFile, const std::string &trackFile, const std::string &outputFile, bool multipleMaterials, bool acc)
 {
     std::string inputPath(track->filename);
     inputPath.resize(inputPath.find_last_of('/'));
@@ -526,7 +526,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
             const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
             saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
             GroupRoot.flipAxes(false); // convert to track coordinate system
-            GroupRoot.writeFile(objectFile, false);
+
+            if (!acc)
+                GroupRoot.writeFile(objectFile, false);
 
             if (all)
             {
@@ -565,7 +567,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
         const std::string objectFile(outputFile + "-" + extName + "-" + std::to_string(index) + ".ac");
         saveACInner(&GroupRoot.root.kids.front(), GroupRoot);
         GroupRoot.flipAxes(false); // convert to track coordinate system
-        GroupRoot.writeFile(objectFile, false);
+
+        if (!acc)
+            GroupRoot.writeFile(objectFile, false);
 
         if (all)
         {

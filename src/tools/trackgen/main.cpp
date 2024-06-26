@@ -104,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.7.0.0", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.1", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -484,7 +484,7 @@ int Application::generate()
     if (useObjectMaterials == "yes")
         MultipleMaterials = true;
 
-    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutTrackName, OutputFileName, MultipleMaterials);
+    GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutTrackName, OutputFileName, MultipleMaterials, Acc);
 
     if (!Acc)
         allAc3d.writeFile(OutputFileName + ".ac", false);
