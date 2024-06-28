@@ -104,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.7.0.1", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.2", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
