@@ -1197,7 +1197,7 @@ void Ac3d::Object::generateNormals()
                 {
                     for (size_t j = 0; j < surface.refs.size(); j++)
                     {
-                        if (surface.refs[j].index == i)
+                        if (surface.refs[j].index == static_cast<int>(i))
                         {
                             if (j < 3)
                             {

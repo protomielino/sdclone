@@ -76,7 +76,6 @@ static int GroupNb;
 
 static float *trackvertices;
 static float *tracktexcoord;
-static float *tracktexcoord1;
 static float *tracktexcoord2;
 static unsigned int *trackindices;
 
