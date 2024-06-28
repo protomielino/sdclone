@@ -218,7 +218,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 }
 
 void
-AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d &trackRoot, Ac3d &objectsRoot, unsigned int clr, tdble x, tdble y, bool multipleMaterials, bool individual)
+AddObject(tTrack *track, void *trackHandle, const Ac3d::Object *terrainRoot, const Ac3d::Object *trackRoot, Ac3d &objectsRoot, unsigned int clr, tdble x, tdble y, bool multipleMaterials, bool individual)
 {
     for (auto &curObj : objects)
     {
@@ -227,11 +227,12 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             Ac3d::Matrix    m;
             tdble           dv = 0;
             tdble           angle = 0;
-            float           z = 0;
+            double          z = 0;
             tdble           orientation = 0;
-            tdble           height = 0;
+            double          height = 0;
             std::string     name;
-            
+            Ac3d::V3d       normal;
+
             if (individual)
             {
                 orientation = GfParmGetCurNum(trackHandle, TRK_SECT_TERRAIN_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0);
@@ -272,7 +273,7 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
 
             if (curObj.terrainOriented)
             {
-                angle = terrainRoot.getTerrainAngle(x, y);
+                angle = terrainRoot->getTerrainAngle(x, y);
             }
 
             if (curObj.trackOriented)
@@ -294,10 +295,10 @@ AddObject(tTrack *track, void *trackHandle, const Ac3d &terrainRoot, const Ac3d 
             }
             else
             {
-                z = terrainRoot.getTerrainHeight(x, y);
+                z = terrainRoot->getTerrainHeight(x, y);
                 if (z == -1000000.0f)
                 {
-                    z = trackRoot.getTerrainHeight(x, y);
+                    z = trackRoot->getTerrainHeight(x, y);
 
                     if (z == -1000000.0f)
                     {
@@ -431,35 +432,43 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
     std::string inputPath(track->filename);
     inputPath.resize(inputPath.find_last_of('/'));
 
-    Ac3d TerrainRoot;
+    Ac3d::Object *TerrainRoot;
+    Ac3d Terrain;
     if (!terrainFile.empty())
     {
         try
         {
-            TerrainRoot.readFile(terrainFile);
-            TerrainRoot.flipAxes(true);       // convert to track coordinate system
+            Terrain.readFile(terrainFile);
+            Terrain.flipAxes(true);       // convert to track coordinate system
         }
         catch (const Ac3d::Exception &e)
         {
             GfOut("Reading terrain file %s: %s\n", terrainFile.c_str(), e.what());
             exit(1);
         }
+        TerrainRoot = &Terrain.root;
     }
+    else
+        TerrainRoot = &allAc3d.root.kids.front();
 
-    Ac3d TrackRoot;
+    Ac3d::Object *TrackRoot;
+    Ac3d Track;
     if (!trackFile.empty())
     {
         try
         {
-            TrackRoot.readFile(trackFile);
-            TrackRoot.flipAxes(true);       // convert to track coordinate system
+            Track.readFile(trackFile);
+            Track.flipAxes(true);       // convert to track coordinate system
         }
         catch (const Ac3d::Exception &e)
         {
             GfOut("Reading track file %s: %s\n", trackFile.c_str(), e.what());
             exit(1);
         }
+        TrackRoot = &Track.root;
     }
+    else
+        TrackRoot = &allAc3d.root.kids.back();
 
     InitObjects(track, TrackHandle);
 

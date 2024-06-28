@@ -1240,6 +1240,17 @@ void Ac3d::Object::generateNormals()
     }
 }
 
+double Ac3d::Object::getTerrainHeight(double x, double y) const
+{
+    double  terrainHeight = -1000000;
+    V3d     terrainNormal;
+
+    getTerrainHeight(x, y, terrainHeight, terrainNormal);
+
+    return terrainHeight;
+
+}
+
 void Ac3d::Object::getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const
 {
     if (getBoundingBox().pointInside(x, y))
@@ -1498,11 +1509,16 @@ double Ac3d::getTerrainHeight(double x, double y) const
  */
 double Ac3d::getTerrainAngle(double x, double y) const
 {
+    return root.getTerrainAngle(x, y);
+}
+
+double Ac3d::Object::getTerrainAngle(double x, double y) const
+{
     double  terrainHeight = -1000000;
     V3d     terrainNormal;
     double  angle = 0;
 
-    root.getTerrainHeight(x, y, terrainHeight, terrainNormal);
+    getTerrainHeight(x, y, terrainHeight, terrainNormal);
 
     if (terrainHeight != -1000000)
         angle = 180.0 - atan2(terrainNormal[0], terrainNormal[1]) * 180.0 / PI;

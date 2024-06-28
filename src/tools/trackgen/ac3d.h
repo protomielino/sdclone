@@ -334,6 +334,8 @@ struct Ac3d
         void generateTriangles();
         void generateNormals();
         void getTerrainHeight(double x, double y, double &terrainHeight, V3d &normal) const;
+        double getTerrainHeight(double x, double y) const;
+        double getTerrainAngle(double x, double y) const;
         bool pointInside(const Surface &surface, double x, double y, double &z, V3d &normal) const;
     };
 
