@@ -99,6 +99,71 @@ check () {
 			printf "        %s\n" "${lines[$i]}"
 		done
 	fi
+	
+	if  test -f "$pwd/../../../data/tracks/$1/$2/$2-trk-raceline.ac"; then
+		$trackgen -c $1 -n $2 -i $pwd/../../../data/tracks/$1/$2 -o $temp_dir -r >& $temp_dir/$2.txt
+		status=$?
+		if [ $status -eq 0 ]; then
+			diff $pwd/../../../data/tracks/$1/$2/$2-trk-raceline.ac $temp_dir/$2-trk-raceline.ac > $temp_dir/$2.ac.txt
+			[ $? -eq 0 ] && echo "    $1/$2-trk-raceline.ac GOOD" || echo "    $1/$2-trk-raceline.ac BAD"
+		elif [ $status -eq 3 ]; then
+			echo "    trackgen CRASHED $status"		
+			lines=()
+			while IFS= read -r line
+			do 
+				lines+=("$line") 
+			done < <(tail -n 3 $temp_dir/$2.txt)
+			numLines=${#lines[@]}
+			for (( i=0; i<${numLines}; i++ ));
+			do
+				printf "        %s\n" "${lines[$i]}"
+			done
+		else
+			echo "    trackgen FAILED $status"
+			lines=()
+			while IFS= read -r line
+			do 
+				lines+=("$line") 
+			done < <(tail -n 3 $temp_dir/$2.txt)
+			numLines=${#lines[@]}
+			for (( i=0; i<${numLines}; i++ ));
+			do
+				printf "        %s\n" "${lines[$i]}"
+			done
+		fi
+	elif  test -f "$pwd/../../../data/tracks/$1/$2/$2-trk-raceline-src.ac"; then
+		$trackgen -c $1 -n $2 -i $pwd/../../../data/tracks/$1/$2 -o $temp_dir -r >& $temp_dir/$2.txt
+		status=$?
+		if [ $status -eq 0 ]; then
+			echo "    FOUND $2-trk-raceline-src.ac"
+			diff $pwd/../../../data/tracks/$1/$2/$2-trk-raceline-src.ac $temp_dir/$2-trk-raceline.ac > $temp_dir/$2.ac.txt
+			[ $? -eq 0 ] && echo "    $1/$2-trk-raceline.ac GOOD" || echo "    $1/$2-trk-raceline.ac BAD"
+		elif [ $status -eq 3 ]; then
+			echo "    trackgen CRASHED $status"		
+			lines=()
+			while IFS= read -r line
+			do 
+				lines+=("$line") 
+			done < <(tail -n 3 $temp_dir/$2.txt)
+			numLines=${#lines[@]}
+			for (( i=0; i<${numLines}; i++ ));
+			do
+				printf "        %s\n" "${lines[$i]}"
+			done
+		else
+			echo "    trackgen FAILED $status"
+			lines=()
+			while IFS= read -r line
+			do 
+				lines+=("$line") 
+			done < <(tail -n 3 $temp_dir/$2.txt)
+			numLines=${#lines[@]}
+			for (( i=0; i<${numLines}; i++ ));
+			do
+				printf "        %s\n" "${lines[$i]}"
+			done
+		fi
+	fi
 }
 
 array=(`find $pwd/../../../data/tracks -name "*.xml"`)
