@@ -449,7 +449,11 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
         TerrainRoot = &Terrain.root;
     }
     else
-        TerrainRoot = &allAc3d.root.kids.front();
+    {
+        Terrain.addObject(allAc3d.root.kids.front());
+        Terrain.flipAxes(true);       // convert to track coordinate system
+        TerrainRoot = &Terrain.root;
+    }
 
     Ac3d::Object *TrackRoot;
     Ac3d Track;
@@ -468,7 +472,11 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
         TrackRoot = &Track.root;
     }
     else
-        TrackRoot = &allAc3d.root.kids.back();
+    {
+        Track.addObject(allAc3d.root.kids.back());
+        Track.flipAxes(true);       // convert to track coordinate system
+        TrackRoot = &Track.root;
+    }
 
     InitObjects(track, TrackHandle);
 
