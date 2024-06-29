@@ -15,10 +15,26 @@ check () {
 	if [ $status -eq 0 ]; then
 		if test -f "$pwd/../../../data/tracks/$1/$2/$2.ac"; then
 			diff $pwd/../../../data/tracks/$1/$2/$2.ac $temp_dir/$2.ac > $temp_dir/$2.ac.diff
-			[ $? -eq 0 ] && echo "$1/$2 GOOD" || echo "$1/$2 BAD"
+			[ $? -eq 0 ] && echo "$1/$2.ac GOOD" || echo "$1/$2.ac BAD"
+			if test -f "$pwd/../../../data/tracks/$1/$2/$2-trk.ac"; then
+				diff $pwd/../../../data/tracks/$1/$2/$2-trk.ac $temp_dir/$2-trk.ac > $temp_dir/$2.ac.diff
+				[ $? -eq 0 ] && echo "$1/$2-trk.ac GOOD" || echo "$1/$2-trk.ac BAD"
+			fi
+			if test -f "$pwd/../../../data/tracks/$1/$2/$2-msh.ac"; then
+				diff $pwd/../../../data/tracks/$1/$2/$2-msh.ac $temp_dir/$2-msh.ac > $temp_dir/$2.ac.diff
+				[ $? -eq 0 ] && echo "$1/$2-msh.ac GOOD" || echo "$1/$2-msh.ac BAD"
+			fi
+			if test -f "$pwd/../../../data/tracks/$1/$2/$2-obj-1.ac"; then
+				diff $pwd/../../../data/tracks/$1/$2/$2-obj-1.ac $temp_dir/$2-obj-1.ac > $temp_dir/$2.ac.diff
+				[ $? -eq 0 ] && echo "$1/$2-obj-1.ac GOOD" || echo "$1/$2-obj-1.ac BAD"
+			fi
+			if test -f "$pwd/../../../data/tracks/$1/$2/$2-obj-2.ac"; then
+				diff $pwd/../../../data/tracks/$1/$2/$2-obj-2.ac $temp_dir/$2-obj-2.ac > $temp_dir/$2.ac.diff
+				[ $? -eq 0 ] && echo "$1/$2-obj-2.ac GOOD" || echo "$1/$2-obj-2.ac BAD"
+			fi
 		elif test -f "$pwd/../../../data/tracks/$1/$2/$2-src.ac"; then
 			diff $pwd/../../../data/tracks/$1/$2/$2-src.ac $temp_dir/$2.ac > $temp_dir/$2.ac.diff
-			[ $? -eq 0 ] && echo "$1/$2 GOOD" || echo "$1/$2 BAD"
+			[ $? -eq 0 ] && echo "$1/$2.ac GOOD" || echo "$1/$2.ac BAD"
 		else
 			echo "$1 $2 no $2.ac file"
 		fi
