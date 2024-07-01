@@ -871,7 +871,7 @@ public:
                 if (_refs.size() == 3) // degenerate triangle so give up
                 {
                     osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected degenerate surface!" << std::endl;
-                    return false;
+                    // TODO delete degenerate triangle
                 }
                 else // remove duplicate vertex and normal
                 {

@@ -3283,6 +3283,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             x -= BR_WIDTH_0;
 
+            NEWDISPLIST(false, "S3Bg", 0);
+
             SETPOINT(curTexElt, nbvert, 3, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
             SETPOINT(curTexElt, nbvert, 3, 0, x, y, z + BR_HEIGHT_1);
 
@@ -3293,7 +3295,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             y += BR_WIDTH_1; /* back to origin */
 
-            NEWDISPLIST(false, "S3Bg", 0);
+            NEWDISPLIST(false, "S4Bg", 0);
 
             y2 += BR_WIDTH_1;
 
@@ -3306,6 +3308,8 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             SETPOINT(curTexElt, nbvert, 1, 0, x2, y2, z + BR_HEIGHT_1);
 
             x2 += BR_WIDTH_0;
+
+            NEWDISPLIST(false, "S5Bg", 0);
 
             SETPOINT(curTexElt, nbvert, 1, 1, x2, y2, z + BR_HEIGHT_1);
             SETPOINT(curTexElt, nbvert, 1, 0, x2, y2, z + BR_HEIGHT_2);
@@ -3326,7 +3330,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             SETPOINT(curTexElt, nbvert, 4, 0, x2, y2, z + BR_HEIGHT_2);
 
             /* Middle on the bridge */
-            CHECKDISPLIST2("pylon3", 4, "S4Bg", 2);
+            CHECKDISPLIST2("pylon3", 4, "S6Bg", 2);
 
             SETPOINT(curTexElt, nbvert, 0, 0, x2, y2, z + BR_HEIGHT_2);
             SETPOINT(curTexElt, nbvert, 1, 0, x, y, z + BR_HEIGHT_2);
