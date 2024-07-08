@@ -35,6 +35,8 @@
 #include <limits>
 #include <map>
 
+#include <portability.h>
+
 struct Ac3d
 {
     struct V2d : public std::array<double, 2>
@@ -66,15 +68,41 @@ struct Ac3d
             at(2) = z;
         }
 
+        double x() const { return (*this)[0]; }
+        double y() const { return (*this)[1]; }
+        double z() const { return (*this)[2]; }
+        void x(double value) { (*this)[0] = value; }
+        void y(double value) { (*this)[1] = value; }
+        void z(double value) { (*this)[2] = value; }
         V3d operator+(const V3d &other) const;
         V3d operator-(const V3d &other) const;
         V3d operator/(double scalar) const;
         V3d operator += (const V3d &other);
         V3d operator /= (double scalar);
+        V3d operator * (double value) const
+        {
+            return V3d{ x() * value, y() * value, z() * value };
+        }
         double dot(const V3d &other) const;
         V3d cross(const V3d &other) const;
         double length() const;
         void normalize();
+        double angleRadians(const V3d &other) const
+        {
+            return acos(dot(other) / (length() * other.length()));
+        }
+        double angleDegrees(const V3d &other) const
+        {
+            return angleRadians(other) * 180.0 / M_PI;
+        }
+        bool equals(const V3d &other) const
+        {
+            static constexpr double  SMALL_NUM = static_cast<double>(std::numeric_limits<double>::epsilon());
+
+            return std::abs(x() - other.x()) < SMALL_NUM &&
+                   std::abs(y() - other.y()) < SMALL_NUM &&
+                   std::abs(z() - other.z()) < SMALL_NUM;
+        }
     };
 
     struct Color : public std::array<double, 3>
@@ -133,35 +161,34 @@ struct Ac3d
         struct Ref
         {
             int                 index = 0;
-            int                 count = 1;
-            std::array<V2d, 4>  coords;
+            std::vector<V2d>    coords;
 
             Ref() = default;
             Ref(int index, double u, double v) : index(index)
             {
-                coords[0] = { u, v };
+                coords.emplace_back(u, v);
             }
-            Ref(int index, double u, double v, double u1, double v1) : index(index), count(2)
+            Ref(int index, double u, double v, double u1, double v1) : index(index)
             {
-                coords[0] = { u, v };
-                coords[1] = { u1, v1 };
+                coords.emplace_back(u, v);
+                coords.emplace_back(u1, v1);
             }
-            Ref(int index, double u, double v, double u1, double v1, double u2, double v2) : index(index), count(3)
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2) : index(index)
             {
-                coords[0] = { u, v };
-                coords[1] = { u1, v1 };
-                coords[2] = { u2, v2 };
+                coords.emplace_back(u, v);
+            coords.emplace_back(u1, v1);
+            coords.emplace_back(u2, v2);
             }
-            Ref(int index, double u, double v, double u1, double v1, double u2, double v2, double u3, double v3) : index(index), count(4)
+            Ref(int index, double u, double v, double u1, double v1, double u2, double v2, double u3, double v3) : index(index)
             {
-                coords[0] = { u, v };
-                coords[1] = { u1, v1 };
-                coords[2] = { u2, v2 };
-                coords[3] = { u3, v3 };
+                coords.emplace_back(u, v);
+                coords.emplace_back(u1, v1);
+                coords.emplace_back(u2, v2);
+                coords.emplace_back(u3, v3);
             }
         };
 
-        enum SURF : int { 
+        enum SURF : unsigned int { 
             Polygon                         = 0x00,
             ClosedLine                      = 0x01,
             OpenLine                        = 0x02,
@@ -171,6 +198,7 @@ struct Ac3d
             DoubleSided                     = 0x20,
             Flat                            = 0x00,
             Smooth                          = 0x10,
+            ShadeMask                       = 0x10,
             PolygonSingleSidedFlat          = Polygon       | SingleSided | Flat,      // 0x00
             ClosedLineSingleSidedFlat       = ClosedLine    | SingleSided | Flat,      // 0x01
             OpenLineSingleSidedFlat         = OpenLine      | SingleSided | Flat,      // 0x02
@@ -224,7 +252,7 @@ struct Ac3d
     template <typename T> struct Value
     {
         T       value = 0;
-        bool    initalized = false;
+        bool    initialized = false;
 
         operator T() const { return value; }
         T operator = (T i) { value = i; return value; }
@@ -325,7 +353,7 @@ struct Ac3d
         void splitBySURF();
         void splitByMaterial();
         void splitByUV();
-        void removeSurfacesNotSURF(int SURF);
+        void removeSurfacesNotSURF(unsigned int SURF);
         void removeSurfacesNotMaterial(int material);
         void removeUnusedVertices();
         const BoundingBox &getBoundingBox() const;
@@ -363,6 +391,8 @@ struct Ac3d
     static void tokenizeLine(const std::string &line, std::vector<std::string> &tokens);
     std::vector<Ac3d::Object *> &getPolys(std::vector<Ac3d::Object *> &polys);
     void getPolys(Object *object, std::vector<Ac3d::Object *> &polys);
+    static V3d normalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2);
+    static V3d unnormalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2);
 };
 
 #endif /* _AC3D_H_ */

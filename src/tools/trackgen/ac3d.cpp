@@ -247,26 +247,27 @@ Ac3d::Surface::Surface(std::ifstream &fin)
                           std::back_inserter(tokens));
 
                 refs[i].index = std::stoi(tokens.at(0));
-                refs[i].coords[0][0] = std::stod(tokens.at(1));
-                refs[i].coords[0][1] = std::stod(tokens.at(2));
+                double u = std::stod(tokens.at(1));
+                double v = std::stod(tokens.at(2));
+                refs[i].coords.emplace_back(u, v);
 
                 if (tokens.size() >= 5)
                 {
-                    refs[i].count = 2;
-                    refs[i].coords[1][0] = std::stod(tokens.at(3));
-                    refs[i].coords[1][1] = std::stod(tokens.at(4));
+                    u = std::stod(tokens.at(1));
+                    v = std::stod(tokens.at(2));
+                    refs[i].coords.emplace_back(u, v);
 
                     if (tokens.size() >= 7)
                     {
-                        refs[i].count = 3;
-                        refs[i].coords[2][0] = std::stod(tokens.at(5));
-                        refs[i].coords[2][1] = std::stod(tokens.at(6));
+                        u = std::stod(tokens.at(1));
+                        v = std::stod(tokens.at(2));
+                        refs[i].coords.emplace_back(u, v);
 
                         if (tokens.size() >= 9)
                         {
-                            refs[i].count = 4;
-                            refs[i].coords[3][0] = std::stod(tokens.at(7));
-                            refs[i].coords[3][1] = std::stod(tokens.at(8));
+                            u = std::stod(tokens.at(1));
+                            v = std::stod(tokens.at(2));
+                            refs[i].coords.emplace_back(u, v);
                         }
                     }
                 }
@@ -286,17 +287,20 @@ void Ac3d::Surface::write(std::ofstream &fout, const Object &object) const
     fout << "refs " << refs.size() << std::endl;
     for (const auto &ref : refs)
     {
-        fout << ref.index << " " << ref.coords[0][0] << " " << ref.coords[0][1];
+        if (!ref.coords.empty())
+            fout << ref.index << " " << ref.coords[0][0] << " " << ref.coords[0][1];
+        else
+            fout << ref.index << " 0 0";
 
-        if (ref.count >= 2)
+        if (ref.coords.size() >= 2)
         {
             fout << " " << ref.coords[1][0] << " " << ref.coords[1][1];
 
-            if (ref.count >= 3)
+            if (ref.coords.size() >= 3)
             {
                 fout << " " << ref.coords[2][0] << " " << ref.coords[2][1];
 
-                if (ref.count == 4)
+                if (ref.coords.size() == 4)
                 {
                     fout << " " << ref.coords[3][0] << " " << ref.coords[3][1];
                 }
@@ -658,12 +662,12 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
         }
         else if (tokens.at(0) == "subdiv")
         {
-            subdiv.initalized = true;
+            subdiv.initialized = true;
             subdiv = std::stoi(tokens.at(1));
         }
         else if (tokens.at(0) == "crease")
         {
-            crease.initalized = true;
+            crease.initialized = true;
             crease = std::stod(tokens.at(1));
         }
         else if (tokens.at(0) == "rot")
@@ -791,9 +795,9 @@ void Ac3d::Object::write(std::ofstream &fout, bool all, bool acc) const
             fout << "texrep " << texrep[0] << " " << texrep[1] << std::endl;
         if (texoff.initialized)
             fout << "texoff " << texoff[0] << " " << texoff[1] << std::endl;
-        if (all && subdiv.initalized)
+        if (all && subdiv.initialized)
             fout << "subdiv " << subdiv.value << std::endl;
-        if (all && crease.initalized)
+        if (all && crease.initialized)
             fout << "crease " << crease.value << std::endl;
     }
     if (rot.initialized)
@@ -904,7 +908,7 @@ void Ac3d::Object::flipAxes(bool in)
     }
 }
 
-void Ac3d::Object::removeSurfacesNotSURF(int SURF)
+void Ac3d::Object::removeSurfacesNotSURF(unsigned int SURF)
 {
     for (std::list<Surface>::iterator it = surfaces.begin(); it != surfaces.end();)
     {
@@ -1178,59 +1182,213 @@ void Ac3d::Object::generateTriangles()
     }
 }
 
+Ac3d::V3d Ac3d::normalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2)
+{
+    V3d  normal((p1 - p0).cross(p2 - p1));
+
+    normal.normalize();
+
+    return normal;
+}
+
+Ac3d::V3d Ac3d::unnormalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2)
+{
+    return ((p1 - p0).cross(p2 - p1));
+}
+
 void Ac3d::Object::generateNormals()
 {
     if (type == "poly")
     {
-        if (normals.size() == vertices.size())
-            return;
-
-        /** for each vertex in this object **/
-        for (size_t i = 0; i < vertices.size(); i++)
+        struct Vertex
         {
-            V3d normal = { 0, 0, 0 };
-            size_t found = 0;
+            V3d vertex = { 0.0, 0.0, 0.0 };
+            V3d normal = { 0.0, 0.0, 0.0 };
 
-            for (const auto &surface : surfaces)
+            bool operator == (const Vertex &other) const
             {
-                if (surface.isPolygon())
+                return (vertex.equals(other.vertex) && normal.equals(other.normal));
+            }
+        };
+        struct Triangle
+        {
+            Triangle() = delete;
+            Triangle(Surface::SURF surf, int mat,
+                const V3d &v0, const V3d &v1, const V3d &v2,
+                const std::vector<V2d> &uv0, const std::vector<V2d> &uv1, const std::vector<V2d> &uv2)
+                : m_surf(surf), m_mat(mat)
+            {
+                m_vertices[0] = v0;
+                m_vertices[1] = v1;
+                m_vertices[2] = v2;
+                m_coordinates[0] = uv0;
+                m_coordinates[1] = uv1;
+                m_coordinates[2] = uv2;
+                if (isFlatShaded())
                 {
-                    for (size_t j = 0; j < surface.refs.size(); j++)
+                    m_normal = normalizedNormal(v0, v1, v2);
+                    m_normals[0].push_back(m_normal);
+                    m_normals[1].push_back(m_normal);
+                    m_normals[2].push_back(m_normal);
+                }
+                else
+                {
+                    m_normal = unnormalizedNormal(v0, v1, v2);
+                    const double a1 = (v1 - v0).angleRadians(v2 - v0);
+                    const double a2 = (v2 - v1).angleRadians(v0 - v1);
+                    const double a3 = (v0 - v2).angleRadians(v1 - v2);
+
+                    m_normals[0].push_back(m_normal * a1);
+                    m_normals[1].push_back(m_normal * a2);
+                    m_normals[2].push_back(m_normal * a3);
+                }
+            }
+            bool isFlatShaded() const
+            {
+                return (m_surf & Surface::ShadeMask) == 0;
+            }
+            bool isSmoothShaded() const
+            {
+                return (m_surf & Surface::ShadeMask) == Surface::Smooth;
+            }
+            bool good() const
+            {
+                return m_vertices[0] != m_vertices[1] && m_vertices[0] != m_vertices[2] && m_vertices[1] != m_vertices[2];
+            }
+            void smooth(Triangle &other)
+            {
+                for (size_t i = 0; i < 3; i++)
+                {
+                    for (size_t j = 0; j < 3; j++)
                     {
-                        if (surface.refs[j].index == static_cast<int>(i))
+                        if (m_vertices[i] == other.m_vertices[j])
                         {
-                            if (j < 3)
-                            {
-                                V3d p0 = vertices[surface.refs[0].index];
-                                V3d p1 = vertices[surface.refs[1].index];
-                                V3d p2 = vertices[surface.refs[2].index];
-                                V3d triNormal = ((p1 - p0).cross(p2 - p1));
-                                triNormal.normalize();
-                                normal += triNormal;
-                                found++;
-                            }
-                            else
-                            {
-                                V3d p0 = vertices[surface.refs[0].index];
-                                V3d p1 = vertices[surface.refs[j - 1].index];
-                                V3d p2 = vertices[surface.refs[j].index];
-                                V3d triNormal = ((p1 - p0).cross(p2 - p1));
-                                triNormal.normalize();
-                                normal += triNormal;
-                                found++;
-                            }
+                            m_normals[i].push_back(other.m_normals[j][0]);
+                            other.m_normals[j].push_back(m_normals[i][0]);
                         }
                     }
                 }
-                else if (surface.isTriangleStrip())
+            }
+            Vertex vertex(size_t index, const Object &object) const
+            {
+                Vertex  vertex;
+                vertex.vertex = m_vertices[index];
+                vertex.normal = m_normals[index][0];
+                for (size_t i = 1; i < m_normals[index].size(); i++)
                 {
+                    if (object.crease.initialized || vertex.normal.angleDegrees(m_normals[index][i]) < object.crease.value)
+                        vertex.normal += m_normals[index][i];
+                }
+                vertex.normal.normalize();
+                return vertex;
+            }
+
+            V3d m_vertices[3];
+            std::vector<V2d> m_coordinates[3];
+            std::vector<V3d> m_normals[3];
+            V3d m_normal;
+            Surface::SURF m_surf;
+            int m_mat;
+            int m_vertex_index[3]{ 0, 0, 0 };
+        };
+
+        std::vector<Triangle> triangles;
+
+        for (auto &surface : surfaces)
+        {
+            if (surface.isPolygon())
+            {
+                if (surface.refs.size() > 3)
+                {
+#if 0
+                    if (surface.concave)
+                    {
+                        // TODO
+                        return;
+                    }
+                    else // triangle fan
+#endif
+                    {
+                        for (int i = 2; i < static_cast<int>(surface.refs.size()); i++)
+                        {
+                            const Triangle triangle(surface.surf, surface.mat,
+                                vertices[surface.refs[0].index],
+                                vertices[surface.refs[i - 1].index],
+                                vertices[surface.refs[i].index],
+                                surface.refs[0].coords,
+                                surface.refs[i - 1].coords,
+                                surface.refs[i].coords);
+                            if (triangle.good())
+                                triangles.emplace_back(triangle);
+                        }
+                    }
+                }
+                else
+                {
+                    const Triangle triangle(surface.surf, surface.mat,
+                        vertices[surface.refs[0].index],
+                        vertices[surface.refs[1].index],
+                        vertices[surface.refs[2].index],
+                        surface.refs[0].coords,
+                        surface.refs[1].coords,
+                        surface.refs[2].coords);
+                    if (triangle.good())
+                        triangles.emplace_back(triangle);
                 }
             }
-            if (found > 0)
+        }
+
+        for (size_t i = 0, end = triangles.size() - 1; i < end; i++)
+        {
+            for (size_t j = i + 1; j < triangles.size(); j++)
             {
-                normal.normalize();
+                if (triangles[i].isSmoothShaded() && triangles[j].isSmoothShaded())
+                    triangles[i].smooth(triangles[j]);
             }
-            normals.push_back(normal);
+        }
+
+        std::vector<Vertex> new_vertices;
+
+        for (auto &triangle : triangles)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                bool found = false;
+                const Vertex vertex = triangle.vertex(i, *this);
+                for (size_t j = 0; j < new_vertices.size(); j++)
+                {
+                    if (new_vertices[j] == vertex)
+                    {
+                        triangle.m_vertex_index[i] = int(j);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    triangle.m_vertex_index[i] = int(new_vertices.size());
+                    new_vertices.push_back(vertex);
+                }
+            }
+        }
+
+        vertices.clear();
+        vertices = vertices;
+
+        surfaces.clear();
+        for (auto &triangle : triangles)
+        {
+            Surface surface;
+            surface.surf = triangle.m_surf;
+            surface.mat = triangle.m_mat;
+            for (size_t i = 0; i < 3; i++)
+            {
+                Surface::Ref ref;
+                ref.index = triangle.m_vertex_index[i];
+                ref.coords = triangle.m_coordinates[i];
+                surface.refs.push_back(ref);
+            }
+            surfaces.push_back(surface);
         }
     }
     else

@@ -1843,12 +1843,21 @@ static void insert_elem_in_group(struct ele *el, struct nod *nods)
     surf.surf = Ac3d::Surface::PolygonSingleSidedSmooth;
     surf.refs.resize(3);
 
-    surf.refs[0].coords[0][0] = nods[el->i].x / TexSize;
-    surf.refs[0].coords[0][1] = nods[el->i].y / TexSize;
-    surf.refs[1].coords[0][0] = nods[el->j].x / TexSize;
-    surf.refs[1].coords[0][1] = nods[el->j].y / TexSize;
-    surf.refs[2].coords[0][0] = nods[el->k].x / TexSize;
-    surf.refs[2].coords[0][1] = nods[el->k].y / TexSize;
+    if (surf.refs[0].coords.empty())
+    {
+        surf.refs[0].coords.emplace_back(nods[el->i].x / TexSize, nods[el->i].y / TexSize);
+        surf.refs[1].coords.emplace_back(nods[el->j].x / TexSize, nods[el->j].y / TexSize);
+        surf.refs[2].coords.emplace_back(nods[el->k].x / TexSize, nods[el->k].y / TexSize);
+    }
+    else
+    {
+        surf.refs[0].coords[0][0] = nods[el->i].x / TexSize;
+        surf.refs[0].coords[0][1] = nods[el->i].y / TexSize;
+        surf.refs[1].coords[0][0] = nods[el->j].x / TexSize;
+        surf.refs[1].coords[0][1] = nods[el->j].y / TexSize;
+        surf.refs[2].coords[0][0] = nods[el->k].x / TexSize;
+        surf.refs[2].coords[0][1] = nods[el->k].y / TexSize;
+    }
 
     surf.refs[0].index = insert_node_in_group(&(nods[el->i]), curGrp);
     surf.refs[1].index = insert_node_in_group(&(nods[el->j]), curGrp);

@@ -104,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.7.0.3", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.4", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -434,9 +434,15 @@ int Application::generate()
             {
                 for (auto &ref : surf.refs)
                 {
-                    ref.coords[1] = uvs[ref.index];
-                    if (ref.count == 1)
-                        ref.count = 2;
+                    if (ref.coords.empty())
+                        ref.coords.emplace_back(0, 0);
+                    if (ref.coords.size() == 1)
+                        ref.coords.emplace_back(uvs[ref.index][0], uvs[ref.index][1]);
+                    else
+                    {
+                        ref.coords[1][0] = uvs[ref.index][0];
+                        ref.coords[1][1] = uvs[ref.index][1];
+                    }
                 }
             }
         }
