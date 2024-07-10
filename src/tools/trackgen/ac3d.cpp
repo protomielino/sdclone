@@ -1227,9 +1227,9 @@ void Ac3d::Object::generateNormals()
                 if (isFlatShaded())
                 {
                     m_normal = normalizedNormal(v0, v1, v2);
-                    m_normals[0].push_back(m_normal);
-                    m_normals[1].push_back(m_normal);
-                    m_normals[2].push_back(m_normal);
+                    m_normals[0].emplace_back(m_normal);
+                    m_normals[1].emplace_back(m_normal);
+                    m_normals[2].emplace_back(m_normal);
                 }
                 else
                 {
@@ -1238,9 +1238,9 @@ void Ac3d::Object::generateNormals()
                     const double a2 = (v2 - v1).angleRadians(v0 - v1);
                     const double a3 = (v0 - v2).angleRadians(v1 - v2);
 
-                    m_normals[0].push_back(m_normal * a1);
-                    m_normals[1].push_back(m_normal * a2);
-                    m_normals[2].push_back(m_normal * a3);
+                    m_normals[0].emplace_back(m_normal * a1);
+                    m_normals[1].emplace_back(m_normal * a2);
+                    m_normals[2].emplace_back(m_normal * a3);
                 }
             }
             bool isFlatShaded() const
@@ -1263,8 +1263,8 @@ void Ac3d::Object::generateNormals()
                     {
                         if (m_vertices[i] == other.m_vertices[j])
                         {
-                            m_normals[i].push_back(other.m_normals[j][0]);
-                            other.m_normals[j].push_back(m_normals[i][0]);
+                            m_normals[i].emplace_back(other.m_normals[j][0]);
+                            other.m_normals[j].emplace_back(m_normals[i][0]);
                         }
                     }
                 }
@@ -1292,7 +1292,9 @@ void Ac3d::Object::generateNormals()
             int m_vertex_index[3]{ 0, 0, 0 };
         };
 
-        std::vector<Triangle> triangles;
+        static std::vector<Triangle> triangles;
+
+        triangles.clear();
 
         for (auto &surface : surfaces)
         {
@@ -1338,16 +1340,20 @@ void Ac3d::Object::generateNormals()
             }
         }
 
-        for (size_t i = 0, end = triangles.size() - 1; i < end; i++)
+        size_t size = triangles.size();
+
+        for (size_t i = 0, endi = size - 1; i < endi; i++)
         {
-            for (size_t j = i + 1; j < triangles.size(); j++)
+            for (size_t j = i + 1; j < size; j++)
             {
                 if (triangles[i].isSmoothShaded() && triangles[j].isSmoothShaded())
                     triangles[i].smooth(triangles[j]);
             }
         }
 
-        std::vector<Vertex> new_vertices;
+        static std::vector<Vertex> new_vertices;
+
+        new_vertices.clear();
 
         for (auto &triangle : triangles)
         {
@@ -1367,13 +1373,19 @@ void Ac3d::Object::generateNormals()
                 if (!found)
                 {
                     triangle.m_vertex_index[i] = int(new_vertices.size());
-                    new_vertices.push_back(vertex);
+                    new_vertices.emplace_back(vertex);
                 }
             }
         }
-
-        vertices.clear();
-        vertices = vertices;
+        
+        size = new_vertices.size();
+        vertices.resize(size);
+        normals.resize(size);
+        for (size_t i = 0; i < size; i++)
+        {
+            vertices[i] = new_vertices[i].vertex;
+            normals[i] = new_vertices[i].normal;
+        }
 
         surfaces.clear();
         for (auto &triangle : triangles)
@@ -1386,9 +1398,9 @@ void Ac3d::Object::generateNormals()
                 Surface::Ref ref;
                 ref.index = triangle.m_vertex_index[i];
                 ref.coords = triangle.m_coordinates[i];
-                surface.refs.push_back(ref);
+                surface.refs.emplace_back(ref);
             }
-            surfaces.push_back(surface);
+            surfaces.emplace_back(surface);
         }
     }
     else
