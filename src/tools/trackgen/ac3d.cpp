@@ -1205,7 +1205,7 @@ void Ac3d::Object::generateNormals()
             V3d vertex = { 0.0, 0.0, 0.0 };
             V3d normal = { 0.0, 0.0, 0.0 };
 
-            bool operator == (const Vertex &other) const
+            bool equals(const Vertex &other) const
             {
                 return (vertex.equals(other.vertex) && normal.equals(other.normal));
             }
@@ -1276,7 +1276,10 @@ void Ac3d::Object::generateNormals()
                 vertex.normal = m_normals[index][0];
                 for (size_t i = 1; i < m_normals[index].size(); i++)
                 {
-                    if (object.crease.initialized || vertex.normal.angleDegrees(m_normals[index][i]) < object.crease.value)
+                    double angle = vertex.normal.angleDegrees(m_normals[index][i]);
+                    if (object.crease.initialized && angle < object.crease.value)
+                        vertex.normal += m_normals[index][i];
+                    else if (angle < 179.999)
                         vertex.normal += m_normals[index][i];
                 }
                 vertex.normal.normalize();
@@ -1361,9 +1364,9 @@ void Ac3d::Object::generateNormals()
             {
                 bool found = false;
                 const Vertex vertex = triangle.vertex(i, *this);
-                for (size_t j = 0; j < new_vertices.size(); j++)
+                for (size_t j = 0, end = new_vertices.size(); j < end; j++)
                 {
-                    if (new_vertices[j] == vertex)
+                    if (new_vertices[j].equals(vertex))
                     {
                         triangle.m_vertex_index[i] = int(j);
                         found = true;

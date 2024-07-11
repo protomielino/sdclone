@@ -97,7 +97,7 @@ struct Ac3d
         }
         bool equals(const V3d &other) const
         {
-            static constexpr double  SMALL_NUM = static_cast<double>(std::numeric_limits<double>::epsilon());
+            static constexpr double  SMALL_NUM = static_cast<double>(std::numeric_limits<float>::epsilon());
 
             return std::abs(x() - other.x()) < SMALL_NUM &&
                    std::abs(y() - other.y()) < SMALL_NUM &&
