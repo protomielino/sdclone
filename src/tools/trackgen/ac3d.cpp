@@ -1279,7 +1279,7 @@ void Ac3d::Object::generateNormals()
                     double angle = vertex.normal.angleDegrees(m_normals[index][i]);
                     if (object.crease.initialized && angle < object.crease.value)
                         vertex.normal += m_normals[index][i];
-                    else if (angle < 179.999)
+                    else if (!object.crease.initialized && angle < 179.999)
                         vertex.normal += m_normals[index][i];
                 }
                 vertex.normal.normalize();
@@ -1295,9 +1295,7 @@ void Ac3d::Object::generateNormals()
             int m_vertex_index[3]{ 0, 0, 0 };
         };
 
-        static std::vector<Triangle> triangles;
-
-        triangles.clear();
+        std::vector<Triangle> triangles;
 
         for (auto &surface : surfaces)
         {
@@ -1343,6 +1341,9 @@ void Ac3d::Object::generateNormals()
             }
         }
 
+        if (triangles.empty())
+            return;
+
         size_t size = triangles.size();
 
         for (size_t i = 0, endi = size - 1; i < endi; i++)
@@ -1354,9 +1355,7 @@ void Ac3d::Object::generateNormals()
             }
         }
 
-        static std::vector<Vertex> new_vertices;
-
-        new_vertices.clear();
+        std::vector<Vertex> new_vertices;
 
         for (auto &triangle : triangles)
         {

@@ -104,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.7.0.6", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.7", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -362,7 +362,7 @@ int Application::generate()
     }
 
     if (!Acc)
-        sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
+        snprintf(buf2, sizeof(buf2), "%s-%s.ac", OutputFileName.c_str(), extName);
     else
         buf2[0] = 0;
     std::string OutTrackName(buf2);
