@@ -9,6 +9,15 @@ fi
 temp_dir=$(mktemp -d -t trackgen.XXXXXXXX)
 pwd=`pwd`
 
+check-acc () {
+	$trackgen -c $1 -n $2 -r -A -i $pwd/../../../data/tracks/$1/$2 -o $temp_dir >& $temp_dir/$2.txt
+	status=$?
+	if [ $status -eq 0 ]; then
+		diff $pwd/../../../data/tracks/$1/$2/$2.acc $temp_dir/$2.acc > $temp_dir/$2.acc.diff
+		[ $? -eq 0 ] && echo "$1/$2.acc GOOD" || echo "$1/$2.acc BAD"
+	fi
+}
+
 check () {
 	$trackgen -c $1 -n $2 $3 -i $pwd/../../../data/tracks/$1/$2 -o $temp_dir -a >& $temp_dir/$2.txt
 	status=$?
@@ -173,5 +182,18 @@ check dirt mixed-2
 check road e-track-4
 check speedway a-speedway
 check speedway e-track-5
+
+check-acc circuit tuna
+check-acc development barrier-testtrack
+check-acc development border-testtrack
+check-acc development no-barrier-testtrack
+check-acc development showroom
+check-acc development straight-10
+check-acc development testtrack
+check-acc dirt dirt-5
+check-acc dirt mixed-2
+check-acc road e-track-4
+check-acc speedway a-speedway
+check-acc speedway e-track-5
 
 rm -rf temp_dir
