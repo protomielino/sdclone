@@ -1264,7 +1264,7 @@ void Ac3d::Object::generateNormals()
             {
                 if (m_vertices[0].equals(m_vertices[1]) || m_vertices[0].equals(m_vertices[2]) || m_vertices[1].equals(m_vertices[2]))
                     return false;
-                return collinear(m_vertices[0], m_vertices[1], m_vertices[2]);
+                return !collinear(m_vertices[0], m_vertices[1], m_vertices[2]);
             }
             void smooth(Triangle &other)
             {
