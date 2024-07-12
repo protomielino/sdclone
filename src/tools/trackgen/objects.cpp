@@ -133,6 +133,7 @@ InitObjects(tTrack *track, void *TrackHandle)
             curObj->ac3d.readFile(curObj->fileName);
             curObj->ac3d.generateTriangles();   // convert quads to triangles
             curObj->ac3d.flattenGeometry();
+            curObj->ac3d.removeEmptyObjects();
             curObj->ac3d.flipAxes(true);        // convert to track coordinate system
         }
         catch (const Ac3d::Exception &e)

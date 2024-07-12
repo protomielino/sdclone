@@ -353,6 +353,7 @@ struct Ac3d
         void splitBySURF();
         void splitByMaterial();
         void splitByUV();
+        void removeEmptyObjects();
         void removeSurfacesNotSURF(unsigned int SURF);
         void removeSurfacesNotMaterial(int material);
         void removeUnusedVertices();
@@ -385,6 +386,7 @@ struct Ac3d
     void splitBySURF();
     void splitByMaterial();
     void splitByUV();
+    void removeEmptyObjects();
     void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;

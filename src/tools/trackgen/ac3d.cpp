@@ -1054,6 +1054,20 @@ void Ac3d::Object::splitByMaterial()
     }
 }
 
+void Ac3d::Object::removeEmptyObjects()
+{
+    auto kid = kids.begin();
+    while (kid != kids.end())
+    {
+        if (kid->type == "poly" && (kid->vertices.empty() || kid->surfaces.empty()))
+            kid = kids.erase(kid);
+        else if (kid->type == "group" && kid->kids.empty())
+            kid = kids.erase(kid);
+        else
+            ++kid;
+    }
+}
+
 void Ac3d::Object::splitByUV()
 {
     if (type == "poly")
@@ -1757,6 +1771,11 @@ void Ac3d::splitByMaterial()
 void Ac3d::splitByUV()
 {
     root.splitByUV();
+}
+
+void Ac3d::removeEmptyObjects()
+{
+    root.removeEmptyObjects();
 }
 
 void Ac3d::getPolys(Object *object, std::vector<Ac3d::Object *> &polys)
