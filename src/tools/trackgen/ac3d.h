@@ -310,7 +310,7 @@ struct Ac3d
 
     struct Texture
     {
-        Texture(const std::string &name) : name(name) { }
+        explicit Texture(const std::string &name) : name(name) { }
         Texture(const std::string &name, const std::string &type) : name(name), type(type) { }
         std::string name;
         std::string type;
@@ -373,7 +373,7 @@ struct Ac3d
     std::stack<Object *>    stack;
 
     Ac3d();
-    void addObject(Object &object);
+    void addObject(const Object &object);
     void addDefaultMaterial();
     void readFile(const std::string &fileName);
     void writeFile(const std::string &fileName, bool all) const;
@@ -390,9 +390,10 @@ struct Ac3d
     double getTerrainAngle(double x, double y) const;
     static void tokenizeLine(const std::string &line, std::vector<std::string> &tokens);
     std::vector<Ac3d::Object *> &getPolys(std::vector<Ac3d::Object *> &polys);
-    void getPolys(Object *object, std::vector<Ac3d::Object *> &polys);
+    static void getPolys(Object *object, std::vector<Ac3d::Object *> &polys);
     static V3d normalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2);
     static V3d unnormalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2);
+    static bool collinear(const V3d &p1, const V3d &p2, const V3d &p3);
 };
 
 #endif /* _AC3D_H_ */

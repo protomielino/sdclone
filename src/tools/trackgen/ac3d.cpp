@@ -33,6 +33,8 @@
 #include <cmath>
 #include <cctype>
 
+#include <tgf.hpp>
+
 //------------------------------------- V3d -----------------------------------
 
 Ac3d::V3d Ac3d::V3d::operator + (const V3d &other) const
@@ -350,8 +352,6 @@ void Ac3d::Matrix::setRotation(const std::array<double, 9> &rotation)
     (*this)[2][0] = rotation[6]; (*this)[2][1] = rotation[7]; (*this)[2][2] = rotation[8];
 }
 
-const double PI = 3.14159265358979323846;
-
 void Ac3d::Matrix::setRotation(double x, double y, double z)
 {
     double cx, sx, cy, sy, cz, sz, szsy, czsy, szcy;
@@ -363,7 +363,7 @@ void Ac3d::Matrix::setRotation(double x, double y, double z)
     }
     else
     {
-        const double ax = x * PI / 180.0;
+        const double ax = x * M_PI / 180.0;
         sx = sin(ax);
         cx = cos(ax);
     }
@@ -1196,6 +1196,15 @@ Ac3d::V3d Ac3d::unnormalizedNormal(const V3d &p0, const V3d &p1, const V3d &p2)
     return ((p1 - p0).cross(p2 - p1));
 }
 
+bool Ac3d::collinear(const V3d &p1, const V3d &p2, const V3d &p3)
+{
+    constexpr double epsilon = static_cast<double>(std::numeric_limits<float>::epsilon());
+    const V3d v = V3d{ p2 - p1 }.cross(p3 - p1);
+    return std::fabs(v.x()) < epsilon &&
+           std::fabs(v.y()) < epsilon &&
+           std::fabs(v.z()) < epsilon;
+}
+
 void Ac3d::Object::generateNormals()
 {
     if (type == "poly")
@@ -1253,7 +1262,9 @@ void Ac3d::Object::generateNormals()
             }
             bool good() const
             {
-                return m_vertices[0] != m_vertices[1] && m_vertices[0] != m_vertices[2] && m_vertices[1] != m_vertices[2];
+                if (m_vertices[0].equals(m_vertices[1]) || m_vertices[0].equals(m_vertices[2]) || m_vertices[1].equals(m_vertices[2]))
+                    return false;
+                return collinear(m_vertices[0], m_vertices[1], m_vertices[2]);
             }
             void smooth(Triangle &other)
             {
@@ -1276,7 +1287,7 @@ void Ac3d::Object::generateNormals()
                 vertex.normal = m_normals[index][0];
                 for (size_t i = 1; i < m_normals[index].size(); i++)
                 {
-                    double angle = vertex.normal.angleDegrees(m_normals[index][i]);
+                    const double angle = vertex.normal.angleDegrees(m_normals[index][i]);
                     if (object.crease.initialized && angle < object.crease.value)
                         vertex.normal += m_normals[index][i];
                     else if (!object.crease.initialized && angle < 179.999)
@@ -1297,7 +1308,7 @@ void Ac3d::Object::generateNormals()
 
         std::vector<Triangle> triangles;
 
-        for (auto &surface : surfaces)
+        for (const auto &surface : surfaces)
         {
             if (surface.isPolygon())
             {
@@ -1323,6 +1334,8 @@ void Ac3d::Object::generateNormals()
                                 surface.refs[i].coords);
                             if (triangle.good())
                                 triangles.emplace_back(triangle);
+                            else
+                                GfLogWarning("Bad triangle in %s\n", name.c_str());
                         }
                     }
                 }
@@ -1337,6 +1350,8 @@ void Ac3d::Object::generateNormals()
                         surface.refs[2].coords);
                     if (triangle.good())
                         triangles.emplace_back(triangle);
+                    else
+                        GfLogWarning("Bad triangle in %s\n", name.c_str());
                 }
             }
         }
@@ -1390,7 +1405,7 @@ void Ac3d::Object::generateNormals()
         }
 
         surfaces.clear();
-        for (auto &triangle : triangles)
+        for (const auto &triangle : triangles)
         {
             Surface surface;
             surface.surf = triangle.m_surf;
@@ -1507,7 +1522,7 @@ Ac3d::Ac3d()
     stack.push(&root);
 }
 
-void Ac3d::addObject(Object &object)
+void Ac3d::addObject(const Object &object)
 {
     stack.top()->kids.push_back(object);
     stack.push(&stack.top()->kids.back());
@@ -1574,7 +1589,7 @@ void Ac3d::readFile(const std::string &fileName)
 
 void Ac3d::writeFile(const std::string &fileName, bool all) const
 {
-    bool acc = fileName.substr(fileName.find_last_of(".") + 1) == "acc";
+    const bool acc = fileName.substr(fileName.find_last_of('.') + 1) == "acc";
 
     std::ofstream   fout(fileName);
 
