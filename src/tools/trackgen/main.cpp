@@ -104,7 +104,7 @@ public:
 
 //! Constructor.
 Application::Application()
-: GfApplication("TrackGen", "1.7.0.10", "Terrain generator for tracks")
+: GfApplication("TrackGen", "1.7.0.11", "Terrain generator for tracks")
 , HeightSteps(30)
 , Bump(false)
 , Raceline(false)
@@ -450,7 +450,8 @@ int Application::generate()
 
     if (!Acc && DoSaveElevation != -1) {
         if (all) {
-            //Ac3dClose(outfd);
+            allAc3d.removeBadTriangles();
+            allAc3d.removeEmptyObjects();
             allAc3d.writeFile(OutputFileName + ".ac", false);
         }
         switch (DoSaveElevation) {
@@ -491,6 +492,9 @@ int Application::generate()
         MultipleMaterials = true;
 
     GenerateObjects(Track, TrackHandle, CfgHandle, allAc3d, all, OutMeshName, OutTrackName, OutputFileName, MultipleMaterials, Acc);
+
+    allAc3d.removeBadTriangles();
+    allAc3d.removeEmptyObjects();
 
     if (!Acc)
         allAc3d.writeFile(OutputFileName + ".ac", false);

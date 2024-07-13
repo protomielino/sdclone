@@ -3746,6 +3746,8 @@ void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile,
         object.name = "track";
         ac3d.addObject(object);
         SaveMainTrack(ac3d, bump, raceline, acc);
+        ac3d.removeBadTriangles();
+        ac3d.removeEmptyObjects();
         ac3d.writeFile(outFile, false);
     }
 

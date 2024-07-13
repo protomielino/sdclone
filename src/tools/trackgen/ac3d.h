@@ -83,6 +83,10 @@ struct Ac3d
         {
             return V3d{ x() * value, y() * value, z() * value };
         }
+        bool operator == (const V3d &other)
+        {
+            return x() == other.x() && y() == other.y() && z() == other.z();
+        }
         double dot(const V3d &other) const;
         V3d cross(const V3d &other) const;
         double length() const;
@@ -232,6 +236,20 @@ struct Ac3d
         {
             return (surf & TypeMask) == TriangleStrip;
         }
+        bool isBadTriangle(const Object &object)
+        {
+            if (isPolygon() && refs.size() == 3)
+            {
+                if (object.vertices[refs[0].index].equals(object.vertices[refs[1].index]) ||
+                    object.vertices[refs[0].index].equals(object.vertices[refs[2].index]) ||
+                    object.vertices[refs[1].index].equals(object.vertices[refs[2].index]))
+                    return true;
+                return collinear(object.vertices[refs[0].index],
+                                 object.vertices[refs[1].index],
+                                 object.vertices[refs[2].index]);
+            }
+            return false;
+        }
     };
 
     class v2 : public std::array<double, 2>
@@ -354,6 +372,7 @@ struct Ac3d
         void splitByMaterial();
         void splitByUV();
         void removeEmptyObjects();
+        void removeBadTriangles();
         void removeSurfacesNotSURF(unsigned int SURF);
         void removeSurfacesNotMaterial(int material);
         void removeUnusedVertices();
@@ -387,6 +406,7 @@ struct Ac3d
     void splitByMaterial();
     void splitByUV();
     void removeEmptyObjects();
+    void removeBadTriangles();
     void merge(const Ac3d &ac3d, bool mergeMaterials);
     double getTerrainHeight(double x, double y) const;
     double getTerrainAngle(double x, double y) const;

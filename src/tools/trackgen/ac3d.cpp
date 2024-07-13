@@ -1068,6 +1068,24 @@ void Ac3d::Object::removeEmptyObjects()
     }
 }
 
+void Ac3d::Object::removeBadTriangles()
+{
+    if (type == "poly")
+    {
+        auto surface = surfaces.begin();
+        while (surface != surfaces.end())
+        {
+            if (surface->isBadTriangle(*this))
+                surface = surfaces.erase(surface);
+            else
+                ++surface;
+        }
+        return;
+    }
+    for (auto &kid : kids)
+        kid.removeBadTriangles();
+}
+
 void Ac3d::Object::splitByUV()
 {
     if (type == "poly")
@@ -1776,6 +1794,11 @@ void Ac3d::splitByUV()
 void Ac3d::removeEmptyObjects()
 {
     root.removeEmptyObjects();
+}
+
+void Ac3d::removeBadTriangles()
+{
+    root.removeBadTriangles();
 }
 
 void Ac3d::getPolys(Object *object, std::vector<Ac3d::Object *> &polys)

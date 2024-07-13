@@ -2529,5 +2529,9 @@ void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfil
         draw_ac(allAc3d, "TERR");
 
     if (hasCur)
+    {
+        curAc3d.removeBadTriangles();
+        curAc3d.removeEmptyObjects();
         curAc3d.writeFile(outfile, false);
+    }
 }
