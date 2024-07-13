@@ -168,6 +168,7 @@ reTrackDump(const tTrack *track, int verbose)
     GfLogInfo("Name     = %s\n", track->name);
     GfLogInfo("Authors  = %s\n", track->authors);
     GfLogInfo("Filename = %s\n", track->filename);
+    GfLogInfo("Model3D  = %s\n", track->graphic.model3d);
     GfLogInfo("NSeg     = %d\n", track->nseg);
     GfLogInfo("Version  = %d\n", track->version);
     GfLogInfo("Length   = %f m\n", track->length);

@@ -113,7 +113,7 @@ void SDScenery::LoadScene(tTrack *track)
     else
         _speedWay = false;
 
-    GfLogDebug("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
+    GfLogDebug("SpeedWay = %d - SubCategory = %d\n", _speedWay, _speedWayLong);
 
     acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 
