@@ -251,7 +251,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			}
 		} catch (IOException e1)
 		{
-			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export AC3D", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export ac" + (acc ? "c" : ""), JOptionPane.ERROR_MESSAGE);
 		}
 		this.waitLabel.setText("Track finished");
 	}
@@ -283,7 +283,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			trackgenLabel.setText("Track data");
 			trackgenLabel.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 18));
 			waitLabel.setBounds(10, 412, 290, 25);
-			waitLabel.setText("Constructing the .ac file. Please wait...");
+			waitLabel.setText("Constructing the .ac" + (acc ? "c" : "") + " file. Please wait...");
 			panel.add(trackgenLabel, null);
 			panel.add(waitLabel, null);
 	

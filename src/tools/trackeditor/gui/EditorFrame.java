@@ -2463,12 +2463,26 @@ public class EditorFrame extends JFrame
 			{
 				if (graphicObjects.get(i).getName().equals(graphicObjects.get(j).getName()))
 				{
-					JOptionPane.showMessageDialog(this, "Graphic Objects has duplicate name: " + graphicObjects.get(i).getName(), "Exporting AC3", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, "Graphic Objects has duplicate name: " + graphicObjects.get(i).getName(), "Exporting AC" + (acc ? "C" : ""), JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 			}
 		}
 
+		if (acc && getTrackData().getGraphic().getDescription().endsWith(".ac"))
+		{
+			if (JOptionPane.showConfirmDialog(this, "Change graphics file type to acc?", "Exporting ACC", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+			{
+				getTrackData().getGraphic().setDescription(getTrackData().getGraphic().getDescription() + "c");
+			}		
+		}
+		else if (!acc && getTrackData().getGraphic().getDescription().endsWith(".acc"))
+		{
+			if (JOptionPane.showConfirmDialog(this, "Change graphics file type to ac?", "Exporting AC", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+			{
+				getTrackData().getGraphic().setDescription(getTrackData().getGraphic().getDescription().substring(0, getTrackData().getGraphic().getDescription().length() - 1));
+			}					
+		}
 		String reliefBorder = getTrackData().getGraphic().getTerrainGeneration().getReliefBorder();
 		String newArgs = additionalArgs;
 		if (reliefBorder !=  null && reliefBorder.equals("yes"))
