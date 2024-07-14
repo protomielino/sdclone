@@ -534,7 +534,10 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
             free(MapImage);
 
             Ac3d GroupRoot;
-            GroupRoot.materials = ObjectsRoot.materials;
+            if (ObjectsRoot.materials.empty())
+                GroupRoot.addDefaultMaterial();
+            else
+                GroupRoot.materials = ObjectsRoot.materials;
             Ac3d::Object object("group", "");
             GroupRoot.addObject(object);
             std::vector<Ac3d::Object *> Groups;
@@ -575,7 +578,10 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d
         } while (!GfParmListSeekNext(TrackHandle, TRK_SECT_TERRAIN_OBJECTS));
 
         Ac3d GroupRoot;
-        GroupRoot.materials = ObjectsRoot.materials;
+        if (ObjectsRoot.materials.empty())
+            GroupRoot.addDefaultMaterial();
+        else
+            GroupRoot.materials = ObjectsRoot.materials;
         Ac3d::Object object("group", "");
         GroupRoot.addObject(object);
         std::vector<Ac3d::Object *> Groups;

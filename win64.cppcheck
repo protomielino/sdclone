@@ -47,6 +47,8 @@
         <suppression>clang-tidy-readability-implicit-bool-conversion</suppression>
         <suppression>clang-tidy-modernize-use-std-print</suppression>
         <suppression>clang-tidy-performance-avoid-endl</suppression>
+        <suppression>clang-tidy-misc-non-private-member-variables-in-classes</suppression>
+        <suppression>clang-tidy-modernize-use-nodiscard</suppression>
     </suppressions>
     <tools>
         <tool>clang-tidy</tool>
