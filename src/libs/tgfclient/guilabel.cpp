@@ -218,13 +218,9 @@ gfuiLabelSetText(tGfuiLabel *label, const char *text)
     if (!text)
         return;
 
-    // Reallocate label->text if maxlen is nul (in case label->text is empty).
-    if (label->maxlen <= 0)
-    {
-        free(label->text);
-        label->maxlen = strlen(text);
-        label->text = (char*)calloc(label->maxlen+1, sizeof(char));
-    }
+    free(label->text);
+    label->maxlen = strlen(text);
+    label->text = (char*)calloc(label->maxlen+1, sizeof(char));
 
     // Update the text.
     strncpy(label->text, text, label->maxlen);
