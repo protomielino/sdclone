@@ -19,6 +19,8 @@
 #include <string>
 #include <sstream>
 
+#include <curl/curl.h>
+
 #include <iraceengine.h>
 #include <igraphicsengine.h>
 #include <isoundengine.h>
@@ -83,6 +85,7 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _piGraphicsEngine(0), _piSoundEngine(0),
 _hscrReUpdateStateHook(0), _hscrGame(0), _bfGraphicsState(0)
 {
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
 bool LegacyMenu::backLoad()

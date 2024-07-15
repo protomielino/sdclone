@@ -22,6 +22,7 @@
 #include <racescreens.h>
 #include <playerconfig.h>
 
+#include "downloadsmenu.h"
 #include "mainmenu.h"
 #include "exitmenu.h"
 #include "optionsmenu.h"
@@ -63,6 +64,12 @@ static void
 onCreditsMenuActivate(void * /* dummy */)
 {
     CreditsMenuActivate(MenuHandle);
+}
+
+static void
+onDownloadsMenuActivate(void *)
+{
+    new DownloadsMenu(MenuHandle);
 }
 
 static void
@@ -115,6 +122,7 @@ MainMenuInit(bool SupportsHumanDrivers)
 	if (SupportsHumanDrivers)
 		GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "downloads", NULL, onDownloadsMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "quit", NULL, onExitMenuActivate);
 

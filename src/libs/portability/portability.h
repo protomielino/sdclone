@@ -240,5 +240,9 @@ PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...)
 
 #endif
 
-#endif // _SD_PORTABILITY_H_
+namespace portability
+{
+    int rmdir_r(const char *path);
+}
 
+#endif // _SD_PORTABILITY_H_

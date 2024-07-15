@@ -2,9 +2,31 @@ INCLUDE(../../../../cmake/macros.cmake)
 
 SET(MS mainscreens)
 SET(MAINSCREENS_SOURCES ${MS}/splash.cpp ${MS}/mainmenu.cpp
-                        ${MS}/optionsmenu.cpp ${MS}/creditsmenu.cpp ${MS}/exitmenu.cpp)
+                        ${MS}/optionsmenu.cpp ${MS}/creditsmenu.cpp ${MS}/exitmenu.cpp
+                        ${MS}/asset.cpp
+                        ${MS}/assets.cpp
+                        ${MS}/downloadservers.cpp
+                        ${MS}/downloadsmenu.cpp
+                        ${MS}/entry.cpp
+                        ${MS}/repomenu.cpp
+                        ${MS}/sha256.cpp
+                        ${MS}/sink.cpp
+                        ${MS}/thumbnail.cpp
+                        ${MS}/unzip.cpp
+                        ${MS}/writebuf.cpp
+                        ${MS}/writefile.cpp)
 SET(MAINSCREENS_HEADERS ${MS}/splash.h ${MS}/mainmenu.h
-                        ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h)
+                        ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h
+                        ${MS}/downloadservers.h
+                        ${MS}/downloadsmenu.h
+                        ${MS}/entry.h
+                        ${MS}/repomenu.h
+                        ${MS}/sha256.h
+                        ${MS}/sink.h
+                        ${MS}/thumbnail.h
+                        ${MS}/unzip.h
+                        ${MS}/writebuf.h
+                        ${MS}/writefile.h)
 
 IF(MSVC)
     # errno.cpp should only be included with MSVC
@@ -78,6 +100,12 @@ ADD_SDL2_INCLUDEDIR()
 
 ADD_ENET_INCLUDEDIR()
 
+ADD_CURL_INCLUDEDIR()
+
+find_package(minizip REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(cJSON 1.0 REQUIRED)
+
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DLEGACYMENU_DLL)
@@ -99,8 +127,11 @@ SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB})
+find_package(OpenSSL 2.0 REQUIRED)
+ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
+    cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB)
 target_compile_features(legacymenu PRIVATE cxx_std_11)
 set_target_properties(legacymenu PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)
+ADD_CURL_LIBRARY(legacymenu)
 
 SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)
