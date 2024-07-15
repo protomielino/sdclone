@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <string>
 #include <map>
+#include <iostream>
 
 #include <portability.h>
 
@@ -989,13 +990,21 @@ GfuiMenuCreateStaticControls(void* hscr, void* hparm)
 void*
 GfuiMenuLoad(const char* pszMenuPath)
 {
-    std::string strPath("data/menu/");
+    const char *data = GfDataDir();
+
+    if (!data)
+    {
+        std::cerr << "GfDataDir failed" << std::endl;
+        return NULL;
+    }
+
+    std::string strPath;
+
+    strPath += data;
+    strPath += "data/menu/";
     strPath += pszMenuPath;
 
-    char buf[1024];
-    snprintf(buf, sizeof(buf), "%s%s", GfDataDir(), strPath.c_str());
-
-    return GfParmReadFile(buf, GFPARM_RMODE_STD);
+    return GfParmReadFile(strPath.c_str(), GFPARM_RMODE_STD);
 }
 
 tdble
