@@ -489,9 +489,6 @@ configure_for_joy_axis:
             return;
         }
     }
-
-    /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfSleep(0.001);
 }
 
 /* Push button callback for each command button : activate input devices action collection loop */

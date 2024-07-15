@@ -95,11 +95,6 @@ static void splashIdle()
         // And now it's done, remember it.
         splBackgroundWorkDone = true;
     }
-    else
-    {
-        // Wait a little, to let the CPU take breath.
-        GfSleep(0.001);
-    }
 
     // Close if the splash screen delay is over.
     if (splTimedOut)

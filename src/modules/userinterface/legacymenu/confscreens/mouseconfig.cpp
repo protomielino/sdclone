@@ -163,9 +163,6 @@ Idle2(void)
 	    return;
 	}
     }
-
-    /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfSleep(0.001);
 }
 
 static void

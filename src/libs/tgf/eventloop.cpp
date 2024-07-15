@@ -274,9 +274,4 @@ void GfEventLoop::recompute()
     // Call the 'recompute' callback if any.
     if (_pPrivate->cbRecompute)
         _pPrivate->cbRecompute();
-
-    // ... otherwise let the CPU take breath (and fans stay at low and quiet speed,
-    // which would not be the case if really doing nothing).
-    else
-        SDL_Delay(1); // ms.
 }

@@ -75,6 +75,7 @@ typedef struct ScreenSize
 {
     int width;  // Width in pixels.
     int height; // Height in pixels.
+    double refresh_rate; // Refresh rate in Hz.
 } tScreenSize;
 
 typedef std::vector<tScreenSize> ScreenSizeVector;
@@ -811,6 +812,9 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
 
     //! Force a call to the "redisplay/refresh" callback function.
     void forceRedisplay();
+
+    //! Sets maximum refresh rate to the event loop.
+    void setMaxRefreshRate(double rate);
 
   protected:
 

@@ -33,10 +33,8 @@ static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", 
 static const char* MonitorTypes[DisplayMenu::nDisplayTypes] = { "none", "4:3", "16:9", "21:9" };
 static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
 static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
-#ifndef NoMaxRefreshRate
-static const int AMaxRefreshRates[] = { 0, 30, 40, 50, 60, 75, 85, 100, 120, 150, 200 };
+static const int AMaxRefreshRates[] = {30, 40, 50, 60, 75, 85, 100, 120, 150, 200 };
 static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefreshRates[0]);
-#endif	
 
 
 // Call-backs ================================================================
@@ -146,7 +144,6 @@ void DisplayMenu::onChangeMenuDisplay(tComboBoxInfo *pInfo)
 	pMenu->setMenuDisplay(pInfo->nPos);
 }
 
-#ifndef NoMaxRefreshRate
 void DisplayMenu::onChangeMaxRefreshRate(tComboBoxInfo *pInfo)
 {
  	// Get the DisplayMenu instance from call-back user data.
@@ -154,7 +151,6 @@ void DisplayMenu::onChangeMaxRefreshRate(tComboBoxInfo *pInfo)
 
 	pMenu->setMaxRefreshRateIndex(pInfo->nPos);
 }
-#endif	
 
 // Re-init screen to take new graphical settings into account (implies process restart).
 void DisplayMenu::onAccept(void *pDisplayMenu)
@@ -185,6 +181,7 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
 		// Restart the game.
 		GfuiApp().restart();
 	}
+	GfuiApp().eventLoop().setMaxRefreshRate(pMenu->_nMaxRefreshRate);
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
@@ -193,7 +190,8 @@ bool DisplayMenu::restartNeeded()
 	bool needRestart = ((_eDisplayMode != _eOriginalDisplayMode) 
 						|| (_nScreenWidth !=_nOriginalScreenWidth)
 						|| (_nScreenHeight != _nOriginalScreenHeight)
-						|| (_nOriginalMenuDisplay != _nMenuDisplay));
+						|| (_nOriginalMenuDisplay != _nMenuDisplay))
+						|| (_nOriginalMaxRefreshRate != _nMaxRefreshRate);
 
 	if(GfScrUsingResizableWindow() && (_eDisplayMode == eResizable))
 		needRestart = false;
@@ -252,7 +250,6 @@ void DisplayMenu::updateControls()
 	sprintf(buf, "%g", _fArcRatio);
 	GfuiEditboxSetString(getMenuHandle(), _nArcRatioID, buf);
 
-#ifndef NoMaxRefreshRate
 	nControlId = getDynamicControlId("MaxRefreshRateCombo");
 	int nMaxRefRateIndex = 0; // Defaults to None.
 	for (int nMaxRefRateInd = 0; nMaxRefRateInd < NMaxRefreshRates; nMaxRefRateInd++)
@@ -262,7 +259,6 @@ void DisplayMenu::updateControls()
 			break;
 		}
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, nMaxRefRateIndex);
-#endif
 }
 
 void DisplayMenu::loadSettings()
@@ -294,12 +290,10 @@ void DisplayMenu::loadSettings()
 	}
 
 
-#ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
-	_nMaxRefreshRate =
-		(int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_MAXREFRESH, NULL, 0);
-#endif	
-	
+	_nMaxRefreshRate = _nOriginalMaxRefreshRate =
+		(int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_MAXREFRESH, NULL, 50);
+
 	// Release screen config params file.
 	GfParmReleaseHandle(hScrConfParams);
 }
@@ -319,9 +313,7 @@ void DisplayMenu::storeSettings() const
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_STARTUPDISPLAY, (char*)NULL, _nMenuDisplay);
-#ifndef NoMaxRefreshRate
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
-#endif
 
 	const char* pszDisplMode =
 		(_eDisplayMode == eFullScreen) ? GFSCR_VAL_YES : GFSCR_VAL_NO;
@@ -424,6 +416,8 @@ void DisplayMenu::storeWindowSettings() const
 	// Open screen config params file.
 	void* hScrConfParams = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, NULL, _nMaxRefreshRate);
+
 	if(_eDisplayMode == eResizable)
 		GfParmSetStr(hScrConfParams, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_RESIZABLE, GFSCR_VAL_YES);
 	else
@@ -459,6 +453,7 @@ void DisplayMenu::resetScreenSizes()
 		tScreenSize _currSize = GfScrGetCurrentDisplaySize( _nMenuDisplay);
 		_nScreenWidth = _currSize.width;
 		_nScreenHeight = _currSize.height;
+		_nMaxRefreshRate = _currSize.refresh_rate;
 	}
 	else
 	{
@@ -511,6 +506,20 @@ void DisplayMenu::resetScreenSizes()
 	
 	// Select the found one in the combo-box.
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nScreenSizeIndex);
+
+	{
+		const int nComboId = getDynamicControlId("MaxRefreshRateCombo");
+
+		if (nComboId != -1)
+			for (size_t i = 0; i < NMaxRefreshRates; i++)
+			{
+				if (AMaxRefreshRates[i] == _nMaxRefreshRate)
+				{
+					GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, i);
+					break;
+				}
+			}
+	}
 }
 
 void DisplayMenu::setScreenSizeIndex(int nIndex)
@@ -553,12 +562,10 @@ void DisplayMenu::setMenuDisplay(int nIndex)
 	}
 }
 
-#ifndef NoMaxRefreshRate
 void DisplayMenu::setMaxRefreshRateIndex(int nIndex)
 {
 	_nMaxRefreshRate = AMaxRefreshRates[nIndex];
 }
-#endif	
 
 DisplayMenu::DisplayMenu()
 : GfuiMenuScreen("displayconfigmenu.xml")
@@ -576,9 +583,7 @@ DisplayMenu::DisplayMenu()
 	_nOriginalScreenHeight = 600;
 	_nOriginalMenuDisplay = 0;
 	_eOriginalDisplayMode = eWindowed;
-#ifndef NoMaxRefreshRate
-	_nMaxRefreshRate = 0;
-#endif	
+	_nMaxRefreshRate = 50;
 }
 
 bool DisplayMenu::initialize(void *pPreviousMenu)
@@ -626,10 +631,8 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	_nArcRatioID = createEditControl("arcratioedit", this, NULL, onChangeArcRatio);
 
 
-#ifndef NoMaxRefreshRate
 	const int nMaxRefRateComboId =
 		createComboboxControl("MaxRefreshRateCombo", this, onChangeMaxRefreshRate);
-#endif	
 
 	createButtonControl("ApplyButton", this, onAccept);
 	createButtonControl("CancelButton", this, onCancel);
@@ -659,7 +662,6 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 		GfuiComboboxAddText(getMenuHandle(), nSpanSplitsComboId, SpansplitValues[index]);
 
 
-#ifndef NoMaxRefreshRate
 	// 6) Max refresh rate combo.
 	std::ostringstream ossMaxRefRate;
 	for (int nRefRateInd = 0; nRefRateInd < NMaxRefreshRates; nRefRateInd++)
@@ -671,7 +673,6 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 			ossMaxRefRate << "None";
 		GfuiComboboxAddText(getMenuHandle(), nMaxRefRateComboId, ossMaxRefRate.str().c_str());
 	}
-#endif	
 
 	return true;
 }

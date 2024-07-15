@@ -25,8 +25,6 @@
 
 #include "confscreens.h"
 
-// Comment-out to activate max. refresh rate settings.
-#define NoMaxRefreshRate 1
 
 
 class DisplayMenu : public GfuiMenuScreen
@@ -46,9 +44,7 @@ public:
 	void setMonitorType(EDisplayType eType);
 	void setArcRatio(float ratio);
 	void setMenuDisplay(int nIndex);
-#ifndef NoMaxRefreshRate
 	void setMaxRefreshRateIndex(int nIndex);
-#endif	
 	void storeSettings() const;
 	void loadSettings();
 
@@ -76,9 +72,7 @@ protected:
 	static void onChangeScreenDist(void *pDisplayMenu);
 	static void onChangeArcRatio(void *pDisplayMenu);
 	static void onChangeMenuDisplay(tComboBoxInfo *pInfo);
-#ifndef NoMaxRefreshRate
 	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
-#endif	
 
 	static void onAccept(void *pDisplayMenu);
 	static void onCancel(void *pDisplayMenu);
@@ -113,10 +107,9 @@ private:
 	int	_nScreenDistId;
 	int	_nArcRatioID;
 
-#ifndef NoMaxRefreshRate
 	//! Currently selected max. refresh rate (Hz).
 	int	_nMaxRefreshRate;
-#endif	
+	int _nOriginalMaxRefreshRate;
 };
 
 extern void* DisplayMenuInit(void* pPreviousMenu);

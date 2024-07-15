@@ -19,6 +19,7 @@
 #include <SDL.h>
 
 #include "tgfclient.h"
+#include "tgf.h"
 
 #ifdef WEBSERVER
 #include "webserver.h"
@@ -48,12 +49,14 @@ class GfuiEventLoop::Private
 
 	// Variables.
 	bool bRedisplay; // Flag to say if a redisplay is necessary.
+	double max_refresh; // Max refresh rate.
 };
 
 GfuiEventLoop::Private::Private()
 : cbMouseButton(0), cbMouseMotion(0), cbMousePassiveMotion(0), cbMouseWheel(0),
   cbJoystickAxis(0), cbJoystickButton(0),
-  cbDisplay(0), cbReshape(0), bRedisplay(false)
+  cbDisplay(0), cbReshape(0), bRedisplay(false),
+  max_refresh(50.0)
 {
 }
 
@@ -238,11 +241,22 @@ void GfuiEventLoop::operator()()
 
 		if (!quitRequested())
 		{
+			double now = GfTimeClock();
+
 			// Recompute if anything to.
 			recompute();
 
 			// Redisplay if anything to.
 			redisplay();
+
+			double elapsed = GfTimeClock() - now;
+
+			if (_pPrivate->max_refresh)
+			{
+				double rate = 1.0 / _pPrivate->max_refresh;
+				if (elapsed < rate)
+					GfSleep(rate - elapsed);
+			}
 		}
 	}
 
@@ -292,6 +306,11 @@ void GfuiEventLoop::setReshapeCB(void (*func)(int width, int height))
 void GfuiEventLoop::postRedisplay(void)
 {
 	_pPrivate->bRedisplay = true;
+}
+
+void GfuiEventLoop::setMaxRefreshRate(double rate)
+{
+	_pPrivate->max_refresh = rate;
 }
 
 void GfuiEventLoop::forceRedisplay()

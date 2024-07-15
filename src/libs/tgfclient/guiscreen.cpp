@@ -210,6 +210,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     tScreenSize last;
     last.width = 0;
     last.height = 0;
+    last.refresh_rate = 0;
 
     bounds.w = 0;
     bounds.h = 0;
@@ -243,6 +244,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
                     GfLogDebug("  %d x %d x %d @ %d hz\n",mode.w,mode.h,SDL_BITSPERPIXEL(mode.format),mode.refresh_rate);
                     last.width = mode.w;
                     last.height = mode.h;
+                    last.refresh_rate = mode.refresh_rate;
                     vecSizes.push_back(last);
                 }
             }
@@ -262,6 +264,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
         // Desperation stick the Display Bounds into the vector
         last.width = bounds.w;
         last.height = bounds.h;
+        last.refresh_rate = mode.refresh_rate;
         vecSizes.push_back(last);
     }
 
@@ -279,12 +282,14 @@ tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex)
 
     size.width = 0;
     size.height = 0;
+    size.refresh_rate = 0;
 
     SDL_DisplayMode mode;
     if(SDL_GetCurrentDisplayMode(nDisplayIndex, &mode) == 0)
     {
         size.width = mode.w;
         size.height = mode.h;
+        size.refresh_rate = mode.refresh_rate;
     }
     return size;
 }
@@ -493,6 +498,10 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
     {
         GfScrStartDisplayId = 0;
     }
+
+    double maxRefreshRate = GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_MAXREFRESH, NULL, 50);
+
+    GfuiApp().eventLoop().setMaxRefreshRate(maxRefreshRate);
 
     bool bFullScreen;
     if (nFullScreen < 0)
@@ -727,6 +736,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
     GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_WINDOW_FULLSCREEN) ? "Yes" : "No");
     GfLogInfo("  Size        : %dx%d\n", nWinWidth, nWinHeight);
     GfLogInfo("  Color depth : %d bits\n", nTotalDepth);
+    GfLogInfo("  Max. refresh rate : %f\n", maxRefreshRate);
 
     // Report about underlying hardware (needs a running frame buffer).
     GfglFeatures::self().dumpHardwareInfo();
@@ -813,6 +823,8 @@ void GfScrShutdown(void)
                          GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_STARTUPDISPLAY, 0, 0));
             GfParmSetStr(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_VDETECT,
                          GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO));
+            GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, 0,
+                         GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, 0, 50));
             const  char* pszVInitMode =
                 GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VINIT,
                              GFSCR_VAL_VINIT_COMPATIBLE);
@@ -1280,6 +1292,20 @@ bool GfScrInitSDL2()
         // Setup the event loop about the new display.
         GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
         GfuiApp().eventLoop().postRedisplay();
+
+        double maxRefreshRate = 50;
+        void* hparmScreen =
+            GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+        if (hparmScreen)
+        {
+            maxRefreshRate = GfParmGetNum(hparmScreen,
+                GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, NULL, maxRefreshRate);
+            GfParmReleaseHandle(hparmScreen);
+        }
+
+        GfuiApp().eventLoop().setMaxRefreshRate(maxRefreshRate);
+
         return true;
     }
     else
