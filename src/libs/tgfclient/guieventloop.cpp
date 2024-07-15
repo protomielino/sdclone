@@ -242,9 +242,10 @@ void GfuiEventLoop::operator()()
 		if (!quitRequested())
 		{
 			double now = GfTimeClock();
+			double rate = 1.0 / _pPrivate->max_refresh;
 
 			// Recompute if anything to.
-			recompute();
+			recompute(1000.0 * rate);
 
 			// Redisplay if anything to.
 			redisplay();
@@ -253,7 +254,6 @@ void GfuiEventLoop::operator()()
 
 			if (_pPrivate->max_refresh)
 			{
-				double rate = 1.0 / _pPrivate->max_refresh;
 				if (elapsed < rate)
 					GfSleep(rate - elapsed);
 			}

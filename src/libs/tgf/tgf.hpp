@@ -142,6 +142,9 @@ class TGF_API GfEventLoop
 	//! Set the "recompute" callback function (run at the end of _every_ event loop).
 	void setRecomputeCB(void (*func)(void));
 
+	//! Set the "recompute" callback function with optional arguments (run at the end of _every_ event loop).
+	void setRecomputeCB(void (*func)(unsigned, void *), void *args);
+
 	//! Set a one-shot timer callback function with given delay.
 	void setTimerCB(unsigned int millis, void (*func)(int value));
 
@@ -158,8 +161,11 @@ class TGF_API GfEventLoop
 	bool quitRequested() const;
 
 	//! Do the 'computing' job of the loop (call the recompute CB or sleep).
-	void recompute();
-	
+	//! 'ms' gives a hint of how much time is available for the callback.
+	//! This might be useful if the callback calls poll(2)-like functions
+	//! inside it.
+	void recompute(unsigned ms);
+
   private: // Member data.
 
 	//! Private data (pimp pattern).

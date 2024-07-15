@@ -652,6 +652,7 @@ GfuiScreenActivate(void *screen)
 	GfuiApp().eventLoop().setMousePassiveMotionCB(gfuiMousePassiveMotion);
 	GfuiApp().eventLoop().setMouseWheelCB(gfuiMouseWheel);
 	GfuiApp().eventLoop().setRecomputeCB(0);
+	GfuiApp().eventLoop().setRecomputeCB(0, 0);
 
 	if (GfuiScreen->onlyCallback == 0) 
 	{

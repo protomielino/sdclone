@@ -47,6 +47,8 @@ class GfEventLoop::Private
     void (*cbKeyboardUp)(int key, int modifiers, int x, int y);
 
     void (*cbRecompute)(void);
+    void (*cbRecomputeArgsFn)(unsigned ms, void *args);
+    void *cbRecomputeArgsData;
 
     void (*cbTimer)(int value);
 
@@ -231,7 +233,7 @@ void GfEventLoop::operator()()
         if (!_pPrivate->bQuit)
         {
             // Recompute if anything to.
-            recompute();
+            recompute(0);
         }
     }
 
@@ -253,6 +255,12 @@ void GfEventLoop::setRecomputeCB(void (*func)(void))
     _pPrivate->cbRecompute = func;
 }
 
+void GfEventLoop::setRecomputeCB(void (*func)(unsigned, void *), void *args)
+{
+    _pPrivate->cbRecomputeArgsFn = func;
+    _pPrivate->cbRecomputeArgsData = args;
+}
+
 void GfEventLoop::setTimerCB(unsigned int millis, void (*func)(int value))
 {
     _pPrivate->cbTimer = func;
@@ -269,9 +277,11 @@ bool GfEventLoop::quitRequested() const
     return _pPrivate->bQuit;
 }
 
-void GfEventLoop::recompute()
+void GfEventLoop::recompute(unsigned ms)
 {
     // Call the 'recompute' callback if any.
-    if (_pPrivate->cbRecompute)
+    if (_pPrivate->cbRecomputeArgsFn)
+        _pPrivate->cbRecomputeArgsFn(ms, _pPrivate->cbRecomputeArgsData);
+    else if (_pPrivate->cbRecompute)
         _pPrivate->cbRecompute();
 }
