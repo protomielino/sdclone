@@ -221,3 +221,17 @@ set(TINYGLTF_PROJECT TinyGLTF-${TINYGLTF_VERSION})
 set(TINYGLTF_FILE ${TINYGLTF_PROJECT}.tar.gz)
 set(TINYGLTF_URL https://github.com/syoyo/tinygltf/archive/refs/tags/v${TINYGLTF_VERSION}.tar.gz)
 set(TINYGLTF_HASH SHA256=e567257d7addde58b0a483832cbaa5dd8f15e5bcaee6f023831e215d1a2c0502)
+
+# minizip
+set(MINIZIP_VERSION 4.0.7)
+set(MINIZIP_PROJECT minizip-${CJSON_VERSION})
+set(MINIZIP_FILE ${MINIZIP_PROJECT}.tar.gz)
+set(MINIZIP_URL https://github.com/zlib-ng/minizip-ng/archive/refs/tags/${MINIZIP_VERSION}.tar.gz)
+set(MINIZIP_HASH SHA256=a87f1f734f97095fe1ef0018217c149d53d0f78438bcb77af38adc21dff2dfbc)
+
+# cjson
+set(CJSON_VERSION 1.7.18)
+set(CJSON_PROJECT cjson-${CJSON_VERSION})
+set(CJSON_FILE ${CJSON_PROJECT}.tar.gz)
+set(CJSON_URL https://github.com/DaveGamble/cJSON/archive/refs/tags/v${CJSON_VERSION}.tar.gz)
+set(CJSON_HASH SHA256=3aa806844a03442c00769b83e99970be70fbef03735ff898f4811dd03b9f5ee5)

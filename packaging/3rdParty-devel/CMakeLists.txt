@@ -114,6 +114,8 @@ option(OPTION_CURL "Download and Build curl" true)
 option(OPTION_OSG "Download and Build OpenSceneGraph" true)
 option(OPTION_GLM "Download and install GLM math headers" true)
 option(OPTION_TINYGLTF "Download and Build TinyGLTF" true)
+option(OPTION_MINIZIP "Download and Build minizip" true)
+option(OPTION_CJSON "Download and Build cjson" true)
 option(OPTION_CACHED_ARCHIVES "Download from a defined cache" false)
 
 set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
@@ -141,6 +143,8 @@ if(OPTION_CACHED_ARCHIVES)
    set(GLM_URL "${CACHED_URL}/${GLM_FILE}")
    set(SQLITE3_URL "${CACHED_URL}/${SQLITE3_FILE}")
    set(TINYGLTF_URL "${CACHED_URL}/${TINYGLTF_FILE}")
+   set(MINIZIP_URL "${CACHED_URL}/${MINIZIP_FILE}")
+   set(CJSON_URL "${CACHED_URL}/${CJSON_FILE}")
 endif()
 
 
@@ -547,6 +551,28 @@ if(OPTION_TINYGLTF)
 else(OPTION_TINYGLTF)
    set(TINYGLTF_PROJECT )
 endif(OPTION_TINYGLTF)
+
+if(OPTION_MINIZIP)
+   set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} 
+                                          -D CMAKE_DEBUG_POSTFIX= )
+   ExternalProject_Add(${MINIZIP_PROJECT}
+      URL ${MINIZIP_URL}
+      URL_HASH ${MINIZIP_HASH}
+      CMAKE_ARGS ${MINIZIP_ARGS})
+else(OPTION_MINIZIP)
+   set(MINIZIP_PROJECT )
+endif(OPTION_MINIZIP)
+
+if(OPTION_CJSON)
+   set(CJSON_ARGS ${EXTERNALS_CMAKE_ARGS} 
+                                          -D CMAKE_DEBUG_POSTFIX= )
+   ExternalProject_Add(${CJSON_PROJECT}
+      URL ${CJSON_URL}
+      URL_HASH ${CJSON_HASH}
+      CMAKE_ARGS ${CJSON_ARGS})
+else(OPTION_CJSON)
+   set(CJSON_PROJECT )
+endif(OPTION_CJSON)
 
 
 # no-output target, for having some files available in IDEs.
