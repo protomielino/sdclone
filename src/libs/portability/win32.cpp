@@ -8,21 +8,21 @@
  * (at your option) any later version.
  */
 
-#include "portability.h"
 #include <windows.h>
 #include <winerror.h>
 #include <shellapi.h>
-#include <errno.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cerrno>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 static char *getdir(const char *path)
 {
     /* SHFileOperation requires a double null-terminated string. */
-    size_t sz = strlen(path) + sizeof (const char[]){'\0', '\0'};
-    char *ret = malloc(sz);
+    static const char end[] = {'\0', '\0'};
+    size_t sz = strlen(path) + sizeof end;
+    char *ret = static_cast<char *>(malloc(sz));
 
     if (!ret)
     {
@@ -36,13 +36,14 @@ static char *getdir(const char *path)
 
 failure:
     free(ret);
-    return NULL;
+    return nullptr;
 }
 
 int portability::rmdir_r(const char *path)
 {
-    int ret = -1;
-    char *dir = dir = getdir(path);
+    int ret = -1, res;
+    char *dir = getdir(path);
+    SHFILEOPSTRUCT op = {0};
 
     if (!dir)
     {
@@ -50,16 +51,12 @@ int portability::rmdir_r(const char *path)
         goto end;
     }
 
-    SHFILEOPSTRUCT op = {
-        .wFunc = FO_DELETE,
-        .pFrom = dir,
-        .fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT,
-        .lpszProgressTitle = ""
-    };
+    op.wFunc = FO_DELETE;
+    op.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+    op.lpszProgressTitle = "";
+    op.pFrom = dir;
 
-    int res = SHFileOperation(&op);
-
-    if (res)
+    if ((res = SHFileOperation(&op)))
     {
         fprintf(stderr, "%s: SHFileOperation failed with %#x\n", __func__, res);
         goto end;
