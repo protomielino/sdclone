@@ -224,7 +224,7 @@ set(TINYGLTF_HASH SHA256=e567257d7addde58b0a483832cbaa5dd8f15e5bcaee6f023831e215
 
 # minizip
 set(MINIZIP_VERSION 4.0.7)
-set(MINIZIP_PROJECT minizip-${CJSON_VERSION})
+set(MINIZIP_PROJECT minizip-${MINIZIP_VERSION})
 set(MINIZIP_FILE ${MINIZIP_PROJECT}.tar.gz)
 set(MINIZIP_URL https://github.com/zlib-ng/minizip-ng/archive/refs/tags/${MINIZIP_VERSION}.tar.gz)
 set(MINIZIP_HASH SHA256=a87f1f734f97095fe1ef0018217c149d53d0f78438bcb77af38adc21dff2dfbc)
