@@ -17,6 +17,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include "portability.h"
+
 static char *getdir(const char *path)
 {
     /* SHFileOperation requires a double null-terminated string. */
