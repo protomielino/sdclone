@@ -553,19 +553,21 @@ else(OPTION_TINYGLTF)
 endif(OPTION_TINYGLTF)
 
 if(OPTION_MINIZIP)
-   set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} 
-                                          -D CMAKE_DEBUG_POSTFIX= )
+   set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX=
+                                            -D MZ_ZSTD=OFF
+                                            -D MZ_BZIP2=OFF
+                                            -D MZ_LZMA=OFF )
    ExternalProject_Add(${MINIZIP_PROJECT}
       URL ${MINIZIP_URL}
       URL_HASH ${MINIZIP_HASH}
-      CMAKE_ARGS ${MINIZIP_ARGS})
+      CMAKE_ARGS ${MINIZIP_ARGS}
+      DEPENDS ${ZLIB_PROJECT})
 else(OPTION_MINIZIP)
    set(MINIZIP_PROJECT )
 endif(OPTION_MINIZIP)
 
 if(OPTION_CJSON)
-   set(CJSON_ARGS ${EXTERNALS_CMAKE_ARGS} 
-                                          -D CMAKE_DEBUG_POSTFIX= )
+   set(CJSON_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX= )
    ExternalProject_Add(${CJSON_PROJECT}
       URL ${CJSON_URL}
       URL_HASH ${CJSON_HASH}
