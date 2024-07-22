@@ -17,6 +17,8 @@ SET(MAINSCREENS_SOURCES ${MS}/splash.cpp ${MS}/mainmenu.cpp
                         ${MS}/writefile.cpp)
 SET(MAINSCREENS_HEADERS ${MS}/splash.h ${MS}/mainmenu.h
                         ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h
+                        ${MS}/asset.h
+                        ${MS}/assets.h
                         ${MS}/downloadservers.h
                         ${MS}/downloadsmenu.h
                         ${MS}/entry.h
