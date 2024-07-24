@@ -107,6 +107,7 @@ ADD_CURL_INCLUDEDIR()
 find_package(minizip REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(cJSON 1.0 REQUIRED)
+find_package(curl REQUIRED)
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
