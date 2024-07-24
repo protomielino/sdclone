@@ -581,17 +581,16 @@ int DownloadsMenu::extract(const entry *e, const std::string &src,
         return -1;
     }
 
-    std::string tmp;
+    std::string name;
 
-    if (tmppath(tmp))
+    if (randname(name))
     {
-        error = "Failed to generate temporary filename";
-        GfLogError("tmppath failed\n");
+        error = "Failed to generate random directory name";
+        GfLogError("randname failed\n");
         return -1;
     }
 
-    tmp += "/";
-
+    std::string tmp = data + name + "/";
     unzip u(src, tmp, a.directory);
     std::string dst = data + a.path() + a.directory,
         tmpd = tmp + a.directory;
