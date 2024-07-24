@@ -623,7 +623,7 @@ int DownloadsMenu::extract(const entry *e, const std::string &src,
 
         error = "Failed to rename directory: ";
         error += e;
-        GfLogError("remove(3) %s -> %s: %s\n", tmpd.c_str(), dst.c_str(), e);
+        GfLogError("rename(3) %s -> %s: %s\n", tmpd.c_str(), dst.c_str(), e);
         goto end;
     }
 
