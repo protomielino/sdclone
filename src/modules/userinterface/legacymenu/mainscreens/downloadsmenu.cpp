@@ -308,12 +308,12 @@ static size_t on_write(char *ptr, size_t size, size_t nmemb, void *userdata)
     if (size != 0 && total / size != nmemb)
     {
         GfLogError("size calculation wrapped around\n");
-        return -1;
+        return !size;
     }
     else if (s->append(ptr, total))
     {
         GfLogError("append failed\n");
-        return -1;
+        return !size;
     }
 
     return total;
