@@ -23,6 +23,7 @@
     @ingroup	trace
 */
 
+#include <portability.h>
 
 #include <cerrno>
 #include <cstdio>
@@ -37,13 +38,11 @@
 #include <map>
 				  
 #ifdef WIN32
-#include <windows.h>
 #include <windowsx.h>
 #else
 #include <sys/param.h>
 #endif // WIN32
 
-#include "portability.h"
 #include "tgf.hpp"
 
 

@@ -15,9 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <portability.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -26,7 +24,6 @@
 #include <utility>
 #include <math.h>
 
-#include <portability.h>
 #include <tgf.h>
 #include <track.h>
 #include <car.h>

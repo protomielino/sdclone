@@ -17,10 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h> // snprintf
+
 #include <ctime>
 
 #include <robottools.h>	//RtXXX()
-#include <portability.h> // snprintf
 #include <glfeatures.h>
 
 #include <plib/ssgAux.h>

@@ -32,13 +32,12 @@
 /** @defgroup teammanager		Teammanager for robots.
     @ingroup	robottools
 */
-    
+
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include <car.h>
 #include "robottools.h"
 #include "teammanager.h"

@@ -24,9 +24,9 @@
     @ingroup	hash
 */
 
-#include "tgf.h"
 #include "portability.h"
 
+#include "tgf.h"
 typedef struct HashElem
 {
     char				*key;

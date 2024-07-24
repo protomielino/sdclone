@@ -24,14 +24,14 @@
 */
 
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <string>
 #include <map>
 #include <iostream>
-
-#include <portability.h>
 
 #include "tgfclient.h"
 #include "gui.h"

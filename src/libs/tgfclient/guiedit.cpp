@@ -24,10 +24,10 @@
     @ingroup	gui
 */
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstring>
-
-#include <portability.h>
 
 #include "tgfclient.h"
 #include "gui.h"

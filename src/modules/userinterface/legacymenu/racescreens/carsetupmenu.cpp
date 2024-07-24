@@ -21,6 +21,8 @@
 This file deals with car setup
 */
 
+#include <portability.h>
+
 #include <sstream>
 #include <iomanip>
 
@@ -30,7 +32,6 @@ This file deals with car setup
 #include <tracks.h>
 #include <drivers.h>
 #include <playerpref.h>
-#include <portability.h>
 
 #include "carsetupmenu.h"
 

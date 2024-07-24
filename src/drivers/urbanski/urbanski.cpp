@@ -6,9 +6,7 @@
 
  ***************************************************************************/
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <portability.h>
 
 #include <cstdio>
 #include <cstdlib>

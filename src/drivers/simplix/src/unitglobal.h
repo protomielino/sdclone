@@ -35,9 +35,10 @@
 #ifndef	_UNITGOBAL_H_
 #define	_UNITGOBAL_H_
 
+#include <portability.h>
+
 // The great question, ...
 #if	defined(WIN32) || defined(_WIN32)
-#include <windows.h>	 // The rich world	of windows and gates, ...
 #define	mysecure		   //	Use	_fopen_s
 #define	myhypot	_hypot	   // Use _hypot	instead	of hypot
 #define	myfopen	_fopen_s   // Use _fopen_s instead of fopen
@@ -50,8 +51,6 @@
 #endif					 // ... who needs windows and gates?
 // ... but the answer is just 42!
 
-#include <portability.h> //	could be used now without vc++ 2005	warnings ...
-//... BUT will not work	with vc++2008!!!
 /*
 // VC++	2005 or	newer ...
 #if	defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++	2005

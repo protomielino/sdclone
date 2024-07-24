@@ -21,12 +21,13 @@
     @ingroup	tgf
 */
 
+#include "portability.h"
+
 #include <cstdio>
 #include <cerrno>
 #include <sys/stat.h>
 
 #include "tgf.h"
-#include "portability.h"
 
 
 static bool gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )

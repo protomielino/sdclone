@@ -19,14 +19,12 @@
 #ifndef __GRSHADER_H
 #define __GRSHADER_H
 
+#include <portability.h>
+
 #include <plib/ssg.h>
 #include "grmain.h"
 
-#include <portability.h>
-
 #ifdef WIN32
-#  include <windows.h>
-
 extern PFNGLVERTEXATTRIB1DARBPROC glVertexAttrib1dARB;
 extern PFNGLVERTEXATTRIB1DVARBPROC glVertexAttrib1dvARB;
 extern PFNGLVERTEXATTRIB1FARBPROC glVertexAttrib1fARB;

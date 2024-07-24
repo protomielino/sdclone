@@ -17,9 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #include <algorithm>
 
-#include <portability.h>
 #include <robottools.h>
 #include <glfeatures.h>
 

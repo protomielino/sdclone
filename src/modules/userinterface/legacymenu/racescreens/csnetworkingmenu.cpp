@@ -23,11 +23,12 @@
    Should also allow choosing IP address, track, etc ...
 */
 #ifdef CLIENT_SERVER
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <string>
 
-#include <portability.h>
 #include <tgf.hpp>
 #include <tgfclient.h>
 

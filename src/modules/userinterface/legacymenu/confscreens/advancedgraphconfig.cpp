@@ -23,11 +23,12 @@
     @version	$Id: advancedgraphconfig.cpp 4542 2012-05-13 17:24:29Z torcs-ng $
 */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
-#include <portability.h>
 #include <tgfclient.h>
 #include <graphic.h>
 

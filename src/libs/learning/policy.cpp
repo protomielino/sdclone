@@ -11,6 +11,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #include <cstring>
 #include <math.h>
 #include "learn_debug.h"
@@ -25,8 +27,6 @@
 #define isnan std::isnan
 #endif
 #endif // WIN32
-
-#include <portability.h>
 
 #undef POLICY_LOG
 

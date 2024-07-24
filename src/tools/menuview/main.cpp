@@ -17,13 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <string>
-
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-
 #include <portability.h>
+
+#include <string>
 
 #include <tgfclient.h>
 

@@ -27,9 +27,7 @@
 #ifndef _GRTRACKMAP_H_
 #define _GRTRACKMAP_H_
 
-#ifdef WIN32
-#include <windows.h>
-#endif //WIN32
+#include <portability.h>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

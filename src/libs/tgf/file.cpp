@@ -23,6 +23,8 @@
     @ingroup	file
 */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cerrno>
 #include <sys/stat.h>
@@ -30,8 +32,6 @@
 #ifdef WIN32
 #include <io.h>
 #endif
-
-#include <portability.h>
 
 #include "tgf.h"
 

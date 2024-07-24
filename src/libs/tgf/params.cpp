@@ -23,6 +23,8 @@
     @ingroup	params
 */
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -35,9 +37,6 @@
 
 #ifdef WIN32
 #include <io.h>
-#include <windows.h>
-#else
-#include <unistd.h>
 #endif
 
 #ifdef THIRD_PARTY_EXPAT
@@ -46,7 +45,6 @@
 #include <xmlparse.h>
 #endif
 
-#include <portability.h>
 #include "tgf.h"
 
 

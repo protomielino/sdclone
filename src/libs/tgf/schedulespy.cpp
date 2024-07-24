@@ -22,14 +22,14 @@
 
 #ifdef SCHEDULE_SPY
 
+#include <portability.h>
+
 #include <vector>
 #include <map>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
 #include <locale>
-
-#include <portability.h>
 
 #include "tgf.h"
 

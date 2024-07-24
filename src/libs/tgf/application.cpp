@@ -22,6 +22,8 @@
     @ingroup	tgf
 */
 
+#include <portability.h>
+
 #include <cerrno>
 #include <ctime>
 #include <limits>
@@ -36,8 +38,6 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-
-#include <portability.h>
 
 #include "tgf.hpp"
 

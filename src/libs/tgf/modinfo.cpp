@@ -22,17 +22,14 @@
     @version	$Id$
 */
 
+#include <portability.h>
+
 #include <cstring>
 #include <climits>
 
-#ifdef WIN32
-#include <windows.h>
-#include <direct.h>
-#else
+#ifndef WIN32
 #include <dlfcn.h>
 #endif
-
-#include <portability.h>
 
 #include "tgf.h"
 

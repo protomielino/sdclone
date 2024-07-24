@@ -28,11 +28,10 @@
     @ingroup	robottools
 */
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <math.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include <car.h>
 #include <tgf.h>
 #include <track.h>

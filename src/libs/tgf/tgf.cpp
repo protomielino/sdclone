@@ -16,13 +16,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #ifdef WIN32
-#include <windows.h>
-#include <direct.h>
 #include <shlobj.h>
 #include <io.h>
-#else
-#include <unistd.h> // getcwd, access
 #endif
 
 #include <cstdio>
@@ -35,8 +33,6 @@
 #endif
 
 #include <SDL.h>
-
-#include <portability.h>
 
 #include "tgf.hpp"
 

@@ -20,10 +20,6 @@
 
 #pragma once
 
-#if _WIN32
-#include <windows.h>
-#endif
-
 extern void *menuHandle;
 
 // What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
@@ -31,5 +27,3 @@ extern void *menuHandle;
 
 extern int PreviewMenuInit(const char *pFile);
 extern int PreviewMenuRun(void);
-
-

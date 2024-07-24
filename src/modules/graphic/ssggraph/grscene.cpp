@@ -17,18 +17,18 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h> // snprintf
+
 #include <ctime>
 #include <string>
 
 #ifdef WIN32
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
 
 #include <glfeatures.h>
 #include <robottools.h>	//RtXXX()
-#include <portability.h> // snprintf
 
 #include "grscene.h"
 #include "grbackground.h"

@@ -35,7 +35,8 @@
 #ifdef _MSC_VER
 #include <direct.h>
 #include <process.h>
-#define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
+#define WIN32_LEAN_AND_MEAN   /* Prevent inclusion of winsock.h in windows.h */
+#include <windows.h>
 #else
 #include <unistd.h>
 #endif

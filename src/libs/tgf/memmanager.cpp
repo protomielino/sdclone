@@ -16,10 +16,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #include "memmanager.h"
 #ifdef __DEBUG_MEMORYMANAGER__
-
-#include <portability.h>
 
 #include "tgf.h"
 
@@ -37,7 +37,6 @@
 	// ... MinGW
 	#else
 	// VC++ ...
-		#include <windows.h>
 		#include <crtdbg.h>
 		#include <cassert>
 		#include <cstdio>

@@ -8,7 +8,8 @@
  * (at your option) any later version.
  */
 
-#include <windows.h>
+#include "portability.h"
+
 #include <winerror.h>
 #include <shellapi.h>
 #include <cerrno>
@@ -16,8 +17,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-
-#include "portability.h"
 
 static char *getdir(const char *path)
 {

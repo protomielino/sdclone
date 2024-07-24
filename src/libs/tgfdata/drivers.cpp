@@ -17,12 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #include <cctype>
 #include <map>
 #include <sstream>
 #include <algorithm>
-
-#include <portability.h>
 
 #include <robot.h>
 

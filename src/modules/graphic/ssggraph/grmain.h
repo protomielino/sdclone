@@ -20,10 +20,11 @@
 #ifndef _GRMAIN_H_
 #define _GRMAIN_H_
 
+#include <portability.h>
+
 #include <plib/ssg.h>	//ssgContect
 
 #ifdef WIN32
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif

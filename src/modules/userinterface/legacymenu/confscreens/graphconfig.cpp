@@ -23,11 +23,12 @@
     @version	$Id$
 */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
-#include <portability.h>
 #include <tgfclient.h>
 #include <graphic.h>
 

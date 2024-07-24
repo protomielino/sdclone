@@ -11,6 +11,8 @@
 #ifndef DOWNLOADSMENU_H
 #define DOWNLOADSMENU_H
 
+#include <portability.h>
+
 #include "assets.h"
 #include "entry.h"
 #include "sink.h"

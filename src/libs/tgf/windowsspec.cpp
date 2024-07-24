@@ -19,14 +19,12 @@
 
 // Note: This code is intended to be compiled ONLY under Windows.
 
+#include <portability.h>
+
 #include <cstddef>
 #include <sys/types.h>
 #include <ctime>
-#include <direct.h>
 #include <io.h>
-#include <windows.h>
-
-#include <portability.h>
 
 #include "tgf.h"
 #include "os.h"

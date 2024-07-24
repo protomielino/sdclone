@@ -26,6 +26,8 @@
 #ifndef _AC3D_H_
 #define _AC3D_H_
 
+#include <portability.h>
+
 #include <array>
 #include <stack>
 #include <string>
@@ -34,8 +36,6 @@
 #include <fstream>
 #include <limits>
 #include <map>
-
-#include <portability.h>
 
 struct Ac3d
 {

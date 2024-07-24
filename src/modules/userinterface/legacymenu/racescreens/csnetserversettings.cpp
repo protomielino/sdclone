@@ -18,11 +18,12 @@
  ***************************************************************************/
 
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 
-#include <portability.h>
 #include <tgfclient.h>
 
 #include <raceman.h>

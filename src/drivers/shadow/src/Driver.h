@@ -26,11 +26,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <portability.h>
+
 #include <track.h>
 #include <car.h>
 #include <robot.h>
-#include <portability.h>
-
 #include <vector>
 #include <algorithm>
 

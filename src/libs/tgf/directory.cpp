@@ -23,11 +23,11 @@
     @ingroup	dir
 */
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <cerrno>
 #include <sys/stat.h>
-
-#include <portability.h>
 
 #include "tgf.h"
 #include "os.h"

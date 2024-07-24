@@ -22,6 +22,9 @@
     @version	$Id$
     @ingroup	gui
 */
+
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -37,7 +40,6 @@
 
 #include <raceman.h>
 
-#include <portability.h>
 #include <tgf.hpp>
 
 #include "tgfclient.h"

@@ -30,13 +30,12 @@
     <br>The graphs are build by gnuplot.
     @ingroup	robottools
 */
-    
+
+#include <portability.h>
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include <telemetry.h>
 #include "robottools.h"
 #include <tgf.h>

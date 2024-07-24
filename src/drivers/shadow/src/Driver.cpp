@@ -20,6 +20,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
+#include <portability.h>
+
 #include <cstdlib>
 #include <algorithm>
 #include <string>
@@ -31,7 +33,6 @@
 #include "Avoidance.h"
 #include "CarBounds2d.h"
 
-#include <portability.h>
 #include <robottools.h>
 
 using namespace std;

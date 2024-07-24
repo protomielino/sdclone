@@ -17,13 +17,13 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #ifdef WIN32
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
 
-#include <portability.h>
 #include <plib/ssg.h>
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY

@@ -8,9 +8,10 @@
  * (at your option) any later version.
  */
 
+#include <portability.h>
+
 #include <tgfclient.h>
 #include <tgf.hpp>
-#include <portability.h>
 #include "assets.h"
 #include "downloadsmenu.h"
 #include "downloadservers.h"

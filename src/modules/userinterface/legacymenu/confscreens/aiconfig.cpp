@@ -22,12 +22,13 @@
     @version	$Id$
 */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 
 #include <tgfclient.h>
 #include <robot.h>
-#include <portability.h>
 
 #include "aiconfig.h"
 

@@ -23,20 +23,16 @@
     @version	$Id$
 */
 
+#include <portability.h>
+
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#ifndef WIN32
-#include <unistd.h>
-#else
-#include <windows.h>
-#endif
 #include <cmath>
 #include <vector>
 #include <plib/ssg.h>
 
-#include <portability.h>
 #include <tgfclient.h>
 #include <track.h>
 

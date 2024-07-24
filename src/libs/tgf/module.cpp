@@ -22,12 +22,13 @@
     @ingroup	module
 */
 
+#include <portability.h>
+
 #include <sstream>
 
 #include "tgf.hpp"
 
 #ifdef WIN32
-# include <windows.h>
 # define dlopen(pszShLibFileName) (void*)LoadLibrary(pszShLibFileName)
 # define dlsym(pvHandle, pszFuncName) GetProcAddress((HMODULE)pvHandle, pszFuncName)
 # define dlclose(pvHandle) !FreeLibrary((HMODULE)pvHandle)

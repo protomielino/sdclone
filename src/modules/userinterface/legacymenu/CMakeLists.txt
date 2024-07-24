@@ -130,8 +130,15 @@ SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 find_package(OpenSSL 2.0 REQUIRED)
-ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
-    cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB)
+
+IF(WIN32)
+    ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
+        cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB bcrypt)
+ELSE(WIN32)
+    ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
+        cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB)
+ENDIF(WIN32)
+
 target_compile_features(legacymenu PRIVATE cxx_std_11)
 set_target_properties(legacymenu PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)
 ADD_CURL_LIBRARY(legacymenu)

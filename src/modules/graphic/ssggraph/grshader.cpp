@@ -16,6 +16,8 @@ version              : $Id: grshader.cpp 4374 2015-10-10 23:20:37Z torcs-ng $
 *                                                                         *
 ***************************************************************************/
 
+#include <portability.h>
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
@@ -27,7 +29,6 @@ version              : $Id: grshader.cpp 4374 2015-10-10 23:20:37Z torcs-ng $
 #include "grshader.h"
 
 #ifdef WIN32
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 PFNGLVERTEXATTRIB1DARBPROC glVertexAttrib1dARB = NULL;

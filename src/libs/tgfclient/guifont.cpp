@@ -19,6 +19,8 @@
 /* This font manipulation is based on Brad Fish's glFont format and code.  */
 /* http://www.netxs.net/bfish/news.html                                    */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -30,8 +32,6 @@
 #ifdef LINUX
 #include <endian.h>
 #endif
-
-#include <portability.h>
 
 #include "tgfclient.h"
 #include "glfeatures.h"

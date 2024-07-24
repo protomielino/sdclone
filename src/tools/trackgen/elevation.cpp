@@ -24,18 +24,16 @@
  */
 
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
-#ifndef WIN32
-#include <unistd.h>
-#endif
 #include <cmath>
 
 #include <tgfclient.h>
 #include <track.h>
-#include <portability.h>
 
 #include "ac3d.h"
 #include "trackgen.h"

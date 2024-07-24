@@ -19,8 +19,9 @@
 
 /* Display configuration menu */
 
-#include <sstream>
 #include <portability.h>
+
+#include <sstream>
 #include <tgfclient.h>
 #include <graphic.h>
 

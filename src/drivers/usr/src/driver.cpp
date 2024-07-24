@@ -15,6 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>
+
 #include <teammanager.h>
 
 #include "driver.h"
@@ -26,8 +28,6 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
-
-#include <portability.h>
 
 
 //#define TIME_ANALYSIS

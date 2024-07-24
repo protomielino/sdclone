@@ -23,23 +23,16 @@
     @ingroup	screen
 */
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstring>
 #include <cmath>
 #include <sstream>
 #include <algorithm>
 
-#ifdef WIN32
-#include <windows.h>
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <SDL.h>
 #include <SDL_video.h>
-
-#include <portability.h>
 
 #include "tgfclient.h"
 #include "gui.h"

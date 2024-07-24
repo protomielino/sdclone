@@ -18,6 +18,8 @@
 #ifndef _GLOBAL_DEFINITIONS_H_
 #define _GLOBAL_DEFINITIONS_H_
 
+#include <portability.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -29,7 +31,6 @@
 #include <raceman.h>
 #include <robot.h>
 #include <robottools.h>
-#include <portability.h>
 
 
 

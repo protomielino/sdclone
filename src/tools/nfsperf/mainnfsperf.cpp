@@ -17,8 +17,10 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
+
+#include <portability.h>
+
 #ifdef WIN32
-#include <windows.h>
 #include <io.h>
 #endif
 
@@ -29,7 +31,6 @@
 #endif
 
 #include <tgf.h>
-#include <portability.h>
 
 
 char	*catfile = NULL;

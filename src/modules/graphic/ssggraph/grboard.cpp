@@ -17,10 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <portability.h>    // snprintf
+
 #include "grboard.h"
 
 #include <plib/ssg.h>
-#include <portability.h>    // snprintf
 #include <robottools.h>     // RELAXATION
 
 #include <algorithm>        // remove

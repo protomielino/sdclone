@@ -28,8 +28,9 @@
 #ifndef _TIMEANALYSIS_H_
 #define _TIMEANALYSIS_H_
 
+#include <portability.h>
+
 #ifdef WIN32
-#include <windows.h>
 #include <ctime>
 #else
 #include <sys/time.h>
