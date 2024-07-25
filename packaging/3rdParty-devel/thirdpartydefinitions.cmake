@@ -115,11 +115,11 @@ set(FREESOLID_URL https://sourceforge.net/projects/freesolid/files/${FREESOLID_F
 set(FREESOLID_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708b5c28eb873)
 
 # enet
-set(ENET_VERSION 1.3.17)
+set(ENET_VERSION 1.3.18)
 set(ENET_PROJECT enet-${ENET_VERSION})
 set(ENET_FILE ${ENET_PROJECT}.tar.gz)
 set(ENET_URL https://github.com/lsalzman/enet/archive/refs/tags/v${ENET_VERSION}.tar.gz)
-set(ENET_HASH SHA256=1e0b4bc0b7127a2d779dd7928f0b31830f5b3dcb7ec9588c5de70033e8d2434a)
+set(ENET_HASH SHA256=28603c895f9ed24a846478180ee72c7376b39b4bb1287b73877e5eae7d96b0dd)
 
 # ogg
 set(OGG_VERSION 1.3.5)
@@ -136,12 +136,12 @@ set(VORBIS_URL http://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
-set(EXPAT_VERSION 2.6.0)
+set(EXPAT_VERSION 2.6.2)
 string(REPLACE "." "_" EXPAT_TAG ${EXPAT_VERSION})
 set(EXPAT_PROJECT expat-${EXPAT_VERSION})
 set(EXPAT_FILE ${EXPAT_PROJECT}.tar.bz2)
 set(EXPAT_URL https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_TAG}/${EXPAT_FILE})
-set(EXPAT_HASH SHA256=ff60e6a6b6ce570ae012dc7b73169c7fdf4b6bf08c12ed0ec6f55736b78d85ba)
+set(EXPAT_HASH SHA256=9c7c1b5dcbc3c237c500a8fb1493e14d9582146dd9b42aa8d3ffb856a3b927e0)
 
 set(EXPAT_LEGACY_VERSION 2.2.10)
 string(REPLACE "." "_" EXPAT_LEGACY_TAG ${EXPAT_LEGACY_VERSION})
@@ -202,11 +202,11 @@ set(OSG_HASH SHA256=0e9e3e4cc6f463f21a901934a95e9264b231a1d5db90f72dcb4b8cc94b0d
 
 # sqlite3
 message(STATUS "Note the YEAR in the path AND hard-coded filename")
-set(SQLITE3_VERSION 3.45.1)
+set(SQLITE3_VERSION 3.46.0)
 set(SQLITE3_PROJECT sqlite3-${SQLITE3_VERSION})
-set(SQLITE3_FILE sqlite-amalgamation-3450100.zip)
+set(SQLITE3_FILE sqlite-amalgamation-3460000.zip)
 set(SQLITE3_URL https://www.sqlite.org/2024/${SQLITE3_FILE})
-set(SQLITE3_HASH SHA256=5592243caf28b2cdef41e6ab58d25d653dfc53deded8450eb66072c929f030c4)
+set(SQLITE3_HASH SHA256=712a7d09d2a22652fb06a49af516e051979a3984adb067da86760e60ed51a7f5)
 
 # GLM
 set(GLM_VERSION 1.0.1)
@@ -216,11 +216,11 @@ set(GLM_URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.g
 set(GLM_HASH SHA256=9f3174561fd26904b23f0db5e560971cbf9b3cbda0b280f04d5c379d03bf234c)
 
 # TinyGLTF 
-set(TINYGLTF_VERSION 2.8.21)
+set(TINYGLTF_VERSION 2.8.22)
 set(TINYGLTF_PROJECT TinyGLTF-${TINYGLTF_VERSION})
 set(TINYGLTF_FILE ${TINYGLTF_PROJECT}.tar.gz)
 set(TINYGLTF_URL https://github.com/syoyo/tinygltf/archive/refs/tags/v${TINYGLTF_VERSION}.tar.gz)
-set(TINYGLTF_HASH SHA256=e567257d7addde58b0a483832cbaa5dd8f15e5bcaee6f023831e215d1a2c0502)
+set(TINYGLTF_HASH SHA256=97c3eb1080c1657cd749d0b49af189c6a867d5af30689c48d5e19521e7b5a070)
 
 # minizip
 set(MINIZIP_VERSION 4.0.7)
