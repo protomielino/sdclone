@@ -41,23 +41,23 @@ public:
   ObjectPtr obj1;
   ObjectPtr obj2;
   Vector sep_axis;
-  
+
   Encounter(ObjectPtr o1, ObjectPtr o2) {
-    if (o2->shapePtr->getType() < o1->shapePtr->getType() || 
-	(o2->shapePtr->getType() == o1->shapePtr->getType() && o2 < o1)) { 
-      obj1 = o2; 
-      obj2 = o1; 
+    if (o2->shapePtr->getType() < o1->shapePtr->getType() ||
+	(o2->shapePtr->getType() == o1->shapePtr->getType() && o2 < o1)) {
+      obj1 = o2;
+      obj2 = o1;
     }
-    else { 
-      obj1 = o1; 
-      obj2 = o2; 
+    else {
+      obj1 = o1;
+      obj2 = o2;
     }
     sep_axis.setValue(0, 0, 0);
   }
 };
 
-inline bool operator<(const Encounter& x, const Encounter& y) { 
-  return x.obj1 < y.obj1 || (!(y.obj1 < x.obj1) && x.obj2 < y.obj2); 
+inline bool operator<(const Encounter& x, const Encounter& y) {
+  return x.obj1 < y.obj1 || (!(y.obj1 < x.obj1) && x.obj2 < y.obj2);
 }
 
 #endif

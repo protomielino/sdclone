@@ -1,7 +1,7 @@
 #ifndef _AVERAGEDATA_H_
 #define _AVERAGEDATA_H_
 
-class AveragedData  
+class AveragedData
 {
 public:
 	AveragedData( int nBinsX, double minX, double maxX,

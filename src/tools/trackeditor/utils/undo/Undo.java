@@ -25,7 +25,7 @@ import java.util.Vector;
 
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -35,7 +35,7 @@ public class Undo
 	private static Vector<UndoInterface>	redoSegments	= new Vector<UndoInterface>();
 
 	/**
-	 *  
+	 *
 	 */
 	public Undo()
 	{
@@ -44,7 +44,7 @@ public class Undo
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see undo.UndoInterface#undo()
 	 */
 	public static void undo()
@@ -60,7 +60,7 @@ public class Undo
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see undo.UndoInterface#redo()
 	 */
 	public static void redo()
@@ -76,7 +76,7 @@ public class Undo
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see undo.UndoInterface#add(utils.circuit.Segment)
 	 */
 	public static void add(UndoInterface undo)

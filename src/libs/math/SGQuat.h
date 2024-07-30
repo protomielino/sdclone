@@ -176,7 +176,7 @@ public:
       xRad = 0;
     else
       xRad = atan2(num, den);
-    
+
     value_type tmp = 2*(x()*z() - w()*y());
     if (tmp < -1)
       yRad = 0.5*SGMisc<value_type>::pi();
@@ -184,8 +184,8 @@ public:
       yRad = -0.5*SGMisc<value_type>::pi();
     else
       yRad = -asin(tmp);
-   
-    num = 2*(x()*y() + w()*z()); 
+
+    num = 2*(x()*y() + w()*z());
     den = sqrQW + sqrQX - sqrQY - sqrQZ;
     if (fabs(den) < SGLimits<value_type>::min() &&
         fabs(num) < SGLimits<value_type>::min())
@@ -220,7 +220,7 @@ public:
       T sAng = sin(angle);
       if (fabs(sAng) < SGLimits<T>::min())
         axis = SGVec3<T>(1, 0, 0);
-      else 
+      else
         axis = (rNrm/sAng)*imag(*this);
       angle *= 2;
     }
@@ -340,7 +340,7 @@ public:
     deriv.x() = 0.5*( w()*angVel(0) - z()*angVel(1) + y()*angVel(2));
     deriv.y() = 0.5*( z()*angVel(0) + w()*angVel(1) - x()*angVel(2));
     deriv.z() = 0.5*(-y()*angVel(0) + x()*angVel(1) + w()*angVel(2));
-    
+
     return deriv;
   }
 

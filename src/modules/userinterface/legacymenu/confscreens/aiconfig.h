@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @version	$Id$
 */
 
@@ -29,7 +29,7 @@
 
 extern void *AIMenuInit(void *prevMenu);
 
-#endif /* _AICONFIG_H_ */ 
+#endif /* _AICONFIG_H_ */
 
 
 

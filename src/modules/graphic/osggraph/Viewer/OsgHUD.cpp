@@ -1971,7 +1971,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         //we do this one time (when a new car is selected)
         if (carHasChanged)
         {
-            //empty the vector to 
+            //empty the vector to
             horsepowerPoints.clear();
 
             //fill it with data, for each datapoint
@@ -2005,7 +2005,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 }
                 //insert the poin value
                 horsepowerPoints.push_back(value);
-                
+
                 prevrpm = rpm;
                 prevtorque = torque;
             }
@@ -2019,7 +2019,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         //otherwise we get infinite values
         if(currCar->_enginerpm > 0 && currCar->_gear > 0 ){
             float nextRpm = currCar->_enginerpm / currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)] * currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset +1)];
-            
+
             //reset all the led to off, we will turn on what's needed later
             hudImgElements["light1-on"]->setNodeMask(0);
             hudImgElements["light2-on"]->setNodeMask(0);
@@ -2033,7 +2033,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             hudImgElements["light10-on"]->setNodeMask(0);
             hudImgElements["light11-on"]->setNodeMask(0);
             hudImgElements["light12-on"]->setNodeMask(0);
-            
+
             float horsepowerCurr = horsepowerPoints.at((int)currCar->_enginerpm);
             float horsepowerNext = horsepowerPoints.at((int)nextRpm);
             //GfLogInfo("Curr gear %i (%f) - RPM %i - CurrPower %f \n", currCar->_gear, currCar->_gearRatio[(int) (currCar->_gear + currCar->_gearOffset)], (int)RADS2RPM(currCar->_enginerpm), horsepowerCurr);
@@ -2813,7 +2813,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //correct the image size to match the hud scale
                             float imgWidth = img->s() *  hudScale;
                             float imgHeight = img->t() * hudScale;
-                            
+
                             //if we specified a different size use that
                            // GfLogError ("OSGHUD: Forced image width %f: \n", forcedImageWidth);
                            // GfLogError ("for %s: \n", url.c_str());

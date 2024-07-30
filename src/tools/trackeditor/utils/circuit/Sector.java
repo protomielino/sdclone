@@ -5,7 +5,7 @@ public class Sector
 	private String	name				= null;
 	private String	comment				= null;
 	private double	distanceFromStart	= Double.NaN;
-	
+
 	public String getName()
 	{
 		return name;

@@ -2,9 +2,9 @@
 
     file        : racemessage.h
     created     : Sat Nov 23 09:35:21 CET 2002
-    copyright   : (C) 2002 by Eric Espie                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espie
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     	    Race message management. Don't use directly, call ReSituation::setRaceMessage.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
@@ -33,7 +33,7 @@ extern void ReRaceMsgSet(struct RmInfo* pReInfo, const char *msg, double life = 
 extern void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life = -1);
 
 
-#endif /* _RACEMESSAGE_H_ */ 
+#endif /* _RACEMESSAGE_H_ */
 
 
 

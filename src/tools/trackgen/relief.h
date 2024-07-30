@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -30,7 +30,7 @@ extern void LoadRelief(tTrack *track, void * TrackHandle, const std::string &rel
 extern void CountRelief(bool interior, int *nb_vert, int *nb_seg);
 extern void GenRelief(bool interior);
 
-#endif /* _RELIEF_H_ */ 
+#endif /* _RELIEF_H_ */
 
 
 

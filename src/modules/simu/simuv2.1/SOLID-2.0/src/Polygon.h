@@ -35,7 +35,7 @@
 
 class Polygon : public Polytope {
 public:
-  Polygon(const VertexBase& b, int c, const unsigned int v[]) : 
+  Polygon(const VertexBase& b, int c, const unsigned int v[]) :
     Polytope(b, c, v), ci(0) {}
 
   Point support(const Vector&) const;

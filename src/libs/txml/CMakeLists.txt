@@ -23,7 +23,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Note: Headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(txml SHARED ${TXML_SOURCES} ${TXML_HEADERS})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(txml PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 IF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)

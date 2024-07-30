@@ -135,7 +135,7 @@ double Pit::getPitOffset(double offset, double fromstart, double nextleft, int w
  lastinpit = false;
  if (mypit != NULL) {
   if (getInPit() || (getPitstop() && isBetween(fromstart))) {
-   if (getPitstop()) 
+   if (getPitstop())
   {
   if (!lastinpit)
   {

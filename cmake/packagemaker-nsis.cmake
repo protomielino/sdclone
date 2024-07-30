@@ -32,28 +32,28 @@ Message(STATUS "NSIS_INET_PLUGIN = ${NSIS_INET_PLUGIN}")
 if(NSIS_FOUND AND NSIS_MAKE_EXE AND NSIS_INET_PLUGIN)
    FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}" NSIS_INSTALL_DIR)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/readme_for_user.txt" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/readme_for_user.txt"
                   "${CMAKE_BINARY_DIR}/packaging/readme_for_user.txt" COPYONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.ini" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.ini"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams.ini" COPYONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.nsh.in" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.nsh.in"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams.nsh" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-base.nsi" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-base.nsi"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams-base.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-hq-cars-and-tracks.nsi" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-hq-cars-and-tracks.nsi"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams-hq-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-more-hq-cars-and-tracks.nsi" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-more-hq-cars-and-tracks.nsi"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams-more-hq-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-wip-cars-and-tracks.nsi" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-wip-cars-and-tracks.nsi"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams-wip-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-unmaintained.nsi" 
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-unmaintained.nsi"
                   "${CMAKE_BINARY_DIR}/packaging/speed-dreams-unmaintained.nsi" @ONLY)
 
    #ADD_CUSTOM_TARGET(PACKAGE_BASE DEPENDS INSTALL)
@@ -73,7 +73,7 @@ if(NSIS_FOUND AND NSIS_MAKE_EXE AND NSIS_INET_PLUGIN)
    ADD_CUSTOM_TARGET(PACKAGE_WIP DEPENDS PACKING_INSTALL PACKAGE_MKDIR)
    ADD_CUSTOM_TARGET(PACKAGE_UNMAINTAINED DEPENDS PACKING_INSTALL PACKAGE_MKDIR)
    ADD_CUSTOM_TARGET(PACKAGE_MKDIR)
-   
+
    ADD_CUSTOM_COMMAND(TARGET PACKING_INSTALL
                       COMMAND "${CMAKE_COMMAND}" --build . --target INSTALL --config $<CONFIG>
                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

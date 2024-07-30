@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 /**
     @defgroup	confscreens	Configuration screens.
     Menu screens for configuration.

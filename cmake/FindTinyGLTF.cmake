@@ -1,6 +1,6 @@
 # Locate TinyGLTF (optionally header-only) library
 # This module defines
-# TINYGLTF_FOUND : 
+# TINYGLTF_FOUND :
 # TINYGLTF_INCLUDE_DIR : where to find the headers
 # Created by Joe Thompson
 

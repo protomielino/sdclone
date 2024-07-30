@@ -98,7 +98,7 @@ SDMakeState(const std::string &path, const char* colorTexture)
     stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
-    stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);    
+    stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
 
     return stateSet;
 }
@@ -501,7 +501,7 @@ bool SDCloudLayer::reposition(const osg::Vec3f &p, double dt )
         }
 
         double sp_dist = speed * dt;
-        
+
         if ( p._v[0] != last_x || p._v[1] != last_y || sp_dist != 0 )
         {
             double ax = 0.0, ay = 0.0, bx = 0.0, by = 0.0;

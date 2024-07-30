@@ -38,7 +38,7 @@ public class UndoSegmentChange implements UndoInterface
 	private int 			pos;
 
 	/**
-	 * 
+	 *
 	 */
 	public UndoSegmentChange(EditorFrame editorFrame, Segment segment)
 	{

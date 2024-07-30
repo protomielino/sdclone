@@ -59,7 +59,7 @@ public final class TrackData
     private MainTrack			mainTrack				= new MainTrack();
     private SegmentVector		segments				= null;
     private Vector<Sector>		sectors					= new Vector<Sector>();
-   
+
 	/**
 	 * @return Returns the header.
 	 */
@@ -210,7 +210,7 @@ public final class TrackData
     {
         this.segments = segments;
     }
-    
+
 	public Vector<TrackObject> getTrackObjects()
 	{
 		return trackObjects;
@@ -219,7 +219,7 @@ public final class TrackData
 	{
 		this.trackObjects = trackObjects;
 	}
-	
+
 	public Vector<Sector> getSectors()
 	{
 		return sectors;
@@ -228,12 +228,12 @@ public final class TrackData
 	{
 		this.sectors = sectors;
 	}
-	
+
 	public TerrainGeneration getTerrainGeneration()
 	{
 		return getGraphic().getTerrainGeneration();
-	}	
-	
+	}
+
 	public Vector<ObjectMap> getObjectMaps()
 	{
 		return getGraphic().getTerrainGeneration().getObjectMaps();
@@ -424,7 +424,7 @@ public final class TrackData
 
 				segment.setCalculatedStartTangentRight((segment.getCalculatedHeightEndRight() - segment.getCalculatedHeightStartRight()) / length);
 				segment.setCalculatedEndTangentRight((segment.getCalculatedHeightEndRight() - segment.getCalculatedHeightStartRight()) / length);
-				
+
 				segment.setCalculatedStartTangent((segment.getCalculatedStartTangentLeft() + segment.getCalculatedStartTangentRight()) / 2);
 				segment.setCalculatedEndTangent((segment.getCalculatedEndTangentLeft() + segment.getCalculatedEndTangentRight()) / 2);
 			}

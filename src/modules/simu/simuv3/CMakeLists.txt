@@ -34,7 +34,7 @@ ENDIF(MSVC)
 # Note: Headers and other sources needed for having them available in IDEs.
 SD_ADD_LIBRARY(simuv3 MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(simuv3 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_SOLID_LIBRARY(simuv3) # Ignored if not OPTION_3RDPARTY_SOLID

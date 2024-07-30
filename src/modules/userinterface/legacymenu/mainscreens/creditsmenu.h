@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 
 #ifndef _CREDITSMENU_H_
 #define _CREDITSMENU_H_
@@ -23,7 +23,7 @@
 extern void CreditsMenuActivate(void *retScrHdle);
 
 
-#endif /* _CREDITSMENU_H_ */ 
+#endif /* _CREDITSMENU_H_ */
 
 
 

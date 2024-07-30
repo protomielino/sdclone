@@ -52,7 +52,7 @@ typedef struct
 #define SIM_WH_SPINNING 4	/* the wheel is spinning */
 #define SIM_WH_LOCKED   8	/* the wheel is locked */
 #define SIM_WH_FREE     16  /* the wheel is non longer on the car */
-#define SIM_WH_BURST    32  /* the wheel has exploded */ 
+#define SIM_WH_BURST    32  /* the wheel has exploded */
     tdble	axleFz;		/* force from axle (anti-roll bar) */
     tTrkLocPos	trkPos;		/* current track position */
     tPosd	relPos;		/* relative pos / GC */
@@ -84,7 +84,7 @@ typedef struct
     tdble   T_operating;    /* Operating temperature */
     tdble   condition;      /* Tyre condition */
     tdble   T_range;
-	/* Modelling uneven thickness due to wear */ 
+	/* Modelling uneven thickness due to wear */
 #ifdef USE_THICKNESS
 	tdble   thickness[N_THICKNESS_SEGMENTS];
 	tdble   segtemp[N_THICKNESS_SEGMENTS];
@@ -114,13 +114,13 @@ typedef struct
 	tdble   s_old;
 	tdble   F_old;
 
-    t3Dd   	normal;	   	
+    t3Dd   	normal;
 
 } tWheel;
 
-    
 
-#endif /* _WHEEL_H__ */ 
+
+#endif /* _WHEEL_H__ */
 
 
 

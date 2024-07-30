@@ -117,8 +117,8 @@ public class PropertiesDialog extends JDialog
 			tabbedPane.addTab("Objects", null, getObjectProperties(), null);
 			tabbedPane.addTab("Cameras", null, getCameraProperties(), null);
 			tabbedPane.addTab("Lights", null, getTrackLightProperties(), null);
-			tabbedPane.addTab("Sectors", null, getSectorProperties(), null);			
-			tabbedPane.addTab("Image", null, getImageProperties(), null);			
+			tabbedPane.addTab("Sectors", null, getSectorProperties(), null);
+			tabbedPane.addTab("Image", null, getImageProperties(), null);
 			SwingUtilities.invokeLater( new Runnable()
 			{
 				public void run()
@@ -307,7 +307,7 @@ public class PropertiesDialog extends JDialog
 			graphicProperties = new GraphicProperties(editorFrame);
 		}
 		return graphicProperties;
-	}	
+	}
 	/**
 	 * This method initializes graphic3DProperties
 	 *
@@ -318,7 +318,7 @@ public class PropertiesDialog extends JDialog
 			graphic3DProperties = new Graphic3DProperties(editorFrame);
 		}
 		return graphic3DProperties;
-	}	
+	}
 	/**
 	 * This method initializes envMapProperties
 	 *

@@ -3,7 +3,7 @@
     file        : racemain.cpp
     created     : Sat Nov 16 12:13:31 CET 2006
     copyright   : (C) 2006 Mart Kelder
-    email       : mart@kelder31.nl   
+    email       : mart@kelder31.nl
     version     : $Id$
 
  ***************************************************************************/
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Useful functions for race engine
     @author	<a href=mailto:mart@kelder31.nl>Mart Kelder</a>
     @version	$Id$
@@ -46,7 +46,7 @@ static tFeature features_list[] =
 	{ ROB_VAL_FEATURE_PENALTIES, RM_FEATURE_PENALTIES },
 	{ ROB_VAL_FEATURE_TIMEDSESSION, RM_FEATURE_TIMEDSESSION },
 	{ ROB_VAL_FEATURE_WETTRACK, RM_FEATURE_WETTRACK },
-	
+
 	/* Career mode features not yet resurrected (robots need work to support them).
 	   { ROB_VAL_FEATURE_SC, RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_PENALTIES },
 	   { ROB_VAL_FEATURE_YELLOW, RM_FEATURE_YELLOW | RM_FEATURE_PENALTIES },
@@ -69,7 +69,7 @@ int RmGetFeaturesList( void* param )
 	int driverFeatureMask;
 	int raceFeatureMask = -1; // All bits set to 1.
 	void *robhdle;
-	
+
 	char path[ 1024 ];
 	char buf[ 1024 ];
 	int xx, yy;
@@ -114,7 +114,7 @@ int RmGetFeaturesList( void* param )
 			      /* | RM_FEATURE_PENALTIES | RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_RED | */
 			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_PRO ) == 0 )
 				driverFeatureMask |= RM_FEATURE_TIMEDSESSION | RM_FEATURE_PENALTIES | RM_FEATURE_WETTRACK;
-			      /*RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_BLUE | RM_FEATURE_RED | RM_FEATURE_PITEXIT |*/		      
+			      /*RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_BLUE | RM_FEATURE_RED | RM_FEATURE_PITEXIT |*/
 		} else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_TYPE, ROB_VAL_ROBOT ), ROB_VAL_ROBOT ) == 0 )
 		{
 			snprintf( buf, sizeof(buf), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
@@ -141,13 +141,13 @@ int RmGetFeaturesList( void* param )
 							driverFeatureMask |= features_list[ yy ].value;
 						}
 					}
-	
+
 					if( features[ features_index ] == '\0' )
 						break; /* Leave */
 					++features_index;
 					buf_index = 0;
 				}
-			}	
+			}
 		}
 
 		GfLogDebug("Driver %s#%d supported-feature mask : 0x%02X\n",
@@ -160,7 +160,7 @@ int RmGetFeaturesList( void* param )
 	}
 
 	GfLogTrace("Race supported-feature mask : 0x%02X\n", raceFeatureMask);
-	
+
 	return raceFeatureMask;
 }
 

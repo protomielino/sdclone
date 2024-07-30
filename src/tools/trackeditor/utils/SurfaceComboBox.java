@@ -26,7 +26,7 @@ import utils.circuit.Surface;
 public class SurfaceComboBox extends JComboBox<String>
 {
 	static private HashMap<String, String>	tooltipMap = new HashMap<>();
-	
+
 	private EditorFrame						editorFrame;
 	private Vector<String>					surfaceVector;
 
@@ -35,10 +35,10 @@ public class SurfaceComboBox extends JComboBox<String>
 	public SurfaceComboBox(EditorFrame editorFrame, Vector<String> surfaceVector)
 	{
 		super(surfaceVector);
-		
+
 		this.editorFrame = editorFrame;
 		this.surfaceVector = surfaceVector;
-		
+
 		initialize();
 	}
 
@@ -118,13 +118,13 @@ public class SurfaceComboBox extends JComboBox<String>
 						try
 						{
 							URL url = file.toURI().toURL();
-							
+
 							if (tooltipMap.containsKey(url.toString()))
 							{
 								tooltipText = tooltipMap.get(url.toString());
 							}
 							else
-							{							
+							{
 								int width = 256;
 								int height = 256;
 

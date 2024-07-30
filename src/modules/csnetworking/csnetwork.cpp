@@ -267,7 +267,7 @@ int NetNetwork::GetNetworkHumanIdx()
     char buf[255];
     sprintf(buf,"drivers/networkhuman/networkhuman.xml");
     void *params = GfParmReadFileLocal(buf,GFPARM_RMODE_REREAD);
-    
+
     if(params)
     {
     char path2[256];

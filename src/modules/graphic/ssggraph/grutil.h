@@ -46,7 +46,7 @@ namespace ssggraph {
 #else
 #define DBG_SET_NAME(base, name, index, subindex)
 #endif
- 
+
 
 /* Vars to set before calling grSsgLoadTexCb */
 extern float grGammaValue;

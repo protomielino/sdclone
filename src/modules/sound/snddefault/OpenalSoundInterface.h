@@ -39,9 +39,9 @@ class OpenalSoundInterface : public SoundInterface
 		float f; //frequency modulation
 		float a; //amplitude modulation
 	} SoundChar;
-	
+
  protected:
-	
+
 	SoundSource* car_src;
 	SoundSource tyre_src[4];
 	ALCcontext* originalcontext;
@@ -57,7 +57,7 @@ class OpenalSoundInterface : public SoundInterface
     virtual void setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
 
  public:
-	
+
 	OpenalSoundInterface(float sampling_rate, int n_channels);
 	OpenalSoundInterface(const OpenalSoundInterface &); // = delete;
 	OpenalSoundInterface & operator = (const OpenalSoundInterface &); // = delete;
@@ -71,7 +71,7 @@ class OpenalSoundInterface : public SoundInterface
 	virtual bool getStaticSource(ALuint *source);
 
 	virtual SharedSourcePool* getSourcePool(void);
-	
+
 	virtual void mute(bool bOn = true);
 };
 
@@ -102,13 +102,13 @@ class SharedSourcePool {
 			}
 			GfLogInfo("  Dynamic Sources: requested: %d, created: %d\n", nbsources, this->nbsources);
 		}
-		
+
 		virtual ~SharedSourcePool() {
 			int i;
 			for (i = 0; i < nbsources; i++) {
 				alDeleteSources(1, &(pool[i].source));
 				alGetError();
-			}			
+			}
 			delete [] pool;
 		}
 
@@ -122,7 +122,7 @@ class SharedSourcePool {
 					return true;
 				}
 			}
-			
+
 			// TODO: Implement free list with ring buffer or whatever data structure
 			// to go from O(n) to O(1). If the ordering is done well it will automatically
 			// result in LRU (least recently used).
@@ -133,7 +133,7 @@ class SharedSourcePool {
 					break;
 				}
 			}
-			
+
 			if (firstfree < 0) {
 				// No free source.
 				return false;

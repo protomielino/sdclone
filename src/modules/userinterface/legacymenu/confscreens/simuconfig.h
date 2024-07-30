@@ -2,9 +2,9 @@
 
     file        : simuconfig.h
     created     : Wed Nov  3 21:48:57 CET 2004
-    copyright   : (C) 2004 by Eric Espié                        
-    email       : eric.espie@free.fr 
-    version     : $Id$                                  
+    copyright   : (C) 2004 by Eric Espié
+    email       : eric.espie@free.fr
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @version	$Id$
 */
 
@@ -30,7 +30,7 @@
 
 extern void *SimuMenuInit(void *prevMenu);
 
-#endif /* _SIMUCONFIG_H_ */ 
+#endif /* _SIMUCONFIG_H_ */
 
 
 

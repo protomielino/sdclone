@@ -35,14 +35,14 @@ import miscel.TCPopupEventQueue;
 
 /**
  * @author babis
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
 public class TrackEditor
 {
 	private static EditorFrame gui;
-	
+
 	public static String executableName = null;
 
 	public static void main(String[] args)
@@ -50,7 +50,7 @@ public class TrackEditor
 		executableName = new File(TrackEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 
 		Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TCPopupEventQueue());
-		
+
 		PlasticLookAndFeel.setCurrentTheme(new DesertBlue());
 		try
 		{

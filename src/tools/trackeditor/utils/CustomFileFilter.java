@@ -27,7 +27,7 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -43,7 +43,7 @@ public class CustomFileFilter extends FileFilter
 		{
 			return true;
 		}
-		
+
 		boolean out = false;
 		String filename = file.getName();
 		int size = valid.size();
@@ -54,7 +54,7 @@ public class CustomFileFilter extends FileFilter
 				out = true;
 			}
 		}
-		
+
 		size = invalid.size();
 		for(int i=0; i<size; i++)
 		{

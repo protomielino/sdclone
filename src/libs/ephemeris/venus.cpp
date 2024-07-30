@@ -22,7 +22,7 @@
 #include "venus.h"
 
 ePhVenus::ePhVenus(double mjd) :
-  ePhCelestialBody(76.67990,  2.4659000E-5, 
+  ePhCelestialBody(76.67990,  2.4659000E-5,
 		3.3946,    2.75E-8,
 		54.89100,  1.3837400E-5,
 		0.7233300, 0.000000,
@@ -32,7 +32,7 @@ ePhVenus::ePhVenus(double mjd) :
 }
 
 ePhVenus::ePhVenus() :
-  ePhCelestialBody(76.67990,  2.4659000E-5, 
+  ePhCelestialBody(76.67990,  2.4659000E-5,
 		3.3946,    2.75E-8,
 		54.89100,  1.3837400E-5,
 		0.7233300, 0.000000,

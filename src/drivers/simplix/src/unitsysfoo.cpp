@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Systemfunktion
 // (C++-Portierung der Unit	UnitSysFoo.pas)
-// 
+//
 // File			:	unitsysfoo.cpp
 // Created		: 2007.02.20
 // Last	changed	: 2014.11.29
@@ -130,7 +130,7 @@ void TSysFoo::Normalize()
 float TSysFoo::Faltung(float Impuls)
 {
   int I;
-  unsigned char	J; 
+  unsigned char	J;
 
   oSignal[oSigIndex] = 0.0;						 // Alte Werte	löschen
   oSigIndex++;									 // Start im	Ringpuffer
@@ -151,7 +151,7 @@ float TSysFoo::Faltung(float Impuls)
 //--------------------------------------------------------------------------*
 void TSysFoo::Reset()
 {
-  for (int I = 0; I	< oNSysFoo;	I++) 
+  for (int I = 0; I	< oNSysFoo;	I++)
 	oSignal[I]	= 0.0;
 };
 //==========================================================================*

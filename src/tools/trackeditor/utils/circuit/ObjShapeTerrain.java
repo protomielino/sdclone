@@ -20,7 +20,7 @@ import gui.EditorFrame;
  * <p>
  * Societe
  * </p>
- * 
+ *
  * @author Patrice Espie
  * @version 0.1a
  */
@@ -47,7 +47,7 @@ public class ObjShapeTerrain extends Segment
 		}
 
 		double border = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin();
-		
+
 		points[0].x = boundingRectangle.getX() - border;
 		points[0].y = boundingRectangle.getY() - border;
 

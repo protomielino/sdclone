@@ -61,10 +61,10 @@ typedef	tTrackSeg* PTrackSeg;
 //==========================================================================*
 // Typdefinition 2D	Vektor und 3D Vektor
 //--------------------------------------------------------------------------*
-typedef	struct 
+typedef	struct
 {
   TFloat x,	y;
-} 
+}
 TV2D;
 typedef	TV2D* PV2D;
 

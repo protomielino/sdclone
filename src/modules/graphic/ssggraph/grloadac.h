@@ -31,7 +31,7 @@ class grssgLoaderOptions : public ssgLoaderOptions
  public:
 
 	grssgLoaderOptions(bool bTextureMipMap = false);
-	
+
 	virtual void makeModelPath(char* path, const char *fname) const;
 	virtual void makeTexturePath(char* path, const char *fname) const;
 
@@ -43,15 +43,15 @@ class grssgLoaderOptions : public ssgLoaderOptions
 
 	//! Answer if there's any available texture mapping or not (avoid calling mapTexture if not needed, for optimization purpose).
 	bool textureMapping() const;
-	
+
 	//! Return the texture file name after applying the first available mapping on the source name.
 	const char* mapTexture(const char* pszSrcFileName) const;
-	
+
  protected:
 
 	//! Flag for texture preprocessing before creation.
 	bool _bTextureMipMap;
-	
+
 	//! Texture substitution map, from the source file name (read in the AC file) to the target file name (found in map).
 	std::map<std::string, std::string> _mapTextures;
 

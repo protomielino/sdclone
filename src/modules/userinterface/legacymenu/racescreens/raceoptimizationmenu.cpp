@@ -19,7 +19,7 @@
 
 /** @file
     		The menu for when the optimiztion is running
-    @ingroup	racemantools		
+    @ingroup	racemantools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id: raceloadingmenu.cpp 4361 2012-01-07 14:05:16Z pouillot $
 */
@@ -85,13 +85,13 @@ onDeactivate(void* /* dummy */)
 	}
 }
 
-static void 
+static void
 onEscape(void * /* dummy */)
 {
 	LmRaceEngine().abortRace(); // Do cleanup to get back correct setup files
 }
 
-/** 
+/**
     @ingroup	racemantools
     @param	title	Screen title.
     @param	bgimg	Optional background image (0 for no img).
@@ -176,7 +176,7 @@ RmOptimizationScreenStart(const char *title, const char *bgimg)
 	TextLineIds = (int*)calloc(NTextLines, sizeof(int));
 
 	ParameterFGColors = (float**)calloc(8, sizeof(float*));
-	
+
 	ParameterIds = (int*)calloc(8, sizeof(int));
 	Parameters = (char**)calloc(8, sizeof(char*));
 
@@ -249,14 +249,14 @@ RmOptimizationScreenStart(const char *title, const char *bgimg)
     }
 
     CurTextLineIdx = 0;
-    
+
     // Add background image.
     if (bgimg)
 		GfuiScreenAddBgImg(HScreen, bgimg);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hmenu);
-    
+
     // Link key handlers
     GfuiMenuDefaultKeysAdd(HScreen);
 	//GfuiAddKey(HScreen, GFUIK_ESCAPE, "Back to the Main menu", RmRaceSelectMenuHandle, GfuiScreenActivate, NULL);
@@ -284,11 +284,11 @@ RmOptimizationScreenShutdown(void)
 		freez(FGColors);
 		freez(TextLines);
 		freez(TextLineIds);
-		
+
 		freez(InitialLapTimeValue);
 		freez(TotalLapTimeValue);
 		freez(BestLapTimeValue);
-	
+
 		for (int I = 0; I < 8; I++)
 		{
 			freez(ParameterFGColors[I]);
@@ -310,7 +310,7 @@ RmOptimizationScreenShutdown(void)
     }
 }
 
-/** 
+/**
     @ingroup	racemantools
     @param	text	Text to display.
     @return	None.
@@ -319,12 +319,12 @@ void
 RmOptimizationScreenSetText(const char* text)
 {
     GfLogTrace("%s\n", text);
-    
+
     if (!HScreen)
 	{
 		return;
 	}
-	
+
 	if (TextLines[CurTextLineIdx])
 		freez(TextLines[CurTextLineIdx]);
 	if (text)
@@ -332,7 +332,7 @@ RmOptimizationScreenSetText(const char* text)
 		TextLines[CurTextLineIdx] = strdup(text);
 		CurTextLineIdx = (CurTextLineIdx + 1) % NTextLines;
 	}
-	
+
 	int i = CurTextLineIdx;
 	int j = 0;
 	do
@@ -343,11 +343,11 @@ RmOptimizationScreenSetText(const char* text)
 		i = (i + 1) % NTextLines;
 	}
 	while (i != CurTextLineIdx);
-	
+
 	GfuiDisplay();
 }
- 
-/** 
+
+/**
     @ingroup	racemantools
     @param	arrays of parameter labels, values and ranges
     @return	None.
@@ -428,8 +428,8 @@ RmOptimizationScreenSetParameterText(int N, char** Labels, char** Values, char**
 
 	GfuiDisplay();
 }
- 
-/** 
+
+/**
     @ingroup	racemantools
     @param	arrays of parameter labels, values and ranges
     @return	None.

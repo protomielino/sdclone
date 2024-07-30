@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file   
+
+/** @file
 		Singleton holding information on the available drivers
     @defgroup	tgfdata	Data manager for the client gaming framework.
 */
@@ -38,7 +38,7 @@ class TGFDATA_API GfDriverSkin
 public:
 
 	GfDriverSkin(const std::string& strName = "");
-	
+
 public:
 
 	int getTargets() const;
@@ -65,7 +65,7 @@ public:
 			 const std::string& strName, void* hparmRobot);
 
 	void load(void* hparmRobot);
-	
+
 	const std::string& getName() const;
 	const std::string& getModuleName() const;
 	int getInterfaceIndex() const;
@@ -79,7 +79,7 @@ public:
 								const std::string& strCarCatId = "") const;
 
 	int getSupportedFeatures() const;
-	
+
 	double getSkillLevel() const;
 
 	void setCar(const GfCar* pCar);
@@ -101,7 +101,7 @@ protected:
 	void getPossibleSkinsInFolder(const std::string& strCarId,
 								  const std::string& strFolderPath,
 								  std::vector<GfDriverSkin>& vecPossSkins) const;
-	
+
 protected:
 
 	std::string  _strName;      // User friendly name (ex: "Yuuki Kyousou").
@@ -133,7 +133,7 @@ public:
 
  	GfDriver* getDriver(const std::string& strModName, int nItfIndex) const;
 	GfDriver* getDriverWithName(const std::string& strName) const;
-	
+
  	std::vector<GfDriver*> getDriversWithTypeAndCategory(const std::string& strType = "",
 														 const std::string& strCarCatId = "") const;
 
@@ -147,7 +147,7 @@ protected:
 
 	// Clear all data.
 	void clear();
-	
+
 protected:
 
 	// The singleton itself.

@@ -50,14 +50,14 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PACKAGE_FILE_PREFIX}-${CPACK_PACKAGE_VERSI
 #SET(CPACK_RESOURCE_FILE_WELCOME "/home/andy/vtk/CMake/Templates/CPack.GenericWelcome.txt")
 
 SET(CPACK_SOURCE_IGNORE_FILES
-    "/installer/" "/doc/design/" "/doc/develdoc" "/doc/website/" "/_CPack_Packages/" 
-    "/CMakeCache\\\\.txt$" "/install_manifest\\\\.txt$" "/xmlversion_loc\\\\.txt$" 
+    "/installer/" "/doc/design/" "/doc/develdoc" "/doc/website/" "/_CPack_Packages/"
+    "/CMakeCache\\\\.txt$" "/install_manifest\\\\.txt$" "/xmlversion_loc\\\\.txt$"
     "/config\\\\.h$" "/version\\\\.h$" "/doxygen_config$"
-    "/\\\\.svn/" "/\\\\.dir/" "/CMakeFiles/" 
+    "/\\\\.svn/" "/\\\\.dir/" "/CMakeFiles/"
     "cmake_install\\\\.cmake$" "CPackConfig\\\\.cmake$" "CPackSourceConfig\\\\.cmake$"
     "\\\\.bak$" "\\\\.flc$" "#.*#$" "~$" "\\\\.~.*"
-    "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
-    "\\\\.exe$" "/sd2-.*$" "/speed-dreams-2$" "/xmlversion$" 
+    "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$"
+    "\\\\.exe$" "/sd2-.*$" "/speed-dreams-2$" "/xmlversion$"
     "\\\\.zip$" "\\\\.tar\\\\.bz2$" "\\\\.tar\\\\.gz$" "\\\\.tar\\\\.Z$" "\\\\.tar\\\\.7z$")
 
 ##########################################################################################
@@ -68,7 +68,7 @@ IF(UNIX AND NOT APPLE)
     MARK_AS_ADVANCED(PACKAGERS_BINARY)
     SET(PACKAGERS_SOURCE "TBZ2" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
     MARK_AS_ADVANCED(PACKAGERS_SOURCE)
-    
+
     SET(CPACK_PACKAGE_NAME ${PACKAGE_FILE_PREFIX} CACHE STRING "" FORCE)
 
     # On debian, auto-detect dependencies
@@ -120,14 +120,14 @@ IF(WIN32)
        SET(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
        SET(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
     ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.5")
-    
+
     IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.17")
       SET(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header.bmp")
     ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.17")
 
-    
+
     # Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
-    SET(CPACK_NSIS_MENU_LINKS 
+    SET(CPACK_NSIS_MENU_LINKS
         "${CPACK_PACKAGE_CONTACT}" "Project Homepage"
         "https://sourceforge.net/p/speed-dreams/discussion/" "Community"
         "https://sourceforge.net/p/speed-dreams/tickets/" "Bug tracker"
@@ -145,19 +145,19 @@ IF(WIN32)
     SET(CPACK_NSIS_HELP_LINK "${CPACK_PACKAGE_CONTACT}")
 
     # Override Start menu entry
-    SET(CPACK_PACKAGE_EXECUTABLES 
-         "${EXECUTABLE_NAME}" "${CPACK_NSIS_DISPLAY_NAME}" 
+    SET(CPACK_PACKAGE_EXECUTABLES
+         "${EXECUTABLE_NAME}" "${CPACK_NSIS_DISPLAY_NAME}"
          CACHE STRING "" FORCE)
-    
+
     # Add a page in the install wizard for options :
     # - adding the installation path in the PATH,
     # - adding a shortcut to start the installed app on the desktop.
     #SET(CPACK_NSIS_MODIFY_PATH "ON")
-    
+
     # Another way to add a shortcut to start the installed app on the desktop :
     # This ONLY works if SET(CPACK_NSIS_MODIFY_PATH "ON") which also enables the whole modify PATH page
     #SET(CPACK_CREATE_DESKTOP_LINKS "${EXECUTABLE_NAME}")
-    
+
     # But this works.
     SET(SHORTCUT_TARGET "$DESKTOP\\\\${CPACK_NSIS_DISPLAY_NAME}.lnk")
 
@@ -182,7 +182,7 @@ IF(WIN32)
 
 
     # Source package specific settings.
-    LIST(APPEND CPACK_SOURCE_IGNORE_FILES 
+    LIST(APPEND CPACK_SOURCE_IGNORE_FILES
                 "/VTune/"
                 "/Release/" "/Debug/" "/RelWithDebInfo/" "/MinSizeRel/"
                 "/release/" "/debug/" "/relwithdebinfo/" "/minsizerel/"
@@ -225,12 +225,12 @@ IF(APPLE)
     # TODO make ${SD_BUNDLE_NAME} a CACHE variable and use it everywhere instead of ${CMAKE_INSTALL_PREFIX}??
     SET(SD_BUNDLE_NAME "${SD_BASE_BUNDLE_NAME}")
 
-    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in" 
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/packagebasedmg.cmake" @ONLY)
 
-    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in" 
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/${DMG_FINDER_SCRIPT}" @ONLY)
-    
+
 
     # Now configure the full package scripts...
     # TODO use ${CPACK_PACKAGE_NAME} ${VERSION}" ??
@@ -243,10 +243,10 @@ IF(APPLE)
     # TODO make ${SD_BUNDLE_NAME} a CACHE variable and use it everywhere instead of ${CMAKE_INSTALL_PREFIX}??
     SET(SD_BUNDLE_NAME "${CMAKE_INSTALL_PREFIX}")
 
-    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in" 
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/packagefulldmg.cmake" @ONLY)
 
-    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in" 
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/${DMG_FINDER_SCRIPT}" @ONLY)
 
    # Create a script to create the base bundle from the full bundle

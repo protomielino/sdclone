@@ -46,7 +46,7 @@ public class Editor
         //properties = props;
     }
     /**
-     * 
+     *
      */
     public Editor()
     {

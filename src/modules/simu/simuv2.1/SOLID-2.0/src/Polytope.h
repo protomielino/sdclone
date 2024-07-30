@@ -37,7 +37,7 @@
 
 class Polytope : public Convex {
 public:
-  Polytope(const VertexBase& b, int c, const unsigned int v[]) : 
+  Polytope(const VertexBase& b, int c, const unsigned int v[]) :
     base(b), index(c, v) {}
   virtual ~Polytope() {}
   virtual Point support(const Vector&) const = 0;

@@ -8,7 +8,7 @@ Building the dependencies for Speed-Dreams makes use of CMake's ExternalProject
 
  =============================================================================
  Windows
- As of version 2.3, this will download approximately 35MB of compressed source 
+ As of version 2.3, this will download approximately 35MB of compressed source
  files.
  You will need more than 1GB of free disk space for the build.
 
@@ -29,13 +29,13 @@ Building the dependencies for Speed-Dreams makes use of CMake's ExternalProject
         copy <Path-to sd-code>\packaging\3rdParty-devel\*.* C:\src\3rdParty-devel
 
     Important - Keep the path short ie: C:\src\3rdParty-devel
-    The building of OpenSceneGraph with CMake's ExternalProject_Add creates quite a deep tree and the build may fail. 
+    The building of OpenSceneGraph with CMake's ExternalProject_Add creates quite a deep tree and the build may fail.
 
  CMake CLI Build
 
     Make a directory under the source directory (C:\src\3rdParty-devel)
         mkdir build-vs2015-release
-    
+
     Change to the new directory:
         cd build-vs2015-release
 
@@ -59,4 +59,3 @@ Building the dependencies for Speed-Dreams makes use of CMake's ExternalProject
 
 
 
- 

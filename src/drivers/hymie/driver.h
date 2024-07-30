@@ -254,7 +254,7 @@ class Driver {
   double TeamWaitTime;
   double SteerGainDiv;
   double PitEntryOffset;
-  char * pszCarName; 
+  char * pszCarName;
   double wheelz[4];
 
   double ABS;

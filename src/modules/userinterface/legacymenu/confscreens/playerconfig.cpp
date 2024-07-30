@@ -387,7 +387,7 @@ refreshEditVal(void)
 
         GfuiEditboxSetString(ScrHandle, WebPasswordEditId, "");
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_DISABLE);
-        
+
         GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, 0);
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_DISABLE);
 
@@ -432,7 +432,7 @@ refreshEditVal(void)
         snprintf(buf, sizeof(buf), "%s", (*CurrPlayer)->webserverpassword());
         GfuiEditboxSetString(ScrHandle, WebPasswordEditId, buf);
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_ENABLE);
-        
+
         GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, (*CurrPlayer)->webserverenabled());
         GfuiEnable(ScrHandle, WebServerCheckboxId, GFUI_ENABLE);
 
@@ -632,9 +632,9 @@ onCopyPlayer(void * /* dummy */)
 
         // Get new (copy) player index (= identification number in params).
         newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
-        
+
         //ovverryde the copied WebServer data (username password and enabled status) with the default settings
-        
+
 #ifdef WEBSERVER
         const char *str;
         char sstring[128];
@@ -649,7 +649,7 @@ onCopyPlayer(void * /* dummy */)
 
         str = GfParmGetStr(PrefHdle, sstring, "WebServerPassword", 0);
         (*CurrPlayer)->setWebserverpassword(str);
-        
+
         webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
         (*CurrPlayer)->setWebserverEnabled(webserverenabledval);
 #endif //WEBSERVER
@@ -860,7 +860,7 @@ GenPlayerList(void)
 
         str = GfParmGetStr(PrefHdle, sstring, "WebServerPassword", 0);
         PlayersInfo[i]->setWebserverpassword(str);
-        
+
         webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
         PlayersInfo[i]->setWebserverEnabled(webserverenabledval);
 #endif //WEBSERVER
@@ -1269,7 +1269,7 @@ PlayerConfigMenuInit(void *prevMenu)
 
     /* Web test button */
     WebServerTestLoginId = GfuiMenuCreateButtonControl(ScrHandle, param, "weblogintest", NULL, onWebserverLoginTest);
-    
+
    	WebServerCheckboxId =
 	GfuiMenuCreateCheckboxControl(ScrHandle, param, "webservercheckbox", NULL, onChangeWebserverenabled);
 #endif //WEBSERVER

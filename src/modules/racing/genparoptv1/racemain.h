@@ -2,9 +2,9 @@
 
     file        : racemain.h
     created     : Sat Nov 16 12:14:57 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espié
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -53,7 +53,7 @@ extern void ReRaceAbort();
 extern void ReRaceSkipSession();
 extern void ReRaceRestart();
 
-#endif /* _RACEMAIN_H_ */ 
+#endif /* _RACEMAIN_H_ */
 
 
 

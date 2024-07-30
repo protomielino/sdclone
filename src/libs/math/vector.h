@@ -44,8 +44,8 @@
  * @param vec (in) the vector to map onto the plane
  * @param result (out) the result vector
  */
-inline void sgmap_vec_onto_cur_surface_plane( sgVec3 normal, 
-					      sgVec3 v0, 
+inline void sgmap_vec_onto_cur_surface_plane( sgVec3 normal,
+					      sgVec3 v0,
 					      sgVec3 vec,
 					      sgVec3 result )
 {
@@ -68,7 +68,7 @@ inline void sgmap_vec_onto_cur_surface_plane( sgVec3 normal,
     // printf("  vec = %.2f, %.2f, %.2f\n", vec[0], vec[1], vec[2]);
     // printf("  v0 = %.2f, %.2f, %.2f\n", v0[0], v0[1], v0[2]);
     // printf("  u1 = %.2f, %.2f, %.2f\n", u1[0], u1[1], u1[2]);
-   
+
     // calculate the vector "v" which is the vector "vec" mapped onto
     // the plane specified by "normal" and "v0".
 
@@ -84,7 +84,7 @@ inline void sgmap_vec_onto_cur_surface_plane( sgVec3 normal,
     // result = v - v0
 
     sgSubVec3(result, v, v0);
-    // printf("  result = %.2f, %.2f, %.2f\n", 
+    // printf("  result = %.2f, %.2f, %.2f\n",
     // result[0], result[1], result[2]);
 }
 

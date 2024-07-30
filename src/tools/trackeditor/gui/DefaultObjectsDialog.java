@@ -11,7 +11,7 @@ public class DefaultObjectsDialog extends JDialog
 {
 	private EditorFrame				editorFrame;
 	private ObjectProperties		objectProperties		= null;
-	
+
 	public DefaultObjectsDialog(EditorFrame editorFrame)
 	{
 		super();
@@ -32,7 +32,7 @@ public class DefaultObjectsDialog extends JDialog
 		this.setResizable(false);
 		this.setTitle("Default Objects");
 	}
-	
+
 	private ObjectProperties getObjectProperties()
 	{
 		if (objectProperties == null)

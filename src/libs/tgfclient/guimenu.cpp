@@ -367,7 +367,7 @@ createLabel(void* hscr, void* hparm, const char* pszPath,
         onFocus = onFocusShowTip;
         onFocusLost = onFocusLostHideTip;
     }
-    
+
     /*BACKGROUND IMAGE FOR THE LABEL AND RELATIVE PADDING (the padding will extend the image size around the actual label width / height*/
     std::string backgrounImageUrl = GfParmGetStr(hparm, pszPath, GFMNU_ATTR_BG_IMAGE, "");
     int bgImgPaddingTop =    (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_TOP, NULL, 0);
@@ -376,7 +376,7 @@ createLabel(void* hscr, void* hparm, const char* pszPath,
     int bgImgPaddingRight =  (int)GfParmGetNum(hparm, pszPath, GFMNU_ATTR_BG_IMAGE_PADDING_RIGHT, NULL, 0);
 
     int labelId = GfuiLabelCreate(hscr, pszText, nFontId, nX, nY, nWidth, nAlign, nMaxLen,
-                                  aColor, aFocusColor, 
+                                  aColor, aFocusColor,
                                   backgrounImageUrl,
                                   bgImgPaddingTop,
                                   bgImgPaddingBottom,

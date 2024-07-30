@@ -45,13 +45,13 @@ cgrVtxTable::cgrVtxTable ()
 	//GfLogDebug("cgrVtxTable@%p()\n", this);
 
 	_nTexMaps = 1; // The one of the ssgVtxTable.
-	
+
 	for (int nStInd = 0; nStInd < NMaxTexMaps-1; nStInd++)
 	{
 		_mTexCoords[nStInd] = 0;
 		_mTexStates[nStInd] = 0;
 	}
-	
+
 	_indices = 0;
 	_stripes = 0;
 	_numStripes = 0;
@@ -126,7 +126,7 @@ void cgrVtxTable::copy_from (cgrVtxTable *src, int clone_flags)
 	}
 
 	// TODO : Clone states ?
-	
+
 	if (src->_stripes) {
 		_numStripes = src->_numStripes;
 		ssgDeRefDelete(_indices);
@@ -280,7 +280,7 @@ void cgrVtxTable::draw_geometry_array ()
 	if (grMaxTextureUnits > 1) {
 		glActiveTexture(GL_TEXTURE0_ARB);
 	}
-	
+
 	TRACE_GL("cgrVtxTable::draw_geometry_array: end");
 }
 
@@ -383,7 +383,7 @@ void cgrVtxTableTrackPart::draw_geometry ()
 		}
 		glVertex3fv(vx[i]);
 	}
-	
+
 	glEnd ();
 
 	if (_mTexStates[0]) {
@@ -493,7 +493,7 @@ void cgrVtxTableCarPart::draw_geometry ()
 
 	if (_nTexMaps > 1 && grEnvState) {
 		grEnvState->apply(GL_TEXTURE1_ARB);
-	
+
 		glActiveTexture(GL_TEXTURE1_ARB);
 		glEnable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
@@ -558,12 +558,12 @@ void cgrVtxTableCarPart::draw_geometry ()
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
 	}
-	
+
 	if (_nTexMaps > 2 && grEnvShadowState) {
 		glActiveTexture(GL_TEXTURE2_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
-	
+
 	glActiveTexture(GL_TEXTURE0_ARB);
 
 	TRACE_GL("cgrVtxTableCarPart::draw_geometry: end");
@@ -650,7 +650,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 
 	if (_nTexMaps > 1 && grEnvState) {
 		grEnvState->apply(GL_TEXTURE1_ARB);
-		
+
 		glActiveTexture(GL_TEXTURE1_ARB);
 		glEnable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
@@ -726,7 +726,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 	}
 
 	glPopClientAttrib();
-	
+
 	glActiveTexture(GL_TEXTURE1_ARB);
 	glDisable (GL_TEXTURE_2D);
 	glMatrixMode(GL_TEXTURE);
@@ -750,7 +750,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 	}
 
 	glActiveTexture (GL_TEXTURE0_ARB);
-	
+
 	TRACE_GL("cgrVtxTableCarPart::draw_geometry_array");
 }
 

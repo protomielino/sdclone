@@ -2,9 +2,9 @@
 
     file        : mouseconfig.h
     created     : Thu Mar 13 21:29:35 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Eric Espié
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -32,7 +32,7 @@
 /* nextMenu : the menu to go to when "next" button is pressed */
 extern void *MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
-#endif /* _MOUSECONFIG_H_ */ 
+#endif /* _MOUSECONFIG_H_ */
 
 
 

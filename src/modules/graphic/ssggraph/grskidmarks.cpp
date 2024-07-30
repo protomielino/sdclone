@@ -164,7 +164,7 @@ cGrSkidStrip::cGrSkidStrip()
 		timeStrip = 0;
 		SkidAnchor->addKid(vta[k]);
 	}//for k
-	
+
 	running_skid = 0;	// no skid is in use
 	next_skid = 0;	// the next skid to used is the first one
 	last_state_of_skid = false;	// there was no skid for this wheel during the next shot
@@ -189,7 +189,7 @@ cGrSkidStrip::~cGrSkidStrip()
 /**
  * Begin
  * Begins a new skid or continues the last one.
- * 
+ *
  * @param tvtx
  * @param tclist
  * @param sgVec4
@@ -247,7 +247,7 @@ cGrSkidStrip::Begin(sgVec3 *tvtx, sgVec2 *tclist, sgVec4 *cur_clr, const double 
 /**
  * End
  * This is the end of a skid or there is nothing to do.
- * 
+ *
  */
 void
 cGrSkidStrip::End()
@@ -285,7 +285,7 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 	for(int i = 0; i < 4; i++) {
 		tdble sling_mud = 1.0f;
 		tdble skid_sensitivity = 0.75f;
-		
+
 		if(car->priv.wheel[i].seg) { // sanity check
 			const char* s = car->priv.wheel[i].seg->surface->material;
 			if(strstr(s, "sand")) {
@@ -342,7 +342,7 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 			if (cur_clr[3] > 0.1f) {
 				ssgVertexArray *basevtx = new ssgVertexArray(4 * 2 + 1);
 				tdble sling_left = -sling_mud;
-				tdble sling_right = sling_mud; 
+				tdble sling_right = sling_mud;
 
 				// TO-DO: Temporary fix, trying to make sure that
 				// skids are above the road surface. This is needed
@@ -352,11 +352,11 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				// on average, because the physical model adds some
 				// sinewave to the road height to simulate uneveness
 				// of the track.  A better fix would be to add a
-				// routine grTrackHeightL(tTrkLocPos *p), similar to 
+				// routine grTrackHeightL(tTrkLocPos *p), similar to
 				// TrTrackHeightL(), but which aim to give the height
 				// of the graphical track.
 				tdble z_adjust = 0.95f;
-				tdble contact_z = car->priv.wheel[i].relPos.z - car->_wheelRadius(i)*z_adjust; 
+				tdble contact_z = car->priv.wheel[i].relPos.z - car->_wheelRadius(i)*z_adjust;
 
 				//One side
 				sgVec3 vtx;
@@ -380,7 +380,7 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				}
 				//vtx[2] = contact_z;
 				basevtx->add(vtx);
-				
+
 				ssgTexCoordArray *texcoords = new ssgTexCoordArray();
 				sgVec2 TxVtx;
 				TxVtx[0] = strips[i].tex_state;
@@ -403,7 +403,7 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				base->getTexCoordList((void**)&tclist);
 
 				strips[i].Begin(tvtx, tclist, &cur_clr, t);
-				
+
 				basevtx->removeAll();
 				delete base;
 			//end if (cur_clr[3] > 0.1f)

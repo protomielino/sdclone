@@ -91,17 +91,17 @@ bool HostSettingsMenu::initialize(void* pMenu)
 
 	pPrevMenu = pMenu;
 
-	void* pMenuHandle = GfuiScreenCreate(NULL,NULL,onActivate, 
+	void* pMenuHandle = GfuiScreenCreate(NULL,NULL,onActivate,
 										 NULL, (tfuiCallback)NULL, 1);
 	setMenuHandle(pMenuHandle);
 
     openXMLDescriptor();
-    
+
     createStaticControls();
 
 	int carCatId = createComboboxControl("carcatcombobox",NULL, onCarControl);
 	const std::vector<std::string>& vecCategories = GfCars::self()->getCategoryIds();
-	
+
 	int CatIndex = 0;
 	for (unsigned int i=0;i<vecCategories.size();i++)
 	{

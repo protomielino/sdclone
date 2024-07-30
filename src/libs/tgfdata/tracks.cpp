@@ -5,7 +5,7 @@
     copyright            : (C) 2010 by Jean-Philippe MEURET
     web                  : speed-dreams.sourceforge.net
     version              : $Id$
-                     
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -27,16 +27,16 @@
 
 #include "tracks.h"
 
-				  
-// Private data for GfTracks				  
+
+// Private data for GfTracks
 class GfTracks::Private
 {
 public:
 
 	Private() : piTrackLoader(0) {}
-	
+
 public:
-	
+
 	// One GfTrack structure for each track (order = sorted directory one).
 	std::vector<GfTrack*> vecTracks;
 
@@ -60,7 +60,7 @@ GfTracks *GfTracks::self()
 {
 	if (!_pSelf)
 		_pSelf = new GfTracks;
-	
+
 	return _pSelf;
 }
 
@@ -92,15 +92,15 @@ GfTracks::GfTracks()
 		GfLogFatal("No track category available in the 'tracks' folder\n");
 		return;
 	}
-	
+
 	tFList* pCatFolder = lstCatFolders;
-	do 
+	do
 	{
 		//GfLogDebug("GfTracks::GfTracks() : Examining category %s\n", pCatFolder->name);
-		
+
 		// Ignore "." and ".." folders.
 		const char* pszCatId = pCatFolder->name;
-		if (pszCatId[0] == '.') 
+		if (pszCatId[0] == '.')
 			continue;
 
 		// Ignore "CMakeLists.txt"
@@ -122,7 +122,7 @@ GfTracks::GfTracks()
 
 		// Look at the tracks in this category.
 		tFList* pTrackFolder = lstTrackFolders;
-		do 
+		do
 		{
 			//GfLogDebug("GfTracks::GfTracks() : Examining track %s\n", pTrackFolder->name);
 
@@ -162,13 +162,13 @@ GfTracks::GfTracks()
 			}
 			if (!GfFileExists(strPreviewFileName.c_str()))
 				strPreviewFileName = "data/img/splash-trackselect.jpg";
-			
+
 			ossFileName.str("");
 			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId << '/' << "outline.png";
 			std::string strOutlineFileName(ossFileName.str());
 			if (!GfFileExists(strOutlineFileName.c_str()))
 				strOutlineFileName = "data/img/notrackoutline.png";
-			
+
 			// Store track info in the GfTrack structure.
 			GfTrack* pTrack = new GfTrack;
 			pTrack->setId(pszTrackId);
@@ -182,13 +182,13 @@ GfTracks::GfTracks()
 			_pPrivate->mapTracksById[pszTrackId] = pTrack;
 		}
 		while ((pTrackFolder = pTrackFolder->next) != lstTrackFolders);
-		
+
 		GfDirFreeList(lstTrackFolders, NULL, true, true);
-	} 
+	}
 	while ((pCatFolder = pCatFolder->next) != lstCatFolders);
-	
+
 	GfDirFreeList(lstCatFolders, NULL, true, true);
-	
+
 	// Sort the car category ids and driver types vectors.
 	std::sort(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end());
 
@@ -246,7 +246,7 @@ const std::vector<std::string>& GfTracks::getCategoryNames() const
 				(*itTrack)->setCategoryName(_pPrivate->vecCatNames[nCatInd]);
 		}
 	}
-	
+
 	return _pPrivate->vecCatNames;
 }
 
@@ -256,7 +256,7 @@ GfTrack* GfTracks::getTrack(const std::string& strId) const
 		_pPrivate->mapTracksById.find(strId);
 	if (itTrack != _pPrivate->mapTracksById.end())
 		return itTrack->second;
-	
+
 	return 0;
 }
 
@@ -306,12 +306,12 @@ std::vector<std::string> GfTracks::getTrackNamesInCategory(const std::string& st
 	return vecTrackNames;
 }
 
-/** 
+/**
  * GfTracks::getFirstUsableTrack
- * 
+ *
  * Retrieve the first usable track in the given category, searching in the given direction
  * and skipping the first found if specified
- * 
+ *
  * @param   strCatId       Id of the category to search inside of.
  * @param   strFromTrackId Id of the track from which to start the search.
  * @param   nSearchDir     <0 = previous, >0 = next.
@@ -323,7 +323,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 {
 	// Check and fix nSearchDir.
 	nSearchDir = nSearchDir > 0 ? +1 : -1;
-	
+
 	// Check category.
 	if (!strCatId.empty()
 		&& std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strCatId)
@@ -341,7 +341,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 		GfLogError("GfTracks::getFirstUsableTrack : Empty category %s\n", strCatId.c_str());
 		return 0;
 	}
-	
+
 	// Retrieve the index of the specified track to start from, if any.
 	int nCurTrackInd = 0;
 	if (!strFromTrackId.empty())
@@ -357,7 +357,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 			++itTrack;
 		}
 	}
-	
+
 	int nTrackInd = nCurTrackInd;
 	if (bSkipFrom || !vecTracksInCat[nTrackInd]->isUsable())
 	{
@@ -376,13 +376,13 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 
 	return pTrack;
 }
-				  
-/** 
+
+/**
  * GfTracks::getFirstUsableTrack
- * 
+ *
  * Retrieve the first usable track among all categories, searching in the given direction
  * from the given category, but skipping it if specified
- * 
+ *
  * @param   strFromCatId   Id of the category to search inside of.
  * @param   nSearchDir     <0 = previous, >0 = next.
  * @param   bSkipFrom      If true, skip the first found track.
@@ -392,7 +392,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
 {
 	// Check and fix nSearchDir.
 	nSearchDir = nSearchDir > 0 ? +1 : -1;
-	
+
 	// Retrieve and check category.
 	std::vector<std::string>::const_iterator itFromCat =
 		std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strFromCatId);
@@ -426,7 +426,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
 
 	return pTrack;
 }
-	
+
 void GfTracks::print(bool bVerbose) const
 {
 	GfLogTrace("Track base : %zu categories, %zu tracks\n",
@@ -605,7 +605,7 @@ bool GfTrack::load() const
 		GfLogError("Track loader not yet initialized ; failed to load any track\n");
         return false;
     }
-	
+
     // Load track data from the XML file.
     tTrack* pTrack = piTrackLoader->load(_strDescFile.c_str());
     if (!pTrack)
@@ -639,6 +639,6 @@ bool GfTrack::load() const
 
 	// Now, the track seems usable (hm ... OK, we didn't check the 3D file contents ...).
 	_bUsable = true;
-	
+
 	return true;
 }

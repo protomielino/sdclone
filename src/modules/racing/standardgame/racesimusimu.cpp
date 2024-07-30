@@ -1,8 +1,8 @@
 /**************************************************************************
 
     file        : racesimusimu.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    copyright   : (C) 2007 by Mart Kelder
+    web         : http://speed-dreams.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Simulation simulation
 */
 
@@ -34,7 +34,7 @@
  *
  * - Car parameters, as stated in the xml-file of the car (or default parameters). The car parameters can be overruled by robot setup files;
  * - Track parameters, as stated in the track xml-file (or default parameters if there is noting in the xml-file);
- * - Robot parameters / robot skills 
+ * - Robot parameters / robot skills
  *
  * Each state can use the already loaded parameters by using <attform>'s.
  *
@@ -140,7 +140,7 @@ static tSimuSimuData* ReSSInit()
 	{
 		ret->robots[ xx ].track = (tTrackParam*)malloc( sizeof( tTrackParam ) );
 		ret->robots[ xx ].carParam = (tCarParam*)malloc( sizeof( tCarParam ) );
-		
+
 		ReSSInitCarParam( ret->robots[ xx ].carParam, ReInfo->s->cars[ xx ] );
 		ReSSInitTrackParam( ret->robots[ xx ].carParam, ret->robots[ xx ].track, ReInfo->track );
 		ReSSInitRobotParam( &(ret->robots[ xx ]), ReInfo->s->cars[ xx ] );

@@ -164,7 +164,7 @@ SimTransmissionReConfig(tCar *car)
     tdble fRatio = 0.0;
     tdble gRatio = 0.0;
     tCarSetupItem *setupGear;
-    
+
     if (trans->type == TRANS_RWD) {
 	SimDifferentialReConfig(car, TRANS_REAR_DIFF);
 	fRatio = trans->differential[TRANS_REAR_DIFF].ratio;
@@ -177,7 +177,7 @@ SimTransmissionReConfig(tCar *car)
 	SimDifferentialReConfig(car, TRANS_CENTRAL_DIFF);
 	fRatio = trans->differential[TRANS_CENTRAL_DIFF].ratio;
     }
-    
+
     for (i = MAX_GEARS - 1; i >= 0; i--) {
         setupGear = &(car->carElt->setup.gearRatio[i]);
 	if (setupGear->changed) {
@@ -217,7 +217,7 @@ SimGearboxUpdate(tCar *car)
     }
 
     trans->curI = trans->driveI[gearbox->gear + 1] * clutch->transferValue + trans->freeI[gearbox->gear +  1] * (1.0f - clutch->transferValue);
-    
+
     if (car->features & FEAT_REALGEARCHANGE) {/* simuv4 new gear change code */
 	if ( (car->ctrl->gear != gearbox->gear) && (car->ctrl->gear <= gearbox->gearMax) && (car->ctrl->gear >= gearbox->gearMin) ) {
 	    /* initiate a shift, go to neutral */
@@ -230,7 +230,7 @@ SimGearboxUpdate(tCar *car)
 		trans->curI = trans->driveI[1] * clutch->transferValue + trans->freeI[1] * (1.0f - clutch->transferValue);
 	    }
 	}
-	
+
 	if (gearbox->timeToEngage > 0.0f) {
 	    gearbox->timeToEngage -= SimDeltaTime;
 	    if (gearbox->timeToEngage <= 0.0f) {
@@ -242,9 +242,9 @@ SimGearboxUpdate(tCar *car)
 	    }
 	}
     } else {/* old gear change code */
-    	if (clutch->state == CLUTCH_RELEASING && gearbox->gear != car->ctrl->gear) { 
-                /* Fast change during clutch release, re-releasing it */ 
-                clutch->state = CLUTCH_RELEASED; 
+    	if (clutch->state == CLUTCH_RELEASING && gearbox->gear != car->ctrl->gear) {
+                /* Fast change during clutch release, re-releasing it */
+                clutch->state = CLUTCH_RELEASED;
     	}
     	if (clutch->state == CLUTCH_RELEASING) {
 		clutch->timeToRelease -= SimDeltaTime;

@@ -131,7 +131,7 @@ SimUpdate(tSituation *s, double deltaTime)
 
 	// readback next race record as required
         for (int nCarInd = 0; nCarInd < s->_ncars; nCarInd++) {
-		if (reload || 
+		if (reload ||
 				(replayForward && s->currentTime >= nextReplayData[nCarInd].currentTime) ||
 				(replayForward == 0 && s->currentTime <= nextReplayData[nCarInd].currentTime)) {
 			result = sqlite3_step(replayBlobs[nCarInd]);
@@ -247,7 +247,7 @@ SimUpdate(tSituation *s, double deltaTime)
 				old_id = pTgtCar->pub.trkPos.seg->id;
 			}
 #endif
-			
+
 			if (pTgtCar->_distFromStartLine > pTgtCar->pub.trkPos.seg->next->lgfromstart) {
 				// Next segment, forward direction
 				pTgtCar->pub.trkPos.seg = pTgtCar->pub.trkPos.seg->next;
@@ -274,7 +274,7 @@ SimUpdate(tSituation *s, double deltaTime)
 			pSrcCar = &curReplayData[nCarInd];
 			pSrc2Car = &nextReplayData[nCarInd];
 
-			if (replayForward) 
+			if (replayForward)
 				timeFrac = (s->currentTime - curReplayData[nCarInd].currentTime) /
 					(nextReplayData[nCarInd].currentTime - curReplayData[nCarInd].currentTime);
 			else
@@ -327,12 +327,12 @@ SimUpdate(tSituation *s, double deltaTime)
 			pTgtCar->pub.DynGCg.pos.x = pSrcCar->pub.DynGCg.pos.x + (pSrc2Car->pub.DynGCg.pos.x - pSrcCar->pub.DynGCg.pos.x) * timeFrac;
 			pTgtCar->pub.DynGCg.pos.y = pSrcCar->pub.DynGCg.pos.y + (pSrc2Car->pub.DynGCg.pos.y - pSrcCar->pub.DynGCg.pos.y) * timeFrac;
 			pTgtCar->pub.DynGCg.pos.z = pSrcCar->pub.DynGCg.pos.z + (pSrc2Car->pub.DynGCg.pos.z - pSrcCar->pub.DynGCg.pos.z) * timeFrac;
-                                                                                                        
+
 			pTgtCar->pub.DynGCg.vel.x = pSrcCar->pub.DynGCg.vel.x + (pSrc2Car->pub.DynGCg.vel.x - pSrcCar->pub.DynGCg.vel.x) * timeFrac;
 			pTgtCar->pub.DynGCg.vel.y = pSrcCar->pub.DynGCg.vel.y + (pSrc2Car->pub.DynGCg.vel.y - pSrcCar->pub.DynGCg.vel.y) * timeFrac;
 			pTgtCar->pub.DynGCg.vel.z = pSrcCar->pub.DynGCg.vel.z + (pSrc2Car->pub.DynGCg.vel.z - pSrcCar->pub.DynGCg.vel.z) * timeFrac;
 
-			// Sound uses accelCmd to antenuate engine 
+			// Sound uses accelCmd to antenuate engine
 			pTgtCar->_accelCmd = pSrcCar->_accelCmd + (pSrc2Car->_accelCmd - pSrcCar->_accelCmd) * timeFrac;
 		}
 	}
@@ -413,7 +413,7 @@ SimShutdown(void)
 }
 
 /* Used for network games to update client physics */
-void 
+void
 UpdateSimCarTable(tDynPt DynGCG,int index)
 {
 	tCar *pCar = SimCarTable;
@@ -421,7 +421,7 @@ UpdateSimCarTable(tDynPt DynGCG,int index)
 }
 
 /* Used for network games get current physics values*/
-tDynPt * 
+tDynPt *
 GetSimCarTable(int index)
 {
 	tCar *pCar = SimCarTable;

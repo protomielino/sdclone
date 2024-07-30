@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 
 #ifndef _OPTIONSMENU_H_
 #define _OPTIONSMENU_H_
@@ -24,7 +24,7 @@
 extern void *OptionsMenuInit(void *precMenu);
 
 
-#endif /* _OPTIONSMENU_H_ */ 
+#endif /* _OPTIONSMENU_H_ */
 
 
 

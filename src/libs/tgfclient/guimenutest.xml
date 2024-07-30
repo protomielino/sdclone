@@ -13,10 +13,10 @@
 <!--    the Free Software Foundation; either version 2 of the License, or     -->
 <!--    (at your option) any later version.                                   -->
 
-<!-- 
+<!--
 
 	Test file for the XML customizable menu system
-	
+
 -->
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
@@ -176,8 +176,8 @@
 
     <!-- Combo-boxes -->
     <section name="ComboBoxSmall">
-      <attstr name="type" val="combo box"/>	  	  	  	  	  
-      <attstr name="text" val="Small combo"/>	  	  	  	  	  
+      <attstr name="type" val="combo box"/>
+      <attstr name="text" val="Small combo"/>
       <attnum name="max len" val="12"/>
       <attstr name="tip" val="Small text combo-box"/>
       <attnum name="x" val="10"/>
@@ -189,8 +189,8 @@
     </section>
 
     <section name="ComboBoxBig">
-      <attstr name="type" val="combo box"/>	  	  	  	  	  
-      <attstr name="text" val="Big combo"/>	  	  	  	  	  
+      <attstr name="type" val="combo box"/>
+      <attstr name="text" val="Big combo"/>
       <attnum name="max len" val="12"/>
       <attstr name="tip" val="Big text combo-box"/>
       <attnum name="x" val="180"/>
@@ -230,7 +230,7 @@
 
     <!-- Scroll-lists  -->
     <section name="ScrollListRight">
-      <attstr name="type" val="scroll list"/>                  
+      <attstr name="type" val="scroll list"/>
       <attnum name="x" val="10"/>
       <attnum name="y" val="240"/>
       <attnum name="width" val="120"/>
@@ -240,10 +240,10 @@
       <attstr name="selected color" val="0x8000FFCC"/>
       <attstr name="scrollbar pos" val="right"/>
       <attnum name="scrollbar width" val="20"/>
-    </section>  
+    </section>
 
     <section name="ScrollListLeft">
-      <attstr name="type" val="scroll list"/>                  
+      <attstr name="type" val="scroll list"/>
       <attnum name="x" val="180"/>
       <attnum name="y" val="240"/>
       <attnum name="width" val="120"/>
@@ -253,7 +253,7 @@
       <attstr name="selected color" val="0x8000FFCC"/>
       <attstr name="scrollbar pos" val="left"/>
       <attnum name="scrollbar width" val="20"/>
-    </section>  
+    </section>
 
     <!-- Static images  -->
     <section name="StaticImage">
@@ -408,7 +408,7 @@
     <section name="1">
       <attstr name="type" val="background image"/>
       <attstr name="image" val="data/img/guitest-grid.png"/>
-    </section>  
+    </section>
 
   </section>
 

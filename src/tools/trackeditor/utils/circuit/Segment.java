@@ -284,7 +284,7 @@ public class Segment implements Cloneable
 	{
 		this.name = name;
 	}
-	
+
 	public String getComment()
 	{
 		return comment;
@@ -327,12 +327,12 @@ public class Segment implements Cloneable
 	{
 		return ((P1.x - P0.x) * (P2.y - P0.y) - (P2.x -  P0.x) * (P1.y - P0.y));
 	}
-	
+
 	public boolean contains(Point2D.Double point)
 	{
 		if (points == null)
 			return false;
-		
+
 		for (int i = 0; i < points.length; i += 4)
 		{
 			int count = 0;
@@ -497,7 +497,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(heightStartLeft);
 	}
-	
+
 	/**
 	 * @return Returns the heightStartRight.
 	 */
@@ -550,7 +550,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(heightEndLeft);
 	}
-	
+
 	/**
 	 * @return Returns the heightEndRight.
 	 */
@@ -610,7 +610,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(bankingStart);
 	}
-	
+
 	/**
 	 * @return Returns the bankingEnd.
 	 */
@@ -630,7 +630,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(bankingEnd);
 	}
-	
+
 	/**
 	 * @return Returns the profil.
 	 */
@@ -670,7 +670,7 @@ public class Segment implements Cloneable
 	{
 		return profilSteps != Integer.MAX_VALUE;
 	}
-	
+
 	/**
 	 * @return Returns the profilStepsLength.
 	 */
@@ -690,7 +690,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(profilStepsLength);
 	}
-	
+
 	/**
 	 * @return Returns the profilStartTangent.
 	 */
@@ -710,7 +710,7 @@ public class Segment implements Cloneable
 	{
 		return !Double.isNaN(profilStartTangent);
 	}
-	
+
 	/**
 	 * @return Returns the profilEndTangent.
 	 */
@@ -1960,7 +1960,7 @@ public class Segment implements Cloneable
 
         return value;
 	}
-    
+
     public String getValidLeftSideSurface(EditorFrame editorFrame)
     {
         Segment previous = this;
@@ -2088,8 +2088,8 @@ public class Segment implements Cloneable
     		{
                 return previous.heightStart;
     		}
-            else if (previous.hasHeightStartLeft() && 
-            		 previous.hasHeightStartRight() && 
+            else if (previous.hasHeightStartLeft() &&
+            		 previous.hasHeightStartRight() &&
             		 previous.heightStartLeft == previous.heightStartRight)
             {
             	return previous.heightStartLeft;
@@ -2103,8 +2103,8 @@ public class Segment implements Cloneable
     		{
                 return previous.heightEnd;
     		}
-            else if (previous.hasHeightEndLeft() && 
-            		 previous.hasHeightEndRight() && 
+            else if (previous.hasHeightEndLeft() &&
+            		 previous.hasHeightEndRight() &&
             		 previous.heightEndLeft == previous.heightEndRight)
             {
             	return previous.heightEnd;
@@ -2238,7 +2238,7 @@ public class Segment implements Cloneable
     public void inheritProperties(Segment previousShape)
     {
 		setSurface(previousShape.getSurface());
-		
+
 		if (!Double.isNaN(previousShape.getHeightEnd()))
 		{
 			setHeightStart(previousShape.getHeightEnd());

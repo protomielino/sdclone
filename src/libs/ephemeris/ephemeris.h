@@ -34,7 +34,7 @@
 
 #include <SGMath.h>
 
-class ePhEphemeris 
+class ePhEphemeris
 {
     ePhStar *our_sun;
     ePhMoonPos *moon;
@@ -59,23 +59,23 @@ public:
 
     inline ePhStar *get_sun() const { return our_sun; }
 
-    inline double getSunRightAscension() const 
+    inline double getSunRightAscension() const
     {
 	return our_sun->getRightAscension();
     }
 
-    inline double getSunDeclination() const 
+    inline double getSunDeclination() const
     {
 	return our_sun->getDeclination();
     }
 
     inline ePhMoonPos *get_moon() const { return moon; }
-    inline double getMoonRightAscension() const 
+    inline double getMoonRightAscension() const
     {
 	return moon->getRightAscension();
     }
 
-    inline double getMoonDeclination() const 
+    inline double getMoonDeclination() const
     {
 	return moon->getDeclination();
     }

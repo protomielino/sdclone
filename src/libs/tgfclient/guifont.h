@@ -1,10 +1,10 @@
 /***************************************************************************
-                        guifont.h -- Interface file for guifont                          
-                             -------------------                                         
+                        guifont.h -- Interface file for guifont
+                             -------------------
     created              : Fri Aug 13 22:20:04 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef _GUIFONT_H_
 #define _GUIFONT_H_
 
@@ -58,7 +58,7 @@ public:
 
 extern GfuiFontClass	*gfuiFont[];
 
-#endif /* _GUIFONT_H_ */ 
+#endif /* _GUIFONT_H_ */
 
 
 

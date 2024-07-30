@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef __REPLAYV1_H__
 #define __REPLAYV1_H__
 
@@ -55,7 +55,7 @@ extern sqlite3_stmt *replayBlobs[50];	// Hard coded 50 car limit to race
 extern sqlite3_stmt *ghostcarBlob;
 #endif
 
-#endif /* __REPLAYV1_H__ */ 
+#endif /* __REPLAYV1_H__ */
 
 
 

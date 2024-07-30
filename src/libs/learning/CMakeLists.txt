@@ -2,11 +2,11 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(learning)
 
-SET(LEARNING_HEADERS learning.h ANN.h ann_policy.h Distribution.h learn_debug.h List.h 
+SET(LEARNING_HEADERS learning.h ANN.h ann_policy.h Distribution.h learn_debug.h List.h
                      MathFunctions.h policy.h real.h string_utils.h)
 SET(LEARNING_SOURCES ANN.cpp Distribution.cpp List.cpp MathFunctions.cpp
                      ann_policy.cpp policy.cpp string_utils.cpp)
-SET(LEARNING_OTHER_SOURCES README) 
+SET(LEARNING_OTHER_SOURCES README)
 
 ADD_SDLIB_INCLUDEDIR(portability)
 
@@ -23,7 +23,7 @@ ENDIF(WIN32)
 # Note: Other sources and headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES} ${LEARNING_HEADERS} ${LEARNING_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(learning PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_SDLIB_LIBRARY(learning portability)

@@ -77,7 +77,7 @@ public class TrackProperties extends PropertyPanel
 	private Vector<String>		roadSurfaceVector			= new Vector<String>(Arrays.asList(roadSurfaceItems));
 
 	private String[]			borderStyleItems			= {"none", "plan", "curb", "wall"};
-	
+
 	private String[]			borderSurfaceItems			=
 	{"curb-5cm-r", "curb-5cm-l", "curb-l", "tar-grass3-l",
 	 "tar-grass3-r", "tar-sand", "b-road1-grass6", "b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3",
@@ -133,7 +133,7 @@ public class TrackProperties extends PropertyPanel
 		addDefaultSurfaces(sideSurfaceVector);
 		addDefaultSurfaces(borderSurfaceVector);
 		addDefaultSurfaces(barrierSurfaceVector);
-		
+
 		this.setLayout(null);
 		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
@@ -216,7 +216,7 @@ public class TrackProperties extends PropertyPanel
 		if (surfaceComboBox == null)
 		{
 			String newSurface = getEditorFrame().getTrackData().getMainTrack().getSurface();
-			addSurface(roadSurfaceVector, newSurface);			
+			addSurface(roadSurfaceVector, newSurface);
 			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
 			surfaceComboBox.setBounds(150, 37, 200, 23);
 			surfaceComboBox.setSelectedItem(newSurface);
@@ -235,7 +235,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			String[] items = {"none", "linear", "spline"};
 			profilComboBox = new JComboBox<String>(items);
-			profilComboBox.setBounds(150, 64, 125, 23);						
+			profilComboBox.setBounds(150, 64, 125, 23);
 			String profil = getEditorFrame().getTrackData().getMainTrack().getProfil();
 			if (profil == null || profil.isEmpty())
 				profil = "none";
@@ -308,7 +308,7 @@ public class TrackProperties extends PropertyPanel
 		private void initialize()
 		{
 			setLayout(null);
-			
+
 			addLabel(this, 0, sideStartWidthLabel, "Side Start Width", 140);
 			addLabel(this, 1, sideEndWidthLabel, "Side End Width", 140);
 			addLabel(this, 2, sideSurfaceLabel, "Side Banking Surface", 140);
@@ -321,7 +321,7 @@ public class TrackProperties extends PropertyPanel
 			addLabel(this, 9, barrierHeightLabel, "Barrier Height", 140);
 			addLabel(this, 10, barrierSurfaceLabel, "Barrier Surface", 140);
 			addLabel(this, 11, barrierStyleLabel, "Barrier Style", 140);
-			
+
 			addTextField(this, 0, sideStartWidthTextField, side.getSideStartWidth(), 150, 125);
 			addTextField(this, 1, sideEndWidthTextField, side.getSideEndWidth(), 150, 125);
 
@@ -381,10 +381,10 @@ public class TrackProperties extends PropertyPanel
 				barrierSurfaceComboBox.setEnabled(true);
 				break;
 			}
-			
+
 			initialized = true;
 		}
-		
+
 		/**
 		 * This method initializes sideSurfaceComboBox
 		 *
@@ -490,7 +490,7 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBorderStyle(style);
-						
+
 						if (!initialized)
 							return;
 
@@ -598,7 +598,7 @@ public class TrackProperties extends PropertyPanel
 						if (style == "none")
 							style = "";
 						side.setBarrierStyle(style);
-						
+
 						if (!initialized)
 							return;
 
@@ -635,7 +635,7 @@ public class TrackProperties extends PropertyPanel
 			return barrierStyleComboBox;
 		}
 	}
-	
+
 	/**
 	 *
 	 */
@@ -699,13 +699,13 @@ public class TrackProperties extends PropertyPanel
         	getEditorFrame().getTrackData().getMainTrack().getLeft().getSideStartWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setSideStartWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(left.sideEndWidthTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getSideEndWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setSideEndWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) left.sideSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getSideSurface(), stringResult))
@@ -723,13 +723,13 @@ public class TrackProperties extends PropertyPanel
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(left.borderHeightTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderHeight(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderHeight(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) left.borderSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderSurface(), stringResult))
@@ -747,13 +747,13 @@ public class TrackProperties extends PropertyPanel
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(left.barrierHeightTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierHeight(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierHeight(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) left.barrierSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierSurface(), stringResult))
@@ -774,13 +774,13 @@ public class TrackProperties extends PropertyPanel
         	getEditorFrame().getTrackData().getMainTrack().getRight().getSideStartWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setSideStartWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(right.sideEndWidthTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getSideEndWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setSideEndWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) right.sideSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getSideSurface(), stringResult))
@@ -798,13 +798,13 @@ public class TrackProperties extends PropertyPanel
             getEditorFrame().getTrackData().getMainTrack().getRight().getBorderWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setBorderWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(right.borderHeightTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getBorderHeight(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setBorderHeight(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) right.borderSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getBorderSurface(), stringResult))
@@ -822,13 +822,13 @@ public class TrackProperties extends PropertyPanel
             getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierWidth(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierWidth(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
         if (isDifferent(right.barrierHeightTextField.getText(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierHeight(), doubleResult))
         {
             getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierHeight(doubleResult.getValue());
-            getEditorFrame().documentIsModified = true;        	
+            getEditorFrame().documentIsModified = true;
         }
 		if (isDifferent((String) right.barrierSurfaceComboBox.getSelectedItem(),
             getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierSurface(), stringResult))

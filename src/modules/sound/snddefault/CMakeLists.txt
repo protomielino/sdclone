@@ -1,23 +1,23 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(_SOURCES snddefault.cpp 
+SET(_SOURCES snddefault.cpp
                        CarSoundData.cpp
                        Sound.cpp OpenalSound.cpp
                        SoundInterface.cpp
-                       OpenalSoundInterface.cpp 
+                       OpenalSoundInterface.cpp
                        grsound.cpp)
-SET(_HEADERS snddefault.h 
-                       CarSoundData.h 
+SET(_HEADERS snddefault.h
+                       CarSoundData.h
                        Sound.h OpenalSound.h
                        SoundInterface.h
-                       OpenalSoundInterface.h 
+                       OpenalSoundInterface.h
                        grsound.h)
 IF(NOT OPTION_USE_MACPORTS)
    SET(_SOURCES ${_SOURCES} PlibSound.cpp PlibSoundInterface.cpp)
    SET(_HEADERS ${_HEADERS} PlibSound.h PlibSoundInterface.h)
 ENDIF(NOT OPTION_USE_MACPORTS)
 
-SET(_OTHER_SOURCES ) 
+SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
@@ -38,16 +38,16 @@ ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG 
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG
         "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmtd.lib")
-    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE 
+    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE
         "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
 # Note: Headers and other source files needed for having them available in IDEs.
 SD_ADD_LIBRARY(snddefault MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(snddefault PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 IF(OPTION_USE_MACPORTS)

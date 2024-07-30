@@ -27,7 +27,7 @@
 
 static void *MenuHandle = NULL;
 
-static void 
+static void
 onAcceptExit(void * /* dummy */)
 {
 	LmRaceEngine().abortRace(); // Do cleanup to get back correct setup files
@@ -48,7 +48,7 @@ onAcceptExit(void * /* dummy */)
  *	The menu handle
  *
  * Remarks
- *	
+ *
  */
 
 void* ExitMenuInit(void *prevMenu)
@@ -66,7 +66,7 @@ void* ExitMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(MenuHandle, param, "nobacktogame", prevMenu, GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
-    
+
     GfuiMenuDefaultKeysAdd(MenuHandle);
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "No, back to the game", prevMenu, GfuiScreenActivate, NULL);
 

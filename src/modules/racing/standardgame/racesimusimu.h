@@ -1,8 +1,8 @@
 /**************************************************************************
 
     file        : racesimusimu.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    copyright   : (C) 2007 by Mart Kelder
+    web         : http://speed-dreams.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Simulation simulation
 */
 

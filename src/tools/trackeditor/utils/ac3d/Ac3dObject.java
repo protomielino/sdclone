@@ -30,7 +30,7 @@ public class Ac3dObject
 	public class Matrix
 	{
 		public double[][] data = new double[4][4];
-		
+
 		public Matrix()
 		{
 			data[0][0] = 1; data[0][1] = 0; data[0][2] = 0; data[0][3] = 0;
@@ -477,7 +477,7 @@ public class Ac3dObject
 	{
 		this.linenum = linenum;
 	}
-	
+
 	public void flatten()
 	{
 		transform(new Matrix(1.0, 0.0, 0.0, 0.0,

@@ -21,7 +21,7 @@
 #define _SUSP_H__
 
 
-typedef struct 
+typedef struct
 {
     tdble C1, b1, v1; /* coefs for slow */
     tdble C2, b2;     /* coefs for fast */
@@ -32,8 +32,8 @@ typedef struct
     tDamperDef bump;
     tDamperDef rebound;
 } tDamper;
-    
-typedef struct 
+
+typedef struct
 {
     tdble K;          /* spring coef */
     tdble F0;         /* initial force */
@@ -63,7 +63,7 @@ typedef struct Suspension
 } tSuspension;
 
 
-#endif /* _SUSP_H__ */ 
+#endif /* _SUSP_H__ */
 
 
 

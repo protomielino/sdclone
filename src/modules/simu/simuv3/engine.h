@@ -55,7 +55,7 @@ typedef struct
 	int         lastInterval; /* interval of torque characteristic used at last call to CalculateTorque2 */
 } tEngine;
 
-#endif /* _ENGINE_H_ */ 
+#endif /* _ENGINE_H_ */
 
 
 

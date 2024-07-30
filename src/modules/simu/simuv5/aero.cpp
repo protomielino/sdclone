@@ -202,7 +202,7 @@ SimAeroUpdate(tCar *car, tSituation *s)
     }
 
     car->airSpeed2 = airSpeed * airSpeed;
-    tdble v2 = car->airSpeed2;    
+    tdble v2 = car->airSpeed2;
 
     // simulate ground effect drop off caused by non-frontal airflow (diffusor stops working etc.)
 

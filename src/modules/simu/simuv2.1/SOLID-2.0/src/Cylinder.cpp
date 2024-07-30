@@ -33,9 +33,9 @@
 Point Cylinder::support(const Vector& v) const {
   Scalar s = sqrt(v[X] * v[X] + v[Z] * v[Z]);
   if (s > EPSILON) {
-    Scalar d = radius / s;  
+    Scalar d = radius / s;
     return Point(v[X] * d, v[Y] < 0 ? -halfHeight : halfHeight, v[Z] * d);
   }
   else return Point(0, v[Y] < 0 ? -halfHeight : halfHeight, 0);
 }
-  
+

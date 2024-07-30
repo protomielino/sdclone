@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -31,7 +31,7 @@ extern tdble GetElevation(tdble x, tdble y, tdble z);
 extern void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp, int heightSteps);
 
 
-#endif /* _ELEVATION_H_ */ 
+#endif /* _ELEVATION_H_ */
 
 
 

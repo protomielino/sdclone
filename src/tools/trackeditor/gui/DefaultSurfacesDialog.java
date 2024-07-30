@@ -11,7 +11,7 @@ public class DefaultSurfacesDialog extends JDialog
 {
 	private EditorFrame				editorFrame;
 	private SurfaceProperties		surfaceProperties		= null;
-	
+
 	public DefaultSurfacesDialog(EditorFrame editorFrame)
 	{
 		super();
@@ -32,7 +32,7 @@ public class DefaultSurfacesDialog extends JDialog
 		this.setResizable(false);
 		this.setTitle("Default Surfaces");
 	}
-	
+
 	private SurfaceProperties getSurfaceProperties()
 	{
 		if (surfaceProperties == null)

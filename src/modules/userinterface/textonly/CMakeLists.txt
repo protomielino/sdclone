@@ -24,7 +24,7 @@ IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTEXTONLY_DLL)
 ENDIF(WIN32)
-    
+
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
@@ -38,7 +38,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Note: Headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(textonly MODULE ${_SOURCES} ${_HEADERS})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(textonly PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_SDLIB_LIBRARY(textonly portability tgf tgfclient tgfdata ${NETWORKING_LIB})

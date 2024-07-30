@@ -18,7 +18,7 @@ public class GraphicObject implements Cloneable
 	{
 		shape = new ObjShapeObject(name, rgb, location);
 	}
-	
+
 	public GraphicObject(String name, int rgb, Point2D.Double location, String comment, double orientation, double height, String useMaterial)
 	{
 		shape = new ObjShapeObject(name, rgb, location);
@@ -27,7 +27,7 @@ public class GraphicObject implements Cloneable
 		this.height = height;
 		this.useMaterial = useMaterial;
 	}
-	
+
 	public GraphicObject(GraphicObjectData data)
 	{
 		shape = new ObjShapeObject(data.name, data.color, new Point2D.Double(data.trackX, data.trackY));
@@ -36,12 +36,12 @@ public class GraphicObject implements Cloneable
 		height = data.height;
 		useMaterial = data.useMaterial;
 	}
-	
+
 	public GraphicObject(ObjShapeObject shape)
 	{
 		this.shape = shape;
 	}
-	
+
 	public Object clone()
 	{
 		GraphicObject object = new GraphicObject((ObjShapeObject) this.shape.clone());
@@ -106,12 +106,12 @@ public class GraphicObject implements Cloneable
 	{
 		return shape.getTrackLocation();
 	}
-	
+
 	public void setLocation(Point2D.Double location)
 	{
 		shape.setLocation(location);
 	}
-	
+
 	public String getComment()
 	{
 		return comment;

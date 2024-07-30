@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
   		A race engine module designed for optimising car and AI driver setups
 		(parameters) through a genetic algorithm
     @version    $Id$
@@ -96,7 +96,7 @@ void GenParOptV1::reset(void)
 
 	// Cleanup everything in case no yet done.
 	cleanup();
-	
+
 	// Internal init.
 	::ReReset();
 
@@ -331,7 +331,7 @@ void GenParOptV1::unloadPhysicsEngine()
     // Unload the Physics engine module if not already done.
 	if (!_piPhysEngine)
 		return;
-	
+
 	GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(_piPhysEngine);
 	if (pmodPhysEngine)
 		GfModule::unload(pmodPhysEngine);

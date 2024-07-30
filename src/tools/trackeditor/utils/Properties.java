@@ -25,7 +25,7 @@ import java.util.Vector;
 
 /**
  * @author babis
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -55,7 +55,7 @@ public  class Properties
 	private int					straightNameCount		= 0;
 
 	/**
-	 *  
+	 *
 	 */
 	public Properties()
 	{
@@ -279,7 +279,7 @@ public  class Properties
 	{
 		this.trackStartDist = trackStartDist;
 	}
- 
+
     /**
      * @return Returns the imgOffset.
      */

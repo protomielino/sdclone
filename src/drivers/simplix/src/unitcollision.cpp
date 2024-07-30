@@ -83,10 +83,10 @@ TCollision::~TCollision()
 // Avoid to side
 //--------------------------------------------------------------------------*
 double TCollision::AvoidTo
-  (const TCollInfo& Coll, 
+  (const TCollInfo& Coll,
   const PCarElt oCar, TDriver& Me, bool& DoAvoid, double& TempOffset)
 {
-  int Flags = 0; 
+  int Flags = 0;
   double AvoidTo = 0.0;                          // Undefined side
   double Offset = 0.0;
 
@@ -100,7 +100,7 @@ double TCollision::AvoidTo
   else // No opponents at side ...
   {
 	// Second priority: Lappers behind?
-	if (Coll.LappersBehind)           
+	if (Coll.LappersBehind)
 	{
 	  Flags = Coll.LappersBehind;                // Get corresponding flags
 	  if (Flags == (F_LEFT | F_RIGHT))
@@ -119,25 +119,25 @@ double TCollision::AvoidTo
 	// Third priority: More than one ahead?
     else if (Coll.OppsAhead == (F_LEFT | F_RIGHT))
     { // cars on both sides ahead, so avoid closest (or slowest) car
-      Flags = (Coll.MinLSideDist < Coll.MinRSideDist) ? F_LEFT : F_RIGHT; 
+      Flags = (Coll.MinLSideDist < Coll.MinRSideDist) ? F_LEFT : F_RIGHT;
 	  AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;
 	  LogSimplix.debug("(Coll.OppsAhead == (F_LEFT | F_RIGHT)): %g\n",AvoidTo);
 	}
-	// Fourth priority: Anyone ahead? 
+	// Fourth priority: Anyone ahead?
     else if (Coll.OppsAhead)
 	{ // cars on one side ahead
       Flags = Coll.Flags;
 	  AvoidTo = (Flags & F_TRK_LEFT) ? 1.0 : -1.0;
       LogSimplix.debug("(Coll.OppsAhead): %g\n",AvoidTo);
 	}
-	// Fifth priority: Anyone behind faster? 
+	// Fifth priority: Anyone behind faster?
     else if (Coll.OppsBehindFaster)
-	{ 
+	{
       Flags = Coll.Flags;
 	  AvoidTo = (Flags & F_TRK_LEFT) ? 1.0 : -1.0;
       LogSimplix.debug("(Coll.OppsBehindFaster): %g\n",AvoidTo);
 	}
-	else 
+	else
 	{
       //LogSimplix.debug("AvoidTo5: %g\n",AvoidTo);
       return AvoidTo;                            // Do not avoid
@@ -187,7 +187,7 @@ double TCollision::AvoidTo
 
   LogSimplix.debug("DoAvoid Offset: S%g(I%g;D%g)\n",Offset,O+CarToMiddle,Offset-(O+CarToMiddle));
 
-  return Offset; 
+  return Offset;
 }
 //--------------------------------------------------------------------------*
 // end of file unitcollision.cpp

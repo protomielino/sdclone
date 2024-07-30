@@ -16,14 +16,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef _LINUXSPEC_H_
 #define _LINUXSPEC_H_
 
 extern void LinuxSpecInit(void);
 
-#endif /* _LINUXSPEC_H_ */ 
+#endif /* _LINUXSPEC_H_ */
 
 
 

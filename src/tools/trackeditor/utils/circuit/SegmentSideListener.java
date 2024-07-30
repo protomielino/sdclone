@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
  */
 public interface SegmentSideListener extends ActionListener
 {
-	
+
 	public void barrierHeightChanged();
 	public void barrierStyleChanged();
 	public void barrierSurfaceChanged();

@@ -25,7 +25,7 @@
 #define MN(x, y)	((x) < (y) ? (x) : (y))
 #define MX(x, y)	((x) > (y) ? (x) : (y))
 
-class Utils  
+class Utils
 {
   public:
   Utils();

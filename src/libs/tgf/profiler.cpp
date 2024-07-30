@@ -168,25 +168,25 @@ void Profiler::printReport() {
   std::vector<ProfileInstance *>::reverse_iterator iter = vecProfiles.rbegin();
   std::vector<ProfileInstance *>::reverse_iterator end = vecProfiles.rend();
   for (; iter != end; ++iter) {
-    std::cerr << "| " << std::setprecision(3) << std::setw(7) 
+    std::cerr << "| " << std::setprecision(3) << std::setw(7)
 	 << TRUNC( (*iter)->totalTime * 100 / total )
-	 << " | " << std::setprecision(3) << std::setw(7) 
-	 << TRUNC( ((*iter)->addTime - 
+	 << " | " << std::setprecision(3) << std::setw(7)
+	 << TRUNC( ((*iter)->addTime -
 		    (*iter)->subTime) * 100.0 / total )
-	 << " |         | " 
+	 << " |         | "
 	 << std::setw(7) << (*iter)->calls << " | " << (*iter)->name << std::endl;
-     std::map<ProfileInstance *, void*>::iterator childiter = 
+     std::map<ProfileInstance *, void*>::iterator childiter =
        (*iter)->mapChildren.begin();
-     std::map<ProfileInstance *, void*>::iterator childend = 
+     std::map<ProfileInstance *, void*>::iterator childend =
        (*iter)->mapChildren.end();
      for (; childiter != childend; ++childiter) {
-       std::cerr << "| " << std::setprecision(3) << std::setw(7) 
+       std::cerr << "| " << std::setprecision(3) << std::setw(7)
 	    << TRUNC( (*childiter).first->totalTime * 100 / total )
-	    << " | " << std::setprecision(3) << std::setw(7) 
+	    << " | " << std::setprecision(3) << std::setw(7)
 	    << TRUNC( ((*childiter).first->addTime - (*childiter).first->subTime) * 100.0 / total )
-	    << " | " << std::setprecision(3) << std::setw(7) 
+	    << " | " << std::setprecision(3) << std::setw(7)
 	    << TRUNC( 100 * (*childiter).first->totalTime / (*iter)->totalTime )
-	    << " | " << std::setw(7) << (*childiter).first->calls 
+	    << " | " << std::setw(7) << (*childiter).first->calls
 	    << " |   " << (*childiter).first->name << std::endl;
      }
      std::cerr << "----------------------------------------------------------" << std::endl;

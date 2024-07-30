@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Helper for parameter handling while optimizations
     @author	<a href=mailto:wdbee@users.sourceforge.net>WDBee</a>
     @version	$Id: genetic.cpp 3657 2011-11-06 09:15:00Z wdbee $
@@ -101,12 +101,12 @@ TGeneticParameter::TGeneticParameter
 	else
   		Unit = NULL;
 
-	Min = GfParmGetNumMin(Handle, 
+	Min = GfParmGetNumMin(Handle,
 		Section, Parameter, Unit, MinDef);
-	Max = GfParmGetNumMax(Handle, 
+	Max = GfParmGetNumMax(Handle,
 		Section, Parameter, Unit, MaxDef);
 	Def = ValDef;
-	Val = GfParmGetNum(Handle, 
+	Val = GfParmGetNum(Handle,
 		Section, Parameter, Unit, Def);
 	Weight = ParamWeight;
 	Range = Max - Min;
@@ -116,7 +116,7 @@ TGeneticParameter::TGeneticParameter
 	Tries = 0;
 	Changed = 0;
 	Selected = false;
-	
+
 	if (Range < 0.000001)
 	{
 		Min = MinDef;
@@ -165,7 +165,7 @@ void TGeneticParameter::DisplayStatistik()
 	char buf[80];
 	ReLogOptim.info("%s: N=%d M=%d (%g %%)\n",Label,Tries,Changed,(100.0 * Changed)/Tries);
 	snprintf(buf,sizeof(buf),"%s: N=%d M=%d (%.1f %%)",Label,Tries,Changed,(100.0 * Changed)/Tries);;
-	ReUI().addOptimizationMessage(buf); 
+	ReUI().addOptimizationMessage(buf);
 };
 
 // Write parameter meta data to xml file
@@ -414,7 +414,7 @@ TGeneticParameterPart::TGeneticParameterPart
 	else
 		Parameter = strdup("track param count");
 
-	Active = 0 < GfParmGetNum(Handle, 
+	Active = 0 < GfParmGetNum(Handle,
 		Section, PRM_ACTIVE, 0, 0.0f);
 };
 
@@ -499,10 +499,10 @@ TGeneticParameterTOC::TGeneticParameterTOC():
 	WeightOfDamages(1.0f),
 	GetInitialVal(true)
 {
-};        
+};
 
 // Constructor
-TGeneticParameterTOC::TGeneticParameterTOC           
+TGeneticParameterTOC::TGeneticParameterTOC
 (
 	void* MetaDataFile,			// Handle to read/write data
 	char* AuthorName,			// Name of author of setup
@@ -521,7 +521,7 @@ TGeneticParameterTOC::TGeneticParameterTOC
 		Private = strdup(PrivateSection);
 	else
 		Private = NULL;
-	OptimisationLoops = Loops; 
+	OptimisationLoops = Loops;
 	WeightOfDamages = WeightDamages;
 	GetInitialVal = InitialVal;
 };
@@ -534,31 +534,31 @@ TGeneticParameterTOC::~TGeneticParameterTOC()
 	free(Author);
 }
 
-// Write table of content to configuration file 
+// Write table of content to configuration file
 int TGeneticParameterTOC::Set()
 {
-	GfParmSetStr(Handle, 
+	GfParmSetStr(Handle,
 		SECT_TOC, PRM_AUTHOR, Author);
-	GfParmSetStr(Handle, 
+	GfParmSetStr(Handle,
 		SECT_TOC, PRM_PRIVATE, Private);
-	GfParmSetNum(Handle, 
+	GfParmSetNum(Handle,
 		SECT_TOC, PRM_LOOPS, 0, (float) OptimisationLoops);
-	GfParmSetNum(Handle, 
+	GfParmSetNum(Handle,
 		SECT_TOC, PRM_DAMAGES, 0, (float) WeightOfDamages);
 	if (GetInitialVal)
-	  GfParmSetNum(Handle, 
+	  GfParmSetNum(Handle,
 	  	SECT_TOC, PRM_INITIAL, 0, 1);
 	else
-	  GfParmSetNum(Handle, 
+	  GfParmSetNum(Handle,
 	  	SECT_TOC, PRM_INITIAL, 0, 0);
 
 	return 0;
-}; 
+};
 
-// Read table of content from configuration file 
-int TGeneticParameterTOC::Get() 
+// Read table of content from configuration file
+int TGeneticParameterTOC::Get()
 {
-	char* Value = (char*) GfParmGetStr(Handle, 
+	char* Value = (char*) GfParmGetStr(Handle,
 		SECT_TOC, PRM_AUTHOR, "Wolf-Dieter Beelitz");
 	if (Author)
 		free(Author);
@@ -567,7 +567,7 @@ int TGeneticParameterTOC::Get()
 	else
 		Author = NULL;
 
-	Value = (char*) GfParmGetStr(Handle, 
+	Value = (char*) GfParmGetStr(Handle,
 		SECT_TOC, PRM_PRIVATE, "simplix private");
 	if (Private)
 		free(Private);
@@ -576,14 +576,14 @@ int TGeneticParameterTOC::Get()
 	else
 		Private = NULL;
 
-	OptimisationLoops = (int) GfParmGetNum(Handle, 
+	OptimisationLoops = (int) GfParmGetNum(Handle,
 		SECT_TOC, PRM_LOOPS, 0, (float) OptimisationLoops);
-	WeightOfDamages = GfParmGetNum(Handle, 
+	WeightOfDamages = GfParmGetNum(Handle,
 		SECT_TOC, PRM_DAMAGES, 0, (float) WeightOfDamages);
-	GetInitialVal = 0 < GfParmGetNum(Handle, 
+	GetInitialVal = 0 < GfParmGetNum(Handle,
 		SECT_TOC, PRM_INITIAL, 0, 1);
 
 	return 0;
-}; 
+};
 
 // end of file genetic.cpp

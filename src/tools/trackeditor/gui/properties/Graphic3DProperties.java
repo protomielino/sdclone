@@ -84,7 +84,7 @@ public class Graphic3DProperties extends PropertyPanel
 	private JLabel				environmentObjectsLabel			= new JLabel();
 	private JTextField			environmentObjectsTextField		= new JTextField();
 	private JButton				environmentObjectsButton		= null;
-	
+
 	private final String sep = System.getProperty("file.separator");
 
 	/**
@@ -651,8 +651,8 @@ public class Graphic3DProperties extends PropertyPanel
 
 	protected void objectsFile(JTextField textField)
 	{
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -675,8 +675,8 @@ public class Graphic3DProperties extends PropertyPanel
 				fileName = fileName.substring(index + 1);
 			textField.setText(fileName);
 		}
-	}	
-	
+	}
+
 	/**
 	 *
 	 */

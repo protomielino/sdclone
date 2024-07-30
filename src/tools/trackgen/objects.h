@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -28,7 +28,7 @@
 
 extern void GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, Ac3d &allAc3d, bool all, const std::string &terrainFile, const std::string &trackFile, const std::string &outputFile, bool multipleMaterials, bool acc);
 
-#endif /* _OBJECTS_H_ */ 
+#endif /* _OBJECTS_H_ */
 
 
 

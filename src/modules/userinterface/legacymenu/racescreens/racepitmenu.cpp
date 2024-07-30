@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Pit menu for human drivers
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
@@ -50,7 +50,7 @@ rmUpdtFuel(void * /* dummy */)
 {
     char	*val;
     char	buf[32];
-    
+
     val = GfuiEditboxGetString(menuHandle, fuelId);
     rmCar->pitcmd.fuel = (tdble)strtod(val, (char **)NULL);
     sprintf(buf, "%.1f", rmCar->pitcmd.fuel);
@@ -62,7 +62,7 @@ rmUpdtRepair(void * /* dummy */)
 {
     char	*val;
     char	buf[32];
-    
+
     val = GfuiEditboxGetString(menuHandle, repairId);
     rmCar->pitcmd.repair = strtol(val, (char **)NULL, 0);
     sprintf(buf, "%d", rmCar->pitcmd.repair);
@@ -155,7 +155,7 @@ RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(menuHandle);
 
@@ -182,7 +182,7 @@ RmCheckPitRequest()
 		// Mute sound.
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(true);
-		
+
 		// TODO pit music??
 
 		// First, stop the race engine.

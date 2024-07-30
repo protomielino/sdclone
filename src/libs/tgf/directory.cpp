@@ -1,10 +1,10 @@
 /***************************************************************************
-                        directory.cpp -- directory management                       
-                             -------------------                                         
+                        directory.cpp -- directory management
+                             -------------------
     created              : Fri Aug 13 21:58:55 CEST 1999
-    copyright            : (C) 1999 by                          
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -108,7 +108,7 @@ bool GfDirExists(const char* pszName)
 {
 	if (!pszName || strlen(pszName) == 0)
 		return false;
-	
+
 	struct stat st;
 
 #ifdef WIN32
@@ -151,7 +151,7 @@ int GfDirCreate(const char *path)
 	for (i = 0; i < nPathBufSize && buf[i] != '\0'; i++)
 		if (buf[i] == '/')
 			buf[i] = cPathSeparator;
-	
+
 #else // WIN32
 
 // mkdir with u+rwx access grants by default
@@ -179,7 +179,7 @@ int GfDirCreate(const char *path)
 		*end = cPathSeparator;
 		err = mkdir(buf);
 	}
-	
+
 	return (err == -1 && errno != EEXIST) ? GF_DIR_CREATION_FAILED : GF_DIR_CREATED;
 }
 

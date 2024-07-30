@@ -62,14 +62,14 @@
 //==========================================================================*
 // Deklaration der Klasse TCommonData
 //--------------------------------------------------------------------------*
-class TCommonData  
+class TCommonData
 {
   public:
 	TCommonData();								  //	Default	constructor
 	~TCommonData();							  //	Destructor
 
   public:
-	PTrack	Track;								  // TORCS Track data	 
+	PTrack	Track;								  // TORCS Track data
 };
 //==========================================================================*
 #endif // _UNITCOMMONDATA_H_

@@ -30,7 +30,7 @@ typedef struct ListItem {
 
 /**
    \brief A very simple list structure
-   
+
    The structure is initialised empty. The search function pointer is
    ListLinearSearchRetrieve.
    \return NULL if nothing could be

@@ -1,8 +1,8 @@
 /**************************************************************************
 
     file        : rtutil.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    copyright   : (C) 2007 by Mart Kelder
+    web         : http://speed-dreams.sourceforge.net
 
  ***************************************************************************/
 
@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		Robot tools utilities 
+/** @file
+    		Robot tools utilities
     @ingroup	robottools
 */
 

@@ -2,7 +2,7 @@
 #
 #   file        : FindCustom3rdParty.cmake
 #   copyright   : (C) 2009 by Brian Gavin, 2012 Jean-Philippe Meuret
-#   web         : www.speed-dreams.org 
+#   web         : www.speed-dreams.org
 #   version     : $Id$
 #
 ############################################################################
@@ -36,7 +36,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCY DEP_NAME INCLUDE_FILE INCLUDE_SUBDIRS LIBRARY_NA
 	LIST(APPEND _INCLUDE_SUBDIRS ${INCLUDE_SUBDIRS})
 	LIST(LENGTH _INCLUDE_SUBDIRS _NB_DIRS)
 	#MESSAGE(STATUS "_INCLUDE_SUBDIRS=${_INCLUDE_SUBDIRS}, _NB_DIRS=${_NB_DIRS}")
-	
+
 	# Find include dirs
 	SET(MY_PATH_INCLUDE )
 	FOREACH(MY_PATH ${SEARCH_PATH_LIST} )
@@ -52,7 +52,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCY DEP_NAME INCLUDE_FILE INCLUDE_SUBDIRS LIBRARY_NA
 			SET(MY_PATH_INCLUDE ${MY_PATH_INCLUDE} ${MY_PATH}/include)
 		ENDIF(${_NB_DIRS} GREATER 0)
 	ENDFOREACH(MY_PATH ${SEARCH_PATH_LIST} )
-	
+
 	#MESSAGE(STATUS "MY_PATH_INCLUDE='${MY_PATH_INCLUDE}'")
 	FIND_PATH("${DEP_NAME}_INCLUDE_DIR" ${INCLUDE_FILE}
 	  ${MY_PATH_INCLUDE}
@@ -60,15 +60,15 @@ MACRO(_FIND_3RDPARTY_DEPENDENCY DEP_NAME INCLUDE_FILE INCLUDE_SUBDIRS LIBRARY_NA
 	)
 	MARK_AS_ADVANCED("${DEP_NAME}_INCLUDE_DIR")
 	#MESSAGE(STATUS "${DEP_NAME}_INCLUDE_DIR = '${${DEP_NAME}_INCLUDE_DIR}'")
-	
+
 	# Find library files
 	SET(MY_PATH_LIB )
 	FOREACH(MY_PATH ${SEARCH_PATH_LIST} )
 		SET(MY_PATH_LIB ${MY_PATH_LIB} ${MY_PATH}/lib)
 	ENDFOREACH(MY_PATH ${SEARCH_PATH_LIST} )
-	
+
 	#MESSAGE(STATUS "LIBRARY_NAMES='${LIBRARY_NAMES}', MY_PATH_LIB=${MY_PATH_LIB}")
-	FIND_LIBRARY("${DEP_NAME}_LIBRARY" 
+	FIND_LIBRARY("${DEP_NAME}_LIBRARY"
 	  NAMES ${LIBRARY_NAMES}
 	  PATHS ${MY_PATH_LIB}
 	  NO_DEFAULT_PATH
@@ -101,7 +101,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	_FIND_3RDPARTY_DEPENDENCY(PLIB_SSGAUX plib/ssgaux.h "" "ssgaux;plibssgaux" ${ROOT_DIR} "")
 	_FIND_3RDPARTY_DEPENDENCY(PLIB_UL plib/ul.h "" "ul;plibul" ${ROOT_DIR} "")
 	_FIND_3RDPARTY_DEPENDENCY(PLIB_JS plib/js.h "" "js;plibjs" ${ROOT_DIR} "")
-	
+
 	# Open GL : Note that the Open GL includes are automatically added by MSVC 2005.
 	# We simply add here the include path for the Open GL extensions headers,
 	# and we use OPENGL_INCLUDE_DIR variable for this,
@@ -112,7 +112,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	# Open AL.
 	_FIND_3RDPARTY_DEPENDENCY(OPENAL AL/al.h "" openal32 ${ROOT_DIR} "")
 
-	# Menu Music requires ogg, vorbis, and vorbisfile 
+	# Menu Music requires ogg, vorbis, and vorbisfile
 	# OGG.
 	_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" "ogg;libogg" ${ROOT_DIR} "")
 
@@ -121,7 +121,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 	# VorbisFile.
 	_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" "vorbisfile;libvorbisfile" ${ROOT_DIR} "")
-	
+
 	# ENet.
 	_FIND_3RDPARTY_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
 
@@ -129,10 +129,10 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	IF(OPTION_3RDPARTY_SQLITE3)
 		_FIND_3RDPARTY_DEPENDENCY(SQLITE3 sqlite3.h "" sqlite3 ${ROOT_DIR} "")
 	ENDIF(OPTION_3RDPARTY_SQLITE3)
-	
+
 	# OpenSceneGraph
 	IF(OPTION_OSGGRAPH)
-	
+
 		_FIND_3RDPARTY_DEPENDENCY(OPENTHREADS OpenThreads/Thread "" OpenThreads ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGDB osgDB/fstream "" osgDB ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGFX osgFX/version "" osgFX ${ROOT_DIR} "")
@@ -143,7 +143,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 		_FIND_3RDPARTY_DEPENDENCY(OSGVIEWER osgViewer/api/Win32/GraphicsHandleWin32 "" osgViewer ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGUTIL osgUtil/Optimizer "" osgUtil ${ROOT_DIR} "")
       _FIND_3RDPARTY_DEPENDENCY(OSGTEXT osgText/Text "" osgText ${ROOT_DIR} "")
-		
+
 		# If everything found, set things as if it was Find_Package(OpenSceneGraph) which had did it,
 		# in order CHECK_LIBRARIES does not call it again.
 		IF(OPENTHREADS_FOUND AND OSGDB_FOUND AND OSGFX_FOUND AND OSGGA_FOUND
@@ -151,25 +151,25 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 		   AND OSGSHADOW_FOUND AND OSGTEXT_FOUND)
 
 			SET(OPENSCENEGRAPH_FOUND "YES")
-			
+
 			SET(OPENSCENEGRAPH_INCLUDE_DIRS "${OSG_INCLUDE_DIR}") # We assume they are all together.
 			SET(OPENSCENEGRAPH_LIBRARIES "${OPENTHREADS_LIBRARY};${OSGDB_LIBRARY};${OSGFX_LIBRARY}")
 			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGGA_LIBRARY};${OSG_LIBRARY}")
 			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGVIEWER_LIBRARY};${OSGUTIL_LIBRARY}")
 			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGPARTICLE_LIBRARY};${OSGSHADOW_LIBRARY};${OSGTEXT_LIBRARY}")
-			
+
 			#MESSAGE(STATUS "OPENSCENEGRAPH_INCLUDE_DIRS=${OPENSCENEGRAPH_INCLUDE_DIRS}")
 			#MESSAGE(STATUS "OPENSCENEGRAPH_LIBRARIES=${OPENSCENEGRAPH_LIBRARIES}")
 
 		ENDIF()
-		
-	ENDIF(OPTION_OSGGRAPH)	
-	
+
+	ENDIF(OPTION_OSGGRAPH)
+
 	# Expat : Replaces bundled libs/txml (that will soon be removed).
 	IF(OPTION_3RDPARTY_EXPAT)
 		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" "libexpat;expat;expat-1" ${ROOT_DIR} "")
 	ENDIF(OPTION_3RDPARTY_EXPAT)
-	
+
 	# FreeSOLID : Replaces bundled modules/simu/.../SOLID2.0 (that will soon be removed).
 	IF(OPTION_3RDPARTY_SOLID)
 
@@ -178,29 +178,29 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 		_FIND_3RDPARTY_DEPENDENCY(SOLID_BROAD SOLID/broad.h ".;FreeSOLID" "broad" ${ROOT_DIR} "")
 
 	ENDIF(OPTION_3RDPARTY_SOLID)
-	
+
 	# JPEG.
 	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-9;jpeg-8" ${ROOT_DIR} "")
 
 	# CURL.
-	_FIND_3RDPARTY_DEPENDENCY(CURL curl/curl.h "" "libcurl;libcurl_imp" ${ROOT_DIR} "")	
+	_FIND_3RDPARTY_DEPENDENCY(CURL curl/curl.h "" "libcurl;libcurl_imp" ${ROOT_DIR} "")
 
 	# ZLib.
 	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "")
-	
+
 	IF(ZLIB_FOUND)
 
-		# PNG.	
+		# PNG.
 		_FIND_3RDPARTY_DEPENDENCY(PNG png.h "" "libpng;png16;png15;png14;png13" ${ROOT_DIR} "")
-		
+
 		IF(PNG_FOUND)
-			# Force subsequent FindPNG stuff not to search for other variables ... kind of a hack 
+			# Force subsequent FindPNG stuff not to search for other variables ... kind of a hack
 			SET(PNG_PNG_INCLUDE_DIR ${PNG_INCLUDE_DIR} CACHE FILEPATH "")
 			MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR)
 		ENDIF(PNG_FOUND)
-		
+
 	ENDIF(ZLIB_FOUND)
-	
+
 ENDMACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 ################################################################################################
@@ -211,7 +211,7 @@ MACRO(SD_FIND_CUSTOM_3RDPARTY)
 	MESSAGE(STATUS "Using custom 3rd party libs location ...")
 
 	GET_FILENAME_COMPONENT(PARENT_DIR ${PROJECT_SOURCE_DIR} PATH)
-	SET(SDEXT_CUSTOM_3DPARTY_DIR "${PARENT_DIR}/3rdparty" CACHE PATH 
+	SET(SDEXT_CUSTOM_3DPARTY_DIR "${PARENT_DIR}/3rdparty" CACHE PATH
 	    "Location of 3rdParty dependencies")
 	IF(EXISTS ${SDEXT_CUSTOM_3DPARTY_DIR})
 		LIST(PREPEND CMAKE_PREFIX_PATH ${SDEXT_CUSTOM_3DPARTY_DIR})
@@ -302,7 +302,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	_FIND_3RDPARTY_DLL("${OPENAL_LIBRARY}" "OpenAL32" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	# Menu Music requires ogg, vorbis, and vorbisfile 
+	# Menu Music requires ogg, vorbis, and vorbisfile
 	_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "ogg;libogg;libogg-0" "" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
@@ -324,7 +324,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	ENDIF(OPTION_3RDPARTY_EXPAT)
-	
+
 	IF(OPTION_OSGGRAPH)
 
 		# DLLs whose libs we link with.
@@ -341,7 +341,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 			ENDFOREACH()
 			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 		ENDFOREACH()
-		
+
 		# Plugins : Complete the list right below according to the actual needs.
 		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
 		SET(_OSG_PLUGIN_NAME_HINTS "osgdb_ac;osgdb_dds;osgdb_glsl") # ';'-separated list
@@ -359,7 +359,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 				ENDIF()
 			ENDFOREACH()
 		ENDFOREACH()
-		
+
 	ENDIF(OPTION_OSGGRAPH)
 
 	IF(OPTION_3RDPARTY_SOLID)

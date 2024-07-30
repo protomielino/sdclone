@@ -143,7 +143,7 @@ void SegLearn::writeKarma()
 			int magic = MAGIC1;
 			int magic2 = MAGIC2;
 			char string[] = STRINGID;
-			
+
 			// The magic numbers are used to catch 32/64 bit mismatches and little/big
 			// endian mismatches. Here the patterns I expect at the beginning of the files.
 			// I call 4 bytes a UNIT, MAGIC1 bytes A1, A2, A3, A4, MAGIC2 bytes B1, B2, B3, B4,
@@ -160,7 +160,7 @@ void SegLearn::writeKarma()
 			fwrite(&magic2, sizeof(magic2), 1, fd);			// magic number 2.
 			fwrite(&nseg, sizeof(nseg), 1, fd);				// # segments.
 			fwrite(string, sizeof(string), 1, fd);			// string.
-			
+
 			for (int i = 0; i < nseg; i++) {
 				fwrite(&updateid[i], sizeof(updateid[0]), 1, fd);
 				fwrite(&radius[i], sizeof(radius[0]), 1, fd);
@@ -181,12 +181,12 @@ bool SegLearn::readKarma(tTrack* track, tSituation *s, float *radius, int *uid, 
 		int magic2 = 0;
 		int nseg = 0;
 		char string[sizeof(STRINGID)] = "";
-	
+
 		fread(&magic, sizeof(magic), 1, fd);
 		fread(&magic2, sizeof(magic2), 1, fd);
 		fread(&nseg, sizeof(nseg), 1, fd);
 		fread(string, sizeof(string), 1, fd);
-	
+
 		if (magic == MAGIC1 && magic2 == MAGIC2 &&
 			nseg == track->nseg &&
 			strncmp(string, STRINGID, sizeof(string)) == 0
@@ -236,7 +236,7 @@ FILE* SegLearn::getKarmaFilename(tTrack* track, tSituation *s, int driverindex)
 			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%s/practice/%s.karma", indexstr, tbuf, s->_raceType == RM_TYPE_PRACTICE);
 			if ( fd != NULL) {
 				return fd;
-			} // not found, try the next.		
+			} // not found, try the next.
 		default:
 			return NULL;
 			break;
@@ -253,7 +253,7 @@ FILE* SegLearn::tryKarmaFilename(char* buffer, int size, const char *path, char 
 	}
 
 	// Try to open the local file.
-	FILE* fd;		
+	FILE* fd;
 	if ((fd = fopen(buffer, "rb")) != NULL) {
 		return fd;
 	}

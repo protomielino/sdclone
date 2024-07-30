@@ -139,7 +139,7 @@ static void
 rmcsDeactivate(void *screen)
 {
     GfuiScreenRelease(menuScreen);
-    
+
     if (screen) {
         GfuiScreenActivate(screen);
     }
@@ -149,7 +149,7 @@ static void
 rmcsNext(void* nextScreenHandle)
 {
     saveOptions();
-    
+
     rmcsDeactivate(nextScreenHandle);
 }
 
@@ -169,7 +169,7 @@ RmClientSettings(void *cs)
     GfLogTrace("Entering Network Client Sttings menu.\n");
 
     // Create the screen, load menu XML descriptor and create static controls.
-    menuScreen = GfuiScreenCreate(NULL, NULL, rmcsActivate, NULL, (tfuiCallback)NULL, 1);   
+    menuScreen = GfuiScreenCreate(NULL, NULL, rmcsActivate, NULL, (tfuiCallback)NULL, 1);
     void *menuXML = GfuiMenuLoad("csnetworkclientmenu.xml");
     GfuiMenuCreateStaticControls(menuScreen, menuXML);
 
@@ -190,12 +190,12 @@ RmClientSettings(void *cs)
                                 MenuData->nextScreen, rmcsNext);
     GfuiMenuCreateButtonControl(menuScreen, menuXML, "backbutton",
                                 MenuData->prevScreen, rmcsDeactivate);
-    
+
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXML);
-    
+
     // Register keyboard shortcuts.
     rmcsAddKeys();
-    
+
     GfuiScreenActivate(menuScreen);
 }

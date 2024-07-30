@@ -158,11 +158,11 @@ public class CheckDialog extends JDialog
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < segments.size(); i++)
 		{
 			Segment segment = segments.get(i);
-			
+
 			if ("plan".equals(segment.getValidLeftBorderStyle(editorFrame)))
 			{
 				double height = segment.getValidLeftBorderHeight(editorFrame);
@@ -170,7 +170,7 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append("Segment " + segment.getName() + " Left border style is plan with " + height + " height (set border style to curb or wall or don't set a height)\n");
 				}
-			}			
+			}
 			if ("plan".equals(segment.getValidRightBorderStyle(editorFrame)))
 			{
 				double height = segment.getValidRightBorderHeight(editorFrame);
@@ -179,7 +179,7 @@ public class CheckDialog extends JDialog
 					textArea.append("Segment " + segment.getName() + " Right border style is plan with " + height + " height (set border style to curb or wall or don't set a height)\n");
 				}
 			}
-			
+
 			if ("fence".equals(segment.getValidLeftBarrierStyle(editorFrame)))
 			{
 				double width = segment.getValidLeftBarrierWidth(editorFrame);
@@ -196,7 +196,7 @@ public class CheckDialog extends JDialog
 					textArea.append("Segment " + segment.getName() + " Right barrier style is fence with " + width + " width (set barrier style to wall or don't set a width)\n");
 				}
 			}
-			
+
 			String style = segment.getValidLeftBarrierStyle(editorFrame);
 			if ("curb".equals(style) || "plan".equals(style))
 			{
@@ -208,58 +208,58 @@ public class CheckDialog extends JDialog
 				textArea.append("Segment " + segment.getName() + " Right barrier invalid style " + style + "\n");
 			}
 		}
-		
+
 		for (int i = 1; i < segments.size(); i++)
 		{
 			Segment segment = segments.get(i);
 			Segment previousSegment = segments.get(i - 1);
-			
+
 			String style = segment.getValidLeftBorderStyle(editorFrame);
 			String previousStyle = previousSegment.getValidLeftBorderStyle(editorFrame);
-			
+
 			if (!style.equals(previousStyle))
 			{
 				if (Double.isNaN(segment.getLeft().getBorderHeight()))
 				{
-					textArea.append("Segment " + segment.getName() + " Left border style changed from " + previousStyle + " to " + style + " but new height not set\n");					
+					textArea.append("Segment " + segment.getName() + " Left border style changed from " + previousStyle + " to " + style + " but new height not set\n");
 				}
 			}
-			
+
 			style = segment.getValidRightBorderStyle(editorFrame);
 			previousStyle = previousSegment.getValidRightBorderStyle(editorFrame);
-			
+
 			if (!style.equals(previousStyle))
 			{
 				if (Double.isNaN(segment.getRight().getBorderHeight()))
 				{
-					textArea.append("Segment " + segment.getName() + " Right border style changed from " + previousStyle + " to " + style + " but new height not set\n");					
+					textArea.append("Segment " + segment.getName() + " Right border style changed from " + previousStyle + " to " + style + " but new height not set\n");
 				}
 			}
-			
+
 			style = segment.getValidLeftBarrierStyle(editorFrame);
 			previousStyle = previousSegment.getValidLeftBarrierStyle(editorFrame);
-			
+
 			if (!style.equals(previousStyle))
 			{
 				if (Double.isNaN(segment.getLeft().getBarrierWidth()))
 				{
-					textArea.append("Segment " + segment.getName() + " Left barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");					
+					textArea.append("Segment " + segment.getName() + " Left barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");
 				}
 			}
-			
+
 			style = segment.getValidRightBarrierStyle(editorFrame);
 			previousStyle = previousSegment.getValidRightBarrierStyle(editorFrame);
-			
+
 			if (!style.equals(previousStyle))
 			{
 				if (Double.isNaN(segment.getRight().getBarrierWidth()))
 				{
-					textArea.append("Segment " + segment.getName() + " Right barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");					
+					textArea.append("Segment " + segment.getName() + " Right barrier style changed from " + previousStyle + " to " + style + " but new width not set\n");
 				}
 			}
-		}		
+		}
 	}
-	
+
 	public void checkHeader()
 	{
 		if (trackData.getHeader().getSubcategory() != null)
@@ -346,10 +346,10 @@ public class CheckDialog extends JDialog
 
 			double bankingStart = segment.getBankingStart();
 			boolean hasBankingStart = !Double.isNaN(bankingStart);
-			
+
 			if (hasHeightStart && (hasHeightStartLeft || hasHeightStartRight))
 			{
-				textArea.append(segmentInfo + "has height start and height start left or height start right\n");				
+				textArea.append(segmentInfo + "has height start and height start left or height start right\n");
 			}
 
 			// Track should start at an elevation of 0.0.
@@ -401,7 +401,7 @@ public class CheckDialog extends JDialog
 
 			if (hasHeightEnd && (hasHeightEndLeft || hasHeightEndRight))
 			{
-				textArea.append(segmentInfo + "has height end and height end left or height end right\n");				
+				textArea.append(segmentInfo + "has height end and height end left or height end right\n");
 			}
 
 			if (hasBankingEnd && hasBankingEndFromHeights)
@@ -440,17 +440,17 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Previous height end left : " + previousHeightEndLeft + " doesn't match " + heightStartLeft + "\n");
 				}
-				
+
 				if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStartLeft)
 				{
 					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStartLeft + "\n");
-				} 
+				}
 
 				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStartRight)
 				{
 					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStartRight + "\n");
 				}
-				
+
 				if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStartRight)
 				{
 					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStartRight + "\n");
@@ -462,12 +462,12 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Previous height end left : " + previousHeightEndLeft + " doesn't match " + heightStart + "\n");
 				}
-				
+
 				if (!Double.isNaN(previousHeightEndRight) && previousHeightEndRight != heightStart)
 				{
 					textArea.append(segmentInfo + "Previous height end right : " + previousHeightEndRight + " doesn't match " + heightStart + "\n");
 				}
-				
+
 				if (!Double.isNaN(previousHeightEnd) && previousHeightEnd != heightStart)
 				{
 					textArea.append(segmentInfo + "Previous height end : " + previousHeightEnd + " doesn't match " + heightStart + "\n");
@@ -479,7 +479,7 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Height end left : " + heightEndLeft + " doesn't match " + firstHeightStartLeft + "\n");
 				}
-				
+
 				if (!Double.isNaN(firstHeightStart) && firstHeightStart != heightEndLeft)
 				{
 					textArea.append(segmentInfo + "Height end left : " + heightEndLeft + " doesn't match " + firstHeightStart + "\n");
@@ -489,7 +489,7 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Height end right : " + heightEndRight + " doesn't match " + firstHeightStartRight + "\n");
 				}
-				
+
 				if (!Double.isNaN(firstHeightStart) && firstHeightStart != heightEndRight)
 				{
 					textArea.append(segmentInfo + "Height end right : " + heightEndRight + " doesn't match " + firstHeightStart + "\n");
@@ -501,18 +501,18 @@ public class CheckDialog extends JDialog
 				{
 					textArea.append(segmentInfo + "Height end : " + heightEnd + " doesn't match " + firstHeightStartLeft + "\n");
 				}
-				
+
 				if (!Double.isNaN(firstHeightStartRight) && firstHeightStartRight != heightEnd)
 				{
 					textArea.append(segmentInfo + "Height end : " + heightEnd + " doesn't match " + firstHeightStartRight + "\n");
 				}
-				
+
 				if (!Double.isNaN(firstHeightStart) && firstHeightStart != heightEnd)
 				{
 					textArea.append(segmentInfo + "Height end : " + heightEnd + " doesn't match " + firstHeightStart + "\n");
 				}
 			}
-			
+
 			previousHeightEnd = heightEnd;
 			previousHeightEndLeft = heightEndLeft;
 			previousHeightEndRight = heightEndRight;
@@ -575,12 +575,12 @@ public class CheckDialog extends JDialog
 					for (Ac3dMaterial material : ac3dFile.getMaterials())
 					{
 						String name = material.getName();
-						
+
 						if (name != null && !name.isEmpty())
 						{
 							if (name.contains(" "))
 							{
-								textArea.append("Relief file " + file.toString() + " : material \"" + name + "\" has space in name\n");					
+								textArea.append("Relief file " + file.toString() + " : material \"" + name + "\" has space in name\n");
 							}
 						}
 					}
@@ -599,14 +599,14 @@ public class CheckDialog extends JDialog
 
 								if (data == null)
 								{
-									textArea.append("Terrain Generation relief file " + reliefFile + " line " + object.getLinenum() + " : missing interior or exterior data\n");									
+									textArea.append("Terrain Generation relief file " + reliefFile + " line " + object.getLinenum() + " : missing interior or exterior data\n");
 								}
 								else if (!(data.equals("interior") || data.equals("exterior")))
 								{
 									textArea.append("Terrain Generation relief file " + reliefFile + " line " + object.getLinenum() + " : expected interior or exterior data but found " + data + "\n");
 								}
 
-								// sd2-trackgen expects borders and holes to be closed line and generates bad terrain when using line and duplicate vertices 
+								// sd2-trackgen expects borders and holes to be closed line and generates bad terrain when using line and duplicate vertices
 								for (int j = 0; j < object.getSurfaces().size(); j++)
 								{
 									Ac3dSurface	surface = object.getSurfaces().get(j);
@@ -615,10 +615,10 @@ public class CheckDialog extends JDialog
 									{
 										double[] firstVertex = object.getVertices().get(0);
 										double[] lastVertex = object.getVertices().get(object.getVertices().size() - 1);
-										
+
 										if (firstVertex[0] == lastVertex[0] && firstVertex[1] == lastVertex[1] && firstVertex[2] == lastVertex[2])
 										{
-											textArea.append("Terrain Generation relief file " + reliefFile + " line " + object.getLinenum() + " : line with first and last vertices same\n");																				
+											textArea.append("Terrain Generation relief file " + reliefFile + " line " + object.getLinenum() + " : line with first and last vertices same\n");
 										}
 									}
 								}
@@ -690,7 +690,7 @@ public class CheckDialog extends JDialog
 				else
 				{
 					colors.addAll(objectMap.getColors());
-					
+
 					if (objectMap.getImageWidth() != 1024)
 					{
 						textArea.append("Terrain Generation object map " + objectMapName + " file " + objectMapFile + " image width must be 1024 but found " + objectMap.getImageWidth() + "\n");
@@ -840,7 +840,7 @@ public class CheckDialog extends JDialog
 				}
 			}
 		}
-		
+
 		//check for graphic objects with same name
 		Vector<GraphicObject> graphicObjects = trackData.getGraphic().getTerrainGeneration().getGraphicObjects();
 		for (int i = 0; i < graphicObjects.size() - 1; i++)
@@ -849,7 +849,7 @@ public class CheckDialog extends JDialog
 			{
 				if (graphicObjects.get(i).getName().equals(graphicObjects.get(j).getName()))
 				{
-					textArea.append("Graphic Objects has duplicate name: " + graphicObjects.get(i).getName() + "\n");					
+					textArea.append("Graphic Objects has duplicate name: " + graphicObjects.get(i).getName() + "\n");
 				}
 			}
 		}
@@ -893,7 +893,7 @@ public class CheckDialog extends JDialog
 		doubleSided = false;
 		flatShaded = false;
 		textures.clear();
-		
+
 		String	object = trackObject.getObject();
 
 		if (!hasText(object))
@@ -939,7 +939,7 @@ public class CheckDialog extends JDialog
 			for (Ac3dMaterial material : ac3dFile.getMaterials())
 			{
 				String name = material.getName();
-				
+
 				if (name != null && !name.isEmpty())
 				{
 					if (name.contains(" "))
@@ -1004,7 +1004,7 @@ public class CheckDialog extends JDialog
 		catch (Exception e)
 		{
 			textArea.append("Object file " + file.toString() + " : " + e.getLocalizedMessage() + "\n");
-		}		
+		}
 	}
 
 	public void checkKid(File file, Ac3dObject object)
@@ -1037,12 +1037,12 @@ public class CheckDialog extends JDialog
 
 				if (surface.getRefs().size() != 3)
 				{
-					textArea.append("Object file " + file.toString() + " line " + surface.getLinenum() + " : surface with " +  surface.getRefs().size() + " vertices\n");																				
+					textArea.append("Object file " + file.toString() + " line " + surface.getLinenum() + " : surface with " +  surface.getRefs().size() + " vertices\n");
 				}
 
 				types.add(surface.getSurf());
 				mats.add(surface.getMat());
-				
+
 				if (surface.isDoubleSided() && objectTexture != null)
 				{
 					File textureFile = findTextureFile(objectTexture);
@@ -1073,7 +1073,7 @@ public class CheckDialog extends JDialog
 						}
 					}
 				}
-				
+
 				if (surface.isFlatShaded())
 				{
 					flatShaded = true;
@@ -1082,12 +1082,12 @@ public class CheckDialog extends JDialog
 
 			if (types.size() > 1)
 			{
-				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " surface types\n");																							
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + types.size() + " surface types\n");
 			}
 
 			if (mats.size() > 1)
 			{
-				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + mats.size() + " materials\n");																							
+				textArea.append("Object file " + file.toString() + " line " + object.getLinenum() + " : object with " + mats.size() + " materials\n");
 			}
 		}
 		else

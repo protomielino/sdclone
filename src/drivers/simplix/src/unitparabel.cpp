@@ -4,8 +4,8 @@
 // A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // Parabel als quadratisches Polynom
-// 
-// File			:	unitparabel.cpp	
+//
+// File			:	unitparabel.cpp
 // Created		: 2007.11.25
 // Last	changed	: 2014.11.29
 // Copyright	: © 2007-2014 Wolf-Dieter Beelitz
@@ -118,7 +118,7 @@ double TParabel::CalcY(double X) const
 //==========================================================================*
 
 //==========================================================================*
-// Solve 
+// Solve
 //--------------------------------------------------------------------------*
 bool TParabel::Solve(double	Y, double& X0, double& X1) const
 {

@@ -470,7 +470,7 @@ int		Utils::NewtonRaphson( double A, double B, double C, double D, double* root 
 
 	// finally, perform a NewtonRaphson search
     int count = 100;
-    while( count-- )  
+    while( count-- )
     {
         y = x * (x * (x * A + B) + C) + D;
 

@@ -149,7 +149,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 					 x + width - combobox->leftButton.width, y,
 					 arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP, (void*)(long)(object->id), gfuiRightArrow, 0, 0, 0);
-					 
+
 
 
 
@@ -188,7 +188,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 					 y, //y placement
 					 width - 2 * combobox->leftButton.width, //width
 					 arrowsHeight, //height: same as the arrows
-					 GFUI_MIRROR_NONE, 
+					 GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP, (void*)(long)(object->id), 0, 0, 0, 0);
 
 	// Add the combo control to the display list.

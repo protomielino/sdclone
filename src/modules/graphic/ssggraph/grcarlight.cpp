@@ -228,7 +228,7 @@ void grInitCarlight(int index)
 	}
 
 	sprintf(buf, "data/textures;data/img;.");
-	
+
 	if (!frontlight1) {
 		frontlight1 = (ssgSimpleState*)grSsgLoadTexStateEx("frontlight1.png", buf, FALSE, FALSE);
 		if (frontlight1) {
@@ -363,7 +363,7 @@ void grLinkCarlights(tCarElt *car)
 	CarlightAnchor->addKid(theCarslight[car->index].lightAnchor);
 }
 
-/* OLD version 
+/* OLD version
 void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 {
 	int i = 0;
@@ -446,7 +446,7 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 	}
 
 	if (disp) {
-	
+
 		// Check wether light is to draw
 		for (i = 0; i < theCarslight[car->index].numberCarlight; i++) {
   			bool DoDraw = false; // Initialize draw state
@@ -454,15 +454,15 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 			switch (theCarslight[car->index].lightType[i]) {
 				case LIGHT_TYPE_BRAKE:
 				case LIGHT_TYPE_BRAKE2:
-					if (car->_brakeCmd>0 || car->_ebrakeCmd>0) 
+					if (car->_brakeCmd>0 || car->_ebrakeCmd>0)
 						DoDraw = true;
 					break;
 				case LIGHT_TYPE_FRONT:
-					if (car->_lightCmd & RM_LIGHT_HEAD1) 
+					if (car->_lightCmd & RM_LIGHT_HEAD1)
 						DoDraw = true;
 					break;
 				case LIGHT_TYPE_FRONT2:
-					if (car->_lightCmd & RM_LIGHT_HEAD2) 
+					if (car->_lightCmd & RM_LIGHT_HEAD2)
 						DoDraw = true;
 					break;
 				case LIGHT_TYPE_REAR:

@@ -9,7 +9,7 @@ ADD_EXPAT_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(txml portability)
 
 SET(TGF_HEADERS os.h tgf.h tgf.hpp modinfo.h osspec.h memmanager.h)
-SET(TGF_SOURCES application.cpp eventloop.cpp directory.cpp file.cpp filesetup.cpp 
+SET(TGF_SOURCES application.cpp eventloop.cpp directory.cpp file.cpp filesetup.cpp
                 formula.cpp hash.cpp module.cpp legacymodule.cpp modinfo.cpp os.cpp
                 params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp memmanager.cpp)
 SET(TGF_OTHER_SOURCES params.dtd)
@@ -35,7 +35,7 @@ ENDIF(WIN32)
 # Note: Other sources needed for having them available in IDEs.
 SD_ADD_LIBRARY(tgf SHARED ${TGF_HEADERS} ${TGF_SOURCES} ${TGF_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(tgf PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 IF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)

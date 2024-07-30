@@ -2,7 +2,7 @@
 
     file        : racetrack.h
     copyright   : (C) 2010 by Xavier Bertaux
-    web         : www.speed-dreams.org 
+    web         : www.speed-dreams.org
     version     : $Id$
 
  ***************************************************************************/

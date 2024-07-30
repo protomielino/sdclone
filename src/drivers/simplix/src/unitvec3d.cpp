@@ -4,7 +4,7 @@
 // A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // Interface to	TORCS
-// 
+//
 // File			:	unitvec2d.cpp
 // Created		: 2007.11.25
 // Last	changed	: 2014.11.29

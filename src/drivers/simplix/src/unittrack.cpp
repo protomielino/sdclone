@@ -6,8 +6,8 @@
 // Track description with variable step	length
 // Streckenbeschreibung	mit	variabler Abtastrate
 // und segmentgenauen Abschnittsgrenzen
-// 
-// File			:	unittrack.cpp 
+//
+// File			:	unittrack.cpp
 // Created		: 2007.11.17
 // Last	changed	: 2014.11.29
 // Copyright	: © 2007-2014 Wolf-Dieter Beelitz
@@ -315,7 +315,7 @@ double TTrackDescription::Friction(int Index) const
 double TTrackDescription::LearnFriction
   (int Index, double Delta,	double MinFriction)
 {
-  if (Delta	> 0) 
+  if (Delta	> 0)
   {
 	for (int I	= MIN(Index	+ 2,oCount - 1); (I	> 0) &&	(I > Index - 3); I--)
 	{
@@ -507,9 +507,9 @@ void TTrackDescription::InitTrack
 			(PSide->endWidth	- PSide->startWidth); // at	current	position
 		float	slope =	PSide->height/PSide->width;// Slope	of border
 		bool outer = ((S == TR_SIDE_LFT)		   // Is it	the	outer side?
-			  &&	(Seg->type == TR_RGT))		 
-			  ||	((S	== TR_SIDE_RGT)			 
-			  &&	(Seg->type == TR_LFT));		 
+			  &&	(Seg->type == TR_RGT))
+			  ||	((S	== TR_SIDE_RGT)
+			  &&	(Seg->type == TR_LFT));
 		bool pitlane = (((S == oPitSideMod.side) // If side of pits
 			&& (I >=	oPitSideMod.start)			//	and	between	start
 			&& (I <=	oPitSideMod.end)));			// and end of	pitlane
@@ -520,7 +520,7 @@ void TTrackDescription::InitTrack
 		if ((PSide->style	== TR_CURB)			   //	On curbs with height
 			&& (slope > 0.01))					  // and great slope
 		{
-			Done	= true;							  // Last	possible to	use	
+			Done	= true;							  // Last	possible to	use
 		  WCurb =	0.8	* W;					   // Use 80%
 		  //WCurb	=  W;							 //	Use	100%
 			if (outer)							  // If	outer side
@@ -545,7 +545,7 @@ void TTrackDescription::InitTrack
 		  //WCurb	= W;							 // Use 100%
 			if (pitlane)							  // if side along pitlane
 			{
-			WCurb = 0.15;						 
+			WCurb = 0.15;
 			  //Done	= true;
 			}
 			else	if (outer && (PSide->surface->kFriction	< Seg->surface->kFriction))
@@ -585,7 +585,7 @@ void TTrackDescription::InitTrack
 			|| (PSide->surface->kRollRes	> MAX_RESIST)
 			|| (fabs(PSide->Kzw - SLOPE)	> 0.005))
 			{
-			WCurb = 0;							
+			WCurb = 0;
 			Done	= true;
 			}
 			else	if (outer
@@ -594,7 +594,7 @@ void TTrackDescription::InitTrack
 				 ||	(PSide->surface->kRollRes >	MAX_RESIST)
 				 ||	(fabs(PSide->Kzw - SLOPE) >	0.005)))
 			{
-			WCurb = 0;							
+			WCurb = 0;
 			Done	= true;
 			}
 			else	if (PSide->surface->kFriction <	Seg->surface->kFriction)
@@ -650,11 +650,11 @@ void TTrackDescription::InitTrack
 
 			if (Done)
 			  PitOnly = true;
-		}	
+		}
 
 		PSide	= PSide->side[S];
 	  }
-	   
+
 	  if (S ==	TR_SIDE_LFT)
 	  {
 		oSections[I].PitWidthToLeft =	oSections[I].WidthToLeft + MAX(ExtraW,ExtraWpit);
@@ -666,7 +666,7 @@ void TTrackDescription::InitTrack
 		oSections[I].WidthToRight	+= ExtraW;
 	  }
 	}
-	NormalizeDir(Seg, DistFromStart - Seg->lgfromstart,	
+	NormalizeDir(Seg, DistFromStart - Seg->lgfromstart,
 	  oSections[I].T, oSections[I].Center,	oSections[I].ToRight);
   }}
   //SmoothSides(0.22);
@@ -689,7 +689,7 @@ double TTrackDescription::MeanSectionLen() const
 TVec2d TTrackDescription::Normale(double TrackPos) const
 {
   //int	LastPos	= 0;
-  int Index	= IndexFromPos(TrackPos); 
+  int Index	= IndexFromPos(TrackPos);
   const	tTrackSeg* Seg = oSections[Index].Seg;
 
   double Tmp;
@@ -824,24 +824,24 @@ void TTrackDescription::NormalizeDir(
 //==========================================================================*
 
 //==========================================================================*
-// Smooth changings	of track width 
+// Smooth changings	of track width
 //--------------------------------------------------------------------------*
-void TTrackDescription::SmoothSides(double Delta) 
+void TTrackDescription::SmoothSides(double Delta)
 {
-  //for	(int J = 0;	J <	3; J++)	
+  //for	(int J = 0;	J <	3; J++)
   {
-	{for (int I = oCount -	2; I > 0; --I)				   
+	{for (int I = oCount -	2; I > 0; --I)
 	{
-	  oSections[I].WidthToLeft	= 
+	  oSections[I].WidthToLeft	=
 		MIN(oSections[I+1].WidthToLeft + Delta/2.0,oSections[I].WidthToLeft);
-	  oSections[I].WidthToRight = 
+	  oSections[I].WidthToRight =
 		MIN(oSections[I+1].WidthToRight +	Delta/2.0,oSections[I].WidthToRight);
 	}}
-	{for (int I = 2; I	< oCount; I++)				   
+	{for (int I = 2; I	< oCount; I++)
 	{
-	  oSections[I].WidthToLeft	= 
+	  oSections[I].WidthToLeft	=
 		MIN(oSections[I-1].WidthToLeft + 2*Delta,oSections[I].WidthToLeft);
-	  oSections[I].WidthToRight = 
+	  oSections[I].WidthToRight =
 		MIN(oSections[I-1].WidthToRight +	2*Delta,oSections[I].WidthToRight);
 	}}
   }

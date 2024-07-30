@@ -258,7 +258,7 @@ void SDScreens::changeCameraTemporaryOn()
 	newCamList = 0; //(see osgcamera.cpp for reference)
 	newCamNum = 5;
 	prevCamList = camList;
-	prevCamNum = camNum; 
+	prevCamNum = camNum;
 
     this->getActiveView()->getCameras()->selectCamera(newCamList,newCamNum);
     usingRearCam = true;

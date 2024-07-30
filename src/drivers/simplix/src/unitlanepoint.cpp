@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Point of	a lane
 // Punkt einer Fahrspur
-// 
+//
 // File			:	unitlanepoint.cpp
 // Created		: 2007.11.25
 // Last	changed	: 2014.11.29

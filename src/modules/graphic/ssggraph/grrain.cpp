@@ -85,12 +85,12 @@ cGrRain::cGrRain() :
 }
 
 
-cGrRain::~cGrRain(void) 
+cGrRain::~cGrRain(void)
 {
 }
 
 
-void cGrRain::initialize(int rain, float precipitationDensity) 
+void cGrRain::initialize(int rain, float precipitationDensity)
 {
 	GfLogInfo("Precipitation : Density = %d %%, initial rain strength = %d\n",
 			  (int)precipitationDensity, rain);
@@ -121,7 +121,7 @@ cGrRain::drawCone(float baseRadius, float height, int slices, bool down, double 
 	if (slices >  MAX_RAIN_SLICE)
 		slices = MAX_RAIN_SLICE; // should never happen
 	for( int i = 0 ; i < slices ; i++ )
-	{	
+	{
 		float x = cos(angle) * (baseRadius + rand() % 10);
 		float y = sin(angle) * (baseRadius + rand() % 10);
 		angle += da;
@@ -129,9 +129,9 @@ cGrRain::drawCone(float baseRadius, float height, int slices, bool down, double 
 
 		// rain drops at 2 different speeds to simulate depth\par
 		float t1 = (i & 1 ? t : t + t) + rainpos[i];
-		if(t1 > 1.0f)	
+		if(t1 > 1.0f)
 			t1 -= 1.0f;
-		if(t1 > 1.0f)	
+		if(t1 > 1.0f)
 			t1 -= 1.0f;
 
 		// distant raindrops are more transparent

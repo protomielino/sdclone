@@ -17,7 +17,7 @@
 # FIND_* is invoked first with specified paths and NO_DEFAULT_PATH
 # and then again with no specified paths to search the default
 # locations. When an earlier FIND_* succeeds, subsequent FIND_*s
-# searching for the same item do nothing. 
+# searching for the same item do nothing.
 
 # try to use framework on mac
 # want clean framework path, not unix compatibility path

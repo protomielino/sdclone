@@ -38,7 +38,7 @@ public:
   VertexBase() : base(0) {}
   VertexBase(const void *ptr) : base(ptr) {}
   const void *getPointer() const { return base; }
-  
+
   const Point& operator[](int i) const { return ((const Point *)base)[i]; }
 
 private:

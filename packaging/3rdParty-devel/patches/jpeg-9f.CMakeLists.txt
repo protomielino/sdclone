@@ -97,7 +97,7 @@ add_library(jpeg STATIC ${jpeg_SOURCES} ${jpeg_HEADERS})
 
 
 install(FILES jconfig.h
-              jerror.h 
+              jerror.h
               jmorecfg.h
               jpeglib.h
               DESTINATION include)

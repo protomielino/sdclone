@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Car parameters changing in time
 // Zeitlich	variable Parameter des Fahrzeugs
-// 
+//
 // File			:	unittmpcarparam.cpp
 // Created		: 2007.11.25
 // Last	changed	: 2014.11.29

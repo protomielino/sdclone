@@ -51,7 +51,7 @@ public class Graphic {
     private TurnMarks					turnMarks				= new TurnMarks();
     private TerrainGeneration			terrainGeneration		= new TerrainGeneration();
     private Vector<EnvironmentMapping>	environmentMapping		= new Vector<EnvironmentMapping>();
-    
+
 	public String getDescription() {
 		return description;
 	}

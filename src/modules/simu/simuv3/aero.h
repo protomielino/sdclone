@@ -31,7 +31,7 @@ typedef struct
     tdble   vertical_drag; /* drag force along car z axis */
 	tdble   Mx, My, Mz; /* torques (only with aero damage) */
 	sgVec3   rot_front;
-	sgVec3   rot_lateral; 
+	sgVec3   rot_lateral;
 	sgVec3   rot_vertical;
     /* static */
     tdble	SCx2;
@@ -50,7 +50,7 @@ typedef struct
     tdble efficiency;
     /* static */
     t3Dd	staticPos;
-    
+
 } tWing;
 
 /// Get the maximum possible lift coefficient given a drag coefficient
@@ -60,7 +60,7 @@ tdble Max_Cl_given_Cd (tdble Cd);
 tdble Max_Cl_given_Cd (tdble Cd, tdble A);
 
 /** Get the maximum lift given drag.
- * 
+ *
  * The equation
  *
  * \f[
@@ -70,11 +70,11 @@ tdble Max_Cl_given_Cd (tdble Cd, tdble A);
  * can be used to calculate \f$F\f$, the exerted force on an object
  * with cross-sectional area \f$A\f$, moving at a speed \f$u\f$
  * through a fluid of density \f$\rho\f$.
- * 
+ *
  * For a plane perpendicular to the direction of motion, \f$C=1\$f.
  * In fact, we can seperate it into two components, \f$C_x=1, ~
  * C_y=0\f$, if we wish.
- * 
+ *
  * The next part is simple.  Given a drag, we can calculate a maximum lift
  * if we know the cross-sectional area involved.
  *
@@ -83,7 +83,7 @@ tdble Max_Cl_given_Cd (tdble Cd, tdble A);
 tdble MaximumLiftGivenDrag (tdble drag, tdble A = 1.0);
 
 
-#endif /* _AERO_H_  */ 
+#endif /* _AERO_H_  */
 
 
 

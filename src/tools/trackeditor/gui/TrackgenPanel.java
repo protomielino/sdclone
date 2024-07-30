@@ -38,7 +38,7 @@ import utils.Editor;
 
 /**
  * @author babis
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -66,7 +66,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JScrollPane			errorsScrollPane	= null;
 	private JTextArea			errorsTextArea		= null;
 	private boolean				acc					= false;
-	
+
 	public TrackgenPanel(EditorFrame editorFrame, String additionalArgs, boolean acc)
 	{
 		super();
@@ -79,7 +79,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize()
@@ -116,7 +116,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			if (additionalArgs != null)
 			{
 				args = args + additionalArgs;
-	
+
 				// don't create everything for race line
 				if (!args.contains("-r"))
 				{
@@ -140,7 +140,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			{
 				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
 			}
-			
+
 			Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
@@ -153,7 +153,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 					// done when process terminated and nothing to read
 					if (!ls_proc.isAlive() && !ls_in.ready() && !ls_err.ready())
 						break;
-					
+
 					if (ls_err.ready())
 					{
 						String str = ls_err.readLine();
@@ -186,8 +186,8 @@ public class TrackgenPanel extends JDialog implements Runnable
 							append(errorsTextArea, str.substring(index));
 						}
 					}
-				
-					if (ls_in.ready()) 
+
+					if (ls_in.ready())
 					{
 						ls_str = ls_in.readLine();
 						if (ls_str.indexOf(" ") != -1)
@@ -239,7 +239,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 								{
 									append(nodesTextArea, ls_str);
 								}
-								
+
 								nodesTextArea.setCaretPosition(nodesTextArea.getText().length());
 							}
 						}
@@ -263,12 +263,12 @@ public class TrackgenPanel extends JDialog implements Runnable
 			textArea.append(newline);
 		}
 
-		textArea.append(text);		
+		textArea.append(text);
 	}
-	
+
 	/**
 	 * This method initializes panel
-	 * 
+	 *
 	 * @return javax.swing.JPanel
 	 */
 	private JPanel getPanel()
@@ -286,7 +286,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			waitLabel.setText("Constructing the .ac" + (acc ? "c" : "") + " file. Please wait...");
 			panel.add(trackgenLabel, null);
 			panel.add(waitLabel, null);
-	
+
 			panel.add(getInfoPanel(), null);
 			panel.add(getNodesScrollPane(), null);
 			panel.add(getErrorsScrollPane(), null);
@@ -294,10 +294,10 @@ public class TrackgenPanel extends JDialog implements Runnable
 		return panel;
 	}
 	/**
-	 * This method initializes infoPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */    
+	 * This method initializes infoPanel
+	 *
+	 * @return javax.swing.JPanel
+	 */
 	private JPanel getInfoPanel() {
 		if (infoPanel == null) {
 			infoPanel = new JPanel();
@@ -338,7 +338,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	/**
 	 * This method initializes nodesScrollPane
-	 * 
+	 *
 	 * @return javax.swing.JScrollPane
 	 */
 	private JScrollPane getNodesScrollPane()
@@ -349,7 +349,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			nodesScrollPane.setBounds(10, 230, 760, 180);
 			nodesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			nodesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			
+
 		    return nodesScrollPane;
 		}
 		return nodesScrollPane;
@@ -357,7 +357,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	/**
 	 * This method initializes nodesTextArea
-	 * 
+	 *
 	 * @return javax.swing.JTextField
 	 */
 	private JTextArea getNodesTextArea()
@@ -374,7 +374,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	/**
 	 * This method initializes errorsScrollPane
-	 * 
+	 *
 	 * @return javax.swing.JScrollPane
 	 */
 	private JScrollPane getErrorsScrollPane()
@@ -391,7 +391,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	/**
 	 * This method initializes errorsTextArea
-	 * 
+	 *
 	 * @return javax.swing.JTextArea
 	 */
 	private JTextArea getErrorsTextArea()

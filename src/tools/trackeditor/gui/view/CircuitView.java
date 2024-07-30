@@ -98,7 +98,7 @@ import utils.undo.UndoSplitSegment;
  * <p>
  * Societe
  * </p>
- * 
+ *
  * @author Patrice Espie
  * @version 0.1a
  */
@@ -132,7 +132,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** current selected shape */
 	public Segment				selectedShape					= null;
 	/** current handled shape */
-	public Segment				handledShape					= null;	
+	public Segment				handledShape					= null;
 	/** current dragging state */
 	boolean						dragging						= false;
 
@@ -143,7 +143,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** offset between mouse click position and object position */
 	private Point2D.Double		objectOffset					= new Point2D.Double();
 	private String				objectName						= null;
-	
+
 	private ObjShapeRelief		reliefShape						= null;
 	private int					reliefPointIndex				= 0;
 	private boolean				showReliefs						= false;
@@ -226,7 +226,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	/**
 	 * constructor
-	 * 
+	 *
 	 * @param editorFrame
 	 *            Upward link
 	 */
@@ -258,7 +258,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	}
 
 	/**
-	 *  
+	 *
 	 */
 	protected void setCircuit()
 	{
@@ -279,10 +279,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	{
 		return boundingRectangle;
 	}
-	
+
 	/**
 	 * Identifies whether or not this component can receive the focus.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isFocusTraversable()
@@ -439,7 +439,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							data.remove(pos);
 							handledShape = null;
 							//selectedShape = newShape;
-							
+
 							editorFrame.documentIsModified = true;
 
 							this.redrawCircuit();
@@ -610,7 +610,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							fireSelectionChanged(selectionChangedEvent);
 
 						JOptionPane.showMessageDialog(editorFrame, "Not implemented yet!", "Moving Finish Line", JOptionPane.INFORMATION_MESSAGE);
-						
+
 						handledShape = null;
 						editorFrame.documentIsModified = true;
 
@@ -645,8 +645,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		newShape.getLeft().setBorderWidth(oldShape.getLeft().getBorderWidth());
 		newShape.getRight().setBorderWidth(oldShape.getRight().getBorderWidth());
-		newShape.getLeft().setBorderStyle(oldShape.getLeft().getBorderStyle());		
-		newShape.getRight().setBorderStyle(oldShape.getRight().getBorderStyle());		
+		newShape.getLeft().setBorderStyle(oldShape.getLeft().getBorderStyle());
+		newShape.getRight().setBorderStyle(oldShape.getRight().getBorderStyle());
 		newShape.getLeft().setBorderSurface(oldShape.getLeft().getBorderSurface());
 		newShape.getRight().setBorderSurface(oldShape.getRight().getBorderSurface());
 		newShape.getLeft().setBorderHeight(oldShape.getLeft().getBorderHeight());
@@ -663,8 +663,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		oldShape.getLeft().setSideEndWidth(leftSide2);
 		oldShape.getRight().setSideEndWidth(rightSide2);
 
-		newShape.getLeft().setBarrierStyle(oldShape.getLeft().getBarrierStyle());		
-		newShape.getRight().setBarrierStyle(oldShape.getRight().getBarrierStyle());		
+		newShape.getLeft().setBarrierStyle(oldShape.getLeft().getBarrierStyle());
+		newShape.getRight().setBarrierStyle(oldShape.getRight().getBarrierStyle());
 		newShape.getLeft().setBarrierSurface(oldShape.getLeft().getBarrierSurface());
 		newShape.getRight().setBarrierSurface(oldShape.getRight().getBarrierSurface());
 		newShape.getLeft().setBarrierHeight(oldShape.getLeft().getBarrierHeight());
@@ -675,21 +675,21 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		double heightStart = oldShape.getValidHeightStart();
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEnd())
-		{								
+		{
 			newShape.setHeightEnd(oldShape.getHeightEnd());
 			newShape.setHeightStart(heightAtSplitPoint);
 			oldShape.setHeightEnd(heightAtSplitPoint);
 		}
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndLeft())
-		{								
+		{
 			newShape.setHeightEnd(oldShape.getHeightEndLeft());
 			newShape.setHeightStartLeft(heightAtSplitPointLeft);
 			oldShape.setHeightEndLeft(heightAtSplitPointLeft);
 		}
 
 		if (!Double.isNaN(heightStart) && oldShape.hasHeightEndRight())
-		{								
+		{
 			newShape.setHeightEnd(oldShape.getHeightEndRight());
 			newShape.setHeightStartRight(heightAtSplitPointRight);
 			oldShape.setHeightEndRight(heightAtSplitPointRight);
@@ -704,7 +704,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			newShape.setBankingStart(banking);
 			oldShape.setBankingEnd(banking);
 		}
-		
+
 		if (gradeAtSplitPointLeft == gradeAtSplitPointRight)
 		{
 			if (oldShape.getCalculatedStartTangent() != gradeAtSplitPoint ||
@@ -724,7 +724,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				newShape.setProfilStartTangentLeft(gradeAtSplitPointLeft);
 				oldShape.setProfilEndTangentLeft(gradeAtSplitPointLeft);
 			}
-			
+
 			if (oldShape.getCalculatedStartTangentRight() != gradeAtSplitPointRight ||
 				oldShape.getCalculatedEndTangentRight() != gradeAtSplitPointRight)
 			{
@@ -743,19 +743,19 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		for (int i = 0; i < editorFrame.getObjectMaps().size(); i++)
 		{
 			ObjectMap objectMap = editorFrame.getObjectMaps().get(i);
-			
+
 			if (objectMap.hasObject(object))
 				return objectMap;
 		}
 		return null;
 	}
-	
+
 	/** input events management */
 	public void mousePressed(MouseEvent e)
 	{
 		if (editorFrame.getTrackData() == null)
 			return;
-		
+
 		origin = e.getPoint();
 
 		if (e.getButton() == MouseEvent.BUTTON3)
@@ -781,7 +781,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					if (graphicObject.getShape() == objectShape)
 					{
 						Undo.add(new UndoEditGraphicObject(editorFrame.getGraphicObjects(), graphicObject));
-	
+
 						Point2D.Double real = new Point2D.Double(0, 0);
 						screenToReal(e, real);
 						objectOffset.setLocation(objectShape.getTrackLocation().x - real.x, objectShape.getTrackLocation().y - real.y);
@@ -828,7 +828,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			if (selectedShape != null)
 			{
-				if (showObjects && 
+				if (showObjects &&
 					(selectedShape.getType().equals("str") || selectedShape.getType().equals("lft") || selectedShape.getType().equals("rgt")) ||
 					(e.isShiftDown() && (selectedShape.getType().equals("object") || selectedShape.getType().equals("graphic object"))))
 				{
@@ -840,7 +840,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					{
 						objectDragging = false;
 						objectShape = (ObjShapeObject) selectedShape;
-						Undo.add(new UndoDeleteObject(findObjectMap(objectShape), objectShape));					
+						Undo.add(new UndoDeleteObject(findObjectMap(objectShape), objectShape));
 						findObjectMap(objectShape).removeObject(objectShape);
 						selectedShape = null;
 						objectShape = null;
@@ -869,12 +869,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				else
 				{
 					dragging = true;
-	
+
 					int curHandle = 0;
 					for (Iterator<Segment> i = handles.iterator(); i.hasNext(); curHandle++)
 					{
 						ObjShapeHandle h = (ObjShapeHandle) i.next();
-	
+
 						// is the mouse in the handledShape handle ?
 						if (e.getX() > h.trPoints[0].getX() - ObjShapeHandle.handleSize
 								&& e.getX() < h.trPoints[0].getX() + ObjShapeHandle.handleSize
@@ -1073,7 +1073,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			{
 				Point2D.Double real = new Point2D.Double();
 				screenToReal(e, real);
-				
+
 				real.x = real.x + reliefOffset.x;
 				real.y = real.y + reliefOffset.y;
 
@@ -1091,14 +1091,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				int x = (int) (imgOffsetPrev.getX() + (tmp.getX() - imgOffsetStart.getX()));
 				int y = (int) (imgOffsetPrev.getY() + (tmp.getY() - imgOffsetStart.getY()));
-				 
+
 				offset.setLocation(x, y);
 				Editor.getProperties().setImgOffset(offset);
 
 				revalidate();
 				invalidate();
 				repaint();
-			}	
+			}
 		}
 		else if (e.getModifiers() == 8) // middle button
 		{
@@ -1161,7 +1161,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				{
 					// must check for a object under the mouse
 					Segment obj = findObjAtMousePos();
-					
+
 					if (obj != null)
 					{
 						if (obj.getType().equals("graphic object") ||
@@ -1173,14 +1173,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							objectName = new String(obj.getName());
 							invalidate();
 							repaint();
-						}						
+						}
 					}
 					else if (objectName != null)
 					{
 						objectName = null;
 						invalidate();
 						repaint();
-					}					
+					}
 				}
 					break;
 
@@ -1286,12 +1286,12 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			invalidate();
 			repaint();
 		}
-		
+
 		if (editorFrame.getCursorNames())
 		{
 			// must check for a object under the mouse
 			Segment obj = findObjAtMousePos();
-			
+
 			if (obj != null)
 			{
 				if (obj.getType().equals("graphic object") ||
@@ -1303,15 +1303,15 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					objectName = new String(obj.getName());
 					invalidate();
 					repaint();
-				}						
+				}
 			}
 			else if (objectName != null)
 			{
 				objectName = null;
 				invalidate();
 				repaint();
-			}					
-		}	
+			}
+		}
 	}
 
 	//	/** input events management */
@@ -1532,7 +1532,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	//
 	/**
 	 * Look for an object under mouse position
-	 * 
+	 *
 	 * @param e
 	 *            Event containing mouse position (mouse move event)
 	 * @return Object under mouse pos, or null if none
@@ -1584,7 +1584,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				}
 			}
 		}
-		
+
 		int count = 0;
 		try
 		{
@@ -1668,7 +1668,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	/**
 	 * Define precise zoom factor
-	 * 
+	 *
 	 * @param newZoomFactor
 	 */
 	public void setZoomFactor(double newZoomFactor)
@@ -1685,7 +1685,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 			// new visible part of screen in pixels
 			Rectangle r = getVisibleRect();
-			
+
 			// out zone size in meters
 			outZoneWidth = (r.getWidth() / 2) / zoomFactor;
 			outZoneHeight = (r.getHeight() / 2) / zoomFactor;
@@ -1737,7 +1737,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	/**
 	 * Paint all paintable objects
-	 * 
+	 *
 	 * @param g
 	 */
 	public void paint(Graphics g)
@@ -1785,22 +1785,22 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				graphics.drawString(coordinates, r.x + 10, r.y + 20);
 			}
 		}
-		
+
 		if (editorFrame.getCursorNames())
 		{
 			if (objectName != null)
 			{
-				graphics.drawString(objectName, r.x + 10, r.y + 40);			
+				graphics.drawString(objectName, r.x + 10, r.y + 40);
 			}
 		}
-		
+
 		if (editorFrame.getTrackData() != null && editorFrame.getTrackData().getSegments() != null)
 		{
 			if (boundingRectangle == null)
 			{
 				return;
 			}
-			
+
 			// out zone size in meters
 			outZoneWidth = (r.getWidth() / 2) / zoomFactor;
 			outZoneHeight = (r.getHeight() / 2) / zoomFactor;
@@ -1860,7 +1860,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				g.setColor(Color.red);
 				selectedShape.draw(g, affineTransform);
 			}
-			
+
 			if (handledShape != null)
 			{
 				g.setColor(Color.YELLOW);
@@ -2107,7 +2107,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			backgroundImg = null;
 		}
 	}
-	
+
 	/**
 	 * @return Returns the showBackground.
 	 */
@@ -2268,18 +2268,18 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			return;
 
 		editorFrame.getTrackData().calculateSegmentValues();
-		
+
 		SegmentVector track = editorFrame.getTrackData().getSegments();
-		
+
 		if (track == null)
 			return;
-		
+
 		int size = track.size();
-		
+
 		Editor.getProperties().setCurrentA(0);
 		Editor.getProperties().setCurrentY(0);
 		Editor.getProperties().setCurrentX(0);
-		
+
 		for(int i=0; i<size; i++)
 		{
 			Segment obj = track.get(i);
@@ -2293,7 +2293,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				e.printStackTrace();
 			}
 		}
-		
+
 		// calculate the bounding rectangle
 		boundingRectangle = null;
 
@@ -2321,7 +2321,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 //		 zoom
 		setZoomFactor(zoomFactor);
 	}
-	
+
 	private void openSegmentDialog(Segment shape)
 	{
 		if (segmentParamDialog != null)
@@ -2353,8 +2353,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				if (index != -1)
 				{
-					Undo.add(new UndoEditRelief(reliefs, shape));					
-					reliefs.get(index).addPoint2D(mousePoint, true);				
+					Undo.add(new UndoEditRelief(reliefs, shape));
+					reliefs.get(index).addPoint2D(mousePoint, true);
 					reliefs.get(index).calcShape(boundingRectangle);
 					selectedShape = null;
 					invalidate();
@@ -2381,8 +2381,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 				if (index != -1)
 				{
-					Undo.add(new UndoEditRelief(reliefs, shape));					
-					reliefs.get(index).addPoint2D(mousePoint, false);				
+					Undo.add(new UndoEditRelief(reliefs, shape));
+					reliefs.get(index).addPoint2D(mousePoint, false);
 					reliefs.get(index).calcShape(boundingRectangle);
 					selectedShape = null;
 					invalidate();
@@ -2471,7 +2471,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			{
 				Vector<ObjShapeRelief> reliefs = editorFrame.getReliefs().getReliefs();
 				int index = reliefs.indexOf(shape);
-					
+
 				if (index != -1)
 				{
 					Undo.add(new UndoDeleteRelief(reliefs, shape));
@@ -2495,7 +2495,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		if (reliefIndex != -1)
 		{
 			int pointIndex = reliefs.get(reliefIndex).getPointIndex(mousePoint);
-			
+
 			if (pointIndex != -1)
 			{
 				String info = "Relief " + (reliefIndex + 1) + " Point " + (pointIndex + 1);
@@ -2504,7 +2504,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				menu.addSeparator();
 			}
 		}
-		
+
 //		JMenuItem itemEditPoint = new JMenuItem("Edit Point");
 //		JMenuItem itemEditRelief = new JMenuItem("Edit Relief");
 		JMenuItem itemAddPointBefore = new JMenuItem("Add Point Before");
@@ -2538,7 +2538,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	        {
 	        }
 	        public void popupMenuWillBecomeVisible(final PopupMenuEvent e)
-	        {	        	
+	        {
 	        }
 	    });
 
@@ -2582,7 +2582,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							{
 								editorFrame.setCurrentObjectMap(objectMapIndex);
 								editorFrame.setCurrentGraphicObjectData(new GraphicObjectData(object));
-								break;								
+								break;
 							}
 						}
 						objectMapIndex++;
@@ -2637,7 +2637,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
-					
+
 					return;
 				}
 
@@ -2653,7 +2653,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						if (objects.elementAt(j) == shape)
 						{
 							editorFrame.setCurrentObjectMap(i);
-							
+
 							Undo.add(new UndoEditObject(objectMap, shape));
 
 							TrackObjectDialog editObjectDialog = new TrackObjectDialog(editorFrame, false, shape, me.getXOnScreen(), me.getYOnScreen());
@@ -2703,7 +2703,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
-					
+
 					return;
 				}
 
@@ -2753,7 +2753,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 								// change all the objects
 								for (int k = 0; k < editedObjects.size(); k++)
 								{
-									editedObjects.get(k).object.setRGB(newRGB);	
+									editedObjects.get(k).object.setRGB(newRGB);
 								}
 
 								editorFrame.documentIsModified = true;
@@ -2769,7 +2769,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
-				}				
+				}
 			}
 		}
 
@@ -2801,7 +2801,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							return;
 						}
 					}
-					
+
 					return;
 				}
 
@@ -2842,7 +2842,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				if (isGraphicObject)
 				{
 					Vector<DeletedObject> deletedObjects = new Vector<DeletedObject>();
-					
+
 					for (int i = 0; i < editorFrame.getGraphicObjects().size(); i++)
 					{
 						if (editorFrame.getGraphicObjects().get(i).getShape().getRGB() == shape.getRGB())
@@ -2850,14 +2850,14 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							deletedObjects.add(0, new DeletedObject(editorFrame.getGraphicObjects().get(i), i));
 						}
 					}
-					
+
 					Undo.add(new UndoDeleteAllGraphicObjects(editorFrame.getGraphicObjects(), deletedObjects));
-					
+
 					for (int i = 0; i < deletedObjects.size(); i++)
 					{
 						editorFrame.getGraphicObjects().remove(deletedObjects.get(i).object);
 					}
-					
+
 					selectedShape = null;
 					editorFrame.documentIsModified = true;
 					invalidate();
@@ -2890,7 +2890,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 				{
 					ObjectMapObject deletedObject = deletedObjects.get(i);
 
-					deletedObject.objectMap.removeObject(deletedObject.object);	
+					deletedObject.objectMap.removeObject(deletedObject.object);
 				}
 
 				selectedShape = null;
@@ -3067,7 +3067,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			public void actionPerformed(ActionEvent e)
 			{
 				editorFrame.setPasteObject(false);
-				
+
 				String name = editorFrame.getObjectColorName(shape.getRGB());
 				GraphicObject foundObject = null;
 				for (GraphicObject object : editorFrame.getGraphicObjects())
@@ -3141,7 +3141,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						}
 					}
 				}
-				
+
 				for (MovedObject movedObject : movedObjects)
 				{
 					editorFrame.getGraphicObjects().add(movedObject.newObject);
@@ -3217,7 +3217,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	        {
 	        }
 	        public void popupMenuWillBecomeVisible(final PopupMenuEvent e)
-	        {	        	
+	        {
 	        }
 	    });
 
@@ -3412,9 +3412,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			}
 			editorFrame.setCurrentObjectMap(0);
 		}
-		
+
 		objectMap = editorFrame.getObjectMaps().get(editorFrame.getCurrentObjectMap());
-		
+
 		Point2D.Double real = new Point2D.Double();
 		screenToReal(me, real);
 
@@ -3422,7 +3422,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
 
 		ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
-		
+
 		object.setLocation(real);
 
 		TrackObjectDialog	addObjectDialog = new TrackObjectDialog(editorFrame, object, me.getXOnScreen(), me.getYOnScreen());
@@ -3444,7 +3444,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 					object.setImageY(imageXY[1]);
 				}
 			}
-			newObjectMap.addObject(object);			
+			newObjectMap.addObject(object);
 			Undo.add(new UndoAddObject(newObjectMap, object));
 			editorFrame.setCurrentObjectGraphic(false);
 			editorFrame.setCurrentObjectColor(object.getRGB());
@@ -3538,9 +3538,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 					int imageXY[] = { 0, 0 };
 					realToImage(real, objectMap.getImageWidth(), objectMap.getImageHeight(), imageXY);
-						
+
 					ObjShapeObject	object = new ObjShapeObject(editorFrame.getObjectColorName(editorFrame.getCurrentObjectColor()), editorFrame.getCurrentObjectColor(), imageXY[0], imageXY[1]);
-				
+
 					objectMap.addObject(object);
 					Undo.add(new UndoAddObject(objectMap, object));
 				}
@@ -3592,7 +3592,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		PasteAction pasteAction = new PasteAction("Paste Object", null, "Paste object.");
 
 		JPopupMenu menu = new JPopupMenu();
-		
+
 	    JMenuItem item1 = new JMenuItem("AddNew");
 
 	    item1.setAction(addNewAction);
@@ -3621,7 +3621,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowActivated(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -3640,7 +3640,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowClosing(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -3649,7 +3649,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowDeactivated(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -3658,7 +3658,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowDeiconified(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -3667,7 +3667,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowIconified(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -3676,6 +3676,6 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	public void windowOpened(WindowEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 }

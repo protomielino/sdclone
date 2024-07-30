@@ -22,10 +22,10 @@ or by re-running the "base" installer and "Add / re-install components".
 Completing the installation
 ---------------------------
 
-After installing Speed Dreams and starting it, if you get and error box 
+After installing Speed Dreams and starting it, if you get and error box
 that says something like "Can't find MSVCxxx.dll" or so,
 try installing the MS Visual C++ redistribuable package :
-- Be carefull to use the x86 (32bits) version, 
+- Be carefull to use the x86 (32bits) version,
 - You can download it here, at Microsoft's official web site:
   https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
 
@@ -36,7 +36,7 @@ Torcs was told to need at least a 600 MHz CPU (800 MHz recommended), 128 Mb RAM 
 recommended) and an OpenGL 1.3 capable graphics card with 32Mb GRAM (64Mb recommended).
 
 You need more now, as Speed Dreams is constantly improving visual rendering :
-- Video card : at least 128Mb ; better with 256 Mb or more 
+- Video card : at least 128Mb ; better with 256 Mb or more
 - CPU        : at least 1 GHz ; better with 1.5 or 2.0 GHz
 - RAM        : from at least 512 Mb (Win XP 32) to 2Gb (Win Vista 32) ; better with 1 to 3 Gb
 
@@ -52,7 +52,7 @@ Running the game
   * WIP online manual http://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual https://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual/
   * Windows : Start menu / Programs / Speed Dreams x.y.z / User Manual
   * Others (soon available online at https://sourceforge.net/projects/speed-dreams/) :
-    - source distribution : open speed-dreams-x.y.z-src/doc/userman/how_to_drive.html 
+    - source distribution : open speed-dreams-x.y.z-src/doc/userman/how_to_drive.html
       in a web browser
     - SubVersion repository : download a GNU tarball of the user manual here :
         http://speed-dreams.svn.sourceforge.net/p/speed-dreams/code/HEAD/tree/tags/x.y.z/doc/userman
@@ -82,7 +82,7 @@ Car Setups
 ----------
 
 For the player driver, the default car parameters are located in the files
-"<install>/drivers/human/car*.xml" depending on the car used. 
+"<install>/drivers/human/car*.xml" depending on the car used.
 
 You can have your own customized version of these files by copying them
 to <My documents>/speed-dreams-2.settings/drivers/human/car*.xml

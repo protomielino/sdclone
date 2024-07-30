@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Human player joystick configuration menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -248,7 +248,7 @@ JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
     if (ScrHandle) {
 	return ScrHandle;
     }
-    
+
     // Create screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreate(NULL, NULL, onActivate, NULL, NULL, 1);
 
@@ -268,7 +268,7 @@ JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Create instruction variable label.
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
-    
+
     // Create Cancel and Reset buttons.
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
@@ -284,7 +284,7 @@ JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Next", NULL, onNext, NULL);

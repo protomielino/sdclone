@@ -66,7 +66,7 @@ typedef set<Encounter> ProxList;
 
 PointBuf pointBuf;
 IndexBuf indexBuf;
-PolyList polyList; 
+PolyList polyList;
 ComplexList complexList;
 ObjectList objectList;
 RespTable respTable;
@@ -117,7 +117,7 @@ void dtEndComplexShape() {
 }
 
 void dtBegin(DtPolyType type) { currentType = type; }
-void dtEnd() { 
+void dtEnd() {
   dtVertexIndices(currentType, indexBuf.size(), &indexBuf[0]);
   indexBuf.erase(indexBuf.begin(), indexBuf.end());
 }
@@ -131,13 +131,13 @@ void dtVertex(DtScalar x, DtScalar y, DtScalar z) {
   indexBuf.push_back(i);
 }
 
-void dtVertexBase(const void *base) { 
-  currentComplex->setBase(base); 
+void dtVertexBase(const void *base) {
+  currentComplex->setBase(base);
 }
 
 void dtVertexIndex(DtIndex index) { indexBuf.push_back(index); }
 
-void dtVertexIndices(DtPolyType type, DtCount count, 
+void dtVertexIndices(DtPolyType type, DtCount count,
 			     const DtIndex *indices) {
   if (currentComplex) {
     const Polytope *poly;
@@ -171,24 +171,24 @@ void dtVertexRange(DtPolyType type, DtIndex first, DtCount count) {
   delete [] indices;
 }
 
-void dtDeleteShape(DtShapeRef shape) { 
+void dtDeleteShape(DtShapeRef shape) {
   if (((Shape *)shape)->getType() == COMPLEX) {
-    ComplexList::iterator i = 
+    ComplexList::iterator i =
       find(complexList.begin(), complexList.end(), (Complex *)shape);
     if (i != complexList.end()) complexList.erase(i);
   }
-  delete (Shape *)shape; 
+  delete (Shape *)shape;
 }
 
-void dtChangeVertexBase(DtShapeRef shape, const void *base) { 
+void dtChangeVertexBase(DtShapeRef shape, const void *base) {
   if (((Shape *)shape)->getType() == COMPLEX)
     ((Complex *)shape)->changeBase(base);
-  for (ObjectList::const_iterator i = objectList.begin(); 
+  for (ObjectList::const_iterator i = objectList.begin();
        i != objectList.end(); ++i) {
     if ((*i).second->shapePtr == (Shape *)shape) {
       (*i).second->move();
     }
-  }   
+  }
 }
 
 
@@ -196,7 +196,7 @@ void dtChangeVertexBase(DtShapeRef shape, const void *base) {
 
 void dtCreateObject(DtObjectRef object, DtShapeRef shape) {
   move();
-  currentObject = objectList[object] = new Object(object, (Shape *)shape); 
+  currentObject = objectList[object] = new Object(object, (Shape *)shape);
 }
 
 void dtSelectObject(DtObjectRef object) {
@@ -229,23 +229,23 @@ void dtScale(DtScalar x, DtScalar y, DtScalar z) {
   if (currentObject) currentObject->scale(x, y, z);
 }
 
-void dtLoadIdentity() { 
+void dtLoadIdentity() {
   if (currentObject) currentObject->setIdentity();
 }
 
-void dtLoadMatrixf(const float *m) { 
+void dtLoadMatrixf(const float *m) {
   if (currentObject) currentObject->setMatrix(m);
 }
 
-void dtLoadMatrixd(const double *m) { 
+void dtLoadMatrixd(const double *m) {
   if (currentObject) currentObject->setMatrix(m);
 }
 
-void dtMultMatrixf(const float *m) { 
+void dtMultMatrixf(const float *m) {
   if (currentObject) currentObject->multMatrix(m);
 }
 
-void dtMultMatrixd(const double *m) { 
+void dtMultMatrixd(const double *m) {
   if (currentObject) currentObject->multMatrix(m);
 }
 
@@ -260,7 +260,7 @@ void dtClearDefaultResponse() {
   respTable.setDefault(Response());
 }
 
-void dtSetObjectResponse(DtObjectRef object, DtResponse response, 
+void dtSetObjectResponse(DtObjectRef object, DtResponse response,
 				 DtResponseType type, void *client_data) {
   respTable.setSingle(object, Response(response, type, client_data));
 }
@@ -273,8 +273,8 @@ void dtResetObjectResponse(DtObjectRef object) {
   respTable.resetSingle(object);
 }
 
-void dtSetPairResponse(DtObjectRef object1, DtObjectRef object2, 
-			       DtResponse response, DtResponseType type, 
+void dtSetPairResponse(DtObjectRef object1, DtObjectRef object2,
+			       DtResponse response, DtResponseType type,
 			       void * client_data) {
   respTable.setPair(object1, object2, Response(response, type, client_data));
 }
@@ -290,10 +290,10 @@ void dtResetPairResponse(DtObjectRef object1, DtObjectRef object2) {
 // Runtime
 
 void dtProceed() {
-  for (ComplexList::iterator i = complexList.begin(); 
-       i != complexList.end(); ++i) 
+  for (ComplexList::iterator i = complexList.begin();
+       i != complexList.end(); ++i)
     (*i)->proceed();
-  for (ObjectList::const_iterator j = objectList.begin(); 
+  for (ObjectList::const_iterator j = objectList.begin();
        j != objectList.end(); ++j)
     (*j).second->proceed();
 }
@@ -314,7 +314,7 @@ void addPair(ObjectPtr object1, ObjectPtr object2) {
 }
 
 void removePair(ObjectPtr object1, ObjectPtr object2) {
-  proxList.erase(Encounter(object1, object2)); 
+  proxList.erase(Encounter(object1, object2));
 }
 
 bool object_test(Encounter& e) {
@@ -322,22 +322,22 @@ bool object_test(Encounter& e) {
   const Response& resp = respTable.find(e.obj1->ref, e.obj2->ref);
   switch (resp.type) {
   case DT_SIMPLE_RESPONSE:
-    if (intersect(*e.obj1, *e.obj2, e.sep_axis)) { 
+    if (intersect(*e.obj1, *e.obj2, e.sep_axis)) {
       resp(e.obj1->ref, e.obj2->ref);
-      return true; 
+      return true;
     }
     break;
   case DT_SMART_RESPONSE:
     if (prev_closest_points(*e.obj1, *e.obj2, e.sep_axis, p1, p2)) {
       Vector v = e.obj1->prev(p1) - e.obj2->prev(p2);
       resp(e.obj1->ref, e.obj2->ref, p1, p2, v);
-      return true; 
+      return true;
     }
     break;
   case DT_WITNESSED_RESPONSE:
-    if (common_point(*e.obj1, *e.obj2, e.sep_axis, p1, p2)) { 
+    if (common_point(*e.obj1, *e.obj2, e.sep_axis, p1, p2)) {
       resp(e.obj1->ref, e.obj2->ref, p1, p2, Vector(0, 0, 0));
-      return true; 
+      return true;
     }
     break;
   // Eric Espie: warning
@@ -351,17 +351,17 @@ DtCount dtTest() {
   move();
   DtCount count = 0;
   if (caching) {
-    for (ProxList::iterator i = proxList.begin(); i != proxList.end(); ++i) 
+    for (ProxList::iterator i = proxList.begin(); i != proxList.end(); ++i)
       if (object_test((Encounter &)*i)) ++count;
   }
   else {
-    for (ObjectList::const_iterator j = objectList.begin(); 
+    for (ObjectList::const_iterator j = objectList.begin();
 	 j != objectList.end(); ++j)
-      for (ObjectList::const_iterator i = objectList.begin(); 
+      for (ObjectList::const_iterator i = objectList.begin();
 	   i != j; ++i) {
 	Encounter e((*i).second, (*j).second);
 	if (object_test(e)) ++count;
-      } 
+      }
   }
   return count;
 }

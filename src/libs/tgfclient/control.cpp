@@ -2,9 +2,9 @@
 
     file        : control.cpp
     created     : Thu Mar  6 22:01:33 CET 2003
-    copyright   : (C) 2003 by Eric Espi�                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Eric Espi�
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Human control (joystick, mouse and keyboard).
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -216,7 +216,7 @@ GfctrlGetNameByRef(int type, int index)
 {
     static char buf[4];
     int i;
-    
+
     switch (type) {
     case GFCTRL_TYPE_NOT_AFFECTED:
 	return NULL;
@@ -288,12 +288,12 @@ void
 gfctrlJoyInit(void)
 {
     memset(&cfx, 0, sizeof(cfx));
-    
+
     for(int i = 0;i<GFCTRL_JOY_NUMBER;i++)
     {
         id[i] = -1;
         names[i].clear();
-    }    
+    }
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
         GfLogError("Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -310,7 +310,7 @@ gfctrlJoyInit(void)
 		if (!Joysticks[index]) {
 			Joysticks[index] = SDL_JoystickOpen(index);
 		}
-    
+
         // Don't configure the joystick if it doesn't work
         if (Joysticks[index] == NULL) {
             GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
@@ -324,7 +324,7 @@ gfctrlJoyInit(void)
 
         // Find which Haptic device relates to this joystick
         Haptics[index] = SDL_HapticOpenFromJoystick(Joysticks[index]);
-        
+
         SDL_JoystickType type = SDL_JoystickGetType(Joysticks[index]);
 
         GfLogInfo("Joystick %d: %s\n", index + 1, names[index].c_str());
@@ -345,7 +345,7 @@ gfctrlJoyInit(void)
         GfLogInfo("  buttons: %d\n", SDL_JoystickNumButtons(Joysticks[index]));
         GfLogInfo("  hats:    %d\n", SDL_JoystickNumHats(Joysticks[index]));
         GfLogInfo("  haptic:  %s\n", Haptics[index] ? "yes" : "no");
-        
+
         if (!Haptics[index]) {
             continue;
         }
@@ -374,9 +374,9 @@ gfctrlJoyConstantForce(int index, int level, int dir)
     {
 		cfx[index].type = SDL_HAPTIC_CONSTANT;
 		cfx[index].constant.direction.type = SDL_HAPTIC_CARTESIAN;
-		cfx[index].constant.direction.dir[0] = 1;	
+		cfx[index].constant.direction.dir[0] = 1;
 		cfx[index].constant.length = 1000; //how log is the effect
-		cfx[index].constant.level = level; // strength: minimum 0 maximum 32767 
+		cfx[index].constant.level = level; // strength: minimum 0 maximum 32767
 		cfx[index].constant.attack_length = 0; // Takes 0 second (instantly) to get max strength
 		cfx[index].constant.fade_length = 0; // Takes 0 second to fade away
 		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
@@ -424,7 +424,7 @@ gfctrlJoyShutdown(void)
             {
 				SDL_HapticClose(Haptics[index]);
 				Haptics[index] = NULL;
-			}			
+			}
 		}
 
       gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
@@ -509,7 +509,7 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
    {
       // Update all the joysticks
       SDL_JoystickUpdate();
-      for (ind = 0; ind < gfctrlJoyPresent; ind++) 
+      for (ind = 0; ind < gfctrlJoyPresent; ind++)
       {
          if (Joysticks[ind])
          {
@@ -525,7 +525,7 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
                 j = GFCTRL_JOY_MAX_BUTTONS;
 
             b = 0;
-            for (i=0; i < j;i++) 
+            for (i=0; i < j;i++)
             {
                mask = (unsigned int)SDL_JoystickGetButton(Joysticks[ind], i);
                b |= (mask << i);
@@ -640,7 +640,7 @@ GfctrlMouseGetCurrentState(tCtrlMouseInfo *mouseInfo)
     mouse = GfuiMouseInfo();
 
     mouseMove = (float)(refMouse.X - mouse->X);
-    
+
     if (mouseMove < 0) {
 	mouseInfo->ax[1] = -mouseMove;
 	mouseInfo->ax[0] = 0;

@@ -62,7 +62,7 @@ void GfglFeatures::closeConfigFile(void* hparmConfig, bool bWrite)
 	// Write if specified.
 	if (bWrite)
 		GfParmWriteFile(NULL, hparmConfig, "Screen");
-	
+
 	// Close.
 	GfParmReleaseHandle(hparmConfig);
 }
@@ -97,11 +97,11 @@ void GfglFeatures::detectStandardSupport()
 	//    choose an uncompressed alternate format if it can't provide the requested
 	//    compressed one... but it does not on all cards/drivers.
     bool bValue = SDL_GL_ExtensionSupported("GL_ARB_texture_compression");
-	if (bValue) 
+	if (bValue)
 	{
 		int nFormats;
 		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, &nFormats);
-		if (nFormats == 0) 
+		if (nFormats == 0)
 			bValue = false;
 	}
 	_mapSupportedBool[TextureCompression] = bValue;
@@ -128,7 +128,7 @@ void GfglFeatures::detectStandardSupport()
 	// 9) Stereo Vision (need a proper check)
 	_mapSupportedBool[StereoVision] = false;
 
-	// 10) Bump Mapping 
+	// 10) Bump Mapping
     bValue = SDL_GL_ExtensionSupported("GL_ARB_multitexture")
             && SDL_GL_ExtensionSupported("GL_ARB_texture_cube_map")
             && SDL_GL_ExtensionSupported("GL_ARB_texture_env_combine")
@@ -195,7 +195,7 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_TRUE);
 					else
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_FALSE);
-		
+
 					// Anti-aliasing : detect the max supported number of samples
 					// (assumed to be <= 32).
 					int nMaxMultiSamples = 32; // Hard coded max value for the moment.
@@ -205,7 +205,7 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 						GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
-						
+
 						testWindow = SDL_CreateWindow("SDL2 test",
 							SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 							nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
@@ -218,11 +218,11 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 							{
 
 								pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 									0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
+#else
 									0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
+#endif
 									0x00000000);
 
 								// Now check if we have a video mode, and if it actually features
@@ -256,7 +256,7 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 							nMaxMultiSamples /= 2;
 						}
 					}
-	
+
 					// Failed : try without anti-aliasing.
 					if (!pWinSurface)
 					{
@@ -274,9 +274,9 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 							{
 
 								pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 									0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
+#else
 									0x000000FF, 0x0000FF00, 0x00FF0000,
 #endif
 									0x00000000);
@@ -291,7 +291,7 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 							GfLogTrace("%d+%d bit double-buffer not supported\n",
 							3*nCurrDepth/4, nCurrDepth/4);
 					}
-	
+
 					// Failed : try without StereoVision
 					if (!pWinSurface)
 						nStereoVision--;
@@ -320,13 +320,13 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 		// thus forcing new detection when checkSupport will be called again).
 		_mapSupportedBool.clear();
 		_mapSupportedInt.clear();
-		
+
 		GfLogError("No supported 'best' video mode found for a %dx%dx%d%s frame buffer.\n",
 				   nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
-		
+
 		return false;
 	}
-	
+
 	testWindow = SDL_CreateWindow("SDL2 test",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
@@ -416,11 +416,11 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 
 		return false;
 	}
-		
-	
+
+
 	// Here, we only update _mapSupportedXXX only if something relevant in the config file
 	// If there's nothing or something not expected, it means no support.
-	
+
 	// 1) Double-buffer.
 	const std::string strDoubleBuffer =
 		GfParmGetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_DOUBLEBUFFER, "");
@@ -495,7 +495,7 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 		_mapSupportedBool[MultiSampling] = true;
 	else if (strMultiSamp == GFSCR_VAL_NO)
 		_mapSupportedBool[MultiSampling] = false;
-	
+
 	const int nMultiSampSamples =
 		(int)GfParmGetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES,
 						  pszNoUnit, (tdble)0);
@@ -546,7 +546,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 	{
 		// Frame buffer specs.
 		GfParmRemoveSection(hparm, GFSCR_SECT_GLDETSPECS);
-	
+
 		// Supported values.
 		GfParmRemoveSection(hparm, GFSCR_SECT_GLDETFEATURES);
 	}
@@ -571,7 +571,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 					 bStereo ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BUMPMAPPING,
 					 bBump ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-	
+
 		// Write new values (remove the ones with no value supported).
 		// 1) Double-buffer.
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_DOUBLEBUFFER,
@@ -597,11 +597,11 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 						 (tdble)getSupported(TextureMaxSize));
 		else
 			GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MAXTEXTURESIZE);
-		
+
 		// 5) Texture compression.
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_TEXTURECOMPRESSION,
 					 isSupported(TextureCompression) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-		
+
 		// 6) Multi-texturing.
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTITEXTURING,
 					 isSupported(MultiTexturing) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
@@ -622,7 +622,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 		// 9) Multi-sampling.
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLING,
 					 isSupported(MultiSampling) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-	
+
 		if (getSupported(MultiSamplingSamples) != InvalidInt)
 			GfParmSetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES, pszNoUnit,
 						 (tdble)getSupported(MultiSamplingSamples));
@@ -632,7 +632,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 		// 10) Stereo Vision
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_STEREOVISION,
 					 isSupported(StereoVision) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-		
+
 		// 11) Bump Mapping
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING,
 					 isSupported(BumpMapping) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
@@ -644,11 +644,11 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
         else
             GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
 
-	}		
-	
+	}
+
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
-	
+
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -728,7 +728,7 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 
 	if (!hparmConfig)
 		closeConfigFile(hparm);
-	
+
 	return bSupportFound;
 }
 
@@ -749,7 +749,7 @@ void GfglFeatures::dumpSupport() const
 		GfLogInfo("  Unknown (detection failed).\n");
 		return;
 	}
-	
+
 	GfLogInfo("  Double buffer           : %s\n",
 			  isSupported(DoubleBuffer) ? "Yes" : "No");
 	GfLogInfo("  Color depth             : %d bits\n",
@@ -823,7 +823,7 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 		&& std::string(GfParmGetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTITEXTURING,
 									GFSCR_ATT_MULTITEXTURING_ENABLED))
 		   == GFSCR_ATT_MULTITEXTURING_ENABLED;
-	_mapSelectedInt[MultiTexturingUnits] = 
+	_mapSelectedInt[MultiTexturingUnits] =
 		(int)GfParmGetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTITEXTURINGUNITS,
 						  pszNoUnit, (tdble)getSupported(TextureMaxSize));
 	if (_mapSelectedInt[MultiTexturingUnits] > getSupported(MultiTexturingUnits))
@@ -844,7 +844,7 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 		&& std::string(GfParmGetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLING,
 									GFSCR_ATT_MULTISAMPLING_ENABLED))
 		   == GFSCR_ATT_MULTISAMPLING_ENABLED;
-	
+
 	_mapSelectedInt[MultiSamplingSamples] =
 		(int)GfParmGetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES,
 						  pszNoUnit, (tdble)8); // Good but reasonable value.
@@ -874,7 +874,7 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
-	
+
 	// Display what we have really selected (after checking / fixing to supported values).
 	dumpSelection();
 }
@@ -898,7 +898,7 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 					 (tdble)getSelected(TextureMaxSize));
 	else
 		GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MAXTEXTURESIZE);
-		
+
 	GfParmSetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTITEXTURING,
 				 isSelected(MultiTexturing)
 				 ? GFSCR_ATT_MULTITEXTURING_ENABLED : GFSCR_ATT_MULTITEXTURING_DISABLED);
@@ -948,10 +948,10 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 					 (tdble)getSelected(AnisotropicFiltering));
 	else
 		GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
-	
+
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
-	
+
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);

@@ -43,7 +43,7 @@ public class StatusBar extends JPanel
 	protected String statusText;
 
 	/**
-	 * 
+	 *
 	 */
 	public StatusBar()
 	{

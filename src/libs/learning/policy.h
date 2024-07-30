@@ -22,7 +22,7 @@
 #include "ANN.h"
 #include "Distribution.h"
 
-/*! 
+/*!
   \class DiscretePolicy
   \brief Discrete policies with reinforcement learning.
 
@@ -37,10 +37,10 @@
   total reward received.
 
   Parameters:
-  
+
   n_states: The number of discrete states, or situations, that the
   agent is in. You should create states that are relevant to the task.
-  
+
   n_actions: The number of different things the agent can do at every
   state. Currently we assume that all actions are usable at all
   states. However if an action a_i is not usable in some state s, then
@@ -84,13 +84,13 @@
   it seems to be than the others. A high randomness (>10.0) will create more
   or less equal probabilities for actions, while a low randomness
   (<0.1) will make the system almost deterministic.
-  
+
   init_eval: This is the initial evaluation for actions. It pays to
   set this to optimistic values (i.e. higher than the reinforcement to
   be given), so that the algorithm becomes always 'disappointed' and
   tries to explore as much of the possible combinations as it can.
-  
-  Member functions: 
+
+  Member functions:
 
   setQLearning(): Use the Q(\f$\lambda\f$) algorithm
 
@@ -136,7 +136,7 @@
   However it is possible to perform direct sampling.
 
   setForcedLearning(bool forced);
-*/ 
+*/
 
 /// Types of learning methods.
 enum LearningMethod {QLearning, Sarsa, ForcedLearning, ELearning};

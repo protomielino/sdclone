@@ -65,7 +65,7 @@ ssgVtxTableShadow::~ssgVtxTableShadow ()
       ssgDeRefDelete ( normals   ) ;
       ssgDeRefDelete ( texcoords ) ;
       ssgDeRefDelete ( colours   ) ; */
-} 
+}
 
 
 void ssgVtxTableShadow::setOffset(float f, float u)
@@ -108,7 +108,7 @@ void ssgVtxTableShadow::draw_geometry ()
 
     glVertex3fv ( vx [ i ] ) ;
   }
- 
+
   glEnd () ;
   glDisable(GL_POLYGON_OFFSET_FILL);
   glDepthMask(GL_TRUE);

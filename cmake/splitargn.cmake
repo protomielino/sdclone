@@ -2,7 +2,7 @@
 #
 #   file        : split_argn.cmake
 #   copyright   : (C) 2008 by Mart Kelder
-#   web         : www.speed-dreams.org 
+#   web         : www.speed-dreams.org
 #   version     : $Id$
 #
 ############################################################################
@@ -153,13 +153,13 @@ MACRO(SPLIT_ARGN)
 				ELSE(NOT SA_EXPECT_VALUE)
 					#Save this item to the list
 					SET(${SA_CUR_VARNAME} ${${SA_CUR_VARNAME}} ${SA_ITEM})
-	
+
 					#Increase index
 					MATH(EXPR SA_CUR_INDEX_TMP "${SA_CUR_INDEX}+1")
 					SET(SA_CUR_INDEX ${SA_CUR_INDEX_TMP})
 				ENDIF(NOT SA_EXPECT_VALUE)
 			ENDIF(SA_ISKEYWORD)
-	
+
 			#Check what to expect from the next element
 			IF(${SA_CUR_INDEX} LESS ${SA_CUR_MINCOUNT})
 				SET(SA_EXPECT_KEYWORD FALSE)
@@ -176,7 +176,7 @@ MACRO(SPLIT_ARGN)
 		ENDIF(NOT SA_START)
 
 	ENDFOREACH(SA_ITEM ${ARGN})
-	
+
 	IF(SA_START AND NOT SA_EXPECT_KEYWORD)
 		#Didn't get all the expected values of the last keyword
 		MESSAGE(ERROR ": Missing values at the end in SPLIT_ARGN.")

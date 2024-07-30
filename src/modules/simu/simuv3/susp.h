@@ -21,7 +21,7 @@
 #define _SUSP_H__
 
 
-typedef struct 
+typedef struct
 {
     tdble C1, b1, v1; /* coefs for slow */
     tdble C2, b2;     /* coefs for fast */
@@ -33,8 +33,8 @@ typedef struct
     tDamperDef rebound;
 	tdble efficiency;
 } tDamper;
-    
-typedef struct 
+
+typedef struct
 {
     tdble K;          /* spring coef */
     tdble F0;         /* initial force */
@@ -58,7 +58,7 @@ typedef struct Suspension
     tdble x; /* suspension travel */
     tdble over_x; /* suspension travel beyond packers */
     tdble v; /* suspension travel speed */
-    tdble fx; // pure elastic collision 
+    tdble fx; // pure elastic collision
     tdble fy; // pure elastic collision
     eSuspensionType type;
     t3Dd dynamic_angles;
@@ -72,7 +72,7 @@ typedef struct Suspension
 
 #define PRM_SUSPENSION_TYPE "suspension type"
 
-#endif /* _SUSP_H__ */ 
+#endif /* _SUSP_H__ */
 
 
 

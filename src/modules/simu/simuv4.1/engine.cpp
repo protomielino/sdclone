@@ -159,7 +159,7 @@ void
 SimEngineReConfig(tCar *car)
 {/* called by SimCarReConfig in car.cpp */
 	tCarSetupItem *setupRevLimit = &(car->carElt->setup.revsLimiter);
-	
+
 	if (setupRevLimit->changed)
 	{
 		car->engine.revsLimiter = MIN(setupRevLimit->max, MAX(setupRevLimit->min, setupRevLimit->desired_value));

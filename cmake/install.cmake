@@ -2,7 +2,7 @@
 #
 #   file        : install.cmake
 #   copyright   : (C) 2008 by Mart Kelder, 2010 by J.-P. Meuret
-#   web         : www.speed-dreams.org 
+#   web         : www.speed-dreams.org
 #   version     : $Id$
 #
 ############################################################################
@@ -353,10 +353,10 @@ ENDMACRO(SD_INSTALL_FILES)
 #  DIRECTORIES : Sub-dirs to recursively install (see PREFIX)
 #  PATTERNS    : Glob patterns to use for seelecting files to install (defaults to *.*)
 # Example:
-#  SD_INSTALL_DIRECTORIES(DATA drivers/human USER drivers/human 
+#  SD_INSTALL_DIRECTORIES(DATA drivers/human USER drivers/human
 #                         PREFIX pfx DIRECTORIES cars tracks PATTERNS *.xml)
 #  will recursively install any .xml file from drivers/human/pfx/cars and drivers/human/pfx/tracks
-#  into drivers/human/cars and  drivers/human/pfx/tracks data dirs ; 
+#  into drivers/human/cars and  drivers/human/pfx/tracks data dirs ;
 #  these files / sub-dirs will also be scheduled for run-time update/install in user settings dir.
 MACRO(SD_INSTALL_DIRECTORIES)
 
@@ -423,7 +423,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
     ENDIF()
   ENDFOREACH()
   SET(DIRECTORIES ${_DIRECTORIES})
-  
+
   # Install selected files into the data dir.
   # And collect user settings files (if any) and target folder for later
   # (see SD_XX_SETTINGS_VERSION above).
@@ -451,7 +451,7 @@ ENDMACRO(SD_INSTALL_DIRECTORIES)
 # Macro to install CMake config files for SD if in-source build.
 IF(IN_SOURCETREE)
   MACRO(INSTALL_SD_CMAKE)
-    INSTALL(CODE 
+    INSTALL(CODE
         "SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
          IF(CUR_DESTDIR MATCHES \"[^/]\")
            STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
@@ -495,7 +495,7 @@ MACRO(SD_INSTALL_CAR CARNAME)
   FILE(GLOB RGB_FILES *.rgb)
   FILE(GLOB WAV_FILES *.wav)
 
-  SET(SDIC_FILES ${SDIC_FILES} ${AC3D_FILES} ${OSGT_FILE} ${XML_FILES} 
+  SET(SDIC_FILES ${SDIC_FILES} ${AC3D_FILES} ${OSGT_FILE} ${XML_FILES}
   	  ${RGB_FILES} ${PNG_FILES} ${DDS_FILES} ${JPG_FILES} ${WAV_FILES})
 
   SD_INSTALL_FILES(DATA cars/models/${CARNAME} FILES ${SDIC_FILES})
@@ -527,7 +527,7 @@ MACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
   FILE(GLOB JPG_FILES *.jpg)
   FILE(GLOB RGB_FILES *.rgb)
 
-  SET(SDIT_FILES ${SDIT_FILES} ${AC3D_FILES} ${OSGT_FILES} 
+  SET(SDIT_FILES ${SDIT_FILES} ${AC3D_FILES} ${OSGT_FILES}
   	${RGB_FILES} ${PNG_FILES} ${JPG_FILES} ${DDS_FILES})
 
   SD_INSTALL_FILES(DATA tracks/${CATEGORY}/${TRACKNAME} FILES ${SDIT_FILES})

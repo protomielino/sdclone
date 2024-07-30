@@ -25,4 +25,4 @@
 
 extern void *PlayerConfigMenuInit(void *prevMenu);
 
-#endif /* _PLAYERCONFIG_H_ */ 
+#endif /* _PLAYERCONFIG_H_ */

@@ -40,7 +40,7 @@ public class UndoAddSegment implements UndoInterface
 	private int 			pos;
 
 	/**
-	 * 
+	 *
 	 */
 	public UndoAddSegment(EditorFrame editorFrame, Segment segment)
 	{
@@ -69,7 +69,7 @@ public class UndoAddSegment implements UndoInterface
 		else
 		{
 			int count = Editor.getProperties().getCurveNameCount() - 1;
-			Editor.getProperties().setCurveNameCount(count);			
+			Editor.getProperties().setCurveNameCount(count);
 		}
 		data.remove(undo);
 		redo = undo;
@@ -95,8 +95,8 @@ public class UndoAddSegment implements UndoInterface
 		else
 		{
 			int count = Editor.getProperties().getCurveNameCount() + 1;
-			Editor.getProperties().setCurveNameCount(count);			
-		}		
+			Editor.getProperties().setCurveNameCount(count);
+		}
 		data.insertElementAt(redo, pos);
 		undo = redo;
 		redo = null;

@@ -2,7 +2,7 @@
 #
 #   file        : macros.cmake
 #   copyright   : (C) 2008 by Mart Kelder
-#   web         : www.speed-dreams.org 
+#   web         : www.speed-dreams.org
 #   version     : $Id$
 #
 ############################################################################
@@ -195,14 +195,14 @@ MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
   # Change target location (for running in build-tree without installing).
   SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
 
-  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
                         RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR})
 
   IF(MSVC)
 
     FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
       STRING(TOUPPER ${_CFG} _CFG)
-      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
                             RUNTIME_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}")
     ENDFOREACH()
 
@@ -265,21 +265,21 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
   ENDIF()
 
   # Change target location (for running in build-tree without installing).
-  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                        RUNTIME_OUTPUT_DIRECTORY "${_TGT_DIR}" 
+  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+                        RUNTIME_OUTPUT_DIRECTORY "${_TGT_DIR}"
                         LIBRARY_OUTPUT_DIRECTORY "${_TGT_DIR}")
 
   IF(MSVC)
 
     FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
       STRING(TOUPPER ${_CFG} _CFG)
-      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                            RUNTIME_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}" 
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+                            RUNTIME_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}"
                             LIBRARY_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}")
     ENDFOREACH()
 
   ENDIF(MSVC)
-  
+
   #MESSAGE(STATUS "SD_ADD_LIBRARY : _TGT_DIR = ${_TGT_DIR}")
 
   # No prefix for module and robot DLLs.
@@ -303,7 +303,7 @@ ENDMACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 MACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
     IF(MSVC)
-  
+
       SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.bat")
       FILE(WRITE  "${TGT_SCRIPT}" "@echo off\n")
       FILE(APPEND "${TGT_SCRIPT}" "rem CMake-generated script for in-source build tree total cleanup\n")
@@ -359,9 +359,9 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
       FILE(APPEND "${TGT_SCRIPT}" "echo Bad current dir for that ; please run from the root folder of a CMake-enabled SD source tree.\n")
       FILE(APPEND "${TGT_SCRIPT}" "\n")
       FILE(APPEND "${TGT_SCRIPT}" ":END\n")
-  
+
     ELSE(MSVC)
-  
+
       SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.sh")
       FILE(WRITE  "${TGT_SCRIPT}" "#!/bin/sh\n")
       FILE(APPEND "${TGT_SCRIPT}" "# CMake-generated script for in-source build tree total cleanup\n")
@@ -405,7 +405,7 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
       FILE(APPEND "${TGT_SCRIPT}" "fi\n")
       EXECUTE_PROCESS(COMMAND chmod ugo+x ${TGT_SCRIPT})
     ENDIF(MSVC)
-  
+
 ENDMACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
 # Add non-default compile options.

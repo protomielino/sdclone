@@ -44,7 +44,7 @@ import javax.swing.text.Document;
 import utils.SegmentSliderLayout;
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -71,7 +71,7 @@ public class SegmentSlider extends JPanel
 	private boolean			integerFormat	= false;
 
 	/**
-	 *  
+	 *
 	 */
 	public SegmentSlider(double min, double max, double defaultValue, double resolution)
 	{
@@ -104,7 +104,7 @@ public class SegmentSlider extends JPanel
 	}
 
 	/**
-	 *  
+	 *
 	 */
 	private void initialize()
 	{
@@ -118,9 +118,9 @@ public class SegmentSlider extends JPanel
 		else
 		{
 			nf.setMaximumFractionDigits(3);
-			nf.setMinimumFractionDigits(1);			
+			nf.setMinimumFractionDigits(1);
 		}
-		
+
 		attLabel = new JLabel();
 		sectionLabel = new JLabel();
 		this.setLayout(new SegmentSliderLayout());
@@ -158,7 +158,7 @@ public class SegmentSlider extends JPanel
 
 	/**
 	 * This method initializes textField
-	 * 
+	 *
 	 * @return javax.swing.JTextField
 	 */
 	private JTextField getTextField()
@@ -166,7 +166,7 @@ public class SegmentSlider extends JPanel
 		if (textField == null)
 		{
 			textField = new JTextField();
-			textField.setHorizontalAlignment(JTextField.LEFT);			
+			textField.setHorizontalAlignment(JTextField.LEFT);
 			textField.getDocument().addDocumentListener(new DocumentListener()
 			{
 				public void changedUpdate(DocumentEvent e)
@@ -248,7 +248,7 @@ public class SegmentSlider extends JPanel
 	}
 	/**
 	 * This method initializes slider
-	 * 
+	 *
 	 * @return javax.swing.JSlider
 	 */
 	private JSlider getSlider()
@@ -264,7 +264,7 @@ public class SegmentSlider extends JPanel
 	}
 	/**
 	 * This method initializes checkBox
-	 * 
+	 *
 	 * @return javax.swing.JCheckBox
 	 */
 	private JCheckBox getCheckBox()
@@ -627,7 +627,7 @@ public class SegmentSlider extends JPanel
 		public void checkBoxChanged()
 		{
 			checkboxChanged();
-			
+
 			double	oldValue = value;
 			if (checkBox.isSelected())
 			{
@@ -680,7 +680,7 @@ public class SegmentSlider extends JPanel
 		}
 
 		/**
-		 *  
+		 *
 		 */
 		protected void textFieldChanged()
 		{

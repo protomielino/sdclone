@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef __CSNETWORKING_H__
 #define __CSNETWORKING_H__
 

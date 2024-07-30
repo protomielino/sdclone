@@ -228,7 +228,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 	sgSubVec2(v1ab, vp[0], vp[1]);
 
 	// try to separate the cars. The computation is necessary because dtProceed is not called till
-	// the collision is resolved. 
+	// the collision is resolved.
 	for (i = 0; i < 2; i++) {
 		sgCopyVec2(pt[i], r[i]);
 		pt[i][2] = 0.0f;
@@ -242,9 +242,9 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 	float distpab = sgLengthVec2(pab);
 
 	sgVec2 tmpv;
-	
+
 	sgScaleVec2(tmpv, n, (tdble) MIN(distpab, 0.05));
-	// No "for" loop here because of subtle difference AddVec/SubVec. 
+	// No "for" loop here because of subtle difference AddVec/SubVec.
 	if (car[0]->blocked == 0 && !(car[0]->carElt->_state & RM_CAR_STATE_NO_SIMU)) {
 		sgAddVec2((float*)&(car[0]->DynGCg.pos), tmpv);
 		car[0]->blocked = 1;
@@ -686,7 +686,7 @@ SimCarCollideInit(tTrack *track)
 	// TODO: understand this and reconsider caching.
 	dtDisableCaching();
 	dtSetTolerance((DT_Scalar)0.001);
-	
+
 	fixedid = 0;
 
 	if (track != NULL) {
@@ -701,7 +701,7 @@ SimCarCollideInit(tTrack *track)
 			dtCreateObject(&fixedobjects[i], fixedobjects[i]);
 			dtSetObjectResponse(&fixedobjects[i], SimCarWallCollideResponse, DT_SMART_RESPONSE, &fixedobjects[i]);
 		}
-	}	
+	}
 }
 
 

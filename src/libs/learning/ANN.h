@@ -28,7 +28,7 @@
 
 /** \file ANN.h
     \brief A neural network implementation.
-    
+
     A neural network is a parametric function composed of a number of
     'layers'. Each layer can be expressed as a function \f$g(y)
     =g(\sum_i w_i f_i (x))\f$, where the \f$w\f$ are a set of weights
@@ -44,7 +44,7 @@
 
 /** \brief A linear connection between two neural elements.
 
-It is used to express the sum weights in 
+It is used to express the sum weights in
 \f$y = \sum_i w_i f_i (x)\f$.
 This type of connection currently also supports eligibility traces
 gradient descent updates, batch updates and variance estimates.
@@ -58,7 +58,7 @@ typedef struct Connection_ {
 } Connection;
 
 /** \brief An RBF connection between two neural elements.
-    
+
 It is used to express:
 \f$y = \sum_i \big((m_i-f_i(x)) w_i\big)^2\f$.
 This type of connection has no extra features. When an RBF connection is created through the standard high-level function AddRBFHiddenLayer, then the layer output is \f$g(y) = e^y\f$.

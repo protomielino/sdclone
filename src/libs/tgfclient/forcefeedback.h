@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
         The Gaming Framework API (client part).
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
@@ -67,7 +67,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 
 		//constructor
 		ForceFeedbackManager();
-	
+
 		//destructor
 		~ForceFeedbackManager();
 
@@ -77,7 +77,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 		void readConfigurationFromFileSection(const std::string &configFileUrl, const std::string &effectsSectionPath);
 
 		std::clock_t lastExecTime; //the current time
-		
+
 		void* menuXMLDescHdle;
 
 		std::clock_t animationStartTime; //when the animation started

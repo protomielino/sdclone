@@ -32,12 +32,12 @@
 //==========================================================================*
 // Deklaration der Klasse TPitParam
 //--------------------------------------------------------------------------*
-class TPitParam	 
+class TPitParam
 {
   private:
 
   public:
-	TPitParam();								  // Default constructor 
+	TPitParam();								  // Default constructor
 	~TPitParam();								  // Destructor
 
   public:
@@ -51,7 +51,7 @@ class TPitParam
 	double	oLatOffset;							  // Lateral offset of pit
 	double	oLongOffset;						  // Longitudinal	offset of pit
 
-	double	oStoppingDist;						  // Stopping distance 
+	double	oStoppingDist;						  // Stopping distance
 
 	int oUseFirstPit;							  // Use special path to first	pit
 	int oUseSmoothPit;							  // Use smoothing pitlane

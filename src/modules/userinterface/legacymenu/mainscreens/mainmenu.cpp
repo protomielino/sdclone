@@ -97,7 +97,7 @@ onMainMenuActivate(void * /* dummy */)
  *	0 ok -1 nok
  *
  * Remarks
- *	
+ *
  */
 
 void *
@@ -107,9 +107,9 @@ MainMenuInit(bool SupportsHumanDrivers)
     if (MenuHandle)
         return MenuHandle;
 
-    MenuHandle = GfuiScreenCreate((float*)NULL, 
-				    NULL, onMainMenuActivate, 
-				    NULL, (tfuiCallback)NULL, 
+    MenuHandle = GfuiScreenCreate((float*)NULL,
+				    NULL, onMainMenuActivate,
+				    NULL, (tfuiCallback)NULL,
 				    1);
 
     void *menuDescHdle = GfuiMenuLoad("mainmenu.xml");
@@ -148,12 +148,12 @@ MainMenuInit(bool SupportsHumanDrivers)
  *	0 ok -1 nok
  *
  * Remarks
- *	
+ *
  */
 int
 MainMenuRun(void)
 {
     GfuiScreenActivate(MenuHandle);
-	
+
     return 0;
 }

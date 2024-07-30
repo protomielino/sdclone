@@ -10,16 +10,16 @@ public class ObjShapeObject extends Segment
 	// color
 	private int					rgb;
 	private Color				color;
-	
+
 	// position
 	private int					imageX = Integer.MAX_VALUE;
 	private int					imageY = Integer.MAX_VALUE;
-	
+
 	// shape info
 	private Point2D.Double		location 	= new Point2D.Double(0, 0);
 	private double				width		= defaultSize;
 	private double				height		= defaultSize;
-	
+
 	public ObjShapeObject(int rgb, int imageX, int imageY)
 	{
 		super("object");
@@ -28,7 +28,7 @@ public class ObjShapeObject extends Segment
 		this.imageX = imageX;
 		this.imageY = imageY;
 	}
-			
+
 	public ObjShapeObject(String name, int rgb, int imageX, int imageY)
 	{
 		super(name, "object");
@@ -112,7 +112,7 @@ public class ObjShapeObject extends Segment
 		imageX = x;
 		imageY = y;
 	}
-	
+
 	public final Point2D.Double getTrackLocation() {
 		return location;
 	}
@@ -147,7 +147,7 @@ public class ObjShapeObject extends Segment
 	{
 		this.location.x = location.x;
 		this.location.y = location.y;
-		
+
 		if (points == null)
 		{
 			points = new Point3D[4]; // 4 points in 2D
@@ -173,12 +173,12 @@ public class ObjShapeObject extends Segment
 
 		setBounds();
 	}
-	
+
 	public void dump(String indent)
 	{
 		super.dump(indent);
-		
-		System.out.println(indent + "  ObjShapeObject");	
+
+		System.out.println(indent + "  ObjShapeObject");
 		System.out.println(indent + "    rgb         : " + String.format("0x%06X", rgb));
 		System.out.println(indent + "    color       : " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue());
 		System.out.println(indent + "    imageX      : " + imageX);

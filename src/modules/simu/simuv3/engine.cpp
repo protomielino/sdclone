@@ -209,7 +209,7 @@ SimEngineConfig(tCar *car)
 	//	);
 	float X=urandom();
     car->engine.rads = X*car->engine.tickover+(1-X)*car->engine.revsMax;
-    
+
     /*sanity check of rev limits*/
     if (car->engine.curve.nbPts > 0 && car->engine.revsMax > car->engine.curve.data[car->engine.curve.nbPts-1].rads) {
         car->engine.revsMax = car->engine.curve.data[car->engine.curve.nbPts-1].rads;

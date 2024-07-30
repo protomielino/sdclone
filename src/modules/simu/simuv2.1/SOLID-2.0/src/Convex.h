@@ -38,7 +38,7 @@
 
 class Convex : public Shape {
 public:
-  ShapeType getType() const { return CONVEX; } 
+  ShapeType getType() const { return CONVEX; }
 
   virtual ~Convex() {}
   virtual Point support(const Vector& v) const = 0;
@@ -50,17 +50,17 @@ bool intersect(const Convex& a, const Convex& b,
 	       const Transform& a2w, const Transform& b2w,
 	       Vector& v);
 
-bool intersect(const Convex& a, const Convex& b, const Transform& b2a, 
+bool intersect(const Convex& a, const Convex& b, const Transform& b2a,
 	       Vector& v);
-			
-bool common_point(const Convex& a, const Convex& b, 
+
+bool common_point(const Convex& a, const Convex& b,
 		  const Transform& a2w, const Transform& b2w,
 		  Vector& v, Point& pa, Point& pb);
 
 bool common_point(const Convex& a, const Convex& b, const Transform& b2a,
 		  Vector& v, Point& pa, Point& pb);
 
-void closest_points(const Convex&, const Convex&, 
+void closest_points(const Convex&, const Convex&,
 		    const Transform&, const Transform&,
 		    Point&, Point&);
 

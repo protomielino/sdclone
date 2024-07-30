@@ -39,10 +39,10 @@
  * FUNCTION:
  *	Creates a new element
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	name and attributes
  *
- * RETURNS:	
+ * RETURNS:
  *	new element created
  *
  */
@@ -54,8 +54,8 @@ NewElt(const char *name, const char **atts)
     const char		*s1, *s2;
     txmlElement		*newElt;
     txmlAttribute	*newAttr;
-    
-    
+
+
     /* Create a new element */
     if ((newElt = (txmlElement*)malloc(sizeof(txmlElement))) == NULL) {
 	return (txmlElement*)NULL;
@@ -108,12 +108,12 @@ NewElt(const char *name, const char **atts)
  *	Create and Insert a new element in the sub-list of
  *	the element given in parameter
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	curElt	element
  *	name	name of the new element
  *	atts	attribute list of the new element
  *
- * RETURNS:	
+ * RETURNS:
  *	the new element created.
  *
  * NOTE:
@@ -123,9 +123,9 @@ txmlElement *
 xmlInsertElt(txmlElement *curElt, const char *name, const char **atts)
 {
     txmlElement		*newElt;
-    
+
     newElt = NewElt(name, atts);
-    
+
     if (curElt) {
 	if (curElt->sub == NULL) {
 	    curElt->sub = newElt;
@@ -138,7 +138,7 @@ xmlInsertElt(txmlElement *curElt, const char *name, const char **atts)
 	newElt->up = curElt;
 	newElt->level = curElt->level + 1;
     }
-    
+
     return newElt;
 }
 
@@ -147,19 +147,19 @@ xmlInsertElt(txmlElement *curElt, const char *name, const char **atts)
  *	startElement
  *
  * Description
- *	
+ *
  *
  * Parameters
- *	
+ *
  *
  * Return
- *	
+ *
  */
-static void 
+static void
 startElement(void *userData, const char *name, const char **atts)
 {
     txmlElement **curElt = (txmlElement **)userData;
-    
+
     *curElt = xmlInsertElt(*curElt, name, atts);
 }
 
@@ -168,30 +168,30 @@ startElement(void *userData, const char *name, const char **atts)
  *	endElement
  *
  * Description
- *	
+ *
  *
  * Parameters
- *	
+ *
  *
  * Return
  *	none
  */
-static void 
+static void
 endElement(void *userData, const char * /* name */)
 {
     txmlElement **curElt = (txmlElement **)userData;
-    
+
     if ((*curElt)->up != NULL) {
 	*curElt = (*curElt)->up;
     }
 }
 
-static void 
+static void
 CharacterData(void *userData, const char *s, int len)
 {
     char *s1,*s2,*s3;
     txmlElement **curElt = (txmlElement **)userData;
-    
+
     if ((s1 = (char*)malloc(len+1)) == NULL) {
 	return;
     }
@@ -202,13 +202,13 @@ CharacterData(void *userData, const char *s, int len)
     while ((*s2 == ' ') || (*s2 == '\t') || (*s2 == '\n')) {
 	s2++;
     }
-    
+
     /* remove spaces at the end */
     s3 = s1+len-1;
     while (((*s3 == ' ') || (*s3 == '\t') || (*s3 == '\n')) && (s3 > s2)) {
 	s3--;
     }
-    
+
     if (s3 > s2) {
 	*(s3+1) = 0;
 	(*curElt)->pcdata = strdup(s2);
@@ -231,7 +231,7 @@ CharacterData(void *userData, const char *s, int len)
  *	NULL	error.
  *
  * Remarks
- *	
+ *
  */
 txmlElement *
 xmlReadFile(const char *file)
@@ -241,12 +241,12 @@ xmlReadFile(const char *file)
     XML_Parser		parser;
     int			done;
     txmlElement		*retElt;
-	
+
     if ((in = fopen(file, "r")) == NULL) {
         fprintf(stderr, "xmlReadFile: file %s has pb (access rights ?)\n", file);
 	return (txmlElement*)NULL;
     }
-    
+
     parser = XML_ParserCreate((XML_Char*)NULL);
     XML_SetUserData(parser, &retElt);
     XML_SetElementHandler(parser, startElement, endElement);
@@ -272,7 +272,7 @@ wr(int indent, const char *buf, FILE *out)
 {
     char		blank[BUFMAX];
     int			i;
-    
+
     for(i = 0; i < indent*2; i++) blank[i] = ' ';
     blank[i] = 0;
     fprintf(out, "%s%s", blank, buf);
@@ -284,9 +284,9 @@ wrrec(txmlElement *startElt, FILE *out)
     txmlElement		*curElt;
     txmlAttribute	*curAttr;
     char		buf[BUFMAX];
-    
+
     curElt = startElt;
-    
+
     if (curElt) {
 	wr(0, "\n", out);
 	do {
@@ -350,9 +350,9 @@ xmlWriteFile(const char *file, txmlElement *startElt, char *dtd)
     sprintf(buf, "\n<!DOCTYPE params SYSTEM \"%s\">\n\n", dtd);
     wr(0, buf, out);
 
-    wrrec(startElt, out);		
+    wrrec(startElt, out);
     wr(0, "\n", out);
-    
+
     fclose(out);
     return 0;
 }
@@ -364,11 +364,11 @@ xmlWriteFile(const char *file, txmlElement *startElt, char *dtd)
  * FUNCTION:
  *	Get the attribute value of an element
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	curElt		element to consider
  *	attrname	name of the attribute
  *
- * RETURNS:	
+ * RETURNS:
  *	the attribute value or NULL if attribute is not present
  *
  */
@@ -396,10 +396,10 @@ xmlGetAttr(txmlElement *curElt, char *attrname)
  * FUNCTION:
  *	Get the next element (same level)
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *
- * RETURNS:	
+ * RETURNS:
  *	the next element or NULL if no more element
  *	at the same level
  *
@@ -408,7 +408,7 @@ txmlElement *
 xmlNextElt(txmlElement *startElt)
 {
     txmlElement *curElt;
-    
+
     curElt = startElt->next;
     if (curElt->up != NULL) {
 	if (curElt->up->sub->next == curElt) {
@@ -422,15 +422,15 @@ xmlNextElt(txmlElement *startElt)
 
 /*
  * NAME:
- *	xmlSubElt	
+ *	xmlSubElt
  *
  * FUNCTION:
  *	Get the first sub-element (nested level)
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *
- * RETURNS:	
+ * RETURNS:
  *	the first sub-element or NULL if no sub-element
  *
  */
@@ -440,7 +440,7 @@ xmlSubElt(txmlElement *startElt)
     if (startElt->sub != NULL) {
 	return startElt->sub->next;
     }
-    
+
     return (txmlElement*)NULL;
 }
 
@@ -452,10 +452,10 @@ xmlSubElt(txmlElement *startElt)
  * FUNCTION:
  *	Walk all the tree
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *
- * RETURNS:	
+ * RETURNS:
  *	the next element in the tree or NULL if all the tree
  *	has been parsed.
  *
@@ -464,7 +464,7 @@ txmlElement *
 xmlWalkElt(txmlElement *startElt)
 {
     txmlElement *curElt;
-    
+
     curElt = startElt;
     /* in depth first */
     if (curElt->sub != NULL) {
@@ -475,7 +475,7 @@ xmlWalkElt(txmlElement *startElt)
     if ((curElt->up != NULL) && (curElt != curElt->up->sub)) {
 	return curElt->next;
     }
-    
+
     /* end of the ring should go upward */
     while (curElt->up != NULL) {
 	curElt = curElt->up;
@@ -495,11 +495,11 @@ xmlWalkElt(txmlElement *startElt)
  * FUNCTION:
  *	walk a sub-tree
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *	topElt		sub-tree root
  *
- * RETURNS:	
+ * RETURNS:
  *	next element in in-depth search or NULL if all sub-tree has been parsed
  *
  */
@@ -507,7 +507,7 @@ txmlElement *
 xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt)
 {
     txmlElement *curElt;
-    
+
     curElt = startElt;
     /* in depth first */
     if (curElt->sub != NULL) {
@@ -518,7 +518,7 @@ xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt)
     if ((curElt->up != NULL) && (curElt != curElt->up->sub) && (curElt != topElt)) {
 	return curElt->next;
     }
-    
+
     /* end of the ring should go upward */
     while ((curElt->up != NULL) && (curElt != topElt)) {
 	curElt = curElt->up;
@@ -538,11 +538,11 @@ xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt)
  * FUNCTION:
  *	Find the next element corresponding to name
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *	name		name of the element to find
  *
- * RETURNS:	
+ * RETURNS:
  *	pointer on next element corresponding to name
  *	or NULL if no more.
  *
@@ -551,7 +551,7 @@ txmlElement *
 xmlFindNextElt(txmlElement *startElt, char *name)
 {
     txmlElement		*curElt;
-    
+
     curElt = startElt;
     curElt = xmlWalkElt(curElt);
     while (curElt) {
@@ -561,7 +561,7 @@ xmlFindNextElt(txmlElement *startElt, char *name)
 	curElt = xmlWalkElt(curElt);
     }
     return (txmlElement*)NULL;
-}    
+}
 
 
 /*
@@ -571,13 +571,13 @@ xmlFindNextElt(txmlElement *startElt, char *name)
  * FUNCTION:
  *	Find an element with its name an an attribute value
  *
- * PARAMETERS:	
+ * PARAMETERS:
  *	startElt	element to start with
  *	name		name of the element to search
  *	attrname	attribute name
  *	attrvalue	attribute value of the searched element
  *
- * RETURNS:	
+ * RETURNS:
  *	the corresponding element or NULL if not found
  *
  */
@@ -586,7 +586,7 @@ xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalu
 {
     txmlElement		*curElt;
     txmlAttribute	*cutAttr;
-    
+
     curElt = startElt;
     curElt = xmlWalkElt(curElt);
     while (curElt) {

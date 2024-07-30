@@ -46,10 +46,10 @@
 //==========================================================================*
 // Deklaration der Klasse TParam
 //--------------------------------------------------------------------------*
-class TParam  
+class TParam
 {
   public:
-	TParam();									  //	Default	constructor	
+	TParam();									  //	Default	constructor
 	~TParam();									  // Destructor
 
 	void Initialize

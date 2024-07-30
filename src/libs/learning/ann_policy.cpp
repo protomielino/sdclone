@@ -20,7 +20,7 @@ ANN_Policy::ANN_Policy (int n_states, int n_actions, int n_hidden, real alpha, r
 	this->eligibility = eligibility;
 	if (eligibility) {
 		message ("Using eligibility traces");
-	}	
+	}
 	if (separate_actions) {
 		message ("Separate actions");
 		J = NULL;
@@ -118,8 +118,8 @@ int ANN_Policy::SelectAction (real* s, real r, int forced_a)
 	}
 
 	switch (learning_method) {
-		
-	case Sarsa: 
+
+	case Sarsa:
 		amax = a;
 		break;
 	case QLearning:
@@ -176,7 +176,7 @@ void ANN_Policy::Reset()
 {
 	if (separate_actions)
 	{
-		for (int i=0; i<n_actions; i++) 
+		for (int i=0; i<n_actions; i++)
 		{
 			ANN_Reset (Ja[i]);
 		}
@@ -187,13 +187,13 @@ void ANN_Policy::Reset()
 
 /// Set to use confidence estimates for action selection, with
 /// variance smoothing zeta.
-bool ANN_Policy::useConfidenceEstimates (bool confid, real zet) 
+bool ANN_Policy::useConfidenceEstimates (bool confid, real zet)
 {
 	this->confidence = confid;
 	this->zeta = zet;
 	if (separate_actions)
 	{
-		for (int i=0; i<n_actions; i++) 
+		for (int i=0; i<n_actions; i++)
 		{
 			ANN_SetZeta(Ja[i], zeta);
 		}
@@ -202,11 +202,11 @@ bool ANN_Policy::useConfidenceEstimates (bool confid, real zet)
 		ANN_SetZeta(J, zeta);
 	}
 
-	if (confidence) 
+	if (confidence)
 	{
 		logmsg ("#+[CONDIFENCE]\n");
-	} 
-	else 
+	}
+	else
 	{
 		logmsg ("#-[CONDIFENCE]\n");
 	}

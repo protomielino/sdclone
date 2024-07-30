@@ -31,23 +31,23 @@
 #  include <GL/gl.h>
 #  include <GL/glu.h>
 #  include <GL/glext.h>
-#endif 
+#endif
 
 #include "tgfclient.h"
 
 
-/* OpenGL features interface 
+/* OpenGL features interface
 
    Makes the difference between "selected", "supported" and "enabled" features :
    - "selected" means that the user choosed to use the feature
      (through the OpenGL option menu or the screen.xml file),
    - "supported" means that the underlying hardware/driver actually supports the feature,
    - "enabled" means that the feature is actually enabled in the underlying hardware/driver.
-   
+
    GfglFeatures generally doesn't automatically select features : call select() for this
    (Exceptions: MultiTexturingUnits = all available ones, MultiSamplingSamples = max level).
    GfglFeatures doesn't enables features : not done here.
-   
+
    A feature that is not supported can not be selected (or enabled).
    A feature that is selected is not necessarily enabled (not done here).
    Integer features must follow an "increasing order" : a value better value is greater,
@@ -57,7 +57,7 @@
 class TGFCLIENT_API GfglFeatures
 {
  public:
-	
+
 	// Access to the unique instance.
 	static GfglFeatures& self();
 
@@ -72,15 +72,15 @@ class TGFCLIENT_API GfglFeatures
 
 	// Dump detected supported features (in the current trace stream).
 	void dumpSupport() const;
-	
+
 	// Load user-selected features from the config file (default = GFSCR_CONF_FILE).
 	// Precondiftion: checkBestSupport() or checkStandardSupport().
 	void loadSelection(void* hparmConfig = 0);
-	
+
 	// Store user-selected features to the config file (default = GFSCR_CONF_FILE).
 	// Precondiftion: loadSelection()
 	void storeSelection(void* hparmConfig = 0) const;
-	
+
 	// Dump user-selected features (in the current trace stream).
 	void dumpSelection() const;
 
@@ -120,9 +120,9 @@ class TGFCLIENT_API GfglFeatures
 
 	// Get the pointer to the named OpenGL extension function.
 	static void* getProcAddress(const char* pszName);
-	
+
  private:
-	
+
 	//! Singleton pattern => private constructor.
 	GfglFeatures();
 
@@ -138,7 +138,7 @@ class TGFCLIENT_API GfglFeatures
 
 	static void* openConfigFile();
 	static void closeConfigFile(void* hparmConfig, bool bWrite = false);
-	
+
  private:
 
 	//! The unique instance (singleton pattern).
@@ -146,7 +146,7 @@ class TGFCLIENT_API GfglFeatures
 
 	//! The config files params pointer.
 	//void* hparmConfig;
-	
+
 	//! Maps of supported features (bool and int-valued).
 	std::map<EFeatureBool, bool> _mapSupportedBool;
 	std::map<EFeatureInt, int>   _mapSupportedInt;

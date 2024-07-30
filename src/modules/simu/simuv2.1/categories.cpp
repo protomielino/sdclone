@@ -2,9 +2,9 @@
 
     file        : categories.cpp
     created     : Sun Dec 15 11:12:56 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espi�
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */

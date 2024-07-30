@@ -39,7 +39,7 @@ Cars:
   also removed now useless tex-wheel.rgb from all cars (Jean-Philippe)
 - set fictious brand and model names for all cars, based on ideas from the whole team,
   to avoid legal issues ; the real brand name replacements follows (Andrew, Jean-Philippe) :
-  * Alfa Romeo 		=> Milano		
+  * Alfa Romeo 		=> Milano
   * Aston Martin 	=> Archer
   * Auto Union 		=> Motor Union
   * Audi 		=> Vieringe
@@ -62,8 +62,8 @@ Cars:
   * Nissan 		=> Kanagawa
   * Peugeot 		=> Lion
   * Porsche 		=> Boxer
-  * Subaru		=> Kenji 
-  * Toyota 		=> Aichi 
+  * Subaru		=> Kenji
+  * Toyota 		=> Aichi
   * TVR			=> RCM (Russian Car Manufacturer)
   * Lister 		=> ?  (a Storm model for LS1 is simply called the "Fury")
   * Mosler 		=> ?
@@ -97,14 +97,14 @@ Robots:
   through new team management interface in RobotTools (Wolf-Dieter)
 
 Menus:
-- splash screen / icons in NG variants by Eckhard M. Jager (Eckhard, Xavier, Jean-Philippe) 
+- splash screen / icons in NG variants by Eckhard M. Jager (Eckhard, Xavier, Jean-Philippe)
 - integrated Simu V3 and resurected Simulation menu by Cristos Dimitrakakis (Jean-Philippe)
 - applied GearChangeMode patch, that adds support for grid shifting (Jean-Philippe)
 - more resolutions available under Windows in Options/Display menu (Jean-Philippe)
 - updated race results and standings menus in order to display the driver "type"
   and used car for each driver (Jean-Philippe)
-  (driver "type" extracted from driver module name cut on the last "_" if any, 
-  for "ubiquitous" robots, or on the last char if it is an isolated digit, 
+  (driver "type" extracted from driver module name cut on the last "_" if any,
+  for "ubiquitous" robots, or on the last char if it is an isolated digit,
   for other robots with duplicate code)
 - improved the "driver select" menu and displayed info about car and driver type (Jean-Philippe)
   * added "car category" and "driver type" filters for the "not selected" driver scroll-list
@@ -139,19 +139,19 @@ Program:
 - renamed config.h to config-win32.h into repository to avoid committing it
   under Linux, where it is generated ; under Windows, config-win32.h
   is renamed to config.h by prebuild.bat (Jean-Philippe)
-- simuv2 update from far better (than 1.3.1) Torcs trunk, plus addition of 
+- simuv2 update from far better (than 1.3.1) Torcs trunk, plus addition of
   enhancements from simuv3 (Andrew).
 - models and textures no longer load for races in "results only" mode (Andrew)
 - applied single processor affinity patch (only for Windows Vista / 7
   otherwise rendering is jerky with multi-core CPUs) (Andrew, Xavier, Jean-Philippe)
 - spinning the drive wheels will now generate smoke (Andrew)
-- F2 camera views - order changed, and "driver" view modified to look in the 
+- F2 camera views - order changed, and "driver" view modified to look in the
   direction the car's turning - work in progress (Andrew)
 - renamed setup_win32.....bat files to prebuild...bat and postbuild...bat
-  (simpler names for easier selection in the explorer ; 
+  (simpler names for easier selection in the explorer ;
    2 useless files removed, now only 4) (Jean-Philippe)
 - applied NoMaxModuleInterfaces patch, that breaks the 10-limit of the maximum number
-  of interfaces a Speed Dreams run-time loadable module can have, 
+  of interfaces a Speed Dreams run-time loadable module can have,
   thus enabling robot modules for an unlimited number of cars (Jean-Philippe)
 - enhanced module management and module interface (in a backward compatible way) :
   a module can export 3 fixed named functions, "moduleWelcome" being called by Speed Dreams
@@ -242,7 +242,7 @@ Also included : Torcs changes since 1.3.0
   "forever stuck in the sand" and the "wheel spinning like mad and
   car stuck" problems (Bernhard).
 - Fixed XML parsing problem with entities (#1651190, reported by Carsten
-  Milkau) (Bernhard) 
+  Milkau) (Bernhard)
 - Code adjustments for VC 2005 (Eric).
 - Added car6-trb1 created by Wolf-Dieter Beelitz and reworked by Bernhard
   (Wolf-Dieter Beelitz, Bernhard).

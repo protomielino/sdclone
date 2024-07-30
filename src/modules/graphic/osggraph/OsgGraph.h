@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file    
+/** @file
             The "osggraph" graphics engine module
     @version    $Id: ssggraph.h 3741 2011-07-21 22:29:34Z pouillot $
 */

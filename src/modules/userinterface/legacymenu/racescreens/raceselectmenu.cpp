@@ -3,8 +3,8 @@
     file        : raceselectmenu.cpp
     created     : Sat Nov 16 09:36:29 CET 2002
     copyright   : (C) 2002 by Eric Espie
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Race selection menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -58,9 +58,9 @@ static void
 rmOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
-	
+
     LmRaceEngine().cleanup();
-	
+
 	LegacyMenu::self().shutdownGraphics(/*bUnloadModule=*/true);
 }
 
@@ -102,7 +102,7 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 	{
 		// Give the selected race manager to the race engine.
 		LmRaceEngine().selectRaceman(pSelRaceMan);
-		
+
 		// Start the race configuration menus sequence.
 		LmRaceEngine().configureRace(/* bInteractive */ true);
 	}
@@ -121,16 +121,16 @@ rmOnChangeRaceMan(tComboBoxInfo *)
 void *
 RmRaceSelectInit(void *prevMenu)
 {
-    if (RmRaceSelectMenuHandle) 
+    if (RmRaceSelectMenuHandle)
 		return RmRaceSelectMenuHandle;
 
 	// Ask the RaceEngine what types of races should be allowed here
 	bool SupportsHumanDrivers = LmRaceEngine().supportsHumanDrivers();
 
     // Create screen, load menu XML descriptor and create static controls.
-    RmRaceSelectMenuHandle = GfuiScreenCreate((float*)NULL, 
-											NULL, rmOnActivate, 
-											NULL, (tfuiCallback)NULL, 
+    RmRaceSelectMenuHandle = GfuiScreenCreate((float*)NULL,
+											NULL, rmOnActivate,
+											NULL, (tfuiCallback)NULL,
 											1);
 #if defined(CLIENT_SERVER)
     void *hMenuXMLDesc = GfuiMenuLoad("csraceselectmenu.xml");
@@ -184,7 +184,7 @@ RmRaceSelectInit(void *prevMenu)
 
 		if (!bCreateCombo)
 			continue;
-		
+
 		// Create the race manager sub-type combo-box.
 		std::string strComboCtrlName(*itRaceManType);
 		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
@@ -207,14 +207,14 @@ RmRaceSelectInit(void *prevMenu)
 		if (vecRaceMans.size() == 1)
 			GfuiEnable(RmRaceSelectMenuHandle, rmMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
 	}
-	
+
     // Create Back button
     GfuiMenuCreateButtonControl(RmRaceSelectMenuHandle, hMenuXMLDesc, "BackButton",
 								prevMenu, rmOnRaceSelectShutdown);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hMenuXMLDesc);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(RmRaceSelectMenuHandle);
     GfuiAddKey(RmRaceSelectMenuHandle, GFUIK_ESCAPE, "Back To Main Menu",

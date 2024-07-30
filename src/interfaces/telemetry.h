@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef _TELEMETRY_H_
 #define _TELEMETRY_H_
 
@@ -33,7 +33,7 @@ typedef void(*tftlmUpdate)(double /* time */);
 typedef void(*tftlmShutdown)(void);
 
 
-typedef struct 
+typedef struct
 {
     tftlmInit			init;			/* Init the telemetry */
     tftlmNewChannel		newChannel;		/* Create a new channel */
@@ -45,7 +45,7 @@ typedef struct
 
 
 
-#endif /* _TELEMETRY_H_ */ 
+#endif /* _TELEMETRY_H_ */
 
 
 

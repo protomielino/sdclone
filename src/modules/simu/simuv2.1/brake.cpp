@@ -19,11 +19,11 @@
 
 #include "sim.h"
 
-void 
+void
 SimBrakeConfig(void *hdle, const char *section, tBrake *brake)
 {
     tdble diam, area, mu;
-    
+
     diam     = GfParmGetNum(hdle, section, PRM_BRKDIAM, (char*)NULL, 0.2f);
     area     = GfParmGetNum(hdle, section, PRM_BRKAREA, (char*)NULL, 0.002f);
     mu       = GfParmGetNum(hdle, section, PRM_MU, (char*)NULL, 0.30f);
@@ -33,7 +33,7 @@ SimBrakeConfig(void *hdle, const char *section, tBrake *brake)
     brake->radius = diam/2.0f;
 }
 
-void 
+void
 SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
 {
     brake->Tq = brake->coeff * brake->pressure;
@@ -44,18 +44,18 @@ SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
     if (brake->temp > 1.0) brake->temp = 1.0;
 }
 
-void 
+void
 SimBrakeSystemConfig(tCar *car)
 {
     void *hdle = car->params;
-    
+
     car->brkSyst.rep   = GfParmGetNum(hdle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
     car->brkSyst.coeff = GfParmGetNum(hdle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, 1000000);
     car->brkSyst.ebrake_pressure = GfParmGetNum(hdle, SECT_BRKSYST, PRM_EBRKPRESS, (char*)NULL, 0.0);
-    
+
 }
 
-void 
+void
 SimBrakeSystemUpdate(tCar *car)
 {
     tBrakeSyst	*brkSyst = &(car->brkSyst);

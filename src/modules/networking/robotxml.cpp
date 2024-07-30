@@ -92,7 +92,7 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
         std::string strClient = GfParmGetStr(params, path2, "client",NULL);
         if (strClient == "yes")
             driver.client = true;
-        else 
+        else
             driver.client = false;
 
         strncpy(driver.car, GfParmGetStr(params, path2, "short name", NULL), 63);

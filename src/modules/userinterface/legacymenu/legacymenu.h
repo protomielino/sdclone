@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The "legacy menu" user interface module
     @version    $Id$
 */
@@ -59,10 +59,10 @@ public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate();
-	
+
 	//! Request exit of the event loop.
 	virtual void quit();
-	
+
 	//! Termination of the user interface.
 	virtual void shutdown();
 
@@ -87,7 +87,7 @@ public:
 
 	virtual bool onRaceStartingPaused();
 	virtual bool onRaceCooldownStarting();
-	
+
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText);
 
@@ -131,7 +131,7 @@ public:
 
 	//! Game screen management.
 	void activateGameScreen();
-	
+
 	//! Accessor to the graphics engine.
 	IGraphicsEngine* graphicsEngine();
 
@@ -142,7 +142,7 @@ public:
 
 	//! Protected constructor to avoid instanciation outside (but friends).
 	LegacyMenu(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	//! Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -156,14 +156,14 @@ public:
 	void shutdownGraphicsView();
 	void unloadCarsGraphics();
 	void unloadTrackGraphics();
-	void shutdownSound(); 
+	void shutdownSound();
 
 	//! Load stuff in the background of the splash screen (menus, XML data, ...).
 	static bool backLoad();
 
 	//! Activate the main menu.
 	static bool activateMainMenu();
-	
+
 	//! Direct race startup (race specified in command line args).
 	static bool startRace();
 
@@ -180,13 +180,13 @@ public:
 
 	//! The graphics engine.
 	IGraphicsEngine* _piGraphicsEngine;
-        
+
         //! The sound engine.
 	ISoundEngine* _piSoundEngine;
 
 	//! The "Race Engine update state" hook (a GfuiScreenActivate'able object).
 	void* _hscrReUpdateStateHook;
-	
+
 	//! The game screen.
 	void* _hscrGame;
 
@@ -200,5 +200,5 @@ inline extern IRaceEngine& LmRaceEngine()
 {
 	return LegacyMenu::self().raceEngine();
 }
-				  
-#endif /* _LEGACYMENU_H_ */ 
+
+#endif /* _LEGACYMENU_H_ */

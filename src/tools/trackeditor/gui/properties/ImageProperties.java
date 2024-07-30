@@ -114,8 +114,8 @@ public class ImageProperties extends PropertyPanel
 	{
 		Path filename = Paths.get(pathTextField.getText());
 		Path trackPath = Paths.get(Editor.getProperties().getPath());
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);

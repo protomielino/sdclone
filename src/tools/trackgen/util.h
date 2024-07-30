@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -36,7 +36,7 @@ extern bool loadPngTexture(const char *fname, ssgTextureInfo *info);
 extern bool loadJpegTexture(const char *fname, ssgTextureInfo *info);
 extern void dumpTrackSegs(tTrack *track);
 
-#endif /* _UTIL_H_ */ 
+#endif /* _UTIL_H_ */
 
 
 

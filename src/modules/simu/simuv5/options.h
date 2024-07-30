@@ -22,7 +22,7 @@
 
 #undef LOG_OPTIONS
 
-/** 
+/**
     \file Options.h
 
     \brief An abstract options framework.
@@ -37,7 +37,7 @@
 
 /// Abstract option class.
 class AbstractOption {
-protected: 
+protected:
     char* name; ///< name of abstract option
 public:
     virtual ~AbstractOption()
@@ -55,14 +55,14 @@ public:
 
 /**
    \brief Specialisation of options.
-   
-   This class is used to store, set and get 
+
+   This class is used to store, set and get
    values of options through template specialisation.
 */
 template <typename T> class Option : public AbstractOption {
 protected:
     T* value; ///< Actual value of option
-public:	
+public:
     /// Construct an option with literal name \c s and referenced value \c p
     Option(const char* s, T* p)
     {
@@ -97,7 +97,7 @@ public:
     }
 };
 
-/** 
+/**
     \brief Class for managing options.
 
     You can use this class to manage options.
@@ -172,7 +172,7 @@ public:
         std::cerr << "Warning: No option " << name << " found\n.";
     }
     /// Check whether \c name exists in the list.
-    bool Exists(const char* name) 
+    bool Exists(const char* name)
     {
         for (unsigned int i=0 ; i<options.size(); i++) {
             if (options[i]->Match(name)) {

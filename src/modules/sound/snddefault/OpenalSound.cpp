@@ -36,7 +36,7 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 	if (error != AL_NO_ERROR) {
 		printf("Uncatched OpenAL Error on entry: %d with file %s\n", error, filename);
 	}
-	
+
 	alGenBuffers (1, &buffer);
 	error = alGetError();
 	if (error != AL_NO_ERROR) {
@@ -101,14 +101,14 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 		is_enabled = false;
 		return;
 	}
-	
+
 	SDL_FreeWAV(wavbuf);
-	
+
 	if (!static_pool) {
 		is_enabled = true;
 		return;
 	}
-	
+
 	if (!sitf->getStaticSource(&source)) {
 		is_enabled = false;
 		printf("    No static sources left: %s\n", filename);
@@ -118,7 +118,7 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 		}
 		return;
 	} else {
-		is_enabled = true;	
+		is_enabled = true;
 	}
 
 	alSourcefv (source, AL_POSITION, source_position);
@@ -199,7 +199,7 @@ void OpenalSound::setReferenceDistance(float dist)
 		}
 	} else {
 		if (itf->getSourcePool()->isSourceActive(this, &poolindex)) {
-			alSourcef (source, AL_REFERENCE_DISTANCE, dist);		
+			alSourcef (source, AL_REFERENCE_DISTANCE, dist);
 			REFERENCE_DISTANCE = dist;
 		}
 	}
@@ -274,7 +274,7 @@ void OpenalSound::stop()
 			}
 		}
 	} else {
-		// Shared source.	
+		// Shared source.
 		if (itf->getSourcePool()->releaseSource(this, &poolindex)) {
 			if (playing) {
 				playing = false;
@@ -316,7 +316,7 @@ void OpenalSound::update ()
 			alSourcefv (source, AL_POSITION, source_position);
 			alSourcefv (source, AL_VELOCITY, zero_velocity);
 			alSourcef (source, AL_PITCH, pitch);
-			alSourcef (source, AL_GAIN, volume);		
+			alSourcef (source, AL_GAIN, volume);
 		}
 	}
 }

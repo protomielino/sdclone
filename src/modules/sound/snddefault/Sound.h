@@ -65,10 +65,10 @@ class Sound
 
 	/// Construct a sound.
 	Sound(unsigned int flags = (ACTIVE_VOLUME|ACTIVE_PITCH), bool loop = false);
-	
+
 	/// Destructor
 	virtual ~Sound();
-	
+
 	virtual void setVolume(float vol);
 	virtual void setPitch(float pitch);
 	virtual void setLPFilter(float lp);
@@ -87,7 +87,7 @@ class Sound
 	virtual void resume() = 0;
 	virtual void pause() = 0;
 	virtual void update() = 0;
-	
+
 	virtual bool isPlaying() const;
 	virtual bool isPaused() const;
 };
@@ -98,7 +98,7 @@ class Sound
  * describe the position, speed, environment and other aspects of the
  * sound's source. Each sound source can emit many different actual
  * sounds.
- * 
+ *
  * Since sources can be coupled to particular listeners, it is in
  * principle possible to implement multiple listeners, something which
  * should be extremely useful for same-computer multiplayer games.
@@ -106,7 +106,7 @@ class Sound
 class SoundSource
 {
  public:
-	
+
 	sgVec3 p_lis; ///< listener position for this source
 	sgVec3 u_lis; ///< listener velocity for this source
 	sgVec3 p_src; ///< source position

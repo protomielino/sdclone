@@ -37,7 +37,7 @@
 //==========================================================================*
 // Deklaration der Klasse TPidController
 //--------------------------------------------------------------------------*
-class TPidController  
+class TPidController
 {
 public:
 	TPidController();
@@ -55,7 +55,7 @@ public:
 
 	double	oP;
 	double	oI;
-	double	oD;	
+	double	oD;
 };
 //==========================================================================*
 #endif // _UNITPIDCTRL_H_

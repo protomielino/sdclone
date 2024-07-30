@@ -3,7 +3,7 @@
     file        : controlconfig.h
     created     : Wed Mar 12 22:09:01 CET 2003
     copyright   : (C) 2003 by Eric Espie
-    email       : eric.espie@torcs.org   
+    email       : eric.espie@torcs.org
     version     : $Id$
 
 ***************************************************************************/
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -29,4 +29,4 @@
 
 extern void *ForceFeedbackMenuInit(void *prevMenu, void *prefHdle, int curPlayerIdx, const std::string &carName);
 
-#endif 
+#endif

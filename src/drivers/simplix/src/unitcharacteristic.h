@@ -32,9 +32,9 @@
 #include "unitglobal.h"
 
 //==========================================================================*
-// Class TCharacteristic  
+// Class TCharacteristic
 //--------------------------------------------------------------------------*
-class TCharacteristic  
+class TCharacteristic
 {
   public:
 	TCharacteristic();                           // Default constructor
@@ -42,10 +42,10 @@ class TCharacteristic
 	TCharacteristic                              // Constructor
 	  (double Offset,                            //   Minimum
 	  double Max,                                //   Maximum
-	  int Count,                                 //   Nbr of increments 
+	  int Count,                                 //   Nbr of increments
 	  double Estimate);                          //   Initial estimate
 
-	~TCharacteristic();                          // Destructor 
+	~TCharacteristic();                          // Destructor
 
 	int	Count() const;                           // Nbr of increments
 

@@ -119,7 +119,7 @@ void SoundSource::update()
 		p[i] = p_src[i] -  p_lis[i];
 		p_rel += p[i]*p[i];
 	}
-    
+
 	a = 1.0;
 	f = 1.0f;
 	lp = 1.0f;

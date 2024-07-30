@@ -43,7 +43,7 @@ int closeGfModule()
 	// Unregister it from the GfModule module manager.
 	if (SimuV20::_pSelf)
 		GfModule::unregister(SimuV20::_pSelf);
-	
+
 	// Delete the (only) module instance.
 	delete SimuV20::_pSelf;
 	SimuV20::_pSelf = 0;

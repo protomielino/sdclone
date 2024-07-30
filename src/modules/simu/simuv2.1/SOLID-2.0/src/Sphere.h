@@ -38,7 +38,7 @@ public:
   Sphere(Scalar r) : radius(r) {}
 
   Point support(const Vector&) const;
-  
+
 protected:
   Scalar radius;
 };

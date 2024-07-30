@@ -76,7 +76,7 @@ void MonitorMenu::onChangeBezelComp(void *)
 		_nBezelComp = 100.0f;
     else if (_nBezelComp < 80.0f)
 		_nBezelComp = 80.0f;
-	
+
     char buf[32];
     sprintf(buf, "%g", _nBezelComp);
     GfuiEditboxSetString(PMonitorMenu->getMenuHandle(), nBezelCompID, buf);
@@ -117,7 +117,7 @@ void MonitorMenu::updateControls()
 {
 	int nControlId = getDynamicControlId("MonitorCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eMonitorType);
-	
+
 	nControlId = getDynamicControlId("SpanSplitCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eSpanSplit);
 
@@ -127,7 +127,7 @@ void MonitorMenu::updateControls()
 
 void MonitorMenu::loadSettings()
 {
-	void* grHandle = 
+	void* grHandle =
 		GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Monitor Type : 4:3, 16:9 or 21:9
@@ -148,7 +148,7 @@ void MonitorMenu::loadSettings()
 		_nBezelComp = 100.0f;
 	else if (_nBezelComp < 80.0f)
 		_nBezelComp = 80.0f;
-	
+
 	char buf[32];
 	sprintf(buf, "%g", _nBezelComp);
 	GfuiEditboxSetString(PMonitorMenu->getMenuHandle(), nBezelCompID, buf);
@@ -212,9 +212,9 @@ bool MonitorMenu::initialize(void *pPreviousMenu)
 	void *param = GfuiMenuLoad("monitorconfigmenu.xml");
 
 	openXMLDescriptor();
-    
+
 	createStaticControls();
-    
+
 	const int nMonitorTypeComboId =
 		createComboboxControl("MonitorTypeCombo", this, onChangeMonitorType);
 
@@ -257,7 +257,7 @@ void* MonitorMenuInit(void *pPreviousMenu)
 	if (!PMonitorMenu)
 	{
 		PMonitorMenu = new MonitorMenu;
-	
+
 		PMonitorMenu->initialize(pPreviousMenu);
 	}
 

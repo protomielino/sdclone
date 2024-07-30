@@ -38,18 +38,18 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
     int layers )
 {
     if (layers < 0) layers = 0;
-    
+
     this->type = car_light_type;
-    
+
     osg::ref_ptr<SDLightTransform> transform = new SDLightTransform;
     transform->setPosition(position);
     transform->setNormal(normal);
     transform->setMatrix(osg::Matrix::scale(size, size, size));
-    
+
     if (layers > 0) {
         const double s = 1;
         const double z = 0; // put 1 to move light bit close to camera
-        
+
         const osg::Vec3d vtx[] = {
             osg::Vec3d(-s,-s, z),
             osg::Vec3d( s,-s, z),
@@ -77,7 +77,7 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
 
         osg::Vec3dArray *normalArray = new osg::Vec3dArray;
         normalArray->push_back( osg::Vec3d(0.0, 0.0, -1.0) );
-        
+
         osg::Geometry *geometry = new osg::Geometry;
         geometry->setVertexArray(vertexArray);
         geometry->setTexCoordArray(0, texArray, osg::Array::BIND_PER_VERTEX);
@@ -90,7 +90,7 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
         geode->setStateSet(state_set);
         transform->addChild(geode);
     }
-    
+
     node = transform;
     return node;
 }
@@ -99,20 +99,20 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
 void SDCarLight::update(const SDCar &car)
 {
     const tCarElt *carElt = car.getCar();
-    
+
     bool visible = false;
     switch (type) {
     case CAR_LIGHT_TYPE_BRAKE:
     case CAR_LIGHT_TYPE_BRAKE2:
-        if (carElt->_brakeCmd>0 || carElt->_ebrakeCmd>0) 
+        if (carElt->_brakeCmd>0 || carElt->_ebrakeCmd>0)
             visible = true;
         break;
     case CAR_LIGHT_TYPE_FRONT:
-        if (carElt->_lightCmd & RM_LIGHT_HEAD1) 
+        if (carElt->_lightCmd & RM_LIGHT_HEAD1)
             visible = true;
         break;
     case CAR_LIGHT_TYPE_FRONT2:
-        if (carElt->_lightCmd & RM_LIGHT_HEAD2) 
+        if (carElt->_lightCmd & RM_LIGHT_HEAD2)
             visible = true;
         break;
     case CAR_LIGHT_TYPE_REAR:
@@ -128,7 +128,7 @@ void SDCarLight::update(const SDCar &car)
     default:
         break;
     }
-    
+
     node->setNodeMask(visible ? NODE_MASK_ALL : NODE_MASK_NONE);
 }
 
@@ -145,18 +145,18 @@ void SDCarLights::loadStates()
         "breaklight2.png",
         NULL
     };
-    
+
     osgLoader loader;
     loader.AddSearchPath("data/textures");
     loader.AddSearchPath("data/img");
     loader.AddSearchPath(".");
-    
+
     for(int i = 0; i < CAR_LIGHT_TYPE_COUNT; ++i) {
         state_sets[i].release();
-        
+
         if (!filenames[i])
             continue;
-        
+
         osg::ref_ptr<osg::Image> image = loader.LoadImageFile(filenames[i]);
         if (!image) {
             GfLogError("Failed to load car lights texture: %s\n", filenames[i]);

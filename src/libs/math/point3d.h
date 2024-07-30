@@ -45,14 +45,14 @@ enum {PX, PY, PZ};		    // axes
 class Point3D;
 istream& operator>> ( istream&, Point3D& );
 ostream& operator<< ( ostream&, const Point3D& );
-Point3D operator- (const Point3D& p);      
+Point3D operator- (const Point3D& p);
 bool operator== (const Point3D& a, const Point3D& b);
 
 /**
  * 3D Point class.
  */
 
-class Point3D 
+class Point3D
 {
 protected:
     double n[3];
@@ -85,7 +85,7 @@ public:
     void setradius(const double z);
     void setelev(const double z);
 
-    // Queries 
+    // Queries
 
     double& operator [] ( int i);		 // indexing
     double operator[] (int i) const;		 // read-only indexing
@@ -125,24 +125,24 @@ operator >> ( istream& in, Point3D& p)
 
     // read past optional comma
     while ( in.get(c) ) {
-	if ( (c != ' ') && (c != ',') ) 
+	if ( (c != ' ') && (c != ',') )
 	{
 	    in.putback(c);
 	    break;
 	}
     }
-	
+
     in >> p.n[PY];
-    
-    while ( in.get(c) ) 
+
+    while ( in.get(c) )
     {
-	if ( (c != ' ') && (c != ',') ) 
+	if ( (c != ' ') && (c != ',') )
 	{
 	    in.putback(c);
 	    break;
 	}
     }
-	
+
     in >> p.n[PZ];
 
     return in;
@@ -238,37 +238,37 @@ inline Point3D& Point3D::operator /= ( const double d )
     return *this;
 }
 
-inline void Point3D::setx(const double x) 
+inline void Point3D::setx(const double x)
 {
     n[PX] = x;
 }
 
-inline void Point3D::sety(const double y) 
+inline void Point3D::sety(const double y)
 {
     n[PY] = y;
 }
 
-inline void Point3D::setz(const double z) 
+inline void Point3D::setz(const double z)
 {
     n[PZ] = z;
 }
 
-inline void Point3D::setlon(const double x) 
+inline void Point3D::setlon(const double x)
 {
     n[PX] = x;
 }
 
-inline void Point3D::setlat(const double y) 
+inline void Point3D::setlat(const double y)
 {
     n[PY] = y;
 }
 
-inline void Point3D::setradius(const double z) 
+inline void Point3D::setradius(const double z)
 {
     n[PZ] = z;
 }
 
-inline void Point3D::setelev(const double z) 
+inline void Point3D::setelev(const double z)
 {
     n[PZ] = z;
 }
@@ -281,7 +281,7 @@ inline double& Point3D::operator [] ( int i)
     return n[i];
 }
 
-inline double Point3D::operator [] ( int i) const 
+inline double Point3D::operator [] ( int i) const
 {
     assert(! (i < PX || i > PZ));
     return n[i];

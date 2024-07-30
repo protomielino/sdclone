@@ -94,19 +94,19 @@ public class Reliefs
 						Ac3dSurface	surface = object.getSurfaces().get(j);
 						ObjShapeRelief.LineType lineType = surface.isOpenLine() ? ObjShapeRelief.LineType.Open : ObjShapeRelief.LineType.Closed;
 						Vector<double[]> vertices = new Vector<double[]>();
-							
+
 						for (int k = 0; k < surface.getRefs().size(); k++)
 						{
 							vertices.add(object.getVertices().get(surface.getRefs().get(k).index));
 						}
-							
+
 						reliefs.add(new ObjShapeRelief(object.getName(), type, lineType, vertices));
 					}
 				}
 			}
 		}
 	}
-	
+
 	public void writeFile() throws IOException
 	{
 		if (!changed)

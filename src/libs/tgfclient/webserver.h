@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
         The Gaming Framework API (client part).
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
@@ -53,10 +53,10 @@ class NotificationManager {
 		std::vector<std::string> msglist;
 
 		std::clock_t animationLastExecTime; //the current time
-	
+
 		//constructor
 		NotificationManager();
-	
+
 		//destructor
 		~NotificationManager();
 
@@ -69,9 +69,9 @@ class NotificationManager {
 		void removeOldUi();
 		void createUi();
 		void updateWebserverStatusUi();
-		
+
 		void* screenHandle;
-		void* prevScreenHandle;	
+		void* prevScreenHandle;
 		void* menuXMLDescHdle;
 		int	notifyUiIdBg;//the bg image uiid
 		int notifyUiIdBusyIcon; //the webserver busy icon
@@ -87,7 +87,7 @@ class NotificationManager {
 		int propertyFinalValue;
 		std::vector<std::string> messageLines;
 		int propertyChangeNeeded;
-		
+
 };
 
 
@@ -116,11 +116,11 @@ class TGFCLIENT_API WebServer {
 		//dynamic data retrieved with some request to the webserver
 		int userId;
 		const char* sessionId;
-		
+
 		//configuration readers
 		void readConfiguration();
 		int readUserConfig(int userId);
-		
+
 		//async requests
 
 		int addAsyncRequest(const std::string &data);

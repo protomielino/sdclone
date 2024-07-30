@@ -318,7 +318,7 @@ void GfuiEventLoop::forceRedisplay()
 #ifdef WEBSERVER
 	webServer().updateStatus();
 #endif //WEBSERVER
-	
+
 	if (_pPrivate->cbDisplay)
 		_pPrivate->cbDisplay();
 }
@@ -329,7 +329,7 @@ void GfuiEventLoop::redisplay()
 	#ifdef WEBSERVER
 	//temp
 	_pPrivate->bRedisplay=true;
-	#endif //WEBSERVER	
+	#endif //WEBSERVER
 
 	// Refresh display if requested and if any redisplay CB.
 	if (_pPrivate->bRedisplay)

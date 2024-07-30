@@ -26,7 +26,7 @@ SimAxleConfig(tCar *car, int index)
 {
     void	*hdle = car->params;
     tdble	rollCenter;
-    
+
     tAxle *axle = &(car->axle[index]);
 
     axle->xpos = GfParmGetNum(hdle, AxleSect[index], PRM_XPOS, (char*)NULL, 0);
@@ -50,7 +50,7 @@ void
 SimAxleUpdate(tCar *car, int index)
 {
     tAxle *axle = &(car->axle[index]);
-    
+
     tdble str = car->wheel[index*2].susp.x;
     tdble stl = car->wheel[index*2+1].susp.x;
     tdble delta = stl - str;
@@ -67,4 +67,4 @@ SimAxleUpdate(tCar *car, int index)
     car->wheel[index*2].axleFz =  F; // right wheel
     car->wheel[index*2+1].axleFz = - F; // left wheel
 }
- 
+

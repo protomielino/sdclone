@@ -3,7 +3,7 @@
     file        : racemessage.cpp
     created     : Sat Nov 23 09:05:23 CET 2002
     copyright   : (C) 2002 by Eric Espie
-    email       : eric.espie@torcs.org 
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Race message management. Don't use directly, call ReSituation::setRaceMessage.
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -44,7 +44,7 @@ ReRaceMsgManage(tRmInfo* pReInfo)
 		free(pReInfo->_reMessage);
 		pReInfo->_reMessage = 0;
 	}
-	
+
 	if (pReInfo->_reBigMessage && pReInfo->_reCurTime > pReInfo->_reBigMessageEnd)
 	{
 		free(pReInfo->_reBigMessage);

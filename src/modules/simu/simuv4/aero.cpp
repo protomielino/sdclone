@@ -353,7 +353,7 @@ SimWingConfig(tCar *car, int index)
     }
     else if (wing->WingType == 2)
     {
-        if (wing->AR > 0.001) 
+        if (wing->AR > 0.001)
         	wing->Kz1 = (tdble) (2 * PI * wing->AR / (wing->AR + 2));
         else
         	wing->Kz1 = (tdble)(2 * PI);

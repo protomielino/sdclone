@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : ssggraph.h
-    copyright   : (C) 2011 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
+    copyright   : (C) 2011 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The "ssggraph" graphics engine module
     @version    $Id$
 */
@@ -76,7 +76,7 @@ class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	SsgGraph(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -90,4 +90,4 @@ class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
 	ssgLoaderOptions* _pDefaultSSGLoaderOptions;
 };
 
-#endif /* _SSGGRAPH_H_ */ 
+#endif /* _SSGGRAPH_H_ */

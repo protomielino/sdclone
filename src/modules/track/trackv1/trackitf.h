@@ -2,7 +2,7 @@
 
     file                 : trackitf.h
     created              : Wed Mar 31 22:12:01 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
 
@@ -69,7 +69,7 @@ class TRACK_API TrackModule : public GfModule, public ITrackLoader //, public IT
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	TrackModule(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -80,7 +80,7 @@ class TRACK_API TrackModule : public GfModule, public ITrackLoader //, public IT
 	static TrackModule* _pSelf;
 };
 
-#endif /* _TRACKITF_H__ */ 
+#endif /* _TRACKITF_H__ */
 
 
 

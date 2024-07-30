@@ -21,7 +21,7 @@
 
 #include "ephemeris.h"
 
-ePhEphemeris::ePhEphemeris( const char *path ) 
+ePhEphemeris::ePhEphemeris( const char *path )
 {
     our_sun = new ePhStar;
     moon = new ePhMoonPos;
@@ -32,14 +32,14 @@ ePhEphemeris::ePhEphemeris( const char *path )
     saturn = new ePhSaturn;
     uranus = new ePhUranus;
     neptune = new ePhNeptune;
-    
+
     nplanets = 7;
     for ( int i = 0; i < nplanets; ++i )
       planets[i] = SGVec3d::zeros();
     stars = new ePhStarData( path );
 }
 
-ePhEphemeris::~ePhEphemeris( void ) 
+ePhEphemeris::~ePhEphemeris( void )
 {
     delete our_sun;
     delete moon;
@@ -55,7 +55,7 @@ ePhEphemeris::~ePhEphemeris( void )
 
 // Update (recalculate) the positions of all objects for the specified
 // time
-void ePhEphemeris::update( double mjd, double lst, double lat ) 
+void ePhEphemeris::update( double mjd, double lst, double lat )
 {
     our_sun->updatePosition( mjd );
     moon->updatePosition( mjd, lst, lat, our_sun );

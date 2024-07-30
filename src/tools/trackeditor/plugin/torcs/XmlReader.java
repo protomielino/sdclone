@@ -118,19 +118,19 @@ public class XmlReader
 			return e;
 		}
 	}
-	
+
 	private EditorFrame		editorFrame = null;
 	private String			filename	= null;
-	
+
 	public XmlReader(EditorFrame editorFrame)
 	{
 		this.editorFrame = editorFrame;
 	}
-	
+
     public void readXml(String filename) throws JDOMException, IOException
     {
     	this.filename = filename;
-    	
+
         Document doc = readFromFile(filename);
         Element element = doc.getRootElement();
         setTrackData(element);
@@ -162,7 +162,7 @@ public class XmlReader
     	sxb.setValidation(false);
     	sxb.setFeature("http://xml.org/sax/features/validation", false);
     	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);    	
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	Document doc = sxb.build(new InputSource(new StringReader(xml)));
     	Element root = doc.getRootElement();
     	Element surfaces = getChildWithName(root, "Surfaces");
@@ -189,7 +189,7 @@ public class XmlReader
     	sxb.setValidation(false);
     	sxb.setFeature("http://xml.org/sax/features/validation", false);
     	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);    	
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	Document doc = sxb.build(new InputSource(new StringReader(xml)));
     	Element root = doc.getRootElement();
     	Element surfaces = getChildWithName(root, "Objects");
@@ -280,7 +280,7 @@ public class XmlReader
 
         if (editorFrame.getTrackData().getHeader().getVersion() == 3)
         	cameras = getChildWithName(cameras, "list");
-        
+
         if (cameras == null)
             return;
 
@@ -511,7 +511,7 @@ public class XmlReader
         getObjects(objects, objectData);
         editorFrame.getTrackData().setObjects(objectData);
     }
-   
+
     /**
      * @param root
      */
@@ -557,7 +557,7 @@ public class XmlReader
         data.setDescription(getAttrStrValue(graphic, "3d description"));
         data.setDescriptionNight(getAttrStrValue(graphic, "3d description night"));
         data.setDescriptionRainNight(getAttrStrValue(graphic, "3d description rain+night"));
-        
+
         data.setSeparateObjects(getAttrStrValue(graphic, "3d separate objects"));
         data.setTerrainObjects(getAttrStrValue(graphic, "3d terrain"));
         data.setRoadObjects(getAttrStrValue(graphic, "3d road"));
@@ -579,7 +579,7 @@ public class XmlReader
         data.setBarrierObjects(getAttrStrValue(graphic, "3d barrier"));
         data.setWallObjects(getAttrStrValue(graphic, "3d wall"));
         data.setEnvironmentObjects(getAttrStrValue(graphic, "3d environment"));
-        
+
         data.setBackgroundImage(getAttrStrValue(graphic, "background image"));
         data.setBackgroundType(getAttrIntValue(graphic, "background type"));
         data.setBackgroundColorR(getAttrNumValue(graphic, "background color R"));
@@ -671,7 +671,7 @@ public class XmlReader
 	        		object.setOrientation(getAttrNumValue(el, "orientation", "deg"));
 	        		object.setHeight(getAttrNumValue(el, "height", "m"));
 	        		object.setUseMaterial(getAttrStrValue(el, "use material"));
-	        		
+
 	        		graphicObjects.add(object);
 	        	}
 	        	data.getTerrainGeneration().setGraphicObjects(graphicObjects);
@@ -755,7 +755,7 @@ public class XmlReader
         if (editorFrame.getPits().getStyle() == Integer.MAX_VALUE)
         {
         	String pitStyle = getAttrStrValue(pits, "type");
-        	
+
             if (pitStyle != null)
             {
          	   if (pitStyle.equals("no pit"))
@@ -850,7 +850,7 @@ public class XmlReader
     private synchronized void setSegments(Element mainTrack)
     {
     	List<?> segments;
-    	
+
         if (editorFrame.getTrackData().getHeader().getVersion() == 3)
             segments = getChildWithName(mainTrack, "segments").getChildren();
         else
@@ -1024,7 +1024,7 @@ public class XmlReader
             // try alternate representation used by some TORCS tracks
             if (part.getSideBankingType() == null)
             {
-                part.setSideBankingType(getAttrStrValue(el, "type"));            	
+                part.setSideBankingType(getAttrStrValue(el, "type"));
             }
         }
 
@@ -1148,7 +1148,7 @@ public class XmlReader
                 	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
                 	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
                 }
-                
+
                 if (!Double.isNaN(out))
                 {
                 	return new DoubleValue(out, e.getAttributeValue("unit"));
@@ -1176,11 +1176,11 @@ public class XmlReader
                 	String msg = filename + " : " + ((MyElement)e).getLineNumber() + " : " + e.getAttribute("name").getValue() + " : " + e.getAttributeValue("val");
                 	JOptionPane.showMessageDialog(editorFrame, msg, "Invalid number", JOptionPane.ERROR_MESSAGE);
                 }
-                
+
                 if (!Double.isNaN(out))
-                {               
+                {
                 	String actualUnit = e.getAttributeValue("unit");
-               
+
                 	if (actualUnit != null && !actualUnit.isEmpty())
                 	{
                 		if (!actualUnit.equals(expectedUnit))

@@ -50,23 +50,23 @@ public:
   void cleanObject(DtObjectRef obj);
 
   void setDefault(const Response& resp) { defaultResp = resp; }
-  
-  void setSingle(DtObjectRef obj, const Response& resp) { 
-    singleList[obj] = resp; 
+
+  void setSingle(DtObjectRef obj, const Response& resp) {
+    singleList[obj] = resp;
   }
 
   void resetSingle(DtObjectRef obj) { singleList.erase(obj); }
-  
+
   void setPair(DtObjectRef obj1, DtObjectRef obj2, const Response& resp) {
     pairList[make_ObjPair(obj1, obj2)] = resp;
   }
 
-  void resetPair(DtObjectRef obj1, DtObjectRef obj2) { 
-    pairList.erase(make_ObjPair(obj1, obj2)); 
+  void resetPair(DtObjectRef obj1, DtObjectRef obj2) {
+    pairList.erase(make_ObjPair(obj1, obj2));
   }
 
-    
-  
+
+
 private:
   Response defaultResp;
   SingleList singleList;

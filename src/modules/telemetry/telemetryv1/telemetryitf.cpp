@@ -38,24 +38,24 @@ BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
  *	telemInit
  *
  * Description
- *	
+ *
  *
  * Parameters
- *	
+ *
  *
  * Return
- *	
+ *
  */
 static int
 telemInit(int index, void *pt)
 {
     tTelemItf	*ptf = (tTelemItf*)pt;
-    
+
     ptf->init			= TlmInit;
     ptf->newChannel		= TlmNewChannel;
     ptf->startMonitoring	= TlmStartMonitoring;
     ptf->stopMonitoring		= TlmStopMonitoring;
-    ptf->update			= TlmUpdate;    
+    ptf->update			= TlmUpdate;
     ptf->shutdown		= TlmShutdown;
 
     return 0;
@@ -76,7 +76,7 @@ telemInit(int index, void *pt)
  *	welcomeOut : Module run-time information returned to the called
  *
  * Return
- *	0, if no error occured 
+ *	0, if no error occured
  *	non 0, otherwise
  *
  * Remarks
@@ -100,11 +100,11 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
  *	modInfo : Module interfaces info array to fill-in
  *
  * Return
- *	0, if no error occured 
+ *	0, if no error occured
  *	non 0, otherwise
  *
  * Remarks
- *	
+ *
  */
 extern "C" int
 moduleInitialize(tModInfo *modInfo)
@@ -129,11 +129,11 @@ moduleInitialize(tModInfo *modInfo)
  *	None
  *
  * Return
- *	0, if no error occured 
+ *	0, if no error occured
  *	non 0, otherwise
  *
  * Remarks
- *	
+ *
  */
 extern "C" int
 moduleTerminate()

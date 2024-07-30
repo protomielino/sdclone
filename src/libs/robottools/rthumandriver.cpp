@@ -727,7 +727,7 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
     // Set up glancing
     car->_oldglance = 0;
     car->_glance = 0;
-    
+
     // Set default for looking back command
     car->_lookback = false;
 
@@ -1338,7 +1338,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
             || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_LOOKBACK].val]) //if is a mouse button check if the button is pressed
             || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LOOKBACK].val)].state)//if is a keyboard key check if the key is pressed
             || (cmd[CMD_LOOKBACK].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LOOKBACK].deadZone != 0)//if it's a joypad axis check if the axis is not at rest position (0)
-        ) 
+        )
         ||
         (//or if both glance left and glance right buttons are pressed simultaneously
             ((cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_RIGHTGLANCE].val])

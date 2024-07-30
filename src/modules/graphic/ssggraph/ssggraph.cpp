@@ -140,7 +140,7 @@ Camera* SsgGraph::getCurCam()
     cam->Upv = gcam->getUpv();
     cam->Speedv = gcam->getSpeedv();
     cam->Posv = gcam->getPosv();
-  
+
     return cam;
 }
 

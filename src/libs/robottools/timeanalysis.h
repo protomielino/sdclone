@@ -4,7 +4,7 @@
     created              : Sun Jun 07 11:15:00 CET 2009
     copyright            : (C) 2009 by Wolf-Dieter Beelitz
     email                : wdbee@users.sourceforge.net
-    version              : 
+    version              :
 
  ***************************************************************************/
 
@@ -17,11 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     This is a collection of useful functions for time analysis
 
     @author	<a href=mailto:wdbee@users.sourceforge.net>Wolf-Dieter Beelitz</a>
-    @version	
+    @version
     @ingroup	robottools
 */
 
@@ -49,4 +49,4 @@ ROBOTTOOLS_API double RtDuration(double StartTimeStamp);// Calculate duration be
 //
 // End of robot developer API
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#endif /* _TIMEANALYSIS_H_ */ 
+#endif /* _TIMEANALYSIS_H_ */

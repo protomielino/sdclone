@@ -349,7 +349,7 @@ bool TOpponent::Classify(
 
 //	if ((fabs(OpState.CarDistLat) < 10) && (fabs(OpState.CarDistLong) < 30))
 //		 LogSimplix.error("Lat:	%g Long: %g\n",OpState.CarDistLat,OpState.CarDistLong);
-  
+
   if (OpState.RelPos < DistAhead &&	OpState.RelPos > -15)
   {
 	oInfo.Flags |=	F_TRAFFIC;					  //	Classify situation as traffic
@@ -460,7 +460,7 @@ bool TOpponent::Classify(
 			oInfo.CatchTime =					  // estimate time	to catch
 			(OpState.CarDistLong	+ OpState.MinDistLong) / OpState.CarDiffVelLong;
 			oInfo.CatchSpeed	= OpVelLong;		  // Save	Opps. speed
-			if ((oInfo.CatchTime	< 1)			  //	Catches	me in less than	2 secs	
+			if ((oInfo.CatchTime	< 1)			  //	Catches	me in less than	2 secs
 			&& (fabs(OpState.CarDistLat)	> OpState.MinDistLat))
 			  oInfo.Flags |=	F_BEHIND_FASTER;	  // Set flags
 		}

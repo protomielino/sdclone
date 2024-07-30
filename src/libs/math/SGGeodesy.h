@@ -30,18 +30,18 @@ public:
   /// Takes a cartesian coordinate data and returns the geodetic
   /// coordinates.
   static void SGCartToGeod(const SGVec3<double>& cart, SGGeod& geod);
-  
+
   /// Takes a geodetic coordinate data and returns the cartesian
   /// coordinates.
   static void SGGeodToCart(const SGGeod& geod, SGVec3<double>& cart);
-  
+
   /// Takes a geodetic coordinate data and returns the sea level radius.
   static double SGGeodToSeaLevelRadius(const SGGeod& geod);
 
   /// Takes a cartesian coordinate data and returns the geocentric
   /// coordinates.
   static void SGCartToGeoc(const SGVec3<double>& cart, SGGeoc& geoc);
-  
+
   /// Takes a geocentric coordinate data and returns the cartesian
   /// coordinates.
   static void SGGeocToCart(const SGGeoc& geoc, SGVec3<double>& cart);

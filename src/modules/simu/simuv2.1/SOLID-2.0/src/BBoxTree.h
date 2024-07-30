@@ -52,9 +52,9 @@ public:
   const Polytope *poly;
 
   BBoxLeaf() {}
-  BBoxLeaf(const Polytope *p) : poly(p) { 
+  BBoxLeaf(const Polytope *p) : poly(p) {
     tag = LEAF;
-    fitBBox(); 
+    fitBBox();
   }
 
   void fitBBox();

@@ -18,14 +18,14 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     This is a collection of useful functions for using a teammanager with
 	teams build of different robots.
 	It can handle teams with more drivers than cars per pit.
-	You can see how to use in the simplix robots. 
+	You can see how to use in the simplix robots.
 
     @author	<a href=mailto:wdbee@users.sourceforge.net>Wolf-Dieter Beelitz</a>
-    @version	
+    @version
     @ingroup	robottools
 */
 
@@ -62,12 +62,12 @@
 // Version header
 //
 typedef struct tDataStructVersionHeader
-{                                                // NEVER CHANGE THIS >>> 
-    short int MajorVersion;                      // Changed if struct is extended 
-    short int MinorVersion;                      // Changed for changes without extending the struct 
+{                                                // NEVER CHANGE THIS >>>
+    short int MajorVersion;                      // Changed if struct is extended
+    short int MinorVersion;                      // Changed for changes without extending the struct
 	int Size;                                    // sizeof the struct including this header
 	tDataStructVersionHeader* Next;              // Linked list for garbage collection
-                                                 // NEVER CHANGE THIS <<< 
+                                                 // NEVER CHANGE THIS <<<
 } tDataStructVersionHeader;
 
 
@@ -119,7 +119,7 @@ typedef struct tTeam
 //
 // Data of a driver beeing in the race
 //
-typedef struct tTeamDriver 
+typedef struct tTeamDriver
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
 	tTeamDriver* Next;                           // Linked list of drivers (containig all drivers of the race)
@@ -131,12 +131,12 @@ typedef struct tTeamDriver
 	float RemainingDistance;                     // Distance still to race
 	float Reserve;                               // Reserve in [m] to keep fuel for
 	float MinFuel;                               // Min fuel of all other teammates using this pit
-	int MinLaps;                                 // All Teammates using this pit have to be able to drive this nbr of laps 
+	int MinLaps;                                 // All Teammates using this pit have to be able to drive this nbr of laps
 	int FuelForLaps;                             // Driver has still fuel for this nbr of laps
 	int LapsRemaining;                           // Nbr of laps still to race
 	                                             // <<< NEVER CHANGE THIS V1.X
 	/*------------------------*/
-	/* V1.1 additional fields */             
+	/* V1.1 additional fields */
                                                  // NEVER CHANGE THIS >>> V1.1
 	// For beeing accepted while pitting ...
 	float StillToGo;                             // Longitudinal distance still to go
@@ -144,22 +144,22 @@ typedef struct tTeamDriver
 	float TooFastBy;                             // Speed over the limit
 												 // <<< NEVER CHANGE THIS V1.1
 												 // Extend it here if needed but increment VERSION!
-} tTeamDriver; 
+} tTeamDriver;
 
 //
 // Data of the one and only team manager
 //
-typedef struct 
+typedef struct
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
     tDataStructVersionHeader* GarbageCollection; // Linked List of allocated memory blocks used for destruction
 	tTeam* Teams;                                // Linked list of teams
 	tTeamDriver* TeamDrivers;                    // Linked list of drivers belonging to a team
 	tTrack* Track;                               // Track
-	tTeamDriver** Drivers;                       // Array of pointers to TeamDrivers 
+	tTeamDriver** Drivers;                       // Array of pointers to TeamDrivers
 	int State;                                   // State of team manager
 	int Count;                                   // Nbr of drivers in race
-	bool PitSharing;                             // Pit sharing activated? 
+	bool PitSharing;                             // Pit sharing activated?
 	float RaceDistance;							 // Distance to race
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment VERSION!
@@ -185,14 +185,14 @@ ROBOTTOOLS_API bool RtIsTeamMate                   // Check wether Car0 is Teamm
 ROBOTTOOLS_API short int RtTeamManagerGetMajorVersion(); // Get major version of used team manager data blocks
 ROBOTTOOLS_API short int RtTeamManagerGetMinorVersion(); // Get minor version of used team manager data blocks
 
-ROBOTTOOLS_API void RtTeamManagerShowInfo();     // Switch on team manager info output 
-ROBOTTOOLS_API void RtTeamManagerLaps(int Laps); // Nbr of laps to add for MinLaps 
+ROBOTTOOLS_API void RtTeamManagerShowInfo();     // Switch on team manager info output
+ROBOTTOOLS_API void RtTeamManagerLaps(int Laps); // Nbr of laps to add for MinLaps
 
 ROBOTTOOLS_API bool RtTeamManagerInit();         // Initialize team manager (is called by RtTeamManagerIndex
                                                  // and RtTeamManagerDump implicitly)
 
 ROBOTTOOLS_API int RtTeamManagerIndex(           // Add a Teammate to it's team (at NewRace)
-	CarElt* const Car,                           // -> teammate's car 
+	CarElt* const Car,                           // -> teammate's car
 	tTrack* const Track,                         // -> track
 	tSituation* Situation);                      // -> situaion
                                                  // <- TeamIndex as handle for the subsequent calls
@@ -204,18 +204,18 @@ ROBOTTOOLS_API void RtTeamManagerDump(int DumpMode = 0); // For tests: Dump cont
                                                          // -> DumpMode = 1, dump only after last driver has been added
                                                          // -> DumpMode = 0, dump only after last driver has been added if more than 1 driver is used
 
-ROBOTTOOLS_API void RtTeamManagerStart();                // Start team manager, needed to start if not all robots use it 
+ROBOTTOOLS_API void RtTeamManagerStart();                // Start team manager, needed to start if not all robots use it
 
 //
 // Team related functions for use by robots
 //
-ROBOTTOOLS_API bool RtTeamAllocatePit(   // Try to allocate the pit for use of this teammate 
+ROBOTTOOLS_API bool RtTeamAllocatePit(   // Try to allocate the pit for use of this teammate
 	const int TeamIndex);
 
 ROBOTTOOLS_API bool RtTeamIsPitFree(     // Check wether the pit to use is available
 	const int TeamIndex);
 
-ROBOTTOOLS_API bool RtTeamNeedPitStop(   // Check wether this teammate should got to pit for refueling 
+ROBOTTOOLS_API bool RtTeamNeedPitStop(   // Check wether this teammate should got to pit for refueling
 	const int TeamIndex,                 // (depends from the fuel of all other teammates using the same pit)
 	float FuelPerM,                      // Fuel consumption per m
 	int RepairWanted);                   // Damage to repair at next pitstop
@@ -223,7 +223,7 @@ ROBOTTOOLS_API bool RtTeamNeedPitStop(   // Check wether this teammate should go
 ROBOTTOOLS_API void RtTeamReleasePit(    // Release the pit
 	const int TeamIndex);
 
-ROBOTTOOLS_API int RtTeamUpdate(    // Get nbr of laps all other teammates using the same pit can still race 
+ROBOTTOOLS_API int RtTeamUpdate(    // Get nbr of laps all other teammates using the same pit can still race
 	const int TeamIndex,
 	const int FuelForLaps);         // -> Nbr of laps the driver has fuel for
                                     // <- Min nbr of laps all other teammates using the same pit have fuel for
@@ -234,11 +234,11 @@ ROBOTTOOLS_API int RtTeamUpdate(    // Get nbr of laps all other teammates using
 ROBOTTOOLS_API float RtTeamDriverRemainingDistance( // Get the remaining distance to race
 	const int TeamIndex);                           // Depends on beeing overlapped or not
 
-// V1.1 
+// V1.1
 ROBOTTOOLS_API tTeamDriver* RtTeamDriverByCar(      // Get the team driver's data by car*
 	CarElt* const Car);
 //
 // End of robot developer API
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-#endif /* _TEAMMANAGER_H_ */ 
+#endif /* _TEAMMANAGER_H_ */

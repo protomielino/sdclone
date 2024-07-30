@@ -17,8 +17,8 @@
 *                                                                         *
 ***************************************************************************/
 
-/** @file   
-			
+/** @file
+
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
 	@version	$Id$
  */

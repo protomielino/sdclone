@@ -95,10 +95,10 @@ void CarSetupMenu::onComboCallback(tComboBoxInfo *pInfo)
     pCarSetupMenu->onCombo(pInfo);
 }
 void CarSetupMenu::onPlusCallback(void *pInfo)
-{    
+{
     // Get the CarSetupMenu instance from call-back user data.
     ComboCallbackData* pInfoDer = static_cast<ComboCallbackData*>(pInfo);
-    
+
     CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu::ComboCallbackData *>(pInfoDer)->menu;
     int ctrlIndex = (pInfoDer)->index;
     pCarSetupMenu->onPlus(ctrlIndex);
@@ -107,7 +107,7 @@ void CarSetupMenu::onMinusCallback(void *pInfo)
 {
     // Get the CarSetupMenu instance from call-back user data.
     ComboCallbackData* pInfoDer = static_cast<ComboCallbackData*>(pInfo);
-    
+
     CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu::ComboCallbackData *>(pInfoDer)->menu;
     int ctrlIndex = (pInfoDer)->index;
     pCarSetupMenu->onMinus(ctrlIndex);
@@ -165,7 +165,7 @@ void CarSetupMenu::onReset()
         {
             att.strValue = att.defaultStrValue;
         }
-    }   
+    }
 
     // Update the GUI.
     updateControls();
@@ -272,7 +272,7 @@ void CarSetupMenu::updateControls()
         {
             ossLabel << att.label;
             if (!att.units.empty())
-                ossLabel << " (" << att.units << ")"; 
+                ossLabel << " (" << att.units << ")";
             ossLabel << ":";
         }
 
@@ -370,7 +370,7 @@ void CarSetupMenu::updateControls()
                     size_t selected = 0;
                     for (size_t i = 0; i < att.in.size(); ++i)
                     {
-                        GfuiComboboxAddText(getMenuHandle(), att.comboId, att.in[i].c_str()); 
+                        GfuiComboboxAddText(getMenuHandle(), att.comboId, att.in[i].c_str());
                         if (att.in[i] == att.strValue)
                             selected = i;
                     }
@@ -654,7 +654,7 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
     createMenu(NULL, this, onActivateCallback, NULL, (tfuiCallback)NULL, 1);
 
     openXMLDescriptor();
-    
+
     createStaticControls();
 
     createLabelControl("CarNameLabel");
@@ -669,7 +669,7 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
 		//add plus and minus (increase/decrease) buttons for the edit
 		createButtonControl(std::string("EditButtonMinus" + strIndex).c_str(), &comboCallbackData[index], onMinusCallback);
 		createButtonControl(std::string("EditButtonPlus" + strIndex).c_str(), &comboCallbackData[index], onPlusCallback);
-        
+
         createComboboxControl(std::string("Combo" + strIndex).c_str(), &comboCallbackData[index], onComboCallback);
         createLabelControl(std::string("DefaultLabel" + strIndex).c_str());
     }

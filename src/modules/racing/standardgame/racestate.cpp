@@ -3,7 +3,7 @@
     file        : racestate.cpp
     created     : Sat Nov 16 12:00:42 CET 2002
     copyright   : (C) 2002 by Eric Espie
-    email       : eric.espie@torcs.org   
+    email       : eric.espie@torcs.org
     version     : $Id$
  ***************************************************************************/
 
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		The Race Engine State Automaton
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -208,7 +208,7 @@ ReStateManage(void)
 
 		//GfLogDebug("ReStateManage : New state 0x%X, %sing.\n",
 		//		   ReInfo->_reState, (mode & RM_SYNC) ? "loop" : "return");
-		
+
 	} while (mode & RM_SYNC);
 }
 

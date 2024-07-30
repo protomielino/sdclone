@@ -6,8 +6,8 @@
     file                 : guimenusfx.h
     created              : Mon March 28 2022
     copyright            : (C) 2022
-    email                : 
-    version              : $Id: 
+    email                :
+    version              : $Id:
 
  ***************************************************************************/
 

@@ -40,15 +40,15 @@
 
 class Object {
 public:
-  Object(DtObjectRef obj, ShapePtr shape); 
-  
+  Object(DtObjectRef obj, ShapePtr shape);
+
   void move();
   void proceed();
 
   void translate(const Vector& v) { curr.translate(v); }
   void rotate(const Quaternion& q) { curr.rotate(q); }
   void scale(Scalar x, Scalar y, Scalar z) { curr.scale(x, y, z); }
-  
+
   void setIdentity() { curr.setIdentity(); }
 
   void setMatrix(const float v[16]) { curr.setValue(v); }
@@ -70,7 +70,7 @@ public:
 
 bool intersect(const Object&, const Object&, Vector& v);
 bool common_point(const Object&, const Object&, Vector&, Point&, Point&);
-bool prev_closest_points(const Object&, const Object&, 
+bool prev_closest_points(const Object&, const Object&,
 			 Vector&, Point&, Point&);
 #endif
 

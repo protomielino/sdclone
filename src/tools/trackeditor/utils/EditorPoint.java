@@ -32,7 +32,7 @@ public class EditorPoint
     double y;
 
     /**
-     * 
+     *
      */
     public EditorPoint()
     {
@@ -77,13 +77,13 @@ public class EditorPoint
     {
         this.y = y;
     }
-    
+
     public void setLocation(double x, double y)
     {
         this.x = x;
         this.y = y;
     }
-    
+
     public void setLocation(EditorPoint point)
     {
         this.x = point.getX();

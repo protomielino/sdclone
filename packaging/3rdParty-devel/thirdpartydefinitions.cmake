@@ -28,7 +28,7 @@
 #           NOTICE
 # When updating OpenSceneGraph, libPNG, or jpeg
 # Check /cmake/customthirdparty.cmake
-#  The macros 
+#  The macros
 #     MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 #     MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 #  may need to be updated for the new version
@@ -215,7 +215,7 @@ set(GLM_FILE ${GLM_PROJECT},tar.gz)
 set(GLM_URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.gz)
 set(GLM_HASH SHA256=9f3174561fd26904b23f0db5e560971cbf9b3cbda0b280f04d5c379d03bf234c)
 
-# TinyGLTF 
+# TinyGLTF
 set(TINYGLTF_VERSION 2.8.22)
 set(TINYGLTF_PROJECT TinyGLTF-${TINYGLTF_VERSION})
 set(TINYGLTF_FILE ${TINYGLTF_PROJECT}.tar.gz)

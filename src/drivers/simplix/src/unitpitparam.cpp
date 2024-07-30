@@ -4,8 +4,8 @@
 // A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // Interface to	TORCS
-// 
-// File			:	unitpitparam.cpp 
+//
+// File			:	unitpitparam.cpp
 // Created		: 2008.04.11
 // Last	changed	: 2014.11.29
 // Copyright	: © 2007-2014 Wolf-Dieter Beelitz
@@ -43,7 +43,7 @@ TPitParam::TPitParam():
   oExitLong(0.0),
   oExitLength(200.0f),
   oLaneEntryOffset(0.0),
-  oLaneExitOffset(0.0),		 
+  oLaneExitOffset(0.0),
   oLatOffset(0),
   oLongOffset(0),
   oStoppingDist(0.0),

@@ -37,7 +37,7 @@ class Correct {
     bool getOldAllowCorrecting() { return old_allow_correcting; }
     double getCorrectTimer() { return MAX(0.0, correct_timer - simtime); }
     double getCorrectLimiter() { return correct_limiter; }
-    
+
     void initCorrectValues();
     void update(double cursimtime, int aligned, int segtype);
     double CorrectSteer(double steer, double linesteer, int slowcorrect, double speed, double accel);

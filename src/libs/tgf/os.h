@@ -1,10 +1,10 @@
 /***************************************************************************
-                        Os.h --- os specific functions interface                                
-                             -------------------                                         
+                        Os.h --- os specific functions interface
+                             -------------------
     created              : Fri Aug 13 22:27:29 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef _OS__H_
 #define _OS__H_
 

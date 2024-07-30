@@ -8,7 +8,7 @@ public class ObjectMapObject
 	public ObjectMap 		objectMap;
 	public ObjShapeObject 	object;
 	public int				objectIndex;
-	
+
 	public ObjectMapObject(ObjectMap objectMap, ObjShapeObject object)
 	{
 		this.objectMap = objectMap;

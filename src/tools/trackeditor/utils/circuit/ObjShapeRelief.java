@@ -94,7 +94,7 @@ public class ObjShapeRelief extends Segment
 	public boolean isOpen()
 	{
 		return lineType == LineType.Open;
-	}	
+	}
 	public Vector<double[]> getVertices() {
 		return vertices;
 	}
@@ -167,13 +167,13 @@ public class ObjShapeRelief extends Segment
 			if (maxY < trPoints[i].y)
 				maxY = (int) (trPoints[i].y);
 		}
-		
+
 		if (minX == maxX)
 		{
 			minX -= 1;
 			maxX += 1;
 		}
-		
+
 		if (minY == maxY)
 		{
 			minY -= 1;
@@ -256,7 +256,7 @@ public class ObjShapeRelief extends Segment
 	{
 		if (points == null)
 			return;
-		
+
 		if (vertices.size() == 1)
 		{
 			points = null;
@@ -272,9 +272,9 @@ public class ObjShapeRelief extends Segment
 				points = null;
 				trPoints = null;
 				int next = (before ? i + vertices.size() - 1 : i + 1) % vertices.size();
-				int addAt = before ? i : (i + 1);				
+				int addAt = before ? i : (i + 1);
 				vertices.add(addAt, new double[] { vertices.get(i)[0] + ((vertices.get(next)[0] - vertices.get(i)[0]) / 2),
-												   vertices.get(i)[1] + ((vertices.get(next)[1] - vertices.get(i)[1]) / 2), 
+												   vertices.get(i)[1] + ((vertices.get(next)[1] - vertices.get(i)[1]) / 2),
 												   vertices.get(i)[2] + ((vertices.get(next)[2] - vertices.get(i)[2]) / 2) });
 				return;
 			}
@@ -326,7 +326,7 @@ public class ObjShapeRelief extends Segment
 	{
 		super.dump(indent);
 
-		System.out.println(indent + "  ObjShapeRelief");	
+		System.out.println(indent + "  ObjShapeRelief");
 		System.out.println(indent + "    reliefType       : " + reliefType.toString());
 		System.out.println(indent + "    lineType         : " + lineType.toString());
 		System.out.println(indent + "    vertices         : " + vertices.size());

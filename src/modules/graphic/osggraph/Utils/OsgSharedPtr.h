@@ -44,7 +44,7 @@ public:
   { get(_ptr); }
   ~SDSharedPtr(void)
   { put(); }
-  
+
   SDSharedPtr& operator=(const SDSharedPtr& p)
   { assign(p.get()); return *this; }
   template<typename U>
@@ -90,7 +90,7 @@ private:
   { T::get(p); }
   void put(void)
   { if (!T::put(_ptr)) delete _ptr; _ptr = 0; }
-  
+
   // The reference itself.
   T* _ptr;
 

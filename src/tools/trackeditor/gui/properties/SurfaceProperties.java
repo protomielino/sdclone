@@ -49,7 +49,7 @@ import utils.circuit.Surface;
 public class SurfaceProperties extends PropertyPanel
 {
 	static private Surface	surfaceCopy			= null;
-	
+
 	private	Boolean			defaultSurfaces		= false;
 	private	JButton			addSurfaceButton	= null;
 	private	JButton			deleteSurfaceButton	= null;
@@ -191,9 +191,9 @@ public class SurfaceProperties extends PropertyPanel
 							surface.setName(name);
 
 							tabbedPane.addTab(name, null, new SurfacePanel(surface), null);
-							tabbedPane.setSelectedIndex(0);						
+							tabbedPane.setSelectedIndex(0);
 						}
-						
+
 						setPanelFromSurface(surfaceCopy, (SurfacePanel) getTabbedPane().getSelectedComponent());
 					}
 				}
@@ -234,7 +234,7 @@ public class SurfaceProperties extends PropertyPanel
 			{
 				public void run()
 				{
-					int lastTab = getEditorFrame().getProject().getPropertiesEditorSurfaceTab();					
+					int lastTab = getEditorFrame().getProject().getPropertiesEditorSurfaceTab();
 					if (lastTab == -1 && tabbedPane.getTabCount() > 0)
 					{
 						lastTab = 0;
@@ -481,8 +481,8 @@ public class SurfaceProperties extends PropertyPanel
 
 		protected void textureNameFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -506,7 +506,7 @@ public class SurfaceProperties extends PropertyPanel
 				textureNameTextField.setText(fileName);
 			}
 		}
-		
+
 		/**
 		 * This method initializes bumpNameButton
 		 *
@@ -532,8 +532,8 @@ public class SurfaceProperties extends PropertyPanel
 
 		protected void bumpNameFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -557,7 +557,7 @@ public class SurfaceProperties extends PropertyPanel
 				bumpNameTextField.setText(fileName);
 			}
 		}
-		
+
 		/**
 		 * This method initializes racelineNameButton
 		 *
@@ -583,8 +583,8 @@ public class SurfaceProperties extends PropertyPanel
 
 		protected void racelineNameFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -845,8 +845,8 @@ public class SurfaceProperties extends PropertyPanel
 		setTextField(panel.colorR2TextField, surface.getColorR2());
 		setTextField(panel.colorG2TextField, surface.getColorG2());
 		setTextField(panel.colorB2TextField, surface.getColorB2());
-		panel.textureNameTextField.setText(new String(surface.getTextureName()));		
-		panel.textureTypeComboBox.setSelectedItem(toNoneString(surface.getTextureType()));		
+		panel.textureNameTextField.setText(new String(surface.getTextureName()));
+		panel.textureTypeComboBox.setSelectedItem(toNoneString(surface.getTextureType()));
 		setTextField(panel.textureSizeTextField, surface.getTextureSize());
 		panel.textureLinkWithPreviousComboBox.setSelectedItem(toNoneString(surface.getTextureLinkWithPrevious()));
 		panel.getTextureStartOnBoundaryComboBox().setSelectedItem(toNoneString(surface.getTextureStartOnBoundary()));

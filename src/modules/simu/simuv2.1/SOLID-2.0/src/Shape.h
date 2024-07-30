@@ -50,11 +50,11 @@ public:
 
 typedef const Shape *ShapePtr;
 
-typedef bool (*Intersect)(const Shape&, const Shape&, 
+typedef bool (*Intersect)(const Shape&, const Shape&,
 			  const Transform&, const Transform&,
 			  Vector&);
 
-typedef bool (*Common_point)(const Shape&, const Shape&, 
+typedef bool (*Common_point)(const Shape&, const Shape&,
 			     const Transform&, const Transform&,
 			     Vector&, Point&, Point&);
 

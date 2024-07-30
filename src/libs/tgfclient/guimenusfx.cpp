@@ -3,8 +3,8 @@
 	file                 : guimenusfx.cpp
 	created              : Mon March 28 2022
 	copyright            : (C) 2022
-	email                : 
-	version              : $Id: 
+	email                :
+	version              : $Id:
 
  ***************************************************************************/
 
@@ -80,7 +80,7 @@ bool initMixer()
 		if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) >= 0 )
 		{
 			mixerInitialized = true;
-		} 
+		}
 		else
 		{
 			GfLogError("Mix_OpenAudio() failed %s \n", Mix_GetError());
@@ -96,7 +96,7 @@ void readSfxConfig()
 	const char *sfxEnabledstr = GfParmGetStr(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_STATE, sfxDisabledStr);
 
 	float sfx_volume = GfParmGetNum(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_VOLUME, "%", 100.0f);
-	
+
 	if (sfx_volume>100.0f)
 		sfx_volume = 100.0f;
 	else if (sfx_volume < 0.0f)
@@ -178,7 +178,7 @@ void enableMenuSfx(bool enable /* true */)
 		if(enable == false)
 			gfuiShutdownMenuSfx();
 	}
-	else 
+	else
 	{
 		 if(enable == true)
 			 gfuiInitMenuSfx();

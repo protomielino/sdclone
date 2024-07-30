@@ -43,7 +43,7 @@ LISTITEM* ListAppend(LIST* list, void* p, void (*free_obj) (void* obj))
 	if (!p) {
 		Swarning("NULL pointer given for new list item data\n");
 	}
-  
+
 	if (!list->head) {
 		tmp = ListItem(p, free_obj);
 		list->head = tmp;
@@ -53,13 +53,13 @@ LISTITEM* ListAppend(LIST* list, void* p, void (*free_obj) (void* obj))
 	}
 
 	list->tail = tmp;
-  
+
 	list->n++;
-  
+
 	assert(list->head);
 	assert(list->curr);
 	assert(list->tail);
-  
+
 	return tmp;
 }
 
@@ -68,8 +68,8 @@ LISTITEM* NextListItem(LIST* list)
 {
 	LISTITEM* t;
 	assert(list);
-  
-	if (!list->curr) 
+
+	if (!list->curr)
 		return NULL;
 
 	t = GetNextItem(list->curr);
@@ -82,14 +82,14 @@ LISTITEM* FirstListItem(LIST* list)
 {
 	LISTITEM* t;
 	assert(list);
-  
+
 	t = list->head;
 
 	if (!t) {
 		//    Swarning("No First Item\n");
 		return NULL;
 	}
-  
+
 	list->curr = t;
 	return t;
 }
@@ -99,14 +99,14 @@ LISTITEM* LastListItem(LIST* list)
 {
 	LISTITEM* t;
 	assert(list);
-  
+
 	t = list->tail;
 
 	if (!t) {
 		//    Swarning("No Last Item\n");
 		return NULL;
 	}
-  
+
 	list->curr = t;
 	return t;
 }
@@ -140,7 +140,7 @@ LISTITEM* LinkNext(LISTITEM* src, void* ptr, void (*free_obj) (void* obj))
 
 	assert(ptr);
 	assert(src);
-  
+
 	if ((dst = ListItem(ptr, free_obj))==NULL) {
 		return NULL;
 	}
@@ -150,7 +150,7 @@ LISTITEM* LinkNext(LISTITEM* src, void* ptr, void (*free_obj) (void* obj))
 	}
 	dst->next = tmp;
 	dst->prev = src;
-	src->next = dst;  
+	src->next = dst;
 
 	return dst;
 }
@@ -161,7 +161,7 @@ LISTITEM* LinkPrev(LISTITEM* src, void* ptr, void (*free_obj) (void* obj))
 	return NULL;
 }
 
-LISTITEM* ListItem(void* ptr, void (*free_obj) (void* obj)) 
+LISTITEM* ListItem(void* ptr, void (*free_obj) (void* obj))
 {
 	LISTITEM* item = NULL;
 
@@ -171,7 +171,7 @@ LISTITEM* ListItem(void* ptr, void (*free_obj) (void* obj))
 		Serror("Failed to allocate new listitem\n");
 		return NULL;
 	}
-  
+
 	item->prev = NULL;
 	item->next = NULL;
 	item->obj = ptr;
@@ -206,7 +206,7 @@ int RemoveListItem(LIST* list, LISTITEM* ptr) {
 
 	prev = GetPrevItem(ptr);
 	next = GetNextItem(ptr);
-  
+
 	if (prev) {
 		if (prev->next != ptr) {
 			Swarning("prev->next Sanity check failed on list\n");
@@ -220,7 +220,7 @@ int RemoveListItem(LIST* list, LISTITEM* ptr) {
 			}
 		}
 	}
-  
+
 	if (next) {
 		if (next->prev != ptr) {
 			Swarning("next->prev Sanity check failed on list\n");
@@ -244,7 +244,7 @@ int RemoveListItem(LIST* list, LISTITEM* ptr) {
 
 	free(ptr);
 	return 0;
- 
+
 }
 
 
@@ -265,7 +265,7 @@ int PopItem(LIST* list) {
 
 	if (list->head==NULL) {
 		if (list->n) {
-			Swarning("List seems empty (%d items remaining?)",list->n);  
+			Swarning("List seems empty (%d items remaining?)",list->n);
 		}
 	} else {
 		assert(list->curr);

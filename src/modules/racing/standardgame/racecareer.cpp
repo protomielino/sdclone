@@ -1,8 +1,8 @@
 /**************************************************************************
 
     file        : racecareer.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    copyright   : (C) 2007 by Mart Kelder
+    web         : http://speed-dreams.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -16,8 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		Career race management 
+/** @file
+    		Career race management
 */
 
 #include <ctime>
@@ -262,7 +262,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 		if( GfParmListSeekNext(ReInfo->params, RM_SECT_LASTNAME) != 0 )
 			GfParmListSeekFirst(ReInfo->params, RM_SECT_LASTNAME);
 		GfParmSetNum(curParam, path2, RM_ATTR_SKILLLEVEL, NULL, (tdble) ReCareerNewSkill( GfParmGetEltNb( ReInfo->params, RM_SECT_CLASSES ), classNb ) );
-	
+
 		/* Add a driver to the result section */
 		snprintf( buf, sizeof(buf), "%s/%s/%d/%d/%s", RE_SECT_CLASSPOINTS, "simplix", 1, xx, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
 		GfParmSetNum( curResult, buf, RE_ATTR_POINTS, NULL, 1.0f );
@@ -301,7 +301,7 @@ static void ReCareerNewAddTeams( void *curParam, void *curResult, int curIndex, 
 	} while( cur < end );
 
 	GfParmListClean( curParam, RM_SECT_TEAMS );
-	
+
 }
 
 static void ReCareerNewDrivers()
@@ -410,7 +410,7 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 		GfLogError( "Subfile %s not found\n", buf );
 		return prevParam;
 	}
-	
+
 	nbGroups = (int)GfParmGetCurNum( ReInfo->params, RM_SECT_CLASSES, RM_ATTR_NBGROUPS, NULL, 1 );
 	nbDrivers = (int)GfParmGetNum( ReInfo->params, RM_SECT_RACECARS, RM_ATTR_MAXNUM, NULL, 10 ) * nbGroups;
 	if( first && nbDrivers < 10 )
@@ -551,7 +551,7 @@ static int ReCareerNextDriversCompare( const void *driver1, const void *driver2 
 void ReCareerNextAddTeams( tGroupInfo *group, void *curParam, void *curResults )
 {
 	int xx;
-	
+
 	group->nbDrivers = (int)GfParmGetNum( curResults, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 10 );
 	group->nbTeams = GfParmGetEltNb( curResults, RE_SECT_TEAMINFO );
 	group->curTeam = 0;
@@ -600,11 +600,11 @@ void ReCareerNextAddDrivers( tDriverInfo ***drivers, int *listLength, tCareerInf
 	newDrivers = (tDriverInfo**)malloc( sizeof( tDriverInfo* ) * ( *listLength + newNb ) );
 	for( xx = 0; xx < *listLength; ++xx )
 		newDrivers[ xx ] = (*drivers)[ xx ];
-	
+
 	classPosition = (int**)malloc( sizeof(int*) * newNb );
 
 	GfLogDebug("ReCareerNextAddDrivers:\n");
-	
+
 	GfParmListSeekFirst( curParam, RM_SECT_DRIVERS );
 	for( xx = *listLength; xx < *listLength + newNb; ++xx ) {
 		newDrivers[ xx ] = (tDriverInfo*)malloc( sizeof( tDriverInfo ) );
@@ -763,7 +763,7 @@ void ReCareerNextRead( tCareerInfo *info, tDriverInfo ***driverList, int *driver
 		GfParmReleaseHandle( curParam );
 		curParam = tmp;
 	} while( curParam && strcmp( firstfile, GfParmGetFileName( curParam ) ) != 0 );
-	
+
 	if( curParam )
 		GfParmReleaseHandle( curParam );
 }
@@ -830,10 +830,10 @@ static void ReCareerNextReorder( tCareerInfo *info, tDriverInfo ***driverList, i
 			qsort( info->classes[ xx ].groups[ yy ].teams, info->classes[ xx ].groups[ yy ].nbTeams, sizeof( tTeamInfo ),
 			       ReCareerNextTeamCompare );
 			for( zz = 0; zz < info->classes[ xx ].groups[ yy ].nbTeams; ++zz ) {
-				info->classes[ xx ].groups[ yy ].teams[ zz ].nbDrivers = 
+				info->classes[ xx ].groups[ yy ].teams[ zz ].nbDrivers =
 				           info->classes[ xx ].groups[ yy ].nbDrivers / info->classes[ xx ].groups[ yy ].nbTeams +
 				           ( ( info->classes[ xx ].groups[ yy ].nbDrivers % info->classes[ xx ].groups[ yy ].nbTeams ) > zz ? 1 : 0 );
-				info->classes[ xx ].groups[ yy ].teams[ zz ].drivers = (tDriverInfo**)malloc( sizeof( tDriverInfo* ) * 
+				info->classes[ xx ].groups[ yy ].teams[ zz ].drivers = (tDriverInfo**)malloc( sizeof( tDriverInfo* ) *
 				                                                                info->classes[ xx ].groups[ yy ].teams[ zz ].nbDrivers );
 			}
 		}
@@ -915,7 +915,7 @@ static void ReCareerNextTracks( void *subparam )
 		snprintf( buf, sizeof(buf), "%s/%s", RM_SECT_ALLOWEDTRACKS, trackEltNames[ trackIndex ] );
 		path = strdup( buf );
 		snprintf( buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, curResultIndex );
-	
+
 		GfParmSetStr( subparam, buf, RM_ATTR_NAME, GfParmGetStr( subparam, path, RM_ATTR_NAME, "free" ) );
 		GfParmSetStr( subparam, buf, RM_ATTR_CATEGORY, GfParmGetStr( subparam, path, RM_ATTR_CATEGORY, "free" ) );
 
@@ -980,7 +980,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 				//const tDriverInfo* pDriver = curGroupPtr->teams[ zz ].drivers[ uu ];
 				//GfLogDebug("  * %s #%d (%s)%s\n", pDriver->module, pDriver->idx, pDriver->name,
 				//		   pDriver->extended ? " extended" : "");
-				
+
 				/* Fill Driver Info */
 				snprintf( buf, sizeof(buf), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, curGroupPtr->teams[ zz ].drivers[ uu ]->module,
 				                                                        curGroupPtr->teams[ zz ].drivers[ uu ]->extended,
@@ -999,7 +999,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 
 		/* Modify result file */
 		GfParmListClean( curResult, RE_SECT_CLASSPOINTS );
-		
+
 		/* Write team points */
 		uu = 0;
 		if( GfParmListSeekFirst( curResult, RE_SECT_TEAMINFO ) == 0 && uu < curGroupPtr->nbTeams ) {
@@ -1009,7 +1009,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 				++uu;
 			} while( GfParmListSeekNext( curResult, RE_SECT_TEAMINFO ) == 0 && uu < curGroupPtr->nbTeams );
 		}
-		
+
 		/* Write files */
 		GfParmWriteFile( NULL, curResult, NULL );
 		GfParmReleaseHandle( curResult );
@@ -1020,7 +1020,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 		++curGroup[ xx ];
 	} while( strcmp( GfParmGetFileName( curParam ), firstfile ) != 0 );
 	GfParmReleaseHandle( curParam );
-	
+
 	free( firstfile );
 	free( curGroup );
 }

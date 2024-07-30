@@ -2,7 +2,7 @@
                  iraceengine.h -- Interface for any race engine
 
     created              : Mon Mar 7 19:32:14 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	Interface for any race engine
     @version	$Id$
 */
@@ -84,7 +84,7 @@ public:
 	virtual bool setSchedulingSpecs(double fSimuRate, double fOutputRate = 0) = 0;
 	virtual void accelerateTime(double fMultFactor) = 0;
 	virtual void setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd) = 0;
-	
+
 };
 
 #include <iuserinterface.h>

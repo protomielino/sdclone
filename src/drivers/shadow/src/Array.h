@@ -21,7 +21,7 @@
 
 #include <memory.h>
 
-template<class T> class Array  
+template<class T> class Array
 {
 public:
 	Array()

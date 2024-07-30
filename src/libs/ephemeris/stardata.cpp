@@ -31,20 +31,20 @@ ePhStarData::ePhStarData( const char *path )
 }
 
 // Destructor
-ePhStarData::~ePhStarData() 
+ePhStarData::~ePhStarData()
 {
 }
 
-bool ePhStarData::load( const char *path ) 
+bool ePhStarData::load( const char *path )
 {
     	_stars.clear();
-    	
+
     	int i = 0;
     	int num = 3000;
 
     	FILE * f;
   	double ra, dec, mag;
-	
+
     	char name;
 
   	f = fopen (path, "r");
@@ -61,7 +61,7 @@ bool ePhStarData::load( const char *path )
      		}
 
 	}
-	
-	fclose (f);    	
+
+	fclose (f);
     	return true;
 }

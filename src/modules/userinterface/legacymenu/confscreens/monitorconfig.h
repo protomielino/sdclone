@@ -30,7 +30,7 @@ public:
 
 	MonitorMenu();
 	bool initialize(void* pPreviousMenu);
-	
+
 	enum EMonitorType { e4by3 = 0, e16by9 = 1, e21by9 = 2, nMonitorTypes };
 	enum ESpanSplit { eDisabled = 0, eEnabled = 1, nSpanSplits };
 
@@ -44,7 +44,7 @@ public:
 	void updateControls();
 
 protected:
-	
+
 	// Control callback functions (must be static).
 	static void onActivate(void *pMonitorMenu);
 	static void onChangeMonitorType(tComboBoxInfo *pInfo);

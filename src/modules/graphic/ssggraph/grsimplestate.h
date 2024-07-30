@@ -33,9 +33,9 @@ namespace ssggraph {
 class cgrSimpleState : public ssgSimpleState
 {
  public:
-		
+
 	cgrSimpleState();
-	
+
 	virtual void setTexture(ssgTexture *tex);
 
 	virtual void setTexture(const char *fname,

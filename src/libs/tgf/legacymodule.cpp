@@ -1,10 +1,10 @@
 /***************************************************************************
-                      legacymodule.cpp -- Legacy dynamic module management                                
-                             -------------------                                         
+                      legacymodule.cpp -- Legacy dynamic module management
+                             -------------------
     created              : Fri Aug 13 22:25:53 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Legacy dynamic module management.
     		This is the interface to load/unload the shared libraries (or DLLs).
 			It is only kept for supporting the robot modules which are implemented

@@ -1,9 +1,9 @@
 /***************************************************************************
 
     file        : learning.h
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
-    version     : $Id$                                  
+    copyright   : (C) 2010 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -15,9 +15,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
     @version    $Id$
 */
@@ -36,4 +36,4 @@
 # define LEARNING_API
 #endif
 
-#endif /* _LEARNING_H_ */ 
+#endif /* _LEARNING_H_ */

@@ -83,7 +83,7 @@ int DeleteANN(ANN * ann)
 	if (ann->error) {
 		FreeM(ann->error);
 	}
-	
+
 	//if (ann->x) {
 	//	FreeM (ann->x);
 	//}
@@ -422,7 +422,7 @@ real ANN_Input(ANN * ann, real * x)
 // ANN_StochasticInput()
 //----------------------------------------------------------
 /// Stochastically generate an output, depending on parameter
-/// distributions. 
+/// distributions.
 /// This is an option for people that understand what they
 /// are doing.
 real ANN_StochasticInput(ANN * ann, real * x)
@@ -462,13 +462,13 @@ void ANN_CalculateLayerOutputs(Layer * current_layer, bool stochastic)
 	if (stochastic) {
 		for (i = 0; i < n_inputs; i++) {
 			for (j = 0; j < n_outputs; j++) {
-				// using uniform bounded.. 
+				// using uniform bounded..
 				real w = c->w + (urandom()-0.5f)*c->v ;
 				z[j] += x[i] * w;
 				c++;
 			}
 		}
-		
+
 		// bias
 		for (j = 0; j < n_outputs; j++) {
 			real w = c->w + (urandom()-0.5f)*c->v ;
@@ -482,14 +482,14 @@ void ANN_CalculateLayerOutputs(Layer * current_layer, bool stochastic)
 				c++;
 			}
 		}
-		
+
 		// bias
 		for (j = 0; j < n_outputs; j++) {
 			z[j] += c->w;
 			c++;
 		}
 	}
-	
+
 	for (j = 0; j < n_outputs; j++) {
 		y[j] = current_layer->f(z[j]);
 	}
@@ -531,7 +531,7 @@ void ANN_RBFCalculateLayerOutputs(Layer * current_layer, bool stochastic)
 
 
 //==========================================================
-// ANN_Train()                           simple MSE training 
+// ANN_Train()                           simple MSE training
 //----------------------------------------------------------
 
 /// Perform mean square error training, where the aim is to minimise
@@ -1215,24 +1215,24 @@ ANN* LoadANN(FILE* f)
 	if( sizeRead < 1)
 		fprintf(stderr, "Integer could not be read correctly from file");
 	sizeRead = fread(&n_outputs, sizeof(int), 1, f);
-	if( sizeRead < 1)	
+	if( sizeRead < 1)
 		fprintf(stderr, "integer could no be read correctly from file");
 	ANN* ann = NewANN (n_inputs, n_outputs);
 	CheckMatchingToken("Layer Data", rtag, f);
 	int n_layers;
 	sizeRead = fread(&n_layers, sizeof(int), 1, f);
-	if( sizeRead < 1)	
+	if( sizeRead < 1)
 		fprintf(stderr, "integer could no be read correctly from file");
 	for (int i=0; i<n_layers-1; i++) {
 		int layer_type;
 		CheckMatchingToken("TYPE", rtag, f);
 		sizeRead = fread(&layer_type, sizeof(int), 1, f);
-		if( sizeRead < 1)	
+		if( sizeRead < 1)
 			fprintf(stderr, "integer could no be read correctly from file");
 		int nhu;
 		CheckMatchingToken("UNITS", rtag, f);
 		sizeRead = fread(&nhu, sizeof(int), 1, f);
-		if( sizeRead < 1)	
+		if( sizeRead < 1)
 			fprintf(stderr, "integer could no be read correctly from file");
 		if (layer_type==0) {
 			ANN_AddHiddenLayer(ann, nhu);
@@ -1245,10 +1245,10 @@ ANN* LoadANN(FILE* f)
 		ANN_Init(ann);
 		CheckMatchingToken("Output Type", rtag, f);
 		sizeRead = fread(&layer_type, sizeof(int), 1, f);
-		if( sizeRead < 1)	
+		if( sizeRead < 1)
 			fprintf(stderr, "integer could no be read correctly from file");
 		if (layer_type==0) {
-			ANN_SetOutputsToLinear(ann);	
+			ANN_SetOutputsToLinear(ann);
 		} else {
 			ANN_SetOutputsToTanH(ann);
 		}
@@ -1260,9 +1260,9 @@ ANN* LoadANN(FILE* f)
 		CheckMatchingToken("Connections", rtag, f);
 		int size = (l->n_inputs + 1 /*bias*/) * l->n_outputs;
 		sizeRead = fread(l->c, size, sizeof(Connection), f);
-		if( sizeRead <= 0)	
+		if( sizeRead <= 0)
 			fprintf(stderr, "Error while reading data from file");
-			
+
 		list_item = NextListItem (ann->c);
 	}
 	CheckMatchingToken("END", rtag, f);
@@ -1278,15 +1278,15 @@ int SaveANN(ANN* ann, FILE* f)
 	if (f==NULL) {
 		return -1;
 	}
-	
+
 	StringBuffer* rtag = NewStringBuffer (256);
 
 	WriteToken("VSOUND_ANN", f);
 	writeSize = fwrite(&ann->n_inputs, sizeof(int), 1, f);
-	if( writeSize < 1)	
+	if( writeSize < 1)
 		fprintf(stderr, "integer could no be written correctly to file");
 	writeSize = fwrite(&ann->n_outputs, sizeof(int), 1, f);
-	if( writeSize < 1)	
+	if( writeSize < 1)
 		fprintf(stderr, "integer could no be written correctly to file");
 	WriteToken("Layer Data", f);
 	int n_layers = 0;
@@ -1296,7 +1296,7 @@ int SaveANN(ANN* ann, FILE* f)
 		list_item = NextListItem (ann->c);
 	}
 	writeSize = fwrite(&n_layers, sizeof(int), 1, f);
-	if( writeSize < 1)	
+	if( writeSize < 1)
 		fprintf(stderr, "integer could no be written correctly to file");
 	list_item = FirstListItem(ann->c);
 	for (int i=0; i<n_layers-1; i++) {
@@ -1305,13 +1305,13 @@ int SaveANN(ANN* ann, FILE* f)
 		int layer_type = 0;
 		WriteToken("TYPE", f);
 		writeSize = fwrite(&layer_type, sizeof(int), 1, f);
-		if( writeSize < 1)	
+		if( writeSize < 1)
 			fprintf(stderr, "integer could no be written correctly to file");
 
 		int nhu = l->n_outputs;
 		WriteToken("UNITS", f);
 		writeSize = fwrite(&nhu, sizeof(int), 1, f);
-		if( writeSize < 1)	
+		if( writeSize < 1)
 			fprintf(stderr, "integer could no be written correctly to file");
 		list_item = NextListItem (ann->c);
 	}
@@ -1329,16 +1329,16 @@ int SaveANN(ANN* ann, FILE* f)
 			}
 		}
 		writeSize = fwrite(&layer_type, sizeof(int), 1, f);
-		if( writeSize < 1)	
+		if( writeSize < 1)
 			fprintf(stderr, "integer could no be written correctly to file");
 	}
-	list_item = FirstListItem(ann->c); 
+	list_item = FirstListItem(ann->c);
 	while(list_item) {
 		Layer* l = (Layer*) list_item->obj;
 		WriteToken("Connections", f);
 		int size = (l->n_inputs + 1 /*bias*/) * l->n_outputs;
 		writeSize = fwrite(l->c, size, sizeof(Connection), f);
-		if( writeSize < 1)	
+		if( writeSize < 1)
 			fprintf(stderr, "Error when writes data to file.");
 		list_item = NextListItem(ann->c);
 	}

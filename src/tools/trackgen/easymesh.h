@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -31,7 +31,7 @@ int getPointCount();
 void addPoint(double x, double y, double z, double F, int mark);
 void addSegment(int n0, int n1, int mark);
 
-#endif /* _EASYMESH_H_ */ 
+#endif /* _EASYMESH_H_ */
 
 
 

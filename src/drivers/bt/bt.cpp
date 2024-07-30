@@ -58,13 +58,13 @@ static void endRace(int index, tCarElt *car, tSituation *s);
 extern "C" int bt(tModInfo *modInfo)
 {
 	int i;
-	
+
 	// Clear all structures.
 	memset(modInfo, 0, 10*sizeof(tModInfo));
 
-	for (i = 0; i < 11; i++) 
+	for (i = 0; i < 11; i++)
 	{
-		if (i < NBBOTS || i == 10) 
+		if (i < NBBOTS || i == 10)
 		{
 			modInfo[i].name    = botname[i];  			// name of the module (short).
 			modInfo[i].desc    = botdesc[i];			// Description of the module (can be long).

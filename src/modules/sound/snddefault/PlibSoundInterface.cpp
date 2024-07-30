@@ -51,11 +51,11 @@ PlibSoundInterface::~PlibSoundInterface()
 	}
 	delete [] engpri;
 	delete sched;
-	
+
 	if (car_src) {
 		delete [] car_src;
 	}
-	
+
 }
 
 void PlibSoundInterface::setNCars(int n_cars)
@@ -76,7 +76,7 @@ Sound* PlibSoundInterface::addSample(const char* filename, unsigned int flags, b
 	sound_list.push_back (sound);
 	return sound;
 }
-	
+
 void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec3 p_obs, sgVec3 u_obs, sgVec3 c_obs, sgVec3 a_obs)
 {
 	// Copy car ID basically.
@@ -143,7 +143,7 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 #endif
 	}
 
-	
+
 	// other looping sounds
 	road.snd = road_ride_sound;
 	sortSingleQueue (car_sound_data, &road, n_cars);
@@ -191,7 +191,7 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 
 		if (sound_data->crash) {
 			if (++curCrashSnd>=NB_CRASH_SOUND) {
-				
+
 				curCrashSnd = 0;
 			}
 			if (car_src[id].a > crash_threshold) {

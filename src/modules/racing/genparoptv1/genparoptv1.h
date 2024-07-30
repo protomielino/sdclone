@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
   		A race engine module designed for optimising car and AI driver setups
 		(parameters) through a genetic algorithm
     @version    $Id$
@@ -95,7 +95,7 @@ public:
 
 	virtual GfRace* race();
 	virtual const GfRace* race() const;
-	
+
 	//! Temporary input / modifiable situation, for commanding the race engine from the outside
 	//! Aimed at being removed when dedicated setters are ready.
 	virtual struct RmInfo* inData();
@@ -105,7 +105,7 @@ public:
 
 	// WIP : dedicated situation setters, for commanding the race engine from the outside.
 	virtual void setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd);
-	
+
 	// Accessor to the singleton.
 	static GenParOptV1& self();
 
@@ -131,11 +131,11 @@ protected:
 	GenParOptV1(const std::string& strShLibName, void* hShLibHandle);
 	GenParOptV1(const GenParOptV1 &); // = delete;
 	GenParOptV1 & operator = (const GenParOptV1 &); // = delete;
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
-	
+
 protected:
 
 	// The singleton.
@@ -146,7 +146,7 @@ protected:
 
 	// The track loader.
 	ITrackLoader* _piTrkLoader;
-	
+
 	// The physics engine.
 	IPhysicsEngine* _piPhysEngine;
 
@@ -159,21 +159,21 @@ inline extern IUserInterface& ReUI()
 {
 	return GenParOptV1::self().userInterface();
 }
-				  
+
 //! Shortcut to the physics engine.
 inline extern IPhysicsEngine& RePhysicsEngine()
 {
 	return GenParOptV1::self().physicsEngine();
 }
-				  
+
 //! Shortcut to the track loader.
 inline extern ITrackLoader& ReTrackLoader()
 {
 	return GenParOptV1::self().trackLoader();
 }
-				  
+
 // The "Optim" logger instance.
 extern GfLogger* RePLogOptim;
 #define ReLogOptim (*RePLogOptim)
 
-#endif /* _GENPAROPTV1_H_ */ 
+#endif /* _GENPAROPTV1_H_ */

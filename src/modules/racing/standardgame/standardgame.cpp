@@ -1,9 +1,9 @@
 /***************************************************************************
 
     file        : standardgame.cpp
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
-    version     : $Id$                                  
+    copyright   : (C) 2010 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The standard game race engine module
     @version    $Id$
 */
@@ -92,7 +92,7 @@ void StandardGame::reset(void)
 
 	// Cleanup everything in case no yet done.
 	cleanup();
-	
+
 	// Internal init.
 	::ReReset();
 
@@ -352,7 +352,7 @@ void StandardGame::unloadPhysicsEngine()
     // Unload the Physics engine module if not already done.
 	if (!_piPhysEngine)
 		return;
-	
+
 	GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(_piPhysEngine);
 	if (pmodPhysEngine)
 		GfModule::unload(pmodPhysEngine);

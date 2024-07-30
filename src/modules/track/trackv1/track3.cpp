@@ -818,14 +818,14 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
     radius = arc = length = alf = xr = yr = newxr = newyr = xl = yl = 0;
     zel = zer = etgtl = etgtr = newxl = newyl = 0;
     type = 0;
-    
+
     width = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, (char*)NULL, 15.0);
     wi2 = (tdble)(width / 2.0);
 
     grade = -100000.0;
     root = (tTrackSeg*)NULL;
     totLength = 0;
-    
+
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_MAIN, TRK_LST_SEG);
 	if (start == NULL) {
 		xr = xl = 0.0;
@@ -1286,7 +1286,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 /*
  * Read version 3 track segments
  */
-void 
+void
 ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 {
     int			i;
@@ -1295,8 +1295,8 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     tTrackSeg		*pitEntrySeg = NULL;
     tTrackSeg		*pitExitSeg = NULL;
     tTrackSeg		*pitStart = NULL;
-    tTrackSeg		*pitBuildingsStart = NULL; 
-    tTrackSeg		*pitBuildingsEnd = NULL; 
+    tTrackSeg		*pitBuildingsStart = NULL;
+    tTrackSeg		*pitBuildingsEnd = NULL;
     tTrackSeg		*pitEnd = NULL;
     tTrackSeg		*curPitSeg = NULL;
     tTrackPitInfo	*pits;
@@ -1435,7 +1435,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 				}
 				if (!found) {
 					pitBuildingsEnd = pitEnd;
-				} 
+				}
 			} else {
 				pitBuildingsEnd = pitEnd;
 			}
@@ -1577,7 +1577,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 				curSeg->raceInfo |= TR_PITEND;
 				if (curSeg2) {
 					curSeg2->raceInfo |= TR_PITEND;
-				} 
+				}
 			}
 	    }
 	}
@@ -1606,7 +1606,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		}
     }
 
-	/* 
+	/*
      * camera definitions
      */
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
@@ -1665,7 +1665,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    }
 	    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
-	
+
 	    do {
 		curSeg->cam = curCam;
 		curSeg = curSeg->next;
@@ -1705,7 +1705,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 	curSeg = curSeg->next;
     }
-    
+
 
     if (*camList != NULL) {
 	curCam = *camList;

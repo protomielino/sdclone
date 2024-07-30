@@ -4,7 +4,7 @@ SET(ROBOT_NAME "dandroid")
 
 SET(ROBOT_INTERFACE LEGACY WELCOME)
 
-SET(ROBOT_SOURCES 
+SET(ROBOT_SOURCES
     src/ClothoidPath.cpp
     src/ClothoidPath.h
     src/cubic.cpp

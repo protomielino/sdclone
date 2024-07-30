@@ -26,7 +26,7 @@ enum AeroFlowModel
 
 /**
    Simulation options for easy handling of default options.
-   
+
    You can read/write the options directly but there is support for
    setting them through strings.
  */

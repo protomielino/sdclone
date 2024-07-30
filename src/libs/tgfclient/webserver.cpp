@@ -415,7 +415,7 @@ WebServer::WebServer()
     //i guess some of the Gf function are not available to be call that early in the game initialization process
     //so we get a segfault.
     // moved this call to the start of the functions 'addAsyncRequest' and 'sendGenericRequest'
-    
+
     //initialize the configuration
     //this->readConfiguration();
 }
@@ -574,7 +574,7 @@ int WebServer::updateAsyncStatus()
                         //notifications.msglist.push_back("WebServer: Login Failed: Wrong username or password.");
                         //since we cant login: disable the webserver
                         this->isWebServerEnabled = false;
-                        
+
                         //since we cant login: remove all the already registered and pending requests
                         this->orderedAsyncRequestQueque.clear();
                         return 1;
@@ -606,9 +606,9 @@ int WebServer::updateAsyncStatus()
 int WebServer::addAsyncRequest(const std::string &data)
 {
     GfLogInfo("WebServer: Performing ASYNC request:\n%s\n", data.c_str());
-    
+
     //read the webserver configuration
-    this->readConfiguration();   
+    this->readConfiguration();
 
     CURL* curl = NULL;
     curl = curl_easy_init();
@@ -645,7 +645,7 @@ int WebServer::addAsyncRequest(const std::string &data)
 
     //add the request to the queque
     curl_multi_add_handle(this->multi_handle, curl);
-    
+
     //pending request
     webserverState=WEBSERVER_SENDING;
 
@@ -716,20 +716,20 @@ int WebServer::sendLogin (int userId)
         return 1;
     }
 
-    std::string serverReply;    
+    std::string serverReply;
     std::string username="username";
     std::string password="password";
     std::string emptyString;
-    
+
     //if the user has not setup the webserver login info abort the login
     if((username==this->username && password==this->password) || this->username==emptyString || this->password==emptyString){
         GfLogInfo("WebServer: Send of login info aborted (the user is not correctly setup in this client).\n");
         GfLogInfo("WebServer: Disabling the webserver!.\n");
         this->isWebServerEnabled = false;
-        
+
         return 1;
     }
-    
+
     this->sendLogin(this->username, this->password);
 
     return 0;
@@ -821,7 +821,7 @@ int WebServer::sendRaceStart (tSkillLevel user_skill, const char *track_id, char
     if(!this->isWebServerEnabled){
         return 1;
     }
-    
+
     std::string serverReply;
     std::string mysetup;
     std::string dataToSend;
@@ -880,7 +880,7 @@ int WebServer::sendRaceEnd (int race_id, int endposition)
     if(!this->isWebServerEnabled){
         return 1;
     }
-    
+
     std::string serverReply;
 
     //Do some sanity-checks befor proceding... If something is wrong do nothing

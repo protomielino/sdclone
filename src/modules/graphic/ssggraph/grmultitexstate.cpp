@@ -37,11 +37,11 @@ cgrMultiTexState::cgrMultiTexState(tfnTexScheme fnTexScheme)
 	if (!_fnTexScheme)
 		GfLogError("cgrMultiTexState MUST be provided a texturing scheme function\n");
 }
-	
+
 void cgrMultiTexState::setTexScheme(tfnTexScheme fnTexScheme)
 {
 	_fnTexScheme = fnTexScheme;
-	
+
 	if (!_fnTexScheme)
 		GfLogError("cgrMultiTexState MUST be provided a texturing scheme function\n");
 }
@@ -66,7 +66,7 @@ void cgrMultiTexState::modulate()
 void cgrMultiTexState::addColorModulateAlpha()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-	
+
 	// Add Color.
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
@@ -75,7 +75,7 @@ void cgrMultiTexState::addColorModulateAlpha()
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
 
 	// Modulate Alpha.
-	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE); 
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_TEXTURE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
@@ -86,13 +86,13 @@ void cgrMultiTexState::addColorModulateAlpha()
 void cgrMultiTexState::ignore()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-	
+
 	// Replace Color.
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
 
 	// Replace Alpha.
-	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE); 
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
 }
 
@@ -159,7 +159,7 @@ void cgrMultiTexState::interpolateConst()
 void cgrMultiTexState::interpolateReverted()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-			
+
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE); //Interpolate RGB / RGB
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
@@ -223,7 +223,7 @@ void cgrMultiTexState::add()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 }
-			
+
 // Name is self-explanatory.
 // => Bad
 void cgrMultiTexState::blend()

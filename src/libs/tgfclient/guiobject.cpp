@@ -1,10 +1,10 @@
 /***************************************************************************
-                                guiobject.cpp                      
-                             -------------------                                         
+                                guiobject.cpp
+                             -------------------
     created              : Fri Aug 13 22:25:06 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -59,7 +59,7 @@ gfuiInitObject(void)
 	GfParmReleaseHandle(param);
 }
 
-void 
+void
 gfuiDrawString(int x, int y, GfuiFontClass *font, const char *string)
 {
     glEnable(GL_TEXTURE_2D);
@@ -120,19 +120,19 @@ GfuiDrawCursor()
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	glBindTexture(GL_TEXTURE_2D, NMouseCursorTexture);
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0.0, 1.0);
 	glVertex2i(xmin, ymin);
-	
+
 	glTexCoord2f(0.0, 0.0);
 	glVertex2i(xmin, ymax);
-	
+
 	glTexCoord2f(1.0, 0.0);
 	glVertex2i(xmax, ymax);
-	
+
 	glTexCoord2f(1.0, 1.0);
 	glVertex2i(xmax, ymin);
 
@@ -150,7 +150,7 @@ GfuiDraw(tGfuiObject *obj)
 	case GFUI_LABEL:
 	    gfuiDrawLabel(obj);
 	    break;
-	
+
 	case GFUI_BUTTON:
 	    gfuiDrawButton(obj);
 	    break;
@@ -162,7 +162,7 @@ GfuiDraw(tGfuiObject *obj)
 	case GFUI_SCROLLIST:
 	    gfuiDrawScrollist(obj);
 	    break;
-	
+
 	case GFUI_EDITBOX:
 	    gfuiDrawEditbox(obj);
 	    break;
@@ -228,7 +228,7 @@ GfuiUnSelectCurrent(void)
 	break;
     case GFUI_EDITBOX:
 	editbox = &(obj->u.editbox);
-	editbox->state = GFUI_BTN_RELEASED;	
+	editbox->state = GFUI_BTN_RELEASED;
 	if (editbox->onFocusLost != NULL) {
 	    editbox->onFocusLost(editbox->userDataOnFocus);
 	}
@@ -265,7 +265,7 @@ gfuiLoseFocus(tGfuiObject *obj)
 		case GFUI_EDITBOX:
 		{
 			tGfuiEditbox* editbox = &(obj->u.editbox);
-			editbox->state = GFUI_BTN_RELEASED;	
+			editbox->state = GFUI_BTN_RELEASED;
 			if (editbox->onFocusLost)
 				editbox->onFocusLost(editbox->userDataOnFocus);
 		}
@@ -286,7 +286,7 @@ gfuiLoseFocus(tGfuiObject *obj)
 				label->onFocusLost(label->userDataOnFocus);
 		}
 		break;
-		
+
  		case GFUI_COMBOBOX:
 		{
 			tGfuiCombobox* combo = &(obj->u.combobox);
@@ -343,7 +343,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			playMenuSfx(SFX_FOCUS);
 		}
 		break;
-		
+
 		case GFUI_LABEL:
 		{
 			tGfuiLabel* label = &(obj->u.label);
@@ -352,7 +352,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			//playMenuSfx(SFX_FOCUS);
 		}
 		break;
-		
+
 		case GFUI_COMBOBOX:
 		{
 			tGfuiCombobox* combo = &(obj->u.combobox);
@@ -368,7 +368,7 @@ void
 gfuiUpdateFocus(void)
 {
     tGfuiObject *curObject;
-    
+
     curObject = GfuiScreen->hasFocus;
     if (curObject != NULL) {
 	if (gfuiMouseIn(curObject)) {
@@ -379,7 +379,7 @@ gfuiUpdateFocus(void)
 	    GfuiScreen->hasFocus = (tGfuiObject*)NULL;
 	}
     }
-    
+
     /* Search for a new focused object */
     curObject = GfuiScreen->objects;
     if (curObject != NULL) {
@@ -403,7 +403,7 @@ gfuiSelectNext(void * /* dummy */)
 {
     tGfuiObject *startObject;
     tGfuiObject *curObject;
-    
+
     startObject = GfuiScreen->hasFocus;
     if (startObject == NULL) {
 	startObject = GfuiScreen->objects;
@@ -417,7 +417,7 @@ gfuiSelectNext(void * /* dummy */)
 	case GFUI_SCROLLIST:
 	    gfuiScrollListNextElt(curObject);
 	    break;
-	    
+
 	default:
 	    curObject = curObject->next;
 	    if ((curObject->focusMode != GFUI_FOCUS_NONE) &&
@@ -428,7 +428,7 @@ gfuiSelectNext(void * /* dummy */)
 	    }
 	    break;
 	}
-    } while (curObject != startObject);    
+    } while (curObject != startObject);
 }
 
 void
@@ -436,7 +436,7 @@ gfuiSelectPrev(void * /* dummy */)
 {
     tGfuiObject *startObject;
     tGfuiObject *curObject;
-    
+
     startObject = GfuiScreen->hasFocus;
     if (startObject == NULL) {
 	startObject = GfuiScreen->objects;
@@ -465,12 +465,12 @@ gfuiSelectPrev(void * /* dummy */)
     } while (curObject != startObject);
 }
 
-void 
+void
 gfuiSelectId(void *scr, int id)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
+
     curObject = screen->objects;
     if (curObject != NULL) {
 	do {
@@ -484,7 +484,7 @@ gfuiSelectId(void *scr, int id)
 }
 
 /** Set/unset the visibility attribute of an object.
-    @param	scr	Screen    
+    @param	scr	Screen
     @param	id	Object id
     @param	visible	GFUI_VISIBLE or GFUI_INVISIBLE
     @return	<tt>0 ... </tt>Ok
@@ -495,7 +495,7 @@ int
 GfuiVisibilitySet(void *scr, int id, int visible)
 {
     tGfuiObject *curObject;
-    
+
     curObject = gfuiGetObject(scr, id);
     if (curObject == NULL) {
 	return -1;
@@ -515,14 +515,14 @@ GfuiVisibilitySet(void *scr, int id, int visible)
 }
 
 /** Enable / Disable an object
-    @param	scr	Screen    
+    @param	scr	Screen
     @param	id	Object id
     @param	flag	GFUI_ENABLE or GFUI_DISABLE
     @return	<tt>0 ... </tt>Ok
 		<br><tt>-1 .. </tt>Error
     @ingroup	gui
  */
-int 
+int
 GfuiEnable(void *scr, int id, int flag)
 {
     tGfuiObject *curObject;
@@ -546,7 +546,7 @@ GfuiEnable(void *scr, int id, int flag)
 	switch (curObject->widget)
 	{
 		case GFUI_BUTTON:
-			if (curObject->state == GFUI_DISABLE) 
+			if (curObject->state == GFUI_DISABLE)
 				curObject->u.button.state = GFUI_BTN_DISABLE;
 			else
 				curObject->u.button.state = GFUI_BTN_RELEASED;
@@ -628,12 +628,12 @@ gfuiAddObject(tGfuiScreen *screen, tGfuiObject *object)
     }
 }
 
-tGfuiObject * 
+tGfuiObject *
 gfuiGetObject(void *scr, int id)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
+
     curObject = screen->objects;
     if (curObject != NULL) {
 	do {
@@ -654,15 +654,15 @@ gfuiReleaseObject(tGfuiObject *curObject)
     case GFUI_LABEL:
 	gfuiReleaseLabel(curObject);
 	break;
-	
+
     case GFUI_BUTTON:
 	gfuiReleaseButton(curObject);
 	break;
-	
+
     case GFUI_GRBUTTON:
 	gfuiReleaseGrButton(curObject);
 	break;
-	
+
     case GFUI_SCROLLIST:
 	gfuiReleaseScrollist(curObject);
 	break;

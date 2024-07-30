@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -32,7 +32,7 @@
 /* nextMenu : the menu to go to when "next" button is pressed */
 extern void *Joy2butCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
-#endif /* _JOY2BUTCONFIG_H_ */ 
+#endif /* _JOY2BUTCONFIG_H_ */
 
 
 

@@ -44,11 +44,11 @@ ePhSaturn::ePhSaturn() :
 void ePhSaturn::updatePosition(double mjd, ePhStar *ourSun)
 {
   	ePhCelestialBody::updatePosition(mjd, ourSun);
-  
+
   	double actTime = sdCalcActTime(mjd);
   	double ir = 0.4897394;
   	double Nr = 2.9585076 + 6.6672E-7*actTime;
-  	double B = asin (sin(declination) * cos(ir) - 
+  	double B = asin (sin(declination) * cos(ir) -
 		   cos(declination) * sin(ir) *
 		   sin(rightAscension - Nr));
   	double ring_magn = -2.6 * sin(fabs(B)) + 1.2 * pow(sin(B), 2);

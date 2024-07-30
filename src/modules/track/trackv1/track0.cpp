@@ -31,7 +31,7 @@ static const int BUFSIZE = 1024;
 /*
  * Read version 0 track segments
  */
-void 
+void
 ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 {
     int		i,j;
@@ -59,8 +59,8 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     tdble	lssw, lsew;
     tdble	rssw, rsew;
     char	path[BUFSIZE];
-    
-    
+
+
 #define TSTX(x)			\
     if (xmin > (x)) xmin = (x);	\
     if (xmax < (x)) xmax = (x);
@@ -86,7 +86,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 
     /* Main Track */
     material = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_SURF, TRK_VAL_ASPHALT);
-	
+
     segread = 0;
     curindex = 0;
 
@@ -94,18 +94,18 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     GfParmListSeekFirst(TrackHandle, path);
     do {
 	segtype = GfParmGetCurStr(TrackHandle, path, TRK_ATT_TYPE, NULL);
-	
+
 	curindex++;
 	if (segtype == 0) {
 	    continue;
 	}
 	segread++;
-	
+
 	zsl = zel;
 	zsr = zer;
 	TSTZ(zsl);
 	TSTZ(zsr);
-	
+
 
 	/* allocate a new segment */
 	curSeg = (tTrackSeg*)calloc(1, sizeof(tTrackSeg));
@@ -148,7 +148,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	if (strcmp(segtype, TRK_VAL_STR) == 0) {
 	    /* straight */
 	    length = GfParmGetCurNum(TrackHandle, path, TRK_ATT_LG, (char*)NULL, 0);
-	    
+
 	    curSeg->type = TR_STR;
 	    curSeg->length = length;
 
@@ -179,7 +179,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->angle[TR_YL] = atan2(curSeg->vertex[TR_EL].z - curSeg->vertex[TR_SL].z, length);
 	    curSeg->angle[TR_XS] = atan2(curSeg->vertex[TR_SL].z - curSeg->vertex[TR_SR].z, width);
 	    curSeg->angle[TR_XE] = atan2(curSeg->vertex[TR_EL].z - curSeg->vertex[TR_ER].z, width);
-	    
+
 	    curSeg->Kzl = tan(curSeg->angle[TR_YR]);
 	    curSeg->Kzw = (curSeg->angle[TR_XE] - curSeg->angle[TR_XS]) / length;
 	    curSeg->Kyl = 0;
@@ -202,7 +202,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->radiusl = radius - wi2;
 	    curSeg->arc = arc;
 	    curSeg->length = radius * arc;
-	    
+
 	    innerradius = radius - wi2; /* left side aligned */
 	    cenx = xl - innerradius * sin(alf);  /* compute center location: */
 	    ceny = yl + innerradius * cos(alf);
@@ -243,7 +243,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->Kzl = tan(curSeg->angle[TR_YR]) * (innerradius + width);
 	    curSeg->Kzw = (curSeg->angle[TR_XE] - curSeg->angle[TR_XS]) / arc;
 	    curSeg->Kyl = 0;
-	    
+
 	    /* to find the boundary */
 	    al = (curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0;
 	    alfl = curSeg->angle[TR_ZS];

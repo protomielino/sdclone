@@ -556,7 +556,7 @@ isNaN(const SGMatrix<T>& m)
 #endif
 
 /// Output to an ostream
-template<typename char_type, typename traits_type, typename T> 
+template<typename char_type, typename traits_type, typename T>
 inline
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& s, const SGMatrix<T>& m)

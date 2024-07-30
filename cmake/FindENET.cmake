@@ -7,11 +7,11 @@
 # $ENETDIR is an environment variable that would correspond
 # to the prefix used to configure ENET.
 #
-# Created by Jean-Philippe Meuret, based on the FindOpenAL.cmake module 
+# Created by Jean-Philippe Meuret, based on the FindOpenAL.cmake module
 # modified by  Bryan Donlan, from original version by Eric Wang.
 FIND_PATH(ENET_INCLUDE_DIR enet/enet.h
   HINTS ENV $ENETDIR
-  PATH_SUFFIXES 
+  PATH_SUFFIXES
 	Headers include
   PATHS
     ~/Library/Frameworks/GLFW.framework
@@ -45,7 +45,7 @@ IF(${ENET_INCLUDE_DIR} MATCHES ".framework")
     )
   # Clear the temp variable so nobody can see it
   SET(ENET_FRAMEWORK_PATH_TMP "" CACHE INTERNAL "")
- 
+
 ELSE(${ENET_INCLUDE_DIR} MATCHES ".framework")
   FIND_LIBRARY(ENET_LIBRARY
     NAMES enet

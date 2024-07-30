@@ -77,13 +77,13 @@ class GfScheduleSpy
 
 // GfScheduleEventLog class implementation //-------------------------------------------------
 
-// 
+//
 GfScheduleEventLog::GfScheduleEventLog(unsigned nMaxEvents, double dIgnoreDelay)
 {
 	configure(nMaxEvents, dIgnoreDelay);
 }
 
-// 
+//
 void GfScheduleEventLog::configure(unsigned nMaxEvents, double dIgnoreDelay)
 {
 	_nMaxEvents = nMaxEvents <= _vecStartTimes.max_size() ? nMaxEvents : _vecStartTimes.max_size();
@@ -158,7 +158,7 @@ void GfScheduleSpy::configureEventLog(const char* pszLogName,
 void GfScheduleSpy::beginSession()
 {
 	GfOut("Beginning schedule spy session\n");
-	
+
 	_dZeroTime = GfTimeClock();
 	MapEventLogs::iterator iterLogs;
 	for (iterLogs = _mapEventLogs.begin(); iterLogs != _mapEventLogs.end(); iterLogs++)
@@ -211,7 +211,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 		GfError("Could not open %s for writing report\n", ossFilePathName.str().c_str());
 		return;
 	}
-		
+
 	// Initialize the next event index for each log (a kind of cursor inside each log).
 	std::map<std::string, unsigned> mapNextEventInd;
 	MapEventLogs::const_iterator itLog;
@@ -240,7 +240,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 		ossStepLine << "\tStart\tDuration";
 	}
 	outFStream << ossStepLine.str() << std::endl;
-	
+
 	// For each time step (fTimeResolution), print events info.
 	const int nTimePrecision = (int)ceil(-log10(fTimeResolution));
 	const int nDurationPrecision = (int)ceil(-log10(fDurationResolution / fDurationUnit));
@@ -281,7 +281,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 					ossStepLine << "\t\t";
 				}
 			}
-			
+
 			// Print report line if any was produced,
 			// and check if any event left to process in this time step.
 			if (nbProcessedEvents > 0)
@@ -306,7 +306,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 				break;
 			}
 		}
-				
+
 		// Next time step.
 		dRelTime += fTimeResolution;
 	}

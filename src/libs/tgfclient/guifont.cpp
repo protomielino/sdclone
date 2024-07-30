@@ -38,7 +38,7 @@
 
 #include "guifont.h"
 
-				  
+
 static char buf[1024];
 
 GfuiFontClass *gfuiFont[GFUI_FONT_NB];
@@ -211,7 +211,7 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	//Save texture number
 	glGenTextures(1, &Tex);
 	font->Tex = Tex;
-	
+
 	//Set texture attributes
 	glBindTexture(GL_TEXTURE_2D, Tex);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -274,7 +274,7 @@ int GfuiFontClass::getHeight() const
 {
 	if (!font)
 		return 0;
-	
+
 	// All chars of the font have the same dy (except 1st and last in liberation-sans-bold ?).
 	return (int)(font->Char[2].dy * size);
 }
@@ -283,7 +283,7 @@ int GfuiFontClass::getDescender() const
 {
 	if (!font)
 		return 0;
-	
+
 	// All chars of the font have the same dy (except 1st and last in liberation-sans-bold ?).
 	return (int)(font->Char[2].dy * size / 3.0);
 }

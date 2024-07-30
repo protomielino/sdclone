@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
         Race initialization routines
     @author <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version  $Id$

@@ -42,7 +42,7 @@ int closeGfModule()
 	// Unregister it from the GfModule module manager.
 	if (TrackModule::_pSelf)
 		TrackModule::unregister(TrackModule::_pSelf);
-	
+
 	// Delete the (only) module instance.
 	delete TrackModule::_pSelf;
 	TrackModule::_pSelf = 0;

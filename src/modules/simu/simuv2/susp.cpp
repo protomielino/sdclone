@@ -26,8 +26,8 @@
 static void initDamper(tSuspension *susp)
 {
 	tDamper *damp;
-	
-	damp = &(susp->damper);	
+
+	damp = &(susp->damper);
 	damp->bump.b2 = (damp->bump.C1 - damp->bump.C2) * damp->bump.v1 + damp->bump.b1;
 	damp->rebound.b2 = (damp->rebound.C1 - damp->rebound.C2) * damp->rebound.v1 + damp->rebound.b1;
 }
@@ -46,11 +46,11 @@ static tdble damperForce(tSuspension *susp)
 	tdble     v;
 
 	v = susp->v;
-	
+
 	if (fabs(v) > 10.0f) {
 		v = (float)(SIGN(v) * 10.0);
 	}
-	
+
 	if (v < 0.0f) {
 		/* rebound */
 		dampdef = &(susp->damper.rebound);
@@ -58,16 +58,16 @@ static tdble damperForce(tSuspension *susp)
 		/* bump */
 		dampdef = &(susp->damper.bump);
 	}
-	
+
 	av = fabs(v);
 	if (av < dampdef->v1) {
 		f = (dampdef->C1 * av + dampdef->b1);
 	} else {
 		f = (dampdef->C2 * av + dampdef->b2);
 	}
-	
+
 	f *= (float)(SIGN(v));
-	
+
 	return f;
 }
 
@@ -81,13 +81,13 @@ static tdble springForce(tSuspension *susp)
 {
 	tSpring *spring = &(susp->spring);
 	tdble f;
-	
+
 	/* K is < 0 */
 	f = spring->K * (susp->x - spring->x0) + spring->F0;
 	if (f < 0.0f) {
 		f = 0.0f;
 	}
-	
+
 	return f;
 }
 
@@ -129,7 +129,7 @@ void SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0,
 	susp->damper.rebound.C1 = GfParmGetNum(hdle, section, PRM_SLOWREBOUND, (char*)NULL, 0.0f);
 	susp->damper.bump.C2    = GfParmGetNum(hdle, section, PRM_FASTBUMP, (char*)NULL, 0.0f);
 	susp->damper.rebound.C2 = GfParmGetNum(hdle, section, PRM_FASTREBOUND, (char*)NULL, 0.0f);
-	
+
 	susp->spring.x0 = susp->spring.bellcrank * X0;
 	susp->spring.F0 = F0 / susp->spring.bellcrank;
 	susp->spring.K = - susp->spring.K;
@@ -137,7 +137,7 @@ void SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0,
 	susp->damper.rebound.b1 = 0.0f;
 	susp->damper.bump.v1 = 0.5f;
 	susp->damper.rebound.v1 = 0.5f;
-	
+
 	initDamper(susp);
 }
 

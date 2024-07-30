@@ -31,4 +31,4 @@ extern void grMuteSound(bool bOn = true);
 extern float grGetVolume();
 extern void grSetVolume(float vol);
 
-#endif /* _GRSOUND_H_ */ 
+#endif /* _GRSOUND_H_ */

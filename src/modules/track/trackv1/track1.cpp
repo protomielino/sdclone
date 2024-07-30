@@ -89,7 +89,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SL].x = curSide->vertex[TR_SR].x + width * curSeg->rgtSideNormal.x;
 	    curSide->vertex[TR_SL].y = curSide->vertex[TR_SR].y + width * curSeg->rgtSideNormal.y;
 	    curSide->vertex[TR_SL].z = curSide->vertex[TR_SR].z + (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    x = curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x + width * curSeg->rgtSideNormal.x;	    
+	    x = curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x + width * curSeg->rgtSideNormal.x;
 	    y = curSide->vertex[TR_EL].y = curSide->vertex[TR_ER].y + width * curSeg->rgtSideNormal.y;
 	    z = curSide->vertex[TR_EL].z = curSide->vertex[TR_ER].z + (tdble)type * width * tan(curSeg->angle[TR_XE]);
 	    break;
@@ -97,7 +97,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SR].x = curSide->vertex[TR_SL].x - width * curSeg->rgtSideNormal.x;
 	    curSide->vertex[TR_SR].y = curSide->vertex[TR_SL].y - width * curSeg->rgtSideNormal.y;
 	    curSide->vertex[TR_SR].z = curSide->vertex[TR_SL].z - (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    x = curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x - width * curSeg->rgtSideNormal.x;	    
+	    x = curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x - width * curSeg->rgtSideNormal.x;
 	    y = curSide->vertex[TR_ER].y = curSide->vertex[TR_EL].y - width * curSeg->rgtSideNormal.y;
 	    z = curSide->vertex[TR_ER].z = curSide->vertex[TR_EL].z - (tdble)type * width * tan(curSeg->angle[TR_XE]);
 	    break;
@@ -132,7 +132,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SL].x = curSide->vertex[TR_SR].x - width * cos(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SL].y = curSide->vertex[TR_SR].y - width * sin(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SL].z = curSide->vertex[TR_SR].z + (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x - width * cos(curSide->angle[TR_CS] + curSide->arc);	    
+	    curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x - width * cos(curSide->angle[TR_CS] + curSide->arc);
 	    curSide->vertex[TR_EL].y = curSide->vertex[TR_ER].y - width * sin(curSide->angle[TR_CS] + curSide->arc);
 	    z = curSide->vertex[TR_EL].z = curSide->vertex[TR_ER].z + (tdble)type * width * tan(curSeg->angle[TR_XE]);
 
@@ -171,7 +171,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SR].x = curSide->vertex[TR_SL].x + width * cos(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SR].y = curSide->vertex[TR_SL].y + width * sin(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SR].z = curSide->vertex[TR_SL].z - (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x + width * cos(curSide->angle[TR_CS] + curSide->arc);	    
+	    curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x + width * cos(curSide->angle[TR_CS] + curSide->arc);
 	    curSide->vertex[TR_ER].y = curSide->vertex[TR_EL].y + width * sin(curSide->angle[TR_CS] + curSide->arc);
 	    z = curSide->vertex[TR_ER].z = curSide->vertex[TR_EL].z - (tdble)type * width * tan(curSeg->angle[TR_XE]);
 
@@ -217,7 +217,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SL].x = curSide->vertex[TR_SR].x + width * cos(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SL].y = curSide->vertex[TR_SR].y + width * sin(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SL].z = curSide->vertex[TR_SR].z + (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x + width * cos(curSide->angle[TR_CS] - curSide->arc);	    
+	    curSide->vertex[TR_EL].x = curSide->vertex[TR_ER].x + width * cos(curSide->angle[TR_CS] - curSide->arc);
 	    curSide->vertex[TR_EL].y = curSide->vertex[TR_ER].y + (tdble)type * width * sin(curSide->angle[TR_CS] - curSide->arc);
 	    z = curSide->vertex[TR_EL].z = curSide->vertex[TR_ER].z + width * tan(curSeg->angle[TR_XE]);
 
@@ -256,7 +256,7 @@ AddSide(tTrackSeg *curSeg, tdble width, char *material, int side, int type, void
 	    curSide->vertex[TR_SR].x = curSide->vertex[TR_SL].x - width * cos(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SR].y = curSide->vertex[TR_SL].y - width * sin(curSide->angle[TR_CS]);
 	    curSide->vertex[TR_SR].z = curSide->vertex[TR_SL].z - (tdble)type * width * tan(curSeg->angle[TR_XS]);
-	    curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x - width * cos(curSide->angle[TR_CS] - curSide->arc);	    
+	    curSide->vertex[TR_ER].x = curSide->vertex[TR_EL].x - width * cos(curSide->angle[TR_CS] - curSide->arc);
 	    curSide->vertex[TR_ER].y = curSide->vertex[TR_EL].y - width * sin(curSide->angle[TR_CS] - curSide->arc);
 	    z = curSide->vertex[TR_ER].z = curSide->vertex[TR_EL].z - (tdble)type * width * tan(curSeg->angle[TR_XE]);
 
@@ -311,7 +311,7 @@ normSeg(tTrackSeg *curSeg)
 /*
  * Read version 1 track segments
  */
-void 
+void
 ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 {
     int		i,j;
@@ -345,8 +345,8 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     char	*lsmaterial;
     char	*rsmaterial;
     int 	lst, rst;
-    
-    
+
+
 
     width = theTrack->width;
     wi2 = width / 2.0;
@@ -381,7 +381,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     } else {
 	lst = 1;
     }
-    
+
     segread = 0;
     curindex = 0;
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
@@ -392,12 +392,12 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    continue;
 	}
 	segread++;
-	
+
 	zsl = zel;
 	zsr = zer;
 	TSTZ(zsl);
 	TSTZ(zsr);
-	
+
 
 	/* allocate a new segment */
 	curSeg = (tTrackSeg*)calloc(1, sizeof(tTrackSeg));
@@ -441,7 +441,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	if (strcmp(segtype, TRK_VAL_STR) == 0) {
 	    /* straight */
 	    length = GfParmGetCurNum(TrackHandle, path, TRK_ATT_LG, (char*)NULL, 0);
-	    
+
 	    curSeg->type = TR_STR;
 	    curSeg->length = length;
 
@@ -472,7 +472,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->angle[TR_YL] = atan2(curSeg->vertex[TR_EL].z - curSeg->vertex[TR_SL].z, length);
 	    curSeg->angle[TR_XS] = atan2(curSeg->vertex[TR_SL].z - curSeg->vertex[TR_SR].z, width);
 	    curSeg->angle[TR_XE] = atan2(curSeg->vertex[TR_EL].z - curSeg->vertex[TR_ER].z, width);
-	    
+
 	    curSeg->Kzl = tan(curSeg->angle[TR_YR]);
 	    curSeg->Kzw = (curSeg->angle[TR_XE] - curSeg->angle[TR_XS]) / length;
 	    curSeg->Kyl = 0;
@@ -495,7 +495,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->radiusl = radius - wi2;
 	    curSeg->arc = arc;
 	    curSeg->length = radius * arc;
-	    
+
 	    innerradius = radius - wi2; /* left side aligned */
 	    cenx = xl - innerradius * sin(alf);  /* compute center location: */
 	    ceny = yl + innerradius * cos(alf);
@@ -536,7 +536,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curSeg->Kzl = tan(curSeg->angle[TR_YR]) * (innerradius + width);
 	    curSeg->Kzw = (curSeg->angle[TR_XE] - curSeg->angle[TR_XS]) / arc;
 	    curSeg->Kyl = 0;
-	    
+
 	    /* to find the boundary */
 	    al = (curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0;
 	    alfl = curSeg->angle[TR_ZS];
@@ -639,7 +639,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 
     theTrack->nseg = segread;
 
-    /* 
+    /*
      * camera definitions
      */
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
@@ -694,7 +694,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    }
 	    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
-	
+
 	    do {
 		curSeg->cam = curCam;
 		curSeg = curSeg->next;
@@ -739,7 +739,7 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	    curCam->pos.z -= zmin;
 	} while (curCam != *camList);
     }
-    
+
 }
 
 

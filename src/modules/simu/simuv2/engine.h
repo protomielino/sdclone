@@ -54,7 +54,7 @@ typedef struct
 	tdble       exhaust_refract;
 } tEngine;
 
-#endif /* _ENGINE_H_ */ 
+#endif /* _ENGINE_H_ */
 
 
 

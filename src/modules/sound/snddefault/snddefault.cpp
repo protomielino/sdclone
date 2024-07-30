@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : snddefault.cpp 
+    file                 : snddefault.cpp
     created              : Thu Aug 17 23:19:19 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -41,7 +41,7 @@ int closeGfModule()
 	// Unregister it from the GfModule module manager.
 	if (SndDefault::_pSelf)
 		SndDefault::unregister(SndDefault::_pSelf);
-	
+
 	// Delete the (only) module instance.
 	delete SndDefault::_pSelf;
 	SndDefault::_pSelf = 0;

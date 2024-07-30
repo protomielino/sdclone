@@ -53,7 +53,7 @@ double Opponent::testCollision(tPosd *c0, tPosd *c1, tPosd *c2, int point_test, 
  // It works by checking whether any of the polygon lines of the robot's car intersects with
  // any lines of the opponent's car.  If so, the cars are going to collide (we're looking at
  // extrapolated polygons based on estimated collision time and their speeds).
- 
+
  int cpos[4] = { 1, 0, 2, 3 };
 
  tPosd pc[4];
@@ -298,13 +298,13 @@ void Opponent::update(tSituation *s, Driver *driver)
  double oppToStart = cseg->lgfromstart + getDistToSegStart();
  distance = oppToStart - mycar->_distFromStartLine;
  //distance = RtGetDistFromStart(car) - RtGetDistFromStart(mycar);
- 
+
  if (distance > track->length/2.0) {
   distance -= track->length;
  } else if (distance < -track->length/2.0) {
   distance += track->length;
  }
- 
+
  // If the distance is small we compute it more accurate.
  if (distance < EXACT_DIST || (mycar->_trkPos.seg->type != TR_STR && distance < EXACT_DIST*5)) {
   Straight carFrontLine(
@@ -534,7 +534,7 @@ void Opponent::update(tSituation *s, Driver *driver)
  }
 
  // Is opponent in relevant range -BACKCOLLDIST..FRONTCOLLDIST m.
- if (distance > -BACKCOLLDIST && distance < FRONTCOLLDIST) 
+ if (distance > -BACKCOLLDIST && distance < FRONTCOLLDIST)
  {
   double sidemargin = driver->getSideMargin();
   if (cseg->type == TR_LFT && cseg->radius <= 120.0 && dnextleft < nextleft - (width+2.0) && car->_trkPos.toLeft-width/2 > 4.0 && dspeed-speed < (130.0-cseg->radius)/10)
@@ -543,8 +543,8 @@ void Opponent::update(tSituation *s, Driver *driver)
    sidemargin += (130.0-cseg->radius) / (mycar->_trkPos.toRight-width/2 < 5.0 ? 30.0 : 15.0);
 
   // Is opponent in front and slower.
-  if (((distance > SIDECOLLDIST) 
-     || (distance >= 0.0 && distance <= SIDECOLLDIST && cardist < sidemargin)) 
+  if (((distance > SIDECOLLDIST)
+     || (distance >= 0.0 && distance <= SIDECOLLDIST && cardist < sidemargin))
     && nextspeed <= dspeed + 2.5f) {
    state |= OPP_FRONT;
 
@@ -566,7 +566,7 @@ void Opponent::update(tSituation *s, Driver *driver)
 
    if (brakedistance > 0.0)
     brakedistance = MAX(0.1, brakedistance - ((team & TEAM_CONTROL) && driver->Alone() ? LENGTH_MARGIN-(seg->type==TR_STR || seg->radius >= 300 ? 1.3 : 0.7) : LENGTH_MARGIN) / 2);
-   
+
    double speedfactor = 0.0, cdist = distance;
    if (fabs(sidedist) > 1.5 && dspeed > speed && cdist-car->_dimension_x < 8.0 && fabs(mycar->_trkPos.toMiddle) < fabs(car->_trkPos.toMiddle))
     speedfactor = (dspeed-speed)/(cseg->type == TR_STR ? 3 : 5);
@@ -642,7 +642,7 @@ void Opponent::update(tSituation *s, Driver *driver)
      {
       // sanity check for cars that are about to plow full speed into the back of other cars
       double margin = dwidth + 0.5; //+ 0.5 + (cseg->type == TR_STR || cseg->radius > 200.0 ? 0.0
-                      //: ((cseg->type == TR_LFT && oleft > dleft) || (cseg->type == TR_RGT && oleft < dleft) 
+                      //: ((cseg->type == TR_LFT && oleft > dleft) || (cseg->type == TR_RGT && oleft < dleft)
                        //  ? (205.0 - cseg->radius)/45 : 0.0));
       double time = 0.6;
       double mti = MAX(t_impact, s_impact);
@@ -713,8 +713,8 @@ fprintf(stderr,"%s->%s A %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f dmg=%d\n",myca
     collide = ((dnext2 < nextleft2 && mymax >= nextLoffset) || (dnext2 > nextleft2 && mymin <= nextRoffset));
 fprintf(stderr,"%s->%s B %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f\n",mycar->_name,car->_name,collide,t_impact,mycar->_speed_x,dspeed,car->_speed_x,speed,brakedistance);fflush(stderr);
    }
-   if (!collide && team == TEAM_CONTROL && sidegap < 5.0 && speed > 10.0 
-       && fabs(angle) < 0.7 && speed > dspeed - 5.0 && !driver->getAvoiding() 
+   if (!collide && team == TEAM_CONTROL && sidegap < 5.0 && speed > 10.0
+       && fabs(angle) < 0.7 && speed > dspeed - 5.0 && !driver->getAvoiding()
        && (brakedistance < 0.5 && t_impact < 0.5))
     collide = 1;
 #endif
@@ -735,7 +735,7 @@ fprintf(stderr,"%s->%s B %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f\n",mycar->_nam
    else
    {
    }
-  } 
+  }
   else
   {
    //if ((seg->type == TR_LFT && seg->radius <= 200.0 && car->_trkPos.toLeft < mycar->_trkPos.toLeft-0.5) ||
@@ -754,12 +754,12 @@ fprintf(stderr,"%s->%s B %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f\n",mycar->_nam
     state |= OPP_BACK;
     distance -= MAX(car->_dimension_x, mycar->_dimension_x);
     distance -= LENGTH_MARGIN;
-   } 
+   }
    else
    {
     // Is opponent aside.
     if (nextdistance > -SIDECOLLDIST &&
-     nextdistance < SIDECOLLDIST) 
+     nextdistance < SIDECOLLDIST)
     {
      sidedist = car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
      //double nextsidedist = nextleft - dnextleft;
@@ -784,14 +784,14 @@ fprintf(stderr,"%s->%s B %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f\n",mycar->_nam
        state |= (OPP_COLL | OPP_COLL_URGENT);
      }
 #endif
-    } 
+    }
     else
     {
      // Opponent is in front and faster.
-     if (distance > SIDECOLLDIST && nextspeed > dspeed + 3.0f) 
+     if (distance > SIDECOLLDIST && nextspeed > dspeed + 3.0f)
      {
       state |= OPP_FRONT_FAST;
-      if ((team & TEAM_CONTROL) && 
+      if ((team & TEAM_CONTROL) &&
          car->_dammage + 500 >= mycar->_dammage)
       {
        state |= OPP_FOLLOW;
@@ -871,9 +871,9 @@ fprintf(stderr,"%s->%s B %d ti=%.3f (%.3f/%.3f-%.3f/%.3f) bd=%.3f\n",mycar->_nam
 
    cdist = (fabs(collpoint.ax - mycar->_corner_x(0)) + fabs(collpoint.ax - mycar->_corner_x(1)) + fabs(collpoint.ay - mycar->_corner_y(0)) + fabs(collpoint.ay - mycar->_corner_y(1))) / 4;
 
-   if ((car->_dimension_x - distance) < 1.5 && 
-       (cdist < mycar->_speed_x*0.65 || 
-        (sidedist < 5.0 
+   if ((car->_dimension_x - distance) < 1.5 &&
+       (cdist < mycar->_speed_x*0.65 ||
+        (sidedist < 5.0
          && ((mycar->_trkPos.toLeft < 4.0 && car->_trkPos.toLeft > mycar->_trkPos.toLeft)
           || (mycar->_trkPos.toRight < 4.0 && car->_trkPos.toRight < mycar->_trkPos.toRight)))))
     state |= (OPP_COLL | OPP_COLL_URGENT);
@@ -953,7 +953,7 @@ float Opponent::getDistToSegStart()
 // Update overlaptimers of opponents.
 void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar)
 {
- if ((state & (OPP_BACK|OPP_SIDE)) && (car->race.laps > mycar->race.laps 
+ if ((state & (OPP_BACK|OPP_SIDE)) && (car->race.laps > mycar->race.laps
       || ((team & TEAM_CONTROL) && mycar->_dammage > car->_dammage + 500)))
  {
   if ((getState() & (OPP_BACK | OPP_SIDE)) && distance < car->_dimension_x && distance > 30.0) {

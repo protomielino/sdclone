@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Container for parameters	of car,	lane, pit ...
 // Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
-// 
+//
 // File			:	unitparam.cpp
 // Created		: 2008.04.11
 // Last	changed	: 2014.11.29

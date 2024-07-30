@@ -19,9 +19,9 @@
 #include "policy.h"
 
 
-/** 
+/**
 	A type of discrete action policy using a neural network for function approximation.
-	
+
 	Constructor arguments offer the additional option
 	\c separate_actions. This is useful for the case of eligibility
 	traces. It allows to use clearing actions traces, since it uses a
@@ -56,9 +56,9 @@ public:
 	/// Reset eligibility traces.
 	virtual void Reset();
 	/// Return the last action value.
-	virtual real getLastActionValue () {return J_ps_pa;} 
+	virtual real getLastActionValue () {return J_ps_pa;}
 	/// \deprecated Get the probabilities of all actions - call after SelectAction().
-	virtual real* getActionProbabilities () 
+	virtual real* getActionProbabilities ()
 	{
 		real sum = 0.0;
 		int i;

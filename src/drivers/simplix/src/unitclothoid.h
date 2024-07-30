@@ -114,7 +114,7 @@ class TClothoidLane : public TLane
 
 	void SmoothPath
 	  (/*TTrackDescription* pTrack,*/
-	   const TParam& Param, 
+	   const TParam& Param,
 	   const TOptions& Opts);
 
     bool SaveToFile(const char* Filename);       // Save to file

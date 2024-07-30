@@ -1,26 +1,26 @@
 /*
  *      opponent.cpp
- *      
+ *
  *      Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
  *      Based on work by Bernhard Wymann and Andrew Sumner.
- *      
+ *
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation; either version 2 of the License, or
  *      (at your option) any later version.
- *      
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- *      
+ *
  *      You should have received a copy of the GNU General Public License
  *      along with this program; if not, write to the Free Software
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
- * 
+ *
  *      $Id$
- * 
+ *
  */
 
 #include "src/drivers/kilo2008/opponent.h"
@@ -187,11 +187,11 @@ void Opponent::UpdateOverlapTimer(tSituation * const s, tCarElt * const mycar) {
 }  // UpdateOverlapTimer
 
 
-/** 
+/**
  * Constructor
  * Initializes the list of opponents.
  * Checks and doesn't store out own car as an opponent.
- * 
+ *
  * @param s Situation provided by TORCS
  * @param driver Our own robot
  * @param c Opponent car data
@@ -215,10 +215,10 @@ Opponents::Opponents(tSituation *s, KDriver *driver, Cardata *c) {
 }  // Opponents::Opponents
 
 
-/** 
+/**
  * Update
  * Makes every opponent update its own data.
- * 
+ *
  * @param   s   Situation provided by TORCS
  * @param   driver  Our own robot
  */
@@ -232,11 +232,11 @@ void Opponents::Update(tSituation *s, KDriver *driver) {
 // for find()
 inline bool operator==(const Opponent& o, const std::string s)
     { return !s.compare(o.car_ptr()->_name); }
-/** 
+/**
  * SetTeamMate
  * Search the opponent list for our own teammate,
  * based on the teammate name given in the config as "teammate".
- * 
+ *
  * @param car Our own car, to read its config
  */
 void Opponents::SetTeamMate(const tCarElt *car) {
@@ -249,7 +249,7 @@ void Opponents::SetTeamMate(const tCarElt *car) {
 }  // SetTeamMate
 
 
-/** 
+/**
  * Searches the first opponent with the given state.
  *
  * @param [in]  state: we only care for an opponent in this state
@@ -270,7 +270,7 @@ Opponent * Opponents::GetOppByState(const int state) {
 /**
  * Decide if there is a car on the side we are to collide with...
  *
- * @param[in] car Our own car 
+ * @param[in] car Our own car
  * @return  Side collision car pointer or NULL
  */
 Opponent * Opponents::GetSidecollOpp(const tCarElt *car) {
@@ -297,7 +297,7 @@ Opponent * Opponents::GetSidecollOpp(const tCarElt *car) {
 
 /**
  * Decide if there is a car behind overlapping us.
- * 
+ *
  * A1) Teammate behind with more laps should overtake.
  * A2) Slipstreaming: the less damaged teammate is also allowed to pass
  *      if on the same lap.
@@ -343,7 +343,7 @@ Opponent * Opponents::GetOverlappingOpp(const tCarElt *car) {
  * Checks if opponent is too much on either side of the track,
  * (doesn't occupy center part of the segment)
  * and whether we are 5+ metres far.
- * 
+ *
  * @param [in]  ocar  the opponent car
  * @return      true if the opp. is too far on either side
 */

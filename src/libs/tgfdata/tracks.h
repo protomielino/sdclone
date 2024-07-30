@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 /**
-    @file   
+    @file
 		Singleton holding information on the available tracks and categories.
     @defgroup	tgfclientdata	Data manager for the client gaming framework.
 */
@@ -40,7 +40,7 @@ class TGFDATA_API GfTrack
 public:
 
 	GfTrack();
-	
+
 	const std::string& getId() const;
 	const std::string& getName() const;
 	const std::string& getDescription() const;
@@ -55,7 +55,7 @@ public:
 	int getMaxNumOfPitSlots() const;
 
 	bool isUsable() const;
-	
+
 	void setId(const std::string& strId);
 	void setName(const std::string& strName);
 	void setDescription(const std::string& strDesc);
@@ -103,7 +103,7 @@ public:
 
 	ITrackLoader* getTrackLoader() const;
 	void setTrackLoader(ITrackLoader* piTrackLoader);
-	
+
  	const std::vector<std::string>& getCategoryIds() const;
  	const std::vector<std::string>& getCategoryNames() const;
 
@@ -113,13 +113,13 @@ public:
  	std::vector<GfTrack*> getTracksInCategory(const std::string& strCatId = "") const;
  	std::vector<std::string> getTrackIdsInCategory(const std::string& strCatId = "") const;
  	std::vector<std::string> getTrackNamesInCategory(const std::string& strCatId = "") const;
-	
+
 	GfTrack* getFirstUsableTrack(const std::string& strCatId = "",
 								 const std::string& strFromTrackId = "",
 								 int nSearchDir = +1, bool bSkipFrom = false) const;
 	GfTrack* getFirstUsableTrack(const std::string& strFromCatId,
 								 int nSearchDir, bool bSkipFrom = false) const;
-	
+
  	void print(bool bVerbose = false) const;
 
 protected:
@@ -127,7 +127,7 @@ protected:
 	// Protected constructor and destructor : clients can not use them.
 	GfTracks();
 	~GfTracks();
-	
+
 protected:
 
 	// The singleton itself.

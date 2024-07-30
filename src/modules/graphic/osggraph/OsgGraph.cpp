@@ -74,7 +74,7 @@ bool OsgGraph::loadTrack(tTrack* pTrack)
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
-{ 
+{
     GfLogDebug("OsgGraph::loadCars\n");
     return osggraph::initCars(pSituation) == 0;
 }
@@ -108,7 +108,7 @@ void OsgGraph::shutdownView()
     osggraph::shutdownView();
 }
 
-Camera* OsgGraph::getCurCam() 
+Camera* OsgGraph::getCurCam()
 {
     return osggraph::getCamera();
 }

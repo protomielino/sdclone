@@ -154,7 +154,7 @@ public class ObjectMapProperties extends PropertyPanel
 		private JTextField			objectMapTextField		= new JTextField();
 		private JButton				objectMapCreateButton 	= null;
 		private JButton				objectMapButton			= null;
-		private ObjectTablePanel	objectTablePanel		= null;		
+		private ObjectTablePanel	objectTablePanel		= null;
 		private ObjectMap			objectMap				= null;
 
 		private Vector<ObjectData> data = new Vector<ObjectData>();
@@ -551,17 +551,17 @@ public class ObjectMapProperties extends PropertyPanel
 					break;
 				case IMAGE_X_INDEX:
 					datum.imageX = (Integer) value;
-					fireTableCellUpdated(rowIndex, columnIndex);			        
+					fireTableCellUpdated(rowIndex, columnIndex);
 					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
 					datum.trackX = real.x;
-					fireTableCellUpdated(rowIndex, TRACK_X_INDEX);			        
+					fireTableCellUpdated(rowIndex, TRACK_X_INDEX);
 					break;
 				case IMAGE_Y_INDEX:
 					datum.imageY = (Integer) value;
-					fireTableCellUpdated(rowIndex, columnIndex);			        
+					fireTableCellUpdated(rowIndex, columnIndex);
 					getEditorFrame().getCircuitView().imageToReal(datum.imageX, datum.imageY, objectMap.getImageWidth(), objectMap.getImageHeight(), real);
 					datum.trackY = real.y;
-					fireTableCellUpdated(rowIndex, TRACK_Y_INDEX);			        
+					fireTableCellUpdated(rowIndex, TRACK_Y_INDEX);
 					break;
 				case TRACK_X_INDEX:
 					datum.trackX = (Double) value;
@@ -825,7 +825,7 @@ public class ObjectMapProperties extends PropertyPanel
 	            	{
 	            		if (JOptionPane.showConfirmDialog(null, "Move this object?", "Move Object", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 	            		{
-	            			ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));											
+	            			ObjectData datum = data.elementAt(panel.table.convertRowIndexToModel(row));
 							String name = getEditorFrame().getObjectColorName(datum.color) + "-" + data.size();
 		            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, null, datum.color, datum.trackX, datum.trackY, Double.NaN, Double.NaN, null);
 		            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
@@ -864,15 +864,15 @@ public class ObjectMapProperties extends PropertyPanel
 	            			int size = data.size();
 	            			for (int i = 0; i < toMove.size(); i++)
 	            			{
-	            				ObjectData datum1 = data.elementAt(i);											
+	            				ObjectData datum1 = data.elementAt(i);
 								String name = getEditorFrame().getObjectColorName(datum.color) + "-" + size++;
 			            		GraphicObjectData	graphicObjectData = new GraphicObjectData(name, null, datum.color, datum1.trackX, datum1.trackY, Double.NaN, Double.NaN, null);
 			            		getEditorFrame().getGraphicObjectProperties().addData(graphicObjectData);
-	            			}	            			
+	            			}
 	            			for (int i = 0; i < toMove.size(); i++)
 	            			{
 	            				panel.model.removeRowAt(toMove.elementAt(i));
-	            			}	            			
+	            			}
 	            		}
 	            	}
 				}
@@ -959,7 +959,7 @@ public class ObjectMapProperties extends PropertyPanel
             	if (getEditorFrame().documentIsModified)
             	{
             		objectMap.setChanged(true);
-            		
+
             		// force recalculation of points
             		object.points = null;
             	}

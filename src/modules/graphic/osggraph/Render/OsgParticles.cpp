@@ -38,7 +38,7 @@ SDParticleSystem::~SDParticleSystem(void){};
 void SDParticleSystem::initialize(){
     //create our own default template
     this->ptemplate.setLifeTime(1.5); // in seconds
-    
+
     // the following ranges set the envelope of the respective
     // graphical properties in time.
     this->ptemplate.setSizeRange(osgParticle::rangef(0.1f, 1.5f));
@@ -72,18 +72,18 @@ void SDParticleSystem::initialize(){
         osg::Vec3(0, 0, -1),
         osg::Vec3(0, 0, 1)));
     this->emitter->setShooter(shooter);
-    
+
     //attach the geode to the main scene
     this->geode->addDrawable( this->particleSystem);
     this->sceneRoot->addChild(this->geode);
 };
 void SDParticleSystem::startEmitting(){
     this->isActive = true;
-    this->randomRateCounter->setRateRange(100, 300); 
+    this->randomRateCounter->setRateRange(100, 300);
 };
 void SDParticleSystem::stopEmitting(){
     this->isActive = false;
-    this->randomRateCounter->setRateRange(0, 0); 
+    this->randomRateCounter->setRateRange(0, 0);
 }
 
 void SDParticleSystem::setEmissionType(std::string groundMaterialType){
@@ -98,7 +98,7 @@ void SDParticleSystem::setEmissionType(std::string groundMaterialType){
         osg::Vec4(1.0f, 0.57f, 0.0f, 0.5f)));
         this->particleSystem->setDefaultParticleTemplate(newTemplate);
         this->particleSystem->setDefaultAttributes("", false, false);
-        
+
         //set the shooting angle
         // Theta is the angle between the velocity vector and Z axis
         this->shooter->setThetaRange( osg::PI_2 - 0.4f, osg::PI_2 + 0.4f );//negatives value on the first parameter mean wider on the top of the car
@@ -178,7 +178,7 @@ void SDParticleSystem::setEmissionType(std::string groundMaterialType){
         this->particleSystem->setDefaultParticleTemplate(newTemplate);
         this->shooter->setInitialSpeedRange(1.5, 5.0);
     }
-    
+
 };
 
 
@@ -191,37 +191,37 @@ void SDParticleSystemManager::initialize(tSituation *s){
     this->tiresSmokeParticleSystems.resize(s->_ncars * 4);
     //one for each car
     this->sparksParticleSystems.resize(s->_ncars);
-    
+
     //get the root node of the scene
     SDRender * renderer = getRender();
     osg::ref_ptr<osg::Group> root = renderer->getRoot();
-    
+
     //add the particle system updater
     osgParticle::ParticleSystemUpdater *psu = new osgParticle::ParticleSystemUpdater;
-    
+
     SDCars *cars = getCars();
-    
+
     for (int h = 0; h < s->_ncars; h++){
         tCarElt* curCar = s->cars[h];
         osg::ref_ptr<osg::Group> carRoot = cars->getCar(curCar)->getCarOsgGroup();
-        
+
         //add a sparks emitter for each car ??
         this->sparksParticleSystems[h] = new SDParticleSystem(root,carRoot);
         this->sparksParticleSystems[h]->setEmissionType("sparks");
         psu->addParticleSystem(sparksParticleSystems[h]->particleSystem);
-        
+
          // for each wheel of this car
         for (int i = 0; i <= 3; i++){
             int index = h*4+i;
             this->tiresSmokeParticleSystems[index] = new SDParticleSystem(root,carRoot);
             this->tiresSmokeParticleSystems[index]->placer->setCenter(curCar->priv.wheel[i].relPos.x, curCar->priv.wheel[i].relPos.y, curCar->priv.wheel[i].relPos.z);
-            
+
             //GfLogInfo("wheel %i x:%f y:%f z:%f\n", i, curCar->priv.wheel[i].relPos.x, curCar->priv.wheel[i].relPos.y, curCar->priv.wheel[i].relPos.z);
-            
+
             psu->addParticleSystem(tiresSmokeParticleSystems[index]->particleSystem);
         }
     }
-    
+
     // add the updater node to the scene graph
     root->addChild(psu);
 };
@@ -231,7 +231,7 @@ void SDParticleSystemManager::update(tSituation *s){
     for (int h = 0; h < s->_ncars; h++){
         tCarElt* car = s->cars[h];
         for (int i = 0; i <= 3; i++){
-            
+
             //get the ParticleSystems index for this specific wheel
             //we must use the position of the car as index because indexs get changed at runtime
             int wheelIndex = car->_startRank * 4 + i;
@@ -239,15 +239,15 @@ void SDParticleSystemManager::update(tSituation *s){
             SDRender * renderer = getRender();
             osg::ref_ptr<osg::Group> root = renderer->getRoot();
 
-            //set the particle emission type depending on what surface the wheel is touching 
+            //set the particle emission type depending on what surface the wheel is touching
             //know surface at the time of this implementation are (sand,dirt,mud,gravel,grass,snow)
             std::string groundMaterialType = car->priv.wheel[i].seg->surface->material;
             this->tiresSmokeParticleSystems[wheelIndex]->setEmissionType(groundMaterialType);
 
             //determine if the car/wheel is skidding/sliding
             bool wheelIsSlidng = (MAX(0.0, ((car->_wheelSpinVel(i) * car->_wheelRadius(i)) - fabs(car->_speed_x)) - 9.0)) > 0.0;
-            bool wheelIsSkidding =  (car->_skid[i]  > 0.4); 
-             
+            bool wheelIsSkidding =  (car->_skid[i]  > 0.4);
+
             //if so emit smoke/sand/dirt (always depending on the surface we are on)
             if(wheelIsSlidng || wheelIsSkidding){
                 if(!this->tiresSmokeParticleSystems[wheelIndex]->isActive){
@@ -259,7 +259,7 @@ void SDParticleSystemManager::update(tSituation *s){
                 }
             }
         }
-        
+
         //if a collision is happening emit sparks
         //nb the collision position passed be the simuEngine is not good yet, I should rework that
         int carIndex = car->_startRank;

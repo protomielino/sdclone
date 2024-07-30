@@ -1,6 +1,6 @@
 /***************************************************************************
-                        file.cpp -- directory management                       
-                             -------------------                                         
+                        file.cpp -- directory management
+                             -------------------
     created              : Thu Oct 12 21:58:55 CEST 2010
     copyright            : (C) 2010 by Mart Kelder, Jean-Philippe Meuret
     web                  : http://www.speed-reams.org
@@ -72,7 +72,7 @@ char* GfFileGetDirName(const char* pszFileName)
 		*pszDirName = '\0';
 
 	//GfLogDebug("GfFileGetDirName(%s) = %s\n", pszFileName, pszDirName);
-	
+
 	// That's all.
 	return pszDirName;
 }
@@ -104,7 +104,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	size_t writeSize;
 	int errnum;
 	bool res = true;
-	
+
 	// Create the target local directory (and parents) if not already done
 	// (first, we have to deduce its path from the target file path-name).
 	// TODO: Use GfFileGetDirName

@@ -23,7 +23,7 @@
 namespace osggraph {
 
 template <typename Vector>
-class SDVectorArrayAdapter 
+class SDVectorArrayAdapter
 {
 public:
 

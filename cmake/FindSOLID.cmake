@@ -34,7 +34,7 @@ IF(PKGCONFIG_FOUND)
     MESSAGE(STATUS "Looking for SOLID --- found using pkg-config (${SOLID_SOLID_LIBRARY})")
     RETURN()
   ENDIF(SOLID_FOUND)
-  
+
 ENDIF(PKGCONFIG_FOUND)
 
 # Then try the good old way for include dirs.
@@ -42,7 +42,7 @@ IF(NOT APPLE)
 
   FIND_PATH(SOLID_INCLUDE_DIR SOLID/solid.h
     HINTS ENV SOLID_DIR
-    PATH_SUFFIXES 
+    PATH_SUFFIXES
 	  include/FreeSOLID include/freesolid include/SOLID include
     PATHS
 	  /usr /usr/local
@@ -52,7 +52,7 @@ ELSE(NOT APPLE)
 
   FIND_PATH(SOLID_INCLUDE_DIR solid.h
     HINTS ENV SOLID_DIR
-    PATH_SUFFIXES 
+    PATH_SUFFIXES
 	  Headers include/FreeSOLID include/freesolid include/SOLID include
     PATHS
 	  #Additional MacOS Paths
@@ -66,7 +66,7 @@ ELSE(NOT APPLE)
 ENDIF(NOT APPLE)
 
 # Then try the good old way for libs.
-FIND_LIBRARY(SOLID_SOLID_LIBRARY 
+FIND_LIBRARY(SOLID_SOLID_LIBRARY
   NAMES solid2 solid FreeSOLID freesolid
   HINTS ENV SOLID_DIR
   PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64

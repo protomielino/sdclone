@@ -93,9 +93,9 @@ void SegLearn::update(tSituation *s, tTrack *t, tCarElt *car, int alone, int avo
  tTrackSeg *seg = car->_trkPos.seg;
  tTrackSeg *tseg = seg;
 
- if (seg->type == lastturn || seg->type == TR_STR) 
+ if (seg->type == lastturn || seg->type == TR_STR)
  {
-  if (check == true && alone > 0) 
+  if (check == true && alone > 0)
   {
    // + to left, - to right
    double toleft = car->_trkPos.toLeft;
@@ -130,8 +130,8 @@ void SegLearn::update(tSituation *s, tTrack *t, tCarElt *car, int alone, int avo
      spindmg_error = 1;
     }
    }
-   
-   // this stops it 'learning' to over-accelerate though the first 
+
+   // this stops it 'learning' to over-accelerate though the first
    // corner of a chicane.
    if ((!avoiding && seg->radius <= 50.0 &&
       (seg->type == TR_RGT && car->_trkPos.toRight < car->_dimension_y/4)) ||
@@ -140,13 +140,13 @@ void SegLearn::update(tSituation *s, tTrack *t, tCarElt *car, int alone, int avo
     inside_error = 1;
     tTrackSeg *cs = seg->prev;
     double len = 0.0;
- 
+
     while (cs->type == seg->type && len < 100.0)
     {
      len += cs->length;
      cs = cs->prev;
     }
- 
+
     if (cs->type != TR_STR && cs->type != seg->type && cs->radius < 400.0 && !last_inside_error)
     {
      int thisturn = cs->type;

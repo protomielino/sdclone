@@ -1,9 +1,9 @@
 /***************************************************************************
                  filesetup.cpp -- Versioned settings XML files installation
-                             -------------------                                         
+                             -------------------
     created              : 2009
     author               : Mart Kelder
-    web                  : http://speed-dreams.sourceforge.net   
+    web                  : http://speed-dreams.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -33,7 +33,7 @@
 static bool gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )
 {
 	bool status;
-	
+
 	// Copy the source file to its target place.
 	if( !( status = GfFileCopy( dataLocation, localLocation ) ) )
 		return status;
@@ -80,7 +80,7 @@ void GfFileSetup()
 	int minor;
 	struct stat st;
 	const char* pszVersionFileName = "version.xml";
-	
+
 	// Try and open version.xml from GfDataDir() .
 	filenameLength = strlen(GfDataDir()) + strlen(pszVersionFileName) + 2;
 	filename = (char*)malloc( sizeof(char) * filenameLength );
@@ -96,7 +96,7 @@ void GfFileSetup()
 		sprintf( filename, "%s%s", GfBinDir(), pszVersionFileName );
 		dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
 	}
-	
+
 	// Exit if version.xml not found.
 	if( !dataVersionHandle )
 	{
@@ -209,7 +209,7 @@ void GfFileSetup()
 						else
 							GfLogTrace(".\n");
 					}
-					
+
 					break;
 				}
 			} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );

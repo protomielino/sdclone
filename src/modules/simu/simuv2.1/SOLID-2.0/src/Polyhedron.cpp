@@ -38,7 +38,7 @@ extern "C" {
 }
 
 #include <vector>
-#include <new.h>  
+#include <new.h>
 
 typedef vector<unsigned int> IndexBuf;
 
@@ -49,7 +49,7 @@ Polyhedron::Polyhedron(const VertexBase& b, int c, const unsigned int v[]) :
   boolT ismalloc;
   int curlong, totlong, exitcode;
   char options[200];
-  
+
   facetT *facet;
   vertexT *vertex;
   vertexT **vertexp;
@@ -77,14 +77,14 @@ Polyhedron::Polyhedron(const VertexBase& b, int c, const unsigned int v[]) :
   FORALLfacets {
     setT *vertices = qh_facet3vertex(facet);
     FOREACHvertex_(vertices) facetIndices.push_back(qh_pointid(vertex->point));
-    for (int i = 0, j = facetIndices.size()-1; 
+    for (int i = 0, j = facetIndices.size()-1;
 	 i < facetIndices.size(); j = i++)
       indexBuf[facetIndices[j]].push_back(facetIndices[i]);
     facetIndices.erase(facetIndices.begin(), facetIndices.end());
   }
 
   cobound = new IndexArray[numVerts()];
-  for (i = 0; i < numVerts(); ++i) 
+  for (i = 0; i < numVerts(); ++i)
     if (indexBuf[i].size())
       new(&cobound[i]) IndexArray(indexBuf[i].size(), &indexBuf[i][0]);
 
@@ -97,7 +97,7 @@ Polyhedron::Polyhedron(const VertexBase& b, int c, const unsigned int v[]) :
   qh NOerrexit = True;
   qh_freeqhull(!qh_ALL);
   qh_memfreeshort(&curlong, &totlong);
-} 
+}
 
 Polyhedron::~Polyhedron() {
   delete [] cobound;
@@ -109,7 +109,7 @@ Point Polyhedron::support(const Vector& v) const {
   for (;;) {
     IndexArray& curr_cobound = cobound[curr_vertex];
     int i = 0, n = curr_cobound.size();
-    while (i != n && 
+    while (i != n &&
 	   (curr_cobound[i] == last_vertex || (d = dot((*this)[curr_cobound[i]], v)) <= h))
       ++i;
     if (i == n) break;

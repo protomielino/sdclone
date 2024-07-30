@@ -92,7 +92,7 @@ class SimpleStrategy2 : public SimpleStrategy {
 		void setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s, int index);
 		float pitRefuel(tCarElt* car, tSituation *s);
 		void update(tCarElt* car, tSituation *s);
-		
+
 
 	protected:
 		int m_remainingstops;

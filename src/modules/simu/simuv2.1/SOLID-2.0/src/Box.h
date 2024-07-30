@@ -40,7 +40,7 @@ public:
   Point support(const Vector&) const;
 
   const Vector& getExtent() const { return extent; }
-  
+
 protected:
   Vector extent;
 };

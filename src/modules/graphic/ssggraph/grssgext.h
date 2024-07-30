@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef _GRSSGEXT_H_
 #define _GRSSGEXT_H_
 
@@ -27,7 +27,7 @@ namespace ssggraph {
 /*
  * An ssgBranch with pre and post draw callbacks.
  * It must be clear that all the children nodes
- * have to be non-transparent in order to be 
+ * have to be non-transparent in order to be
  * drawn immediately.
  */
 class ssgBranchCb : public ssgBranch

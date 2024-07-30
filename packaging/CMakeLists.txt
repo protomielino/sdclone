@@ -75,7 +75,7 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 
    #================
    # TODO figure out if this is needed...
-   MESSAGE(STATUS "TODO: Hard coded loadable libraries...") 
+   MESSAGE(STATUS "TODO: Hard coded loadable libraries...")
    IF(NOT OPTION_OFFICIAL_ONLY)
       LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/libephemeris.dylib")
    ENDIF(NOT OPTION_OFFICIAL_ONLY)
@@ -96,7 +96,7 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 
    # Build up the 'app' path for FIXUP_BUNDLE()
    SET(SD_FU_BUNDLE "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_BINDIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-   
+
    SET(SD_FU_PLUGINS ${_loadables})
 
    SET(SD_FU_SEARCHDIRS ${_search_dirs})

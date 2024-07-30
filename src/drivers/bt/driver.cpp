@@ -267,7 +267,7 @@ float Driver::getAllowedSpeed(tTrackSeg *segment)
 		r += dr;
 	} else {
 		float tdr = dr*(1.0f - MIN(1.0f, fabs(myoffset)*2.0f/segment->width));
-		r += tdr;	
+		r += tdr;
 	}
 	// README: the outcommented code is the more save version.
 	/*if ((alone > 0 && fabs(myoffset) < USE_LEARNED_OFFSET_RANGE) ||
@@ -862,7 +862,7 @@ float Driver::filterSColl(float steer)
 				if (fabs(myoffset) > w) {
 					myoffset = (myoffset > 0.0f) ? w : -w;
 				}
-				
+
 				// On straights the car near to the middle can correct more, in turns the car inside
 				// the turn does (because if you leave the track on the turn "inside" you will skid
 				// back to the track.

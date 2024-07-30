@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Human player joystick configuration menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -42,7 +42,7 @@ static void* PrevScrHandle = NULL;
 
 //force feedback manager
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
- 
+
 
 
 //editBoxStruct
@@ -54,24 +54,24 @@ struct EditBox
 };
 
 //editBoxVector
-std::vector<EditBox> EditBoxes; 
+std::vector<EditBox> EditBoxes;
 
 
 
-// Called on menu (re)activation 
+// Called on menu (re)activation
 static void
 onActivate(void * /* dummy */)
 {
 	for(std::vector<EditBox>::iterator editbox = EditBoxes.begin(); editbox != EditBoxes.end(); ++editbox) {
-		
+
 		//convert the integer to a string
 		std::ostringstream editBoxValue;
 		editBoxValue << forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()];
-		
+
 		//reset the on screen value
 		GfuiEditboxSetString(ScrHandle, editbox->id, editBoxValue.str().c_str());
-		
-	}	
+
+	}
 
 }
 
@@ -87,28 +87,28 @@ static void
 onSaveForceFeedbackConfig(void * /* dummy */)
 {
 	//save the changes
-	
+
 	//read all the values from the editBox into the forceFeedback config map
 	for(std::vector<EditBox>::iterator editbox = EditBoxes.begin(); editbox != EditBoxes.end(); ++editbox) {
 
 		GfLogInfo("%s%s.\n", editbox->effectTypeName.c_str(), editbox->effectParameterName.c_str());
 
 		if (editbox->effectParameterName == "enabled" || editbox->effectParameterName == "reverse"){
-			
-			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
+
+			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] =
 				(int)GfuiCheckboxIsChecked(ScrHandle, (int)editbox->id);
 
-	
+
 		}else{
-			
-			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
+
+			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] =
 				atoi(GfuiEditboxGetString(ScrHandle, editbox->id));
 
 		}
-		
-	}	
-	
-	
+
+	}
+
+
 	//call the save function of the force feedback manager
 	forceFeedback.saveConfiguration();
 
@@ -132,15 +132,15 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 	//make the previous screen/menu value available outside of this function
     PrevScrHandle = prevMenu;
 
-	// Is the Screen has beean already created  we nothing more to do 
+	// Is the Screen has beean already created  we nothing more to do
     if (ScrHandle) {
 		return ScrHandle;
     }
 
     // Create screen
     ScrHandle = GfuiScreenCreate(NULL, NULL, onActivate, NULL, NULL, 1);
-	
-	// load menu XML descriptor 
+
+	// load menu XML descriptor
     void *menuXMLDescHdle = GfuiMenuLoad("forcefeedbackconfigmenu.xml");
 
 	// Create static controls.
@@ -159,7 +159,7 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 	std::string editBoxName;
 	std::string sectionName;
 	int editBoxId = 0;
-	
+
 
 	// iterate on the first map: the various effect config sections
 	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
@@ -172,7 +172,7 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); ++iterator2) {
 			// iterator2->first = key (effect parameter name)
 			// iterator2->second = value (effect value)
-	
+
 			editBoxName.clear();
 			editBoxName.append(iterator->first);
 			editBoxName.append(iterator2->first);
@@ -181,22 +181,22 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 			sectionName.append(editBoxName);
 
 			//GfLogInfo("%s%s\n", iterator->first.c_str(), iterator2->first.c_str());
-			
+
 			if(GfParmExistsSection(menuXMLDescHdle, sectionName.c_str())){
 				GfLogInfo("Exist: %s\n", editBoxName.c_str());
-		
+
 				//if (iterator2->first.c_str() == "enabled"){
 				if (iterator2->first == "enabled" || iterator2->first == "reverse"){
-					
+
 					int checkboxId =
 						GfuiMenuCreateCheckboxControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),
 							  NULL, NULL/*onClientPlayerReady*/);
-							  
+
 					//
 					GfuiCheckboxSetChecked(ScrHandle, checkboxId, (bool)iterator2->second);
 					//
 					//GfuiCheckboxSetText(ScrHandle, checkboxId, iterator->first.c_str());
-					
+
 					//save this data for later use
 					EditBox editbox;
 					editbox.id = checkboxId;
@@ -204,49 +204,49 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 					editbox.effectParameterName = iterator2->first;
 
 					//add it to our list
-					EditBoxes.push_back(editbox);	
-												
+					EditBoxes.push_back(editbox);
+
 					GfLogInfo("Generated checkbox for (%s)\n", editBoxName.c_str());
-					
+
 				}else{
 					//crete the editBox GUI
 					editBoxId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),
 					NULL, NULL, onValueChange);
-					
+
 					//convert the integer to a string
 					std::ostringstream editBoxValue;
 					editBoxValue << iterator2->second;
 
 					//set the value of the editBox
 					GfuiEditboxSetString(ScrHandle, editBoxId, editBoxValue.str().c_str());
-					
+
 					//save this data for later use
 					EditBox editbox;
 					editbox.id = editBoxId;
 					editbox.effectTypeName = iterator->first;
 					editbox.effectParameterName = iterator2->first;
-					
+
 					//add it to our list
-					EditBoxes.push_back(editbox);	
+					EditBoxes.push_back(editbox);
 
 					GfLogInfo("Generated editbox for (%s)\n", editBoxName.c_str());
 				}
-				
+
 			}else{
 				//GfLogInfo("NON Exist: %s\n", editBoxName.c_str());
-				
+
 			}
 		}
 	}
-		   
-		   
+
+
     // create Accept and Cancel buttons. (dynamic controls)
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ApplyButton", NULL, onSaveForceFeedbackConfig);
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "CancelButton", NULL, onQuitForceFeedbackConfig);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Quit", NULL, onQuitForceFeedbackConfig , NULL);

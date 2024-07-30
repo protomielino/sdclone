@@ -2,8 +2,8 @@
 
     file        : raceconfigstate.cpp
     created     : Fri Jan  3 22:24:41 CET 2003
-    copyright   : (C) 2003 by Eric Espie                        
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		The automaton for race configuration
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -54,7 +54,7 @@ rmConfigBack(void)
 	void* params = LmRaceEngine().inData()->params;
 
 	/* Go back one step in the conf */
-	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 
+	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL,
 				 GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1) - 2);
 
 	RmConfigRunState();
@@ -110,7 +110,7 @@ RmConfigRunState(bool bStart)
 	void	*params = reInfo->params;
 
 	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
-	
+
 	// Reset config automaton to the "start" state if specified.
 	if (bStart)
 		GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
@@ -137,10 +137,10 @@ RmConfigRunState(bool bStart)
 
 	// Normal configuration steps :
 	GfLogInfo("%s configuration now in #%d '%s' stage.\n", reInfo->_reName, curConf, conf);
-	
+
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
-		
-		// Track Select Menu 
+
+		// Track Select Menu
 		ts.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
 			ts.prevScreen = RmGetRacemanMenuHandle();
@@ -152,7 +152,7 @@ RmConfigRunState(bool bStart)
 		RmTrackSelect(&ts);
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
-		
+
 		// Drivers select menu
 		ds.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
@@ -164,7 +164,7 @@ RmConfigRunState(bool bStart)
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
-		
+
 		// Race (= session) Options menu
 		rp.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
@@ -178,7 +178,7 @@ RmConfigRunState(bool bStart)
 	}
 #ifdef CLIENT_SERVER
 	else if (!strcmp(conf, RM_VAL_CLIENTCONF)) {
-		
+
 		// network client settings menu
 		cs.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
@@ -190,7 +190,7 @@ RmConfigRunState(bool bStart)
 		RmClientSettings(&cs);
 
 	}else if (!strcmp(conf, RM_VAL_SERVERCONF)) {
-		
+
 		// network server settings menu
 		ss.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
@@ -201,7 +201,7 @@ RmConfigRunState(bool bStart)
 		ss.pRace = LmRaceEngine().race();
 		RmServerSettings(&ss);
 	}
-#endif	
+#endif
 	// Prepare next configuration if any.
 	curConf++;
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, curConf);

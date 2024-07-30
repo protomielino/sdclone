@@ -52,7 +52,7 @@ public:
   void draw_geometry_array();
 
 protected:
-	
+
   virtual void copy_from ( cgrVtxTable* src, int clone_flags = 0) ;
 
 protected:
@@ -70,7 +70,7 @@ protected:
   // 1 state for each other texture map (see ssgVtxTable for the 1st one)
   cgrMultiTexState* _mTexStates[NMaxTexMaps-1] ; // 0 => texture unit 1 ; 1 => TU 2 ; ...
 
-_SSG_PUBLIC:  
+_SSG_PUBLIC:
 
   // 1 texCoordArray for each other state.
   ssgTexCoordArray* _mTexCoords[NMaxTexMaps-1] ;
@@ -100,7 +100,7 @@ public:
   virtual ssgBase* clone ( int clone_flags = 0 ) ;
 
   cgrVtxTableCarPart () ;
-  
+
   cgrVtxTableCarPart (int nTexMaps, int carIndex,
 					  GLenum ty, ssgVertexArray* vl,
 					  ssgNormalArray* nl,
@@ -115,7 +115,7 @@ public:
   void draw_geometry_array () ;
 
 protected:
-	
+
   virtual void copy_from ( cgrVtxTableCarPart* src, int clone_flags = 0) ;
 
 protected:

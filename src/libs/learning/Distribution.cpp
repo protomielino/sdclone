@@ -21,7 +21,7 @@ static const float PI = 3.1415927f;
 
 void setRandomSeed(unsigned int seed)
 {
-	srand(seed); 
+	srand(seed);
 }
 
 real urandom()
@@ -65,11 +65,11 @@ real NormalDistribution::generate()
 	} else {
 		cache = false;
 	}
-	
+
 	if (cache) {
 		return normal_rho * cos(2.0f * PI * normal_x) * s + m;
 	} else {
-		return normal_rho * sin(2.0f * PI * normal_x) * s + m;	
+		return normal_rho * sin(2.0f * PI * normal_x) * s + m;
 	}
 }
 
@@ -89,7 +89,7 @@ real LaplacianDistribution::generate()
 	} else {
 		sgnx = -1.0;
 	}
-	
+
 	return m + sgnx * log(1.0f - absx) / l;
 
 }
@@ -152,6 +152,6 @@ real DiscreteDistribution::pdf(real x)
 	int i=(int) floor(x);
 	if ((i>=0)&&(i<n_outcomes)) {
 		return p[i];
-	} 
+	}
 	return 0.0;
 }

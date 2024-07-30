@@ -320,17 +320,17 @@ SimUpdate(tSituation *s, double deltaTime)
 	int ncar;
 	tCarElt *carElt;
 	tCar *car;
-	
+
 	SimDeltaTime = (tdble) deltaTime;
 	for (ncar = 0; ncar < s->_ncars; ncar++) {
 		SimCarTable[ncar].collision = 0;
 		SimCarTable[ncar].blocked = 0;
 	}
-	
+
 	for (ncar = 0; ncar < s->_ncars; ncar++) {
 		car = &(SimCarTable[ncar]);
 		carElt = car->carElt;
-	
+
 		if (carElt->_state & RM_CAR_STATE_NO_SIMU) {
 			RemoveCar(car, s);
 			continue;
@@ -342,13 +342,13 @@ SimUpdate(tSituation *s, double deltaTime)
 				continue;
 			}
 		}
-	
-		if (s->_raceState & RM_RACE_PRESTART && 
+
+		if (s->_raceState & RM_RACE_PRESTART &&
 				(car->carElt->_skillLevel < PRO || !(s->_features & RM_FEATURE_PENALTIES))) {
 			car->ctrl->brakeCmd = 1.0;
 			car->ctrl->clutchCmd = 1.0;
 		}
-	
+
 		CHECK(car);
 		ctrlCheck(car);
 		CHECK(car);
@@ -358,9 +358,9 @@ SimUpdate(tSituation *s, double deltaTime)
 		CHECK(car);
 		SimEngineUpdateTq(car);
 		CHECK(car);
-	
+
 		if (!(s->_raceState & RM_RACE_PRESTART) || car->carElt->_skillLevel == PRO) {
-	
+
 			SimCarUpdateWheelPos(car);
 			CHECK(car);
 			SimBrakeSystemUpdate(car);
@@ -394,25 +394,25 @@ SimUpdate(tSituation *s, double deltaTime)
 			SimEngineUpdateRpm(car, 0.0);
 		}
 	}
-	
+
 	SimCarCollideCars(s);
-	
+
 	/* printf ("%f - ", s->currentTime); */
-	
+
 	for (ncar = 0; ncar < s->_ncars; ncar++) {
 		car = &(SimCarTable[ncar]);
 		CHECK(car);
 		carElt = car->carElt;
-	
+
 		if (carElt->_state & RM_CAR_STATE_NO_SIMU) {
 			continue;
 		}
-	
+
 		CHECK(car);
 		SimCarUpdate2(car, s); /* telemetry */
-	
+
 		/* copy back the data to carElt */
-	
+
 		carElt->pub.DynGC = car->DynGC;
 		carElt->pub.DynGCg = car->DynGCg;
 		sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
@@ -462,7 +462,7 @@ SimShutdown(void)
 }
 
 /* Used for network games to update client physics */
-void 
+void
 UpdateSimCarTable(tDynPt DynGCG,int index)
 {
 	tCar *pCar = SimCarTable;
@@ -470,7 +470,7 @@ UpdateSimCarTable(tDynPt DynGCG,int index)
 }
 
 /* Used for network games get current physics values*/
-tDynPt * 
+tDynPt *
 GetSimCarTable(int index)
 {
 	tCar *pCar = SimCarTable;
@@ -485,11 +485,11 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	//int ncar;
 	tCarElt *carElt;
 	tCar *car;
-	
+
 	SimDeltaTime = (tdble) deltaTime;
 	SimCarTable[index].collision = 0;
 	SimCarTable[index].blocked = 0;
-	
+
 	car = &(SimCarTable[index]);
 	carElt = car->carElt;
 
@@ -502,7 +502,7 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	CHECK(car);
 	SimEngineUpdateTq(car);
 	CHECK(car);
-	
+
 	SimCarUpdateWheelPos(car);
 	CHECK(car);
 	SimBrakeSystemUpdate(car);
@@ -531,7 +531,7 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	CHECK(car);
 	SimCarUpdate(car, s);
 	CHECK(car);
-	
+
 	/* copy back the data to carElt */
 
 	carElt->pub.DynGC = car->DynGC;

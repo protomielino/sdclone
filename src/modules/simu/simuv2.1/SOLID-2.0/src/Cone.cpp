@@ -35,7 +35,7 @@ Point Cone::support(const Vector& v) const {
   else {
     Scalar s = sqrt(v[X] * v[X] + v[Z] * v[Z]);
     if (s > EPSILON) {
-      Scalar d = bottomRadius / s;  
+      Scalar d = bottomRadius / s;
       return Point(v[X] * d, -halfHeight, v[Z] * d);
     }
     else  return Point(0, -halfHeight, 0);

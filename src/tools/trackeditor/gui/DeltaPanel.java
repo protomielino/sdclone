@@ -40,7 +40,7 @@ import javax.swing.JTextField;
 
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -71,15 +71,15 @@ public class DeltaPanel extends JDialog implements Runnable
 	private JButton adjustButton = null;
 	private JButton lengthButton = null;
 	private JTextField jTextField = null;
-	
+
 	private boolean finish = true;
-	
+
 	private double length = 0;
 	private double dX = 0;
 	private double dY = 0;
 	private double angle = 0;
     /**
-     *  
+     *
      */
     public DeltaPanel(EditorFrame editorFrame, String title, boolean modal)
     {
@@ -91,7 +91,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
     /**
      * This method initializes this
-     * 
+     *
      * @return void
      */
     private void initialize()
@@ -114,7 +114,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		deltaXLabel.setText(null);
 		deltaYLabel.setText(null);
 		deltaAngLabel.setText(null);
-		
+
 		finish = false;
 		errorMessage = null;
 		waitLabel.setText("Calculating track data. Please wait...");
@@ -195,7 +195,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
     /**
      * This method initializes jPanel
-     * 
+     *
      * @return javax.swing.JPanel
      */
     private JPanel getJPanel()
@@ -226,7 +226,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
     /**
      * This method initializes jPanel1
-     * 
+     *
      * @return javax.swing.JPanel
      */
     private JPanel getJPanel1()
@@ -289,7 +289,7 @@ public class DeltaPanel extends JDialog implements Runnable
 
     /**
      * This method initializes calcButton
-     * 
+     *
      * @return javax.swing.JButton
      */
     private JButton getCalcButton()
@@ -315,19 +315,19 @@ public class DeltaPanel extends JDialog implements Runnable
     }
 
 	/**
-	 * This method initializes adjustButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes adjustButton
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getAdjustButton() {
 		if (adjustButton == null) {
 			adjustButton = new JButton();
 			adjustButton.setBounds(82, 320, 65, 25);
 			adjustButton.setText("Auto");
 			adjustButton.setToolTipText("Auto adjust the start/finish segments of the track");
-			adjustButton.addActionListener(new java.awt.event.ActionListener() { 
-				public void actionPerformed(java.awt.event.ActionEvent e) 
-				{  
+			adjustButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
 				    getCalcButton().setEnabled(false);
 			        getAdjustButton().setEnabled(false);
 			        getLengthButton().setEnabled(false);
@@ -342,7 +342,7 @@ public class DeltaPanel extends JDialog implements Runnable
 				    {
 						getCalcButton().setEnabled(true);
 				        getAdjustButton().setEnabled(true);
-				        getLengthButton().setEnabled(true);		
+				        getLengthButton().setEnabled(true);
 				        return;
 				    }
 				    adjust();
@@ -352,23 +352,23 @@ public class DeltaPanel extends JDialog implements Runnable
 		return adjustButton;
 	}
 	/**
-	 * This method initializes lengthButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */    
+	 * This method initializes lengthButton
+	 *
+	 * @return javax.swing.JButton
+	 */
 	private JButton getLengthButton() {
 		if (lengthButton == null) {
 			lengthButton = new JButton();
 			lengthButton.setBounds(169, 320, 85, 25);
 			lengthButton.setText("Length");
 			lengthButton.setToolTipText("Adjust the length of the track to match the value in the text field on the rigth");
-			lengthButton.addActionListener(new java.awt.event.ActionListener() { 
-				public void actionPerformed(java.awt.event.ActionEvent e) 
-				{    
+			lengthButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
 				    getCalcButton().setEnabled(false);
                     getAdjustButton().setEnabled(false);
                     getLengthButton().setEnabled(false);
-                    
+
 				    int options = JOptionPane.OK_CANCEL_OPTION;
 				    String msg = "This option will change your track permantly.\n"
 				        +"The result will be writed on xml file and no undo has implemented yet.\n\n"
@@ -379,22 +379,22 @@ public class DeltaPanel extends JDialog implements Runnable
 				    {
 						getCalcButton().setEnabled(true);
 				        getAdjustButton().setEnabled(true);
-				        getLengthButton().setEnabled(true);		
+				        getLengthButton().setEnabled(true);
 				        return;
 				    }
-				    
+
 				    adjustLength();
 				}
 			});
 		}
 		return lengthButton;
 	}
-	
+
 	/**
-	 * This method initializes jTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */    
+	 * This method initializes jTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
 	private JTextField getJTextField() {
 		if (jTextField == null) {
 			jTextField = new JTextField();
@@ -403,38 +403,38 @@ public class DeltaPanel extends JDialog implements Runnable
 		}
 		return jTextField;
 	}
-	
+
     /**
-     * 
+     *
      */
     protected void startTrackgen()
-    {       
+    {
         editorFrame.exportTrack();
         ac3d = new Thread(this);
         ac3d.start();
     }
-	
+
     private synchronized void calculate()
-    {      
+    {
         finish = false;
         startTrackgen();
         waitTrackgen();
-        
+
         if (errorMessage != null)
         {
 			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
         }
-        
+
         this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);
         this.getLengthButton().setEnabled(true);
     }
-	
+
 	private synchronized void adjustLength()
 	{
 	    double newLength = 0;
 	    double co = 0;
-	    
+
 	    finish = false;
 	    startTrackgen();
 	    waitTrackgen();
@@ -444,7 +444,7 @@ public class DeltaPanel extends JDialog implements Runnable
 			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
 			getCalcButton().setEnabled(true);
 	        getAdjustButton().setEnabled(true);
-	        getLengthButton().setEnabled(true);		
+	        getLengthButton().setEnabled(true);
 			return;
         }
 	    try
@@ -487,9 +487,9 @@ public class DeltaPanel extends JDialog implements Runnable
 		editorFrame.refresh();
 		this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);
-        this.getLengthButton().setEnabled(true);		
+        this.getLengthButton().setEnabled(true);
 	}
-	
+
 	private synchronized void adjust()
 	{
         finish = false;
@@ -500,11 +500,11 @@ public class DeltaPanel extends JDialog implements Runnable
 			JOptionPane.showMessageDialog(this, errorMessage, "Delta Dialog", JOptionPane.ERROR_MESSAGE);
 			getCalcButton().setEnabled(true);
 	        getAdjustButton().setEnabled(true);
-	        getLengthButton().setEnabled(true);		
+	        getLengthButton().setEnabled(true);
 			return;
         }
 	    double co = 360/(360+angle);
-	    
+
 		SegmentVector track = editorFrame.getTrackData().getSegments();
 		int size = track.size();
 
@@ -528,9 +528,9 @@ public class DeltaPanel extends JDialog implements Runnable
 		finish = false;
 		startTrackgen();
 		waitTrackgen();
-		
+
 		double totalY = 0;
-		
+
 		for(int i=0; i<size; i++)
 		{
 			Segment obj = track.get(i);
@@ -552,9 +552,9 @@ public class DeltaPanel extends JDialog implements Runnable
 				e.printStackTrace();
 			}
 		}
-		
+
 		co = (totalY+dY)/totalY;
-		
+
 		for(int i=0; i<size; i++)
 		{
 			Segment obj = track.get(i);
@@ -579,9 +579,9 @@ public class DeltaPanel extends JDialog implements Runnable
 		finish = false;
 		startTrackgen();
 		waitTrackgen();
-		
+
 		double totalX = 0;
-		
+
 		for(int i=0; i<size; i++)
 		{
 			Segment obj = track.get(i);
@@ -603,9 +603,9 @@ public class DeltaPanel extends JDialog implements Runnable
 				e.printStackTrace();
 			}
 		}
-		
+
 		co = (totalX+dX)/totalX;
-		
+
 		for(int i=0; i<size; i++)
 		{
 			Segment obj = track.get(i);
@@ -631,12 +631,12 @@ public class DeltaPanel extends JDialog implements Runnable
 		startTrackgen();
 		waitTrackgen();
 		editorFrame.refresh();
-		
+
         this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);
         this.getLengthButton().setEnabled(true);
 	}
-	
+
 	private synchronized void waitTrackgen()
 	{
 	    while(!finish)

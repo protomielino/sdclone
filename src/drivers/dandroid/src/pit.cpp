@@ -177,7 +177,7 @@ void Pit::setPitstop(bool pitst)
     if (mypit == NULL) return;
     if (!isBetween(mFromStart) && !isBetween(mFromStart + ENTRY_MARGIN))
     {
-        if (teamcar != NULL && !(teamcar->_state & RM_CAR_STATE_OUT)) 
+        if (teamcar != NULL && !(teamcar->_state & RM_CAR_STATE_OUT))
         {
             if (teamcar->_raceCmd == RM_CMD_PIT_ASKED || teamcar->_state & RM_CAR_STATE_PIT)
             {

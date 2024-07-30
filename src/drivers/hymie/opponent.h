@@ -99,7 +99,7 @@ class Opponent {
   double distance;  // approximation of the real distance, negative if the opponent is behind.
   double catchdist; // distance needed to catch the opponent (linear estimate).
   double sidedist;  // approx distance of center of gravity of the cars.
-  double sidegap, prevsidegap; 
+  double sidegap, prevsidegap;
   double overlaptimer;
   double lastspeed;
   double nextspeed;

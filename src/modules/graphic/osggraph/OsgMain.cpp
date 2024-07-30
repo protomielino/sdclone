@@ -249,7 +249,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     nFPSTotalSeconds = 0;
 
     screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
-    
+
     GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	SDSetZoom, NULL);
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	SDSetZoom, NULL);
     GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	SDSetZoom, NULL);
@@ -376,14 +376,14 @@ int refresh(tSituation *s)
     adaptScreenSize();
 
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
-    
+
     //switch to look back camera if requested by the driver
     if (curCar->_lookback == true){
         SDSelectCameraTemporaryOn((void*)0);
     }else{
         SDSelectCameraTemporaryOff((void*)0);
     }
-    
+
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
     double X = eye[0];
@@ -402,7 +402,7 @@ int refresh(tSituation *s)
 
     //refresh the hud
     hud.Refresh(s, &frameInfo, curCar, Clouds, Rain, TimeOfDay);
-    
+
     //update particles
     ParticleManager.update(s);
 

@@ -37,8 +37,8 @@ public:
   Quaternion(const double v[4]) : Tuple4(v) {}
   Quaternion(Scalar x, Scalar y, Scalar z, Scalar w) : Tuple4(x, y, z, w) {}
   Quaternion(const Vector& axis, Scalar angle) { setRotation(axis, angle); }
-  Quaternion(Scalar yaw, Scalar pitch, Scalar roll) { 
-    setEuler(yaw, pitch, roll); 
+  Quaternion(Scalar yaw, Scalar pitch, Scalar roll) {
+    setEuler(yaw, pitch, roll);
   }
 
   void setRotation(const Vector& axis, Scalar angle) {
@@ -60,13 +60,13 @@ public:
 	     sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
 	     cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
   }
-  
+
   Quaternion& operator+=(const Quaternion& q);
   Quaternion& operator-=(const Quaternion& q);
   Quaternion& operator*=(const Quaternion& q);
   Quaternion& operator*=(Scalar s);
   Quaternion& operator/=(Scalar s);
-  
+
   Scalar length2() const;
   Scalar length() const;
 
@@ -110,7 +110,7 @@ inline Quaternion& Quaternion::operator-=(const Quaternion& q) {
   comp[X] -= q[X]; comp[Y] -= q[Y]; comp[Z] -= q[Z]; comp[W] -= q[W];
   return *this;
 }
- 
+
 inline Quaternion& Quaternion::operator*=(const Quaternion& q) {
   setValue(comp[W] * q[X] + comp[X] * q[W] + comp[Y] * q[Z] - comp[Z] * q[Y],
 	   comp[W] * q[Y] + comp[Y] * q[W] + comp[Z] * q[X] - comp[X] * q[Z],
@@ -142,11 +142,11 @@ inline Quaternion operator-(const Quaternion& q) {
 }
 
 inline Quaternion operator*(const Quaternion& q1, const Quaternion& q2) {
-  return 
+  return
     Quaternion(q1[W] * q2[X] + q1[X] * q2[W] + q1[Y] * q2[Z] - q1[Z] * q2[Y],
 	       q1[W] * q2[Y] + q1[Y] * q2[W] + q1[Z] * q2[X] - q1[X] * q2[Z],
 	       q1[W] * q2[Z] + q1[Z] * q2[W] + q1[X] * q2[Y] - q1[Y] * q2[X],
-	       q1[W] * q2[W] - q1[X] * q2[X] - q1[Y] * q2[Y] - q1[Z] * q2[Z]); 
+	       q1[W] * q2[W] - q1[X] * q2[X] - q1[Y] * q2[Y] - q1[Z] * q2[Z]);
 }
 
 inline Quaternion operator*(const Quaternion& q, Scalar s) {
@@ -179,7 +179,7 @@ inline void Quaternion::conjugate() {
 inline Quaternion Quaternion::conjugate() const {
   return Quaternion(-comp[X], -comp[Y], -comp[Z], comp[W]);
 }
-  
+
 inline void Quaternion::invert() {
   conjugate();
   *this /= length2();
@@ -193,11 +193,11 @@ inline Scalar length2(const Quaternion& q) { return q.length2(); }
 inline Scalar length(const Quaternion& q) { return q.length(); }
 
 inline bool approxZero(const Quaternion& q) { return q.approxZero(); }
-inline bool approxEqual(const Quaternion& q1, const Quaternion& q2) { 
-  return approxZero(q1 - q2); 
+inline bool approxEqual(const Quaternion& q1, const Quaternion& q2) {
+  return approxZero(q1 - q2);
 }
 
-// From: "Uniform Random Rotations", Ken Shoemake, Graphics Gems III, 
+// From: "Uniform Random Rotations", Ken Shoemake, Graphics Gems III,
 //       pg. 124-132
 inline Quaternion Quaternion::random() {
   Scalar x0 = rnd();

@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
@@ -83,11 +83,11 @@ static void
 loadOptions()
 {
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    
+
     FovFactorValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", 100.0);
-      
+
     SmokeValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, 300.0);
- 
+
     SkidValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, 20.0);
 
     LodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
@@ -95,9 +95,9 @@ loadOptions()
     SkyDomeDistanceIndex = 0; // Default value index, in case file value not found in list.
     const int nSkyDomeDist =
 		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) + 0.5);
-    for (int i = 0; i < NbSkyDomeDistanceValues; i++) 
+    for (int i = 0; i < NbSkyDomeDistanceValues; i++)
     {
-		if (nSkyDomeDist <= SkyDomeDistanceValues[i]) 
+		if (nSkyDomeDist <= SkyDomeDistanceValues[i])
 		{
 			SkyDomeDistanceIndex = i;
 			break;
@@ -107,7 +107,7 @@ loadOptions()
 	DynamicTimeOfDayIndex = 0; // Default value index, in case file value not found in list.
 	const char* pszDynamicTimeOfDay =
 		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED);
-	for (int i = 0; i < NbDynamicTimeOfDayValues; i++) 
+	for (int i = 0; i < NbDynamicTimeOfDayValues; i++)
 	{
 		if (!strcmp(pszDynamicTimeOfDay, DynamicTimeOfDayValues[i]))
 		{
@@ -119,7 +119,7 @@ loadOptions()
 	BackgroundLandscapeIndex = 0; // Default value index, in case file value not found in list.
 	const char* pszBackgroundLandscape =
 		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED);
-	for (int i = 0; i < NbBackgroundLandscapeValues; i++) 
+	for (int i = 0; i < NbBackgroundLandscapeValues; i++)
 	{
 		if (!strcmp(pszBackgroundLandscape, BackgroundLandscapeValues[i]))
 		{
@@ -130,9 +130,9 @@ loadOptions()
 
 	const int nCloudLayer =
 		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, 1) + 0.5f);
-	for (int i = 0; i < NbCloudLayersValues; i++) 
+	for (int i = 0; i < NbCloudLayersValues; i++)
 	{
-		if (nCloudLayer <= CloudLayersValues[i]) 
+		if (nCloudLayer <= CloudLayersValues[i])
 		{
 			CloudLayerIndex = i;
 			break;
@@ -142,9 +142,9 @@ loadOptions()
     PrecipDensityIndex = NbPrecipDensityValues - 1; // Default value index, in case file value not found in list.
     const int nPrecipDensity =
 		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100) + 0.5f);
-    for (int i = 0; i < NbPrecipDensityValues; i++) 
+    for (int i = 0; i < NbPrecipDensityValues; i++)
     {
-		if (nPrecipDensity <= PrecipDensityValues[i]) 
+		if (nPrecipDensity <= PrecipDensityValues[i])
 		{
 			PrecipDensityIndex = i;
 			break;
@@ -173,7 +173,7 @@ saveOptions()
     GfuiUnSelectCurrent();
 
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    
+
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", FovFactorValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, SmokeValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
@@ -184,9 +184,9 @@ saveOptions()
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, CloudLayersValues[CloudLayerIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, BackgroundLandscapeValues[BackgroundLandscapeIndex]);
 	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, NULL, VisibilityValues[VisibilityIndex]);
-    
+
     GfParmWriteFile(NULL, grHandle, "graph");
-    
+
     GfParmReleaseHandle(grHandle);
 }
 
@@ -200,7 +200,7 @@ onChangeVisibility(void* vp)
     VisibilityIndex = (VisibilityIndex + NbVisibilityValues + delta) % NbVisibilityValues;
     snprintf(buf, sizeof(buf), "%d", VisibilityValues[VisibilityIndex]);
     GfuiLabelSetText(ScrHandle, VisibilityLabelId, buf);
-} 
+}
 
 static void
 onChangeFov(void* vp)
@@ -268,7 +268,7 @@ onChangeDynamicTimeOfDay(void* vp)
     const long delta = (long)vp;
     DynamicTimeOfDayIndex = (DynamicTimeOfDayIndex + NbDynamicTimeOfDayValues + delta) % NbDynamicTimeOfDayValues;
     GfuiLabelSetText(ScrHandle, DynamicTimeOfDayLabelId, DynamicTimeOfDayValues[DynamicTimeOfDayIndex]);
-} 
+}
 
 static void
 onChangeBackgroundLandscape(void* vp)
@@ -276,7 +276,7 @@ onChangeBackgroundLandscape(void* vp)
     const long delta = (long)vp;
     BackgroundLandscapeIndex = (BackgroundLandscapeIndex + NbBackgroundLandscapeValues + delta) % NbBackgroundLandscapeValues;
     GfuiLabelSetText(ScrHandle, BackgroundLandscapeLabelId, BackgroundLandscapeValues[BackgroundLandscapeIndex]);
-} 
+}
 
 static void
 onChangeCloudLayers(void* vp)
@@ -304,8 +304,8 @@ onChangeSkyDomeDistance(void* vp)
 		onChangeDynamicTimeOfDay(0); // Display real value.
 	else
 		GfuiLabelSetText(ScrHandle, DynamicTimeOfDayLabelId, GR_ATT_DYNAMICSKYDOME_DISABLED);
-		
-	
+
+
 	// No changes of background landscape if sky dome disabled
 	GfuiEnable(ScrHandle, BackgroundLandscapeLeftButtonId, bSkyDome ? GFUI_ENABLE : GFUI_DISABLE);
 	GfuiEnable(ScrHandle, BackgroundLandscapeRightButtonId, bSkyDome ? GFUI_ENABLE : GFUI_DISABLE);
@@ -328,10 +328,10 @@ onChangeSkyDomeDistance(void* vp)
 		onChangeVisibility(0); // Display Real value.
 	else
 		GfuiLabelSetText(ScrHandle, VisibilityLabelId, "4000");
-	
+
 	// No changes of FOV if sky dome enabled
 	GfuiEnable(ScrHandle, FovEditId, bSkyDome ? GFUI_DISABLE : GFUI_ENABLE);
-} 
+}
 
 static void
 onChangePrecipDensity(void* vp)
@@ -361,7 +361,7 @@ static void
 onAccept(void* tgtScrHdle)
 {
     saveOptions();
-    
+
     GfuiScreenActivate(tgtScrHdle);
 }
 
@@ -400,14 +400,14 @@ GraphMenuInit(void* prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistrightarrow", (void*)1, onChangeSkyDomeDistance);
     SkyDomeDistanceLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "skydomedistlabel");
-    
+
     DynamicTimeOfDayLeftButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomeleftarrow", (void*)-1, onChangeDynamicTimeOfDay);
     DynamicTimeOfDayRightButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomerightarrow", (void*)1, onChangeDynamicTimeOfDay);
     DynamicTimeOfDayLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "dynamicskydomelabel");
-    
+
     GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityleftarrow", (void*)-1, onChangePrecipDensity);
     GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityrightarrow", (void*)1, onChangePrecipDensity);
     PrecipDensityLabelId =
@@ -436,9 +436,9 @@ GraphMenuInit(void* prevMenu)
 
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);
     GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", prevMenu, onCancel);
-    
+
     GfParmReleaseHandle(param);
-    
+
     // Add standard keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", prevMenu, onAccept, NULL);

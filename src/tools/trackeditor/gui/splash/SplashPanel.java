@@ -50,7 +50,7 @@ public class SplashPanel extends JPanel
 	private StatusBar status = new StatusBar();
 
 	/**
-	 * 
+	 *
 	 */
 	public SplashPanel(String iconName)
 	{
@@ -66,7 +66,7 @@ public class SplashPanel extends JPanel
 		this.add(headerLabel, BorderLayout.NORTH);
 		this.add(splash,BorderLayout.CENTER);
 		this.add(status,BorderLayout.SOUTH);
-		
+
 	}
 
 	/**

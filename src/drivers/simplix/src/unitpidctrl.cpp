@@ -4,7 +4,7 @@
 // A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // PID Controller
-// 
+//
 // File			:	unitpidctrl.cpp
 // Created		: 2007.11.257
 // Last	changed	: 2014.11.29
@@ -87,7 +87,7 @@ double TPidController::Sample(double PropValue,	double DiffValue)
 	  oTotal =	oMaxTotal;
 	else if (oTotal < oMinTotal)
 	  oTotal =	oMinTotal;
-	
+
 	Cntrl += oTotal * oI;
   }
 

@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file                 : legacymenu.cpp
-    copyright            : (C) 2011 by Jean-Philippe Meuret                        
-    email                : pouillot@users.sourceforge.net   
+    copyright            : (C) 2011 by Jean-Philippe Meuret
+    email                : pouillot@users.sourceforge.net
     version              : $Id$
 
  ***************************************************************************/
@@ -141,7 +141,7 @@ bool LegacyMenu::startRace()
         }
         else if ((0 == strcmp(racID.c_str(), "netwatcher")))
         {
-            // TODO netwatcher menu may be RmNetworkClientMenu() 
+            // TODO netwatcher menu may be RmNetworkClientMenu()
             // with no driver ??
             ::RmNetworkClientMenu();
         }
@@ -430,7 +430,7 @@ bool LegacyMenu::onRaceStartingPaused(){
    if (preracePauseEnabled){
       ::RmAddPreRacePauseItems();
    }
-   
+
    // Tell the race engine if Prerace Pause is enabled
    return preracePauseEnabled;
 }
@@ -475,7 +475,7 @@ bool LegacyMenu::onRaceCooldownStarting(){
    if (cooldownEnabled){
       ::RmAddCooldownItems();
    }
-   
+
    // Tell the race engine if Cooldown is enabled
    return cooldownEnabled;
 }

@@ -34,8 +34,8 @@
 Point Polygon::support(const Vector& v) const {
   Scalar h = dot((*this)[ci], v), d;
   int ni = ci < numVerts()-1 ? ci+1 : 0;
-  if ((d = dot((*this)[ni], v)) > h) { 
-    do { 
+  if ((d = dot((*this)[ni], v)) > h) {
+    do {
       h = d; ci = ni;
       if (++ni == numVerts()) ni = 0;
     }
@@ -47,7 +47,7 @@ Point Polygon::support(const Vector& v) const {
       h = d; ci = ni;
       if (ni) --ni; else ni = numVerts()-1;
     }
-  }  
+  }
   return (*this)[ci];
 }
 

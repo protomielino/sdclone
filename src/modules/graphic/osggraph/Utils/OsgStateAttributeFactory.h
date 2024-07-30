@@ -47,7 +47,7 @@ class SDStateAttributeFactory
 {
 public:
     ~SDStateAttributeFactory();
-          
+
     // Alpha test > .01
     osg::AlphaFunc* getStandardAlphaFunc() { return _standardAlphaFunc.get(); }
     // alpha source, 1 - alpha destination
@@ -70,7 +70,7 @@ public:
     osg::CullFace* getCullFaceBack() { return _cullFaceBack.get(); }
     // Standard depth with writes disabled.
     osg::Depth* getDepthWritesDisabled() { return _depthWritesDisabled.get(); }
-    SDStateAttributeFactory();    
+    SDStateAttributeFactory();
 protected:
     osg::ref_ptr<osg::AlphaFunc> _standardAlphaFunc;
     osg::ref_ptr<osg::ShadeModel> _smooth;

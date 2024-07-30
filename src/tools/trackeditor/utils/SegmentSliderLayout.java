@@ -36,7 +36,7 @@ public class SegmentSliderLayout implements LayoutManager, Serializable
 {
 
 	/**
-	 * 
+	 *
 	 */
 	public SegmentSliderLayout()
 	{
@@ -56,7 +56,7 @@ public class SegmentSliderLayout implements LayoutManager, Serializable
 	{
 		int width = parent.getWidth();
 		int heigth = parent.getHeight();
-		
+
 		if(heigth < 108)
 		{
 			heigth = 108;
@@ -66,7 +66,7 @@ public class SegmentSliderLayout implements LayoutManager, Serializable
 
 		//		label.setFont(new java.awt.Font("SansSerif", 0, 8));
 		Component[] comps = parent.getComponents();
-		
+
 		comps[0].setBounds(2, 2, width-4, 20);
 		comps[1].setBounds(2, 22, 20, 20);
 		comps[2].setBounds(22, 22, width-26, 20);

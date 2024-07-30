@@ -6,7 +6,7 @@ public class UndoDeleteAllObjects implements UndoInterface
 {
 	private Vector<ObjectMapObject> undo;
 	private Vector<ObjectMapObject> redo;
-	
+
 	public UndoDeleteAllObjects(Vector<ObjectMapObject> deletedObjects)
 	{
 		this.undo = deletedObjects;
@@ -17,7 +17,7 @@ public class UndoDeleteAllObjects implements UndoInterface
 		for (int i = undo.size() - 1; i >= 0 ; i--)
 		{
 			ObjectMapObject objectMapObject = undo.get(i);
-			
+
 			objectMapObject.objectMap.addObjectAt(objectMapObject.object, objectMapObject.objectIndex);
 		}
 		redo = undo;
@@ -27,9 +27,9 @@ public class UndoDeleteAllObjects implements UndoInterface
 	public void redo()
 	{
 		for (int i = 0; i < redo.size(); i++)
-		{			
+		{
 			ObjectMapObject objectMapObject = redo.get(i);
-			
+
 			objectMapObject.objectMap.removeObject(objectMapObject.object);
 		}
 		undo = redo;

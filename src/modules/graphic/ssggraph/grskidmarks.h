@@ -1,28 +1,28 @@
 /*
  *      grskidmarks.h
- *      
+ *
  *			created              : Fri Mar 22 23:17:24 CET 2002
  *			Copyright: (C) 2001-2005 by Christophe Guionneau
  * 																	Christos Dimitrakakis
  *																	Bernhard Wymann
- *      
+ *
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation; either version 2 of the License, or
  *      (at your option) any later version.
- *      
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- *      
+ *
  *      You should have received a copy of the GNU General Public License
  *      along with this program; if not, write to the Free Software
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
- * 
+ *
  * 			$Id$
- * 
+ *
  */
 
 #ifndef _GRSKIDMARKS_H_
@@ -59,10 +59,10 @@ public:
 
 	virtual void Begin(sgVec3 * tvtx, sgVec2 *tclist, sgVec4 *cur_clr, const double t);
 	virtual void End();
-	
+
   ssgVertexArray		**vtx; //the strips
   ssgVtxTableShadow	**vta;
-  ssgTexCoordArray	**tex; 
+  ssgTexCoordArray	**tex;
   ssgColourArray		**clr;
 	sgVec4						smooth_colour;
 	int								*state;
@@ -81,9 +81,9 @@ class cGrSkidmarks
 public:
 	cGrSkidmarks() {}
 	virtual ~cGrSkidmarks() {}
-	
+
 	virtual void Update(const tCarElt* car, const double t);
-	
+
   ssgVtxTable		*base; 			//to remember the pos of the wheel line before transform
   cGrSkidStrip	strips[4];	//the strips of the four wheels
 };

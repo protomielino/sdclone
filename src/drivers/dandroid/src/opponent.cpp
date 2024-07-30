@@ -374,14 +374,14 @@ void Opponents::update(PSituation s, PCarElt mycar)
   for (i = 0; i < nopponents; i++) {
     // Update opponent
     opponent[i].update(s);
-    
+
     // Is opponent coming fast from behind
     if (opponent[i].mDist > -100.0 && opponent[i].mDist < 0.0) {
       if (!oppComingFastBehind) {
         oppComingFastBehind = opponent[i].mFastBehind;
       }
     }
-    
+
     // Get nearest opponent
     double dist = opponent[i].mDist;
     double sidedist = opponent[i].sidedist;

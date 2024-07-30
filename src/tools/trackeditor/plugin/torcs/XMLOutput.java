@@ -33,7 +33,7 @@ public class XMLOutput extends XMLOutputter
 {
 
 	/**
-	 * 
+	 *
 	 */
 	public XMLOutput()
 	{
@@ -47,13 +47,13 @@ public class XMLOutput extends XMLOutputter
 	{
 		super(format);
 	}
-	
-	 public String escapeAttributeEntities(String str) 
+
+	 public String escapeAttributeEntities(String str)
 	 {
 	 	return str;
 	 }
-	 
-	 public String escapeElementEntities(String str) 
+
+	 public String escapeElementEntities(String str)
 	 {
 	 	return str;
 	 }

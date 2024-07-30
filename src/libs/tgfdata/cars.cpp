@@ -33,7 +33,7 @@
 class GfCars::Private
 {
 public:
-	
+
 	// One GfCar structure for each car (order = sorted directory one).
 	std::vector<GfCar*> vecCars;
 
@@ -42,7 +42,7 @@ public:
 
 	// Vector of category Ids.
 	std::vector<std::string> vecCatIds;
-	
+
 	// Vector of category names.
 	std::vector<std::string> vecCatNames;
 };
@@ -54,7 +54,7 @@ GfCars *GfCars::self()
 {
 	if (!_pSelf)
 		_pSelf = new GfCars;
-	
+
 	return _pSelf;
 }
 
@@ -69,7 +69,7 @@ GfCars::~GfCars()
 	std::vector<GfCar*>::const_iterator itCar;
 	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		delete *itCar;
-	
+
 	delete _pPrivate;
 	_pPrivate = 0;
 }
@@ -85,25 +85,25 @@ GfCars::GfCars()
 		GfLogFatal("No car available in the 'cars' folder\n");
 		return;
 	}
-	
+
 	std::string strLastCatId("none");
 	std::string strCatName;
 	tFList* pFolder = lstFolders;
-	do 
+	do
 	{
 		//GfLogDebug("GfCars::GfCars() : Examining %s\n", pFolder->name);
-		
+
 		// Ignore "." and ".." folders.
-		if (pFolder->name[0] == '.') 
+		if (pFolder->name[0] == '.')
 			continue;
 
 		// Ignore "CMakeLists.txt"
 		if (strcmp(pFolder->name, "CMakeLists.txt") == 0)
 			continue;
-			
+
 		// Open the XML file of the car.
 		const char* pszCarId = pFolder->name;
-			
+
 		std::ostringstream ossCarFileName;
 		ossCarFileName << "cars/models/" << pszCarId << '/' << pszCarId << PARAMEXT;
 		void* hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
@@ -151,11 +151,11 @@ GfCars::GfCars()
 
 		// Close the XML file of the car and category.
 		GfParmReleaseHandle(hparmCar);
-	} 
+	}
 	while ((pFolder = pFolder->next) != lstFolders);
-	
+
 	GfDirFreeList(lstFolders, NULL, true, true);
-	
+
 	// Trace what we got.
 	print();
 }
@@ -176,7 +176,7 @@ GfCar* GfCars::getCar(const std::string& strId) const
 		_pPrivate->mapCarsById.find(strId);
 	if (itCar != _pPrivate->mapCarsById.end())
 		return itCar->second;
-	
+
 	return 0;
 }
 
@@ -279,7 +279,7 @@ void GfCar::load(void* hparmCar)
 	// Mass and front/rear repartition.
 	_fMass = GfParmGetNum(hparmCar, SECT_CAR, PRM_MASS, 0, 1500);
 	_fFrontRearMassRatio = GfParmGetNum(hparmCar, SECT_CAR, PRM_FRWEIGHTREP, 0, .5);
-	
+
 	// Drive train.
 	if (GfParmExistsParam(hparmCar, SECT_DRIVETRAIN, PRM_TYPE))
 	{
@@ -335,7 +335,7 @@ void GfCar::load(void* hparmCar)
 			_fMaxTorque = fTorque;
 			_fMaxTorqueSpeed = fSpeed;
 		}
-		const tdble fPower = (tdble)(fTorque * fSpeed); 
+		const tdble fPower = (tdble)(fTorque * fSpeed);
 		if (fPower > _fMaxPower)
 		{
 			_fMaxPower = fPower;
@@ -384,10 +384,10 @@ void GfCar::load(void* hparmCar)
 	// Engine capacity.
 	_fEngineCapacity =
 		GfParmGetNum(hparmCar, SECT_ENGINE, PRM_CAPACITY, 0, 0);
-	
+
 	// Engine number of cylinders.
 	_nCylinders = (unsigned)GfParmGetNum(hparmCar, SECT_ENGINE, PRM_CYLINDERS, 0, 0);
-	
+
 	// "Mechanical = Low speed" grip (~mu*g, but with front/rear mass repartition).
 	const tdble fMuFront =
 		(GfParmGetNum(hparmCar, SECT_FRNTRGTWHEEL, PRM_MU, 0, 1.0)
@@ -416,9 +416,9 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_XPOS, 0, 0);
 	const tdble fRearWingXpos =
 		GfParmGetNum(hparmCar, SECT_REARWING, PRM_XPOS, 0, 0);
-	const tdble fFrontAxleXpos = 
+	const tdble fFrontAxleXpos =
 		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, 0, 0.0f);
-	const tdble fRearAxleXpos = 
+	const tdble fRearAxleXpos =
 		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, 0, 0.0f);
 	// Never used : remove ?
 	//const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0f - _fFrontRearMassRatio) * fRearAxleXpos;
@@ -441,7 +441,7 @@ void GfCar::load(void* hparmCar)
 	_fInvertedZAxisInertia = // Stolen from Simu V2.1, car.cpp, SimCarConfig()
 		(fFrontAxleXpos - fRearAxleXpos) * 12.0f / (_fMass * fMassRepCoef * fMassRepCoef)
 		/ (fCarWidth * fCarWidth + fCarLength * fCarLength);
-	
+
 	// Theoretical top speed on a flat road, assuming the gears are tuned accordingly.
 	const tdble fFrontArea =
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FRNTAREA, 0, 2.0f);

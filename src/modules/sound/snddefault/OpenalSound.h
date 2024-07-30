@@ -40,7 +40,7 @@ protected:
 	ALfloat source_velocity[3] = { 0.0f, 0.0f, 0.0f }; ///< source velocity
 	const ALfloat zeroes[3] = { 0.0f, 0.0f, 0.0f }; ///< just a vector of 0s
 	ALfloat back[6]; ///< direction of back
-	ALfloat front[6]; ///< direction of front 
+	ALfloat front[6]; ///< direction of front
 	ALfloat MAX_DISTANCE = 10000.0f; ///< maximum allowed distance
 	ALfloat MAX_DISTANCE_LOW = 5.0f; ///< maximum allowed distance
 	ALfloat REFERENCE_DISTANCE = 5.0f; ///< reference distance for sound

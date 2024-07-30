@@ -27,9 +27,9 @@ static void
 initDamper(tSuspension *susp)
 {
     tDamper *damp;
-    
+
     damp = &(susp->damper);
-    
+
     damp->bump.b2 = (damp->bump.C1 - damp->bump.C2) * damp->bump.v1 + damp->bump.b1;
     damp->rebound.b2 = (damp->rebound.C1 - damp->rebound.C2) * damp->rebound.v1 + damp->rebound.b1;
 }
@@ -57,7 +57,7 @@ damperForce(tSuspension *susp)
     if (fabs(v) > 10.0) {
         v = (float)(SIGN(v) * 10.0);
     }
-    
+
     if (v < 0) {
         /* rebound */
         dampdef = &(susp->damper.rebound);
@@ -65,7 +65,7 @@ damperForce(tSuspension *susp)
         /* bump */
         dampdef = &(susp->damper.bump);
     }
-    
+
     av = fabs(v);
     if (av < dampdef->v1) {
         f = (dampdef->C1 * av + dampdef->b1);
@@ -160,7 +160,7 @@ SimSuspCheckIn(tSuspension *susp)
         }
         break;
     case Simple:
-        susp->dynamic_angles.x = 
+        susp->dynamic_angles.x =
             asin(((susp->x - susp->spring.x0)/susp->spring.bellcrank)/susp->link.y);
         susp->dynamic_angles.y = 0.0;
         susp->dynamic_angles.z = 0.0;

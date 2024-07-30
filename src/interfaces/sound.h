@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef _SOUND_H_
 #define _SOUND_H_
 
@@ -50,7 +50,7 @@
 #define SND_VAL_MENUSFX_STATE_ENABLED  "enabled"
 #define SND_VAL_MENUSFX_STATE_DISABLED "disabled"
 
-#endif /* _SOUND_H_ */ 
+#endif /* _SOUND_H_ */
 
 
 

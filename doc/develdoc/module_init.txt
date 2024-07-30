@@ -20,7 +20,7 @@ extern "C" int foo( tModInfo* modinfo );
 
 tModInfo is a pointer to an array of length 10 with elements of type
 tModInfo. In this function, you need to initialize all the members
-of that struct. The function must return 0 on success. After this, 
+of that struct. The function must return 0 on success. After this,
 the module is initialized.
 
 Finitely many robots

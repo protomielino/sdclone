@@ -35,12 +35,12 @@ public:
   Vector(const float v[3]) : Tuple3(v) {}
   Vector(const double v[3]) : Tuple3(v) {}
   Vector(Scalar x, Scalar y, Scalar z) : Tuple3(x, y, z) {}
-  
+
   Vector& operator+=(const Vector& v);
   Vector& operator-=(const Vector& v);
   Vector& operator*=(Scalar s);
   Vector& operator/=(Scalar s);
-  
+
   Scalar length2() const;
   Scalar length() const;
 
@@ -84,7 +84,7 @@ inline Vector& Vector::operator-=(const Vector& v) {
   comp[X] -= v[X]; comp[Y] -= v[Y]; comp[Z] -= v[Z];
   return *this;
 }
- 
+
 inline Vector& Vector::operator*=(Scalar s) {
   comp[X] *= s; comp[Y] *= s; comp[Z] *= s;
   return *this;
@@ -147,8 +147,8 @@ inline Scalar length2(const Vector& v) { return v.length2(); }
 inline Scalar length(const Vector& v) { return v.length(); }
 
 inline bool approxZero(const Vector& v) { return v.approxZero(); }
-inline bool approxEqual(const Vector& v1, const Vector& v2) { 
-  return approxZero(v1 - v2); 
+inline bool approxEqual(const Vector& v1, const Vector& v2) {
+  return approxZero(v1 - v2);
 }
 
 inline Scalar angle(const Vector& v1, const Vector& v2) {
@@ -164,8 +164,8 @@ inline Vector cross(const Vector& v1, const Vector& v2) {
 }
 
 inline Scalar triple(const Vector& v1, const Vector& v2, const Vector& v3) {
-  return v1[X] * (v2[Y] * v3[Z] - v2[Z] * v3[Y]) + 
-         v1[Y] * (v2[Z] * v3[X] - v2[X] * v3[Z]) + 
+  return v1[X] * (v2[Y] * v3[Z] - v2[Z] * v3[Y]) +
+         v1[Y] * (v2[Z] * v3[X] - v2[X] * v3[Z]) +
          v1[Z] * (v2[X] * v3[Y] - v2[Y] * v3[X]);
 }
 

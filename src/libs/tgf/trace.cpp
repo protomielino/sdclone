@@ -1,11 +1,11 @@
 /***************************************************************************
-                          Tracing / logging system                   
-                             -------------------                                         
+                          Tracing / logging system
+                             -------------------
     created              : Fri Aug 13 22:32:45 CEST 1999
     copyright            : (C) 2010, 2013 by Jean-Philippe Meuret
     web                  : www.speed-dreams.org
     version              : $Id$
-                                  
+
 ***************************************************************************/
 
 /***************************************************************************
@@ -36,7 +36,7 @@
 #include <algorithm>
 
 #include <map>
-				  
+
 #ifdef WIN32
 #include <windowsx.h>
 #else
@@ -122,7 +122,7 @@ void GfLogger::boot(bool bWithLogging)
 	GfLogDefault.info("Date and time : %4d/%02d/%02d %02d:%02d:%02d\n",
 					  stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 					  stm->tm_hour, stm->tm_min, stm->tm_sec);
-	
+
 }
 
 void GfLogger::setup()
@@ -154,9 +154,9 @@ void GfLogger::setup()
 	GfLogDefault.setStream("gflogger-test.log");
 	GfLogDefault.debug("Visible test trace\n");
 	GfLogDefault.setStream(stderr);
-	
+
 	GfLogDefault.debug("Testing GfLogger : done.\n");
-#endif	
+#endif
 
 	// Load logger settings and create and / or configure them as requested.
 	// 1) Open and load the logger settings file.
@@ -224,7 +224,7 @@ void GfLogger::setup()
 			if (strHdrCols.find("level") != std::string::npos)
 				bfHdrCols |= eLevel;
 		}
-		
+
 		GfLogDefault.trace("Logger '%s' settings : stream=%s, threshold=%s, columns=%s\n",
 						   pszLogName, pszOutStream, pszLvlThresh, strHdrCols.c_str());
 
@@ -246,7 +246,7 @@ void GfLogger::setup()
 
 	}
 	while(!GfParmListSeekNext(hparmlogSettings, "Loggers"));
-	
+
 	GfParmReleaseHandle(hparmlogSettings);
 
 	// TODO : Update logger settings from command line options if any.
@@ -277,7 +277,7 @@ GfLogger::GfLogger(const std::string& strName, const std::string& strFilename,
 {
 	// Set file stream.
 	setStream(strFilename);
-	
+
 	// Trace initial state.
 	info("Logger '%s' created : Level threshold ", strName.c_str());
 	if (_nLvlThresh >= eFatal && _nLvlThresh <= eDebug)
@@ -354,7 +354,7 @@ void GfLogger::setStream(FILE* pFile, bool bLogFileChange)
 {
 	if (pFile == _pStream)
 		return;
-	
+
 	if (pFile)
 	{
 		// Trace the stream change on the current stream.
@@ -385,12 +385,12 @@ void GfLogger::setStream(FILE* pFile, bool bLogFileChange)
 		if (_pStream && eError <= _nLvlThresh)
 		{
 			putLineHeader(eError);
-			fprintf(_pStream, 
+			fprintf(_pStream,
 					"GfLogger::setStream(FILE*) : Null stream (%s)\n", strerror(nErrNo));
 			fflush(_pStream);
 		}
 	}
-	
+
 	if (_pStream)
 	{
 		// Trace date and time on new stream.
@@ -403,7 +403,7 @@ void GfLogger::setStream(FILE* pFile, bool bLogFileChange)
 					stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 					stm->tm_hour, stm->tm_min, stm->tm_sec);
 		}
-		
+
 		// Trace current trace level threshold.
 		if (eInfo <= _nLvlThresh)
 		{
@@ -433,7 +433,7 @@ void GfLogger::setStream(const std::string& strPathname)
 		setStream(stdout);
 		return;
 	}
-	
+
 	// Open the requested target file in GfLocalDir()
 	std::string strRealPathname(GfLocalDir());
 	strRealPathname += strPathname;
@@ -447,7 +447,7 @@ void GfLogger::setStream(const std::string& strPathname)
 			fprintf(_pStream, "Changing target stream to %s\n", strRealPathname.c_str());
 			fflush(_pStream);
 		}
-		
+
 		// Do the change (don't trace FILE* value).
 		setStream(pFile, false);
 	}
@@ -469,7 +469,7 @@ void GfLogger::putLineHeader(int nLevel)
 {
 	if (nLevel > _nLvlThresh)
 		return;
-	
+
 	if (_bfHdrCols & eTime)
 	{
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);

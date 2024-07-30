@@ -2619,7 +2619,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
                 continue;
             }
-            
+
             bool startPolygonNeeded = false;
 
             if (lastBarrier)
@@ -2736,12 +2736,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     break;
                 }
             }
-            
+
             switch (seg->type)
             {
             case TR_STR:
                 ts = LMAX;
-            
+
                 trkpos.seg = seg;
                 while (ts < seg->length)
                 {
@@ -2818,17 +2818,17 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // nothing to do
                         break;
                     }
-            
+
                     ts += LMAX;
                 }
                 ts = seg->length;
                 break;
             case TR_LFT:
                 step = LMAX / (mseg->radiusr);
-            
+
                 anz = seg->angle[TR_ZS] + step;
                 ts = step;
-            
+
                 radiusl = seg->radiusl;
                 trkpos.seg = seg;
                 while (anz < seg->angle[TR_ZE])
@@ -2841,7 +2841,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     texLen += texStep;                                                            // new
                     xprev = x;                                                                    // new
                     yprev = y;                                                                    // new
-            
+
                     switch (curBarrier->style)
                     {
                     case TR_FENCE:
@@ -2907,19 +2907,19 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // nothing to do
                         break;
                     }
-            
+
                     ts += step;
-            
+
                     anz += step;
                 }
                 ts = seg->arc;
                 break;
             case TR_RGT:
                 step = LMAX / (mseg->radiusl);
-            
+
                 anz = seg->angle[TR_ZS] - step;
                 ts = step;
-            
+
                 radiusl = seg->radiusl;
                 trkpos.seg = seg;
                 while (anz > seg->angle[TR_ZE])
@@ -2997,9 +2997,9 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         // nothing to do
                         break;
                     }
-            
+
                     ts += step;
-            
+
                     anz -= step;
                 }
                 ts = seg->arc;
@@ -3086,7 +3086,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 // nothing to do
                 break;
             }
-            
+
             startNeeded = false;
             runninglentgh += seg->length;
             lastBarrier = curBarrier;

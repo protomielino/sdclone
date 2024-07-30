@@ -1,10 +1,10 @@
 /***************************************************************************
-                       guihelp.cpp -- automatic help on keys                                
-                             -------------------                                         
+                       guihelp.cpp -- automatic help on keys
+                             -------------------
     created              : Fri Aug 13 22:20:37 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		GUI help screen management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
@@ -73,7 +73,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 
     // Create help screen, load menu XML descriptor and create static controls.
     void* scrHandle = GfuiScreenCreate(0, 0, onActivate, 0, onDeactivate);
-    
+
     void *hmenu = GfuiMenuLoad("helpmenu.xml");
 
     GfuiMenuCreateStaticControls(scrHandle, hmenu);
@@ -88,7 +88,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
     // Create 2 columns table for the keyboard shortcuts explanations
     int ys = nYTopLine;
     int yn = nYTopLine;
-    
+
     tGfuiScreen	*pscrTgt = (tGfuiScreen*)targetScreen;
 
     tGfuiKey *curKey = pscrTgt->userKeys;
@@ -163,7 +163,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 			curKey = (tGfuiKey*)NULL;
 
     }
-    
+
 
     // Create Back button.
     GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", returnScreen, GfuiScreenReplace);
@@ -174,7 +174,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hmenu);
-    
+
     // Add keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(scrHandle);
     GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Back to the menu", returnScreen, GfuiScreenReplace, NULL);

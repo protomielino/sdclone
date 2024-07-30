@@ -33,6 +33,6 @@
 Point Box::support(const Vector& v) const {
   return Point(v[X] < 0 ? -extent[X] : extent[X],
 	       v[Y] < 0 ? -extent[Y] : extent[Y],
-	       v[Z] < 0 ? -extent[Z] : extent[Z]); 
+	       v[Z] < 0 ? -extent[Z] : extent[Z]);
 }
 

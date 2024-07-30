@@ -137,7 +137,7 @@ inline float urandom() {
 
 /// Due to numerical precision we sometimes get 1 or greater
 /// using urandom() or indeed, drand48().
-/// This 
+/// This
 inline float safe_urandom() {
 	float X;
 	do {
@@ -190,7 +190,7 @@ inline void QuatInverseRotate(t3Dd& src, sgQuat& q, t3Dd& dst)
 
 #define SIM_Z_OFFSET	2.0
 
-#endif /* _SIMFCT_H_ */ 
+#endif /* _SIMFCT_H_ */
 
 
 

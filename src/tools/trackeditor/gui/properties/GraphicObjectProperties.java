@@ -68,7 +68,7 @@ public class GraphicObjectProperties extends PropertyPanel
 	{
 		return data;
 	}
-	
+
 	public void addData(GraphicObjectData graphicObjectData)
 	{
 		graphicObjectTablePanel.model.addRow(graphicObjectData);
@@ -123,9 +123,9 @@ public class GraphicObjectProperties extends PropertyPanel
 								break;
 							}
 						}
-					}					
+					}
 				}
-				else					
+				else
 					label.setBackground(Color.WHITE);
 				label.setForeground(Color.BLACK);
 			}
@@ -289,7 +289,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			data.removeElementAt(row);
 			fireTableRowsDeleted(row - 1, data.size() - 1);
 		}
-		
+
 		public void addRow(GraphicObjectData graphicObjectData)
 		{
 			data.add(graphicObjectData);
@@ -366,7 +366,7 @@ public class GraphicObjectProperties extends PropertyPanel
 			TableColumn useMaterialColumn = table.getColumnModel().getColumn(USE_MATERIAL_INDEX);
 			String[] items = {"none", "yes", "no"};
 			JComboBox<String> useMaterialComboBox = new JComboBox<String>(items);
-			useMaterialColumn.setCellEditor(new DefaultCellEditor(useMaterialComboBox));	
+			useMaterialColumn.setCellEditor(new DefaultCellEditor(useMaterialComboBox));
 
 			add(scrollPane);
 		}
@@ -525,7 +525,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 			if (datum.orientation == null)
 			{
-				if (!Double.isNaN(object.getOrientation())) 
+				if (!Double.isNaN(object.getOrientation()))
 				{
 					object.setOrientation(Double.NaN);
 					getEditorFrame().documentIsModified = true;
@@ -539,7 +539,7 @@ public class GraphicObjectProperties extends PropertyPanel
 
 			if (datum.height == null)
 			{
-				if (!Double.isNaN(object.getHeight())) 
+				if (!Double.isNaN(object.getHeight()))
 				{
 					object.setHeight(Double.NaN);
 					getEditorFrame().documentIsModified = true;
@@ -550,7 +550,7 @@ public class GraphicObjectProperties extends PropertyPanel
 				object.setHeight(datum.height);
 				getEditorFrame().documentIsModified = true;
 			}
-			
+
 			if (datum.useMaterial == null)
 			{
 				if (object.getUseMaterial() != null)
@@ -592,7 +592,7 @@ public class GraphicObjectProperties extends PropertyPanel
 				{
 					graphicObjects.lastElement().setHeight(datum.height);
 				}
-				
+
 				if (datum.useMaterial != null && !datum.useMaterial.isBlank())
 				{
 					graphicObjects.lastElement().setUseMaterial(datum.useMaterial);

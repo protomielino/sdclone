@@ -2,9 +2,9 @@
 
     file        : raceresults.h
     created     : Thu Jan  2 12:43:28 CET 2003
-    copyright   : (C) 2002 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espié
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -44,7 +44,7 @@ extern void ReEventInitResults(void);
 
 extern void ReUpdateStandings();
 
-#endif /* _RACERESULTS_H_ */ 
+#endif /* _RACERESULTS_H_ */
 
 
 

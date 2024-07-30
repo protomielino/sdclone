@@ -264,7 +264,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     return vecSizes;
 }
 
-/** Get the screen dimensions 
+/** Get the screen dimensions
     @ingroup	screen
     @param	nDisplayIndex	Index of the display from which to get the size
     @return	tScreenSize containing the current size
@@ -507,7 +507,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
     if(bFullScreen)
         bfVideoMode |= SDL_WINDOW_FULLSCREEN;
 
-//* TODO : move and re-implement these? 
+//* TODO : move and re-implement these?
     bool bAlphaChannel =
         std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
         GFSCR_VAL_YES))
@@ -994,7 +994,7 @@ bool gfScrAAOpenGLSetup()
 
     SDL_Window* testWindow = SDL_CreateWindow("AA test",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        640, 480, 
+        640, 480,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if(testWindow)
@@ -1077,7 +1077,7 @@ bool GfScrCreateMenuWindow()
     GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         bounds.w * percentage,
-        bounds.h * percentage, 
+        bounds.h * percentage,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!GfuiWindow)
@@ -1244,7 +1244,7 @@ bool GfScrInitSDL2()
     if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         GfLogError("Couldn't initialize SDL audio/video sub-system (%s)\n", SDL_GetError());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), 
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(),
             "SDL2 initialization failed.\nPlease verify that all prerequistes are installed.\n", NULL);
         return false;
     }
@@ -1304,7 +1304,7 @@ bool GfScrInitSDL2()
     else
     {
         gfScrDisableResizable();
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), 
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(),
             "Unable to create a resizable openGL window.\nThe Display Mode has been reset.", NULL);
         GfuiApp().restart();
     }
@@ -1351,7 +1351,7 @@ SDL_Rect GetMultiFullScreenBounds()
     {
         if(SDL_GetDisplayBounds(i, &bounds) == 0)
         {
-            if(i == 0) 
+            if(i == 0)
             {
                 maxBounds = bounds;
             }
@@ -1381,7 +1381,7 @@ bool GfscrAllowMultiFullScreens()
         {
             if(SDL_GetDisplayBounds(i, &bounds) == 0)
             {
-                if(i == 0) 
+                if(i == 0)
                 {
                     top = bounds.y;
                     height = bounds.h;

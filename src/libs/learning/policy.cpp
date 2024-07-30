@@ -21,7 +21,7 @@
 #ifdef WIN32
 #include <float.h>
 #else
-// std::isnan should be available as of C++11 (201103L) but some compiler 
+// std::isnan should be available as of C++11 (201103L) but some compiler
 // vendors set this even though support is incomplete
 #if __cplusplus>=201402L // compiler claims to be C++14 compliant
 #define isnan std::isnan
@@ -69,10 +69,10 @@ DiscretePolicy::DiscretePolicy (int n_states, int n_actions, real alpha,
 	temp = randomness;
 	//logmsg ("RR:%f", temp);
 	if (smax) {
-		if (temp<0.1f) 
+		if (temp<0.1f)
 			temp = 0.1f;
 	} else {
-		if (temp<0.0f) { 
+		if (temp<0.0f) {
 			temp = 0.0f;
 		}
 		if (temp>1.0f) {
@@ -86,7 +86,7 @@ DiscretePolicy::DiscretePolicy (int n_states, int n_actions, real alpha,
 		logmsg ("#softmax");
 	} else {
 		logmsg ("#e-greedy");
-	}	
+	}
 	logmsg (" policy with Q:[%d x %d] -> R, a:%f g:%f, l:%f, t:%f\n",
 			this->n_states, this->n_actions, this->alpha, this->gamma, this->lambda, this->temp);
 
@@ -133,12 +133,12 @@ DiscretePolicy::DiscretePolicy (int n_states, int n_actions, real alpha,
 /// The values are saved as triplets (\c Q, \c P, \c
 /// vQ). The columns are ordered by actions and the rows by state
 /// number.
-void DiscretePolicy::saveState(FILE* f) 
+void DiscretePolicy::saveState(FILE* f)
 {
 	if (!f)
 		return;
 	for (int s=0; s<n_states; s++) {
-		
+
 		//softMax(Q[s]);
 		real sum2=0.0;
 		int a;
@@ -215,7 +215,7 @@ DiscretePolicy::~DiscretePolicy()
 
    Two algorithms are implemented, both of which converge. One of them
    calculates the value of the current policy, while the other that of
-   the optimal policy. 
+   the optimal policy.
 
    Sarsa (\f$\lambda\f$) algorithmic description:
 
@@ -232,7 +232,7 @@ DiscretePolicy::~DiscretePolicy()
    Q_{t}(s,a) = Q_{t-1}(s,a) + \alpha \delta e_{t}(s,a),
    \f]
 where \f$e_{t}(s,a) = \gamma \lambda e_{t-1}(s,a)\f$
-   
+
 	  end
 
    6. \f$a = a'\f$ (we will take this action at the next step)
@@ -298,7 +298,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 		expected_r += r;
 		expected_V += Q[ps][pa];
 		n_samples++;
-		
+
 		if (s==0) {
 			real max_estimate = 0.0;
 			real max_estimate_k = 0.0;
@@ -309,7 +309,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 
 #if 0
 			logmsg ("%f %f %f %f#rTVV\n",
-					expected_r/((real) n_samples), 
+					expected_r/((real) n_samples),
 					temp,
 					expected_V/((real) n_samples),
 					max_estimate/max_estimate_k);
@@ -383,8 +383,8 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 	int i;
 
 	switch (learning_method) {
-		
-	case Sarsa: 
+
+	case Sarsa:
 		amax = a;
 		EQ_s = Q[s][amax];
 		break;
@@ -393,7 +393,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 		EQ_s = Q[s][amax];
 		break;
 	case ELearning:
-		amax = a; //? correct ? 
+		amax = a; //? correct ?
 		Normalise(eval, eval, n_actions);
 		EQ_s = 0.0;
 		for (i=0; i<n_actions; i++) {
@@ -415,7 +415,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 		}
 		real ad = alpha*delta;
 		real gl = gamma * lambda;
-		real variance_threshold = 0.0001f;		
+		real variance_threshold = 0.0001f;
 		if  (confidence_eligibility == false) {
 			vQ[ps][pa] = (1.0f - zeta)*vQ[ps][pa] + zeta*(ad*ad);
 			if (vQ[ps][pa]<variance_threshold) {
@@ -424,7 +424,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 		}
 		if (ps<min_el_state) min_el_state = ps;
 		if (ps>max_el_state) max_el_state = ps;
-		
+
 
 		for (i=0; i<n_states; i++) {
 			//for (int i=min_el_state; i<=max_el_state; i++) {
@@ -446,7 +446,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 					if ((fabs (Q[i][j])>1000.0)||(isnan(Q[i][j]))) {
 						printf ("u: %d %d %f %f\n", i,j,Q[i][j], ad * e[i][j]);
 					}
-					
+
 					//This is only needed for Qlearning, but sarsa is not
 					//affected since always amax==a;
 					if (amax==a) {
@@ -517,7 +517,7 @@ void DiscretePolicy::loadFile (char* f)
 	readSize = fread((void *) &n_read_actions, sizeof(int), 1, fh);
 	if( readSize < 1 )
 		fprintf(stderr, "Error when reading file");
-	
+
 	if ((n_read_states!=n_states)||(n_read_actions!=n_actions)) {
 		fprintf (stderr, "File has %dx%d space! Aborting read.\n", n_read_states, n_read_actions);
 		fclose(fh);
@@ -606,12 +606,12 @@ void DiscretePolicy::saveFile (char* f) {
 /// \brief Set to use confidence estimates for action selection, with
 /// variance smoothing zeta.
 /// Variance smoothing currently uses a very simple method to estimate
-/// the variance. 
+/// the variance.
 bool DiscretePolicy::useConfidenceEstimates (bool confidence, real zet, bool confidence_eligib) {
 	this->confidence = confidence;
 	this->zeta = zet;
 	this->confidence_eligibility = confidence_eligib;
-	
+
 	if (confidence_eligibility) {
 		logmsg ("#+[ELIG_VAR]");
 	}
@@ -620,7 +620,7 @@ bool DiscretePolicy::useConfidenceEstimates (bool confidence, real zet, bool con
 	} else {
 		logmsg ("#-[CONDIFENCE]\n");
 	}
-	
+
 	return confidence;
 }
 
@@ -683,13 +683,13 @@ void DiscretePolicy::setRandomness (real epsilon)
 }
 
 /// Set the gamma of the sum to be maximised.
-void DiscretePolicy::setGamma (real gamm) 
+void DiscretePolicy::setGamma (real gamm)
 {
 	this->gamma = gamm;
 }
 
 /// Set action selection to softmax.
-void DiscretePolicy::useSoftmax (bool softmax) 
+void DiscretePolicy::useSoftmax (bool softmax)
 {
 	smax = softmax;
 	if (smax) {
@@ -768,7 +768,7 @@ int DiscretePolicy::confMax(real* Qs, real* vQs, real p) {
 	real dsum = 0.0;
 	for (a=0; a<n_actions; a++) {
 		dsum += eval[a];
-		if (X<=dsum) 
+		if (X<=dsum)
 			return a;
 
 	}
@@ -822,7 +822,7 @@ int DiscretePolicy::softMax(real* Qs) {
 	real dsum = 0.0;
 	for (a=0; a<n_actions; a++) {
 		dsum += eval[a];
-		if (X<=dsum) 
+		if (X<=dsum)
 			return a;
 
 	}

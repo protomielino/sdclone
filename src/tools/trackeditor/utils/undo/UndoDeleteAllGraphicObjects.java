@@ -9,7 +9,7 @@ public class UndoDeleteAllGraphicObjects implements UndoInterface
 	Vector<GraphicObject>	graphicObjects;
 	Vector<DeletedObject>	undo;
 	Vector<DeletedObject>	redo;
-	
+
 	public UndoDeleteAllGraphicObjects(Vector<GraphicObject> graphicObjects, Vector<DeletedObject> deletedObjects)
 	{
 		this.graphicObjects = graphicObjects;
@@ -25,14 +25,14 @@ public class UndoDeleteAllGraphicObjects implements UndoInterface
 		redo = undo;
 		undo = null;
 	}
-	
+
 	public void redo()
 	{
 		for (int i = 0; i < redo.size(); i++)
-		{			
+		{
 			graphicObjects.remove(redo.get(i).object);
 		}
 		undo = redo;
-		redo = null;		
+		redo = null;
 	}
 }

@@ -34,7 +34,7 @@
 class Point : public Vector {
 public:
   Point() {}
-  Point(const float p[3]) : Vector(p) {} 
+  Point(const float p[3]) : Vector(p) {}
   Point(const double p[3]) : Vector(p) {}
   Point(Scalar x, Scalar y, Scalar z) : Vector(x, y, z) {}
 
@@ -101,11 +101,11 @@ inline bool operator<(const Point& p1, const Point& p2) {
   return p1[X] < p2[X] && p1[Y] < p2[Y] && p1[Z] < p2[Z];
 }
 
-inline Point inf(const Point& p1, const Point& p2) { 
+inline Point inf(const Point& p1, const Point& p2) {
   return Point(min(p1[X], p2[X]), min(p1[Y], p2[Y]), min(p1[Z], p2[Z]));
 }
 
-inline Point sup(const Point& p1, const Point& p2) { 
+inline Point sup(const Point& p1, const Point& p2) {
   return Point(max(p1[X], p2[X]), max(p1[Y], p2[Y]), max(p1[Z], p2[Z]));
 }
 
@@ -115,12 +115,12 @@ inline Point affine(const Point& p1, const Point& p2, Scalar t) {
 	       p1[Z] + (p2[Z] - p1[Z]) * t);
 }
 
-inline Scalar distance(const Point& p1, const Point& p2) { 
-  return length(p1 - p2); 
+inline Scalar distance(const Point& p1, const Point& p2) {
+  return length(p1 - p2);
 }
 
-inline Scalar distance2(const Point& p1, const Point& p2) { 
-  return length2(p1 - p2); 
+inline Scalar distance2(const Point& p1, const Point& p2) {
+  return length2(p1 - p2);
 }
 
 #endif

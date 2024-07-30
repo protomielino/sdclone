@@ -53,7 +53,7 @@ install(FILES src/fnt/fnt.h DESTINATION include/plib)
 install(TARGETS fnt
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 ## Joystick library (js)
 set(js_SOURCES src/js/js.cxx
@@ -73,7 +73,7 @@ install(FILES src/js/js.h DESTINATION include/plib)
 install(TARGETS js
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 ## Network library (net)
 set(net_SOURCES src/net/netBuffer.cxx
@@ -100,7 +100,7 @@ install(FILES ${net_HEADERS} DESTINATION include/plib)
 install(TARGETS net
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 
 ## PLIB Scripting library (psl)
@@ -133,7 +133,7 @@ install(FILES src/psl/psl.h DESTINATION include/plib)
 install(TARGETS psl
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 ## PUI Auxiliary library (puAux)
 set(puAux_SOURCES src/puAux/puAux.cxx
@@ -163,7 +163,7 @@ install(FILES src/puAux/puAux.h DESTINATION include/plib)
 install(TARGETS puAux
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 ## Picoscopic User Interface library (pui)
 set(pui_SOURCES src/pui/pu.cxx
@@ -207,7 +207,7 @@ install(FILES ${pui_HEADERS} DESTINATION include/plib)
 install(TARGETS pui
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib) 
+        ARCHIVE DESTINATION lib)
 
 ## PLIB Windowing library (pw)
 

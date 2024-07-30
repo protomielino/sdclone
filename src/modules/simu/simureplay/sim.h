@@ -122,7 +122,7 @@ inline float urandom() {
 
 #define SIM_Z_OFFSET	2.0
 
-#endif /* _SIMFCT_H_ */ 
+#endif /* _SIMFCT_H_ */
 
 
 

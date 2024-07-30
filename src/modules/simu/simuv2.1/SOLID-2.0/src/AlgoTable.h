@@ -38,7 +38,7 @@ const int NUM_TYPES = 8;
 template <class Function>
 class AlgoTable {
 public:
-  void addEntry(ShapeType type1, ShapeType type2, Function function) { 
+  void addEntry(ShapeType type1, ShapeType type2, Function function) {
     table[type2][type1] = function;
     table[type1][type2] = function;
   }

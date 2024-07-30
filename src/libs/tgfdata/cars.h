@@ -29,7 +29,7 @@
 #include "tgfdata.h"
 
 
-/** @file   
+/** @file
 		Singleton holding information on the available cars and categories
     @defgroup	tgfdata	Data manager for the client gaming framework.
 */
@@ -37,7 +37,7 @@
 class TGFDATA_API GfCar
 {
 public:
-	
+
 	GfCar(const std::string& strId, const std::string& strCatId,
 		  const std::string& strCatName, void* hparmCar);
 
@@ -48,19 +48,19 @@ public:
 	const std::string& getDescriptorFileName() const;
 
 	tDriveType getDriveTrain() const;
-	
+
 	unsigned getGearsCount() const;
-	
+
 	bool isTurboCharged() const;
-	
+
 	unsigned getCylinders() const;
-	
+
 	tdble getEngineCapacity() const;
-	
+
 	tEngineShape getEngineShape() const;
-	
+
 	tEnginePosition getEnginePosition() const;
-	
+
 	tdble getMaxPower() const;
 	tdble getMaxPowerSpeed() const;
 	tdble getMaxTorque() const;
@@ -72,11 +72,11 @@ public:
 	tdble getLowSpeedGrip() const;
 	tdble getHighSpeedGrip() const;
 	tdble getInvertedZAxisInertia() const;
-	
+
 	void load(void* hparmCar);
 
 protected:
-	
+
 	std::string _strId; // XML file / folder name (ex: "sc-boxer-96")
 	std::string _strName; // User friendly name (ex: "SC Boxer 96").
 	std::string _strCatId; // Category XML file / folder name (ex: "LS-GT1").
@@ -94,7 +94,7 @@ protected:
 	tdble _fMaxTorque, _fMaxTorqueSpeed; // Engine max torque (Nm) and associated engine speed.
 	tdble _fMass; // Total mass (kg).
 	tdble _fFrontRearMassRatio; // Front to rear mass ratio (no unit, inside ]0,1[).
-	
+
 	tdble _fTopSpeed; // Theorical top speed (m/s)
 	tdble _fLowSpeedGrip; // Mechanical grip (~mu*g, but with front/rear mass repartition)
 	tdble _fHighSpeedGrip; // Aerodynamic grip (same + with aero down-force)
@@ -108,7 +108,7 @@ public:
 	// Accessor to the unique instance of the singleton.
 	static GfCars* self();
 	static void shutdown();
-	
+
 	const std::vector<std::string>& getCategoryIds() const;
 	const std::vector<std::string>& getCategoryNames() const;
 
@@ -119,7 +119,7 @@ public:
 	std::vector<GfCar*> getCarsInCategoryWithName(const std::string& strCatName = "") const;
 	std::vector<std::string> getCarIdsInCategory(const std::string& strCatId = "") const;
 	std::vector<std::string> getCarNamesInCategory(const std::string& strCatId = "") const;
-	
+
 	void print() const;
 
 protected:

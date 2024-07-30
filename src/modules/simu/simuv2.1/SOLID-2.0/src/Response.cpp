@@ -32,9 +32,9 @@
 
 DtCollData Response::coll_data;
 
-void Response::operator()(DtObjectRef a, DtObjectRef b, 
-			  const Point& pa, const Point& pb, 
-			  const Vector& v) const {  
+void Response::operator()(DtObjectRef a, DtObjectRef b,
+			  const Point& pa, const Point& pb,
+			  const Vector& v) const {
   coll_data.point1[X] = pa[X];
   coll_data.point1[Y] = pa[Y];
   coll_data.point1[Z] = pa[Z];
@@ -44,9 +44,9 @@ void Response::operator()(DtObjectRef a, DtObjectRef b,
   coll_data.normal[X] = v[X];
   coll_data.normal[Y] = v[Y];
   coll_data.normal[Z] = v[Z];
-  response(client_data, a, b, &coll_data); 
+  response(client_data, a, b, &coll_data);
 }
 
-void Response::operator()(DtObjectRef a, DtObjectRef b) const {  
-  response(client_data, a, b, 0); 
+void Response::operator()(DtObjectRef a, DtObjectRef b) const {
+  response(client_data, a, b, 0);
 }

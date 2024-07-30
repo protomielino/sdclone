@@ -32,7 +32,7 @@
 #define NOMUSIC "None"
 
 #include "sdl2musicplayer.h"
- 
+
 static const char *musicDisabledStr = SND_VAL_MUSIC_STATE_DISABLED;
 
 static bool enabled = true;
@@ -53,7 +53,7 @@ static void readConfig();
 static SDL2MusicPlayer* getMusicPlayer(char* oggFilePath)
 {
 	SDL2MusicPlayer* player = NULL;
-	
+
 	SDL_LockMutex(mapMutex);
 	const std::map<std::string, SDL2MusicPlayer*>::const_iterator itPlayers = mapSDL2Players.find(oggFilePath);
 
@@ -137,8 +137,8 @@ void playMusic(char* filename)
 				player = getMusicPlayer(filename);
 				player->resume();
 			}
-		} 
-		else 
+		}
+		else
 		{
 			if(0 != strcmp(currentMusicfile,defaultMusic))
 			{
@@ -187,7 +187,7 @@ static void readConfig()
 	float music_volume = GfParmGetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", 100.0f);
 	if (music_volume>100.0f) {
 		music_volume = 100.0f;
-	} 
+	}
 	else if (music_volume < 0.0f) {
 		music_volume = 0.0f;
 	}
@@ -220,7 +220,7 @@ void setMusicVolume(float vol /* 100.0f */)
 	if (vol>100.0f)
 	{
 		vol = 100.0f;
-	} 
+	}
 	else if (vol < 0.0f)
 	{
 		vol = 0.0f;
@@ -243,12 +243,12 @@ float getMusicVolume()
 
 void enableMusic(bool enable /* true */)
 {
-	if (isEnabled()) 
+	if (isEnabled())
 	{
 		if(enable == false)
 			shutdownMusic();
 	}
-	else 
+	else
 	{
 		 if(enable == true)
 			 initMusic();

@@ -40,16 +40,16 @@
 //==========================================================================*
 // Deklaration der Klasse TCubicSpline
 //--------------------------------------------------------------------------*
-class TCubicSpline	
+class TCubicSpline
 {
   public:
 	TCubicSpline();							  //	Default	constructor
 	TCubicSpline								  // Constructor
-	  (int	Count, const double* X,	
+	  (int	Count, const double* X,
 	  const double* Y,	const double* S);
 	~TCubicSpline();
 
-	void Init(int Count, const	double*	X, 
+	void Init(int Count, const	double*	X,
 		const	double*	Y, const double* S);
 
 	double	CalcOffset(double X) const;			  // Get offset

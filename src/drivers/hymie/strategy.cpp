@@ -180,7 +180,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  int laps = car->_remainingLaps-car->_lapsBehindLeader;
  int this_pit_dammage = PIT_DAMMAGE;
 
- if (laps > 0) 
+ if (laps > 0)
  {
   float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;
   if (s->_totTime > s->currentTime)
@@ -188,7 +188,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 	if (car->_laps > 2)
 		laps += (int)ceil( ( s->_totTime - s->currentTime ) / car->_bestLapTime + 0.3f );
 	// For the case car->laps <= 2, the old laps only makes a stronger constraight, so no read to calculate it
-  }				
+  }
   if (car->_fuel < 1.5*cmpfuel &&
       car->_fuel < laps*cmpfuel)
   {
@@ -213,7 +213,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  }
 
  // Do we need to repair?
- if (car->_dammage > this_pit_dammage) 
+ if (car->_dammage > this_pit_dammage)
  {
   is_pitting = 1;
   pit_reason = REASON_DAMAGE;
@@ -292,7 +292,7 @@ int SimpleStrategy::pitRepair(tCarElt* car, tSituation *s, Opponents *opp)
   float laps = car->_remainingLaps + 1.0f;
   if (car->_laps > 2 && s->_totTime > s->currentTime)
 	laps += ceil( ( s->_totTime - s->currentTime ) / car->_bestLapTime + 0.3f );
-  float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;  
+  float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;
   float fuel = MAX(MIN(laps*cmpfuel - car->_fuel, car->_tank), 0.0);
 
   if (fuel < car->_tank-15.0)

@@ -65,11 +65,11 @@ static int MaxPitsLabelId;
 // Max length of track description lines (loaded from menu properties).
 static unsigned DescLinesMaxLen = 35;
 
-/** 
+/**
  * rmtsWordWrap
- * 
+ *
  * Cuts the input string into two, according to the line length given.
- * 
+ *
  * @param   str Input string
  * @param   str1    First line should be placed in here
  * @param   str2    Second line should be placed in here (if needed)
@@ -91,7 +91,7 @@ rmtsWordWrap(const std::string &str, std::string &str1, std::string &str2, unsig
 		str1 += " ";    //as the iterator eats the whitespace...
 		it++;
 	}//while
-	
+
 	if (str.size() >= length)    //If input string was longer than required,
 		str2 = str.substr(str1.size()); //put the rest in str2.
 }//rmtsWordWrap
@@ -101,12 +101,12 @@ rmtsUpdateTrackInfo(void)
 {
 	if (!PCurTrack)
 		return;
-	
+
 	// Update GUI with track info.
 	// 0) Track category and name.
 	GfuiLabelSetText(ScrHandle, CategoryEditId, PCurTrack->getCategoryName().c_str());
 	GfuiLabelSetText(ScrHandle, NameEditId, PCurTrack->getName().c_str());
-	
+
 	// 1) Track description, optionally wrapped in 2 lines
 	std::string strDescLine1, strDescLine2;
 	rmtsWordWrap(PCurTrack->getDescription(), strDescLine1, strDescLine2, DescLinesMaxLen);
@@ -120,7 +120,7 @@ rmtsUpdateTrackInfo(void)
 	std::ostringstream ossData;
 	ossData << std::fixed << std::setprecision(0) << PCurTrack->getWidth() << " m";
 	GfuiLabelSetText(ScrHandle, WidthLabelId, ossData.str().c_str());
-	
+
 	// 4) Length.
 	ossData.str("");
 	ossData << PCurTrack->getLength() << " m";
@@ -164,7 +164,7 @@ rmtsActivate(void * /* dummy */)
 		GfuiEnable(ScrHandle, PrevCategoryArrowId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, NextCategoryArrowId, GFUI_DISABLE);
 	}
-	
+
 	// Disable track combo-box arrows if only one track available in the current category.
 	if (GfTracks::self()->getTracksInCategory(PCurTrack->getCategoryId()).size() <= 1)
 	{
@@ -203,7 +203,7 @@ rmtsTrackCatPrevNext(void *vsel)
 
 	// Update GUI
 	rmtsUpdateTrackInfo();
-	
+
 	// Disable track combo-box arrows if only one track available in this category.
 	if (PCurTrack)
 	{
@@ -258,7 +258,7 @@ RmTrackSelect(void *vs)
 	PCurTrack =
 		GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(), PCurTrack->getId());
 	if (PCurTrack && PCurTrack->getId() != strReqTrackId)
-		GfLogWarning("Could not find / use selected track %s (%s) ; using %s (%s)\n", 
+		GfLogWarning("Could not find / use selected track %s (%s) ; using %s (%s)\n",
 					 strReqTrackId.c_str(), strReqTrackCatId.c_str(),
 					 PCurTrack->getId().c_str(), PCurTrack->getCategoryId().c_str());
 
@@ -272,7 +272,7 @@ RmTrackSelect(void *vs)
 						 strReqTrackId.c_str(), strReqTrackCatId.c_str(),
 						 PCurTrack->getId().c_str(), PCurTrack->getCategoryId().c_str());
 	}
-	
+
 	// If no usable category/track found, ... return
 	if (!PCurTrack)
 	{
@@ -313,7 +313,7 @@ RmTrackSelect(void *vs)
 
 	// Load menu properties.
 	DescLinesMaxLen = (unsigned)GfuiMenuGetNumProperty(hparmMenu, "nDescLinesMaxLen", 35);
-	
+
 	GfParmReleaseHandle(hparmMenu);
 
 	// Keyboard shortcuts.

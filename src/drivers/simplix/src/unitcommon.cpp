@@ -13,7 +13,7 @@
 // eMail		:	wdbee@users.sourceforge.net
 // Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// This	unit is	based on the robot mouse_2006 
+// This	unit is	based on the robot mouse_2006
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
 //	  Copyright:	(C)	2006-2007 Tim Foden
@@ -60,23 +60,23 @@ TUtils::~TUtils()
 //==========================================================================*
 // Utility to merge	parameter files
 //--------------------------------------------------------------------------*
-void* TUtils::MergeParamFile( 
-  PCarSettings Params, 
+void* TUtils::MergeParamFile(
+  PCarSettings Params,
   const	char* FileName)
 {
   PCarSettings NewParams =						 //	Open setup file
 	GfParmReadFile(FileName, GFPARM_RMODE_STD,	false);
 
-  if(NewParams == NULL)							 // Return old one, 
-	return	Params;								 		 // if new one is	empty 
+  if(NewParams == NULL)							 // Return old one,
+	return	Params;								 		 // if new one is	empty
 
-  if(Params	== NULL)								 // Return new one, 
-	return	NewParams;							 	 //	if old one is	empty  
+  if(Params	== NULL)								 // Return new one,
+	return	NewParams;							 	 //	if old one is	empty
 
   return GfParmMergeHandles(Params,	NewParams,	 // Merge setup files
-	GFPARM_MMODE_SRC 
-	| GFPARM_MMODE_DST	
-	| GFPARM_MMODE_RELSRC 
+	GFPARM_MMODE_SRC
+	| GFPARM_MMODE_DST
+	| GFPARM_MMODE_RELSRC
 	| GFPARM_MMODE_RELDST);
 }
 //==========================================================================*
@@ -336,7 +336,7 @@ bool TUtils::CalcTangent(
 //==========================================================================*
 
 //==========================================================================*
-// Utility to interpolate a	curve linear 
+// Utility to interpolate a	curve linear
 //--------------------------------------------------------------------------*
 double TUtils::InterpCurvatureLin( double k0, double k1, double	t )
 {
@@ -363,7 +363,7 @@ double TUtils::InterpCurvatureRad( double k0, double k1, double	t )
 //==========================================================================*
 
 //==========================================================================*
-// Utility to interpolate a	curve 
+// Utility to interpolate a	curve
 //--------------------------------------------------------------------------*
 double TUtils::InterpCurvature(	double k0, double k1, double t )
 {

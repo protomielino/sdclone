@@ -151,7 +151,7 @@ PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...)
 
 // Workaround for sucking MSVC "access" function in C lib :
 // * define F_OK, R_OK, W_OK and X_OK.
-// * X_OK : no "executable" bit under Windows => use "R_OK" 
+// * X_OK : no "executable" bit under Windows => use "R_OK"
 #ifdef F_OK
 #undef F_OK
 #endif

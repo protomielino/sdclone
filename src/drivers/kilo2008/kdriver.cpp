@@ -1,26 +1,26 @@
 /*
  *      kdriver.cpp
- *      
+ *
  *      Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
  *      Based on work by Bernhard Wymann and Andrew Sumner.
- *      
+ *
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation; either version 2 of the License, or
  *      (at your option) any later version.
- *      
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- *      
+ *
  *      You should have received a copy of the GNU General Public License
  *      along with this program; if not, write to the Free Software
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
- * 
+ *
  *      $Id$
- * 
+ *
  */
 
 #include "src/drivers/kilo2008/kdriver.h"
@@ -150,7 +150,7 @@ KDriver::~KDriver() {
 
 /**
  * Drive during the race.
- * 
+ *
  * @param[in] s Situation provided by the sim.
  */
 void KDriver::drive(tSituation * s) {
@@ -208,7 +208,7 @@ void KDriver::endRace(tSituation * s) {
 
 /**
  * Checks if I'm stuck.
- * 
+ *
  * @return true if stuck
  */
 bool KDriver::IsStuck() {
@@ -234,7 +234,7 @@ bool KDriver::IsStuck() {
 /**
  * Reduces the brake value such that it fits the speed
  * (more downforce -> more braking).
- * 
+ *
  * @param[in] brake Original braking value
  * @return  Modified braking value
  */
@@ -249,7 +249,7 @@ double KDriver::FilterBrakeSpeed(double brake) {
 /**
  * Compute offset to normal target point
  * for overtaking or let pass an opponent.
- * 
+ *
  * @return  new offset. Equals member 'my_offset_'
  */
 double KDriver::GetOffset() {
@@ -361,10 +361,10 @@ double KDriver::GetOffset() {
 /**
  * Modifies the member 'my_offset_' so that the car moves out of the way
  * of the overlapping opponent.
- * 
+ *
  * @param [in] o: the opponent we should let go
  * @return    new offset. Equals member 'my_offset_'
- * 
+ *
  */
 double KDriver::FilterOverlappedOffset(const Opponent *o) {
   double w = car_->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
@@ -385,7 +385,7 @@ double KDriver::FilterOverlappedOffset(const Opponent *o) {
 }  // FilterOverlappedOffset
 
 
-/** 
+/**
  * If there is an opponent overlapping us, reduce accelerator.
  *
  * @param [in]  accel: original acceleration value
@@ -400,7 +400,7 @@ double KDriver::FilterOverlap(double accel) {
 
 /**
  * Decide if there is a car ahead we can take over.
- * 
+ *
  * @return  Overlap car pointer or NULL
  */
 Opponent* KDriver::GetTakeoverOpp() {
@@ -612,7 +612,7 @@ double KDriver::FilterSidecollOffset(const Opponent *o,
 /**
  * Initialize the robot on a track.
  * For this reason it looks up any setup files.
- * 
+ *
  * Setup files are in a directory path like:
  * drivers/kilo
  *          |- default.xml  (skill enable)
@@ -625,7 +625,7 @@ double KDriver::FilterSidecollOffset(const Opponent *o,
  *            |-def-slow.xml      (setup for undefined, slow tracks)
  *            |-def-norm.xml      (setup for undefined, normal tracks)
  *            |-def-fast.xml      (setup for undefined, fast tracks)
- * 
+ *
  * @param [in]  t the track
  * @param [out] carHandle
  * @param [out] carParmHandle
@@ -733,7 +733,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
 
 /**
  * Update own private data on every timestep.
- * 
+ *
  * @param [in]  s situation provided by the sim
  */
 void KDriver::Update(tSituation * s) {
@@ -766,7 +766,7 @@ void KDriver::Update(tSituation * s) {
  * Checks if we need to plan a pitstop.
  * If yes, checks availability of the pit,
  * is it free or occupied by teammate.
- * 
+ *
  * @param [in]  s Situation provided by the sim
  */
 void KDriver::CheckPitStatus(tSituation *s) {
@@ -816,7 +816,7 @@ void KDriver::CheckPitStatus(tSituation *s) {
 /**
  * Brake filter for collision avoidance.
  * If there is an opponent we are to collide, brake brake brake!
- * 
+ *
  * @param [in]  brake Original brake value
  * @return  Possibly modified brake value
  */
@@ -843,7 +843,7 @@ double KDriver::FilterBColl(const double brake) {
 
 /**
  * Set pitstop commands.
- * 
+ *
  * @param [in]  s Situation provided by the sim
  * @return        Request pit immediately
  */
@@ -858,7 +858,7 @@ int KDriver::pitCommand(tSituation * s) {
 
 /**
  * Initialize a new race.
- * 
+ *
  * @param [in]  car Our own car
  * @param [in]  s Situation provided by the sim
  */
@@ -917,7 +917,7 @@ void KDriver::newRace(tCarElt * car, tSituation * s) {
 
 /**
  * Calculates target speed dependent on the traffic situation.
- * 
+ *
  */
 void KDriver::CalcSpeed() {
   accel_cmd_ = brake_cmd_ = 0.0;
@@ -952,7 +952,7 @@ void KDriver::CalcSpeed() {
 /**
  * Decides the character of the track and chooses 1 of 3 default setups.
  * Loads the appropriate setup file and returns it's handler.
- * 
+ *
  * @return  Handler to the loaded default setup
  */
 void* KDriver::LoadDefaultSetup() const {
@@ -1008,7 +1008,7 @@ void* KDriver::LoadDefaultSetup() const {
 
 /**
  * Merges 2 car setup infos, possibly read from different setup files.
- * 
+ *
  * @param [in,out]  oldHandle setup #1, output as the merged setups.
  * @param [in]      newHandle setup #2
  */
@@ -1027,7 +1027,7 @@ void KDriver::MergeCarSetups(void **oldHandle, void *newHandle) const {
 
 /**
  * Computes CA (aerodynamic downforce coefficient).
- * 
+ *
  */
 void KDriver::InitCa() {
   double rear_wing_area =
@@ -1061,7 +1061,7 @@ void KDriver::InitCa() {
 
 /**
  * Computes CW (aerodynamic drag coefficient).
- * 
+ *
  */
 void KDriver::InitCw() {
   double cx = GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS,
@@ -1075,7 +1075,7 @@ void KDriver::InitCw() {
 
 /**
  * Init the friction coefficient of the tires.
- * 
+ *
  */
 void KDriver::InitTireMu() {
   double tm = DBL_MAX;
@@ -1461,7 +1461,7 @@ double KDriver::SmoothSteering(double steercmd) {
 /**
  * GetSteer
  * Computes steer value.
- * 
+ *
  * @param[in] s global situation
  * @return    steer value range -1...1
  */
@@ -1572,7 +1572,7 @@ double KDriver::GetSteer(tSituation *s) {
 /**
  * TargetPoint
  * Computes target point for steering.
- * 
+ *
  * @return 2D coords of the target
  */
 vec2f KDriver::TargetPoint() {
@@ -1669,10 +1669,10 @@ vec2f KDriver::TargetPoint() {
 }  // TargetPoint
 
 
-/** 
+/**
  * GetDistToSegEnd
  * Computes the distance to the end of the segment.
- * 
+ *
  * @return distance in meter.
  */
 inline double KDriver::GetDistToSegEnd() const {
@@ -1716,10 +1716,10 @@ void KDriver::SetMode(int newmode) {
 }  // SetMode
 
 
-/** 
+/**
  * GetAccel
  * Computes fitting acceleration.
- * 
+ *
  * @return Acceleration scaled 0-1.
  */
 double KDriver::GetAccel() {
@@ -1743,7 +1743,7 @@ double KDriver::GetAccel() {
 /**
  * GetBrake
  * Computes initial brake value.
- * 
+ *
  * @return brake scaled 0-1
  */
 double KDriver::GetBrake() {
@@ -1837,10 +1837,10 @@ double KDriver::GetClutch() {
 }  // GetClutch
 
 
-/** 
+/**
  * InitSkill
  * Reads the global and the driver-specific skill values.
- * 
+ *
  * @return The accumulated skill value
  */
 double KDriver::InitSkill(tSituation * s) {

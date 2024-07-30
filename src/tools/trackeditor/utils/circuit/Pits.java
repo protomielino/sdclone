@@ -14,9 +14,9 @@ public class Pits {
 	private double				width				= Double.NaN;
 	private double				length				= Double.NaN;
 	private int					style				= Integer.MAX_VALUE;
-	private int					indicator			= Integer.MAX_VALUE;	
+	private int					indicator			= Integer.MAX_VALUE;
 	private DoubleValue			speedLimit			= null;
-	
+
 	/**
 	 * @return Returns the side.
 	 */
@@ -265,9 +265,9 @@ public class Pits {
 			{
 				return;
 			}
-			
+
 			this.speedLimit = new DoubleValue();
-		}		
+		}
 		this.speedLimit.units = units;
 	}
 

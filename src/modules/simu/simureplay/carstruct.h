@@ -80,10 +80,10 @@ typedef struct
     DtShapeRef	shape;		/* for collision */
     int		blocked;		// Flag to show if the car has had already a collision in the same timestep.
     int		dammage;
-    
+
     /* enabling features */
     int features;
-    
+
     tDynPt	restPos;	/* target rest position after the car is broken */
 
     int		collisionAware;
@@ -145,7 +145,7 @@ typedef struct
 
 #endif
 
-#endif /* _CAR__H_ */ 
+#endif /* _CAR__H_ */
 
 
 

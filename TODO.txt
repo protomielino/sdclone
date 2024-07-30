@@ -27,7 +27,7 @@ Menus:
 Robots:
 -
 
-Program: 
+Program:
 - network gaming - take over Brian's unfinished work, or restart from scratch
   (using graphics data transmission rather than physics one,
    see devel list discussions)
@@ -47,7 +47,7 @@ Program:
         If needed define car type specific parameters.
 
 Other:
-- finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 
+- finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run.
   Plib is the biggest source of headaches. CMake integration still unfinished in that way.
 - think about how to integrate Haruna's fictious racing teams backstories in the game
   (ex: LS1 in 'LS1 team "backstories" (for fun)' devel list post)
@@ -92,12 +92,12 @@ Program:
   => we must find a better indexing of these array, to use the really needed
      minimum number of key entries in these arrays (may be with some king of
      indirection ?)
-- Support for 3rd party robots, cars and track. 3rd party robot builders 
+- Support for 3rd party robots, cars and track. 3rd party robot builders
   should be able to use our CMake macro's, so we need to make some changes
   to these macros and install them in such way that a robot can find it
   during compilation.
-- Done: Implemented simple memory leak detection by overriding 
-  malloc, calloc, realloc, strdup, free, new, delete ... etc 
+- Done: Implemented simple memory leak detection by overriding
+  malloc, calloc, realloc, strdup, free, new, delete ... etc
   in order to save informations about the caller in the allocated block.
   To collect infos about the caller the return address is taken from the stack
   ( __LINE__, __FILE__ ... cannot work without changing all the callers code)
@@ -111,7 +111,7 @@ Program:
   add also something for preventing you from smashing into the back of the car in front
   (see Haruna's detailed post on the subject
    and associated thread http://sourceforge.net/mailarchive/forum.php?thread_name=e17477d90904182050lc339f5cy6b4908ed8dc1723%40mail.gmail.com&forum_name=speed-dreams-devel)
-- introduce AI vs AI duel tournament mode for casual robot programmers (similar to 
+- introduce AI vs AI duel tournament mode for casual robot programmers (similar to
   R-TYPE FINAL's 'VS AI' mode); with varying car types, tracks, and robot competence
 - Add co-driver/navigator signals and sounds for dirt and certain road tracks to be
   used in rallying game modes

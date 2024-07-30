@@ -1,6 +1,6 @@
 /***************************************************************************
-                          tgf.cpp -- The Gaming Framework                            
-                             -------------------                                         
+                          tgf.cpp -- The Gaming Framework
+                             -------------------
     created              : Fri Aug 13 22:31:43 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
@@ -81,7 +81,7 @@ static char* gfBinDir = 0;
  *	The address of the matching modlist item if found, 0 otherwise.
  *
  * Remarks
- *	
+ *
  */
 tModList *GfModIsInList(const char *sopath, tModList *modlist)
 {
@@ -99,7 +99,7 @@ tModList *GfModIsInList(const char *sopath, tModList *modlist)
 	if (!strcmp(sopath, curMod->sopath))
 	  return curMod;
     } while (curMod != modlist);
-    
+
     return 0;
 }
 
@@ -119,7 +119,7 @@ tModList *GfModIsInList(const char *sopath, tModList *modlist)
  *	Nothing
  *
  * Remarks
- *	
+ *
  */
 void GfModAddInList(tModList *mod, tModList **modlist, int priosort)
 {
@@ -166,7 +166,7 @@ void GfModAddInList(tModList *mod, tModList **modlist, int priosort)
  *
  * Remarks
  *	Nothing done if mod or *modlist is NULL
- *	
+ *
  */
 void GfModMoveToListHead(tModList *mod, tModList **modlist)
 {
@@ -202,18 +202,18 @@ void GfModMoveToListHead(tModList *mod, tModList **modlist)
 *	-1	Error
 *
 * Remarks
-*	
+*
 */
 int GfModFreeInfoList(tModList **modlist)
 {
     tModList	*curMod;
     tModList	*nextMod;
-    
+
     curMod = *modlist;
     if (curMod == 0)
 	return 0;
 
-    do 
+    do
     {
 	nextMod = curMod->next;
 
@@ -224,7 +224,7 @@ int GfModFreeInfoList(tModList **modlist)
 	curMod = nextMod;
     }
     while (curMod != *modlist);
-    
+
     *modlist = 0;
 
     return 0;
@@ -243,7 +243,7 @@ int GfModFreeInfoList(tModList **modlist)
 void* GfPoolMalloc(size_t size, tMemoryPool* pool)
 {
 	tMemoryPoolItem *data;
-	
+
 	if( !pool )
 		return 0;
 
@@ -555,7 +555,7 @@ void GfInit(bool bWithLogging)
 void GfShutdown(void)
 {
 	GfLogTrace("Shutting down gaming framework.\n");
-	
+
 	// Shudown SDL.
 	SDL_Quit();
 
@@ -644,7 +644,7 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 	const int bufSize = (plus ? strlen(plus) : 0) + 9 + prec + 1 + 4; // 4 is for security.
 	char* buf = (char*)malloc(bufSize*sizeof(char));
 	char* secondsPrecision = (char*)malloc((prec+2)*sizeof(char));
-	
+
 	const char* sign = (sec < 0.0) ? "-" : (plus ? plus : "");
 	if (sec < 0.0)
 		sec = -sec;
@@ -760,18 +760,18 @@ char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen)
 }
 
 /* Translate a directory path into a run-time dir path :
-   - ~ management, 
-   - \ to / conversion, 
+   - ~ management,
+   - \ to / conversion,
    - mandatory unique trailing /,
    - if not absolute, make absolute through gfInstallDir if already available,
      or through getcwd otherwise.
-   Warning: The returned path is allocated on the heap (malloc) and must be free'd by the caller. 
+   Warning: The returned path is allocated on the heap (malloc) and must be free'd by the caller.
 */
 
 static char* makeRunTimeDirPath(const char* srcPath)
 {
 	static const size_t bufSize = 1024;
-	
+
 	// Allocate target buffer (must be freed by caller when useless).
 	char* tgtPath = (char *)malloc(bufSize);
 	tgtPath[0] = 0;
@@ -874,7 +874,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	{
 		*pLastPathSep = 0;
 	}
-	
+
 	// Otherwise, let's try the PATH
 	else if (getenv("PATH"))
 	{
@@ -924,7 +924,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	if (pBinDir - gfInstallDir == (long)(strlen(gfInstallDir) - strlen(SD_BINDIR)))
 	{
 		*pBinDir = 0;
-	}	
+	}
 	// Otherwise, let's consider the install dir is the current dir
 	// (quite strange : the executable is not in SD_BINDIR ? When can this happen ?).
 	else
@@ -936,7 +936,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 
 		gfInstallDir = makeRunTimeDirPath(pszPath);
 	}
-	
+
 	GfLogInfo("Install dir is %s (from executable %s)\n", gfInstallDir, pszExecutablePath);
 }
 

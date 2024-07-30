@@ -107,7 +107,7 @@ public class LocalInfoProperties extends PropertyPanel
 		addTextField(this, 9, longitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getLongitude(), 170, 125);
 		addTextField(this, 10, climatTextField, getEditorFrame().getTrackData().getLocalInfo().getClimat(), 170, 125);
 		addTextField(this, 11, precipitationTextField, getEditorFrame().getTrackData().getLocalInfo().getPrecipitation(), 170, 125);
-		
+
 		if (getEditorFrame().getCarsSportsRacing())
 		{
 			addLabel(this, 12, bestLapLabel, "Best Lap", 150);

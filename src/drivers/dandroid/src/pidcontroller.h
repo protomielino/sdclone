@@ -19,7 +19,7 @@
 #define _PIDCONTROLLER_H_
 
 
-class PidController  
+class PidController
 {
 public:
   PidController();

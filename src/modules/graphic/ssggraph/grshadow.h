@@ -11,7 +11,7 @@ protected:
   float factor;
   float unit;
   virtual void copy_from ( ssgVtxTableShadow *src, int clone_flags ) ;
-	
+
 public:
   virtual ssgBase *clone ( int clone_flags = 0 ) ;
   ssgVtxTableShadow (float f, float u) ;
@@ -22,10 +22,10 @@ public:
                            ssgColourArray   *cl ) ;
   void setOffset(float f, float u);
   void draw_geometry();
-  
 
-  virtual void drawHighlight ( sgVec4 colour ){ssgVtxTable::drawHighlight(colour);} 
-  virtual void drawHighlight ( sgVec4 colour, int i ){ssgVtxTable::drawHighlight(colour,i);} 
+
+  virtual void drawHighlight ( sgVec4 colour ){ssgVtxTable::drawHighlight(colour);}
+  virtual void drawHighlight ( sgVec4 colour, int i ){ssgVtxTable::drawHighlight(colour,i);}
 
   virtual void pick ( int baseName )  { ssgVtxTable::pick(baseName);}
   virtual void transform ( const sgMat4 m )  { ssgVtxTable::transform(m);}

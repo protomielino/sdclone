@@ -70,14 +70,14 @@
 //==========================================================================*
 // Deklaration der Klasse TCollision
 //--------------------------------------------------------------------------*
-class TCollision  
+class TCollision
 {
   public:
 	struct TCollInfo                             // Infos to possible Collision
 	{
 	  int Flags;                                 // Flags
 	  int LappersBehind;                         // Lappers behind?
-	  double MinLSideDist;                        
+	  double MinLSideDist;
 	  double MinRSideDist;
 	  double CarDistLong;
       int NextSide;                              // Side of next curve
@@ -104,8 +104,8 @@ class TCollision
 		TargetSpeed(500),
   	    MinOppDistance(1000),
   	    AvoidSide(0.0),
-	    ToL(100),	
-	    ToR(100)        
+	    ToL(100),
+	    ToR(100)
 	  {
         for (int I = 0; I < MAXBLOCKED; I++)
   	      Blocked[I] = false;
@@ -118,9 +118,9 @@ class TCollision
 
 	double AvoidTo                               // Direction to go
 	  (const TCollInfo& CollInfo,                //   to avoid collision
-	  const PCarElt Car, 
+	  const PCarElt Car,
 	  TDriver& Me,
-	  bool& AvoidAhead, 
+	  bool& AvoidAhead,
 	  double& TempOffset);
 };
 //==========================================================================*

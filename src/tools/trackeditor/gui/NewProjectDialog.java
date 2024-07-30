@@ -35,7 +35,7 @@ import javax.swing.WindowConstants;
 
 /**
  * @author babis
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -66,13 +66,13 @@ public class NewProjectDialog extends JDialog
 	private JTextField 			copyrightTextField 			= null;
 	private JLabel 				descriptionLabel 			= null;
 	private JTextField 			descriptionTextField		= null;
-	
+
 	private EditorFrame.NewProjectInfo	newProjectInfo;
-	
+
 	private final String sep = System.getProperty("file.separator");
-	
+
 	/**
-	 *  
+	 *
 	 */
 	public NewProjectDialog(EditorFrame editorFrame, EditorFrame.NewProjectInfo newProjectInfo)
 	{
@@ -83,7 +83,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize()
@@ -102,7 +102,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes jPanel
-	 * 
+	 *
 	 * @return javax.swing.JPanel
 	 */
 	private JPanel getJPanel()
@@ -164,7 +164,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes projectNameTextField
-	 * 
+	 *
 	 * @return javax.swing.JTextField
 	 */
 	private JTextField getProjectNameTextField()
@@ -196,7 +196,7 @@ public class NewProjectDialog extends JDialog
 			if (editorFrame.getCarsSportsRacing())
 				items = new String[] {"circuit", "development", "dirt", "grandprix", "road", "speedway"};
 			else
-				items = new String[] {"circuit", "development", "dirt", "gprix", "karting", "road", "speedway"};			
+				items = new String[] {"circuit", "development", "dirt", "gprix", "karting", "road", "speedway"};
 			trackCategoryComboBox = new JComboBox<String>(items);
 			trackCategoryComboBox.setSelectedItem("road");
 			trackCategoryComboBox.setBounds(145, 37, 170, 23);
@@ -270,7 +270,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes pathTextField
-	 * 
+	 *
 	 * @return javax.swing.JTextField
 	 */
 	private JTextField getPathTextField()
@@ -279,7 +279,7 @@ public class NewProjectDialog extends JDialog
 		{
 			pathTextField = new JTextField();
 			pathTextField.setBounds(95, 118, 331, 23);
-			
+
 			String path = null;
 			File dataDir = new File(editorFrame.getDataDirectory());
 			if (dataDir.isDirectory() && dataDir.canWrite())
@@ -294,13 +294,13 @@ public class NewProjectDialog extends JDialog
 					}
 				}
 			}
-			
+
 			if (path == null)
 			{
 				String defaultPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
-				
+
 				File userTracksDir = new File(defaultPath + sep + "tracks");
-				
+
 				if (userTracksDir.exists() && userTracksDir.isDirectory() && userTracksDir.canWrite())
 					path = userTracksDir.getAbsolutePath();
 				else
@@ -327,7 +327,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes browseButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private JButton getBrowseButton()
@@ -348,10 +348,10 @@ public class NewProjectDialog extends JDialog
 		return browseButton;
 	}
 	/**
-	 * This method initializes authorTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */    
+	 * This method initializes authorTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
 	private JTextField getAuthorTextField() {
 		if (authorTextField == null) {
 			authorTextField = new JTextField();
@@ -360,10 +360,10 @@ public class NewProjectDialog extends JDialog
 		return authorTextField;
 	}
 	/**
-	 * This method initializes emailTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */    
+	 * This method initializes emailTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
 	private JTextField getEmailTextField() {
 		if (emailTextField == null) {
 			emailTextField = new JTextField();
@@ -372,10 +372,10 @@ public class NewProjectDialog extends JDialog
 		return emailTextField;
 	}
 	/**
-	 * This method initializes copyrightTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */    
+	 * This method initializes copyrightTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
 	private JTextField getCopyrightTextField() {
 		if (copyrightTextField == null) {
 			copyrightTextField = new JTextField();
@@ -384,10 +384,10 @@ public class NewProjectDialog extends JDialog
 		return copyrightTextField;
 	}
 	/**
-	 * This method initializes descriptionTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */    
+	 * This method initializes descriptionTextField
+	 *
+	 * @return javax.swing.JTextField
+	 */
 	private JTextField getDescriptionTextField() {
 		if (descriptionTextField == null) {
 			descriptionTextField = new JTextField();
@@ -396,7 +396,7 @@ public class NewProjectDialog extends JDialog
 		return descriptionTextField;
 	}
 	/**
-	 *  
+	 *
 	 */
 	protected void selectPath()
 	{
@@ -418,7 +418,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes okButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private JButton getOkButton()
@@ -440,7 +440,7 @@ public class NewProjectDialog extends JDialog
 	}
 	/**
 	 * This method initializes cancelButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private JButton getCancelButton()
@@ -461,11 +461,11 @@ public class NewProjectDialog extends JDialog
 		return cancelButton;
 	}
 	/**
-	 *  
+	 *
 	 */
 	protected void exit()
 	{
-		String tmpName = getProjectNameTextField().getText();	
+		String tmpName = getProjectNameTextField().getText();
 		String tmpPath = getPathTextField().getText();
 
 		File projectPath = new File(tmpPath + sep + tmpName);
@@ -490,7 +490,7 @@ public class NewProjectDialog extends JDialog
 		cancel();
 	}
 	/**
-	 *  
+	 *
 	 */
 	protected void cancel()
 	{

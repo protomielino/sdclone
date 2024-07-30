@@ -43,7 +43,7 @@ static const double POLRAD  = 6356752.3142451794975639668;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Direct and inverse distance functions 
+// Direct and inverse distance functions
 //
 // Proceedings of the 7th International Symposium on Geodetic
 // Computations, 1985
@@ -63,7 +63,7 @@ static const double GEOD_INV_PI = SGD_PI;
 
 static inline double M0( double e2 ) {
     //double e4 = e2*e2;
-    return GEOD_INV_PI*(1.0 - e2*( 1.0/4.0 + e2*( 3.0/64.0 + 
+    return GEOD_INV_PI*(1.0 - e2*( 1.0/4.0 + e2*( 3.0/64.0 +
 						  e2*(5.0/256.0) )))/2.0;
 }
 
@@ -83,8 +83,8 @@ int geo_direct_wgs_84 ( double lat1, double lon1, double az1,
     double sinphi1 = sin(phi1), cosphi1 = cos(phi1);
     double azm1 = az1*RADDEG;
     double sinaz1 = sin(azm1), cosaz1 = cos(azm1);
-	
-	
+
+
     if( fabs(s) < 0.01 ) {	// distance < centimeter => congruency
 	*lat2 = lat1;
 	*lon2 = lon1;
@@ -112,8 +112,8 @@ int geo_direct_wgs_84 ( double lat1, double lon1, double az1,
 	    c2sigm = cos(2.0*sig1+sig);
 	    sinsig = sin(sig); cossig = cos(sig);
 	    temp = sig;
-	    sig = first + 
-		tb*sinsig*(c2sigm+tb*(cossig*(-1.0+2.0*c2sigm*c2sigm) - 
+	    sig = first +
+		tb*sinsig*(c2sigm+tb*(cossig*(-1.0+2.0*c2sigm*c2sigm) -
 				      tb*c2sigm*(-3.0+4.0*sinsig*sinsig)
 				      *(-3.0+4.0*c2sigm*c2sigm)/6.0)
 			   /4.0);
@@ -155,7 +155,7 @@ int geo_direct_wgs_84 ( double lat1, double lon1, double az1,
 	double paz = ( phi1 < 0.0 ? 180.0 : 0.0 );
         double zero = 0.0f;
 	return geo_direct_wgs_84( zero, lon1, paz, dM, lat2, lon2, az2 );
-    } 
+    }
 }
 
 
@@ -176,10 +176,10 @@ int geo_inverse_wgs_84( double lat1, double lon1, double lat2,
     double sinphi1 = sin(phi1), cosphi1 = cos(phi1);
     double phi2 = lat2*RADDEG, lam2 = lon2*RADDEG;
     double sinphi2 = sin(phi2), cosphi2 = cos(phi2);
-	
-    if( (fabs(lat1-lat2) < testv && 
+
+    if( (fabs(lat1-lat2) < testv &&
 	 ( fabs(lon1-lon2) < testv) || fabs(lat1-90.0) < testv ) )
-    {	
+    {
 	// TWO STATIONS ARE IDENTICAL : SET DISTANCE & AZIMUTHS TO ZERO */
 	*az1 = 0.0; *az2 = 0.0; *s = 0.0;
 	return 0;
@@ -192,15 +192,15 @@ int geo_inverse_wgs_84( double lat1, double lon1, double lat2,
     } else if( fabs(cosphi2) < testv ) {
 	// terminal point is polar
         double _lon1 = lon1 + 180.0f;
-	int k = geo_inverse_wgs_84( lat1, lon1, lat1, _lon1, 
+	int k = geo_inverse_wgs_84( lat1, lon1, lat1, _lon1,
 				    az1, az2, s );
 	k = k; // avoid compiler error since return result is unused
 	*s /= 2.0;
 	*az2 = *az1 + 180.0;
-	if( *az2 > 360.0 ) *az2 -= 360.0; 
+	if( *az2 > 360.0 ) *az2 -= 360.0;
 	return 0;
-    } else if( (fabs( fabs(lon1-lon2) - 180 ) < testv) && 
-	       (fabs(lat1+lat2) < testv) ) 
+    } else if( (fabs( fabs(lon1-lon2) - 180 ) < testv) &&
+	       (fabs(lat1+lat2) < testv) )
     {
 	// Geodesic passes through the pole (antipodal)
 	double s1,s2;
@@ -224,18 +224,18 @@ int geo_inverse_wgs_84( double lat1, double lon1, double lat2,
 	temp = (1.0-f)*sinphi2/cosphi2;
 	cosu2 = 1.0/sqrt(1.0+temp*temp);
 	sinu2 = temp*cosu2;
-    
+
 	do {
 	    sdlams = sin(dlams), cdlams = cos(dlams);
 	    sinsig = sqrt(cosu2*cosu2*sdlams*sdlams+
 			  (cosu1*sinu2-sinu1*cosu2*cdlams)*
 			  (cosu1*sinu2-sinu1*cosu2*cdlams));
 	    cossig = sinu1*sinu2+cosu1*cosu2*cdlams;
-	    
+
 	    sig = atan2(sinsig,cossig);
 	    sinaz = cosu1*cosu2*sdlams/sinsig;
 	    cos2saz = 1.0-sinaz*sinaz;
-	    c2sigm = (sinu1 == 0.0 || sinu2 == 0.0 ? cossig : 
+	    c2sigm = (sinu1 == 0.0 || sinu2 == 0.0 ? cossig :
 		      cossig-2.0*sinu1*sinu2/cos2saz);
 	    tc = f*cos2saz*(4.0+f*(4.0-3.0*cos2saz))/16.0;
 	    temp = dlams;

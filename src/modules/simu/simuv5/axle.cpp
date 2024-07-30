@@ -29,20 +29,20 @@ void SimAxleConfig(tCar *car, int index)
 	tCarSetupItem *setupRideHeightR = &(car->carElt->setup.rideHeight[index*2]);
 	tCarSetupItem *setupRideHeightL = &(car->carElt->setup.rideHeight[index*2+1]);
 	tAxle *axle = &(car->axle[index]);
-	
+
 	axle->xpos = GfParmGetNum(hdle, AxleSect[index], PRM_XPOS, (char*)NULL, 0.0f);
 	axle->I    = GfParmGetNum(hdle, AxleSect[index], PRM_INERTIA, (char*)NULL, 0.15f);
-	
+
 	setupRideHeightR->desired_value = setupRideHeightR->min = setupRideHeightR->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightR->desired_value), &(setupRideHeightR->min), &(setupRideHeightR->max));
 	setupRideHeightR->changed = true;
 	setupRideHeightR->stepsize = 0.001f;
-	
+
 	setupRideHeightL->desired_value = setupRideHeightL->min = setupRideHeightL->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2+1], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightL->desired_value), &(setupRideHeightL->min), &(setupRideHeightL->max));
 	setupRideHeightL->changed = true;
 	setupRideHeightL->stepsize = 0.001f;
-	
+
 	if (index == 0) {
 		setupArbK->desired_value = setupArbK->min = setupArbK->max = 175000.0f;
 		GfParmGetNumWithLimits(hdle, SECT_FRNTARB, PRM_SPR, (char*)NULL, &(setupArbK->desired_value), &(setupArbK->min), &(setupArbK->max));
@@ -56,7 +56,7 @@ void SimAxleConfig(tCar *car, int index)
 		setupArbK->stepsize = 1000;
 		SimSuspConfig(car, hdle, SECT_REARHEAVE, &(axle->heaveSusp), 5);
 	}
-	
+
 	car->wheel[index*2].feedBack.I += (tdble) (axle->I / 2.0);
 	car->wheel[index*2+1].feedBack.I += (tdble) (axle->I / 2.0);
 }
@@ -78,9 +78,9 @@ void SimAxleReConfig(tCar *car, int index, tdble weight0)
 	tCarSetupItem *setupRideHeightL = &(car->carElt->setup.rideHeight[index*2+1]);
 	tAxle *axle = &(car->axle[index]);
 	tdble x0r, x0l;
-	
+
 	SimArbReConfig(car, index);
-	
+
 	if (setupRideHeightR->changed) {
 		x0r = MIN(setupRideHeightR->max, MAX(setupRideHeightR->min, setupRideHeightR->desired_value));
 		setupRideHeightR->value = x0r;
@@ -106,26 +106,26 @@ void SimAxleUpdate(tCar *car, int index)
 {
 	tAxle *axle = &(car->axle[index]);
 	tdble str, stl, sgn, vtl, vtr;
-	
+
 	str = car->wheel[index*2].susp.x;
 	stl = car->wheel[index*2+1].susp.x;
 	vtr = car->wheel[index*2].susp.v;
 	vtl = car->wheel[index*2+1].susp.v;
-	
+
 	sgn = (tdble) (SIGN(stl - str));
-	axle->arbSusp.x = fabs(stl - str);		
+	axle->arbSusp.x = fabs(stl - str);
 	tSpring *spring = &(axle->arbSusp.spring);
 
 	// To save CPU power we compute the force here directly. Just the spring
 	// is considered.
 	tdble f;
 	f = spring->K * axle->arbSusp.x;
-	
+
 	// right
 	car->wheel[index*2].axleFz =  + sgn * f;
 	// left
 	car->wheel[index*2+1].axleFz = - sgn * f;
-	
+
 	/* heave/center spring */
 	axle->heaveSusp.x = (tdble) (0.5 * (stl + str));
 	axle->heaveSusp.v = (tdble) (0.5 * (vtl + vtr));

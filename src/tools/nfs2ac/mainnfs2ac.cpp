@@ -2,8 +2,8 @@
 
     file        : main.cpp
     created     : Tue Jul 29 19:45:27 CEST 2003
-    copyright   : (C) 2003 by Christophe Guionneau                       
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Christophe Guionneau
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -63,7 +63,7 @@ typedef struct {
 } tTriangle;
 
 int main(int argc, char **argv)
-{ 
+{
     FILE * in ;
     int ver;
     int num=0 ;
@@ -96,9 +96,9 @@ int main(int argc, char **argv)
 		perror(argv[1]);
 		return -1;
     }
-    
+
     num = fstat.st_size;
-    
+
     mem= (char *) malloc(num+1);
 
     in=fopen(argv[1],"rb");
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 
     if ((int)fread(p,1,num,in) != num)
 	exit(-2);
-  
+
     magic         = * ((int *)(mem));
 
     if (magic == 0x00101014) {
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
 	PartNames     =    (char *)(mem + 0x0E04);
 	p             =             mem + 0x1F04;
     }
-  
+
 
 
     printf("AC3Db\n");
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
     printf("name \"ouature%d\"\n", ver);
     printf("kids %d\n", NumParts);
 
-  
+
     for (i = 0; i < NumParts; i++) {
 	vl= (p + P1stVertices[i] * sizeof(tVector) + VertTblOffset);
 	tl= (p + P1stTriangle[i] * sizeof(tTriangle) + TriaTblOffset);

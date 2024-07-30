@@ -19,7 +19,7 @@ import java.awt.geom.Point2D;
  * <p>
  * Societe
  * </p>
- * 
+ *
  * @author Patrice Espie
  * @version 0.1a
  */

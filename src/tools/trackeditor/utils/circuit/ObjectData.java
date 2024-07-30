@@ -8,7 +8,7 @@ public class ObjectData
 	public Integer	imageY;
 	public Double	trackX;
 	public Double	trackY;
-	
+
 	public ObjectData(String name, Integer color, Integer imageX, Integer imageY, double trackX, double trackY)
 	{
 		this.name = name;

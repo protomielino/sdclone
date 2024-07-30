@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file                 : textonly.cpp
-    copyright            : (C) 2011 by Jean-Philippe Meuret                        
-    email                : pouillot@users.sourceforge.net   
+    copyright            : (C) 2011 by Jean-Philippe Meuret
+    email                : pouillot@users.sourceforge.net
     version              : $Id$
 
  ***************************************************************************/
@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #include <string>
 #include <vector>
 #include <sstream>
@@ -89,13 +89,13 @@ bool TextOnlyUI::activate()
     // Get the race to start.
     std::string strRaceToStart;
 	(void)GfApp().hasOption("startrace", strRaceToStart); // Should always be true (see main).
-		
+
     // Check if it's an available one, and refuse activation if not.
 	GfRaceManager* pSelRaceMan =  GfRaceManagers::self()->getRaceManager(strRaceToStart);
     if (!pSelRaceMan)
 	{
         GfLogError("No such race type '%s'\n", strRaceToStart.c_str());
-		
+
 		return false;
 	}
 
@@ -105,7 +105,7 @@ bool TextOnlyUI::activate()
 
 	// * Give the selected race manager to the race engine.
 	raceEngine().selectRaceman(pSelRaceMan, /*bKeepHumans=*/false);
-		
+
 	// * Configure the new race (no user interaction needed).
 	raceEngine().configureRace(/* bInteractive */ false);
 
@@ -222,11 +222,11 @@ void TextOnlyUI::onLapCompleted(int nLapIndex)
 		return;
 
 	GfLogInfo("Lap #%d completed.\n", nLapIndex);
-	
+
     // Dump the results table.
 	GfLogInfo("%s - %s\n", _pResTable->strTitle.c_str(), _pResTable->strSubTitle.c_str());
 	GfLogInfo("%s\n", _pResTable->strHeader.c_str());
-	
+
 	std::vector<std::string>::const_iterator itLine;
 	for (itLine = _pResTable->vecLines.begin(); itLine != _pResTable->vecLines.end(); ++itLine)
 		GfLogInfo("%s\n", itLine->c_str());
@@ -240,7 +240,7 @@ void TextOnlyUI::onRaceInterrupted()
 void TextOnlyUI::onRaceFinishing()
 {
 	GfLogDebug("TextOnlyUI::onRaceFinishing()\n");
-	
+
 	// Configure the event loop : compute = nothing.
 	GfApp().eventLoop().setRecomputeCB(0);
 }
@@ -261,7 +261,7 @@ bool TextOnlyUI::onRaceFinished(bool bEndOfSession)
 	{
 		// TODO: Dump results table in the console (something like RmShowResults) ?
 	}
-	
+
 	// Tell the race engine state automaton to go on looping.
 	return true;
 }
@@ -280,7 +280,7 @@ bool TextOnlyUI::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 	{
 		// TODO: Dump results table in the console (something like RmShowStandings) ?
 	}
-	
+
 	// Tell the race engine state automaton to go on looping.
 	return true;
 }
@@ -331,7 +331,7 @@ void TextOnlyUI::setResultsTableRow(int nIndex, const char* pszText, bool bHighl
 					 nIndex, (int)_pResTable->vecLines.size() - 1);
 		_pResTable->vecLines.resize(nIndex + 1);
 	}
-		
+
 	_pResTable->vecLines[nIndex] = pszText;
 	if (bHighlight)
 		_pResTable->vecLines[nIndex] += " *";

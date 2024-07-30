@@ -51,7 +51,7 @@ public:
 	real* p; ///< probabilities of outcomes
 	DiscreteDistribution();
 	/// Make a discrete distribution with N outcomes
-	DiscreteDistribution(int N); 
+	DiscreteDistribution(int N);
 	virtual ~DiscreteDistribution();
 	virtual real generate();
 	virtual real pdf(real x);
@@ -75,8 +75,8 @@ public:
 	virtual ~NormalDistribution() {std::cout << "Normal dist destroyed\n";}
 	virtual real generate();
 	virtual real pdf(real x);
-	virtual void setVariance (real var) 
-	{s = sqrt(var);} 
+	virtual void setVariance (real var)
+	{s = sqrt(var);}
 	virtual void setMean (real mean)
 	{m = mean;}
 };
@@ -96,8 +96,8 @@ public:
 	virtual ~UniformDistribution() {}
 	virtual real generate();
 	virtual real pdf(real x);
-	virtual void setVariance (real var) 
-	{s = sqrt(12.0f * var);} 
+	virtual void setVariance (real var)
+	{s = sqrt(12.0f * var);}
 	virtual void setMean (real mean)
 	{m = mean;}
 };

@@ -35,14 +35,14 @@
 //==========================================================================*
 // Deklaration der Klasse TTmpCarParam
 //--------------------------------------------------------------------------*
-class TTmpCarParam	
+class TTmpCarParam
 {
   private:
 
   public:
 	PtCarElt oCar;								  //	Pointer	to TORCS data of car
 
-	TTmpCarParam();							  //	Default	constructor	
+	TTmpCarParam();							  //	Default	constructor
 	~TTmpCarParam();							  // Destructor
 
 	void Initialize(PtCarElt Car);

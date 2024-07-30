@@ -120,7 +120,7 @@ static void grSetupState(cgrSimpleState *st, char *buf)
 	st->enable(GL_LIGHTING);
 	st->enable(GL_TEXTURE_2D);
 	st->enable(GL_BLEND);
-	st->setColourMaterial(GL_AMBIENT_AND_DIFFUSE);	
+	st->setColourMaterial(GL_AMBIENT_AND_DIFFUSE);
 
 	stlist *curr = (stlist*)calloc(sizeof(stlist), 1);
 	curr->next = stateList;
@@ -158,7 +158,7 @@ ssgState* grSsgLoadTexState(const char *img, int errIfNotFound)
 	st = grStateFactory->getSimpleState();
 	grSetupState(st, buf);
 	st->setTexture(buf);
-	
+
 	return (ssgState*)st;
 }
 
@@ -219,10 +219,10 @@ cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexSche
 }
 
 /*
- * 
+ *
  * name: grWriteTime
  * Formats and outputs the time as a right aligned string.
- * 
+ *
  * @param color: colour to use
  * @param font: font to use
  * @param x: X coord of the left side of the bounding box
@@ -230,27 +230,27 @@ cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexSche
  * @param width: width of the bounding box
  * @param sec: time to format, in seconds
  * @param sgn: whether use +/- signs or not
- * 
+ *
  * @return
  */
 void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int sgn)
 {
 	char  buf[256];
-	
+
 	grWriteTimeBuf(buf, sec, sgn);
 	GfuiDrawString(buf, color, font, x, y, width, GFUI_ALIGN_HR);
 }
 
 
 /*
- * 
+ *
  * name: grWriteTimeBuf
  * Formats and write the time into the supplied character buffer.
- * 
+ *
  * @param buf: character buffer. Caller is totally responsible for this.
  * @param sec: time to format, in seconds
  * @param sgn: whether use +/- signs or not
- * 
+ *
  * @return
  */
 void grWriteTimeBuf(char *buf, tdble sec, int sgn)

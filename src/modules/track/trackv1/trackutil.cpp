@@ -39,16 +39,16 @@ TrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int type)
 }
 /*
  * Function
- *	
+ *
  *
  * Description
- *	
+ *
  *
  * Parameters
- *	
+ *
  *
  * Return
- *	
+ *
  */
 
 tdble
@@ -80,13 +80,13 @@ TrackSpline(tdble p0, tdble p1, tdble t0, tdble t1, tdble t)
 {
     tdble t2, t3;
     tdble h0, h1, h2, h3;
-    
+
     t2 = t * t;
     t3 = t * t2;
     h1 = 3 * t2 - 2 * t3;
     h0 = 1 - h1;
     h2 = t3 - 2 * t2 + t;
     h3 = t3 - t2;
-    
+
     return h0 * p0 + h1 * p1 + h2 * t0 + h3 * t1;
 }

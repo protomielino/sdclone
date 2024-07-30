@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -26,7 +26,7 @@
 #ifndef _TRANSMISSION_H_
 #define _TRANSMISSION_H_
 
-typedef struct 
+typedef struct
 {
     int		gear;
     int		gearMin;
@@ -66,7 +66,7 @@ typedef struct
 } tTransmission;
 
 
-#endif /* _TRANSMISSION_H_ */ 
+#endif /* _TRANSMISSION_H_ */
 
 
 

@@ -1679,7 +1679,7 @@ void grInitBoardCar(tCarElt *car)
     lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "data/textures");
 
     grSetFilePath(filePath);
-    
+
     /* Tachometer --------------------------------------------------------- */
     tgrCarInstrument *curInst = &(carInfo->instrument[0]);
 

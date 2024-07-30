@@ -80,10 +80,10 @@ static const float STEER_AVOIDANCE_GAIN = 0.01f; ///< [lograd/m] Gain for border
 
 static const double DivLength = 3.0;   // Length of path elements in meters
 static const double MAXINCFACTOR = 2.6;
- 
+
 static const double SecurityR = 100.0; // Security radius
 static double SideDistExt = 2.0; // Security distance wrt outside
-static double SideDistInt = 1.0; // Security distance wrt inside 
+static double SideDistInt = 1.0; // Security distance wrt inside
 
 static int telemetry[128] = {0};
 static int pitstatus[128] = {0};
@@ -121,14 +121,14 @@ static void RtGetCarindexString( int index, const char *, char, char *dest, int 
 #else
 #define OUTPUT(x)
 #endif
- 
+
 #define FATAL(x) do{if (x){OUTPUT("Fatal error: " << #x); exit(1);}}while(0)
 #define SEGTYPE2(seg, n) (SEGTYPE(seg) == TR_STR ? TR_STR \
-           : !n || seg->length*0.5>getDistToSegStart(car, 0) ? seg->type : seg->next->type) 
+           : !n || seg->length*0.5>getDistToSegStart(car, 0) ? seg->type : seg->next->type)
 
-//#define SEGTYPENEXT(seg) (seg->type == TR_STR || seg->radius >= 130.0 || (tSegArc[seg->id]*(seg->radius*6.5) <= seg->radius) ? TR_STR : seg->type) 
+//#define SEGTYPENEXT(seg) (seg->type == TR_STR || seg->radius >= 130.0 || (tSegArc[seg->id]*(seg->radius*6.5) <= seg->radius) ? TR_STR : seg->type)
 //#define SEGTYPE(seg) (seg->type != TR_STR && (SEGTYPENEXT(seg) == seg->type || (tSegArc[seg->id]*(seg->radius*6.5) > seg->radius && seg->radius <= 120.0 /*&& tSegLength[tSegID[seg->id]] > 10.0*/)) ? seg->type : TR_STR)
-#define SEGTYPENEXT(seg) (seg->type == TR_STR || seg->radius >= 130.0 || (tSegLength[seg->id] <= seg->radius) ? TR_STR : seg->type) 
+#define SEGTYPENEXT(seg) (seg->type == TR_STR || seg->radius >= 130.0 || (tSegLength[seg->id] <= seg->radius) ? TR_STR : seg->type)
 #define SEGTYPE(seg) (seg->type != TR_STR && (SEGTYPENEXT(seg) == seg->type || (tSegLength[seg->id] > seg->radius && seg->radius <= 120.0 /*&& tSegLength[tSegID[seg->id]] > 10.0*/)) ? seg->type : TR_STR)
 #define STRAIGHT_RADIUS 2000.0
 
@@ -152,7 +152,7 @@ static double Mag(double x, double y)
 {
  return sqrt(x * x + y * y);
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // Update tx and ty arrays
 /////////////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ void Driver::UpdateTxTy(int i)
 {
  tx[rl][i] = tLane[rl][i] * txRight[rl][i] + (1 - tLane[rl][i]) * txLeft[rl][i];
  ty[rl][i] = tLane[rl][i] * tyRight[rl][i] + (1 - tLane[rl][i]) * tyLeft[rl][i];
-}                                                                               
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Set segment info
@@ -206,14 +206,14 @@ void Driver::InitSegInfo()
      double arc = (arc_total/arc_count);
      arc -= arc/10;
      arc *= ((double)arc_count * (arc*1.2));
- 
+
      for (;firstseg != nseg; firstseg = firstseg->next)
      {
       tSegArc[firstseg->id] = arc;
       tSegLength[firstseg->id] = length_total;
      }
     }
-    
+
     firstseg = nseg;
     last_radius = nseg->radius;
     last_type = nseg->type;
@@ -229,7 +229,7 @@ void Driver::InitSegInfo()
   {
    double arc = (arc_total/(arc_count));
    arc *= ((double)arc_count * (arc*1.2));
- 
+
    for (;firstseg != nseg; firstseg = firstseg->next)
    {
     tSegArc[firstseg->id] = arc;
@@ -359,7 +359,7 @@ void Driver::InitSegInfo()
 
  for (i=0; i<=Divs; i++)
  {
-  tAvoidLeft[i] = MIN(tAvoidLeft[i], tLane[rl][i] * seg->width - 3.0); 
+  tAvoidLeft[i] = MIN(tAvoidLeft[i], tLane[rl][i] * seg->width - 3.0);
   tAvoidRight[i] = MIN(tAvoidRight[i], seg->width - (tLane[rl][i]*seg->width + 3.0));
  }
 }
@@ -433,18 +433,18 @@ void Driver::SplitTrack(tTrack *ptrack)
    {
     tTrackSeg *psegside = psegCurrent->side[side];
     double margin = 0.0;
- 
+
     while (psegside != NULL)
     {
      if (psegside->style == TR_WALL || psegside->style == TR_FENCE)
       margin = MAX(0.0, margin - (psegCurrent->type == TR_STR ? 0.5 : 1.0));
- 
+
      if (psegside->style != TR_PLAN ||
          psegside->surface->kFriction < psegCurrent->surface->kFriction*0.8 ||
          psegside->surface->kRoughness > MAX(0.02, psegCurrent->surface->kRoughness*1.2) ||
          psegside->surface->kRollRes > MAX(0.005, psegCurrent->surface->kRollRes*1.2))
       break;
- 
+
      if (track->pits.type != TR_PIT_NONE)
      {
       if (((side == TR_SIDE_LFT && track->pits.side == TR_LFT) ||
@@ -490,7 +490,7 @@ void Driver::SplitTrack(tTrack *ptrack)
   {
    double cosine = cos(Angle);
    double sine = sin(Angle);
-   
+
    if (psegCurrent->type == TR_STR)
    {
     xPos += cosine * Step;
@@ -574,10 +574,10 @@ void Driver::SplitTrack(tTrack *ptrack)
    }
    else
     tLSlope[i] = tRSlope[i] = 0.0f;
-  
+
    if (tLSlope[i] < 0.0) tLSlope[i] *= 1.0f + MIN(1.0, fabs(tLSlope[j]-tLSlope[i])*0.3);
    if (tRSlope[i] < 0.0) tRSlope[i] *= 1.0f + MIN(1.0, fabs(tRSlope[j]-tRSlope[i])*0.3);
- 
+
    psegCurrent = psegCurrent->next;
   }
   while (psegCurrent != ptrack->seg);
@@ -587,10 +587,10 @@ void Driver::SplitTrack(tTrack *ptrack)
    int i = psegCurrent->id;
    tTrackSeg *psegNext = psegCurrent->next;
    int j = psegNext->id;
- 
+
    tLDelta[i] = atan((tLSlope[j] - tLSlope[i]) / 4.0);
    tRDelta[i] = atan((tRSlope[j] - tRSlope[i]) / 4.0);
- 
+
    psegCurrent = psegCurrent->next;
   }
   while (psegCurrent != ptrack->seg);
@@ -646,13 +646,13 @@ double Driver::GetRInverse(int prev, double x, double y, int next, int rline)
  double y2 = ty[rline][prev] - y;
  double x3 = tx[rline][next] - tx[rline][prev];
  double y3 = ty[rline][next] - ty[rline][prev];
- 
+
  double det = x1 * y2 - x2 * y1;
  double n1 = x1 * x1 + y1 * y1;
  double n2 = x2 * x2 + y2 * y2;
  double n3 = x3 * x3 + y3 * y3;
  double nnn = sqrt(n1 * n2 * n3);
- 
+
  return 2 * det / nnn;
 }
 
@@ -669,7 +669,7 @@ void Driver::AdjustRadius(int prev, int i, int next, double TargetRInverse, doub
   first_time = 1;
   Security = SecurityZ;
  }
- 
+
  //
  // Start by aligning points for a reasonable initial lane
  //
@@ -707,7 +707,7 @@ void Driver::AdjustRadius(int prev, int i, int next, double TargetRInverse, doub
  }
 #endif
  UpdateTxTy(i);
- 
+
  //
  // Newton-like resolution method
  //
@@ -718,10 +718,10 @@ void Driver::AdjustRadius(int prev, int i, int next, double TargetRInverse, doub
  //tTrackSeg *seg = tSegment[tDivSeg[i]];
  //if (seg->type != TR_STR && seg->radius <= 60.0)
  // SInt += (65.0 - seg->radius) / 70.0;
- 
+
  double dx = dLane * (txRight[rl][i] - txLeft[rl][i]);
  double dy = dLane * (tyRight[rl][i] - tyLeft[rl][i]);
- 
+
  double dRInverse = GetRInverse(prev, tx[rl][i] + dx, ty[rl][i] + dy, next, rl);
  int pi = i - 1;
  if (pi < 0)
@@ -730,7 +730,7 @@ void Driver::AdjustRadius(int prev, int i, int next, double TargetRInverse, doub
  if (dRInverse > 0.000000001)
  {
   tLane[rl][i] += (dLane / dRInverse) * TargetRInverse;
- 
+
   double ExtLane = (SExt + Security) / Width;
   double IntLane = (SInt + Security) / Width;
   if (ExtLane > 0.5)
@@ -750,7 +750,7 @@ void Driver::AdjustRadius(int prev, int i, int next, double TargetRInverse, doub
     IntLane -= tLaneRMargin[i];
    }
   }
- 
+
   if (TargetRInverse >= 0.0)
   {
    if (tLane[rl][i] < IntLane)
@@ -792,7 +792,7 @@ void Driver::Smooth(int Step)
  int prevprev = prev - Step;
  int next = Step;
  int nextnext = next + Step;
- 
+
  for (int i = 0; i <= Divs - Step; i += Step)
  {
   {
@@ -802,7 +802,7 @@ void Driver::Smooth(int Step)
    double lNext = Mag(tx[rl][i] - tx[rl][next], ty[rl][i] - ty[rl][next]);
 
    double TargetRInverse = (lNext * ri0 + lPrev * ri1) / (lNext + lPrev);
-  
+
    double Security = lPrev * lNext / (8 * SecurityR);
 
    if (CurveFactor && ri0 * ri1 > 0)
@@ -821,7 +821,7 @@ void Driver::Smooth(int Step)
 
    AdjustRadius(prev, i, next, TargetRInverse, Security);
   }
- 
+
   prevprev = prev;
   prev = i;
   next = nextnext;
@@ -839,11 +839,11 @@ void Driver::StepInterpolate(int iMin, int iMax, int Step)
  int next = (iMax + Step) % Divs;
  if (next > Divs - Step)
   next = 0;
- 
+
  int prev = (((Divs + iMin - Step) % Divs) / Step) * Step;
  if (prev > Divs - Step)
   prev -= Step;
- 
+
  double ir0 = GetRInverse(prev, tx[rl][iMin], ty[rl][iMin], iMax % Divs, rl);
  double ir1 = GetRInverse(iMin, tx[rl][iMax % Divs], ty[rl][iMax % Divs], next, rl);
 
@@ -854,7 +854,7 @@ void Driver::StepInterpolate(int iMin, int iMax, int Step)
   AdjustRadius(iMin, k, iMax % Divs, TargetRInverse);
  }
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // Calls to StepInterpolate for the full path
 /////////////////////////////////////////////////////////////////////////////
@@ -1138,14 +1138,14 @@ void Driver::ComputeFullPath()
 
   memset(Flying, 0, sizeof(Flying));
   double lastspeed = 0.0;
- 
+
   //
   // Compute curvature and speed along the path
   //
   for (i = Divs; --i >= 0;)
   {
    double TireAccel = TireAccel1 * tFriction[i];
-   if (0 && rl != LINE_RL) 
+   if (0 && rl != LINE_RL)
    {
     tTrackSeg *seg = (tSegment[tDivSeg[i]]);
     if (SEGTYPE(seg) != TR_STR)
@@ -1157,12 +1157,12 @@ void Driver::ComputeFullPath()
    tTrackSeg *tseg = (tSegment[tDivSeg[nnext]]);
    tTrackSeg *seg = tSegment[tDivSeg[i]];
    int iscorner = SEGTYPE(tseg);
-   
+
    if (rl == LINE_LEFT)
    {
     if (iscorner == TR_RGT)
      TireAccel *= MAX(0.7, (1.0f - ((120.0f-seg->radius)/120.0f) * 0.5f));
-    else 
+    else
      TireAccel *= 1.0f + (seg->width - 8.0) * 0.018;
      //TireAccel *= 2.5 + seg->width/10;
    }
@@ -1170,7 +1170,7 @@ void Driver::ComputeFullPath()
    {
     if (iscorner == TR_LFT)
      TireAccel *= MAX(0.7, (1.0f - ((120.0f-seg->radius)/120.0f) * 0.5f));
-    else 
+    else
      TireAccel *= 1.0f + (seg->width - 8.0) * 0.018;
      //TireAccel *= 2.5 + seg->width/10;
    }
@@ -1192,7 +1192,7 @@ void Driver::ComputeFullPath()
     MaxSpeed = sqrt(TireAccel / (fabs(tmpRInverse) - wingrinverse));
     //if (0)
      //MaxSpeed *= MAX(1.0, (1.28 - fabs(sRInverse)*15));   // speed car up on faster bends
- 
+
     // adjust speed based on the camber of the corner
 #if 1
     if (fabs(rInverse) > 0.002)
@@ -1248,7 +1248,7 @@ void Driver::ComputeFullPath()
      }
     }
 #endif
-  
+
     // adjust speed for uphill/downhill corners
     //double slope = tLSlope[tDivSeg[i]] * (1.0 - tLane[rl][i]) + tRSlope[tDivSeg[i]] * tLane[rl][i];
     if (delta < -0.03f && fabs(rInverse) > 0.002 && MaxSpeed >= 30.0)
@@ -1290,7 +1290,7 @@ void Driver::ComputeFullPath()
       OldMaxSpeed = 80.0f;
      if (MaxSpeed > 50)
       OldMaxSpeed = MIN(OldMaxSpeed, 50 + (50 * 1.0/FlyingCaution));
- 
+
      if (OldMaxSpeed > 15.0f)
      {
       double caution = MAX(0.1f, 1.0f-(FlyingCaution * 0.9f));
@@ -1315,14 +1315,14 @@ void Driver::ComputeFullPath()
    }
 #endif
 
-   if ((rInverse > 0.0 && tLane[rl][next] > tLane[rl][i]) || 
+   if ((rInverse > 0.0 && tLane[rl][next] > tLane[rl][i]) ||
        (rInverse < 0.0 && tLane[rl][next] < tLane[rl][i]))
     MaxSpeed *= TurnAccel;
 
    if (rl == LINE_RL)
     tSpeed[i] = tMaxSpeed[i] = lastspeed = MaxSpeed;
   }
- 
+
   //
   // Anticipate braking
   //
@@ -1360,8 +1360,8 @@ void Driver::ComputeFullPath()
     if (delta < -0.02 && fabs(tRInverse[rl][next]) > 0.0024)
      factor += MAX(-0.3, delta * 5);
 
-    tSpeed[i] = MIN(tSpeed[i], tSpeed[next] + MAX(0.1, 
-       ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*8)) 
+    tSpeed[i] = MIN(tSpeed[i], tSpeed[next] + MAX(0.1,
+       ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*8))
         * MAX(MaxBrake/4.0, MaxBrake / (tSpeed[next]/20))) * factor));
    }
   }
@@ -1371,14 +1371,14 @@ void Driver::ComputeFullPath()
   for (i = Divs; --i >= 0;)
   {
    double TireAccel = TireAccel1 * tFriction[i];
-   if (rl != LINE_RL) 
+   if (rl != LINE_RL)
     TireAccel = (TireAccel1 - 2.0) * tFriction[i];
    int prev = (i - 1 + Divs) % Divs;
    int nnext = (i + 5 + Divs) % Divs;
    tTrackSeg *tseg = (tSegment[tDivSeg[nnext]]);
    tTrackSeg *seg = (tSegment[tDivSeg[i]]);
    int iscorner = SEGTYPE(tseg);
-   
+
    if (rl == LINE_LEFT)
    {
     if (iscorner == TR_RGT)
@@ -1392,7 +1392,7 @@ void Driver::ComputeFullPath()
       TireAccel *= 1.5;
     }
 #endif
-    else 
+    else
      TireAccel *= 1.0f + (seg->width - 8.0) * 0.018;
      //TireAccel *= 2.5 + seg->width/10;
    }
@@ -1409,25 +1409,25 @@ void Driver::ComputeFullPath()
       TireAccel *= 1.5;
     }
 #endif
-    else 
+    else
      TireAccel *= 1.0f + (seg->width - 8.0) * 0.018;
      //TireAccel *= 2.5 + seg->width/10;
    }
- 
+
    double dx = tx[rl][i] - tx[rl][prev];
    double dy = ty[rl][i] - ty[rl][prev];
    double dist = Mag(dx, dy);
- 
+
    //double Speed = (tSpeed[i] + tSpeed[i] + tSpeed[prev]) / 3;
    double Speed = (tSpeed[i] + tSpeed[prev]) / 2;
- 
+
    //double LatA = tSpeed[i] * tSpeed[i] *
    double rInverse = (fabs(tRInverse[rl][prev]) + fabs(tRInverse[rl][i])) / 2;
    //rInverse *= fabs(rInverse)*295;
 
    double LatA = Speed * Speed * rInverse;
                  //(fabs(tRInverse[rl][prev]) + fabs(tRInverse[rl][i])) / 2;
- 
+
    double TanA = TireAccel * TireAccel +
                  WingRInverse * Speed * Speed - LatA * LatA;
 
@@ -1440,12 +1440,12 @@ void Driver::ComputeFullPath()
    {
     TanA = (maxbrake * tFriction[i]);
    }
- 
+
    double Time = dist / Speed;
    double MaxSpeed = tSpeed[i] + TanA * Time;
 
    tSpeed[prev] = MIN(MaxSpeed, tMaxSpeed[prev]);
-  }                                                                              
+  }
 #endif
   if (BrakeShift != 0.0f)
   {
@@ -1453,7 +1453,7 @@ void Driver::ComputeFullPath()
    for (i = 1; ++i < Divs;)
    {
     int prev = (i - 1 + Divs) % Divs;
-  
+
     if (tSpeed[i] < tSpeed[prev] - (1.0 - MIN(0.9, ((float) j+0.01)/BrakeShift)))
      tSpeed[prev] = ((tSpeed[i] * (1.5 + fabs(tRInverse[rl][i]) * 100.0)) + tSpeed[prev]) / (2.5 + fabs(tRInverse[rl][i]) * 100.0);
    }
@@ -1469,7 +1469,7 @@ void Driver::ComputeFullPath()
     Braking[prev] = 1;
   }
  }
-} 
+}
 
 double Driver::InverseFriction(double a)
 {
@@ -1509,7 +1509,7 @@ double Driver::GetControl(double At, double An, double v, double mass)
    vc = (L * CosTheta + v) / cos(alpha);
    double x = cos(alpha) * CosTheta + sin(alpha) * SinTheta;
    double P = A * mass * vc * x;
-   
+
    if (At < 0 || (!fAdjustP && P < PM) || (fAdjustP && P < PM && P > 0.999 * PM))
     break;
 
@@ -1592,9 +1592,9 @@ fprintf(stderr,"%d: c\n",i);fflush(stderr);
     UpdateTxTy(i);
     ComputeFullPath();
     double s = EstimateSpeed();
-    
+
     if (s > s0)
-    { 
+    {
      BestLane = tLane[rl][i];
      s0 = s;
     }
@@ -1602,7 +1602,7 @@ fprintf(stderr,"%d: c\n",i);fflush(stderr);
     {
      if (j == 1 && Dir < 0)
       Dir = 1;
-     else 
+     else
       break;
      j = 0;
     }
@@ -1785,14 +1785,14 @@ void Driver::initRadius()
  currentseg = startseg;
 
  do {
-  if (currentseg->type == TR_STR) 
+  if (currentseg->type == TR_STR)
   {
    lastsegtype = TR_STR;
    tRadius[currentseg->id] = FLT_MAX;
-  } 
-  else 
+  }
+  else
   {
-   if (currentseg->type != lastsegtype) 
+   if (currentseg->type != lastsegtype)
    {
     double arc = 0.0;
     tTrackSeg *s = currentseg;
@@ -2005,7 +2005,7 @@ void Driver::saveSVG()
   seg = seg->next;
  }
 #endif
- 
+
  // now write the path in red
  fprintf(fp, "  <path\n    d=\"M %.3f,%.3f", tx[rl][0], ty[rl][0]);
 
@@ -2151,7 +2151,7 @@ double Driver::K1999Steer(tSituation *s)
 {
  //memset(&(car->ctrl), 0, sizeof(tCarCtrl));
 
- // 
+ //
  // Find index in data arrays
  //
  int SegId = car->_trkPos.seg->id;
@@ -2367,7 +2367,7 @@ double Driver::K1999Steer(tSituation *s)
    double dx = tx[rl][Next] - tx[rl][Index];
    double dy = ty[rl][Next] - ty[rl][Index];
    Error = (dx * (Y - ty[rl][Index]) - dy * (X - tx[rl][Index])) / Mag(dx, dy);
-  }  
+  }
 
   int Prev = (Index + Divs - 1) % Divs;
   double txPrev = tx[rl][Prev];
@@ -2455,7 +2455,7 @@ double Driver::K1999Steer(tSituation *s)
   double steerskid = SteerSkid;
   if (car->_accel_x < -10.0)
    steerskid += (car->_accel_x+10.0)/300;
-  if ((flying_timer > currentsimtime - 2.0) && 
+  if ((flying_timer > currentsimtime - 2.0) &&
       (segtype == TR_STR ||
        (segtype == TR_RGT && nextleft > 4.0f) ||
        (segtype == TR_LFT && nextleft < seg->width - 4.0f) ||
@@ -2485,26 +2485,26 @@ double Driver::K1999Steer(tSituation *s)
 #if 1
   if (fabs(car->_yaw_rate) < 1.8 && getSpeed() < 10.0 && fabs(angle) > 1.6)
   {
-   if ((angle > 1.6f && car->_trkPos.toRight > angle*2 && steer < -0.1) || 
+   if ((angle > 1.6f && car->_trkPos.toRight > angle*2 && steer < -0.1) ||
        (angle < -1.4f && car->_trkPos.toLeft > fabs(angle)*2 && steer > 0.1))
     steer = -steer;
-   if ((angle >= 1.6 && car->_trkPos.toRight < angle*2 && steer > 0.1) || 
+   if ((angle >= 1.6 && car->_trkPos.toRight < angle*2 && steer > 0.1) ||
        (angle <= -1.6 && car->_trkPos.toLeft < fabs(angle)*2 && steer < -0.1))
     steer = -steer;
   }
-  else 
+  else
 #endif
   if (fabs(car->_yaw_rate) >= 1.8 && getSpeed() > 10.0)
   {
    AccelCmd = 0.0;
    BrakeCmd = 1.0;
   }
-   
+
    // this applies only to the lumbering, understeering Viper...
    if (fabs(steer) < 0.35
-    //&& !(avoiding || (avoiding & AVOID_ALIGNED)) 
+    //&& !(avoiding || (avoiding & AVOID_ALIGNED))
     && (segtype != TR_STR )
-    // || (segtype == TR_LFT && car->_trkPos.toLeft > 3.0) 
+    // || (segtype == TR_LFT && car->_trkPos.toLeft > 3.0)
     // || (segtype == TR_RGT && car->_trkPos.toRight > 3.0)))
      )
     steer *= (1.0 + (0.35 - fabs(steer)) * 1.3);
@@ -2519,15 +2519,15 @@ double Driver::K1999Steer(tSituation *s)
   // Handle getting unstuck
   //
   if (reversehold > s->currentTime && reversehold < s->currentTime + 1.2 &&
-      ((nextleft > -1.0 && angle > 0.3 && nextleft < seg->width - 1.5) || 
+      ((nextleft > -1.0 && angle > 0.3 && nextleft < seg->width - 1.5) ||
        (nextleft < seg->width + 1.0 && angle < -0.3 && nextleft > 1.5)))
    reversehold = 0.0f;
- 
+
   int stuck = isStuck();
- 
+
   if (!pit->getPitstop() && !pit->getInPit() &&
       (stuck || reversehold > s->currentTime) && stuckhold < s->currentTime && car->_speed_x < 1.0 &&
-      (fabs(angle)>1.4 || nextleft < 1.5 || nextleft > seg->width-1.5)) 
+      (fabs(angle)>1.4 || nextleft < 1.5 || nextleft > seg->width-1.5))
   {
    if (fStuckForward)
     steer = -laststeer;
@@ -2555,8 +2555,8 @@ double Driver::K1999Steer(tSituation *s)
    avoiding = 0;
    setCorrecting(0);
    setAllowCorrecting(0);
-  } 
-  else 
+  }
+  else
   {
    //float last_lane = car->_trkPos.toLeft / car->_trkPos.seg->width;
    if (stuck ||
@@ -2623,10 +2623,10 @@ double Driver::K1999Steer(tSituation *s)
    }
 #else
    // My own hack
- 
+
    if (segtype != TR_STR)
     limit -= MIN(2.4, ((140.0 - seg->radius) * ((140.0-seg->radius)/20)) / 250.0);
- 
+
    if (lastcornertype == TR_RGT)
    {
     double outside = MAX(MIN(lane2left, 1.5), lane2left - limit);
@@ -2637,12 +2637,12 @@ double Driver::K1999Steer(tSituation *s)
     double outside = MIN(MAX(lane2left, seg->width - 1.5), lane2left + limit);
     dr = outside - car->_trkPos.toLeft;
    }
- 
+
    if (dr > 0.0)
     dr = MIN(1.0, dr / 10);
    else
     dr = MAX(-1.0, dr / 5);
- 
+
    if (tLearnCount[div] < LearnLimit)
    {
     tMaxSpeed[div] += dr * Learning;
@@ -2653,7 +2653,7 @@ double Driver::K1999Steer(tSituation *s)
  }
 
  return steer;
-} 
+}
 
 double Driver::AvoidSteer(tSituation *s)
 {
@@ -2751,7 +2751,7 @@ double Driver::AvoidSteer(tSituation *s)
  }
  seg = car->_trkPos.seg;
 
-#if !K1999AVOIDSTEER 
+#if !K1999AVOIDSTEER
  //memset(&(car->ctrl), 0, sizeof(tCarCtrl));
  //tTrackSeg *nseg = tSegment[tDivSeg[next]];
  //int ntype = nseg->type;
@@ -2788,7 +2788,7 @@ double Driver::AvoidSteer(tSituation *s)
 
  if (fabs(car->_speed_y) > 1.5
      && fabs(car->_speed_y-angle) > fabs(car->_speed_y)
-     && fabs(car->_speed_y-car->_yaw_rate) > fabs(car->_speed_y) 
+     && fabs(car->_speed_y-car->_yaw_rate) > fabs(car->_speed_y)
      && fabs(car->_speed_y * (car->_speed_x/10)) > 1.0)
  {
   k1999steer_a += car->_speed_y * (1.0 - MIN(60.0, MAX(25.0, car->_speed_x)) / 80.0) / MAX(5, 20-fabs(car->_speed_y));
@@ -2798,7 +2798,7 @@ double Driver::AvoidSteer(tSituation *s)
      ((angle < -0.8 || lastbrake > 0.7 || fabs(car->_yaw_rate) > 1.4) && k1999steer_a < -0.25))
   k1999steer_a *= 0.8f;
 #else
- // 
+ //
  // Find index in data arrays
  //
  int SegId = car->_trkPos.seg->id;
@@ -2822,7 +2822,7 @@ double Driver::AvoidSteer(tSituation *s)
 
  //if ((avoiding && !(avoiding & AVOID_ALIGNED)) || getCorrecting())
  // Next = (Next + 2) % Divs;
- 
+
  //Next = (nextdiv+2) % Divs;
  //int NextNext = (nextdiv + MAX(3, MIN(8, (int) (car->_speed_x/10)))) % Divs;
  Next = (nextdiv);// + (int) (getSpeed()/10)) % Divs;;
@@ -2867,7 +2867,7 @@ double Driver::AvoidSteer(tSituation *s)
  target1.y = newlane * tyRight[line][Next] + (1 - newlane) * tyLeft[line][Next];
  target2.x = newlane * txRight[line][NextNext] + (1 - newlane) * txLeft[line][NextNext];
  target2.y = newlane * tyRight[line][NextNext] + (1 - newlane) * tyLeft[line][NextNext];
-  
+
  prevxy = 1;
  int nprev = (pit->getInPit() ? 3 : 3);
 
@@ -2901,7 +2901,7 @@ double Driver::AvoidSteer(tSituation *s)
  double RInxt = (tRInverse[line][Next] + tRInverse[line][Next])/2;
  double TargetCurvature = ((1 - c0) * RInxt + c0 * RIidx) * 1.2;
 #if 1
- //if (seg->type != TR_STR || (prefer_side != TR_STR && cornerdist < cornerlimit 
+ //if (seg->type != TR_STR || (prefer_side != TR_STR && cornerdist < cornerlimit
  //    && ((prefer_side == TR_LFT && tRInverse[rl][next] > 0.0) || (prefer_side == TR_RGT && tRInverse[rl][next] < 0.0))))
  if ((TargetCurvature < 0.0 && KTC < TargetCurvature) || (TargetCurvature > 0.0 && KTC > TargetCurvature))
  {
@@ -2955,7 +2955,7 @@ double Driver::AvoidSteer(tSituation *s)
  double steer = 0.0;
  CosAngleError = 1;
  SinAngleError = 0;
- 
+
  {
   //
   // Ideal value
@@ -2986,11 +2986,11 @@ double Driver::AvoidSteer(tSituation *s)
    }
 #endif
    steer = atan(wheelbase * steergain * TargetCurvature) / car->_steerLock;
-   
+
    // this applies only to the lumbering, understeering Viper...
-   if (fabs(steer) < 0.35 
-    && !(avoiding || (avoiding & AVOID_ALIGNED)) 
-    && (segtype != TR_STR || (segtype == TR_LFT && car->_trkPos.toLeft > 3.0) 
+   if (fabs(steer) < 0.35
+    && !(avoiding || (avoiding & AVOID_ALIGNED))
+    && (segtype != TR_STR || (segtype == TR_LFT && car->_trkPos.toLeft > 3.0)
      || (segtype == TR_RGT && car->_trkPos.toRight > 3.0)))
     steer *= (1.0 + (0.35 - fabs(steer)) * 1.3);
   }
@@ -3002,7 +3002,7 @@ double Driver::AvoidSteer(tSituation *s)
    double dx = txNext - txIndex;
    double dy = tyNext - tyIndex;
    Error = (dx * (Y - tyIndex) - dy * (X - txIndex)) / Mag(dx, dy);
-  }  
+  }
 
   double Prevdx = txNext - txPrev;
   double Prevdy = tyNext - tyPrev;
@@ -3042,7 +3042,7 @@ double Driver::AvoidSteer(tSituation *s)
   double diff = car->_yaw_rate - yr;
   //double diff = (car->_yaw_rate-(car->_yaw_rate-lastyr)/4) - yr;
   double steerskid = SteerSkid;
-  if ((flying_timer > currentsimtime - 3.5) && 
+  if ((flying_timer > currentsimtime - 3.5) &&
       (segtype == TR_STR ||
        (segtype == TR_RGT && nextleft > 4.0f) ||
        (segtype == TR_LFT && nextleft < seg->width - 4.0f) ||
@@ -3068,14 +3068,14 @@ double Driver::AvoidSteer(tSituation *s)
 #if 1
   if (fabs(car->_yaw_rate) < 1.8 && getSpeed() < 10.0 && fabs(angle) > 1.6)
   {
-   if ((angle > 1.6f && car->_trkPos.toRight > angle*2 && steer < -0.1) || 
+   if ((angle > 1.6f && car->_trkPos.toRight > angle*2 && steer < -0.1) ||
        (angle < -1.4f && car->_trkPos.toLeft > fabs(angle)*2 && steer > 0.1))
     steer = -steer;
-   if ((angle >= 1.6 && car->_trkPos.toRight < angle*2 && steer > 0.1) || 
+   if ((angle >= 1.6 && car->_trkPos.toRight < angle*2 && steer > 0.1) ||
        (angle <= -1.6 && car->_trkPos.toLeft < fabs(angle)*2 && steer < -0.1))
     steer = -steer;
   }
-  else 
+  else
 #endif
   if (fabs(car->_yaw_rate) >= 1.8 && getSpeed() > 10.0)
   {
@@ -3090,7 +3090,7 @@ double Driver::AvoidSteer(tSituation *s)
  }
 #endif // K1999AVOIDSTEER
 
- if (!pit->getInPit()) 
+ if (!pit->getInPit())
  {
   int csegtype = seg->type;
   double segradius = seg->radius;
@@ -3100,14 +3100,14 @@ double Driver::AvoidSteer(tSituation *s)
    csegtype = cseg->type;
    segradius = cseg->radius;
   }
- 
+
   double oldsteer = k1999steer_a;
   // if we need to include some of the raceline steering...
 #if 1
   if (getCorrecting())
   {
    double meldfactor = 0.2;
-                       //((avoiding & AVOID_SIDE_COLL) ? MAX(0.25, 0.6 - (sidemargin/20)) : 
+                       //((avoiding & AVOID_SIDE_COLL) ? MAX(0.25, 0.6 - (sidemargin/20)) :
                        // (avoiding & AVOID_SIDE) ? MAX(0.2, 0.4 - (sidemargin/20)) : 0.2);
    /*
    if ((avoiding & AVOID_SIDE) && segtype != TR_STR)
@@ -3159,14 +3159,14 @@ double Driver::AvoidSteer(tSituation *s)
    }
    if ((avoiding & AVOID_FRONT) && frontmargin > 3.0)
     factor = MIN(0.5, factor * 1.0 + (frontmargin-3.0)/5);
-   if ((!(avoiding & AVOID_FRONT) || frontmargin < 3.0) && sidemargin < 4.0 && 
+   if ((!(avoiding & AVOID_FRONT) || frontmargin < 3.0) && sidemargin < 4.0 &&
        ((k1999steer > k1999steer_a && (avoiding & AVOID_LEFT)) || (k1999steer<k1999steer_a && (avoiding & AVOID_RIGHT))))
    {
     factor = correct_meld = MAX(0.0, correct_meld - correct_meld / (sidemargin/3));
     if ((avoiding & AVOID_TEAM) || sidemargin <= 2.0)
      factor = correct_meld = 0.0;
    }
-   else if (sidemargin < 8.0 && (avoiding & AVOID_SIDE) && 
+   else if (sidemargin < 8.0 && (avoiding & AVOID_SIDE) &&
             (((avoiding & AVOID_LEFT) && k1999steer > k1999steer_a) ||
              ((avoiding & AVOID_RIGHT) && k1999steer < k1999steer_a)))
    {
@@ -3232,7 +3232,7 @@ double Driver::AvoidSteer(tSituation *s)
 #if 0
    int avoidside = ((avoiding & AVOID_TEAM) || (avoiding & AVOID_SIDE_COLL));
 
-   if (avoiding && 
+   if (avoiding &&
        ((!(avoiding & AVOID_LEFT) && k1999steer > k1999steer_a && k1999steerL > k1999steer_a) ||
         (!(avoiding & AVOID_RIGHT) && k1999steer < k1999steer_a && k1999steerR < k1999steer_a)))
     avoidside = 2;
@@ -3319,7 +3319,7 @@ double Driver::AvoidSteer(tSituation *s)
 
   if (!pit->getInPit())
   {
-   if ((car->_trkPos.toLeft < -2.0 && nextleft/seg->width < tLane[rl][nextdiv]-0.1) || 
+   if ((car->_trkPos.toLeft < -2.0 && nextleft/seg->width < tLane[rl][nextdiv]-0.1) ||
        (car->_trkPos.toRight < -2.0 && nextleft/seg->width > tLane[rl][nextdiv]+0.1))
     k1999steer_a *= 0.7;
 
@@ -3344,7 +3344,7 @@ double Driver::AvoidSteer(tSituation *s)
  }
 
  return k1999steer_a;
-} 
+}
 
 Driver::Driver(int index)
  : stuck(0),
@@ -3523,7 +3523,7 @@ Driver::Driver(int index)
  side_count( 0 ),
  random_seed( 0 ),
  cseg( NULL ),
- 
+
  fDirt( 0 ),
  last_flying( 0 ),
  drivetrain( 0 )
@@ -3534,7 +3534,7 @@ Driver::Driver(int index)
  for (xx = 0; xx < 4; ++xx)
    wheelz[ xx ] = 0.0;
 
- for (xx = 0; xx < MaxSegments; ++xx) 
+ for (xx = 0; xx < MaxSegments; ++xx)
  {
    tSegDist[xx] = 0.0;
    tElemLength[xx] = 0.0;
@@ -3555,7 +3555,7 @@ Driver::Driver(int index)
    tSegDivStart[xx] = 0;
  }
 
- for (xx = 0; xx < MaxDivs; ++xx) 
+ for (xx = 0; xx < MaxDivs; ++xx)
  {
    Flying[xx] = 0.0;
    tMaxSpeed[xx] = 0.0;
@@ -3574,9 +3574,9 @@ Driver::Driver(int index)
    Braking[xx] = 0;
  }
 
- for (xx = 0; xx < 3; ++xx) 
+ for (xx = 0; xx < 3; ++xx)
  {
-  for (yy = 0; yy < MaxDivs; ++yy) 
+  for (yy = 0; yy < MaxDivs; ++yy)
   {
    tx[xx][yy] = 0.0f;
    ty[xx][yy] = 0.0f;
@@ -3589,7 +3589,7 @@ Driver::Driver(int index)
   }
  }
 
- for (xx = 0; xx < 10; ++xx) 
+ for (xx = 0; xx < 10; ++xx)
  {
    lastX[xx] = 0.0;
    lastY[xx] = 0.0;
@@ -3600,7 +3600,7 @@ Driver::Driver(int index)
  nextpt.x = 0.0;
  nextpt.y = 0.0;
 
- for (xx = 0; xx < 4; ++xx) 
+ for (xx = 0; xx < 4; ++xx)
  {
    corner1[xx].x = 0.0;
    corner1[xx].y = 0.0;
@@ -3663,7 +3663,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
  // load the default setup.  Track specific ones will override this.
  snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", DRIVERNAME, indexstr);
  *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
- 
+
  char* trackname = strrchr(track->filename, '/') + 1;
  void *newHandle;
 
@@ -3741,8 +3741,8 @@ void Driver::newRace(tCarElt* car, tSituation *s)
  initCw();
  initCR();
  initTireMu();
- aero = (((CA * 0.45 + CW * 0.16) / 9.0f) 
-         - ((float) CARMASS-950.0f) * 0.0001 /*0.00007*/ 
+ aero = (((CA * 0.45 + CW * 0.16) / 9.0f)
+         - ((float) CARMASS-950.0f) * 0.0001 /*0.00007*/
          + MAX(0.0f, (track->width - 8.0f) * 0.0014f))
          * (TIREMU/1.6f);
  aero = MIN(0.2f, aero);
@@ -3913,7 +3913,7 @@ void Driver::drive(tSituation *s)
      flying_timer = currentsimtime;
    }
 
-   if (car->_accelCmd > 0.0 && !pit->getInPit() && (fabs(angle) > 1.3 || fabs(car->_yaw_rate) > 2.0 || 
+   if (car->_accelCmd > 0.0 && !pit->getInPit() && (fabs(angle) > 1.3 || fabs(car->_yaw_rate) > 2.0 ||
         (fabs(car->_steerCmd) >= 0.8 && (avoiding || getCorrecting() || align_hold > currentsimtime))))
    {
     car->_accelCmd = (float)MIN(car->_accelCmd, 0.5);
@@ -3929,7 +3929,7 @@ void Driver::drive(tSituation *s)
 
    double lane2left = tLane[rl][thisdiv] * car->_trkPos.seg->width;
    if (!pit->getInPit() && align_hold > currentsimtime + 3.0 &&
-       ((segtype != TR_STR && 
+       ((segtype != TR_STR &&
          ((segtype == TR_LFT && car->_trkPos.toLeft > lane2left + 3.0) ||
           (segtype == TR_RGT && car->_trkPos.toLeft < lane2left - 3.0))) ||
         (fabs((float) car->_gear) == 1 && fabs(car->_speed_x) < 15.0 &&
@@ -4185,7 +4185,7 @@ double Driver::AvoidBrake(double speed)
  if (fabs(angle) > 1.4)
   return speed;
 
- for (i = 0; i < opponents->getNOpponents(); i++) 
+ for (i = 0; i < opponents->getNOpponents(); i++)
  {
   if (opponent[i].car == car) continue;
   tCarElt *ocar = opponent[i].car;
@@ -4209,9 +4209,9 @@ double Driver::AvoidBrake(double speed)
    team = TEAM_KAOS;
   double dx = opponent[i].car->_speed_X - car->_speed_X;
   double dy = opponent[i].car->_speed_Y - car->_speed_Y;
-  double accel = MAX(-8.0, MIN(2.0, 
-     (car->_accel_x > 0.0 && !(opponent[i].getState() & OPP_COLL_URGENT) && dist > 1.5 
-      ? car->_accel_x / ((team & TEAM_CONTROL) ? 0.5 : 1.5) 
+  double accel = MAX(-8.0, MIN(2.0,
+     (car->_accel_x > 0.0 && !(opponent[i].getState() & OPP_COLL_URGENT) && dist > 1.5
+      ? car->_accel_x / ((team & TEAM_CONTROL) ? 0.5 : 1.5)
       : (car->_accel_x < -2.0 ? (car->_accel_x+2.0)/((team & TEAM_CONTROL)
         ? 20.5 : 1.5) : 0.0))));
   accel = 0;
@@ -4254,7 +4254,7 @@ double Driver::AvoidBrake(double speed)
   }
 
   double n2left = car->_trkPos.toLeft;
-  if (/*lastaccel >= 0.8 &&*/ dist < 4.0 && 
+  if (/*lastaccel >= 0.8 &&*/ dist < 4.0 &&
       ((n2left < lane2left && nextleft < car->_trkPos.toLeft-0.1 && n2left < (seg->type == TR_LFT ? 1.0 : 2.5)) ||
        (n2left > lane2left && nextleft > car->_trkPos.toLeft+0.1 && n2left > seg->width-(seg->type == TR_RGT ? 1.0 : 2.5))))
   {
@@ -4301,7 +4301,7 @@ double Driver::AvoidBrake(double speed)
   double tradius = MIN(lowestrad, tseg->radius);
 
 #if 1
-  if (fabs(nextleft-ocar->_trkPos.toLeft) > 1.5 && closing == CLOSING_FAST &&  
+  if (fabs(nextleft-ocar->_trkPos.toLeft) > 1.5 && closing == CLOSING_FAST &&
       (//closing_fast ||
        // checking for being trapped inside the other car on the corner
        (0 != (inside = (
@@ -4337,7 +4337,7 @@ double Driver::AvoidBrake(double speed)
    }
   }
 
-  if (tsegtype != TR_STR && (tradius <= 30.0 || (tradius <= 60.0 && !(team & TEAM_CONTROL) && cornercoll)) 
+  if (tsegtype != TR_STR && (tradius <= 30.0 || (tradius <= 60.0 && !(team & TEAM_CONTROL) && cornercoll))
       && dist < 15.0 && sidedistance < MIN(12.0, MAX(4.0, ospeed)))
   {
 #if 0
@@ -4389,20 +4389,20 @@ double Driver::AvoidBrake(double speed)
     dspd = MIN(dspd, ospeed - 0.5);
   }
 
-  if (!coll && !pit->getInPit())/* && 
+  if (!coll && !pit->getInPit())/* &&
       //(team != TEAM_CONTROL || currentsimtime > 7.0 || ocar->_speed_x > 5) &&
-       (sidedistance > 0.5 || 
-        (currentsimtime < 3.0) || 
-        ((car->_speed_x < opponent[i].car->_speed_x && !(opponent[i].getState() & OPP_SIDE))) || 
+       (sidedistance > 0.5 ||
+        (currentsimtime < 3.0) ||
+        ((car->_speed_x < opponent[i].car->_speed_x && !(opponent[i].getState() & OPP_SIDE))) ||
         (dist > (tsegtype == TR_STR && tMaxSpeed[nextdiv] > tSpeed[thisdiv] - 0.8 ? 1.0 : 1.6))))*/
    continue;
 
 #if 0
-  if (dist < safedist && team != TEAM_CONTROL && 
-      (cornercoll || 
-       (fabs(nextleft-ocar->_trkPos.toLeft) < 90.0-tradius/5) && 
+  if (dist < safedist && team != TEAM_CONTROL &&
+      (cornercoll ||
+       (fabs(nextleft-ocar->_trkPos.toLeft) < 90.0-tradius/5) &&
         fabs(car->_trkPos.toLeft-ocar->_trkPos.toLeft) > fabs(nextleft-opponent[i].getNextLeft()) &&
-        ((tseg->type == TR_LFT && ocar->_trkPos.toLeft < 10.0) || 
+        ((tseg->type == TR_LFT && ocar->_trkPos.toLeft < 10.0) ||
          (tseg->type == TR_RGT && ocar->_trkPos.toRight < 10.0))))
    dspd = MAX(ocar->_speed_x, dspd - (90.0 - tradius) / 40.0);
 #endif
@@ -4572,7 +4572,7 @@ double Driver::getAllowedSpeed(tTrackSeg *segment, int accel)
      avoid = 0;
     break;
    case TR_LFT:
-    if (car->_trkPos.toLeft < segment->width*0.6 
+    if (car->_trkPos.toLeft < segment->width*0.6
         && nleft+(nleft-car->_trkPos.toLeft)*15 < segment->width - tAvoidRight[nextdiv]
         && car->_speed_x < TargetSpeed - (2.0 + fabs(sideslip)/2))
      avoid = 0;
@@ -4582,7 +4582,7 @@ double Driver::getAllowedSpeed(tTrackSeg *segment, int accel)
 
  if (avoid)
  {
-  fastspeed = (fabs(car->_trkPos.toLeft-lane2left)<1.0 || 
+  fastspeed = (fabs(car->_trkPos.toLeft-lane2left)<1.0 ||
                (segment->type == TR_LFT && car->_trkPos.toLeft < lane2left && car->_trkPos.toLeft > 1.0) ||
                (segment->type == TR_RGT && car->_trkPos.toLeft < lane2left && car->_trkPos.toRight > 1.0));
  }
@@ -4624,7 +4624,7 @@ double Driver::getAllowedSpeed(tTrackSeg *segment, int accel)
   if (segtype == TR_LFT || (segtype == TR_STR && lastcornertype == TR_LFT))
    dir = TR_RGT;
 
-  if ((dir == TR_LFT && nleft < car->_trkPos.toLeft && car->_speed_x >= TargetSpeed-10.0 && (angle < 0.1 || nleft < tAvoidLeft[nextdiv]+6.0)) || 
+  if ((dir == TR_LFT && nleft < car->_trkPos.toLeft && car->_speed_x >= TargetSpeed-10.0 && (angle < 0.1 || nleft < tAvoidLeft[nextdiv]+6.0)) ||
       (dir == TR_RGT && nleft > car->_trkPos.toLeft && car->_speed_x >= TargetSpeed-10.0 && (angle > -0.1 || segment->width-nleft < tAvoidRight[nextdiv]+6.0)))
   {
    if (dir == TR_LFT)
@@ -4664,7 +4664,7 @@ double Driver::getAllowedSpeed(tTrackSeg *segment, int accel)
  double nextright = segment->width - nleft;
  lane2left = tLane[rl][(thisdiv+1)%Divs] * track->width;
 
- int danger = (fabs(sideslip) > 15.0 || 
+ int danger = (fabs(sideslip) > 15.0 ||
                (segtype == TR_LFT && nleft > segment->width - MAX(3.0, 3.0 + (100.0-segment->radius)/15)) ||
                (segtype == TR_RGT && nleft < MAX(3.0, (100.0-segment->radius)/15)) ||
                (nleft < MAX(car->_dimension_y*0.7, tAvoidLeft[nextdiv]) && nleft < tlane2left) ||
@@ -4689,7 +4689,7 @@ double Driver::getAllowedSpeed(tTrackSeg *segment, int accel)
  speed += dr;
  TargetSpeed += dr;
 
- if (((getCorrecting() || (avoiding && getAllowCorrecting() && !(avoiding & AVOID_ALIGNED))) && dr >= 0.0 && 
+ if (((getCorrecting() || (avoiding && getAllowCorrecting() && !(avoiding & AVOID_ALIGNED))) && dr >= 0.0 &&
       fabs(angle) < 0.4 && fabs(laststeer) < 0.4 &&
       fabs(car->_trkPos.toLeft - lane2left) < 1.0 &&
       fabs(nleft - lane2left) < 1.0 &&
@@ -4743,7 +4743,7 @@ double Driver::filterTeam(double accel)
 
   minaccel = accel = MIN(accel, opponent[i].car->_accelCmd);
  }
- 
+
  // now filter to wait for catching up
  for (i = 0; i < opponents->getNOpponents(); i++)
  {
@@ -4759,7 +4759,7 @@ double Driver::filterTeam(double accel)
     return accel;
   }
 
-  if (opponent[i].car->_pos >= car->_pos + 2 && 
+  if (opponent[i].car->_pos >= car->_pos + 2 &&
       opponent[i].car->_laps == car->_laps &&
       opponent[i].getDistance() > -(car->_speed_x*2) &&
       opponent[i].getDistance() < 0.0)
@@ -4768,7 +4768,7 @@ double Driver::filterTeam(double accel)
   }
  }
 
- for (i = 0; i < opponents->getNOpponents(); i++) 
+ for (i = 0; i < opponents->getNOpponents(); i++)
  {
   if (opponent[i].car->_state >= RM_CAR_STATE_PIT) continue;
   if (opponent[i].car == car) continue;
@@ -4779,7 +4779,7 @@ double Driver::filterTeam(double accel)
 
   double time_behind = fabs(opponent[i].getDistance()) / opponent[i].car->_speed_x;
 
-  if ((opponent[i].getTeam() & TEAM_CONTROL) && 
+  if ((opponent[i].getTeam() & TEAM_CONTROL) &&
       opponent[i].car->_laps >= car->_laps &&
       opponent[i].car->_dammage < car->_dammage + 2000 &&
       ((time_behind <= TeamWaitTime && time_behind > 0.4) ||
@@ -4812,18 +4812,18 @@ double Driver::getAvoidSpeed(double toLeft)
   else if (tRInverse[LINE_RL][nextdiv] > 0.002)
    side = TR_LFT;
  }
- 
- // if outside the raceline or significantly inside approaching a corner, 
+
+ // if outside the raceline or significantly inside approaching a corner,
  // reduce speed as required.
  if (side != TR_STR &&
      (tSpeed[nextdiv] < tSpeed[thisdiv] ||
       fabs(tRInverse[LINE_MID][nextdiv]) > WingRInverse))
  {
   double dirdiverge = fabs((car->_trkPos.toLeft-nextleft) - (tlane2left - nlane2left)) * 2;
-  if ((side == TR_LFT && (toLeft >= nlane2left+3.0 || 
+  if ((side == TR_LFT && (toLeft >= nlane2left+3.0 ||
        ((tlane2left > nlane2left || tSpeed[nextdiv] < tSpeed[thisdiv]) &&
         toLeft <= nlane2left - 4.0))) ||
-      (side == TR_RGT && (toLeft <= nlane2left-3.0 || 
+      (side == TR_RGT && (toLeft <= nlane2left-3.0 ||
        ((tlane2left < nlane2left || tSpeed[nextdiv] < tSpeed[thisdiv]) &&
         toLeft >= nlane2left + 4.0))) ||
       (dirdiverge > 0.4))
@@ -4885,7 +4885,7 @@ fprintf(stderr,"%.3f\n",speed1);fflush(stderr);
     rInverse = thisRInverse;
    }
   }
- 
+
   // work out speed according to future stuff
   if (maxinv != nextdiv && rInverse > WingRInverse)
   {
@@ -4940,7 +4940,7 @@ double Driver::getAvoidSpeed(tTrackSeg *seg)
   if (delta < -0.03)
    radius -= MIN(radius/3, fabs(delta) * 30);
  }
-  
+
  while (lookahead < maxlookahead)
  {
   seg = seg->next;
@@ -4959,12 +4959,12 @@ double Driver::getAvoidSpeed(tTrackSeg *seg)
   speed1 = sqrt((mu * G * radius * 3.0) / (1.0 - MIN(1.0, radius * CA * mu/(mass + MAX(0.0, CARMASS-1000.0)))));
   if (tSpeed[next] > thisspeed)
    speed1 += (tSpeed[next] - thisspeed) * 4.0;
-  else 
+  else
   {
    speed1 -= (thisspeed - tSpeed[next]) * 1.0;
 
    double lane2left = tLane[rl][nextdiv] * seg->width;
-   if ((segtype == TR_LFT && nextleft < lane2left && tLane[rl][nextdiv] <= tLane[rl][thisdiv]) || 
+   if ((segtype == TR_LFT && nextleft < lane2left && tLane[rl][nextdiv] <= tLane[rl][thisdiv]) ||
        (segtype == TR_RGT && nextleft > lane2left && tLane[rl][nextdiv] >= tLane[rl][thisdiv]))
     speed1 -= (segtype == TR_LFT ? MAX(0.0, 7.0 - car->_trkPos.toLeft) : MAX(0.0, 7.0 - car->_trkPos.toRight));
   }
@@ -5176,7 +5176,7 @@ double Driver::getAccel()
   // RELAXATION(BrakeCmd, lastbrake, MaxBrake * 0.8);//1.0f : 0.7f);
 
  }
- 
+
  if (AccelCmd > 0.0)
  {
   BrakeCmd = 0.0;
@@ -5212,19 +5212,19 @@ double Driver::getAccel()
  else
   BTAccelCmd = 0.0;
 
- if (brake_collision) 
+ if (brake_collision)
   BTAccelCmd = MIN(BTAccelCmd, AccelCmd);
 
  if (avoid)
  {
   if (fabs(angle) > 0.4 || (car->_trkPos.seg->type == TR_LFT && angle > 0.05) || (car->_trkPos.seg->type == TR_RGT && angle < -0.05))
-  { 
+  {
    BTAccelCmd = MAX(0.1, BTAccelCmd - fabs(angle)/2);
    AccelCmd = MAX(0.1, AccelCmd - fabs(angle)/2);
   }
  }
 
- if (fabs(car->_steerCmd) > 0.9) 
+ if (fabs(car->_steerCmd) > 0.9)
  {
   AccelCmd = MIN(AccelCmd, 0.8);
   BTAccelCmd = MIN(BTAccelCmd, 0.8);
@@ -5289,7 +5289,7 @@ double Driver::getAccel()
    if (ABS > 2.5)
     ABS = 2.5;
   }
- } 
+ }
 #endif
 
  if (fabs(car->_yaw_rate) > 2.0 || fabs(angle) > 1.2)
@@ -5346,7 +5346,7 @@ double Driver::getBrake(double brake)
   return brake;
 
  // Car drives backward?
- if (car->_speed_x < -MAX_UNSTUCK_SPEED) 
+ if (car->_speed_x < -MAX_UNSTUCK_SPEED)
  {
   // Yes, brake.
   BTBrakeCmd = 1.0;
@@ -5372,7 +5372,7 @@ double Driver::getBrake(double brake)
  }
 
  segptr = segptr->next;
- while (lookaheaddist < maxlookaheaddist) 
+ while (lookaheaddist < maxlookaheaddist)
  {
   allowedspeed = getAllowedSpeed(segptr, 0);
   double dr = learn->getRadius(segptr, avoid);
@@ -5435,9 +5435,9 @@ int Driver::getGear()
 
   if (rpm > car->_enginerpmRedLine * RevsChangeUp)
    car->_gearCmd = car->_gear + 1;
-     
+
   if (car->_gear > 1 &&
-    rpm < car->_enginerpmRedLine * RevsChangeDown && 
+    rpm < car->_enginerpmRedLine * RevsChangeDown &&
     down_rpm < car->_enginerpmRedLine * RevsChangeDownMax)
    car->_gearCmd = car->_gear - 1;
  }
@@ -5477,8 +5477,8 @@ double Driver::getSteer(tSituation *s)
  }
 
  double lane2left = tLane[rl][thisdiv] * seg->width;
- if (avoiding && !(avoiding & (AVOID_SIDE|AVOID_ALIGNED)) && 
-     ((car->_trkPos.toLeft < 0.0f && car->_trkPos.toLeft < lane2left-1.0) || 
+ if (avoiding && !(avoiding & (AVOID_SIDE|AVOID_ALIGNED)) &&
+     ((car->_trkPos.toLeft < 0.0f && car->_trkPos.toLeft < lane2left-1.0) ||
       (car->_trkPos.toRight < 0.0f && car->_trkPos.toLeft > lane2left+1.0)))
  {
   avoid_hold = 0.0f;
@@ -5559,8 +5559,8 @@ double Driver::getSteer(tSituation *s)
   correct_meld = 0.0;
 
  if (avoiding && !(avoiding & AVOID_SIDE) && fabs(k1999steer) > fabs(dsteercmd) && (car->_trkPos.toLeft < -2.0 || car->_trkPos.toLeft > car->_trkPos.seg->width+2.0))
- if (avoiding && !(avoiding & (AVOID_SIDE|AVOID_ALIGNED)) && fabs(k1999steer) > fabs(dsteercmd) && 
-     ((car->_trkPos.toLeft < 0.0f && car->_trkPos.toLeft < lane2left-1.0) || 
+ if (avoiding && !(avoiding & (AVOID_SIDE|AVOID_ALIGNED)) && fabs(k1999steer) > fabs(dsteercmd) &&
+     ((car->_trkPos.toLeft < 0.0f && car->_trkPos.toLeft < lane2left-1.0) ||
       (car->_trkPos.toRight < 0.0f && car->_trkPos.toLeft > lane2left+1.0)))
  {
   setCorrecting(1);
@@ -5582,7 +5582,7 @@ double Driver::getSteer(tSituation *s)
   //int ndiv = (nextdiv + (int)(car->_speed_x/7)) % Divs;
   //double nlane2left = tLane[rl][ndiv] * seg->width;
   if ((k1999steer > k1999steer_a && !(avoiding & AVOID_LEFT))
-      || (k1999steer < k1999steer_a && !(avoiding & AVOID_RIGHT))) 
+      || (k1999steer < k1999steer_a && !(avoiding & AVOID_RIGHT)))
   {
    this_allow_correcting = 1;
   }
@@ -5640,12 +5640,12 @@ double Driver::getSteer(tSituation *s)
    double nlane2left = tLane[rl][nextdiv] * seg->width;
    if ((last_flying & FLYING_FRONT) || pit->isExiting())
     correct->initCorrectValues();
-   int slowcorrect = ((last_flying & FLYING_FRONT) ? 1 : 
-     (pit->isExiting() || car->_accel_x < -5.0 || 
+   int slowcorrect = ((last_flying & FLYING_FRONT) ? 1 :
+     (pit->isExiting() || car->_accel_x < -5.0 ||
       (segtype == TR_STR && cornerdist < cornerlimit * 0.7) ||
       (tRInverse[LINE_RL][nextdiv] > 0.001 && nlane2left > nextleft) ||
       (tRInverse[LINE_RL][nextdiv] < -0.001 && nlane2left < nextleft)) ? 1 : 0);
-   
+
    steercmd = correct->CorrectSteer(steercmd, k1999steer, slowcorrect, car->_speed_x, car->_accel_x);
    //steercmd = correct->CorrectSteer(steercmd, k1999steer, nlane2left, slowcorrect, 1.0 + (MaxIncFactor < MAXINCFACTOR ? ((MAXINCFACTOR-MaxIncFactor)+0.1) * (2.0 + car->_speed_x/15) : 0.1 * (2.0 + car->_speed_x/15)), car->_speed_x);
 #if 0
@@ -5669,7 +5669,7 @@ double Driver::getSteer(tSituation *s)
    else if (correct_timer < currentsimtime ||
             (MIN(car->_trkPos.toLeft, car->_trkPos.toRight) > 2.0 &&
              ((avoiding & AVOID_ALIGNED) ||
-              (csteer > laststeer && csteer < laststeer + (lftlimit/2)) || 
+              (csteer > laststeer && csteer < laststeer + (lftlimit/2)) ||
               (csteer < laststeer && csteer > laststeer - (rgtlimit/2)))))
    {
     correct_timer = currentsimtime;
@@ -5709,7 +5709,7 @@ double Driver::getSteer(tSituation *s)
      }
     }
 #if 1
-    if (!change && !this_allow_correcting 
+    if (!change && !this_allow_correcting
         && fabs(k1999steer) < fabs(laststeer) && fabs(laststeer) < fabs(steercmd) && fabs(laststeer - k1999steer) < fabs(steercmd - k1999steer))
     {
      // following lane path is harder steering, whereas raceline is less - move to raceline.
@@ -5722,7 +5722,7 @@ double Driver::getSteer(tSituation *s)
 #endif
     }
 #endif
-    
+
     correct_timer = MAX(currentsimtime, MIN(correct_timer, MAX(currentsimtime, currentsimtime + factor)));
    }
 
@@ -5780,7 +5780,7 @@ double Driver::getClutch()
  else if (car->_gear > 1) {
   clutchtime = 0.0;
   return 0.0;
- } else*/ 
+ } else*/
  if (1 || car->_gearCmd > 1)
  {
   double maxtime = MAX(0.06, 0.32 - ((double) car->_gearCmd / 65));
@@ -5928,7 +5928,7 @@ v2d Driver::getTargetPoint()
   pitting = 1;
   if (!pit->isApproaching() &&
       fabs(offset) < fabs(nextoffset) &&
-      fabs(nextoffset) < seg->width * 0.5f - 2.0f && 
+      fabs(nextoffset) < seg->width * 0.5f - 2.0f &&
       ((track->pits.side == TR_LFT && nextoffset > offset) ||
        (track->pits.side == TR_RGT && nextoffset < offset)))
   {
@@ -6001,7 +6001,7 @@ void Driver::updateSegAvoidance()
 
  if (!pit->getInPit()
      && last_damage == car->_dammage
-     && ((nextleft < -1.0 && nextleft - fabs(angle)*2 < -1.5 && nextleft < lane2left - 1.0) 
+     && ((nextleft < -1.0 && nextleft - fabs(angle)*2 < -1.5 && nextleft < lane2left - 1.0)
       || (nextleft > seg->width+1.0 && nextleft + fabs(angle)*2 > seg->width + 1.5 && nextleft > lane2left + 1.0)))
  {
   float lftaddition = 0.0f, rgtaddition = 0.0f;
@@ -6259,7 +6259,7 @@ double Driver::getOffset()
   front_avoid_allowed = 0;
 
  // process opponents beside us
- for (i = 0; i < opponents->getNOpponents(); i++) 
+ for (i = 0; i < opponents->getNOpponents(); i++)
  {
   if (opponent[i].car->_state >= RM_CAR_STATE_PIT) continue;
 
@@ -6277,14 +6277,14 @@ double Driver::getOffset()
    side_count |= AVOID_RIGHT;
   else
    side_count |= AVOID_LEFT;
-  
+
   if (segtype != TR_STR && seg->radius <= 30.0 && (opponent[i].getState() & OPP_SIDE_FRONT))
   {
    continue;
   }
 
 #if 0
-  if (!(opponent[i].getState() & OPP_SIDE_COLL) && 
+  if (!(opponent[i].getState() & OPP_SIDE_COLL) &&
       fabs(otherCar->_trkPos.toLeft - car->_trkPos.toLeft) - (opponent[i].getWidth()/2 + getWidth()/2) > 4.0 &&
       (fabs(nextleft - nlane2left) < 3.0 || fabs(otherCar->_trkPos.toLeft - nlane2left) > fabs(nextleft - nlane2left)))
    continue;
@@ -6379,7 +6379,7 @@ fprintf(stderr,"%s: RSIDE %s %.3f/%.3f (%.3f/%.3f)\n",car->_name,otherCar->_name
 #endif
 
    // see if we can use the raceline to help us
-   if (!(avoiding & AVOID_LEFT) && 
+   if (!(avoiding & AVOID_LEFT) &&
        ((MAX(tlane2left, lane2left) <= MIN(car->_trkPos.toLeft, nextleft)
          && MAX(tlane2left, lane2left) <= oppmin-((opponent[i].getState() & OPP_SIDE_COLL) ? 8.0 : 6.0)) ||
         (MAX(tlane2left, lane2left) < oppmin - ((opponent[i].getState() & OPP_SIDE_COLL) ? 8.0 : 6.0))))
@@ -6461,7 +6461,7 @@ fprintf(stderr,"side bail b (%.3f < %.3f)\n",thisoppmax,oppmax);
    }
 #endif
 
-   if (!(avoiding & AVOID_RIGHT) && 
+   if (!(avoiding & AVOID_RIGHT) &&
        ((MIN(tlane2left, lane2left) >= MAX(car->_trkPos.toLeft, nextleft)
          && MIN(tlane2left, lane2left) >= oppmax+((opponent[i].getState() & OPP_SIDE_COLL) ? 8.0 : 6.0)) ||
         (MIN(tlane2left, lane2left) > oppmax + ((opponent[i].getState() & OPP_SIDE_COLL) ? 8.0 : 6.0))))
@@ -6492,7 +6492,7 @@ fprintf(stderr,"side bail b (%.3f < %.3f)\n",thisoppmax,oppmax);
  if (!avoiding || avoiding == AVOID_HOLD)
  {
   // if a team-member is right in front of us and avoiding, copy them
-  for (i = 0; i < opponents->getNOpponents(); i++) 
+  for (i = 0; i < opponents->getNOpponents(); i++)
   {
    if (opponent[i].car->_state >= RM_CAR_STATE_PIT) continue;
 
@@ -6555,7 +6555,7 @@ fprintf(stderr,"AVOID TEAM\n");
   double myspeed = MIN(getSpeed() + 2.0, (getSpeed()*2 + avoidspeed)/3);
 
   // now process front avoidance
-  for (i = 0; i < opponents->getNOpponents(); i++) 
+  for (i = 0; i < opponents->getNOpponents(); i++)
   {
    tCarElt *otherCar = opponent[i].car;
    if ((otherCar == car))
@@ -6564,31 +6564,31 @@ fprintf(stderr,"AVOID TEAM\n");
     continue;
    }
 
-   if (opponent[i].car->_state >= RM_CAR_STATE_PIT) 
+   if (opponent[i].car->_state >= RM_CAR_STATE_PIT)
    {
     // don't overtake pitted cars
     continue;
    }
 
-   if ((opponent[i].getTeam() & TEAM_CONTROL) && 
+   if ((opponent[i].getTeam() & TEAM_CONTROL) &&
        (car->_speed_x > otherCar->_speed_x + 8.0 ||
-        (fabs(opponent[i].getAngle()) < 1.0 && 
-         otherCar->_speed_x > 15.0 && 
+        (fabs(opponent[i].getAngle()) < 1.0 &&
+         otherCar->_speed_x > 15.0 &&
          ((otherCar->_pos < car->_pos && otherCar->_dammage < car->_dammage + 500) ||
           (otherCar->_pos > car->_pos && otherCar->_dammage <= car->_dammage)))))
    {
     // don't overtake team members unless damaged or out of control
     continue;
    }
- 
+
    //double distance = opponent[i].getBrakeDistance() + 2.0;
- 
+
    if (otherCar->_trkPos.toLeft < -3.0f || otherCar->_trkPos.toRight < -3.0f)
    {
     // don't overtake if off the track
     continue;
    }
- 
+
    if (!(opponent[i].getState() & OPP_FRONT))
    {
     if (opponent[i].getDistance() > 100.0 || opponent[i].getDistance() < 0.0)
@@ -6619,7 +6619,7 @@ fprintf(stderr,"%s - %d %.3f %.3f\n",otherCar->_name,(opponent[i].getState()), o
 
     if (opponent[i].getTimeImpact() > 2.0 * factor && (segtype != TR_STR || car->_pos > otherCar->_pos || opponent[i].getBrakeDistance() > 4.0))
     {
-     if (t_impact > (segtype == TR_STR ? 10.0 : 4.0) && 
+     if (t_impact > (segtype == TR_STR ? 10.0 : 4.0) &&
          opponent[i].getBrakeDistance() > (segtype == TR_STR ? 7.0 : 3.5))
      {
 #ifdef OVERTAKE_DEBUG_MSG
@@ -6683,7 +6683,7 @@ fprintf(stderr,"%s - bail c sp=%.3f os=%.3f bd=%.3f\n",otherCar->_name,getSpeed(
      double radius = tSegRadius[oseg->id];
      double speed1 = sqrt((mu * G * radius * 3.0) / (1.0 - MIN(1.0, radius * CA * mu/(mass + MAX(0.0, CARMASS-1000.0)))));
      double delta = tLDelta[oseg->id] * 0.5 + tRDelta[oseg->id] * 0.5;
-  
+
      if (delta < -0.03)
       speed1 -= MIN(speed1/3, fabs(delta) * 25);
 
@@ -6744,7 +6744,7 @@ fprintf(stderr,"%s - bail d1\n",otherCar->_name);
 #endif
      continue;
     }
-    else 
+    else
     {
      tTrackSeg *tseg = seg->next;
      while (tseg != oseg)
@@ -6764,7 +6764,7 @@ fprintf(stderr,"%s - bail d2\n",otherCar->_name);
     }
    }
 
-   //if ((opponent[i].getState() & OPP_FRONT) && distance < 200.0 && 
+   //if ((opponent[i].getState() & OPP_FRONT) && distance < 200.0 &&
    //    opponent[i].getTimeImpact() > opponent[i].getBrakeDistance() / (car->_pos > otherCar->_pos ? 4 : 2))
    {
     // don't overtake if we won't catch him before corner
@@ -6776,12 +6776,12 @@ fprintf(stderr,"%s - bail d2\n",otherCar->_name);
         (segtype == TR_RGT && nextleft < otherCar->_trkPos.toLeft))
      ospeed += fabs(nextleft-otherCar->_trkPos.toLeft) * 0.75;
 #endif
-    
+
     catchdist = MIN(500.0, (myspeed*distance)/MAX(0.1, myspeed-ospeed));
     if (otherCar->_pos > car->_pos)
      catchdist /= 5;
 
-    if (segtype == TR_STR && cornerdist*0.8 < catchdist && //car->_pos > otherCar->_pos && 
+    if (segtype == TR_STR && cornerdist*0.8 < catchdist && //car->_pos > otherCar->_pos &&
         ((cseg->type == TR_LFT && car->_trkPos.toLeft < otherCar->_trkPos.toLeft) ||
          (cseg->type == TR_RGT && car->_trkPos.toLeft > otherCar->_trkPos.toLeft)))
     {
@@ -6825,7 +6825,7 @@ fprintf(stderr,"%s - bail g\n",otherCar->_name);
    if (tseg->type == TR_STR || (seg->type != TR_STR && seg->radius < tseg->radius))
     tseg = seg;
    //double wdiff = (car->_trkPos.toLeft-Oleft);
-   double nwdiff = fabs((car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft) * (t_impact/deltaTime)) - 
+   double nwdiff = fabs((car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft) * (t_impact/deltaTime)) -
                         (o->car->_trkPos.toLeft + (o->getNextLeft() - o->car->_trkPos.toLeft) * (t_impact/deltaTime)));
    //double ospeed = o->getSpeed();
    //int onext = (thisdiv + (int) (distance/DivLength)) % Divs;
@@ -6848,7 +6848,7 @@ fprintf(stderr,"%s - bail g\n",otherCar->_name);
     thisoppmax = o->getNextLeft() + width/2 + car->_dimension_y/2 + 2.0;
     thisoppmin = o->getNextLeft() - (width/2 + car->_dimension_y/2 + 2.0);
    }
- 
+
    oppmax = MAX(oppmax, thisoppmax);
    oppmin = MIN(oppmin, thisoppmin);
 
@@ -6869,8 +6869,8 @@ fprintf(stderr,"%s: %s (%.3f,%.3f > %.3f (%.3f/%.3f)\n",car->_name, o->car->_nam
    if (car->_trkPos.toLeft > o->car->_trkPos.toLeft)
    {
     // on his right
-    //int allow_switch = ((prefer_side == TR_LFT && ONleft > (car->_dimension_y + avoidwidth + 6.0 + tAvoidLeft[next]) && (segtype != TR_STR || cornerdist < 100.0) && o->getTimeImpact() > 0.5) 
-    if (distance < 4.0 && cseg != NULL && (segtype!=TR_STR || cornerdist<cornerlimit*0.75) 
+    //int allow_switch = ((prefer_side == TR_LFT && ONleft > (car->_dimension_y + avoidwidth + 6.0 + tAvoidLeft[next]) && (segtype != TR_STR || cornerdist < 100.0) && o->getTimeImpact() > 0.5)
+    if (distance < 4.0 && cseg != NULL && (segtype!=TR_STR || cornerdist<cornerlimit*0.75)
         && seg->width-Oleft < car->_dimension_y*2 + MAX(0.0, 130.0-cseg->radius)/20)
     {
      o->setState(OPP_COLL);
@@ -6890,7 +6890,7 @@ fprintf(stderr,"%s: %s (%.3f,%.3f > %.3f (%.3f/%.3f)\n",car->_name, o->car->_nam
      double mrightmove = nextleft - car->_trkPos.toLeft;
      double orightmove = o->getNextLeft() - o->car->_trkPos.toLeft;
 
-     if ((mnl <= onl && onl > o->car->_dimension_y + car->_dimension_y + 2) || 
+     if ((mnl <= onl && onl > o->car->_dimension_y + car->_dimension_y + 2) ||
          (cd < 2.0 && orightmove > mrightmove * 1.2 && orightmove > 0.1) ||
          (onl + o->getWidth() > seg->width - (car->_dimension_y + 2 + margin)))// && mnl <= car->_trkPos.toLeft + 1.0))
       try_allow_switch = 1;
@@ -6962,7 +6962,7 @@ fprintf(stderr,"STICK TO RIGHT SIDE, PS=%d sm=%.3f ",prevent_switch,sidemargin);
      //if (nextleft > seg->width-tAvoidRight[nextnext] && car->_speed_x > tSlowSpeed[nextnext]+4.0)
 #if 0
      if (((prefer_side == TR_LFT && cornerdist < cornerlimit*0.7) || (segtype == TR_LFT && tMaxSpeed[nextdiv] <= tMaxSpeed[thisdiv]))
-         && nextleft > seg->width - tAvoidRight[nextnext] 
+         && nextleft > seg->width - tAvoidRight[nextnext]
          && MAX(ospeed, getSpeed()-5) > tSpeed[nextdiv] + (o->car->_pos < car->_pos ? 2.0 : 6.0))
      {
 #ifdef OVERTAKE_DEBUG_MSG
@@ -6979,7 +6979,7 @@ fprintf(stderr," - BAILING2\n");
      }
 #endif
 
-     if (((segtype == TR_LFT || (prefer_side == TR_LFT && cornerdist < cornerlimit)) 
+     if (((segtype == TR_LFT || (prefer_side == TR_LFT && cornerdist < cornerlimit))
          && (MIN(o->car->_speed_x, getSpeed()) > avoidspeedR+1.0 && nextright < (MIN(o->car->_speed_x, (getSpeed()) - avoidspeedR) * 3))) ||
             (tRInverse[LINE_RL][nextdiv] > 0.002 && t_impact > tRInverse[LINE_RL][nextdiv] * 150))
      {
@@ -7068,7 +7068,7 @@ fprintf(stderr," B2 %d\n",this_allow_correcting);
    else
    {
     // on his left
-    if (distance < 4.0 && cseg != NULL && (segtype!=TR_STR || cornerdist<cornerlimit*0.75) 
+    if (distance < 4.0 && cseg != NULL && (segtype!=TR_STR || cornerdist<cornerlimit*0.75)
         && Oleft < car->_dimension_y*2 + MAX(0.0, 130.0-cseg->radius)/20)
     {
      o->setState(OPP_COLL);
@@ -7087,7 +7087,7 @@ fprintf(stderr," B2 %d\n",this_allow_correcting);
      double mleftmove = car->_trkPos.toLeft - nextleft;
      double oleftmove = o->car->_trkPos.toLeft - o->getNextLeft();
 
-     if ((mnl >= onl && onl < seg->width - (o->car->_dimension_y + car->_dimension_y + 2)) || 
+     if ((mnl >= onl && onl < seg->width - (o->car->_dimension_y + car->_dimension_y + 2)) ||
          (cd < 2.0 && oleftmove > mleftmove * 1.2 && oleftmove > 0.1) ||
          (onl - o->getWidth() < (car->_dimension_y + 2 + margin)))// && mnl >= car->_trkPos.toLeft - 1.0))
       try_allow_switch = 1;
@@ -7159,7 +7159,7 @@ fprintf(stderr,"STICK TO LEFT SIDE");
      //if (0 && nextleft < tAvoidLeft[nextnext] && car->_speed_x > tSlowSpeed[nextnext]+4.0)
 #if 0
      if (((prefer_side == TR_RGT && cornerdist < cornerlimit*0.7) || (segtype == TR_RGT && tMaxSpeed[nextdiv] <= tMaxSpeed[thisdiv]))
-         && nextleft < tAvoidLeft[nextnext] 
+         && nextleft < tAvoidLeft[nextnext]
          && MAX(ospeed, getSpeed()-5) > tSpeed[nextdiv] + (o->car->_pos < car->_pos ? 2.0 : 6.0))
      {
 #ifdef OVERTAKE_DEBUG_MSG
@@ -7271,17 +7271,17 @@ frontavoid_end:
  if (!avoiding || avoiding == AVOID_HOLD)
  {
   // look for overlappers to allow past
-  for (i = 0; i < opponents->getNOpponents(); i++) 
+  for (i = 0; i < opponents->getNOpponents(); i++)
   {
    if (opponent[i].car->_state >= RM_CAR_STATE_PIT) continue;
- 
+
    tCarElt *otherCar = opponent[i].car;
    if ((otherCar == car))
     continue;
- 
+
    if (otherCar->_trkPos.toLeft < -3.0f || otherCar->_trkPos.toRight < -3.0f)
     continue;
- 
+
    if (!(opponent[i].getState() & OPP_LETPASS))
     continue;
 
@@ -7292,12 +7292,12 @@ frontavoid_end:
     dlg -= track->length;
    if (dlg > -10)
    {
-    if (car->_trkPos.toLeft > otherCar->_trkPos.toLeft) 
+    if (car->_trkPos.toLeft > otherCar->_trkPos.toLeft)
     {
      Tleft += avoidrightinc*0.7;
      avoiding |= (AVOID_BACK | AVOID_LEFT);
-    } 
-    else 
+    }
+    else
     {
      Tleft -= avoidleftinc*0.7;
      avoiding |= (AVOID_BACK | AVOID_RIGHT);
@@ -7325,8 +7325,8 @@ frontavoid_end:
    avoid_hold -= 0.5;
  }
 
- if (!fStuck && fabs(angle) < 1.0 && car->_speed_x > 25.0 && !avoiding && !getCorrecting() && 
-     ((car->_trkPos.toLeft < -0.5f && car->_trkPos.toLeft < lane2left-1.5) || 
+ if (!fStuck && fabs(angle) < 1.0 && car->_speed_x > 25.0 && !avoiding && !getCorrecting() &&
+     ((car->_trkPos.toLeft < -0.5f && car->_trkPos.toLeft < lane2left-1.5) ||
       (car->_trkPos.toRight < -0.5f && car->_trkPos.toLeft > lane2left+1.5)))
  {
   setCorrecting(1);
@@ -7341,13 +7341,13 @@ frontavoid_end:
    av2 *= 1.5;
   }
 #if 0
-  if (((avoiding & AVOID_RIGHT) && tlane2left < MIN(seg->width - 5.0, oppmin - (segtype == TR_LFT ? av1 : av2)) 
-       && lane2left < MIN(seg->width - 5.0, oppmin - (segtype == TR_LFT ? av1 : av2)) 
-       && (fabs(tlane2left-nlane2left) < 1.0 || nlane2left < nextleft)) || 
-      ((avoiding & AVOID_LEFT) && tlane2left > MAX(5.0, oppmax + (segtype == TR_RGT ? av1 : av2)) 
-       && lane2left > MAX(5.0, oppmax + (segtype == TR_RGT ? av1 : av2)) 
+  if (((avoiding & AVOID_RIGHT) && tlane2left < MIN(seg->width - 5.0, oppmin - (segtype == TR_LFT ? av1 : av2))
+       && lane2left < MIN(seg->width - 5.0, oppmin - (segtype == TR_LFT ? av1 : av2))
+       && (fabs(tlane2left-nlane2left) < 1.0 || nlane2left < nextleft)) ||
+      ((avoiding & AVOID_LEFT) && tlane2left > MAX(5.0, oppmax + (segtype == TR_RGT ? av1 : av2))
+       && lane2left > MAX(5.0, oppmax + (segtype == TR_RGT ? av1 : av2))
        && (fabs(tlane2left-nlane2left) < 1.0 || nlane2left > nextleft)) ||
-      (!(avoiding & AVOID_SIDE) && cornerdist < 50.0 && 
+      (!(avoiding & AVOID_SIDE) && cornerdist < 50.0 &&
        ((prefer_side==TR_LFT && car->_trkPos.toRight < 6.0) || (prefer_side == TR_RGT && car->_trkPos.toLeft < 6.0))))
 #else
   if (this_allow_correcting)
@@ -7367,7 +7367,7 @@ frontavoid_end:
     avoiding |= AVOID_ALIGNED;
     //correct_timer = 0.0;
    }
-   else 
+   else
    {
     Tleft = startleft;
     setAllowCorrecting(1);
@@ -7404,7 +7404,7 @@ frontavoid_end:
     Tleft = startleft - avoidleftinc * 0.5;
    }
   }
-  else 
+  else
    setAllowCorrecting(0);
  }
  else if (old_avoiding || getCorrecting())
@@ -7412,10 +7412,10 @@ frontavoid_end:
   setCorrecting(1);
 
   if (start_finished ||
-      (currentsimtime > 1.0 && 
+      (currentsimtime > 1.0 &&
        (//(cseg->type == TR_LFT && car->_trkPos.toMiddle <= 0.0) ||
         //(cseg->type == TR_RGT && car->_trkPos.toMiddle >= 0.0) ||
-        (old_avoiding & AVOID_ALIGNED) || 
+        (old_avoiding & AVOID_ALIGNED) ||
         car->_pos == 1 ||
         cornerdist < 120.0))
       || nsegtype != TR_STR)
@@ -7438,7 +7438,7 @@ frontavoid_end:
     correct->setAligned(1);
     align_hold = currentsimtime + 5.0;
    }
-   else 
+   else
    {
     if (startleft < tlane2left && startleft < car->_dimension_y*0.7)
     {
@@ -7453,7 +7453,7 @@ frontavoid_end:
  }
 
  if (!avoiding && !getCorrecting() && align_hold > currentsimtime &&
-     fabs(angle) < 0.3 && fabs(laststeer) < 0.08 && 
+     fabs(angle) < 0.3 && fabs(laststeer) < 0.08 &&
      fabs(car->_yaw_rate) < 0.6 && fabs(car->_trkPos.toLeft - lane2left) <= incfactor)
   align_hold = currentsimtime;
 
@@ -7560,7 +7560,7 @@ double Driver::getSideMargin()
  double sm = 0.5;
  //if (segtype != TR_STR || cornerdist < cornerlimit)
  // sm *= 2.0f;
- if (strategy->getStrategy() == STRATEGY_NORMAL) return sm; 
+ if (strategy->getStrategy() == STRATEGY_NORMAL) return sm;
  return sm * 1.3f;
 }
 
@@ -7585,7 +7585,7 @@ void Driver::update(tSituation *s)
  nextwidth = getWidth() + (getWidth() - prevwidth);
  prevwidth = getWidth();
  nextleft = car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft);
-  
+
  mass = (float)(CARMASS + car->_fuel);
  currentspeedsqr = car->_speed_x*car->_speed_x;
  opponents->update(s, this);
@@ -7682,7 +7682,7 @@ bool Driver::isStuck()
  if (fabs(angle) > MAX_UNSTUCK_ANGLE &&
    fabs(angle) < MIN_UNSTUCK_ANGLE &&
    getSpeed() < MAX_UNSTUCK_SPEED &&
-   fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) 
+   fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
  {
   if (stuck > MAX_UNSTUCK_COUNT && (car->_trkPos.toMiddle*angle < 0.0 || (fabs(car->_trkPos.toMiddle) > car->_trkPos.seg->width * 0.6 && fabs(car->_speed_x) < 1.0 && car->_gear > 0)) )
   {
@@ -7690,18 +7690,18 @@ bool Driver::isStuck()
        (angle < -0.4 && car->_trkPos.toRight < 3.0 && car->_trkPos.toRight > -4.0))
     return false;
    return true;
-  } 
+  }
   else if (fStuck && reversehold < currentsimtime && stuck > MAX_UNSTUCK_COUNT)
   {
    stuck = 0;
    return false;
   }
-  else 
+  else
   {
    stuck++;
    return false;
   }
- } 
+ }
  else if (fabs(car->_trkPos.toMiddle) > car->_trkPos.seg->width * 0.6 && fabs(getSpeed()) < 1.0 && car->_gear > 0)
  {
   if (stuck > MAX_UNSTUCK_COUNT)
@@ -7715,7 +7715,7 @@ bool Driver::isStuck()
   stuck++;
   return false;
  }
- else 
+ else
  {
   stuck = 0;
   return false;
@@ -7772,7 +7772,7 @@ void Driver::initCw()
   h += GfParmGetNum(car->_carHandle, WheelSect[i], PRM_RIDEHEIGHT, (char*) NULL, 0.20f);
  }
  h*= 1.5; h = h*h; h = h*h; h = 2.0 * exp(-3.0*h);
- CW = (h + 4.0*CW); 
+ CW = (h + 4.0*CW);
 }
 
 void Driver::initCR()
@@ -7883,8 +7883,8 @@ double Driver::filterBPit(double brake)
      return maxbrake;
     } else if (s > pit->getNPitLoc(pitpos)) {
      // Stop in the pit.
-     if (car->_speed_x < 5.0 && s < pit->getNPitLoc(pitpos) + 3.0 && 
-         ((pitoffset > 0.0 && myoffset < pitoffset && nextleft > car->_trkPos.toLeft) || 
+     if (car->_speed_x < 5.0 && s < pit->getNPitLoc(pitpos) + 3.0 &&
+         ((pitoffset > 0.0 && myoffset < pitoffset && nextleft > car->_trkPos.toLeft) ||
           (pitoffset < 0.0 && myoffset > pitoffset && nextleft < car->_trkPos.toLeft)))
      {
       car->_accelCmd = AccelCmd = BTAccelCmd = MAX(car->_accelCmd, 0.2f);
@@ -8040,7 +8040,7 @@ int Driver::rearWheelSlip()
         car->_wheelSeg(REAR_LFT)->surface->kRoughness > MAX(0.02, car->_trkPos.seg->surface->kRoughness*1.2) ||
         car->_wheelSeg(REAR_LFT)->surface->kRollRes > MAX(0.005, car->_trkPos.seg->surface->kRollRes*1.2)));
 
-  if ((left_bad && right_bad) || 
+  if ((left_bad && right_bad) ||
       ((avoiding || getCorrecting() || align_hold+4.0 > currentsimtime || MAX(fabs(angle), fabs(laststeer)*2) > 0.5) && (left_bad || right_bad)))
   {
    return 1;
@@ -8064,7 +8064,7 @@ double Driver::filterTCL(double accel, char slow)
  int gear = car->_gear;
  double steer = car->_steerCmd;
  double aspect = car->_yaw_rate;
-    
+
  /* anti-slip */
  /* assume SPOOL differential and rwd */
  if (car->_speed_x > 0) {
@@ -8077,15 +8077,15 @@ double Driver::filterTCL(double accel, char slow)
  } else if (car->_gear > 1) {
   accel = accel * exp(-fabs(aspect) * 0.3); //+ 0.15;
  }
- 
- 
+
+
  if ((slip > 1.0) && (car->_gear > 1)) {
   accel /= 2.0;
   //lastAccel = 0.0;
  } else {
   //RELAXATION(car->_accelCmd, lastAccel[idx], 30.0);
  }
- 
+
 #else
  //if (currentsimtime < 5.0 || (fabs(angle) < 0.2 && fabs(car->_steerCmd) < 0.1))
  // return 1.0f;
@@ -8159,7 +8159,7 @@ fprintf(stderr,"filterTCL - accel=%.3f decel=%.3f ",accel,decel);
   {
    laststeer = car->_steerCmd = MAX(-0.7f, MIN(0.7f, car->_steerCmd));
   }
- 
+
   double slip = (this->*GET_DRIVEN_WHEEL_SPEED)() - fabs(car->_speed_x);
   if (slip > SlipLimit*1.2) {
    accel = accel - MIN(accel-0.1, ((slip - SlipLimit*1.2)/TCL_RANGE));
@@ -8257,7 +8257,7 @@ double Driver::filterTrk(double accel)
   if (newleft > mmax)
    accel = MAX(0.0, MIN(accel, 1.0 - (newleft - mmax) / MAX(6.0, (seg->width-1.0) - lane2left)));
  }
- 
+
  if (((segtype == TR_RGT || tRInverse[rl][nextdiv] < -0.003) && car->_steerCmd < -0.2 && nextleft < 5.0 && lane2left - nextleft > 5.0) ||
      ((segtype == TR_LFT || tRInverse[rl][nextdiv] > 0.003) && car->_steerCmd > 0.2 && nextleft > seg->width - 5.0 && nextleft - lane2left > 5.0))
   accel = MIN(accel, 0.7 - (AvoidSpeed/20));
@@ -8267,7 +8267,7 @@ double Driver::filterTrk(double accel)
   //double w = (seg->width - car->_dimension_y)/2.0 ;
   //if (tm > w) {
   // return 0.0;
-  if (cornerdist < cornerlimit && 
+  if (cornerdist < cornerlimit &&
       ((prefer_side == TR_LFT && car->_trkPos.toLeft < 5.0) ||
        (prefer_side == TR_RGT && car->_trkPos.toRight < 5.0)))
   {

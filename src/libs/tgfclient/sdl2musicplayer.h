@@ -5,8 +5,8 @@
 
     file                 : SDL2MusicPlayer.h
     created              : Sat June 5 2021
-    copyright            : (C) 2021 
-    email                : 
+    copyright            : (C) 2021
+    email                :
     version              : $Id$
 
  ***************************************************************************/
@@ -27,7 +27,7 @@ class SDL2MusicPlayer
 	public:
 		SDL2MusicPlayer(char* oggFilePath);
 		virtual ~SDL2MusicPlayer();
-		
+
 		virtual void start();
 		virtual void stop();
 		virtual void pause();
@@ -42,13 +42,13 @@ class SDL2MusicPlayer
 		virtual bool startPlayback();
 		virtual bool isPlaying();
 		virtual void doFade();
-		
+
 		Mix_Music* music;
 
 		typedef enum { NONE, FADEIN, FADEOUT } eFadeState;
 
 		eFadeState fadestate;
-		
+
 		float maxVolume;
 		bool ready;
 		bool started;

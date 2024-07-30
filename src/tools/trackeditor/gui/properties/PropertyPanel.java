@@ -12,7 +12,7 @@ import utils.MutableString;
 public class PropertyPanel extends JPanel
 {
 	private EditorFrame			editorFrame;
-	
+
 	protected EditorFrame getEditorFrame()
 	{
 		return editorFrame;

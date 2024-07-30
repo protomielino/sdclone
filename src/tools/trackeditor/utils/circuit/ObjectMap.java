@@ -21,7 +21,7 @@ public class ObjectMap
 	// XML attributes
 	private String					name		= null;
 	private String					objectMap	= null;
-	
+
 	// image information
 	private Vector<ObjShapeObject>	objects		= new Vector<ObjShapeObject>();
 	private Set<Integer>			colors		= new HashSet<Integer>();
@@ -86,28 +86,28 @@ public class ObjectMap
 		}
 		return false;
 	}
-	
+
 	public int getObjectIndex(ObjShapeObject object)
 	{
 		int index = objects.indexOf(object);
-		
+
 		return index;
 	}
-	
+
 	public boolean hasObject(ObjShapeObject object)
 	{
 		return getObjectIndex(object) != -1;
 	}
-	
+
 	public void addColor(int color)
 	{
 		colors.add(color);
-	}	
+	}
 
 	public Set<Integer> getColors() {
 		return colors;
 	}
-	
+
 	public void recalculateColors() {
 		colors.clear();
 		for (int i = 0; i < objects.size(); i++)

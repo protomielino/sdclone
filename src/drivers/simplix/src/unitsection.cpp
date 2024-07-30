@@ -5,8 +5,8 @@
 //--------------------------------------------------------------------------*
 // Teile der Streckenbeschreibung
 // (C++-Portierung der Unit	UnitTrack.pas)
-// 
-// File			:	unitsection.cpp	
+//
+// File			:	unitsection.cpp
 // Created		: 2007.11.17
 // Last	changed	: 2014.11.29
 // Copyright	: © 2007-2014 Wolf-Dieter Beelitz

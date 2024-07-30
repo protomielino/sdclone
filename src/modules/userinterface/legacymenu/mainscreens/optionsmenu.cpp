@@ -94,7 +94,7 @@ onAIMenuActivate(void * /* dummy */)
 void *
 OptionsMenuInit(void *prevMenu)
 {
-    if (MenuHandle) 
+    if (MenuHandle)
 		return MenuHandle;
 
     MenuHandle = GfuiScreenCreate((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);
@@ -102,7 +102,7 @@ OptionsMenuInit(void *prevMenu)
     void *param = GfuiMenuLoad("optionsmenu.xml");
 
     GfuiMenuCreateStaticControls(MenuHandle, param);
-    
+
 // SDW hack to get access to Monitor menu, doesn't have a defined position yet
 #ifdef MonitorMenu
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onMonitorMenuActivate);

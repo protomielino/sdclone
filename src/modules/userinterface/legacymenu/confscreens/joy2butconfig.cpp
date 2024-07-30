@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Human player joystick configuration menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -115,7 +115,7 @@ static void advanceStep (void)
 
     /* scan through cmds looking for the next ATOB on this axis */
     while (AtobCount <= CMD_END_OF_LIST) {
-	if (Cmd[AtobCount].ref.type == GFCTRL_TYPE_JOY_ATOB 
+	if (Cmd[AtobCount].ref.type == GFCTRL_TYPE_JOY_ATOB
 		&& Cmd[AtobCount].ref.index == AtobAxis) {
 	    GfuiLabelSetText(ScrHandle, AtobCommandID, Cmd[AtobCount].name);
 	    return;
@@ -127,13 +127,13 @@ static void advanceStep (void)
     if (CalState ==2) {
 	CalState = 3;
 	return;
-    } 
+    }
 
     /* no more new ATOBs for this axis, scan for next smallest axis */
     AtobCount = 0;
 
     for (i = 0; i <= CMD_END_OF_LIST; i++) {
-	if (Cmd[i].ref.type == GFCTRL_TYPE_JOY_ATOB 
+	if (Cmd[i].ref.type == GFCTRL_TYPE_JOY_ATOB
 		&& nextAxis > Cmd[i].ref.index && AtobAxis < Cmd[i].ref.index) {
 	    nextAxis = Cmd[i].ref.index;
 	    AtobCount ++;
@@ -144,7 +144,7 @@ static void advanceStep (void)
 
 	/* find first command on new axis */
 	for (AtobCount = 0; AtobCount <= CMD_END_OF_LIST; AtobCount++) {
-	    if (Cmd[AtobCount].ref.type == GFCTRL_TYPE_JOY_ATOB 
+	    if (Cmd[AtobCount].ref.type == GFCTRL_TYPE_JOY_ATOB
 		    && Cmd[AtobCount].ref.index == AtobAxis) {
     		GfuiLabelSetText(ScrHandle, AtobAxisID, GfctrlGetNameByRef(GFCTRL_TYPE_JOY_ATOB, AtobAxis));
 		GfuiLabelSetText(ScrHandle, AtobCommandID, Cmd[AtobCount].name);
@@ -190,7 +190,7 @@ JoyCalAutomaton(void)
 	new_in_list = (linked_item_t*)malloc(sizeof(linked_item_t));
 	new_in_list->command = AtobCount;
    new_in_list->value = joyInfo.ax[AtobAxis];
-		
+
 	if (new_in_list->value < item_in_list->value) {
 	    /* insert first position*/
 	    new_in_list->next = item_in_list;
@@ -206,7 +206,7 @@ JoyCalAutomaton(void)
 		}
 
 		/* step to next item */
-		item_in_list = item_in_list->next; 
+		item_in_list = item_in_list->next;
 	    }
 
 	    if (item_in_list->next == NULL) {
@@ -236,7 +236,7 @@ JoyCalAutomaton(void)
 		if (item_in_list->command != -1)
 		    Cmd[item_in_list->command].max = last_max;
 
-		AtobList = item_in_list->next; 
+		AtobList = item_in_list->next;
 		free(item_in_list);
 	    }
 
@@ -286,7 +286,7 @@ static void
 onActivate(void * /* dummy */)
 {
     int i;
-    
+
     //joyInfo = GfctrlJoyCreate();
     GfctrlJoyGetCurrentStates(&joyInfo);
 
@@ -330,7 +330,7 @@ Joy2butCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
     if (ScrHandle) {
 	return ScrHandle;
     }
-    
+
     // Create screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreate(NULL, NULL, onActivate, NULL, NULL, 1);
 
@@ -343,7 +343,7 @@ Joy2butCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Create instruction variable label.
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
-    
+
     // Create Cancel and Reset buttons.
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
@@ -359,7 +359,7 @@ Joy2butCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Next", NULL, onNext, NULL);

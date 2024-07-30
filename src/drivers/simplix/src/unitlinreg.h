@@ -12,7 +12,7 @@
 // eMail		:	wdbee@users.sourceforge.net
 // Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// Teile diese Unit	basieren auf 
+// Teile diese Unit	basieren auf
 //
 // dem Roboter mouse_2006
 //	  Copyright:	(C)	2006 Tim Foden
@@ -41,7 +41,7 @@
 //==========================================================================*
 // Class TLinearRegression
 //--------------------------------------------------------------------------*
-class TLinearRegression	 
+class TLinearRegression
 {
   public:
 	TLinearRegression();

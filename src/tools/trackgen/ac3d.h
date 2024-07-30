@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -192,7 +192,7 @@ struct Ac3d
             }
         };
 
-        enum SURF : unsigned int { 
+        enum SURF : unsigned int {
             Polygon                         = 0x00,
             ClosedLine                      = 0x01,
             OpenLine                        = 0x02,

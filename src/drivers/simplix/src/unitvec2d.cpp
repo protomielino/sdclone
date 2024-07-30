@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Roboter für TORCS-Version 1.3.0
 // Erweiterung des 2D-Vektors
-// 
+//
 // File			:	unitvec2d.cpp
 // Created		: 2007.21.25
 // Last	changed	: 2014.11.29

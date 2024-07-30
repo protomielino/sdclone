@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -83,7 +83,7 @@
    @defgroup trace		Trace management.
    Allow the trace in the file <tt>trace.txt</tt>
 */
-/** 
+/**
     @defgroup OS		OS dependant functions
     OS specific function table
 */
@@ -153,7 +153,7 @@
 
 */
 
-#endif /* _SD_DOC_H_ */ 
+#endif /* _SD_DOC_H_ */
 
 
 

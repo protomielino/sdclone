@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 /**
  * @author Robert Reif
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -47,7 +47,7 @@ public class ProfileButton extends JPanel
 	private SegmentEditorDlg	parent;
 
 	/**
-	 *  
+	 *
 	 */
 	public ProfileButton()
 	{
@@ -55,7 +55,7 @@ public class ProfileButton extends JPanel
 	}
 
 	/**
-	 *  
+	 *
 	 */
 	private void initialize()
 	{

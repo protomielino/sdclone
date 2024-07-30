@@ -35,7 +35,7 @@
 
 class Simplex : public Polytope {
 public:
-  Simplex(const VertexBase& b, int c, const unsigned int v[]) : 
+  Simplex(const VertexBase& b, int c, const unsigned int v[]) :
     Polytope(b, c, v) {}
 
   Point support(const Vector&) const;

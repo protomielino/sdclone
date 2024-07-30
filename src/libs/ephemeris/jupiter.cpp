@@ -16,13 +16,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #include <math.h>
 
 #include "jupiter.h"
 
 ePhJupiter::ePhJupiter(double mjd) :
-  ePhCelestialBody(100.4542,  2.7685400E-5,	
+  ePhCelestialBody(100.4542,  2.7685400E-5,
 		1.3030,   -1.557E-7,
 		273.8777,  1.6450500E-5,
 		5.2025600, 0.000000,
@@ -32,7 +32,7 @@ ePhJupiter::ePhJupiter(double mjd) :
 }
 
 ePhJupiter::ePhJupiter() :
-  ePhCelestialBody(100.4542,  2.7685400E-5,	
+  ePhCelestialBody(100.4542,  2.7685400E-5,
 		1.3030,   -1.557E-7,
 		273.8777,  1.6450500E-5,
 		5.2025600, 0.000000,

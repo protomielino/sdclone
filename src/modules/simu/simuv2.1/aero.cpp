@@ -21,12 +21,12 @@
 
 #include "sim.h"
 
-void 
+void
 SimAeroConfig(tCar *car)
 {
     void *hdle = car->params;
     tdble Cx, FrntArea;
-    
+
     Cx       = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.4f);
     FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5f);
     car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0f);
@@ -36,11 +36,11 @@ SimAeroConfig(tCar *car)
 }
 
 
-void 
+void
 SimAeroUpdate(tCar *car, tSituation *s)
 {
     tdble	hm;
-    int		i;	    
+    int		i;
     tCar	*otherCar;
     tdble	x, y;
     tdble	yaw, otherYaw, airSpeed, tmpas, spdang, tmpsdpang, dyaw;
@@ -90,7 +90,7 @@ SimAeroUpdate(tCar *car, tSituation *s)
 	// Never used : remove ?
 	//tdble speed = sqrt(car->DynGC.vel.x*car->DynGC.vel.x + car->DynGC.vel.y*car->DynGC.vel.y);
 	//tdble cosa = 1.0f;
-	
+
     car->aero.drag = (tdble) (-SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK);
 
     hm = 1.5f * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);

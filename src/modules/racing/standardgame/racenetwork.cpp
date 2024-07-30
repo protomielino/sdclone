@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : racenetwork.cpp
-    copyright   : (C) 2009 by Brian Gavin 
-    web         : www.speed-dreams.org 
+    copyright   : (C) 2009 by Brian Gavin
+    web         : www.speed-dreams.org
     version     : $Id$
 
  ***************************************************************************/
@@ -16,8 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	    Brian Gavin
     @version	$Id$
 */
@@ -44,7 +44,7 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 	// double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
 
 	int idx = NetGetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
-	
+
 	//Car controls (steering,gas,brake, gear
 	tCarElt *pCar = ReInfo->s->cars[idx];
 	pCar->ctrl.accelCmd = pCt->throttle;
@@ -96,7 +96,7 @@ reNetworkSetCarStatus(CarStatus *pStatus)
 		pCar->race.topSpeed = pStatus->topSpeed;
 
 	pCar->pub.state = pStatus->state;
-	
+
 
 }
 
@@ -120,7 +120,7 @@ ReNetworkOneStep()
 	//Do network updates if needed
 	//CarControlsData *pControls = NULL;
 	int numCars = 0;
-	
+
 	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
 
 	numCars = pNData->m_vecCarCtrls.size();
@@ -161,7 +161,7 @@ ReNetworkOneStep()
 	{
 		if(p->time<s->currentTime)
 			p = pNData->m_vecCarCtrls.erase(p);
-		else 
+		else
 			++p;
 	}
 
@@ -197,7 +197,7 @@ ReNetworkWaitReady()
 		GfLogInfo("Client beginning race in %lf seconds!\n", - ReInfo->s->currentTime);
 		bWaitFinished = true;
 	}
-	
+
 	else if (NetGetServer())
 	{
 		if (NetGetServer()->ClientsReadyToRace())

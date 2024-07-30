@@ -214,7 +214,7 @@ function(cars_from_lst_file  lst_file outlist)
       #message(STATUS "${_line}")
    endforeach()
    list(REMOVE_ITEM _car_list "cmakelists.txt")
-   
+
    set(${outlist} ${_car_list} PARENT_SCOPE)
    #foreach(_car ${_car_list})
    #   message(STATUS "${_car}")
@@ -326,7 +326,7 @@ endfunction()
 # compares 2 lists and returns Lists with ONLY the
 # the unique items from each list
 #
-# example: 
+# example:
 # compare_lists(list_installed_cars list_packaged_cars _ret_installed _ret_packaged)
 #
 # ${_ret_installed} will contain the cars that were in ${list_installed_cars}
@@ -351,7 +351,7 @@ function(compare_lists list_a list_b ret_list_a ret_list_b)
 
    set(${ret_list_a} ${_lc_a} PARENT_SCOPE)
    set(${ret_list_b} ${_lc_b} PARENT_SCOPE)
-    
+
 endfunction()
 # ================================================
 function(dump_list _list)

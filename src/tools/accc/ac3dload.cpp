@@ -803,13 +803,13 @@ void splitOb(std::list<ob_t> &objects, std::list<ob_t>::iterator &it)
     while (mustcontinue)
     {
         mustcontinue = false;
-		
+
         int numvertstored = 0; /* number of vertices stored in the object */
         int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
         int numptstored = 0; /* number of vertices stored */
         bool firstTri = false;
         bool atleastone = true;
-		
+
         while (atleastone)
         {
             atleastone = false;
@@ -1409,7 +1409,7 @@ bool isTerrainSplit(const ob_t &object)
         }
 
         /* name contains terrain or ground */
-        if (object.nameHasStr("terrain") || object.nameHasStr("TERRAIN") || 
+        if (object.nameHasStr("terrain") || object.nameHasStr("TERRAIN") ||
             object.nameHasStr("GROUND") || object.nameHasStr("ground"))
             return true;
     }
@@ -3557,7 +3557,7 @@ int mergeSplitted(std::list<ob_t> &objects)
 
         k = 0;
         std::list<ob_t>::iterator tob0 = tob;
-        for (++tob0; tob0 != objects.end();) 
+        for (++tob0; tob0 != objects.end();)
         {
             if (tob0->canSkip() || tob0->type == "group")
             {

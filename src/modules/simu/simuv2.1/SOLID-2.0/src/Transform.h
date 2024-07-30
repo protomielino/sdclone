@@ -43,19 +43,19 @@ public:
   Transform() {}
   Transform(const float m[16]) { setValue(m); }
   Transform(const double m[16]) { setValue(m); }
- 
+
   Point operator()(const Point& p) const {
-    return Point(dot(basis[X], p) + origin[X], 
-		 dot(basis[Y], p) + origin[Y], 
+    return Point(dot(basis[X], p) + origin[X],
+		 dot(basis[Y], p) + origin[Y],
 		 dot(basis[Z], p) + origin[Z]);
   }
-  
+
   const Matrix& getBasis() const { return basis; }
   const Point& getOrigin() const { return origin; }
 
   void setValue(const float m[16]);
   void setValue(const double m[16]);
-  
+
   void setIdentity();
 
   Transform& operator*=(const Transform& t);
@@ -66,11 +66,11 @@ public:
 
   void invert(const Transform& t);
   void mult(const Transform& t1, const Transform& t2);
-  void multInverseLeft(const Transform& t1, const Transform& t2); 
+  void multInverseLeft(const Transform& t1, const Transform& t2);
 
 private:
-  enum { 
-    IDENTITY = 0x00, 
+  enum {
+    IDENTITY = 0x00,
     TRANSLATION = 0x01,
     ROTATION = 0x02,
     SCALING = 0x04,

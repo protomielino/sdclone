@@ -137,8 +137,8 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
 	int yl = y;
 	if (height > gfuiFont[font]->getHeight())
 		yl += (height -  gfuiFont[font]->getHeight()) / 2;
-		
-		
+
+
 	std::string backgrounImageUrl="";
 	int bgImgPaddingTop = 0;
 	int bgImgPaddingBottom = 0;
@@ -147,7 +147,7 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
 
 	checkbox->labelId =
 		GfuiLabelCreate(scr, pszText, font, xl, yl, 0, GFUI_ALIGN_HL, strlen(pszText),
-						0, 0, 
+						0, 0,
 						backgrounImageUrl.c_str(),
 						bgImgPaddingTop,
 						bgImgPaddingBottom,
@@ -213,9 +213,9 @@ bool
 GfuiCheckboxIsChecked(void* scr, int id)
 {
     tGfuiObject* object = gfuiGetObject(scr, id);
-	
+
 	//should we check here if the given id is actually a checkbox??
-	
+
 	tGfuiCheckbox* checkbox = &(object->u.checkbox);
 
 	return checkbox->pInfo->bChecked;

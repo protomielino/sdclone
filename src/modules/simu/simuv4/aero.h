@@ -42,7 +42,7 @@ typedef struct
     tdble	Kz;
     tdble	Kz_org;
     tdble	angle;
-    
+
     /* static */
     t3Dd	staticPos;
 
@@ -61,7 +61,7 @@ typedef struct
     tdble	c;			/* Curvature of start of decreasing */
     tdble	d;			/* Scale at AoA = 0 */
     tdble	f;			/* Scale factor */
-    
+
     /* parameters for THIN wing model */
     tdble   AoStall;    /* angle of stall =15 deg (1 < AoStall < 45 in degrees) */
     tdble   Stallw;     /* stall width =2 deg, (1 < Stallw < AoStall) */
@@ -73,7 +73,7 @@ typedef struct
 //<<< simuV4
 } tWing;
 
-#endif /* _AERO_H_  */ 
+#endif /* _AERO_H_  */
 
 
 

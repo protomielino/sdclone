@@ -37,7 +37,7 @@
 //==========================================================================*
 // Deklaration der Klasse TCubic
 //--------------------------------------------------------------------------*
-class TCubic  
+class TCubic
 {
   public:
 	TCubic();									  //	Default	constructor
@@ -47,9 +47,9 @@ class TCubic
 	  (double X0, double Y0, double S0,	double	X1,	double Y1, double S1);
 	~TCubic();
 
-	void Set									  // Set coefficients	
+	void Set									  // Set coefficients
 	  (double C0, double C1, double C2, double	C3);
-	void Set									  // Set two points 
+	void Set									  // Set two points
 	  (double X0, double Y0, double S0, double	X1,	double Y1, double S1);
 
 	double	CalcOffset(double X) const;			  // Get offset

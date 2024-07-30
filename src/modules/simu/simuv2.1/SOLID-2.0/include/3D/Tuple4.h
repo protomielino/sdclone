@@ -40,7 +40,7 @@ public:
   Tuple4(const float v[4]) { setValue(v); }
   Tuple4(const double v[4]) { setValue(v); }
   Tuple4(Scalar x, Scalar y, Scalar z, Scalar w) { setValue(x, y, z, w); }
-  
+
   Scalar&       operator[](int i)       { return comp[i]; }
   const Scalar& operator[](int i) const { return comp[i]; }
 
@@ -50,17 +50,17 @@ public:
   void setValue(const float v[4]) {
     comp[X] = v[X]; comp[Y] = v[Y]; comp[Z] = v[Z]; comp[W] = v[W];
   }
-  
+
   void setValue(const double v[4]) {
     comp[X] = v[X]; comp[Y] = v[Y]; comp[Z] = v[Z]; comp[W] = v[W];
   }
-  
+
   void setValue(Scalar x, Scalar y, Scalar z, Scalar w) {
     comp[X] = x; comp[Y] = y; comp[Z] = z; comp[W] = w;
   }
-  
+
 protected:
-  Scalar comp[4];                            
+  Scalar comp[4];
 };
 
 inline bool operator==(const Tuple4& t1, const Tuple4& t2) {

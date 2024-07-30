@@ -19,11 +19,11 @@
 #include <fstream>
 #include <cstring>
 
-#include "tgf.h" 
-#include "track.h" 
+#include "tgf.h"
+#include "track.h"
 #include "car.h"
-#include "raceman.h" 
-#include "robot.h" 
+#include "raceman.h"
+#include "robot.h"
 #include "robottools.h"
 
 using namespace std;
@@ -40,10 +40,10 @@ static const int MaxDivs = 20000;
 
 static const int Iterations = 100;     // Number of smoothing operations
 static const double DivLength = 3.0;   // Length of path elements in meters
- 
+
 static const double SecurityR = 100.0; // Security radius
 static double SideDistExt = 2.0; // Security distance wrt outside
-static double SideDistInt = 1.0; // Security distance wrt inside          
+static double SideDistInt = 1.0; // Security distance wrt inside
 
 class CK1999Data
 {
@@ -58,13 +58,13 @@ class CK1999Data
   {
    fDirt = 0;
   }
-   
+
   const double WingRInverse;
   const double TireAccel1;
   const double MaxBrake;
   const double SlipLimit;
   const double SteerSkid;
-  const char * const pszCarName; 
+  const char * const pszCarName;
 
   double ABS;
   double TractionHelp;
@@ -138,14 +138,14 @@ ofstream ofsLog("K1999.log", ios::out);
 #else
 #define OUTPUT(x)
 #endif
- 
+
 #define FATAL(x) do{if (x){OUTPUT("Fatal error: " << #x); exit(1);}}while(0)
 
 static double Mag(double x, double y)
 {
  return sqrt(x * x + y * y);
 }
- 
+
 static double Min(double x1, double x2)
 {
  if (x1 < x2)
@@ -153,7 +153,7 @@ static double Min(double x1, double x2)
  else
   return x2;
 }
- 
+
 static double Max(double x1, double x2)
 {
  if (x1 < x2)
@@ -161,7 +161,7 @@ static double Max(double x1, double x2)
  else
   return x1;
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // Update tx and ty arrays
 /////////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ void CK1999Data::UpdateTxTy(int i)
 {
  tx[i] = tLane[i] * txRight[i] + (1 - tLane[i]) * txLeft[i];
  ty[i] = tLane[i] * tyRight[i] + (1 - tLane[i]) * tyLeft[i];
-}                                                                               
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Draw a path (use gnuplot)
@@ -240,7 +240,7 @@ void CK1999Data::SplitTrack(tTrack *ptrack)
   {
    double cosine = cos(Angle);
    double sine = sin(Angle);
-   
+
    if (psegCurrent->type == TR_STR)
    {
     xPos += cosine * Step;
@@ -306,7 +306,7 @@ void CK1999Data::SplitTrack(tTrack *ptrack)
  OUTPUT("Track length : " << Length);
  OUTPUT("Width : " << Width);
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // Compute the inverse of the radius
 /////////////////////////////////////////////////////////////////////////////
@@ -318,13 +318,13 @@ double CK1999Data::GetRInverse(int prev, double x, double y, int next)
  double y2 = ty[prev] - y;
  double x3 = tx[next] - tx[prev];
  double y3 = ty[next] - ty[prev];
- 
+
  double det = x1 * y2 - x2 * y1;
  double n1 = x1 * x1 + y1 * y1;
  double n2 = x2 * x2 + y2 * y2;
  double n3 = x3 * x3 + y3 * y3;
  double nnn = sqrt(n1 * n2 * n3);
- 
+
  return 2 * det / nnn;
 }
 
@@ -334,7 +334,7 @@ double CK1999Data::GetRInverse(int prev, double x, double y, int next)
 void CK1999Data::AdjustRadius(int prev, int i, int next, double TargetRInverse, double Security)
 {
  double OldLane = tLane[i];
- 
+
  //
  // Start by aligning points for a reasonable initial lane
  //
@@ -347,28 +347,28 @@ void CK1999Data::AdjustRadius(int prev, int i, int next, double TargetRInverse, 
  else if (tLane[i] > 1.2)
   tLane[i] = 1.2;
  UpdateTxTy(i);
- 
+
  //
  // Newton-like resolution method
  //
  const double dLane = 0.0001;
- 
+
  double dx = dLane * (txRight[i] - txLeft[i]);
  double dy = dLane * (tyRight[i] - tyLeft[i]);
- 
+
  double dRInverse = GetRInverse(prev, tx[i] + dx, ty[i] + dy, next);
- 
+
  if (dRInverse > 0.000000001)
  {
   tLane[i] += (dLane / dRInverse) * TargetRInverse;
- 
+
   double ExtLane = (SideDistExt + Security) / Width;
   double IntLane = (SideDistInt + Security) / Width;
   if (ExtLane > 0.5)
    ExtLane = 0.5;
   if (IntLane > 0.5)
    IntLane = 0.5;
- 
+
   if (TargetRInverse >= 0.0)
   {
    if (tLane[i] < IntLane)
@@ -394,7 +394,7 @@ void CK1999Data::AdjustRadius(int prev, int i, int next, double TargetRInverse, 
     tLane[i] = 1 - IntLane;
   }
  }
- 
+
  UpdateTxTy(i);
 }
 
@@ -407,7 +407,7 @@ void CK1999Data::Smooth(int Step)
  int prevprev = prev - Step;
  int next = Step;
  int nextnext = next + Step;
- 
+
  for (int i = 0; i <= Divs - Step; i += Step)
  {
   double ri0 = GetRInverse(prevprev, tx[prev], ty[prev], i);
@@ -416,10 +416,10 @@ void CK1999Data::Smooth(int Step)
   double lNext = Mag(tx[i] - tx[next], ty[i] - ty[next]);
 
   double TargetRInverse = (lNext * ri0 + lPrev * ri1) / (lNext + lPrev);
- 
+
   double Security = lPrev * lNext / (8 * SecurityR);
   AdjustRadius(prev, i, next, TargetRInverse, Security);
- 
+
   prevprev = prev;
   prev = i;
   next = nextnext;
@@ -437,11 +437,11 @@ void CK1999Data::StepInterpolate(int iMin, int iMax, int Step)
  int next = (iMax + Step) % Divs;
  if (next > Divs - Step)
   next = 0;
- 
+
  int prev = (((Divs + iMin - Step) % Divs) / Step) * Step;
  if (prev > Divs - Step)
   prev -= Step;
- 
+
  double ir0 = GetRInverse(prev, tx[iMin], ty[iMin], iMax % Divs);
  double ir1 = GetRInverse(iMin, tx[iMax % Divs], ty[iMax % Divs], next);
  for (int k = iMax; --k > iMin;)
@@ -451,7 +451,7 @@ void CK1999Data::StepInterpolate(int iMin, int iMax, int Step)
   AdjustRadius(iMin, k, iMax % Divs, TargetRInverse);
  }
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // Calls to StepInterpolate for the full path
 /////////////////////////////////////////////////////////////////////////////
@@ -467,18 +467,18 @@ void CK1999Data::Interpolate(int Step)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Function declaration 
+// Function declaration
 ////////////////////////////////////////////////////////////////////////////
-static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *p); 
-static void drive(int index, tCarElt* car, tSituation *s); 
-static void newrace(int index, tCarElt* car, tSituation *s); 
-static int InitFuncPt(int index, void *pt); 
+static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *p);
+static void drive(int index, tCarElt* car, tSituation *s);
+static void newrace(int index, tCarElt* car, tSituation *s);
+static int InitFuncPt(int index, void *pt);
 
 ////////////////////////////////////////////////////////////////////////////
-// Module entry point  
+// Module entry point
 ////////////////////////////////////////////////////////////////////////////
-extern "C" int K1999(tModInfo *modInfo) 
-{ 
+extern "C" int K1999(tModInfo *modInfo)
+{
  OUTPUT("modInfo");
  memset(modInfo, 0, 10*sizeof(tModInfo));
  for (int i = CARS; --i >= 0;)
@@ -490,27 +490,27 @@ extern "C" int K1999(tModInfo *modInfo)
   modInfo[i].gfId    = ROB_IDENT;
   modInfo[i].index   = i + 1;
  }
- return 0; 
-} 
+ return 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Module Initialization : give addresses of functions
 ////////////////////////////////////////////////////////////////////////////
-static int InitFuncPt(int index, void *pt) 
-{ 
+static int InitFuncPt(int index, void *pt)
+{
  OUTPUT("InitFuncPt");
- tRobotItf *itf = (tRobotItf *)pt; 
+ tRobotItf *itf = (tRobotItf *)pt;
  itf->rbNewTrack = initTrack;
- itf->rbNewRace = newrace; 
+ itf->rbNewRace = newrace;
  itf->rbDrive = drive;
- itf->index = index; 
- return 0; 
-} 
+ itf->index = index;
+ return 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // New track
 ////////////////////////////////////////////////////////////////////////////
-static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *p) 
+static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *p)
 {
  OUTPUT("initTrack(" << index << ")");
  char szSettings[100];
@@ -541,7 +541,7 @@ void CK1999Data::InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
    Smooth(Step);
   Interpolate(Step);
  }
- 
+
  //
  // Compute curvature and speed along the path
  //
@@ -563,7 +563,7 @@ void CK1999Data::InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
 
   tSpeed[i] = tMaxSpeed[i] = MaxSpeed;
  }
- 
+
  //
  // Anticipate braking
  //
@@ -572,16 +572,16 @@ void CK1999Data::InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
  {
   double TireAccel = TireAccel1 * tFriction[i];
   int prev = (i - 1 + Divs) % Divs;
- 
+
   double dx = tx[i] - tx[prev];
   double dy = ty[i] - ty[prev];
   double dist = Mag(dx, dy);
- 
+
   double Speed = (tSpeed[i] + tSpeed[prev]) / 2;
 
   double LatA = tSpeed[i] * tSpeed[i] *
                 (fabs(tRInverse[prev]) + fabs(tRInverse[i])) / 2;
- 
+
 #if 0
   double TanA = TireAccel * TireAccel - LatA * LatA;
   if (TanA < 0.0)
@@ -597,23 +597,23 @@ void CK1999Data::InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
   if (TanA > MaxBrake * tFriction[i])
    TanA = MaxBrake * tFriction[i];
 #endif
- 
+
   double Time = dist / Speed;
   double MaxSpeed = tSpeed[i] + TanA * Time;
   tSpeed[prev] = Min(MaxSpeed, tMaxSpeed[prev]);
- }                                                                              
+ }
 
 #ifdef DRAWPATH
  ofstream ofs("k1999.path", ios::out);
  DrawPath(ofs);
 #endif
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // New race
 ////////////////////////////////////////////////////////////////////////////
-static void newrace(int index, tCarElt* car, tSituation *s) 
-{ 
+static void newrace(int index, tCarElt* car, tSituation *s)
+{
  OUTPUT("newrace(" << index << ")");
  tpdata[index - 1]->NewRace(car, s);
 }
@@ -634,12 +634,12 @@ void CK1999Data::NewRace(tCarElt* car, tSituation *s)
  ABS = 1;
  TractionHelp = 1;
  fStuck = 0;
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Car control
 ////////////////////////////////////////////////////////////////////////////
-static void drive(int index, tCarElt* car, tSituation *s) 
+static void drive(int index, tCarElt* car, tSituation *s)
 {
  tpdata[index - 1]->Drive(car, s);
 }
@@ -648,7 +648,7 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
 {
  memset(&(car->ctrl), 0, sizeof(tCarCtrl));
 
- // 
+ //
  // Find index in data arrays
  //
  int SegId = car->_trkPos.seg->id;
@@ -726,7 +726,7 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
    double dx = tx[Next] - tx[Index];
    double dy = ty[Next] - ty[Index];
    Error = (dx * (Y - ty[Index]) - dy * (X - tx[Index])) / Mag(dx, dy);
-  }  
+  }
 
   int Prev = (Index + Divs - 1) % Divs;
   int NextNext = (Next + 1) % Divs;
@@ -783,7 +783,7 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
   car->_accelCmd = (float)Min(x, TractionHelp);
  else
   car->_brakeCmd = (float)Min(-10 * x, ABS);
- 
+
  if (car->_speed_x > 30 && fabs(Error) * car->_speed_x > 60)
   car->_accelCmd = 0;
 
@@ -841,7 +841,7 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
   }
  }
 
- // 
+ //
  // Gearbox command
  //
  car->_gearCmd = car->_gear;
@@ -854,7 +854,7 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
 
   if (rpm > car->_enginerpmRedLine * 0.95)
    car->_gearCmd = car->_gear + 1;
-    
+
   if (car->_gear > 1 &&
       rpm / tRatio[car->_gear] * tRatio[car->_gear - 1] < car->_enginerpmRedLine * 0.70 + 2 * car->_gear)
    car->_gearCmd = car->_gear - 1;
@@ -914,4 +914,4 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
  LOG(car->_pos_Y);
  LOG(double(Index % 10) / 10.0);
  LOG('\n');
-} 
+}

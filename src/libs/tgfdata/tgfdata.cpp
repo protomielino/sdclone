@@ -29,7 +29,7 @@ void GfData::initialize()
 {
 	// Nothing actually needed here for the moment,
 	// as everything is lazily initialized/loaded.
-	
+
 	// BTW, we can imagine adding things here to force initializing/loading,
 	// if it can make the game react more quickly in the menu ?
 }

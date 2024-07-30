@@ -20,7 +20,7 @@
 #define Smessage printf("# "); printf
 //#define error printf("# ERROR: %s:%d ",__FILE__,__LINE__); printf
 //#define warning printfww1("# Warning: %s:%d ",__FILE__,__LINE__); printfww2
- 
+
 
 
 #define ReadFile(f,fs) ((fs=fopen(f,"rb"))!=NULL)

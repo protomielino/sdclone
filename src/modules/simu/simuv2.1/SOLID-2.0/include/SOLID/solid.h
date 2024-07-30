@@ -45,7 +45,7 @@ typedef enum DtPolyType {
   DT_POLYHEDRON
 } DtPolyType;
 
-typedef enum DtResponseType { 
+typedef enum DtResponseType {
   DT_NO_RESPONSE,
   DT_SIMPLE_RESPONSE,
   DT_SMART_RESPONSE,
@@ -82,9 +82,9 @@ extern void dtEnd();
 extern void dtVertex(DtScalar x, DtScalar y, DtScalar z);
 extern void dtVertexBase(const void *base);
 extern void dtVertexIndex(DtIndex index);
-extern void dtVertexIndices(DtPolyType type, DtCount count, 
+extern void dtVertexIndices(DtPolyType type, DtCount count,
 			    const DtIndex *indices);
-extern void dtVertexRange(DtPolyType type, DtIndex first, DtCount count); 
+extern void dtVertexRange(DtPolyType type, DtIndex first, DtCount count);
 
 extern void dtChangeVertexBase(DtShapeRef shape, const void *base);
 
@@ -93,7 +93,7 @@ extern void dtDeleteShape(DtShapeRef shape);
 
 /* Object  */
 
-extern void dtCreateObject(DtObjectRef object, DtShapeRef shape); 
+extern void dtCreateObject(DtObjectRef object, DtShapeRef shape);
 extern void dtDeleteObject(DtObjectRef object);
 extern void dtSelectObject(DtObjectRef object);
 
@@ -112,18 +112,18 @@ extern void dtScale(DtScalar x, DtScalar y, DtScalar z);
 
 /* Response */
 
-extern void dtSetDefaultResponse(DtResponse response, DtResponseType type, 
+extern void dtSetDefaultResponse(DtResponse response, DtResponseType type,
 				 void *client_data);
 
 extern void dtClearDefaultResponse();
 
-extern void dtSetObjectResponse(DtObjectRef object, DtResponse response, 
+extern void dtSetObjectResponse(DtObjectRef object, DtResponse response,
 				DtResponseType type, void *client_data);
 extern void dtClearObjectResponse(DtObjectRef object);
 extern void dtResetObjectResponse(DtObjectRef object);
 
-extern void dtSetPairResponse(DtObjectRef object1, DtObjectRef object2, 
-			      DtResponse response, DtResponseType type, 
+extern void dtSetPairResponse(DtObjectRef object1, DtObjectRef object2,
+			      DtResponse response, DtResponseType type,
 			      void *client_data);
 extern void dtClearPairResponse(DtObjectRef object1, DtObjectRef object2);
 extern void dtResetPairResponse(DtObjectRef object1, DtObjectRef object2);

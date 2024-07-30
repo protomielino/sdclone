@@ -1,6 +1,6 @@
 # Locate GLM math (header-only) library
 # This module defines
-# GLM_FOUND : 
+# GLM_FOUND :
 # GLM_INCLUDE_DIR : where to find the headers
 # Created by Joe Thompson
 

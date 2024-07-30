@@ -195,7 +195,7 @@ static void shutdown(int index)
 	delete driver[index-1];
 #ifdef ROB_SECT_ARBITRARY
 	driver[index-1] = NULL;
-	
+
 	for (yy = driverAlloc - 1; yy >= 0; --yy) {
 		if (driver[yy]) {
 			if (yy == driverAlloc - 1)

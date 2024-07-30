@@ -51,7 +51,7 @@ private:
 public:
     SDCarLight() : type(CAR_LIGHT_TYPE_NONE) {}
     ~SDCarLight() {}
-    
+
     CarLightType get_type() const { return type; }
 
     osg::ref_ptr<osg::Node> init(
@@ -77,7 +77,7 @@ public:
     ~SDCarLights() {}
 
     void loadStates();
-    
+
     osg::ref_ptr<osg::Group> getLightsRoot() const
         { return lights_root; }
     osg::ref_ptr<osg::StateSet> getStateSet(CarLightType type) const

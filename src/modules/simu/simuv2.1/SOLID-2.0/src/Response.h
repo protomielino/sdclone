@@ -43,14 +43,14 @@ public:
   DtResponseType type;
   void *client_data;
 
-  Response(DtResponse r = 0, 
-	   DtResponseType t = DT_NO_RESPONSE, 
-	   void *p = 0) : 
+  Response(DtResponse r = 0,
+	   DtResponseType t = DT_NO_RESPONSE,
+	   void *p = 0) :
     response(r), type(t), client_data(p) {}
 
-  void operator()(DtObjectRef a, DtObjectRef b, 
+  void operator()(DtObjectRef a, DtObjectRef b,
 		  const Point& pa, const Point& pb, const Vector& v) const;
   void operator()(DtObjectRef a, DtObjectRef b) const;
 };
 
-#endif  
+#endif

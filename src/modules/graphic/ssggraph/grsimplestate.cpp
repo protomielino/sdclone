@@ -39,14 +39,14 @@ void cgrSimpleState::setTexture(ssgTexture *tex)
 void cgrSimpleState::setTexture(const char *fname, int wrapu, int wrapv, int mipmap)
 {
 	mipmap = doMipMap(fname, mipmap);
-	
+
 	ssgSimpleState::setTexture(fname, wrapu, wrapv, mipmap);
 }
 
 void cgrSimpleState::setTexture(GLuint tex)
 {
 	GfLogWarning("Obsolete call: setTexture(GLuint tex)\n");
-	
+
 	ssgSimpleState::setTexture(tex);
 }
 

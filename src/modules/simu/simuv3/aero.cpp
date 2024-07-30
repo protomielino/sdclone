@@ -21,12 +21,12 @@
 
 #include "sim.h"
 
-void 
+void
 SimAeroConfig(tCar *car)
 {
     void *hdle = car->params;
     tdble Cx, FrntArea;
-    
+
     Cx       = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.4f);
     FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5f);
     car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0f);
@@ -65,11 +65,11 @@ SimAeroConfig(tCar *car)
 }
 
 
-void 
+void
 SimAeroUpdate(tCar *car, tSituation *s)
 {
     //tdble	hm;
-    int		i;	    
+    int		i;
     tdble	airSpeed;
     tdble	dragK = 1.0f;
 
@@ -116,14 +116,14 @@ SimAeroUpdate(tCar *car, tSituation *s)
     }
 
     car->airSpeed2 = airSpeed * airSpeed;
-    
+
     tdble v2 = car->airSpeed2;
     tdble dmg_coef = (tdble)((tdble)car->dammage / 10000.0);
 
     car->aero.drag = (tdble)(-SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0 + dmg_coef) * dragK * dragK);
 
 
-    // Since we have the forces ready, we just multiply. 
+    // Since we have the forces ready, we just multiply.
     // Should insert constants here.
     // Also, no torque is produced since the effect can be
     // quite dramatic. Interesting idea to make all drags produce
@@ -148,7 +148,7 @@ SimAeroUpdate(tCar *car, tSituation *s)
 
 
 
-    
+
 
 }
 
@@ -197,7 +197,7 @@ SimWingConfig(tCar *car, int index)
     wing->angle       = GfParmGetNum(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, 0);
     wing->staticPos.x = GfParmGetNum(hdle, WingSect[index], PRM_XPOS, (char*)NULL, 0);
     wing->staticPos.z = GfParmGetNum(hdle, WingSect[index], PRM_ZPOS, (char*)NULL, 0);
-    
+
     switch (car->options->aeroflow_model) {
     case SIMPLE:
         wing->Kx = (tdble)(-AIR_DENSITY * area); ///< \bug: there should be a 1/2 here.
@@ -232,17 +232,17 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     tdble i_flow = 1.0;
     // rear wing should not get any flow.
 
-    // compute angle of attack 
+    // compute angle of attack
     // we don't  add ay anymore since DynGC.vel.x,z are now in the correct frame of reference (see car.cpp)
     tdble aoa = atan2(car->DynGC.vel.z, car->DynGC.vel.x); //+ car->DynGC.pos.ay;
     // The flow to the rear wing can get cut off at large negative
     // angles of attack.  (so it won't produce lift because it will be
     // completely shielded by the car's bottom)
-    // The value -0.4 should depend on the positioning of the wing. 
+    // The value -0.4 should depend on the positioning of the wing.
     // we also make this be like that.
     if (index==1) {
         i_flow = PartialFlowSmooth (-0.4f, aoa);
-    } 
+    }
     // Flow to the wings gets cut off by other cars.
     tdble airSpeed = car->DynGC.vel.x;
 
@@ -272,7 +272,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 		    tmpas = (tdble)(1.0 - factor*exp(- 2.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y) /
                                              (otherCar->aero.Cd * otherCar->DynGC.vel.x)));
 		    i_flow = i_flow * tmpas;
-		} 
+		}
 	    }
 	}
     }
@@ -295,9 +295,9 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 
     vt2=vt2*i_flow;
     vt2=vt2*vt2;
-	
+
     aoa += wing->angle;
-	
+
     // the sinus of the angle of attack
     tdble sinaoa = sin(aoa);
     tdble cosaoa = cos(aoa);
@@ -333,7 +333,7 @@ tdble PartialFlowRectangle(tdble theta, tdble psi)
         return 0.0;
     return (tdble)((1.0-(1.0-sin(psi)/sin(2.0*theta))));
 }
- 
+
 tdble PartialFlowSmooth(tdble theta, tdble psi)
 {
     if (psi>0)
@@ -342,7 +342,7 @@ tdble PartialFlowSmooth(tdble theta, tdble psi)
         return 0.0;
     return (tdble)((0.5*(1.0+tanh((theta-psi)/(fabs(1.0-(psi/theta))-1.0)))));
 }
- 
+
 tdble PartialFlowSphere(tdble theta, tdble psi)
 {
     if (psi>0)
@@ -351,13 +351,13 @@ tdble PartialFlowSphere(tdble theta, tdble psi)
         return 0.0;
     return (tdble)((0.5*(1.0+sin((theta-psi)*M_PI/(2.0*theta)))));
 }
-           
+
 tdble Max_Cl_given_Cd (tdble Cd)
 {
     // if Cd = 1, then all air hitting the surface is stopped.
     // In any case, horizontal speed of air particles is given by
     tdble ux = 1 - Cd;
-    
+
     // We assume no energy lost and thus can calculate the maximum
     // possible vertical speed imparted to the paticles
     tdble uy = sqrt(1 - ux*ux);

@@ -1,11 +1,11 @@
 /***************************************************************************
-  
+
 	file                 : linuxspec.cpp
 	created              : Sat Mar 18 23:54:05 CET 2000
 	copyright            : (C) 2000 by Eric Espie
 	email                : torcs@free.fr
 	version              : $Id$
-	
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -82,19 +82,19 @@ static const size_t SOPathLenMax = 1024;
  *
  * Remarks
  *	* Nothing done if a module with equal shared library file path-name
- *	  already exists in modlist (WARNING: if same shared library file, but with different 
+ *	  already exists in modlist (WARNING: if same shared library file, but with different
  *	  path-names, like with an absolute and a relative one, the module is loaded again !)
  *	* The loaded module info structure is added at the HEAD of the list (**modlist)
  *	  (not added, but only moved to HEAD, if a module with equal shared library file path-name
  *	   already exists in modlist).
- *	
+ *
  */
 static int
 linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 {
 	tSOHandle handle;
 	tModList* curMod;
-	
+
 	/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
 	if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
 	{
@@ -102,9 +102,9 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 		GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
 		return 0;
 	}
-	
+
 	GfLogInfo("Loading module %s\n", sopath);
-	
+
 	/* Load the shared library */
 	handle = dlopen(sopath, RTLD_LAZY);
 	if (handle)
@@ -116,7 +116,7 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 				// Add the loaded module at the head of the list (no sort by priority).
 				GfModAddInList(curMod, modlist, /* priosort */ 0);
 		}
-		else 
+		else
 		{
 			dlclose(handle);
 			GfLogError("linuxModLoad: Module init function failed %s\n", sopath);
@@ -128,7 +128,7 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 		GfLogError("linuxModLoad: ...  %s\n", dlerror());
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -151,12 +151,12 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
  *
  * Remarks
  *	* Nothing done if a module with equal shared library file path-name
- *	  already exists in modlist (WARNING: if same shared library file, but with different 
+ *	  already exists in modlist (WARNING: if same shared library file, but with different
  *	  path-names, like with an absolute and a relative one, the module is loaded again !)
  *	* The loaded module info structure is added at the HEAD of the list (**modlist)
  *	  (not added, but only moved to HEAD, if a module with equal shared library file path-name
  *	   already exists in modlist).
- *	
+ *
  */
 static int
 linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
@@ -164,7 +164,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 	tSOHandle handle;
 	tModList *curMod;
 	int       infoSts = 0;
-	
+
 	/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
 	if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
 	{
@@ -172,12 +172,12 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 		GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
 		return infoSts;
 	}
-	
+
 	GfLogTrace("Querying module %s\n", sopath);
-	
+
 	/* Load the shared library */
 	handle = dlopen(sopath, RTLD_LAZY);
-	if (handle) 
+	if (handle)
 	{
 		/* Initialize the module */
 		if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
@@ -187,25 +187,25 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 				// Add the loaded module at the head of the list (no sort by priority).
 				GfModAddInList(curMod, modlist, /* priosort */ 0);
 			}
-			
+
 			/* Terminate the module */
 			infoSts = GfModTerminate(handle, sopath);
-		} 
-		else 
+		}
+		else
 		{
 			GfLogError("linuxModInfo: Module init function failed %s\n", sopath);
 			infoSts = -1;
 		}
-		
+
 		/* Close the DLL whatever happened */
 		dlclose(handle);
-	} 
-	else 
+	}
+	else
 	{
 		GfLogError("linuxModInfo: ...  %s\n", dlerror());
 		infoSts = -1;
 	}
-	
+
 	return infoSts;
 }
 
@@ -230,7 +230,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
  * Remarks
  *	The loaded module info structures are added in the list according to each module's priority
  *	(NOT at the head of the list).
- *	
+ *
  */
 static int
 linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
@@ -241,15 +241,15 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	struct dirent	*ep;
 	int			modnb;		/* number on loaded modules */
 	tModList		*curMod;
-	
+
 	modnb = 0;
-	
+
 	/* open the current directory */
 	dp = opendir(dir);
-	if (dp) 
+	if (dp)
 	{
 		/* some files in it */
-		while ((ep = readdir (dp)) != 0) 
+		while ((ep = readdir (dp)) != 0)
 		{
 			if ((strlen(ep->d_name) > SOFileExtLen + 1) &&
 				(strcmp(DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
@@ -271,7 +271,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 								modnb++;
 								GfModAddInList(curMod, modlist, /* priosort */ 1);
 							}
-						} 
+						}
 						else
 						{
 							dlclose(handle);
@@ -290,12 +290,12 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		}
 		(void)closedir(dp);
 	}
-	else 
+	else
 	{
 		GfLogError("linuxModLoadDir: ... Couldn't open the directory %s\n", dir);
 		modnb = -1;
 	}
-	
+
 	return modnb;
 }
 
@@ -322,7 +322,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
  * Remarks
  *	The loaded module info structures are added in the list according to each module's priority
  *	(NOT at the head of the list).
- *	
+ *
  */
 static int
 linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **modlist)
@@ -333,17 +333,17 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 	struct dirent	*ep;
 	int			 modnb;		/* number on loaded modules */
 	tModList		*curMod;
-	
+
 	modnb = 0;
-	
+
 	/* open the current directory */
 	dp = opendir(dir);
 	if (dp)
 	{
 		/* some files in it */
-		while ((ep = readdir (dp)) != 0) 
+		while ((ep = readdir (dp)) != 0)
 		{
-			if (((strlen(ep->d_name) >  SOFileExtLen + 1) && 
+			if (((strlen(ep->d_name) >  SOFileExtLen + 1) &&
 				 (strcmp(DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
 				|| ((level == 1) && (ep->d_name[0] != '.')))
 			{
@@ -351,7 +351,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 					snprintf(sopath, sizeof(sopath), "%s/%s/%s%s", dir, ep->d_name, ep->d_name, DLLEXT);
 				else
 					snprintf(sopath, sizeof(sopath), "%s/%s", dir, ep->d_name);
-				
+
 				/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
 				if (!GfModIsInList(sopath, *modlist))
 				{
@@ -369,15 +369,15 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 								modnb++;
 								GfModAddInList(curMod, modlist, /* priosort */ 1);
 							}
-							
+
 							/* Terminate the module */
 							GfModTerminate(handle, sopath);
 						}
-						
+
 						/* Close the shared library */
 						dlclose(handle);
-					} 
-					else 
+					}
+					else
 					{
 						GfLogError("linuxModInfoDir: ...  %s\n", dlerror());
 					}
@@ -385,13 +385,13 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 			}
 		}
 		(void)closedir(dp);
-	} 
-	else 
+	}
+	else
 	{
 		GfLogError("linuxModInfoDir: ... Couldn't open the directory %s.\n", dir);
 		return -1;
 	}
-	
+
 	return modnb;
 }
 
@@ -410,7 +410,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
  *	-1	Error
  *
  * Remarks
- *	
+ *
  */
 static int
 linuxModUnloadList(tModList **modlist)
@@ -419,35 +419,35 @@ linuxModUnloadList(tModList **modlist)
 	tModList		*nextMod;
 	int                 termSts;
 	int                 unloadSts = 0;
-	
+
 	curMod = *modlist;
 	if (curMod == 0)
 		return 0;
-	
-	do 
+
+	do
 	{
 		nextMod = curMod->next;
-		
+
 		/* Terminate the module */
 		termSts = GfModTerminate(curMod->handle, curMod->sopath);
 		if (termSts)
 			unloadSts = termSts;
-		
+
 		// Comment out for valgrind runs, be aware that the driving with the keyboard does
 		// just work to first time this way.
 		dlclose(curMod->handle);
 		GfLogInfo("Unloaded module %s\n", curMod->sopath);
-		
+
 		GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 		free(curMod->sopath);
 		free(curMod);
-		
+
 		curMod = nextMod;
 	}
 	while (curMod != *modlist);
-	
+
 	*modlist = (tModList *)NULL;
-	
+
 	return unloadSts;
 }
 
@@ -471,7 +471,7 @@ linuxDirGetList(const char *dir)
 	struct dirent *ep;
 	tFList *flist = (tFList*)NULL;
 	tFList *curf;
-	
+
 	/* open the current directory */
 	dp = opendir(dir);
 	if (dp != NULL) {
@@ -531,13 +531,13 @@ linuxDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)
 	tFList *curf;
 	int	prefixLg, suffixLg;
 	int	fnameLg;
-	
+
 	if ((!prefix || strlen(prefix) == 0) && (!suffix || strlen(suffix) == 0))
 		return linuxDirGetList(dir);
-	
+
 	suffixLg = suffix ? strlen(suffix) : 0;
 	prefixLg = prefix ? strlen(prefix) : 0;
-	
+
 	/* open the current directory */
 	dp = opendir(dir);
 	if (dp != NULL) {
@@ -602,12 +602,12 @@ static double
 linuxTimeClock(void)
 {
 	struct timeval tv;
-	
+
 	gettimeofday(&tv, 0);
-	
+
 	if (InitTime < 0)
 		InitTime = (double)(tv.tv_sec + tv.tv_usec * 1e-6);
-	
+
 	return (double)(tv.tv_sec + tv.tv_usec * 1e-6) - InitTime;
 }
 
@@ -629,48 +629,48 @@ linuxTimeClock(void)
 *
 * Remarks
 *       WARNING: Not tested under platforms other than Linux : Mac OS X, BSD, Solaris, AIX.
-*	
+*
 */
 unsigned linuxGetNumberOfCPUs()
 {
 	static unsigned nCPUs = 0;
-	
+
 	if (nCPUs == 0)
 	{
-		
+
 		// MacOS X, OpenBSD, NetBSD, etc ...
 #if (defined(__APPLE__) && !defined(USE_MACPORTS)) || defined(__OpenBSD__) || defined(__NetBSD__)
-		
+
 		nt mib[4];
-		size_t len; 
-		
+		size_t len;
+
 		// Set the mib for hw.ncpu
-		
+
 		// Get the number of CPUs from the system
 		// 1) Try HW_AVAILCPU first.
 		mib[0] = CTL_HW;
 		mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 		sysctl(mib, 2, &nCPUs, &len, NULL, 0);
-		
-		if (nCPUs < 1) 
+
+		if (nCPUs < 1)
 		{
 			// 2) Try alternatively HW_NCPU.
 			mib[1] = HW_NCPU;
 			sysctl(mib, 2, &nCPUs, &len, NULL, 0);
 		}
-		
+
 		// Linux, FreeBSD, Solaris, AIX
 #elif defined(__FreeBSD__) || defined(linux) || defined(__linux__) || defined(USE_MACPORTS)
-		
+
 		nCPUs = (unsigned)sysconf(_SC_NPROCESSORS_ONLN);
-		
+
 		// Anything else ... not supported.
 #else
-		
+
 #warning "Unsupported Linux OS"
-		
+
 #endif
-		
+
 		if (nCPUs < 1)
 		{
 			GfLogWarning("Could not get the number of CPUs here ; assuming only 1\n");
@@ -679,7 +679,7 @@ unsigned linuxGetNumberOfCPUs()
 		else
 			GfLogInfo("Detected %d CPUs\n", nCPUs);
 	}
-	
+
 	return nCPUs;
 }
 
@@ -697,7 +697,7 @@ unsigned linuxGetNumberOfCPUs()
 *    true if any error occured, false otherwise
 *
 * Remarks
-*    
+*
 */
 #if !defined(USE_MACPORTS) && !defined(__HAIKU__)
 std::string cpuSet2String(const cpu_set_t* pCPUSet)
@@ -710,7 +710,7 @@ std::string cpuSet2String(const cpu_set_t* pCPUSet)
 				ossCPUSet << ',';
 			ossCPUSet << nCPUIndex;
 		}
-	
+
 	return ossCPUSet.str();
 }
 #endif
@@ -719,16 +719,16 @@ linuxSetThreadAffinity(int nCPUId)
 {
 	// MacOS X, OpenBSD, NetBSD, etc ...
 #if defined(__APPLE__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
-	
+
 	GfLogWarning("Thread affinity not yet implemented on Mac OS X or BSD or Haiku.\n");
 	// TODO.
-	
+
 	// Linux, FreeBSD, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
 #elif defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-	
+
 	// Get the handle for the current thread.
 	pthread_t hCurrThread = pthread_self();
-	
+
 	// Determine the affinity mask to set for the current thread.
 	cpu_set_t nThreadAffinityMask;
 	CPU_ZERO(&nThreadAffinityMask);
@@ -742,11 +742,11 @@ linuxSetThreadAffinity(int nCPUId)
 		}
 	}
 	else
-	{	
+	{
 		// Affinity on a specified CPU => compute its mask.
 		CPU_SET(nCPUId, &nThreadAffinityMask);
 	}
-	
+
 	// Set the affinity mask for the current thread ("stick" it to the target core).
 	if (pthread_setaffinity_np(hCurrThread, sizeof(nThreadAffinityMask), &nThreadAffinityMask))
 	{
@@ -757,17 +757,17 @@ linuxSetThreadAffinity(int nCPUId)
 	else
 		GfLogInfo("Affinity set on CPU(s) %s for current pthread (handle=0x%lX)\n",
 				  cpuSet2String(&nThreadAffinityMask).c_str(), hCurrThread);
-	
+
 	return true;
-	
+
 	// Anything else ... not supported.
 #else
-	
+
 #warning "linuxspec.cpp::linuxSetThreadAffinity : Unsupported Linux OS"
 	GfLogWarning("Thread affinity not yet implemented on this unknown Unix.\n");
-	
+
 #endif
-	
+
 	return false;
 }
 
@@ -798,7 +798,7 @@ linuxGetOSInfo(std::string& strName, int& nMajor, int& nMinor, int& nPatch, int&
 		GfLogWarning("Could not get OS info through uname (%s).\n", strerror(errnum));
 		return false;
 	}
-	
+
 	//GfLogDebug("linuxGetOSInfo : name='%s', version='%s', release='%s'\n",
 	//		   utsName.sysname, utsName.version, utsName.release);
 	strName = utsName.sysname;
@@ -814,7 +814,7 @@ linuxGetOSInfo(std::string& strName, int& nMajor, int& nMinor, int& nPatch, int&
 	if (nNums < 3)
 		nPatch = -1;
 	nBits = strstr(utsName.release, "64") ? 64 : 32;
-	
+
 	return true;
 }
 
@@ -832,13 +832,13 @@ linuxGetOSInfo(std::string& strName, int& nMajor, int& nMinor, int& nPatch, int&
  *    none
  *
  * Remarks
- *    
+ *
  */
 void
 LinuxSpecInit(void)
 {
 	memset(&GfOs, 0, sizeof(GfOs));
-	
+
 	GfOs.modLoad = linuxModLoad;
 	GfOs.modLoadDir = linuxModLoadDir;
 	GfOs.modUnloadList = linuxModUnloadList;

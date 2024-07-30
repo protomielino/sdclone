@@ -2,9 +2,9 @@
 
     file        : hash.cpp
     created     : Sat Dec 14 16:40:15 CET 2002
-    copyright   : (C) 2002 by Eric Espie                       
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espie
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		This is the hash computation API.
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -59,7 +59,7 @@ hash_str (tHashHeader *hash, const char *sstr)
 {
 	const unsigned char *str = (const unsigned char *)sstr;
 	unsigned int val = 0;
-	
+
 	if (!str) {
 		return 0;
 	}
@@ -70,7 +70,7 @@ hash_str (tHashHeader *hash, const char *sstr)
 		val = (val + (*str >> 4) + (*str << 4)) * 11;
 		str++;
 	}
-	
+
 	return val % hash->size;
 }
 
@@ -137,7 +137,7 @@ gfIncreaseHash(tHashHeader *curHeader)
     for (i = 0; i < curHeader->size; i++) {
 	GF_TAILQ_INIT(&(curHeader->hashHead[i]));
     }
-    
+
     /* copy the elements */
     for (i = 0; i < oldSize; i++) {
 	while ((curElem = GF_TAILQ_FIRST(&(oldHashHead[i]))) != NULL) {
@@ -174,15 +174,15 @@ GfHashAddStr(void *hash, const char *key, void *data)
 	tHashHeader		*curHeader = (tHashHeader *)hash;
 	tHashElem		*newElem;
 	unsigned int	index;
-	
+
 	if (curHeader->type != GF_HASH_TYPE_STR) {
 		return 1;
 	}
-	
+
 	if ((curHeader->nbElem + 1) > (2 * curHeader->size)) {
 		gfIncreaseHash(curHeader);
 	}
-	
+
 	index = hash_str(curHeader, key);
 	newElem = (tHashElem*)malloc(sizeof(tHashElem));
 	if (!newElem) {
@@ -194,7 +194,7 @@ GfHashAddStr(void *hash, const char *key, void *data)
 	newElem->data = data;
 	GF_TAILQ_INSERT_TAIL(&(curHeader->hashHead[index]), newElem, link);
 	curHeader->nbElem++;
-	
+
 	return 0;
 }
 
@@ -249,7 +249,7 @@ GfHashGetStr(void *hash, const char *key)
 	tHashHeader		*curHeader = (tHashHeader *)hash;
 	tHashElem		*curElem;
 	unsigned int	index;
-	
+
 	index = hash_str(curHeader, key);
 	curElem = GF_TAILQ_FIRST(&(curHeader->hashHead[index]));
 	while (curElem) {
@@ -277,7 +277,7 @@ GfHashAddBuf(void *hash, char *key, size_t sz, void *data)
     tHashHeader		*curHeader = (tHashHeader *)hash;
     tHashElem		*newElem;
     unsigned int	index;
-    
+
     if (curHeader->type != GF_HASH_TYPE_BUF) {
 	return;
     }
@@ -361,7 +361,7 @@ GfHashRelease(void *hash, tfHashFree hashFree)
     tHashElem		*curElem;
     void		*data;
     int			i;
-    
+
     for (i = 0; i < curHeader->size; i++) {
 	while ((curElem = GF_TAILQ_FIRST(&(curHeader->hashHead[i]))) != NULL) {
 	    data = gfRemElem(&(curHeader->hashHead[i]), curElem);
@@ -388,7 +388,7 @@ GfHashGetFirst(void *hash)
 
     curHeader->curIndex = -1;
     curHeader->curElem = NULL;
-    
+
     return GfHashGetNext(hash);
 }
 

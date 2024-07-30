@@ -54,7 +54,7 @@ TCarParam::TCarParam():
   oScaleBumpOuter(0.6f),
   oScaleBumpLeft(0),
   oScaleBumpRight(0),
-  oLimitSideUse(false), 
+  oLimitSideUse(false),
   oLimitSideWidth(1.5),
   oUglyCrvZ(-0.0035)
 {

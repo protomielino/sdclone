@@ -6,7 +6,7 @@
 class LinePath;
 class MyTrack;
 
-class BendAnalysis  
+class BendAnalysis
 {
 public:
 	enum // types

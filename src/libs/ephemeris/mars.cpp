@@ -41,9 +41,9 @@ ePhMars::ePhMars() :
 }
 /*************************************************************************
  * void Mars::updatePosition(double mjd, Star *ourSun)
- * 
+ *
  * calculates the current position of Mars, by calling the base class,
- * CelestialBody::updatePosition(); The current magnitude is calculated using 
+ * CelestialBody::updatePosition(); The current magnitude is calculated using
  * a Mars specific equation
  *************************************************************************/
 void ePhMars::updatePosition(double mjd, ePhStar *ourSun)

@@ -116,7 +116,7 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     label->userDataOnFocus = userDataOnFocus;
     label->onFocus = onFocus;
     label->onFocusLost = onFocusLost;
-    
+
     if (!bgImgUrl.empty()){
 		label->bgImg = GfTexReadTexture(bgImgUrl.c_str());
 	}
@@ -170,7 +170,7 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y,
                   screen->bgColor.toFloatRGBA(), fgFocusColor,
                   backgrounImageUrl,
                   userDataOnFocus, onFocus, onFocusLost);
-                  
+
     label->bgImgPaddingTop = bgImgPaddingTop;
     label->bgImgPaddingBottom = bgImgPaddingBottom;
     label->bgImgPaddingLeft = bgImgPaddingLeft;
@@ -400,7 +400,7 @@ gfuiDrawLabel(tGfuiObject *obj)
         glVertex2i(obj->xmax, obj->ymin);
         glEnd();
     }
-    
+
     //draw the bg image
 	if (label->bgImg)
 	{

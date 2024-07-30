@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
@@ -623,7 +623,7 @@ void Ac3d::Object::parse(std::ifstream &fin, const std::string &objType)
     while (std::getline(fin, line))
     {
         std::vector<std::string> tokens;
- 
+
         tokenizeLine(line, tokens);
 
         if (tokens.empty())
@@ -986,7 +986,7 @@ void Ac3d::Object::splitBySURF()
                 // add the new objects to the kids
                 for (size_t i = 1; i < surfTypes.size(); i++)
                     first = kids.insert(first, Object(kid));
- 
+
                 std::set<int>::iterator it1 = surfTypes.begin();
                 int i = 0;
                 for (std::list<Object>::iterator it2 = first; it2 != std::next(last, 1); ++it2, ++it1)
@@ -1426,7 +1426,7 @@ void Ac3d::Object::generateNormals()
                 }
             }
         }
-        
+
         size = new_vertices.size();
         vertices.resize(size);
         normals.resize(size);
@@ -1598,7 +1598,7 @@ void Ac3d::readFile(const std::string &fileName)
         while (std::getline(fin, line))
         {
             std::vector<std::string> tokens;
- 
+
             tokenizeLine(line, tokens);
 
             if (tokens.empty() || tokens[0].empty())

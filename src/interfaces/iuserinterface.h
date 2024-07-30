@@ -2,7 +2,7 @@
                  iuserinterface.h -- Interface for any user interface module
 
     created              : Mon Mar 7 19:32:14 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	Interface for any user interface module
     @version	$Id$
 */
@@ -66,7 +66,7 @@ public:
 
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText) = 0;
-	
+
 	// Optimiaztion messages management.
 	virtual void addOptimizationMessage(const char* pszText) = 0;
     virtual void addOptimizationParameterMessage(int n, char** Labels, char** Values, char** Ranges) = 0;

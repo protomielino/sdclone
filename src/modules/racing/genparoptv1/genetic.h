@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 /**
     @defgroup	genetictools	Tools for genetic parameter optimization.
     Collection of functions for genetic parameter optimization.
@@ -57,26 +57,26 @@
 
 #define PRV_OPTI	    "genetic optimisation"
 
-//  
-// Genetic parameters are handled in a single array 
+//
+// Genetic parameters are handled in a single array
 // (See TGeneticParameter** GP;).
 //
-// At start there are global parameters. 
-// Global parameters are car setup parameters like wing angles 
+// At start there are global parameters.
+// Global parameters are car setup parameters like wing angles
 // or robot parameters that are used for the whole track.
 //
 // This block is followed by one ore more parts defining local
 // parameters. The definition of the part of the track that has
-// to use a set of such local parameters (let's call it section) 
-// is not contained here, just because we do not need it, 
+// to use a set of such local parameters (let's call it section)
+// is not contained here, just because we do not need it,
 // it has to be handled by the consumer (robot).
-// 
+//
 // We have the number of parts stored here, so we can handle
-// each group of parameters defined in a part based on the 
-// index offset to the first parameter of the group and we 
-// know the number of parameters per section and the number of 
+// each group of parameters defined in a part based on the
+// index offset to the first parameter of the group and we
+// know the number of parameters per section and the number of
 // sections defined in a part.
-// 
+//
 // To store these information we use a strucure per part.
 // (See tgenPart).
 
@@ -89,9 +89,9 @@ class TGeneticParameter;		// Optimization parameter
 
 //
 // Structure to bundle handling data of parts or parameters.
-// Used to allow the definition of more than one part of parameters 
+// Used to allow the definition of more than one part of parameters
 // that are defined for subsections of the track as USR or DanDroid do.
-//  
+//
 typedef struct genPart
 {
 	int Offset;			// Index offset of first parameter
@@ -105,7 +105,7 @@ typedef struct genPart
 //
 // Global data for control of parameter optimization
 //
-// This structure contains all values from the current race 
+// This structure contains all values from the current race
 // we need for genetic parameter optimization
 //
 typedef struct genData
@@ -170,7 +170,7 @@ typedef struct genData
 	TGeneticParameter** GP; // Pointer to first parameter
 
 	// Buffers for strings						// FILENAME_MAX = Windows(MAX_PATH = 260)
-	char TrackNameBuffer[FILENAME_MAX+1];		// Buffer for trackname 
+	char TrackNameBuffer[FILENAME_MAX+1];		// Buffer for trackname
 	char CarTypeBuffer[FILENAME_MAX+1];			// ... for car type
 	char RobotNameBuffer[FILENAME_MAX+1];		// ... for robotname
 	char AuthorNameBuffer[FILENAME_MAX+1];		// ... name of setup author
@@ -199,11 +199,11 @@ class TGeneticParameter
 		float MaxDef,				// Defines the maximum allowed value
 		const char *LabelName,		// Gives a short label for console output
 		const char *SectionName,	// Section to be used reading in the setup file
-		const char *ParameterName,	// Name of data line used reading in the setup file 
+		const char *ParameterName,	// Name of data line used reading in the setup file
 		const char *UnitName,		// Defines the unit used for the value
 		float ParamWeight,			// Weight of parameter for random selection
 		float ParamScale,			// Scales the random variation of the value
-		float ParamRound,			// Defines the rounding 
+		float ParamRound,			// Defines the rounding
 									// (to be able to write it in xml without loss of information)
 		int TwoSided = 0			// If there are left and right parameters to be set
 
@@ -215,13 +215,13 @@ class TGeneticParameter
 	void DisplayStatistik(); // Display statistics at console
 
 	int Set(	// Write meta data to the configuration file
-		const char* Part, int Index); 
+		const char* Part, int Index);
 	int Get(	// Read meta data from the configuration file
-		bool First = false, const char* Part = NULL); 
+		bool First = false, const char* Part = NULL);
 
 	int GetVal(	// Read initial value from setup file
-		void* SetupHandle, bool First = false, bool Local = false); 
-	int SetVal(	// Write data to car setup file 
+		void* SetupHandle, bool First = false, bool Local = false);
+	int SetVal(	// Write data to car setup file
 		void* SetupHandle, int Index = 0);
 
   public:
@@ -244,15 +244,15 @@ class TGeneticParameter
 					// that cannot be stored in the xml file
 
 	// Statistics
-	int Tries;		// Number of selections 
+	int Tries;		// Number of selections
 	int Changed;	// Number of successfull variations
-	bool Selected;	// Parameter is in current selection 
+	bool Selected;	// Parameter is in current selection
 					// (to avoid multiple variations)
 
 	bool LeftRight;
 	bool SameSign;
 
-	char *Label;  
+	char *Label;
 	char *Section;
 	char *Parameter;
 	char *Unit;
@@ -280,14 +280,14 @@ class TGeneticParameterPart
 		void* MetaDataFile,					// Handle to read the data from
 		const char* ShortLabel = NULL,		// Short label for console output
 		const char* SectionName = NULL,		// Section to pick up data in the xml file
-		const char* ParameterName = NULL,	// Name of data line to use 
+		const char* ParameterName = NULL,	// Name of data line to use
 		const char* SubSectionName = NULL	// Subsection to pick up data in the xml file
 	);
 
 	virtual ~TGeneticParameterPart();		// Destructor
 
-	int Set(int Index);	// Write meta data to configuration file 
-	int Get(int Index);	// Read meta data from configuration file 
+	int Set(int Index);	// Write meta data to configuration file
+	int Get(int Index);	// Read meta data from configuration file
 
   public:
 	void* Handle;		// Handle to read/write data
@@ -325,8 +325,8 @@ class TGeneticParameterTOC
 
 	virtual ~TGeneticParameterTOC(); // Destructor
 
-	int Set(); // Write table of content to configuration file 
-	int Get(); // Read table of content from configuration file 
+	int Set(); // Write table of content to configuration file
+	int Get(); // Read table of content from configuration file
 
   public:
 	void* Handle;					// Handle to read /write data

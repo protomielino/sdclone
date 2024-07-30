@@ -369,7 +369,7 @@ void setTab(char *tab, struct range *ranges, size_t nRanges)
 }
 
 void printTabs(char *tab)
-{ 
+{
   int nBitmaps = 2;
   int i, j, k;
   unsigned char pageIndex[512];
@@ -389,7 +389,7 @@ void printTabs(char *tab)
       }
     if (i >= 256 &&  memcmp(tab + (i - 256)*256, tab + i*256, 256) == 0)
       pageIndex[i] = pageIndex[i - 256];
-    else if (kind == -1) { 
+    else if (kind == -1) {
       pageIndex[i] = nBitmaps++;
       for (j = 0; j < 8; j++) {
 	unsigned val = 0;
@@ -416,7 +416,7 @@ void printTabs(char *tab)
 }
 
 int main()
-{ 
+{
   char tab[2*65536];
   memset(tab, 0, 65536);
   setTab(tab, nmstrt, sizeof(nmstrt)/sizeof(nmstrt[0]));

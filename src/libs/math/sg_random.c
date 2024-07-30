@@ -21,17 +21,17 @@
 // $Id: sg_random.c,v 1.5 2006-03-08 18:16:08 mfranz Exp $
 
 
-/* 
+/*
    A C-program for MT19937, with initialization improved 2002/2/10.
    Coded by Takuji Nishimura and Makoto Matsumoto.
    This is a faster version by taking Shawn Cokus's optimization,
    Matthe Bellew's simplification, Isaku Wada's real version.
 
-   Before using, initialize the state by using init_genrand(seed) 
+   Before using, initialize the state by using init_genrand(seed)
    or init_by_array(init_key, key_length).
 
    Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.                          
+   All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
@@ -44,8 +44,8 @@
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
-     3. The names of its contributors may not be used to endorse or promote 
-        products derived from this software without specific prior written 
+     3. The names of its contributors may not be used to endorse or promote
+        products derived from this software without specific prior written
         permission.
 
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -68,11 +68,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>         // for random(), srandom()
-#include <time.h>           // for time() to seed srandom()        
+#include <time.h>           // for time() to seed srandom()
 
 #include "sg_random.h"
 
-/* Period parameters */  
+/* Period parameters */
 #define N 624
 #define M 397
 #define MATRIX_A 0x9908b0dfUL   /* constant vector a */
@@ -93,7 +93,7 @@ void init_genrand(unsigned long s)
     int j;
     state[0]= s & 0xffffffffUL;
     for (j=1; j<N; j++) {
-        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j); 
+        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j);
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         /* In the previous versions, MSBs of the seed affect   */
         /* only MSBs of the array state[].                        */
@@ -115,10 +115,10 @@ static void next_state(void)
     left = N;
     next = state;
 
-    for (j=N-M+1; --j; p++) 
+    for (j=N-M+1; --j; p++)
         *p = p[M] ^ TWIST(p[0], p[1]);
 
-    for (j=M; --j; p++) 
+    for (j=M; --j; p++)
         *p = p[M-N] ^ TWIST(p[0], p[1]);
 
     *p = p[M-N] ^ TWIST(p[0], state[0]);
@@ -127,7 +127,7 @@ static void next_state(void)
 // Seed the random number generater with time() so we don't see the
 // same sequence every time
 
-void sg_srandom_time() 
+void sg_srandom_time()
 {
     init_genrand(time(NULL));
 }
@@ -136,7 +136,7 @@ void sg_srandom_time()
 // so we get the same sequence within 10 minutes interval.
 // This is useful for synchronizing two display systems.
 
-void sg_srandom_time_10() 
+void sg_srandom_time_10()
 {
     init_genrand(time(NULL) / 600);
 }
@@ -145,7 +145,7 @@ void sg_srandom_time_10()
 // Seed the random number generater with your own seed so can set up
 // repeatable randomization.
 
-void sg_srandom( unsigned int seed ) 
+void sg_srandom( unsigned int seed )
 {
     init_genrand( seed );
 }
@@ -153,7 +153,7 @@ void sg_srandom( unsigned int seed )
 
 // return a random number between [0.0, 1.0)
 
-double sg_random() 
+double sg_random()
 {
     unsigned long y;
 
@@ -167,8 +167,8 @@ double sg_random()
     y ^= (y << 15) & 0xefc60000UL;
     y ^= (y >> 18);
 
-    return (double)y * (1.0/4294967295.0); 
-    /* divided by 2^32-1 */ 
+    return (double)y * (1.0/4294967295.0);
+    /* divided by 2^32-1 */
 }
 
 

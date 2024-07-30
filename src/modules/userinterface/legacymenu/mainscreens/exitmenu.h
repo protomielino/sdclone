@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 
 #ifndef _EXITMENU_H_
 #define _EXITMENU_H_
@@ -24,7 +24,7 @@
 
 extern void* ExitMenuInit(void *prevMenu);
 
-#endif /* _EXITMENU_H_ */ 
+#endif /* _EXITMENU_H_ */
 
 
 

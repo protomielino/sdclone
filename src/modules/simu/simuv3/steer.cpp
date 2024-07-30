@@ -19,7 +19,7 @@
 
 #include "sim.h"
 
-void 
+void
 SimSteerConfig(tCar *car)
 {
     void *hdle = car->params;
@@ -30,7 +30,7 @@ SimSteerConfig(tCar *car)
 }
 
 
-void 
+void
 SimSteerUpdate(tCar *car)
 {
     tdble steer, steer2;
@@ -41,7 +41,7 @@ SimSteerUpdate(tCar *car)
     steer = car->ctrl->steer;
     steer *= car->steer.steerLock;
     stdelta = steer - car->steer.steer;
-    
+
     if ((fabs(stdelta) / SimDeltaTime) > car->steer.maxSpeed) {
 		steer = (float)(SIGN(stdelta) * car->steer.maxSpeed * SimDeltaTime + car->steer.steer);
     }
@@ -50,7 +50,7 @@ SimSteerUpdate(tCar *car)
 	tanSteer = fabs(tan(steer));
 	steer2 = atan2(car->wheelbase * tanSteer ,(car->wheelbase - tanSteer * car->wheeltrack));
 
-	
+
 	//printf ("%f %f\n", steer2, steer);
     if (steer > 0) {
 		car->wheel[FRNT_RGT].steer = steer2;
@@ -61,4 +61,4 @@ SimSteerUpdate(tCar *car)
     }
 }
 
-	
+

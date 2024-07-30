@@ -49,43 +49,43 @@ public:
   Complex() {}
   ~Complex();
 
-  ShapeType getType() const { return COMPLEX; } 
+  ShapeType getType() const { return COMPLEX; }
   BBox bbox(const Transform& t) const;
 
-  const VertexBase& getBase() const { return base; } 
-  void setBase(const void *ptr, bool free = false) { 
-    base = ptr; free_base = free; 
-  } 
+  const VertexBase& getBase() const { return base; }
+  void setBase(const void *ptr, bool free = false) {
+    base = ptr; free_base = free;
+  }
   void changeBase(const void *ptr);
   void proceed() { prev_base = base; }
-  void swapBase() { swap(base, prev_base); } 
+  void swapBase() { swap(base, prev_base); }
 
   void finish(int n, const Polytope **p);
 
   friend bool intersect(const Complex& a, const Convex& b,
 			const Transform& a2w, const Transform& b2w,
 			Vector& v);
-  
+
   friend bool intersect(const Complex& a, const Complex& b,
 			const Transform& a2w, const Transform& b2w,
 			Vector& v);
-  
-  friend bool find_prim(const Complex& a, const Convex& b, 
+
+  friend bool find_prim(const Complex& a, const Convex& b,
 			const Transform& a2w, const Transform& b2w,
 			Vector& v, ShapePtr& p);
-  
+
   friend bool find_prim(const Complex& a, const Complex& b,
 			const Transform& a2w, const Transform& b2w,
 			Vector& v, ShapePtr& pa, ShapePtr& pb);
-  
+
   friend  bool common_point(const Complex& a, const Convex& b,
 			    const Transform& a2w, const Transform& b2w,
 			    Vector& v, Point& pa, Point& pb);
-  
+
   friend bool common_point(const Complex& a, const Complex& b,
 			   const Transform& a2w, const Transform& b2w,
 			   Vector& v, Point& pa, Point& pb);
-			
+
 private:
   VertexBase base;
   VertexBase prev_base;

@@ -1,9 +1,9 @@
 /***************************************************************************
 
     file        : standardgame.h
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
-    version     : $Id$                                  
+    copyright   : (C) 2010 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The standard game race engine module
     @version    $Id$
 */
@@ -92,7 +92,7 @@ public:
 
 	virtual GfRace* race();
 	virtual const GfRace* race() const;
-	
+
 	//! Temporary input / modifiable situation, for commanding the race engine from the outside
 	//! Aimed at being removed when dedicated setters are ready.
 	virtual struct RmInfo* inData();
@@ -102,7 +102,7 @@ public:
 
 	// WIP : dedicated situation setters, for commanding the race engine from the outside.
 	virtual void setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd);
-	
+
 	// Accessor to the singleton.
 	static StandardGame& self();
 
@@ -128,11 +128,11 @@ protected:
 	StandardGame(const std::string& strShLibName, void* hShLibHandle);
 	StandardGame(const StandardGame &); // = delete;
 	StandardGame & operator = (const StandardGame &); // = delete;
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
-	
+
 protected:
 
 	// The singleton.
@@ -143,7 +143,7 @@ protected:
 
 	// The track loader.
 	ITrackLoader* _piTrkLoader;
-	
+
 	// The physics engine.
 	IPhysicsEngine* _piPhysEngine;
 
@@ -156,17 +156,17 @@ inline extern IUserInterface& ReUI()
 {
 	return StandardGame::self().userInterface();
 }
-				  
+
 //! Shortcut to the physics engine.
 inline extern IPhysicsEngine& RePhysicsEngine()
 {
 	return StandardGame::self().physicsEngine();
 }
-				  
+
 //! Shortcut to the track loader.
 inline extern ITrackLoader& ReTrackLoader()
 {
 	return StandardGame::self().trackLoader();
 }
-				  
-#endif /* _STANDARDGAME_H_ */ 
+
+#endif /* _STANDARDGAME_H_ */

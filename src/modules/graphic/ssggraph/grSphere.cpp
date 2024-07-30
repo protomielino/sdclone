@@ -53,7 +53,7 @@ ssgBranch *grMakeSphere(
   imax = stacks;
 
   /* build slices as quad strips */
-  for ( i = imin; i < imax; i++ ) 
+  for ( i = imin; i < imax; i++ )
   {
     ssgVertexArray   *vl = new ssgVertexArray();
     ssgNormalArray   *nl = new ssgNormalArray();
@@ -61,7 +61,7 @@ ssgBranch *grMakeSphere(
 
     rho = i * drho;
     s = 0.0;
-    for ( j = 0; j <= slices; j++ ) 
+    for ( j = 0; j <= slices; j++ )
     {
       theta = (j == slices) ? 0.0 : j * dtheta;
       x = (float)(-sin(theta) * sin(rho));
@@ -94,15 +94,15 @@ ssgBranch *grMakeSphere(
       vl->add( vec3 );
     }
 
-    ssgLeaf *slice = 
+    ssgLeaf *slice =
       new ssgVtxTable ( GL_TRIANGLE_STRIP, vl, nl, tl, cl );
 
-    if ( vl->getNum() != nl->getNum() ) 
+    if ( vl->getNum() != nl->getNum() )
     {
       ulSetError(UL_FATAL, "bad sphere1\n");
       exit(-1);
     }
-    if ( vl->getNum() != tl->getNum() ) 
+    if ( vl->getNum() != tl->getNum() )
     {
       ulSetError(UL_FATAL, "bad sphere2\n");
       exit(-1);

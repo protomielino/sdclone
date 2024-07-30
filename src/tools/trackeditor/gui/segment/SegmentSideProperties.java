@@ -118,12 +118,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	public SegmentSideProperties(SegmentEditorDlg parent, Segment segment, SegmentSide side)
 	{
 		this.parent = parent;
-		
+
 		// add new surfaces from Surfaces
 		addDefaultSurfaces(sideSurfaceVector, sideSurfaceItems);
 		addDefaultSurfaces(borderSurfaceVector, borderSurfaceItems);
 		addDefaultSurfaces(barrierSurfaceVector, barrierSurfaceItems);
-		
+
 		setSide(segment, side);
 		initialize();
 	}
@@ -736,7 +736,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 		// update border
 		surface = this.side.getBorderSurface();
-		addSurface(borderSurfaceVector, surface);	
+		addSurface(borderSurfaceVector, surface);
 
 		if (surface != null && !surface.isEmpty())
 			this.getBorderSurfaceComboBox().setSelectedItem(surface);
@@ -796,7 +796,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			getBorderWidthSlider().setValue(side.getBorderWidth());
 			break;
 		}
-		
+
 		// update barrier
 		surface = this.side.getBarrierSurface();
 		addSurface(barrierSurfaceVector, surface);
@@ -805,7 +805,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			this.getBarrierSurfaceComboBox().setSelectedItem(surface);
 		else
 			this.getBarrierSurfaceComboBox().setSelectedIndex(-1);
-		
+
 		this.getBarrierHeightSlider().setValue(side.getBarrierHeight());
 		this.getBarrierWidthSlider().setValue(side.getBarrierWidth());
 
@@ -925,7 +925,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		// fix up bad value (plan and curb are not a valid style)
 		String[] options = { "Set style to none", "Set style to no barrier", "Set style to fence", "Set style to wall", "Ignore" };
 		switch (JOptionPane.showOptionDialog(null, "Found " + side.getName() + getBarrierStyleText(segment, side) + " with" +
-				getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side), 
+				getBarrierWidthText(segment, side) + getBarrierHeightText(segment, side) + getBarrierSurfaceText(segment, side),
 				"Invalid Barrier Style", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[4]))
 		{
 		case 0: // none
@@ -974,7 +974,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			break;
 		}
 	}
-	
+
 	private void checkBarrierWall(Segment segment, SegmentSide side)
 	{
 		// fix up bad value (width should not be 0)
@@ -1100,7 +1100,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBarrierHeight();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBarrierHeight(parent.editorFrame) : segment.getValidLeftBarrierHeight(parent.editorFrame);
 	}
 
@@ -1110,7 +1110,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " height " + side.getBarrierHeight();
 		}
-		
+
 		return " inherited height " + getBarrierHeight(segment, side);
 	}
 
@@ -1120,7 +1120,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBarrierWidth();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBarrierWidth(parent.editorFrame) : segment.getValidLeftBarrierWidth(parent.editorFrame);
 	}
 
@@ -1130,7 +1130,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " width " + side.getBarrierWidth();
 		}
-		
+
 		return " inherited width " + getBarrierWidth(segment, side);
 	}
 
@@ -1140,7 +1140,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBarrierSurface();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBarrierSurface(parent.editorFrame) : segment.getValidLeftBarrierSurface(parent.editorFrame);
 	}
 
@@ -1150,7 +1150,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " surface \"" + side.getBarrierSurface() + "\"";
 		}
-		
+
 		return " inherited surface \"" + getBarrierSurface(segment, side) + "\"";
 	}
 
@@ -1180,7 +1180,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBorderHeight();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBorderHeight(parent.editorFrame) : segment.getValidLeftBorderHeight(parent.editorFrame);
 	}
 
@@ -1190,7 +1190,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " height " + side.getBorderHeight();
 		}
-		
+
 		return " inherited height " + getBorderHeight(segment, side);
 	}
 
@@ -1200,7 +1200,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBorderWidth();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBorderWidth(parent.editorFrame) : segment.getValidLeftBorderWidth(parent.editorFrame);
 	}
 
@@ -1210,7 +1210,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " width " + side.getBorderWidth();
 		}
-		
+
 		return " inherited width " + getBorderWidth(segment, side);
 	}
 
@@ -1220,7 +1220,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return side.getBorderSurface();
 		}
-		
+
 		return side.isRight() ? segment.getValidRightBorderSurface(parent.editorFrame) : segment.getValidLeftBorderSurface(parent.editorFrame);
 	}
 
@@ -1230,7 +1230,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			return " surface \"" + side.getBorderSurface() + "\"";
 		}
-		
+
 		return " inherited surface \"" + getBorderSurface(segment, side) + "\"";
 	}
 
@@ -1287,5 +1287,5 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 	public void checkBoxChanged(SegmentSlider slider)
 	{
-	}	
+	}
 } //  @jve:decl-index=0:visual-constraint="42,-30"

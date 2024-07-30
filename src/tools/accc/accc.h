@@ -17,7 +17,7 @@
  ***************************************************************************/
 
 /** @file
- 
+
  @author Christophe Guionneau
  @version    $Id$
  */
@@ -248,9 +248,9 @@ struct ob_t
     bool hasTexture1() const { return !texture1.empty(); }
     bool hasTexture2() const { return !texture2.empty(); }
     bool hasTexture3() const { return !texture3.empty(); }
-    bool hasMultiTexture() const 
+    bool hasMultiTexture() const
     {
-        return hasTexture1() || hasTexture2() || hasTexture3(); 
+        return hasTexture1() || hasTexture2() || hasTexture3();
     }
     bool hasNoSmooth() const { return data.find("nosmooth") != std::string::npos; }
 
@@ -352,11 +352,11 @@ struct mat_t
 
     bool operator == (const mat_t & rhs) const
     {
-        return rgb == rhs.rgb && 
+        return rgb == rhs.rgb &&
                amb == rhs.amb &&
                emis == rhs.emis &&
                spec == rhs.spec &&
-               shi == rhs.shi && 
+               shi == rhs.shi &&
                trans == rhs.trans;
     }
     bool operator != (const mat_t & rhs) const
@@ -427,5 +427,5 @@ int printOb(FILE *ofile, ob_t &object);
 
 void smoothTriNorm(std::list<ob_t> &objects);
 
-#endif /* _ACCC_H_ */ 
+#endif /* _ACCC_H_ */
 

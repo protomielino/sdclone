@@ -16,7 +16,7 @@ public class UndoAddObject implements UndoInterface
 		undo = object;
 		redo = null;
 	}
-	
+
 	public void undo()
 	{
 		index = objectMap.getObjectIndex(undo);
@@ -24,7 +24,7 @@ public class UndoAddObject implements UndoInterface
 		redo = undo;
 		undo = null;
 	}
-	
+
 	public void redo()
 	{
 		objectMap.addObjectAt(redo, index);

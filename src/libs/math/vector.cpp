@@ -35,7 +35,7 @@ void sgClosestPointToLine( sgVec3 p1, const sgVec3 p, const sgVec3 p0,
 			   const sgVec3 d ) {
 
     sgVec3 u, u1;
-    
+
     // u = p - p0
     sgSubVec3(u, p, p0);
 
@@ -55,7 +55,7 @@ void sgdClosestPointToLine( sgdVec3 p1, const sgdVec3 p, const sgdVec3 p0,
 			    const sgdVec3 d ) {
 
     sgdVec3 u, u1;
-    
+
     // u = p - p0
     sgdSubVec3(u, p, p0);
 
@@ -79,7 +79,7 @@ double sgClosestPointToLineDistSquared( const sgVec3 p, const sgVec3 p0,
 					const sgVec3 d ) {
 
     sgVec3 u, u1, v;
-    
+
     // u = p - p0
     sgSubVec3(u, p, p0);
 
@@ -101,7 +101,7 @@ double sgdClosestPointToLineDistSquared( const sgdVec3 p, const sgdVec3 p0,
 					 const sgdVec3 d ) {
 
     sgdVec3 u, u1, v;
-    
+
     // u = p - p0
     sgdSubVec3(u, p, p0);
 

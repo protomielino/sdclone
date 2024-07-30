@@ -4,7 +4,7 @@
 // A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // Lineare Regression
-// 
+//
 // File			:	unitlinreg.cpp
 // Created		: 2007.11.17
 // Last	changed	: 2014.11.29
@@ -12,7 +12,7 @@
 // eMail		:	wdbee@users.sourceforge.net
 // Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// Teile diese Unit	basieren auf 
+// Teile diese Unit	basieren auf
 //
 // dem Roboter mouse_2006
 //	  Copyright:	(C)	2006 Tim Foden
@@ -103,9 +103,9 @@ double TLinearRegression::CalcY(double X) const
 
   double A = (oSumXY + Xbar	* oSumY	+ oSumX	* Ybar + Xbar *	Ybar) /
 				(oSumXX	+ Xbar * Xbar +	2 *	oSumX *	Xbar);
-				
+
   double B = Ybar -	A *	Xbar;
-  
+
   return A * X + B;
 }
 //==========================================================================*
@@ -120,7 +120,7 @@ void TLinearRegression::CalcLine(TVec2d& Point,	TVec2d&	V) const
   // a = x - p.x, b	= y	- p.y
   double SumAA = oSumXX	- 2	* Point.x *	oSumX +	oCount * Point.x * Point.x;
   double SumBB = oSumYY	- 2	* Point.y *	oSumY +	oCount * Point.y * Point.y;
-  double SumAB = oSumXY	
+  double SumAB = oSumXY
 	- Point.y * oSumX - Point.x * oSumY + oCount *	Point.x	* Point.y;
 
   double Angle = atan2(2 * SumAB, SumAA	- SumBB) / 2;

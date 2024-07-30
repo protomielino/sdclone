@@ -52,7 +52,7 @@ typedef struct
     tdble	sa;		/* slip angle */
     tdble	sx;		/* longitudinal slip value */
     tdble	steer;
-    
+
     /* static */
     tPosd	staticPos;	/* pos relative to the GC (z is suspension travel at rest) */
 				/* and angles are camber (ax), caster (ay) and toe (az) */
@@ -82,9 +82,9 @@ typedef struct
     tdble	preFn, preFt;
 } tWheel;
 
-    
 
-#endif /* _WHEEL_H__ */ 
+
+#endif /* _WHEEL_H__ */
 
 
 

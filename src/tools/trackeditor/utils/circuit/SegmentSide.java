@@ -25,7 +25,7 @@ import java.util.Vector;
 
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -56,19 +56,19 @@ public class SegmentSide implements Cloneable
 	public static final String	DEFAULT_BORDER_CURB_RIGHT_SURFACE	= "curb-5cm-r";
 	public static final String	DEFAULT_BORDER_WALL_SURFACE			= "concrete";
 	public static final String	DEFAULT_BORDER_STYLE				= "curb";
-	
+
 	public static final String	DEFAULT_PIT_ENTRY_SURFACE			= "asphalt";
 	public static final String	DEFAULT_PIT_ENTRY_BORDER_STYLE		= null;
 	public static final String	DEFAULT_PIT_ENTRY_BORDER_SURFACE	= null;
 	public static final double	DEFAULT_PIT_ENTRY_BORDER_HEIGHT		= 0.0;
 	public static final double	DEFAULT_PIT_ENTRY_BORDER_WIDTH		= 0.0;
-	
+
 	public static final String	DEFAULT_PIT_PITS_SURFACE			= "asphalt-pits";
 	public static final double	DEFAULT_PIT_PITS_BORDER_WIDTH		= 0.5;
 	public static final double	DEFAULT_PIT_PITS_BORDER_HEIGHT		= 1.0;
 	public static final String	DEFAULT_PIT_PITS_BORDER_SURFACE		= "wall";
 	public static final String	DEFAULT_PIT_PITS_BORDER_STYLE		= "wall";
-	
+
 	public static final String	DEFAULT_PIT_EXIT_SURFACE			= "asphalt";
 	public static final String	DEFAULT_PIT_EXIT_BORDER_STYLE		= null;
 	public static final String	DEFAULT_PIT_EXIT_BORDER_SURFACE		= null;
@@ -126,7 +126,7 @@ public class SegmentSide implements Cloneable
 
 	private boolean				isRight;
 	/**
-	 *  
+	 *
 	 */
 	public SegmentSide(boolean isRight)
 	{
@@ -228,7 +228,7 @@ public class SegmentSide implements Cloneable
 		checkHasBarrier();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void barrierHeightChanged()
 	{
@@ -261,7 +261,7 @@ public class SegmentSide implements Cloneable
 		checkHasBarrier();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void barrierStyleChanged()
 	{
@@ -294,7 +294,7 @@ public class SegmentSide implements Cloneable
 		checkHasBarrier();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void barrierSurfaceChanged()
 	{
@@ -327,7 +327,7 @@ public class SegmentSide implements Cloneable
 		checkHasBarrier();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void barrierWidthChanged()
 	{
@@ -376,7 +376,7 @@ public class SegmentSide implements Cloneable
 		checkHasBorder();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void borderHeightChanged()
 	{
@@ -409,7 +409,7 @@ public class SegmentSide implements Cloneable
 		checkHasBorder();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void borderStyleChanged()
 	{
@@ -442,7 +442,7 @@ public class SegmentSide implements Cloneable
 		checkHasBorder();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void borderSurfaceChanged()
 	{
@@ -475,7 +475,7 @@ public class SegmentSide implements Cloneable
 		checkHasBorder();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void borderWidthChanged()
 	{
@@ -524,7 +524,7 @@ public class SegmentSide implements Cloneable
 		checkHasSide();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void sideEndWidthChanged()
 	{
@@ -557,7 +557,7 @@ public class SegmentSide implements Cloneable
 		checkHasSide();
 	}
 	/**
-	 *  
+	 *
 	 */
 	private void sideStartWidthChanged()
 	{
@@ -591,7 +591,7 @@ public class SegmentSide implements Cloneable
 	}
 
 	/**
-	 *  
+	 *
 	 */
 	private void sideSurfaceChanged()
 	{
@@ -784,7 +784,7 @@ public class SegmentSide implements Cloneable
 		//
 		//			public void actionPerformed(ActionEvent arg0)
 		//			{
-		//				
+		//
 		//			}
 		//				});
 	}
@@ -908,7 +908,7 @@ public class SegmentSide implements Cloneable
 
 		});
 	}
-	
+
 	protected Object clone()
 	{
 		SegmentSide s = null;
@@ -932,7 +932,7 @@ public class SegmentSide implements Cloneable
 			s.hasBorder = this.hasBorder;
 			s.hasBarrier = this.hasBarrier;
 			s.isRight = this.isRight;
-			
+
 		} catch (CloneNotSupportedException e)
 		{
 			// TODO Auto-generated catch block

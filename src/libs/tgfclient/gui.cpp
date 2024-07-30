@@ -1,10 +1,10 @@
 /***************************************************************************
-                               gui.cpp -- gui                   
-                             -------------------                                         
+                               gui.cpp -- gui
+                             -------------------
     created              : Fri Aug 13 22:01:33 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -81,7 +81,7 @@ gfuiInitColor(void)
 {
 	static const char *rgba[4] =
 		{ GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA };
-	
+
 	static const char *clr[GFUI_COLORNB] =
 	{
 		GFSCR_ELT_BGCOLOR,
@@ -106,11 +106,11 @@ gfuiInitColor(void)
 	}
 
 	GfParmReleaseHandle(hdle);
-	
+
 	// Remove the X11/Windows cursor if required.
 	if (!GfuiMouseHW)
 		SDL_ShowCursor(SDL_DISABLE);
-	
+
 	GfuiMouseVisible = 1;
 }
 
@@ -155,7 +155,7 @@ gfuiShutdown(void)
 #endif
 }
 
-GfuiColor 
+GfuiColor
 GfuiColor::build(const float* afColor)
 {
 	 if (afColor)
@@ -175,12 +175,12 @@ GfuiColor
 GfuiColor::build(float r, float g, float b, float a)
 {
 	GfuiColor c;
-	
+
 	c.red = r;
 	c.green = g;
 	c.blue = b;
 	c.alpha = a;
-	
+
 	return c;
 }
 
@@ -199,11 +199,11 @@ GfuiColor::build(const char* pszARGB)
 		{
 			// Blue channel.
 			color.blue = (uColor & 0xFF) / 255.0;
-		
+
 			// Green channel.
 			uColor >>= 8;
 			color.green = (uColor & 0xFF) / 255.0;
-		
+
 			// Red channel.
 			uColor >>= 8;
 			color.red = (uColor & 0xFF) / 255.0;
@@ -225,7 +225,7 @@ GfuiColor::build(const char* pszARGB)
 
 	// GfLogDebug("GfuiColor::build(%s) = r=%f, g=%f, b=%f, a=%f\n",
 	// 		   pszARGB ? pszARGB : "<null>", color.red, color.green, color.blue, color.alpha);
-	
+
 	return color;
 }
 
@@ -247,7 +247,7 @@ void
 GfuiIdle(void)
 {
 	double curtime = GfTimeClock();
-	
+
 	if ((curtime - LastTimeClick) > DelayRepeat) {
 		DelayRepeat = REPEAT2;
 		LastTimeClick = curtime;
@@ -277,7 +277,7 @@ void
 GfuiRedraw(void)
 {
 	tGfuiObject	*curObj;
-	
+
 	glUseProgram(0);
 	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_DEPTH_TEST);
@@ -287,20 +287,20 @@ GfuiRedraw(void)
 	glDisable(GL_ALPHA_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	GfScrGetSize(&ScrW, &ScrH, &ViewW, &ViewH);
-	
+
 	glViewport((ScrW-ViewW) / 2, (ScrH-ViewH) / 2, ViewW, ViewH);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, GfuiScreen->width, 0, GfuiScreen->height);
-	glMatrixMode(GL_MODELVIEW);  
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glMatrixMode(GL_TEXTURE);  
+	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-	
-	
+
+
 	if (GfuiScreen->bgColor.alpha != 0.0) {
 		glClearColor(GfuiScreen->bgColor.red,
 			     GfuiScreen->bgColor.green,
@@ -318,7 +318,7 @@ GfuiRedraw(void)
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
 
-		glColor3f(gfuiColors[GFUI_BASECOLORBGIMAGE][0], 
+		glColor3f(gfuiColors[GFUI_BASECOLORBGIMAGE][0],
 				  gfuiColors[GFUI_BASECOLORBGIMAGE][1],
 				  gfuiColors[GFUI_BASECOLORBGIMAGE][2]);
 
@@ -353,7 +353,7 @@ GfuiRedraw(void)
 			tx1 += tdx;
 			tx2 -= tdx;
 		} else {
-			// If aspect ratio of view is larger than image's one, 
+			// If aspect ratio of view is larger than image's one,
 			// "cut off" top and bottom.
 			const GLfloat tdy = GfuiScreen->bgHeight * rfactor / bgPow2Height / 2.0f;
 			ty2 = (ty1+1)/2 + tdy;
@@ -371,24 +371,24 @@ GfuiRedraw(void)
 
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
-		
+
 
 		glEnable(GL_BLEND);
 	}
-	
+
 	// Display other screen objects
 	curObj = GfuiScreen->objects;
-	if (curObj) 
+	if (curObj)
 	{
-		do 
+		do
 		{
 			curObj = curObj->next;
 			GfuiDraw(curObj);
 		} while (curObj != GfuiScreen->objects);
 	}
-	
+
 	// Display mouse cursor if needed/specified
-	if (!GfuiMouseHW && GfuiMouseVisible && GfuiScreen->mouseAllowed) 
+	if (!GfuiMouseHW && GfuiMouseVisible && GfuiScreen->mouseAllowed)
 		GfuiDrawCursor();
 
 	glDisable(GL_BLEND);
@@ -454,15 +454,15 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 {
 	tGfuiKey	*curKey;
 	tGfuiObject	*obj;
-	
+
 	/* User-preempted key */
-	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_DOWN)) 
+	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_DOWN))
 		return;
-	
+
 	/* Now look at the user's defined keys */
 	if (GfuiScreen->userKeys) {
 		curKey = GfuiScreen->userKeys;
-		do 
+		do
 		{
 			curKey = curKey->next;
 			// Ignore Shift modifier when printable unicode,
@@ -482,9 +482,9 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 
 	// Edit-box management (TODO: Should at least partly have priority on user's keys).
 	obj = GfuiScreen->hasFocus;
-	if (obj) 
+	if (obj)
 	{
-		switch (obj->widget) 
+		switch (obj->widget)
 		{
 			case GFUI_EDITBOX:
 				gfuiEditboxKey(obj, key, modifier);
@@ -499,22 +499,22 @@ static void
 gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 {
 	tGfuiKey	*curKey;
-	
+
 	/* User-preempted key */
-	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_UP)) 
+	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_UP))
 		return;
-	
+
 	/* Now look at the user's defined keys */
-	if (GfuiScreen->userKeys) 
+	if (GfuiScreen->userKeys)
 	{
 		curKey = GfuiScreen->userKeys;
-		do 
+		do
 		{
 			curKey = curKey->next;
 			if (curKey->key == key
 				&& (curKey->modifier == modifier
 					|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
-						&& key >= ' ' && key <= 'z'))) 
+						&& key >= ' ' && key <= 'z')))
 			{
 				if (curKey->onRelease)
 					curKey->onRelease(curKey->userData);
@@ -522,7 +522,7 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 			}
 		} while (curKey != GfuiScreen->userKeys);
 	}
-	
+
 	GfuiApp().eventLoop().postRedisplay();
 }
 
@@ -562,7 +562,7 @@ gfuiMouseButton(int button, int state, int x, int y)
 		GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 
 		GfuiMouse.button[button-1] = (state == SDL_PRESSED); /* SDL 1st button has index 1 */
-	
+
 		DelayRepeat = REPEAT1;
 		LastTimeClick = GfTimeClock();
 
@@ -571,8 +571,8 @@ gfuiMouseButton(int button, int state, int x, int y)
 			GfuiScreen->mouse = 1;
 			gfuiUpdateFocus();
 			gfuiMouseAction((void*)0);
-		} 
-		else 
+		}
+		else
 		{
 			GfuiScreen->mouse = 0;
 			gfuiUpdateFocus();
@@ -623,7 +623,7 @@ GfuiScreenIsActive(void *screen)
 
 /** Get the screen.
     @ingroup	gui
-    @param	
+    @param
     @return	screen handle.
  */
 void*
@@ -640,13 +640,13 @@ GfuiGetScreen(void)
 void
 GfuiScreenActivate(void *screen)
 {
-	if (GfuiScreen && GfuiScreen->onDeactivate) 
+	if (GfuiScreen && GfuiScreen->onDeactivate)
 		GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
-	
+
 	GfuiScreen = (tGfuiScreen*)screen;
 
 	playMusic(GfuiScreen->musicFilename);
-	
+
   	GfuiApp().eventLoop().setKeyboardDownCB(gfuiKeyboardDown);
 	GfuiApp().eventLoop().setKeyboardUpCB(gfuiKeyboardUp);
    	GfuiApp().eventLoop().setMouseButtonCB(gfuiMouseButton);
@@ -656,23 +656,23 @@ GfuiScreenActivate(void *screen)
 	GfuiApp().eventLoop().setRecomputeCB(0);
 	GfuiApp().eventLoop().setRecomputeCB(0, 0);
 
-	if (GfuiScreen->onlyCallback == 0) 
+	if (GfuiScreen->onlyCallback == 0)
 	{
-		if (GfuiScreen->hasFocus == NULL) 
+		if (GfuiScreen->hasFocus == NULL)
 		{
 			gfuiSelectNext(NULL);
 		}
 		GfuiApp().eventLoop().setRedisplayCB(GfuiDisplay);
-	} 
-	else 
+	}
+	else
 	{
 		GfuiApp().eventLoop().setRedisplayCB(GfuiDisplayNothing);
 	}
-	
+
 	if (GfuiScreen->onActivate)
 		GfuiScreen->onActivate(GfuiScreen->userActData);
-	
-	if (GfuiScreen->onlyCallback == 0) 
+
+	if (GfuiScreen->onlyCallback == 0)
 	{
 		GfuiDisplay();
 		GfuiApp().eventLoop().postRedisplay();
@@ -690,7 +690,7 @@ GfuiScreenReplace(void *screen)
 {
 	tGfuiScreen	*oldScreen = GfuiScreen;
 
-	if (oldScreen) 
+	if (oldScreen)
 //		GfuiScreenRelease(oldScreen);
 	GfuiScreenActivate(screen);
 }
@@ -703,9 +703,9 @@ GfuiScreenDeactivate(void)
 {
 	if (GfuiScreen->onDeactivate)
 		GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
-	
+
 	GfuiScreen = (tGfuiScreen*)NULL;
-	
+
   	GfuiApp().eventLoop().setKeyboardDownCB(0);
  	GfuiApp().eventLoop().setKeyboardUpCB(0);
 	GfuiApp().eventLoop().setMouseButtonCB(0);
@@ -730,28 +730,28 @@ GfuiScreenDeactivate(void)
  */
 void *
 GfuiScreenCreate(float *bgColor,
-				 void *userDataOnActivate, tfuiCallback onActivate, 
+				 void *userDataOnActivate, tfuiCallback onActivate,
 				 void *userDataOnDeactivate, tfuiCallback onDeactivate,
 				 int mouseAllowed)
 {
 	tGfuiScreen	*screen;
-	
+
 	screen = (tGfuiScreen*)calloc(1, sizeof(tGfuiScreen));
-	
+
 	screen->width = 640.0;
 	screen->height = 480.0;
-	
+
 	screen->bgColor = bgColor ? GfuiColor::build(bgColor) : GfuiColor::build(GFUI_BGCOLOR);
 
 	screen->onActivate = onActivate;
 	screen->userActData = userDataOnActivate;
 	screen->onDeactivate = onDeactivate;
 	screen->userDeactData = userDataOnDeactivate;
-	
+
 	screen->mouseAllowed = mouseAllowed;
-	
+
 	screen->keyAutoRepeat = 1; // Default key auto-repeat on.
- 
+
 	RegisterScreens(screen);
 
 	return (void*)screen;
@@ -817,14 +817,14 @@ void *
 GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate)
 {
 	tGfuiScreen	*screen;
-	
+
 	screen = (tGfuiScreen*)calloc(1, sizeof(tGfuiScreen));
 	screen->onActivate = onActivate;
 	screen->userActData = userDataOnActivate;
 	screen->onlyCallback = 1;
 
 	RegisterScreens(screen);
-	
+
 	return (void*)screen;
 }
 
@@ -844,9 +844,9 @@ GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction)
 {
 	if (!scr)
 		return;
-	
+
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	
+
 	screen->onKeyAction = onKeyAction;
 }
 
@@ -898,7 +898,7 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 {
 	if (!scr)
 		return;
-	
+
 	// Allocate a key entry for the key list
 	tGfuiKey* curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
 	curKey->key = key;
@@ -1032,7 +1032,7 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 
 	//GfLogDebug("GfuiAddKey(k=%d, m=%d, d=%s) : mod='%s', key='%s', UFN='%s'\n",
 	//		   key, modifier, descr, pszModString, pszKeyString, curKey->name);
-	
+
 	// Add the new key entry in the key list if not already in,
 	// or else replace the previous definition.
 	tGfuiScreen* screen = (tGfuiScreen*)scr;
@@ -1067,7 +1067,7 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	}
 }
 
-/** Remove a Keyboard shortcut from the screen 
+/** Remove a Keyboard shortcut from the screen
 	 @ingroup	gui
 	 @param	scr		Target screen
 	 @param	key		Key code : the ASCII code when possible (for 'a', '_', '[' ...), or else the tgfclient::GFUIK_* value for special keys) ; Always in [0, GFUIK_MAX]
@@ -1075,13 +1075,13 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	 @param	descr		Description for help screen
 	 @return	true for success false if key not found
  */
- bool 
+ bool
 GfuiRemoveKey(void *scr, int key, const char *descr)
  {
 	 return GfuiRemoveKey(scr, key, GFUIM_NONE, descr);
  }
 
-bool 
+bool
 GfuiRemoveKey(void *scr, int key, int modifier, const char *descr)
 {
 	bool bFound = false;
@@ -1109,7 +1109,7 @@ GfuiRemoveKey(void *scr, int key, int modifier, const char *descr)
 
 				// unlink the removed key
 				prevKey->next = checkKey->next;
-				
+
 				// First key in list
 				if (prevKey == screen->userKeys)
 				{
@@ -1191,7 +1191,7 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	int pow2Width, pow2Height;
-	
+
 	if (screen->bgImage) {
 		GfTexFreeTexture(screen->bgImage);
 	}
@@ -1233,7 +1233,7 @@ GfuiScreenAddMusic(void *scr, const char *filename)
     @param	h		Height (pixels)
 */
 
-void 
+void
 GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 {
 	// No need to resize, already done when setting the video mode.
@@ -1254,17 +1254,17 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 }
 
 /** Swap display buffers (double buffering)
-    
+
     @ingroup	gui
 */
 
-void 
+void
 GfuiSwapBuffers(void)
 {
 	SDL_GL_SwapWindow(GfuiWindow);
 }
 
-void 
+void
 GfuiToggleMenuSound(void*)
 {
 	static bool muteToggle = true;
@@ -1288,7 +1288,7 @@ GfuiToggleMenuSound(void*)
 	muteToggle = !muteToggle;
 }
 
-void 
+void
 GfuiMenuVolumeUp(void*)
 {
 	float musicVol = getMusicVolume();
@@ -1300,7 +1300,7 @@ GfuiMenuVolumeUp(void*)
 	setMenuSfxVolume(sfxVol);
 }
 
-void 
+void
 GfuiMenuVolumeDown(void*)
 {
 	float musicVol = getMusicVolume();

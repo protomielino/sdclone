@@ -3,7 +3,7 @@
     file        : raceupdate.cpp
     created     : Sat Nov 23 09:05:23 CET 2002
     copyright   : (C) 2002 by Eric Espie
-    email       : eric.espie@torcs.org 
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -47,7 +47,7 @@ static ReSituationUpdater* situationUpdater = 0;
 class reMainUpdater
 {
 public:
-	
+
 	//! Constructor.
 	reMainUpdater(ReSituationUpdater* pSituUpdater);
 
@@ -85,7 +85,7 @@ int reMainUpdater::operator()(void)
 		GfSchedBeginEvent("raceupdate", "situCopy");
 		_pReInfo = situationUpdater->getPreviousStep();
 		GfSchedEndEvent("raceupdate", "situCopy");
-		
+
 		// Compute the situation for the current step (mono-threaded race engine)
 		// or do nothing (dual-threaded race engine : the updater thread does the job itself).
 		_pSituationUpdater->computeCurrentStep();
@@ -154,7 +154,7 @@ void ReShutdownUpdaters()
 	// Destroy the situation updater.
 	delete situationUpdater;
 	situationUpdater = 0;
-	
+
 	// Destroy the main updater.
 	delete mainUpdater;
 	mainUpdater = 0;

@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 /**
  * @author Charalampos Alexopoulos
- * 
+ *
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -45,7 +45,7 @@ public class GroupButton extends JPanel
 	private SegmentEditorDlg	parent;
 
 	/**
-	 *  
+	 *
 	 */
 	public GroupButton()
 	{
@@ -53,7 +53,7 @@ public class GroupButton extends JPanel
 	}
 
 	/**
-	 *  
+	 *
 	 */
 	private void initialize()
 	{

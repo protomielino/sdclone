@@ -2,8 +2,8 @@
 
     file        : grcarlight.h
     created     : Sun Oct 26 15:15:11 CET 2003
-    copyright   : (C) 2003 by Christophe Guionneau                      
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Christophe Guionneau
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef _GRCARLIGHT_H_
 #define _GRCARLIGHT_H_
 
@@ -32,7 +32,7 @@ protected:
   float size;
   sgVec3 pos;
   double factor;
-    
+
   virtual void copy_from ( ssgVtxTableCarlight *src, int clone_flags ) ;
 
 public:
@@ -47,9 +47,9 @@ public:
   sgVec3 * getPos() { return(&pos);}
   void setFactor(double f){factor=f;}
   void draw_geometry();
-  
-  virtual void drawHighlight ( sgVec4 colour ){ssgVtxTable::drawHighlight(colour);} 
-  virtual void drawHighlight ( sgVec4 colour, int i ){ssgVtxTable::drawHighlight(colour,i);} 
+
+  virtual void drawHighlight ( sgVec4 colour ){ssgVtxTable::drawHighlight(colour);}
+  virtual void drawHighlight ( sgVec4 colour, int i ){ssgVtxTable::drawHighlight(colour,i);}
 
   virtual void pick ( int baseName )  { ssgVtxTable::pick(baseName);}
   virtual void transform ( const sgMat4 m )  { ssgVtxTable::transform(m);}
@@ -77,7 +77,7 @@ public:
 
 #define MAX_NUMBER_LIGHT 4+4+4+2
 /*
-   4 front 
+   4 front
    4 rear
    4 break
    2 reverse

@@ -19,10 +19,10 @@
 
 #include "celestialbody.h"
 #include "star.h"
- 
+
 void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
 {
-  	double eccAnom, v, ecl, actTime, 
+  	double eccAnom, v, ecl, actTime,
     	xv, yv, xh, yh, zh, xg, yg, zg, xe, ye, ze;
 
   	updateOrbElements(mjd);
@@ -30,13 +30,13 @@ void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
 
   	// calcualate the angle bewteen ecliptic and equatorial coordinate system
   	ecl = SGD_DEGREES_TO_RADIANS * (23.4393 - 3.563E-7 *actTime);
-  
+
   	eccAnom = sdCalcEccAnom(M, e);  //calculate the eccentric anomaly
   	xv = a * (cos(eccAnom) - e);
   	yv = a * (sqrt (1.0 - e*e) * sin(eccAnom));
   	v = atan2(yv, xv);           // the planet's true anomaly
   	r = sqrt (xv*xv + yv*yv);    // the planet's distance
-  
+
   	// calculate the planet's position in 3D space
   	xh = r * (cos(N) * cos(v+w) - sin(N) * sin(v+w) * cos(i));
   	yh = r * (sin(N) * cos(v+w) + cos(N) * sin(v+w) * cos(i));
@@ -56,7 +56,7 @@ void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
   	rightAscension = atan2(ye, xe);
   	declination = atan2(ze, sqrt(xe*xe + ye*ye));
 
-  	//calculate some variables specific to calculating the magnitude 
+  	//calculate some variables specific to calculating the magnitude
   	//of the planet
   	R = sqrt (xg*xg + yg*yg + zg*zg);
   	s = ourSun->getDistance();
@@ -66,10 +66,10 @@ void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
   	// checking.
 
   	double tmp = (r*r + R*R - s*s) / (2*r*R);
-  	if ( tmp > 1.0) 
-  	{ 
+  	if ( tmp > 1.0)
+  	{
       		tmp = 1.0;
-  	} else if ( tmp < -1.0) 
+  	} else if ( tmp < -1.0)
   	{
       		tmp = -1.0;
   	}
@@ -79,11 +79,11 @@ void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
 
 double ePhCelestialBody::sdCalcEccAnom(double M, double e)
 {
-  	double 
+  	double
     	eccAnom, E0, E1, diff;
-  
+
   	eccAnom = M + e * sin(M) * (1.0 + e * cos (M));
-  	// iterate to achieve a greater precision for larger eccentricities 
+  	// iterate to achieve a greater precision for larger eccentricities
   	if (e > 0.05)
     	{
       		E0 = eccAnom;
@@ -96,7 +96,7 @@ double ePhCelestialBody::sdCalcEccAnom(double M, double e)
       		while (diff > (SGD_DEGREES_TO_RADIANS * 0.001));
       			return E0;
     	}
-    	
+
   	return eccAnom;
 }
 

@@ -30,7 +30,7 @@ public class UndoEditAllObjects implements UndoInterface
 	public void redo()
 	{
 		for (int i = 0; i < clone.size(); i++)
-		{			
+		{
 			ObjectMapObject objectMapObject = clone.get(i);
 
 			int index = objectMapObject.objectMap.getObjectIndex(objectMapObject.object);

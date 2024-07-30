@@ -2,7 +2,7 @@
 // globaldefinitions.h
 //--------------------------------------------------------------------------*
 // Global definitions used by all other files of the robot
-// 
+//
 // File         : globaldefinitions.h
 // Created      : 2011.06.19
 // Last changed : 2011.09.26
@@ -39,8 +39,8 @@
 //--------------------------------------------------------------------------*
 static const int MAX_NBBOTS = 100;                    // Max nbr of drivers per robot
 const int cMAX_OPP = 120;                     // Max nbr of drivers per race
-const int RTYPE_FRAMEWORK = 100;              // Robot type 
-const float HALFFRICTION = (float) sqrt(0.5); // 1=Sqrt(2*HALFFRICTION**2) 
+const int RTYPE_FRAMEWORK = 100;              // Robot type
+const float HALFFRICTION = (float) sqrt(0.5); // 1=Sqrt(2*HALFFRICTION**2)
 const float DELTA_OFFSET = 0.0001f;			  // Scale offset change
 const float MAX_SCALE_FRICTION = 0.80f;		  // Limit for friction calc.
 const float SLOWSPEED = 5.0f;				  // Define slow speed in m/s
@@ -185,7 +185,7 @@ typedef tTrackSeg* PTrackSeg;                      // SD segment of track
 #define PRV_FIXEDOFFSET      "fixed offset"       // Fixed offset for tests
 #define PRV_FORCEPITSTOP     "force pit stop"     // Force allways pit stops
 #define PRV_FUELPER100KM     "fuelper100km"       // Fuel consumpt. at 100 km
-#define PRV_MAX_FUEL         "max fuel"           // Capacity 
+#define PRV_MAX_FUEL         "max fuel"           // Capacity
 #define PRV_QUALIFICATION    "qualifying"         // Practice as qualifying
 #define PRV_RESERVE          "reserve"            // Reserve in m
 #define PRV_START_FUEL       "start fuel"         // Fuel at start of race
@@ -203,7 +203,7 @@ typedef tTrackSeg* PTrackSeg;                      // SD segment of track
 const int OPP_LEFT		 = 0x000001; // You are at my left side
 const int OPP_RIGHT		 = 0x000002; // or my right side
 const int OPP_FRONT		 = 0x000004; // in front of me
-const int OPP_REAR		 = 0x000008; // behind me 
+const int OPP_REAR		 = 0x000008; // behind me
 
 const int OPP_AHEAD		 = 0x000010; // I see you in front of me
 const int OPP_SIDE		 = 0x000020; // or looking to a side

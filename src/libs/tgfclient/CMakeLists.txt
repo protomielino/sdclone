@@ -17,10 +17,10 @@ ENDIF(OPTION_WEBSERVER)
 SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
             guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
             tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
-            guilabel.cpp guiobject.cpp guiscrollist.cpp 
-            guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
-            guiscreen.cpp guieventloop.cpp guiapplication.cpp 
-            musicplayer.cpp musicplayer.h 
+            guilabel.cpp guiobject.cpp guiscrollist.cpp
+            guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp
+            guiscreen.cpp guieventloop.cpp guiapplication.cpp
+            musicplayer.cpp musicplayer.h
             sdl2musicplayer.cpp sdl2musicplayer.h
             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h
             forcefeedback.cpp forcefeedback.h
@@ -41,19 +41,19 @@ IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTGFCLIENT_DLL)
 ENDIF(WIN32)
-    
+
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG 
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG
         "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmt.lib")
-    SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE 
+    SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE
         "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
 # Note: Other sources needed for having them available in IDEs.
 SD_ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_PLIB_LIBRARY(tgfclient ul sg)

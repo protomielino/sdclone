@@ -47,9 +47,9 @@ PartnerList partnerList;
 
 void RespTable::cleanObject(DtObjectRef obj) {
   resetSingle(obj);
-  for (PairList::const_iterator i = pairList.begin(); 
-       i != pairList.end(); ++i) { 
-    if ((*i).first.first == obj) { 
+  for (PairList::const_iterator i = pairList.begin();
+       i != pairList.end(); ++i) {
+    if ((*i).first.first == obj) {
       partnerList.push_back((*i).first.second);
     }
     else if ((*i).first.second == obj) {

@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	The Gaming Framework API, with C++-specific extensions.
     @version	$Id$
 */
@@ -82,12 +82,12 @@ class TGF_API GfModule
 	{
 		return dynamic_cast<Interface*>(this);
 	}
-	
+
  public: // Services for the module implementation.
 
 	//! Register a new module instance (aimed at being called by the GfModuleOpen function).
 	static bool register_(GfModule* pModule);
-	
+
 	//! Constructor.
 	GfModule(const std::string& strShLibName, void* hShLibHandle);
 
@@ -96,15 +96,15 @@ class TGF_API GfModule
 
 	//! Get the asssociated shared library path-name.
 	const std::string& getSharedLibName() const;
-		
+
 	//! Get the asssociated shared library handle.
 	void* getSharedLibHandle() const;
-		
+
  protected:
 
 	//! Unregister a module instance.
 	static bool unregister(GfModule* pModule);
-	
+
  protected:
 
 	//! The table of loaded modules and their associated shared library (key = file name).
@@ -148,7 +148,7 @@ class TGF_API GfEventLoop
 	//! Set a one-shot timer callback function with given delay.
 	void setTimerCB(unsigned int millis, void (*func)(int value));
 
-	//! Request the event loop to terminate on next loop. 
+	//! Request the event loop to terminate on next loop.
 	void postQuit();
 
   protected:
@@ -182,7 +182,7 @@ class TGF_API GfApplication
 
 	//! Accessor to the singleton.
 	static GfApplication& self();
-	
+
 	//! Constructor.
     GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc);
 
@@ -191,10 +191,10 @@ class TGF_API GfApplication
 
 	//! Name accessor.
 	const std::string& name() const;
-	
+
 	//! Version accessor.
 	const std::string& version() const;
-	
+
 	//! Description accessor.
 	const std::string& description() const;
 
@@ -211,7 +211,7 @@ class TGF_API GfApplication
 
 	//! Add a text line to the list of those which explain the cmd line options when help is invoked.
 	void addOptionsHelpExplainLine(const std::string& strTextLine);
-	
+
 	//! Parse the command line for registered options.
 	virtual bool parseOptions();
 
@@ -253,21 +253,21 @@ class TGF_API GfApplication
 
 	//! Print a short help about using the command line.
 	void printUsage(const char* pszErrMsg = 0) const;
-	
+
  protected:
 
 	//! The app. name.
 	std::string _strName;
-	
+
 	//! The app. description.
 	std::string _strDesc;
-	
+
 	//! The app. version.
 	std::string _strVersion;
-	
+
 	//! The event loop.
 	GfEventLoop* _pEventLoop;
-	
+
 	//! The list of original command line args (setup in constructor).
 	std::list<std::string> _lstArgs;
 
@@ -295,7 +295,7 @@ class TGF_API GfApplication
 		}
 	};
 	std::list<Option> _lstOptions;
-	
+
 	//! The help syntax/explaination about the options (setup in constructor).
 	class OptionsHelp
 	{
@@ -316,7 +316,7 @@ inline GfApplication& GfApp()
 {
 	return GfApplication::self();
 }
-				  
+
 #endif // __TGF__HPP__
 
 

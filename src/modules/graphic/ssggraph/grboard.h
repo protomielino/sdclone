@@ -74,7 +74,7 @@ class cGrBoard
     void grDispCounterBoard2();
     void grDispLeaderBoardScroll(const tSituation *s);
     void grDispLeaderBoardScrollLine(const tSituation *s);
-    
+
     void grDispDashboard();
 
     void grDispArcade(const tSituation *s);

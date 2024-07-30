@@ -25,14 +25,14 @@ void SimAxleConfig(tCar *car, int index)
 {
 	void	*hdle = car->params;
 	tdble	rollCenter;
-	
+
 	tAxle *axle = &(car->axle[index]);
-	
+
 	axle->xpos = GfParmGetNum(hdle, AxleSect[index], PRM_XPOS, (char*)NULL, 0.0f);
 	axle->I    = GfParmGetNum(hdle, AxleSect[index], PRM_INERTIA, (char*)NULL, 0.15f);
 	rollCenter = GfParmGetNum(hdle, AxleSect[index], PRM_ROLLCENTER, (char*)NULL, 0.15f);
 	car->wheel[index*2].rollCenter = car->wheel[index*2+1].rollCenter = rollCenter;
-	
+
 	if (index == 0) {
 		SimSuspConfig(hdle, SECT_FRNTARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
@@ -40,7 +40,7 @@ void SimAxleConfig(tCar *car, int index)
 		SimSuspConfig(hdle, SECT_REARARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
 	}
-	
+
 	car->wheel[index*2].feedBack.I += (tdble) (axle->I / 2.0);
 	car->wheel[index*2+1].feedBack.I += (tdble) (axle->I / 2.0);
 }
@@ -52,19 +52,19 @@ void SimAxleUpdate(tCar *car, int index)
 {
 	tAxle *axle = &(car->axle[index]);
 	tdble str, stl, sgn;
-	
+
 	str = car->wheel[index*2].susp.x;
 	stl = car->wheel[index*2+1].susp.x;
-	
+
 	sgn = (tdble) (SIGN(stl - str));
-	axle->arbSusp.x = fabs(stl - str);		
+	axle->arbSusp.x = fabs(stl - str);
 	tSpring *spring = &(axle->arbSusp.spring);
 
 	// To save CPU power we compute the force here directly. Just the spring
 	// is considered.
 	tdble f;
 	f = spring->K * axle->arbSusp.x;
-	
+
 	// right
 	car->wheel[index*2].axleFz =  + sgn * f;
 	// left

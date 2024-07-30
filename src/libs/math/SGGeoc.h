@@ -19,7 +19,7 @@
 #define SGGeoc_H
 
 #include <constants.h>
- 
+
 // #define SG_GEOC_NATIVE_DEGREE
 
 /// Class representing a geocentric location

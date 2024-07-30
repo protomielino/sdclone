@@ -66,14 +66,14 @@ public:
 		double af, double as,
 		double ef, double es,
 		double Mf, double Ms);
-		
+
   void getPos(double *ra, double *dec);
   void getPos(double *ra, double *dec, double *magnitude);
   double getRightAscension();
   double getDeclination();
   double getMagnitude();
   double getLon() const;
-  double getLat() const; 
+  double getLat() const;
   void updatePosition(double mjd, ePhStar *ourSun);
 };
 

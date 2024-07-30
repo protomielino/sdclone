@@ -129,7 +129,7 @@ SDTrackLights::Internal::addLight(const osg::ref_ptr<osg::Group> &group, tGraphi
 
     if (!new_light)
         return;
-    
+
     int states = 2;
 
     osg::Vec3Array *vertexArray = new osg::Vec3Array;

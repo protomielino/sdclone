@@ -2,9 +2,9 @@
 
     file        : mouseconfig.cpp
     created     : Thu Mar 13 21:27:03 CET 2003
-    copyright   : (C) 2003 by Eric Espi�                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Eric Espi�
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Human player mouse configuration menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -126,7 +126,7 @@ MouseCalAutomaton(void)
 	Cmd[CmdOffset + CalState].max = axv;
 	Cmd[CmdOffset + CalState].pow = 1.0 / axv;
 	break;
-	
+
     }
 
     CalState++;
@@ -200,7 +200,7 @@ MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
     MaxCmd = maxcmd;
     NextMenuHandle = nextMenu;
     PrevMenuHandle = prevMenu;
-    
+
     if (ScrHandle) {
 	return ScrHandle;
     }
@@ -214,7 +214,7 @@ MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Create instruction variable label.
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
-    
+
     // Create Back and Reset buttons.
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
@@ -230,7 +230,7 @@ MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
+
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Next", NULL, onNext, NULL);

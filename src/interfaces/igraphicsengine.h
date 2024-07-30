@@ -2,7 +2,7 @@
                  igraphicsengine.h -- Interface for graphics engines
 
     created              : Mon Mar 28 19:48:14 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	Interface for graphics engines
     @version	$Id$
 */

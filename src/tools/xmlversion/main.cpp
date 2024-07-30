@@ -1,9 +1,9 @@
 /***************************************************************************
                  main.cpp -- Versionned settings XML files installation
-                             -------------------                                         
+                             -------------------
     created              : 2009
     author               : Mart Kelder
-    web                  : http://speed-dreams.sourceforge.net   
+    web                  : http://speed-dreams.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -51,7 +51,7 @@ static int findIndex( void *versionHandle, const char* dataLocation,
 
 	GfLogDebug("findIndex(h=%p, d=%s, u=%s, p=%s, dataonly=%d) : n=%d\n",
 			   versionHandle, dataLocation, userLocation, path, dataOnly, nbIndices-1);
-	
+
 	memset( indices, false, nbIndices );
 
 	if( GfParmListSeekFirst( versionHandle, path ) == 0 )
@@ -60,7 +60,7 @@ static int findIndex( void *versionHandle, const char* dataLocation,
 		{
 			curIndex = atoi( GfParmListGetCurEltName( versionHandle, path ) );
 			GfLogDebug("  Examining index %d : ", curIndex);
-			
+
 			if( curIndex >= 0 && curIndex < nbIndices )
 				indices[ curIndex ] = true;
 
@@ -115,7 +115,7 @@ static int process( const char* versionFile, const char* dataLocation,
 	}
 	else
 		absDataLocation = strdup(dataLocation);
-	
+
 	xmlHandle = GfParmReadFile( absDataLocation, GFPARM_RMODE_STD );
 	if( !xmlHandle )
 	{
@@ -135,7 +135,7 @@ static int process( const char* versionFile, const char* dataLocation,
 	actualDataLoc = strip_destdir( dataLocation, destDir ); // TODO: Is is really usefull ? Comment needed.
 	majorVer = GfParmGetMajorVersion( xmlHandle );
 	minorVer = GfParmGetMinorVersion( xmlHandle );
-	
+
 	path = (char*)malloc( sizeof(char) * 31 );
 	snprintf( path, 30, "versions/%d", index );
 
@@ -149,7 +149,7 @@ static int process( const char* versionFile, const char* dataLocation,
 	free(absDataLocation);
 
 	GfParmWriteFile( NULL, versionHandle, "versions" );
-	
+
 	GfParmReleaseHandle( versionHandle );
 	GfParmReleaseHandle( xmlHandle );
 
@@ -157,7 +157,7 @@ static int process( const char* versionFile, const char* dataLocation,
 			   versionFile, index, actualDataLoc, majorVer, minorVer, userLocation);
 	fprintf(stderr, "xmlversion: Updated %s for %s (version %d.%d)\n",
 			versionFile, actualDataLoc, majorVer, minorVer);
-	
+
 	return 0;
 }
 
@@ -187,7 +187,7 @@ static int add_directory( const char* versionFile, const char* directoryName, co
 	free( path );
 
 	GfParmWriteFile( NULL, versionHandle, "versions" );
-	
+
 	GfParmReleaseHandle( versionHandle );
 
 	fprintf(stderr, "xmlversion: Updated %s (directory %s).\n", versionFile, actualDirName);
@@ -238,7 +238,7 @@ int main( int argc, char **argv )
 	GfLogDebug("xmlversion: dataLocation='%s'\n", dataLocation);
 	GfLogDebug("xmlversion: userLocation='%s'\n", userLocation);
 	GfLogDebug("xmlversion: dataDir='%s'\n", dataDir ? dataDir : "<not specified>");
-	
+
 	if( strcmp( versionfile, "-d" ) == 0 )
 		ret = add_directory( dataLocation, userLocation, destDir );
 	else if( strcmp( dataLocation, "-d" ) == 0 )

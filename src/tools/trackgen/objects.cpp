@@ -358,7 +358,7 @@ saveACInner(Ac3d::Object *ent, Ac3d &ac3d)
 
         return true;
     }
-    
+
     ent->name = "obj" + std::to_string(ObjUniqId++);;
 
     return true;

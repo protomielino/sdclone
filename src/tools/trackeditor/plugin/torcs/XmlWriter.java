@@ -58,12 +58,12 @@ import utils.circuit.TrackObject;
 public class XmlWriter
 {
 	private EditorFrame			editorFrame;
-	
+
 	public XmlWriter(EditorFrame editorFrame)
 	{
 		this.editorFrame = editorFrame;
 	}
-	
+
 	public void writeXml(String fileName, String trackName) throws FileNotFoundException, IOException, SecurityException
 	{
 		Document doc = new Document();
@@ -303,7 +303,7 @@ public class XmlWriter
 			}
 			addContent(segment, "marks", ((Curve) shape).getMarks());
 		}
-		
+
 		addContent(segment, "z start", "m", shape.getHeightStart());
 		addContent(segment, "z start left", "m", shape.getHeightStartLeft());
 		addContent(segment, "z start right", "m", shape.getHeightStartRight());
@@ -325,14 +325,14 @@ public class XmlWriter
 		addContent(segment, "profil start tangent right", "%", shape.getProfilStartTangentRight());
 		addContent(segment, "profil end tangent right", "%", shape.getProfilEndTangentRight());
 		addContent(segment, "surface", shape.getSurface());
-		
+
 		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
 			getSideV3(segment, shape.getLeft(), "l");
 			getSideV3(segment, shape.getRight(), "r");
 		}
 		else
-		{		
+		{
 			com = new Comment("Left part of segment");
 			segment.addContent(com);
 			if (shape.getLeft().getHasSide())

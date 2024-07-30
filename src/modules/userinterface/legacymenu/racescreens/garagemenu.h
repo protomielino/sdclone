@@ -37,7 +37,7 @@ public:
 
 	RmGarageMenu();
 	void runMenu(GfRace* pRace, GfDriver* pDriver);
-	
+
 	std::string resetCarCategoryComboBox(const std::string& strSelCatName = "");
 	GfCar* resetCarModelComboBox(const std::string& strCatName,
 								 const std::string& strSelCarName = "");
@@ -47,7 +47,7 @@ public:
 	void resetCarPreviewImage(const GfDriverSkin& selSkin);
 
 protected:
-	
+
 	bool initialize();
 
 	void setDriver(GfDriver* pDriver);
@@ -74,10 +74,10 @@ private:
 
 	// The target race.
 	GfRace* _pRace;
-	
+
 	// The target driver.
 	GfDriver* _pDriver;
-	
+
 	// Possible driver skins and the currently selected one.
 	std::vector<GfDriverSkin> _vecPossSkins;
 	size_t _nCurSkinIndex;

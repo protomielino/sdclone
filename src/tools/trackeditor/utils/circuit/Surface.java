@@ -27,7 +27,7 @@ public final class Surface {
     private String racelineName				= null;
     private double dammage					= Double.NaN;
     private double rebound					= Double.NaN;
-    
+
     public String getName() {
 		return name;
 	}

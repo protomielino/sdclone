@@ -3,8 +3,8 @@
     file        : racecars.h
     created     : Sat Nov 23 09:35:21 CET 2002
     copyright   : (C) 2002 by Eric Espie
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -32,7 +32,7 @@ extern void ReCarsUpdateCarPitTime(tCarElt *car);
 extern void ReCarsManageCar(tCarElt *car, bool& bestLapChanged);
 extern void ReCarsSortCars(void);
 
-#endif /* _RACECARS_H_ */ 
+#endif /* _RACECARS_H_ */
 
 
 

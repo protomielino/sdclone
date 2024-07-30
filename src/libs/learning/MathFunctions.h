@@ -38,6 +38,6 @@ inline const T sign(const T& x)
 	} else {
 		return 0;
 	}
-} 
+}
 
 #endif

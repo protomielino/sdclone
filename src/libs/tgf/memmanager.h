@@ -1,6 +1,6 @@
 /***************************************************************************
 	memmanager.h -- Interface file for The Memory Manager
-                             -------------------                                         
+                             -------------------
     created              : Wed Nov 12 17:54:00:00 CEST 2014
     copyright            : (C) 2014 by Wolf-Dieter Beelitz
     email                : wdbee@users.sourceforge.net
@@ -48,13 +48,13 @@
 //============================================================================*
 // Prototypes
 //----------------------------------------------------------------------------*
-TGF_API bool GfMemoryManagerInitialize(void);			
+TGF_API bool GfMemoryManagerInitialize(void);
 // Release memory manager at Shutdown
-TGF_API void GfMemoryManagerRelease(bool Dump = true);	
+TGF_API void GfMemoryManagerRelease(bool Dump = true);
 // Is the memory manager running?
-TGF_API bool GfMemoryManagerRunning(void);				
+TGF_API bool GfMemoryManagerRunning(void);
 // Setup parameters
-TGF_API void GfMemoryManagerSetup(int AddedSpace, uint16 Group = 0);	
+TGF_API void GfMemoryManagerSetup(int AddedSpace, uint16 Group = 0);
 // Switch to debug mode:  keep the allocated blocks
 TGF_API void GfMemoryManagerDoAccept(void);
 // Switch to normal mode: free the blocks
@@ -121,12 +121,12 @@ void GfMemoryManagerHistFree(size_t size);
 //============================================================================*
 
 //============================================================================*
-// Block to link allocated memory blocks in a 
+// Block to link allocated memory blocks in a
 // double linked list and some additional flags to check
 // integrity of block at call of free
 //----------------------------------------------------------------------------*
 typedef struct tDSMMLinkBlock
-{	
+{
 	uint8 Mark;				// Marker to identify it as start of tDSMMLinkBlock
 	uint8 Type;				// Type of allocation
 	uint16 Grup;  			// Allocation group
@@ -142,7 +142,7 @@ typedef struct tDSMMLinkBlock
 // Stack to handle blocks of a defined size
 //----------------------------------------------------------------------------*
 typedef struct tMMBlockStack
-{	
+{
 	size_t Size;			// Blocksize handled here
 	int Count;				// Capacity of the stack
 	int Index;				// Number of available blocks contained - 1
@@ -154,9 +154,9 @@ typedef struct tMMBlockStack
 // Array of stacks
 //----------------------------------------------------------------------------*
 typedef struct tMMStackBuffer
-{	
+{
 	unsigned int MaxSize;			// Maximum blocksize that is handled here
-	tMMBlockStack Stack[MAXBLOCKSIZE]; 
+	tMMBlockStack Stack[MAXBLOCKSIZE];
 } tMMStackBuffer;
 //============================================================================*
 

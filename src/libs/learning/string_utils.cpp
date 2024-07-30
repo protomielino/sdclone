@@ -88,7 +88,7 @@ void message(const char* msg, ...)
 #define INIT_MSG_LEN 100
 
 
-//==================================================================== 
+//====================================================================
 // read_string()                             Dynamically read a string
 //--------------------------------------------------------------------
 StringBuffer* read_string (FILE* f, StringBuffer* s)
@@ -122,8 +122,8 @@ StringBuffer* read_string (FILE* f, StringBuffer* s)
 	       return NULL;
 	  }
      }
-	  
-     
+
+
 }
 
 

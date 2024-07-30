@@ -43,13 +43,13 @@ public:
   Matrix(Scalar x, Scalar y, Scalar z) { setScaling(x, y, z); }
   Matrix(Scalar xx, Scalar xy, Scalar xz,
 	 Scalar yx, Scalar yy, Scalar yz,
-	 Scalar zx, Scalar zy, Scalar zz) { 
+	 Scalar zx, Scalar zy, Scalar zz) {
     setValue(xx, xy, xz, yx, yy, yz, zx, zy, zz);
   }
-  
+
   Vector&       operator[](int i)       { return *(Vector *)elem[i]; }
   const Vector& operator[](int i) const { return *(Vector *)elem[i]; }
-  
+
   Mat3&       getValue()       { return elem; }
   const Mat3& getValue() const { return elem; }
 
@@ -65,14 +65,14 @@ public:
     elem[X][Z] = *m++; elem[Y][Z] = *m++; elem[Z][Z] = *m;
   }
 
-  void setValue(Scalar xx, Scalar xy, Scalar xz, 
-		Scalar yx, Scalar yy, Scalar yz, 
+  void setValue(Scalar xx, Scalar xy, Scalar xz,
+		Scalar yx, Scalar yy, Scalar yz,
 		Scalar zx, Scalar zy, Scalar zz) {
     elem[X][X] = xx; elem[X][Y] = xy; elem[X][Z] = xz;
     elem[Y][X] = yx; elem[Y][Y] = yy; elem[Y][Z] = yz;
     elem[Z][X] = zx; elem[Z][Y] = zy; elem[Z][Z] = zz;
   }
-  
+
   void setRotation(const Quaternion& q) {
     Scalar d = q.length2();
     assert(!eqz(d));
@@ -85,25 +85,25 @@ public:
 	     xy + wz      , 1 - (xx + zz),       yz - wx,
 	     xz - wy      , yz + wx      , 1 - (xx + yy));
   }
-  
+
   void setScaling(Scalar x, Scalar y, Scalar z) {
-    setValue(x, 0, 0, 0, y, 0, 0, 0, z); 
+    setValue(x, 0, 0, 0, y, 0, 0, 0, z);
   }
-  
+
   void setIdentity() { setValue(1, 0, 0, 0, 1, 0, 0, 0, 1); }
-  
-  Matrix& operator*=(const Matrix& m); 
+
+  Matrix& operator*=(const Matrix& m);
 
   Scalar tdot(int i, const Vector& v) const {
     return elem[X][i] * v[X] + elem[Y][i] * v[Y] + elem[Z][i] * v[Z];
   }
-  
+
   Scalar determinant() const;
   Matrix absolute() const;
   Matrix transpose() const;
   Matrix adjoint() const;
-  Matrix inverse() const; 
-  
+  Matrix inverse() const;
+
 protected:
   Mat3 elem;
 };
@@ -136,7 +136,7 @@ inline Matrix& Matrix::operator*=(const Matrix& m) {
   return *this;
 }
 
-inline Scalar Matrix::determinant() const { 
+inline Scalar Matrix::determinant() const {
   return triple((*this)[X], (*this)[Y], (*this)[Z]);
 }
 
@@ -166,7 +166,7 @@ inline Matrix Matrix::adjoint() const {
 
 inline Matrix Matrix::inverse() const {
   Vector co(elem[Y][Y] * elem[Z][Z] - elem[Y][Z] * elem[Z][Y],
-	    elem[Y][Z] * elem[Z][X] - elem[Y][X] * elem[Z][Z], 
+	    elem[Y][Z] * elem[Z][X] - elem[Y][X] * elem[Z][Z],
 	    elem[Y][X] * elem[Z][Y] - elem[Y][Y] * elem[Z][X]);
   Scalar d = dot((*this)[X], co);
   assert(!eqz(d));

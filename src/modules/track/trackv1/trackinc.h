@@ -41,7 +41,7 @@ extern void TrackSurfaceNormal(tTrkLocPos *p, t3Dd *norm);
 extern tdble TrackSpline(tdble p0, tdble p1, tdble t0, tdble t1, tdble t);
 
 
-#endif /* _TRACKINC_H__ */ 
+#endif /* _TRACKINC_H__ */
 
 
 

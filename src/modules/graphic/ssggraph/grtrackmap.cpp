@@ -252,7 +252,7 @@ cGrTrackMap::cGrTrackMap()
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 
 	glBegin(GL_QUAD_STRIP);
-	
+
 	seg = first;
 	do {
 		if (seg->type == TR_STR) {

@@ -2,8 +2,8 @@
 
     file        : fileselect.cpp
     created     : Sun Feb 16 13:09:23 CET 2003
-    copyright   : (C) 2003 by Eric Espie                       
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
  ***************************************************************************/
 
@@ -16,7 +16,7 @@
  *																		 *
  ***************************************************************************/
 
-/** @file   
+/** @file
 			Files open/save menu screens.
 	@ingroup	racemantools
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
@@ -48,7 +48,7 @@ rmOnActivate(void * /* dummy */ )
 
 	// Fill-in the Scroll List with the names of the files in the specified folder.
 	GfuiScrollListClear(ScrHandle, FilesScrollListId);
-	
+
 	FileList = GfDirGetListFiltered(RmFs->dirPath.c_str(),
 									RmFs->namePrefix.c_str(), RmFs->nameSuffix.c_str());
 	if (FileList)
@@ -67,9 +67,9 @@ rmOnActivate(void * /* dummy */ )
     GfuiEditboxSetString(ScrHandle, FileNameEditId, "");
 
 	// Show/Hide Load/Save buttons according to the file selection mode.
-	GfuiVisibilitySet(ScrHandle, LoadButtonId, 
+	GfuiVisibilitySet(ScrHandle, LoadButtonId,
 					  RmFs->mode == RmFSModeLoad ? GFUI_VISIBLE : GFUI_INVISIBLE);
-	GfuiVisibilitySet(ScrHandle, SaveButtonId, 
+	GfuiVisibilitySet(ScrHandle, SaveButtonId,
 					  RmFs->mode == RmFSModeSave ? GFUI_VISIBLE : GFUI_INVISIBLE);
 
 	// Inhibit file name control editbox if only loading.
@@ -139,7 +139,7 @@ RmFileSelect(void *pFileSelect)
 	// Create variable title label.
 	const int titleId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
 	GfuiLabelSetText(ScrHandle, titleId, RmFs->title.c_str());
-	
+
 	// Create the Scroll List containing the File list
 	FilesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",
 														NULL, rmOnClickOnFile);
@@ -155,7 +155,7 @@ RmFileSelect(void *pFileSelect)
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
-	
+
 	// Register keyboard shortcuts.
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", NULL, rmOnDeactivate, NULL);
 	GfuiMenuDefaultKeysAdd(ScrHandle);

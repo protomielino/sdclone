@@ -2,7 +2,7 @@
 #
 #   file        : robot.cmake
 #   copyright   : (C) 2008 by Mart Kelder, 2010 by J.-P. Meuret
-#   web         : www.speed-dreams.org 
+#   web         : www.speed-dreams.org
 #   version     : $Id$
 #
 ############################################################################
@@ -157,7 +157,7 @@ MACRO(ROBOT_MODULE)
 
   # Customize shared library versions.
   IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
-    # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+    # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
     #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
     #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES SOVERSION ${RBM_SOVERSION})
   ELSE()
@@ -174,7 +174,7 @@ MACRO(ROBOT_MODULE)
 
   # Install clone robot modules shared libraries (use ldconfig version naming scheme under Linux)
   IF(RBM_HAS_CLONENAMES AND RBM_CLONENAMES)
-  
+
     GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} RUNTIME_OUTPUT_DIRECTORY)
     IF(NOT RUNTIME_OUTPUT_DIRECTORY)
       GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LIBRARY_OUTPUT_DIRECTORY)
@@ -182,12 +182,12 @@ MACRO(ROBOT_MODULE)
     SET(MODLOC "${MODLOC}/${RBM_NAME}${CMAKE_SHARED_MODULE_SUFFIX}")
 
     FOREACH(CLONENAME ${RBM_CLONENAMES})
-    
+
       SET(CLONE_MODDIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${CLONENAME}")
       SET(CLONE_MODLOC "${CLONE_MODDIR}/${CLONENAME}${CMAKE_SHARED_MODULE_SUFFIX}")
       SET_PROPERTY(GLOBAL APPEND PROPERTY SD_ROBOT_LIST "${CLONENAME}")
       IF(FALSE) #IF(UNIX)
-        # Might not work with GCC 4.5 or + (see above) 
+        # Might not work with GCC 4.5 or + (see above)
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_MODULE_SUFFIX} into ${CLONE_MODLOC}.${RBM_VERSION}"
                            COMMAND ${CMAKE_COMMAND} -E make_directory "${CLONE_MODDIR}"
@@ -206,9 +206,9 @@ MACRO(ROBOT_MODULE)
         SD_INSTALL_FILES(LIB drivers/${CLONENAME}
                          FILES ${CLONE_MODLOC})
       ENDIF()
-        
+
     ENDFOREACH(CLONENAME ${RBM_CLONENAMES})
-    
+
   ENDIF()
 
 ENDMACRO(ROBOT_MODULE)
@@ -219,11 +219,11 @@ ENDMACRO(ROBOT_MODULE)
 #  PREFIX   : Prefix to use to get source path for files/subdirs specified in FILES/SUBDIRS
 #  FILES    : Files to install in the robot's data dir (see PREFIX)
 #  SUBDIRS  : Sub-dirs to recusively install in the robot's data dir (see PREFIX)
-#  PATTERNS : Files to install from SUBDIRS in the robot's data dir, 
+#  PATTERNS : Files to install from SUBDIRS in the robot's data dir,
 #             as glob patterns (defaults to *.*)
 #  USER     : If this keyword is present, also mark _any_ above specified XML file
 #             as a user settings file (installed at run-time is the user settings folders).
-#  
+#
 MACRO(ROBOT_DATA)
 
   SET(RBD_SYNTAX "NAME,1,1,RBD_HAS_NAME,RBD_NAME")
@@ -246,10 +246,10 @@ MACRO(ROBOT_DATA)
   IF(RBD_HAS_FILES AND RBD_FILES)
 
     IF(RBD_IS_USER)
-      SD_INSTALL_FILES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME} 
+      SD_INSTALL_FILES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME}
                 PREFIX ${RBD_PREFIX} FILES ${RBD_FILES})
     ELSE()
-      SD_INSTALL_FILES(DATA drivers/${RBD_NAME} 
+      SD_INSTALL_FILES(DATA drivers/${RBD_NAME}
                   PREFIX ${RBD_PREFIX} FILES ${RBD_FILES})
     ENDIF()
 
@@ -260,12 +260,12 @@ MACRO(ROBOT_DATA)
 
     # Install specified files.
     IF(RBD_IS_USER)
-      SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME} 
-                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+      SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME}
+                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS}
                              PATTERNS ${RBD_PATTERNS})
     ELSE()
-      SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} 
-                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+      SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME}
+                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS}
                              PATTERNS ${RBD_PATTERNS})
     ENDIF()
 

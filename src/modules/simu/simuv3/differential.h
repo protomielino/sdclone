@@ -58,7 +58,7 @@ typedef struct
 
 
 
-#endif /* _DIFFERENTIAL_H_ */ 
+#endif /* _DIFFERENTIAL_H_ */
 
 
 

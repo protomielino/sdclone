@@ -1,10 +1,10 @@
 /***************************************************************************
-                         os.cpp -- os specific function table                             
-                             -------------------                                         
+                         os.cpp -- os specific function table
+                             -------------------
     created              : Fri Aug 13 22:26:42 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -28,7 +28,7 @@
 #include "windowsspec.h"
 #else
 #include "linuxspec.h"
-#endif	
+#endif
 
 #include "os.h"
 
@@ -47,7 +47,7 @@ gfOsInit(void)
     WindowsSpecInit();
 #else
     LinuxSpecInit();
-#endif	
+#endif
 }
 
 

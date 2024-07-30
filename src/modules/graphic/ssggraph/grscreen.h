@@ -3,7 +3,7 @@
     file        : grscreen.h
     created     : Thu May 15 22:11:19 CEST 2003
     copyright   : (C) 2003 by Eric Espié
-    email       : eric.espie@torcs.org 
+    email       : eric.espie@torcs.org
     version     : $Id$
  ***************************************************************************/
 
@@ -30,42 +30,42 @@ class cGrFrameInfo;
 class cGrScreen {
 	protected:
 		int id;
-	
+
 		tCarElt	*curCar;		// Current car viewed.
 		tCarElt	**cars;			// List of cars.
-	
+
 		int	curCamHead;							// The current camera list.
 		tGrCamHead		cams[10];				// From F2 to F11.
 		int				subcamIndex[10];		// current subcam index (for each list)
-	
+
 		class cGrPerspCamera *curCam;			// The current camera.
 		class cGrCarCamMirror *mirrorCam;		// The mirror camera.
 		class cGrPerspCamera *dispCam;			// The display camera.
 		class cGrOrthoCamera *boardCam;			// The board camera.
 		class cGrBackgroundCam *bgCam;			// The background camera.
-	
+
 		class cGrBoard *board;					// The board.
-	
+
 		int drawCurrent;						// Should the current car be drawn.
-	
+
 		int scrx, scry, scrw, scrh;
 		float viewOffset;
 		float viewRatio;
 		int fakeWidth;
 		int boardWidth;
-	
+
 		bool active;								// Is the screen activated.
 		bool selectNextFlag;
 		bool selectPrevFlag;
 		int mirrorFlag;
-	
+
 		void loadParams(tSituation *s);			// Load from parameters files.
 		void saveCamera(void);
 
 	public:
 		cGrScreen(int id);
 		~cGrScreen();
-	
+
 		void activate(int x, int y, int w, int h, float v);
 		inline void deactivate(void) { active = false; }
 		inline void setZoom(const long zoom) { curCam->setZoom(zoom); }
@@ -80,16 +80,16 @@ class cGrScreen {
 		float getViewOffset(void) { return viewOffset; }
 		void selectBoard(const long brd);
 		void selectTrackMap();
-	
+
 		void setCurrentCar(tCarElt *newCurCar);
 
 		void initCams(tSituation *s);
 		void initBoard(void);
-	
+
 		inline void selectNextCar(void) { selectNextFlag = true; }
 		inline void selectPrevCar(void) {	selectPrevFlag = true; }
 		void switchMirror(void);
-	
+
 		inline tCarElt *getCurrentCar(void) { return curCar; }
 		inline cGrCamera* getCurCamera(void) { return curCam; }
 		inline float getViewRatio(void) { return viewRatio; }

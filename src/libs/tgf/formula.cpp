@@ -2,7 +2,7 @@
 
     file                 : formula.cpp
     copyright            : (C) 2009 by Mart Kelder
-    web                  : http://speed-dreams.sourceforge.net   
+    web                  : http://speed-dreams.sourceforge.net
     web                  : speed-dreams.sourceforge.net
     version              : $Id$
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Mathematical formula interpreter
 */
 
@@ -53,7 +53,7 @@
 typedef struct FormAnswer
 {
 	int validFields;
-	
+
 	bool boolean;
 	int integer;
 	tdble number;
@@ -329,7 +329,7 @@ static char cmdMul( tPSStackItem **topStack, void* /*dummy*/, const char* /*path
 	double aa;
 
 	error = FALSE;
-	
+
 	bb = popDouble( topStack, &error );
 	aa = popDouble( topStack, &error );
 	if( error )
@@ -417,7 +417,7 @@ static char cmdExch( tPSStackItem **topStack, void* /*dummy*/, const char* /*pat
 
 	if( !item2 )
 		return FALSE;
-	
+
 	push( topStack, item1 );
 	push( topStack, item2 );
 	return TRUE;
@@ -446,7 +446,7 @@ static char cmdRoll( tPSStackItem **topStack, void* /*dummy*/, const char* /*pat
 	jj %= nn;
 	while( jj < 0 )
 		jj += nn;
-	
+
 	for( xx = nn + jj - 1; xx >= jj; --xx )
 		push( topStack, stackItems[ xx % nn ] );
 	free( stackItems );
@@ -527,7 +527,7 @@ static char cmdPushVar( tPSStackItem **topStack, void* v_varname, const char* pa
 
 static void parseSkipWhitespace( char **string )
 {
-	while( (*string)[0] == ' ' || (*string)[0] == '\r' || (*string)[0] == '\n' )	
+	while( (*string)[0] == ' ' || (*string)[0] == '\r' || (*string)[0] == '\n' )
 		++(*string);
 }
 
@@ -595,7 +595,7 @@ static char parseCommandVar( char **string, tPSCommand **current )
 
 	while( ( (*string)[ len ] >= 'a' && (*string)[len] <= 'z' ) || ( (*string)[len] >= 'A' && (*string)[len] <= 'Z' ) )
 		++len;
-	
+
 	cmdVar = (char*)malloc( sizeof( char ) * ( len + 1 ) );
 	for( xx = 0; xx < len; ++xx ) {
 		cmdVar[ xx ] = (*string)[0];
@@ -606,7 +606,7 @@ static char parseCommandVar( char **string, tPSCommand **current )
 	newCommand = (tPSCommand*)malloc( sizeof(tPSCommand) );
 	newCommand->data = NULL;
 	newCommand->next = NULL;
-	
+
 	if( strcmp( cmdVar, "add" ) == 0 )
 		newCommand->func = &cmdAdd;
 	else if( strcmp( cmdVar, "sub" ) == 0 )
@@ -653,7 +653,7 @@ static tPSCommand* parseFormulaStringIntern( char **string )
 	char ret = TRUE;
 	tPSCommand *result = NULL;
 	tPSCommand *current = NULL;
-	
+
 	while( ret ) {
 		if( (*string)[0] == '{' ) {
 			ret = parseSubCommands( string, &current );
@@ -931,7 +931,7 @@ static void parseIntoBlocks( tFormNode **node )
 				startNodeBracket1 = prevNode;
 				startNodeBracket2 = curNode;
 			}
-			++bracketLevel;	
+			++bracketLevel;
 		} else if( curNode->type == FORMNODE_TYPE_TOPARSE_STRING && curNode->string[ 0 ] == ')' ) {
 			if( bracketLevel == 1 ) {
 				newNode = (tFormNode*)malloc( sizeof( tFormNode ) );
@@ -980,7 +980,7 @@ static void parseIntoBlocks( tFormNode **node )
 			} else {
 				*node = newNode;
 			}
-	
+
 			startNodeKomma2 = curNode;
 			startNodeKomma1 = newNode;
 
@@ -1169,7 +1169,7 @@ void* GfFormParseFormulaStringNew( const char *string )
 
 	return (void*)formula;
 	//Clean
-	
+
 }
 
 void GfFormFreeCommandNewRec( tFormNode *node )
@@ -1292,13 +1292,13 @@ char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const *path, char *bool
 		*number = answer.number;
 	if( string && ( answer.validFields & FORMANSWER_TYPE_STRING ) )
 		*string = answer.string;
- 
+
  	/* A string result is stored until the formula is evaluated again */
 	if( formula->lastAnswer.string )
 		free( formula->lastAnswer.string );
 	formula->lastAnswer = answer;
 
-	return ( answer.validFields != 0 ) ? TRUE : FALSE; 
+	return ( answer.validFields != 0 ) ? TRUE : FALSE;
 }
 
 /* Helper functions */
@@ -1318,7 +1318,7 @@ static tFormAnswer func_op_add_cat( tFormNode *node, void *parmHandle, char cons
 		result.string = NULL;
 		return result;
 	}
-	
+
 	arg1 = eval( node, parmHandle, path );
 	arg2 = eval( node->next, parmHandle, path );
 
@@ -1357,7 +1357,7 @@ static tFormAnswer func_op_sub_not( tFormNode *node, void *parmHandle, char cons
 		result.string = NULL;
 		return result;
 	}
-	
+
 	arg1 = eval( node, parmHandle, path );
 	arg2 = eval( node->next, parmHandle, path );
 
@@ -1389,7 +1389,7 @@ static tFormAnswer func_op_mul( tFormNode *node, void *parmHandle, char const *p
 		result.string = NULL;
 		return result;
 	}
-	
+
 	arg1 = eval( node, parmHandle, path );
 	arg2 = eval( node->next, parmHandle, path );
 
@@ -1421,7 +1421,7 @@ static tFormAnswer func_op_div( tFormNode *node, void *parmHandle, char const *p
 		result.string = NULL;
 		return result;
 	}
-	
+
 	arg1 = eval( node, parmHandle, path );
 	arg2 = eval( node->next, parmHandle, path );
 
@@ -1462,7 +1462,7 @@ static tFormAnswer func_max_or( tFormNode *node, void *parmHandle, char const *p
 		result.string = NULL;
 		return result;
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	result.validFields &= FORMANSWER_TYPE_BOOLEAN | FORMANSWER_TYPE_INTEGER | FORMANSWER_TYPE_NUMBER;
 	if( result.string )
@@ -1476,7 +1476,7 @@ static tFormAnswer func_max_or( tFormNode *node, void *parmHandle, char const *p
 		result.boolean = ( result.validFields & FORMANSWER_TYPE_BOOLEAN ) ? result.boolean || arg.boolean : FALSE;
 		result.integer = ( result.validFields & FORMANSWER_TYPE_INTEGER ) ? (result.integer > arg.integer ? result.integer : arg.integer ) : 0;
 		result.number = ( result.validFields & FORMANSWER_TYPE_NUMBER ) ? ( result.number > arg.number ? result.number : arg.number ) : 0.0f;
-	
+
 		if( arg.string )
 			free( arg.string );
 	}
@@ -1497,7 +1497,7 @@ static tFormAnswer func_min_and( tFormNode *node, void *parmHandle, char const *
 		result.string = NULL;
 		return result;
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	result.validFields &= FORMANSWER_TYPE_BOOLEAN | FORMANSWER_TYPE_INTEGER | FORMANSWER_TYPE_NUMBER;
 	if( result.string )
@@ -1511,7 +1511,7 @@ static tFormAnswer func_min_and( tFormNode *node, void *parmHandle, char const *
 		result.boolean = ( result.validFields & FORMANSWER_TYPE_BOOLEAN ) ? result.boolean && arg.boolean : FALSE;
 		result.integer = ( result.validFields & FORMANSWER_TYPE_INTEGER ) ? (result.integer < arg.integer ? result.integer : arg.integer ) : 0;
 		result.number = ( result.validFields & FORMANSWER_TYPE_NUMBER ) ? ( result.number < arg.number ? result.number : arg.number ) : 0.0f;
-	
+
 		if( arg.string )
 			free( arg.string );
 	}
@@ -1535,7 +1535,7 @@ static tFormAnswer func_op_compare( tFormNode *node, void *parmHandle, char cons
 		result.string = NULL;
 		return result;
 	}
-	
+
 	arg1 = eval( node, parmHandle, path );
 	arg2 = eval( node->next, parmHandle, path );
 
@@ -1576,7 +1576,7 @@ static tFormAnswer func_op_compare( tFormNode *node, void *parmHandle, char cons
 		result.number = 0.0f;
 		result.string = NULL;
 	}
-		
+
 	return result;
 }
 
@@ -1621,7 +1621,7 @@ static tFormAnswer func_if( tFormNode *node, void *parmHandle, const char *path 
 	result.integer = 0;
 	result.number = 0.0f;
 	result.string = NULL;
-	
+
 	if( !node )
 		return result;
 
@@ -1636,10 +1636,10 @@ static tFormAnswer func_if( tFormNode *node, void *parmHandle, const char *path 
 		isTrue = !( strcmp( isTrueAnswer.string, "" ) == 0 );
 	else
 		return result;
-	
+
 	if( !node->next || ( !isTrue && !node->next->next ) )
 		return result;
-	
+
 	if( isTrue )
 		result = eval( node->next, parmHandle, path );
 	else
@@ -1660,7 +1660,7 @@ static tFormAnswer func_sqrt( tFormNode *node, void *parmHandle, char const *pat
 		result.string = NULL;
 		return result;
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	result.validFields &= FORMANSWER_TYPE_INTEGER | FORMANSWER_TYPE_NUMBER;
 	if( result.string )
@@ -1698,7 +1698,7 @@ static tFormAnswer func_log( tFormNode *node, void *parmHandle, char const *path
 		result.string = NULL;
 		return result;
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	result.validFields &= FORMANSWER_TYPE_NUMBER;
 	if( result.string )
@@ -1730,11 +1730,11 @@ static tFormAnswer func_toString( tFormNode *node, void *parmHandle, char const 
 		result.string = NULL;
 		return result;
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	if( result.string )
 		free( result.string );
-	
+
 	if( result.validFields & FORMANSWER_TYPE_INTEGER ) {
 		result.validFields = FORMANSWER_TYPE_STRING;
 		result.string = (char*)malloc( sizeof( char ) * 20 );
@@ -1747,7 +1747,7 @@ static tFormAnswer func_toString( tFormNode *node, void *parmHandle, char const 
 		result.validFields = 0;
 		result.string = NULL;
 	}
-		
+
 	result.integer = 0;
 	result.number = 0.0f;
 	result.boolean = FALSE;
@@ -1784,11 +1784,11 @@ static tFormAnswer func_toAlpha( tFormNode *node, void *parmHandle, char const *
 		if( lengthArg.string )
 			free( lengthArg.string );
 	}
-	
+
 	result = eval( node, parmHandle, path );
 	if( result.string )
 		free( result.string );
-	
+
 	if( result.validFields & FORMANSWER_TYPE_INTEGER ) {
 		number = result.integer;
 	} else if( result.validFields & FORMANSWER_TYPE_NUMBER ) {

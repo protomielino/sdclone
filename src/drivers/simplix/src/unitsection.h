@@ -63,14 +63,14 @@
 //==========================================================================*
 // Class TSection
 //--------------------------------------------------------------------------*
-class TSection	
+class TSection
 {
   public:
 	TSection();								  // Default constructor
 	~TSection();								  // Destructor
 
   public:
-	double	Station;							  //	Dist. f. Start of Segment 
+	double	Station;							  //	Dist. f. Start of Segment
 	double	DistFromStart;						  // Dist. from	Start of Track
 	tTrackSeg*	Seg;								   // Original Track segment.
 	double	WidthToLeft;							   // Width to left.

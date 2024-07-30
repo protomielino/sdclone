@@ -54,10 +54,10 @@ public class Project
 	private int propertiesEditorCameraTab = 0;
 	private int propertiesEditorLightTab = 0;
 	private int propertiesEditorTerrainTab = 0;
-	
+
 	public Project()
 	{
-		
+
 	}
 
 	/**
@@ -197,42 +197,42 @@ public class Project
 		this.trackgenDialogY = trackgenDialogY;
 	}
 
-	public int getPreferencesDialogX() 
+	public int getPreferencesDialogX()
 	{
 		return preferencesDialogX;
 	}
 
-	public void setPreferencesDialogX(int preferencesDialogX) 
+	public void setPreferencesDialogX(int preferencesDialogX)
 	{
 		this.preferencesDialogX = preferencesDialogX;
 	}
 
-	public int getPreferencesDialogY() 
+	public int getPreferencesDialogY()
 	{
 		return preferencesDialogY;
 	}
 
-	public void setPreferencesDialogY(int preferencesDialogY) 
+	public void setPreferencesDialogY(int preferencesDialogY)
 	{
 		this.preferencesDialogY = preferencesDialogY;
 	}
 
-	public int getNewProjectDialogX() 
+	public int getNewProjectDialogX()
 	{
 		return newProjectDialogX;
 	}
 
-	public void setNewProjectDialogX(int newProjectDialogX) 
+	public void setNewProjectDialogX(int newProjectDialogX)
 	{
 		this.newProjectDialogX = newProjectDialogX;
 	}
 
-	public int getNewProjectDialogY() 
+	public int getNewProjectDialogY()
 	{
 		return newProjectDialogY;
 	}
 
-	public void setNewProjectDialogY(int newProjectDialogY) 
+	public void setNewProjectDialogY(int newProjectDialogY)
 	{
 		this.newProjectDialogY = newProjectDialogY;
 	}

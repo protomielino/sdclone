@@ -2,9 +2,9 @@
 
     file                 : guiscrollbar.cpp
     created              : Mon Aug 23 22:11:37 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		GUI scrollbar management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
@@ -115,11 +115,11 @@ gfuiScrollMinus(void *idv)
  */
 int
 GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butLength,
-					int orientation, int position, int min, int max, int visLen, int start, 
+					int orientation, int position, int min, int max, int visLen, int start,
 					void *userData, tfuiSBCallback onScroll)
 {
     tGfuiScreen* screen = (tGfuiScreen*)scr;
-    
+
     tGfuiObject* object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_SCROLLBAR;
     object->focusMode = GFUI_FOCUS_MOUSE_CLICK;
@@ -149,7 +149,7 @@ GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butL
 							   x + length - pArrowBut->width, y, butLength, thickness,
 							   butMirror, false, 1,
 							   (void*)(long)(object->id), gfuiScrollPlus,
-							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			break;
 		}
 		case GFUI_VERT_SCROLLBAR:
@@ -162,7 +162,7 @@ GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butL
 								   x, y, thickness, butLength,
 								   butMirror, false, 1,
 								   (void*)(long)(object->id), gfuiScrollPlus,
-								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			const tGfuiGrButton* pArrowBut = &(gfuiGetObject(scr, arrowButId)->u.grbutton);
 			GfuiGrButtonCreate(scr, "data/img/arrow-up.png", "data/img/arrow-up.png",
 							   "data/img/arrow-up-focused.png", "data/img/arrow-up-pushed.png",
@@ -175,11 +175,11 @@ GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butL
 		default:
 			break;
     }
-    
+
     gfuiAddObject(screen, object);
-	
+
     GfuiScrollBarPosSet(scr, object->id, min, max, visLen, start);
-	
+
     return object->id;
 }
 

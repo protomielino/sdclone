@@ -48,38 +48,38 @@ SET(CONFSCREENS_HEADERS ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
                         ${CS}/playerconfig.h ${CS}/controlconfig.h
                         ${CS}/joystickconfig.h ${CS}/mouseconfig.h
                         ${CS}/joy2butconfig.h ${CS}/monitorconfig.h
-                        ${CS}/displayconfig.h ${CS}/graphconfig.h ${CS}/openglconfig.h 
+                        ${CS}/displayconfig.h ${CS}/graphconfig.h ${CS}/openglconfig.h
                         ${CS}/simuconfig.h ${CS}/soundconfig.h ${CS}/aiconfig.h
                         ${CS}/hostsettingsmenu.h ${CS}/forcefeedbackconfig.h)
 
 SET(RS racescreens)
-SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp 
+SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         #${RS}/raceweekendmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
                         ${RS}/raceconfigstate.cpp
                         ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
                         ${RS}/raceparamsmenu.cpp ${RS}/carsetupmenu.cpp
                         ${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
-                        ${RS}/raceoptimizationmenu.cpp 
-                        ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
+                        ${RS}/raceoptimizationmenu.cpp
+                        ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp
                         ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp)
 IF(OPTION_CLIENT_SERVER)
-   SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/csnetworkingmenu.cpp 
+   SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/csnetworkingmenu.cpp
                                                   ${RS}/csnetclientsettings.cpp
                                                   ${RS}/csnetserversettings.cpp)
 ENDIF(OPTION_CLIENT_SERVER)
 
 SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h ${RS}/carsetupmenu.h) #${RS}/raceweekendscreens.h)
 IF(OPTION_CLIENT_SERVER)
-   SET(RACESCREENS_HEADERS ${RACESCREENS_HEADERS} ${RS}/csnetworking.h) 
+   SET(RACESCREENS_HEADERS ${RACESCREENS_HEADERS} ${RS}/csnetworking.h)
 ENDIF(OPTION_CLIENT_SERVER)
 
-SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES} 
-                       ${CONFSCREENS_SOURCES} 
+SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES}
+                       ${CONFSCREENS_SOURCES}
                        ${RACESCREENS_SOURCES}
                        legacymenu.cpp)
-SET(LEGACYMENU_HEADERS ${MAINSCREENS_HEADERS} 
-                       ${CONFSCREENS_HEADERS} 
+SET(LEGACYMENU_HEADERS ${MAINSCREENS_HEADERS}
+                       ${CONFSCREENS_HEADERS}
                        ${RACESCREENS_HEADERS}
                        legacymenu.h)
 
@@ -112,7 +112,7 @@ IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DLEGACYMENU_DLL)
 ENDIF(WIN32)
-    
+
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
@@ -126,7 +126,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Note: Headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 find_package(OpenSSL 2.0 REQUIRED)

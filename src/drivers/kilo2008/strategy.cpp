@@ -1,26 +1,26 @@
 /*
  *      strategy.cpp
- *      
+ *
  *      Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
  *      Based on work by Bernhard Wymann and Andrew Sumner.
- *      
+ *
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
  *      the Free Software Foundation; either version 2 of the License, or
  *      (at your option) any later version.
- *      
+ *
  *      This program is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- *      
+ *
  *      You should have received a copy of the GNU General Public License
  *      along with this program; if not, write to the Free Software
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
- * 
+ *
  *      $Id$
- * 
+ *
  */
 
 #include "src/drivers/kilo2008/strategy.h"
@@ -53,9 +53,9 @@ KStrategy::KStrategy() {
 }  // KStrategy
 
 
-/** 
+/**
  * SetFuelAtRaceStart
- * 
+ *
  * @param t the track
  * @param carParmHandle handle for car parameters
  * @param s current situation, provided by TORCS
@@ -111,12 +111,12 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
 }   // SetFuelAtRaceStart
 
 
-/** 
+/**
  * updateFuelStrategy
- * 
+ *
  * Computes the fuel amount required to finish the race.
  * If there is not enough fuel in the tank, re-runs pit computations.
- * 
+ *
  * @param: -
  * @return void
  */
@@ -135,7 +135,7 @@ void KStrategy::UpdateFuelStrategy() {
 }  // UpdateFuelStrategy
 
 
-/** 
+/**
  * pitRefuel
  * @return amount of fuel requested from race engine.
  */
@@ -191,7 +191,7 @@ void KStrategy::ComputeBestNumberOfPits(const double tankCapacity,
 
 /**
  * Update
- * 
+ *
  * Stores last N laps' damage values.
  * Updates best & worst lap times.
  * Then resumes fuel statistics updates.
@@ -245,7 +245,7 @@ void KStrategy::Update() {
 
 /**
  * NeedPitstop
- * 
+ *
  * Checks if we need to pit.
  * We need a pit stop if fuel is low, or if damage is over the limit.
  * In the last 5 laps we want to pit only if the predicted damage value
@@ -310,7 +310,7 @@ bool KStrategy::NeedPitstop() const {
 
 /**
  * GetAvgDamage
- * 
+ *
  * Computes last N laps' average damage increment
  *
  * @return average damage increment
@@ -323,7 +323,7 @@ int KStrategy::GetAvgDamage(void) const {
 
 /**
  * PitRepair
- * 
+ *
  * Tells TORCS how much damage we ask to be repaired.
  * On the last N laps, we push fast pitstops with minimal repairs.
  * Otherwise, let's repair all damage.

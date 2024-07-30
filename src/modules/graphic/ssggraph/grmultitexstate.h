@@ -33,7 +33,7 @@ class cgrMultiTexState : public cgrSimpleState
 	//! Useful texturing schemes.
 	static void modulate(); // Multiply color and alpha.
 	static void addColorModulateAlpha(); // Self explanatory.
-	
+
 	static void ignore(); // Simply propagate previous (ignore source) : useful for debugging.
 
 	//! Other possible texturing schemes (not used, might be one day ; not exhaustive).
@@ -50,10 +50,10 @@ class cgrMultiTexState : public cgrSimpleState
 
 	//! Constructor (use only above-defined functions as fnTexScheme).
 	cgrMultiTexState(tfnTexScheme fnTexScheme = modulate);
-	
+
 	//! Set texturing scheme (use only above-defined functions).
 	void setTexScheme(tfnTexScheme fnTexScheme);
-	
+
 	// Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
 	virtual void apply(GLint nUnit);
 

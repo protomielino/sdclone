@@ -92,7 +92,7 @@ public:
 
     inline osg::FrontFace *  getOsgCamFrontFace(void) { return camFrontFace; }
     inline osg::FrontFace *  getOsgMirrorCamFrontFace(void) { return mirrorCamFrontFace; }
-    
+
     inline int  getScreenXPos(void) const { return x; }
     inline int  getScreenYPos(void) const { return y; }
 

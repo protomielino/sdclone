@@ -31,16 +31,16 @@ class PlibSoundInterface : public SoundInterface
 		float f; //frequency modulation
 		float a; //amplitude modulation
 	} SoundChar;
-	
+
  protected:
-	
+
 	slScheduler* sched;
 	SoundSource* car_src;
 	SoundSource tyre_src[4];
 	void setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
-	
+
  public:
-	
+
 	PlibSoundInterface(float sampling_rate, int n_channels);
 	PlibSoundInterface(const PlibSoundInterface &); // = delete;
 	PlibSoundInterface & operator = (const PlibSoundInterface &); // = delete;

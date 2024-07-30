@@ -15,7 +15,7 @@
 
 /**
    \file MathFunctions.cpp
-   
+
    \brief Mathematical functions.
 
    A range of functions
@@ -59,7 +59,7 @@ void SoftMax (int n, real* Q, real* p, real beta)
 		p[i] *= sum;
 	}
 }
-	
+
 void SoftMin (int n, real* Q, real* p, real beta)
 {
 	real sum = 0.0f;
@@ -73,11 +73,11 @@ void SoftMin (int n, real* Q, real* p, real beta)
 		p[i] *= sum;
 	}
 }
-	
+
 
 /**
    \brief Approximate max (f1,f2) via a gamma function.
-	
+
 	We have:
 	\f[
 	f(x) = \max \{f_1(x), f_2(x)\}
@@ -112,7 +112,7 @@ void SoftMin (int n, real* Q, real* p, real beta)
 	\end{cases}
 	\f]
 
-	The error 
+	The error
 */
 real SmoothMaxGamma (real f1, real f2, real lambda, real c)
 {
@@ -135,7 +135,7 @@ real SmoothMaxGamma (real f1, real f2, real lambda, real c)
 
 /**
    \brief Approximate max (f1,f2) via a power function.
-	
+
 	We have:
 	\f[
 	f(x) = \max \{f_1(x), f_2(x)\} = \lim_{p \rightarrow \infty} (f_1(x)^p, f_2(x)^p)^{1/p}.
@@ -149,12 +149,12 @@ real SmoothMaxPNorm (real f1, real f2, real p)
 	assert(p>0);
 	return (real) pow(pow(f1,p)+pow(f2,p),1/p);
 }
-	
+
 /// Normalise a vector to a destination vector (low level)
 ///
 /// src is the source vector.
 /// dst is the destination vector.
-/// n_elements is the number of elements. 
+/// n_elements is the number of elements.
 /// As pointers are raw, make sure n_elements is correct.
 /// It is safe for src and dst to point at the same vector.
 void Normalise (real* src, real* dst, int n_elements)

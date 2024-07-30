@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -31,7 +31,7 @@
 
 extern void *GraphMenuInit(void *prevMenu);
 
-#endif /* _GRAPHCONFIG_H_ */ 
+#endif /* _GRAPHCONFIG_H_ */
 
 
 

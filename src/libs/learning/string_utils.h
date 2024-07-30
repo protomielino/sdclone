@@ -23,7 +23,7 @@
 #include "learning.h"
 #include "learn_debug.h"
 
-/** 
+/**
 	\file string_utils.h
 
 	Some simple functions for string operations.

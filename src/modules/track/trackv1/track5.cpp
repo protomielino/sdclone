@@ -835,7 +835,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             }
             pitEntrySeg = pitEntrySeg->prev;
         }// for i
-        if (found) 
+        if (found)
 	        GfOut("PitEntry: %s\n", pitEntrySeg->name);
 		else
             pitEntrySeg = NULL;
@@ -855,7 +855,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
                 }
                 pitExitSeg = pitExitSeg->prev;
             }
-            if (found) 
+            if (found)
 		        GfOut("PitExit: %s\n", pitExitSeg->name);
 			else
                 pitExitSeg = NULL;
@@ -946,7 +946,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 			    }
 				if (!found) {
 					pitBuildingsEnd = pitEnd;
-	            } 
+	            }
 		    } else {
 			    pitBuildingsEnd = pitEnd;
 	        }
@@ -1154,7 +1154,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 								curSeg->raceInfo |= TR_PITEND;
 								if (curSeg2) {
 									curSeg2->raceInfo |= TR_PITEND;
-								} 
+								}
 							}
 						}
 					}

@@ -40,15 +40,15 @@ typedef struct
     tdble	Kx;
     tdble	Kz;
 	tdble	angle;
-    
+
     /* static */
     t3Dd	staticPos;
-    
+
 } tWing;
 
 
 
-#endif /* _AERO_H_  */ 
+#endif /* _AERO_H_  */
 
 
 

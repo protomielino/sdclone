@@ -83,9 +83,9 @@ public class TerrainProperties extends PropertyPanel
 	private JLabel				randomSeedLabel				= new JLabel();
 	private JTextField			randomSeedTextField			= new JTextField();
 	private JLabel				useObjectMaterialsLabel		= new JLabel();
-	private JComboBox<String>	useObjectMaterialsComboBox	= null;	
+	private JComboBox<String>	useObjectMaterialsComboBox	= null;
 	private JLabel				tiledFileLabel				= new JLabel();
-	private JTextField			tiledFileTextField			= new JTextField();	
+	private JTextField			tiledFileTextField			= new JTextField();
 	private JButton				defaultButton				= null;
 	private JButton				deleteButton				= null;
 	private JTabbedPane			tabbedPane					= null;
@@ -339,8 +339,8 @@ public class TerrainProperties extends PropertyPanel
 
 	protected void elevationMapFile()
 	{
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -367,8 +367,8 @@ public class TerrainProperties extends PropertyPanel
 
 	protected void reliefFile()
 	{
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -443,8 +443,8 @@ public class TerrainProperties extends PropertyPanel
 
 	protected void tiledFile()
 	{
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -467,8 +467,8 @@ public class TerrainProperties extends PropertyPanel
 				fileName = fileName.substring(index + 1);
 			tiledFileTextField.setText(fileName);
 		}
-	}	
-	
+	}
+
 	/**
 	 * This method initializes defaultButton
 	 *

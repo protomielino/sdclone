@@ -1,9 +1,9 @@
 /*
- * xml.h -- Interface file for XML 
+ * xml.h -- Interface file for XML
  *
  * @(#) $Id$
  */
- 
+
 #ifndef _XML_H_
 #define _XML_H_
 
@@ -33,7 +33,7 @@ typedef struct xmlElement {
     struct xmlElement	*next;		/* next element at the same level */
     struct xmlElement	*sub;		/* next element at the next level (nested) */
     struct xmlElement	*up;		/* upper element */
-} txmlElement;    
+} txmlElement;
 
 TXML_API txmlElement *xmlInsertElt(txmlElement *curElt, const char *name, const char **atts);
 TXML_API txmlElement *xmlReadFile(const char *file);
@@ -46,7 +46,7 @@ TXML_API txmlElement *xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt);
 TXML_API txmlElement *xmlFindNextElt(txmlElement *startElt, char *name);
 TXML_API txmlElement *xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalue);
 
-#endif /* _XML_H_ */ 
+#endif /* _XML_H_ */
 
 
 

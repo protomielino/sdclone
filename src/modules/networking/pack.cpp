@@ -366,7 +366,7 @@ unsigned short PackedBuffer::unpack_ushort()
     }
 
     Uint16 x;
-    
+
     ::memcpy(&x, buf_data, size);
     next_data(size);
 
@@ -388,7 +388,7 @@ unsigned int PackedBuffer::unpack_uint()
 
     ::memcpy(&x, buf_data, size);
     next_data(size);
-    
+
     return (unsigned int)ntohl(x);
 }
 
@@ -410,7 +410,7 @@ float PackedBuffer::unpack_float()
     ::memcpy(&x, buf_data, size);
     next_data(size);
     u.intval = (Uint32)ntohl(x);
-    
+
     return u.floatval;
 }
 

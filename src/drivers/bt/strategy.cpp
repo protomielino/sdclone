@@ -84,7 +84,7 @@ void SimpleStrategy::update(tCarElt* car, tSituation *s)
 bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
 {
 	// Question makes only sense if there is a pit.
-	if (car->_pit != NULL) {	
+	if (car->_pit != NULL) {
 		// Do we need to refuel?
 		int laps = car->_remainingLaps - car->_lapsBehindLeader;
 		if (laps > 0) {
@@ -95,7 +95,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
 					laps += (int)ceil( ( s->_totTime - s->currentTime ) / car->_bestLapTime + 0.3f );
 				// For the case car->laps <= 2, the old laps only makes a stronger constraight, so no read to calculate it
 			}
-					
+
 			// TODO: Investigate if buggy for two pit stops in one lap, BUG?
 			if (car->_fuel < 1.5*cmpfuel &&
 				car->_fuel < laps*cmpfuel)
@@ -103,7 +103,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
 					return true;
 			}
 		}
-	
+
 		// Do we need to repair and the pit is free?
 		if (car->_dammage > PIT_DAMMAGE && isPitFree(car)) {
 			return true;
@@ -115,7 +115,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
 
 bool SimpleStrategy::isPitFree(tCarElt* car)
 {
-	if (car->_pit != NULL) {	
+	if (car->_pit != NULL) {
 		if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE) {
 			return true;
 		}

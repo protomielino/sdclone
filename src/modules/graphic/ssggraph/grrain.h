@@ -39,7 +39,7 @@ private:
 	double elapsed_time, dt;
 	sgVec4	fog_color;
 	sgMat4 transform;
-	double last_lon, last_lat, last_alt;	
+	double last_lon, last_lat, last_alt;
 	double min_time_before_lt;
 
 	float fov_width, fov_height;
@@ -62,7 +62,7 @@ public:
 	~cGrRain();
 
 	void initialize(int rain, float precipitationDensity);
-	
+
 	void drawRain(double pitch, double roll, double heading, double hspeed, double rain_norm, int rain);
     /**
      * Draw rain or snow precipitation around the viewer.
@@ -80,7 +80,7 @@ public:
      * Forward the fog color used by the rain rendering.
      * @param adj_fog_color color of the fog
      */
-	
+
 	// rain/snow
 	//inline float get_precipitation_density(void) const
 		//{ return precipitation_density; }
@@ -88,7 +88,7 @@ public:
 	//inline bool get_precipitation_enable_state(void) const
 		//{ return precipitation_enable_state; }
 
-	/** 
+	/**
 	 * Decrease the precipitation density to the given percentage.
 	 * (Only show the given percentage of rain streaks etc.)
 	 * Default precipitation density upon construction is 100.0.
@@ -99,7 +99,7 @@ public:
      * Enable or disable the rendering of precipitation around the viewer.
      * @param enable when true we will draw precipitation depending on metar data
      */
-	//void set_precipitation_enable_state(bool enable);   
+	//void set_precipitation_enable_state(bool enable);
 
    	//void setFOV( float w, float h );
 	//void getFOV( float &w, float &h );

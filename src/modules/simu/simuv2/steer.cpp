@@ -19,7 +19,7 @@
 
 #include "sim.h"
 
-void 
+void
 SimSteerConfig(tCar *car)
 {
 	void *hdle = car->params;

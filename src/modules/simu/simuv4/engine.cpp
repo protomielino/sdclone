@@ -159,7 +159,7 @@ void
 SimEngineReConfig(tCar *car)
 {/* called by SimCarReConfig in car.cpp */
 	tCarSetupItem *setupRevLimit = &(car->carElt->setup.revsLimiter);
-	
+
 	if (setupRevLimit->changed)
 	{
 		car->engine.revsLimiter = MIN(setupRevLimit->max, MAX(setupRevLimit->min, setupRevLimit->desired_value));
@@ -287,7 +287,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 	float transfer;
 
 
-	if (car->fuel <= 0.0) 
+	if (car->fuel <= 0.0)
 	{
 		engine->rads = 0;
 		clutch->state = CLUTCH_APPLIED;
@@ -329,7 +329,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 	{
 		sdI = 1.0;
 	}
-	
+
 	float alpha = 0.1f; // transition coefficient
 	engine->I_joint = (tdble) (engine->I_joint*(1.0-alpha) +  alpha*trans->curI);
 
@@ -347,7 +347,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 			engine->Tq = 0.0;
 		}
 	}
-	else 
+	else
 	{
 		engine->rads = freerads;
 	}

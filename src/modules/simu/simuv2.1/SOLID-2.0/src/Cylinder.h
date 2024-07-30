@@ -35,12 +35,12 @@
 
 class Cylinder : public Convex {
 public:
-  Cylinder(Scalar r, Scalar h) : 
-    radius(r), 
+  Cylinder(Scalar r, Scalar h) :
+    radius(r),
     halfHeight(h / 2) {}
 
   Point support(const Vector&) const;
-  
+
 protected:
   Scalar radius;
   Scalar halfHeight;

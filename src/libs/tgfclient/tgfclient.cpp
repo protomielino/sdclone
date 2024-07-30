@@ -1,6 +1,6 @@
 /***************************************************************************
                           tgfclient.cpp -- The Gaming Framework UI
-                             -------------------                                         
+                             -------------------
     created              : Fri Aug 13 22:31:43 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
@@ -73,7 +73,7 @@ void FreeScreens()
 	{
 		// Get the screen from the owner
 		tGfuiScreen* screen = OwnerOfScreens[I];
-		if (screen) 
+		if (screen)
 		{
 			fprintf(stderr,"Unreleased screen: %d\n",screen->ScreenID);
 			ScreenRelease(screen); // Free all resources
@@ -88,7 +88,7 @@ void FreeScreens()
 // Free screen
 void FreeScreen(void* screen)
 {
-	if (screen) 
+	if (screen)
 	{
 		tGfuiScreen* _screen = (tGfuiScreen*) screen;
 		fprintf(stderr,"Release screen: %d\n",_screen->ScreenID);
@@ -161,6 +161,6 @@ void GfuiShutdown(void)
 
 	// Free screens that are stil allocated
 	FreeScreens();
-	
+
 	GfScrShutdown();
 }

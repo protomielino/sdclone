@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : snddefault.h
-    copyright   : (C) 2011 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
+    copyright   : (C) 2011 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The "snddefault" sound engine module
     @version    $Id$
 */
@@ -68,7 +68,7 @@ class SNDDEFAULT_API SndDefault : public GfModule, public ISoundEngine
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	SndDefault(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -79,4 +79,4 @@ class SNDDEFAULT_API SndDefault : public GfModule, public ISoundEngine
 	static SndDefault* _pSelf;
 };
 
-#endif /* _SNDDEFAULT_H_ */ 
+#endif /* _SNDDEFAULT_H_ */

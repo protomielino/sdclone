@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * <p>
  * Societe
  * </p>
- * 
+ *
  * @author Patrice Espie
  * @version 0.1a
  */

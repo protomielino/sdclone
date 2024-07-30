@@ -36,7 +36,7 @@
 #include <config.h>
 #endif
 
-#include <raceman.h> // RACE_ENG_CFG 
+#include <raceman.h> // RACE_ENG_CFG
 #include <iraceengine.h>
 #include <iuserinterface.h>
 
@@ -65,10 +65,10 @@ void ReleaseData(void)
 		// Shutdown and unload the user interface and race engine modules.
 		// piUserItf->shutdown();
 		// piRaceEngine->shutdown();
-		
+
 		// GfModule::unload(pmodUserItf);
 		// GfModule::unload(pmodRaceEngine);
-		
+
 		// Shutdown the data layer.
 		// GfData::shutdown();  << causes crashes if called from here
 
@@ -78,7 +78,7 @@ void ReleaseData(void)
 	// ... For debugging only
 	*/
 }
-#endif 
+#endif
 // ... Use new Memory Manager
 
 /*
@@ -141,11 +141,11 @@ main(int argc, char *argv[])
 	else
 		pApp = new GfuiApplication("Speed Dreams", VERSION_LONG, "an Open Motorsport Sim");
 	pApp->initialize(/*bLoggingEnabled=*/true, argc, argv);
-	
+
 	// Register app. specific options and help text.
 	pApp->registerOption("s", "startrace", /* nHasValue = */ true);
 	pApp->registerOption("x", "textonly", /* nHasValue = */ false);
-	
+
 	pApp->addOptionsHelpSyntaxLine("[-s|--startrace <race name> [-x|--textonly] ]");
 	pApp->addOptionsHelpExplainLine
 	 	("- race name : Name without extension of the selected raceman file,");
@@ -166,7 +166,7 @@ main(int argc, char *argv[])
 				  << " because no race specified in text-only mode." << std::endl;
 		return 1;
 	}
-	
+
 	// If "data dir" specified in any way, cd to it.
 	if(chdir(GfDataDir()))
 	{
@@ -226,7 +226,7 @@ main(int argc, char *argv[])
 		piRaceEngine->setUserInterface(*piUserItf);
 		piUserItf->setRaceEngine(*piRaceEngine);
 	}
-	
+
 	if (piUserItf && piRaceEngine)
 	{
 #ifdef __DEBUG_MEMORYMANAGER__
@@ -240,14 +240,14 @@ main(int argc, char *argv[])
 			// Game event loop (when it returns, it's simply because we are exiting).
 			pApp->eventLoop()();
 		}
-		
+
 		// Shutdown and unload the user interface and race engine modules.
 		piUserItf->shutdown();
 		piRaceEngine->shutdown();
-		
+
 		GfModule::unload(pmodUserItf);
 		GfModule::unload(pmodRaceEngine);
-		
+
 		// Shutdown the data layer.
 		GfData::shutdown();
 	}

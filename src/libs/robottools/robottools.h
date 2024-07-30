@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Robots Tools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -106,7 +106,7 @@ ROBOTTOOLS_API void RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tT
 /*
  * Returns the absolute height in meters of the road
  * at the Local position p.
- * 
+ *
  * If the point lies outside the track (and sides)
  * the height is computed using the tangent to the banking
  * of the segment (or side).

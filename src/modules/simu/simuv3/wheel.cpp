@@ -27,8 +27,8 @@
 #define BEGIN_PROFILE(x) double x##_dt = GfTimeClock()
 #define END_PROFILE(x) x += GfTimeClock() - x##_dt
 #else
-#define BEGIN_PROFILE(x) 
-#define END_PROFILE(x) 
+#define BEGIN_PROFILE(x)
+#define END_PROFILE(x)
 #endif
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 static const char *SuspSect[4] = {SECT_FRNTRGTSUSP, SECT_FRNTLFTSUSP, SECT_REARRGTSUSP, SECT_REARLFTSUSP};
@@ -90,10 +90,10 @@ SimWheelConfig(tCar *car, int index)
     } else {
 		wheel->relPos.ax = wheel->staticPos.ax;
     }
-    
+
     wheel->lfMin = MIN(0.9f, wheel->lfMin);
     wheel->lfMax = MAX(1.1f, wheel->lfMax);
-    
+
     RFactor = MIN(1.0f, RFactor);
     RFactor = MAX(0.1f, RFactor);
     EFactor = MIN(1.0f, EFactor);
@@ -117,7 +117,7 @@ SimWheelConfig(tCar *car, int index)
     /* components */
     SimSuspConfig(hdle, SuspSect[index], &(wheel->susp), wheel->weight0, x0);
     SimBrakeConfig(hdle, BrkSect[index], &(wheel->brake));
-    
+
     carElt->_rimRadius(index) = rimdiam / 2.0f;
     if (tireheight > 0.0)
 	    carElt->_tireHeight(index) = tireheight;
@@ -131,7 +131,7 @@ SimWheelConfig(tCar *car, int index)
     wheel->mfC = (float)(2.0 - asin(RFactor) * 2.0 / PI);
     wheel->mfB = Ca / wheel->mfC;
     wheel->mfE = EFactor;
-    
+
     wheel->lfK = (float)log((1.0 - wheel->lfMin) / (wheel->lfMax - wheel->lfMin));
     wheel->spinVel = 0.0;
     wheel->feedBack.I += wheel->I;
@@ -176,12 +176,12 @@ SimWheelUpdateRide(tCar *car, int index)
 	tdble new_susp_x= prexwheel - wheel->rel_vel * SimDeltaTime;
     tdble max_extend;
 
-    
+
     t3Dd normal;
     t3Dd rel_normal;
     // Find normal of track.
     RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
-    wheel->normal = normal; 
+    wheel->normal = normal;
     {
 		sgQuat Q;
 		sgCopyQuat (Q, car->posQuat);
@@ -200,14 +200,14 @@ SimWheelUpdateRide(tCar *car, int index)
 #else
 	tdble adjRadius = wheel->radius;
 #endif
-    if (rel_normal.z > MIN_NORMAL_Z) {		
+    if (rel_normal.z > MIN_NORMAL_Z) {
 		wheel->susp.fx = adjRadius - adjRadius/rel_normal.z;
 		wheel->susp.fy = 0.0;
 		//wheel->susp.x = wheel->rideHeight =
 		max_extend = adjRadius + ((dZ)*normal.z - adjRadius)/rel_normal.z;
     } else {
 		//wheel->susp.x = wheel->rideHeight = (wheel->pos.z - Zroad);
-		//	wheel->susp.x = wheel->rideHeight = wheel->susp.spring.packers; 
+		//	wheel->susp.x = wheel->rideHeight = wheel->susp.spring.packers;
 		wheel->susp.fx = 0.0;
 		wheel->state = wheel->state | SIM_SUSP_COMP;
 		max_extend = 0.0;
@@ -227,7 +227,7 @@ SimWheelUpdateRide(tCar *car, int index)
 
 	   In either case, the collision code is used to see how to react.
 	   In the collision code, we check if the car is upright :
-	   
+
 	   If the car is upright:
 	   * If the car is not very low, then the simuv2 approach is used.
 	   * If the car is under the track (beyond a margin) then damages are taken
@@ -237,10 +237,10 @@ SimWheelUpdateRide(tCar *car, int index)
 	   Now, this collision code with the ground (collidez) seems to be somewhat problematic,
 	   but I do not know why. Virtually the same code is used for collisions with the walls,
 	   and there the car behaves nicely.
-	   
+
 	   Possibly there is a mixup with the frames of reference.
 	*/
-	
+
 	wheel->rideHeight = max_extend;
 
     wheel->bump_force = 0.0; // force of the wheel bumping up into the frame
@@ -250,9 +250,9 @@ SimWheelUpdateRide(tCar *car, int index)
 	} else if (new_susp_x <= wheel->susp.spring.packers) {
         wheel->bump_force = wheel->mass * wheel->rel_vel / SimDeltaTime;
         wheel->susp.x = wheel->susp.spring.packers;
-		wheel->rel_vel = 0.0f; 
+		wheel->rel_vel = 0.0f;
 	}
- 
+
 	tdble prex = wheel->susp.x;
 	wheel->susp.x = new_susp_x;
 
@@ -286,7 +286,7 @@ SimWheelUpdateRide(tCar *car, int index)
     wheel->susp.v = (prex - wheel->susp.x) / SimDeltaTime;
     /* update wheel brake */
     SimBrakeUpdate(car, wheel, &(wheel->brake));
-    
+
 }
 
 // Note that this differs in the calculation of sx, sy, sa
@@ -320,22 +320,22 @@ SimWheelUpdateForce(tCar *car, int index)
 	tdble adjRadius = wheel->radius + wheel->thickness[seg_id];
 #else
 	tdble adjRadius = wheel->radius;
-#endif	
+#endif
 
 
 	wheel->T_current = car->carElt->_tyreT_mid(index);
 	wheel->condition = car->carElt->_tyreCondition(index);
 
     waz = wheel->relPos.az;//wheel->steer + wheel->staticPos.az;
-    /* Get normal of road relative to the wheel's axis 
+    /* Get normal of road relative to the wheel's axis
 	   This should help take into account the camber.*/
 
 	BEGIN_PROFILE(timer_coordinate_transform);
-    
-    //RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
-	normal = wheel->normal; 
 
-    
+    //RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+	normal = wheel->normal;
+
+
     // now rel_normal.x is the effective camber angle
 	if (USE_QUATERNIONS==0) {
 		t3Dd angles = { car->DynGCg.pos.ax + wheel->relPos.ax,
@@ -351,7 +351,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		sgRotateVecQuat (P, Q);
 		sg2t3 (P, rel_normal);
 	}
-    
+
     wheel->state = 0;
 	END_PROFILE(timer_coordinate_transform);
 
@@ -362,7 +362,7 @@ SimWheelUpdateForce(tCar *car, int index)
     wheel->forces.y = 0.0;
     wheel->forces.z = 0.0;
 
-	
+
     /* Now uses the normal, so it should work */
     /* update suspension force */
     SimSuspUpdate(&(wheel->susp));
@@ -390,7 +390,7 @@ SimWheelUpdateForce(tCar *car, int index)
 			// reaction force on track z axis should be equal to
 			// suspension reaction if suspension is perpendicular
 			// to the track plane. We assume other reaction forces
-			// proportional, but things break down when car is 
+			// proportional, but things break down when car is
 			// tilted a lot with respect to the track plane.
 			tdble invrel_normal = 1.0f/rel_normal.z;
 			if (invrel_normal>= 4.0) {
@@ -469,7 +469,7 @@ SimWheelUpdateForce(tCar *car, int index)
 	    sy = wvy/ABSOLUTE_SPEED_CUTOFF;
 	    sa = atan2(wvy, wvx);
     } else {
-		// The division with absolute_speed is a bit of a hack. 
+		// The division with absolute_speed is a bit of a hack.
         // But the assumption is that the profile of friction
         // scales linearly with speed.
 		sx = wvx/absolute_speed;
@@ -509,7 +509,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_skid[index] = 0.0f;
 		car->carElt->_reaction[index] = 0.0f;
     }
-    
+
     stmp = MIN(s, 1.5f);
 
     /* MAGIC FORMULA */
@@ -521,7 +521,7 @@ SimWheelUpdateForce(tCar *car, int index)
 	/* load sensitivity */
     mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * reaction_force / wheel->opLoad));
     //mu = wheel->mu;
-    
+
 	tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction;
 	//tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction/0.7f;
 
@@ -544,19 +544,19 @@ SimWheelUpdateForce(tCar *car, int index)
 		tdble mfT;
 		// friction heat transfer
 		T_current += (tdble)(0.00003*((fabs(relative_speed)+0.1*fabs(wrl))*reaction_force)*SimDeltaTime);
-		T_current = (tdble)(T_current * (1.0-htrf) + htrf * 25.0);	
+		T_current = (tdble)(T_current * (1.0-htrf) + htrf * 25.0);
 		tdble dist = (T_current - T_operating)/T_range;
 		//mfT = 100.0f * exp(-0.5f*(dist*dist))/T_range;
 		mfT = 0.85f + 3.0f * exp(-0.5f*(dist*dist))/T_range;
 		if (T_current>200.0) T_current=200.0;
 		wheel->mfT = mfT;
 		wheel->T_current = T_current;
-	
+
     }
 
     if (car->options->tyre_damage > 0.0f && s>0.01f) {
 		tdble compound_melt_point = wheel->T_operating + wheel->T_range;
-		tdble adherence = wheel->Ca * 500.0f; 
+		tdble adherence = wheel->Ca * 500.0f;
 		tdble melt = (exp (2.0f*(wheel->T_current - compound_melt_point)/compound_melt_point)) * car->options->tyre_damage;
 		tdble removal = exp (2.0f*(F - adherence)/adherence);
 		tdble wheel_damage = (tdble)(0.001 * melt * relative_speed * removal / (2.0 * M_PI * wheel->radius * wheel->width * wheel->Ca));
@@ -605,14 +605,14 @@ SimWheelUpdateForce(tCar *car, int index)
     Ft2 -= tanh(wvx) * fabs(wheel->rollRes);
     Fn2 -= tanh(wvy) * fabs(wheel->rollRes);
 	wheel->forces.x = Ft2 * rel_normal_yz;
-	wheel->forces.y = Fn2 * rel_normal_xz; 
+	wheel->forces.y = Fn2 * rel_normal_xz;
 	wheel->forces.z = Ft2 * rel_normal.x + Fn2 * rel_normal.y;
 
 	END_PROFILE(timer_force_calculation);
-	
+
 	if (0) {
 		// EXPERIMENTAL code - estimate amount of mass linked to this
-		// wheel. Maybe useful for adjusting the slope of the 
+		// wheel. Maybe useful for adjusting the slope of the
 		// static friction function. Currently not used.
 		tdble Ftot = sqrt(Ft2*Ft2 + Fn2*Fn2);
 		tdble ds = wheel->s_old-s;
@@ -659,7 +659,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		// TODO: Check whether this is correct.
 		t3Dd angles = { wheel->relPos.ax + asin(rel_normal.x), asin(rel_normal.y), waz };
 		NaiveInverseRotate (f, angles, &wheel->forces);
-		// transmit reaction forces to the car	
+		// transmit reaction forces to the car
 		wheel->forces.x +=(Ft* CosA - Fn * SinA);
 		wheel->forces.y +=(Ft* SinA + Fn * CosA);
 
@@ -695,9 +695,9 @@ SimWheelUpdateRotation(tCar *car)
     for (i = 0; i < 4; i++) {
 		wheel = &(car->wheel[i]);
 		wheel->spinVel = wheel->in.spinVel;
-	
+
 		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
-	
+
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
 		car->carElt->_wheelSpinVel(i) = wheel->spinVel;
     }
@@ -712,12 +712,12 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
     tdble		BrTq;		/* brake torque */
     tdble		ndot;		/* rotation acceleration */
     tdble		I;
-    
+
     for (i = axlenb * 2; i < axlenb * 2 + 2; i++) {
 		wheel = &(car->wheel[i]);
 
 		I = wheel->I + car->axle[axlenb].I / 2.0f;
-	    
+
 		ndot = SimDeltaTime * wheel->spinTq / I;
 		wheel->spinVel -= ndot;
 
@@ -727,7 +727,7 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
 		if (fabs(ndot) > fabs(wheel->spinVel)) {
 			ndot = -wheel->spinVel;
 		}
-	
+
 		wheel->spinVel += ndot;
 		wheel->in.spinVel = wheel->spinVel;
     }

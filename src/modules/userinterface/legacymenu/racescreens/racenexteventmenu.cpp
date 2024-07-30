@@ -2,8 +2,8 @@
 
     file        : racenexteventmenu.cpp
     created     : Fri Jan  3 22:24:41 CET 2003
-    copyright   : (C) 2003 by Eric Espie                        
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		The Next Event menu (where one sees which track the next event is run on)
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -63,11 +63,11 @@ RmNextEventMenu(void)
 	}
 
 	GfLogTrace("Entering Next Event menu\n");
-	
+
 	// Create screen, load menu XML descriptor and create static controls.
-	rmScrHandle = GfuiScreenCreate(NULL, 
-								  NULL, (tfuiCallback)NULL, 
-								  NULL, (tfuiCallback)NULL, 
+	rmScrHandle = GfuiScreenCreate(NULL,
+								  NULL, (tfuiCallback)NULL,
+								  NULL, (tfuiCallback)NULL,
 								  1);
 	void *menuXMLDescHdle = GfuiMenuLoad("racenexteventmenu.xml");
 	GfuiMenuCreateStaticControls(rmScrHandle, menuXMLDescHdle);
@@ -92,7 +92,7 @@ RmNextEventMenu(void)
 
 	// Calculate which race of the series this is
 	raceNumber = 1;
-	for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx) 
+	for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx)
 	{
 		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, xx);
 		if (strcmp( GfParmGetStr(reInfo->params, buf, RM_ATTR_NAME, "free"), "free") != 0)
@@ -104,7 +104,7 @@ RmNextEventMenu(void)
 			 raceNumber,
 			 (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) >= 0
 			 ? (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 )
-			 : GfParmGetEltNb(params, RM_SECT_TRACKS), 
+			 : GfParmGetEltNb(params, RM_SECT_TRACKS),
 			 reInfo->track->name);
 	int subTitleId = GfuiMenuCreateLabelControl(rmScrHandle, menuXMLDescHdle, "SubTitleLabel");
 	GfuiLabelSetText(rmScrHandle, subTitleId, buf);
@@ -115,7 +115,7 @@ RmNextEventMenu(void)
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
-	
+
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(rmScrHandle);
 	GfuiAddKey(rmScrHandle, GFUIK_RETURN, "Start Event", NULL, rmStateManage, NULL);

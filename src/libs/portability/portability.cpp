@@ -75,7 +75,7 @@ char *strtok_r(char *str, const char *delim, char **nextp)
 // that ensures 0 ending for the string.
 // and returns the number of bytes written to the str
 // or if the str is not large enough, the function writes as much
-// as possible and returns the number of bytes that WOULD have 
+// as possible and returns the number of bytes that WOULD have
 // been written had str been large enough. ie: the needed buffer size
 
 #if _MSC_VER && _MSC_VER < 1900

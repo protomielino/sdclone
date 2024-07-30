@@ -2,7 +2,7 @@
                  itrackloader.h -- Interface for track loaders
 
     created              : Wed Mar 31 22:12:01 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	Interface for track loaders
     @version	$Id$
 */

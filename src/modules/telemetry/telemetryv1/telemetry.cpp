@@ -28,7 +28,7 @@
 
 #include "tlm.h"
 
-typedef struct Channel 
+typedef struct Channel
 {
     struct Channel	*next;
     const char		*name;	/* channel name */
@@ -45,7 +45,7 @@ typedef struct Tlm
     tdble	ymax;
     tChannel	*chanList;
 } tTlm;
-    
+
 static tTlm	TlmData;
 
 
@@ -109,7 +109,7 @@ TlmNewChannel(const char *name, tdble *var, tdble min, tdble max)
     }
 }
 
-void 
+void
 TlmStartMonitoring(const char *filename)
 {
     char	buf[1024];
@@ -117,7 +117,7 @@ TlmStartMonitoring(const char *filename)
     FILE	*fcmd;
     tChannel	*curChan;
     int		i;
-    
+
     GfOut("Telemetry: start monitoring\n");
 
     sprintf(buf, "telemetry/%s.cmd", filename);
@@ -148,9 +148,9 @@ TlmStartMonitoring(const char *filename)
     }
     fprintf(fcmd, "!!\n");
     fclose(fcmd);
-    
+
     TlmData.cmdfile = strdup(buf);
-    
+
     sprintf(buf, "telemetry/%s.dat", filename);
     fout = TlmData.file = fopen(buf, "w");
     if (fout == NULL) {
@@ -165,11 +165,11 @@ TlmStartMonitoring(const char *filename)
 	} while (curChan != TlmData.chanList);
 	fprintf(fout, "\n");
     }
-    
+
     TlmData.state = 1;
 }
 
-void 
+void
 TlmUpdate(double time)
 {
     FILE	*fout;
@@ -180,7 +180,7 @@ TlmUpdate(double time)
     }
     fout = TlmData.file;
     fprintf(fout, "%f ", time);
-    
+
     curChan = TlmData.chanList;
     if (curChan != NULL) {
 	do {
@@ -192,11 +192,11 @@ TlmUpdate(double time)
 }
 
 
-void 
+void
 TlmStopMonitoring(void)
 {
     char	buf[256];
-    
+
     if (TlmData.state == 1) {
 	fclose(TlmData.file);
     }

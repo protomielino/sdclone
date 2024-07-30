@@ -90,7 +90,7 @@ typedef struct
     DtShapeRef	shape;		/* for collision */
     int		blocked;
     int		dammage;
-    
+
     tdble       upside_down_timer;
     tDynPt	restPos;	/* target rest position after the car is broken */
 //    tRmInfo     *ReInfo; // Not used til now.
@@ -155,7 +155,7 @@ typedef struct
 
 #endif
 
-#endif /* _CAR__H_ */ 
+#endif /* _CAR__H_ */
 
 
 

@@ -19,7 +19,7 @@
 
 /** @file
     		The menu for when the race is running
-    @ingroup	racemantools		
+    @ingroup	racemantools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
@@ -46,7 +46,7 @@ static char** TextLines = 0;
 static int CurTextLineIdx;
 
 
-/** 
+/**
     @ingroup	racemantools
     @param	title	Screen title.
     @param	bgimg	Optional background image (0 for no img).
@@ -104,21 +104,21 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     }
 
     CurTextLineIdx = 0;
-    
+
     // Add background image.
     if (bgimg)
 		GfuiScreenAddBgImg(HScreen, bgimg);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hmenu);
-    
+
     // Display screen.
     GfuiScreenActivate(HScreen);
     GfuiDisplay();
 
 	#ifdef WEBSERVER
     //force one redisplay
-    GfuiApp().eventLoop().forceRedisplay(); 
+    GfuiApp().eventLoop().forceRedisplay();
 	#endif //WEBSERVER
 
 }
@@ -137,14 +137,14 @@ RmLoadingScreenShutdown(void)
 		freez(FGColors);
 		freez(TextLines);
 		freez(TextLineIds);
-		
+
 		GfuiScreenRelease(HScreen);
 		HScreen = 0;
     }
 }
 
 
-/** 
+/**
     @ingroup	racemantools
     @param	text	Text to display.
     @return	None.
@@ -153,13 +153,13 @@ void
 RmLoadingScreenSetText(const char *text)
 {
     GfLogTrace("%s\n", text);
-    
+
     if (!HScreen)
 	{
 		//GfLogWarning("Can't display loading message : loading screen not created.\n");
 		return;
 	}
-	
+
 	if (TextLines[CurTextLineIdx])
 		freez(TextLines[CurTextLineIdx]);
 	if (text)
@@ -167,7 +167,7 @@ RmLoadingScreenSetText(const char *text)
 		TextLines[CurTextLineIdx] = strdup(text);
 		CurTextLineIdx = (CurTextLineIdx + 1) % NTextLines;
 	}
-	
+
 	int i = CurTextLineIdx;
 	int j = 0;
 	do
@@ -178,11 +178,11 @@ RmLoadingScreenSetText(const char *text)
 		i = (i + 1) % NTextLines;
 	}
 	while (i != CurTextLineIdx);
-	
+
 	GfuiDisplay();
 	#ifdef WEBSERVER
     //force one redisplay
-    GfuiApp().eventLoop().forceRedisplay(); 
+    GfuiApp().eventLoop().forceRedisplay();
 	#endif //WEBSERVER
 }
- 
+

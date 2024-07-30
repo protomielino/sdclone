@@ -292,8 +292,8 @@ public class TrackLightProperties extends PropertyPanel
 
 		protected void textureOnFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -320,8 +320,8 @@ public class TrackLightProperties extends PropertyPanel
 
 		protected void textureOffFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -486,6 +486,6 @@ public class TrackLightProperties extends PropertyPanel
 			}
 		}
 
-		getEditorFrame().getProject().setPropertiesEditorLightTab(this.tabbedPane.getSelectedIndex());	
+		getEditorFrame().getProject().setPropertiesEditorLightTab(this.tabbedPane.getSelectedIndex());
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

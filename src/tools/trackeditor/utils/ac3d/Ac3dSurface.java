@@ -45,12 +45,12 @@ public class Ac3dSurface
 	private Integer 	surf;
 	private Integer 	mat;
 	private Vector<Ref>	refs = new Vector<Ref>();
-	
+
 	public boolean isPolygon()
 	{
 		return (surf & SURFACE_TYPE_MASK) == SURFACE_TYPE_POLYGON;
 	}
-	
+
 	public void setPolygon()
 	{
 		if (surf == null)
@@ -62,12 +62,12 @@ public class Ac3dSurface
 			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_POLYGON;
 		}
 	}
-	
+
 	public boolean isClosedLine()
 	{
 		return (surf & SURFACE_TYPE_MASK) == SURFACE_TYPE_CLOSED_LINE;
 	}
-	
+
 	public void setClosedLine()
 	{
 		if (surf == null)
@@ -79,7 +79,7 @@ public class Ac3dSurface
 			surf = (surf & ~SURFACE_TYPE_MASK) | SURFACE_TYPE_CLOSED_LINE;
 		}
 	}
-	
+
 	public boolean isOpenLine()
 	{
 		return (surf & SURFACE_TYPE_MASK) == SURFACE_TYPE_OPEN_LINE;
@@ -101,7 +101,7 @@ public class Ac3dSurface
 	{
 		return (surf & SHADED_MASK) == SHADED_FLAT;
 	}
-	
+
 	public void setFlatShaded()
 	{
 		if (surf == null)
@@ -118,7 +118,7 @@ public class Ac3dSurface
 	{
 		return (surf & SHADED_MASK) == SHADED_SMOOTH;
 	}
-	
+
 	public void setSmoothShaded()
 	{
 		if (surf == null)
@@ -135,7 +135,7 @@ public class Ac3dSurface
 	{
 		return (surf & SIDED_MASK) == SIDED_ONE;
 	}
-	
+
 	public void setSingleSided()
 	{
 		if (surf == null)
@@ -152,7 +152,7 @@ public class Ac3dSurface
 	{
 		return (surf & SIDED_MASK) == SIDED_TWO;
 	}
-	
+
 	public void setDoubleSided()
 	{
 		if (surf == null)
@@ -164,7 +164,7 @@ public class Ac3dSurface
 			surf = (surf & ~SIDED_MASK) | SIDED_TWO;
 		}
 	}
-	
+
 	public void write(FileWriter file) throws IOException
 	{
 		NumberFormat	nf;

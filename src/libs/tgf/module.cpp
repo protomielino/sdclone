@@ -1,6 +1,6 @@
 /***************************************************************************
-                      module.cpp -- Dynamic module management                                
-                             -------------------                                         
+                      module.cpp -- Dynamic module management
+                             -------------------
     created              : Mod Mar 14 20:32:14 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		Dynamic module management.
     @version	$Id$
     @ingroup	module
@@ -50,20 +50,20 @@ static const char* pszCloseModuleFuncName = "closeGfModule";
 static std::string lastDLErrorString()
 {
 	std::string strError;
-	
+
 #ifdef WIN32
 
     // Retrieve the system error message for the last-error code
     LPVOID lpMsgBuf;
-    DWORD dw = GetLastError(); 
-	
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+    DWORD dw = GetLastError();
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
 				  FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				  NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				  (LPTSTR) &lpMsgBuf, 0, NULL );
 
 	strError = (const char*)lpMsgBuf;
-	
+
     LocalFree(lpMsgBuf);
 
 #else
@@ -145,7 +145,7 @@ GfModule* GfModule::load(const std::string& strShLibName)
 bool GfModule::isPresent(const std::string& strModCatName, const std::string& strModName)
 {
 	std::ostringstream ossModLibPathName;
-	
+
 	ossModLibPathName << GfLibDir() << "modules/" << strModCatName << "/"
 					  <<  strModName << DLLEXT;
 
@@ -155,7 +155,7 @@ bool GfModule::isPresent(const std::string& strModCatName, const std::string& st
 GfModule* GfModule::load(const std::string& strModPathName, const std::string& strModName)
 {
 	std::ostringstream ossModLibPathName;
-	
+
 	ossModLibPathName << GfLibDir() << strModPathName << "/" <<  strModName << DLLEXT;
 
 	return load(ossModLibPathName.str());
@@ -175,14 +175,14 @@ std::vector<GfModule*> GfModule::loadFromDir(const std::string& strDirPath,
 	{
 		// Filter module shared libraries and try and load each of them.
 		tFList* pFileOrDir = lstFilesOrDirs;
-		do 
+		do
 		{
 			// Ignore "." and ".." folders.
-			if (pFileOrDir->name[0] == '.') 
+			if (pFileOrDir->name[0] == '.')
 				continue;
-			
+
 			GfLogDebug("  Examining %s\n", pFileOrDir->name);
-		
+
 			// Build module shared library path-name (consider only foders, not files).
 			std::ostringstream ossShLibPath;
 			ossShLibPath << strDirPath << '/' << pFileOrDir->name;
@@ -200,11 +200,11 @@ std::vector<GfModule*> GfModule::loadFromDir(const std::string& strDirPath,
 				vecModules.push_back(pModule);
 			else
 				GfLogWarning("Failed to load module %s\n", ossShLibPath.str().c_str());
-			
+
 		}
 		while ((pFileOrDir = pFileOrDir->next) != lstFilesOrDirs);
 	}
-	
+
 	return vecModules;
 }
 
@@ -226,10 +226,10 @@ bool GfModule::unload(GfModule*& pModule)
 		GfLogWarning("Library %s '%s' function call failed ; going on\n",
 					 strShLibName.c_str(), pszCloseModuleFuncName);
 	}
-	
+
 	// Make it clear that the passed pointer is no more usable (it was deleted).
-	pModule = 0; 
-	
+	pModule = 0;
+
 	// Try and close the shared library.
 	if (dlclose(hShLibHandle))
 	{
@@ -237,7 +237,7 @@ bool GfModule::unload(GfModule*& pModule)
 					 strShLibName.c_str(), lastDLErrorString().c_str());
 		return false;
 	}
-	
+
 	GfLogTrace("Module %s unloaded\n", strShLibName.c_str());
 
 	return true;
@@ -257,7 +257,7 @@ bool GfModule::unload(std::vector<GfModule*>& vecModules)
 bool GfModule::register_(GfModule* pModule) // Can't use 'register' as it is a C++ keyword.
 {
 	bool bStatus = false;
-	
+
 	if (pModule)
 	{
 		if (_mapModulesByLibName.find(pModule->getSharedLibName()) != _mapModulesByLibName.end())
@@ -277,12 +277,12 @@ bool GfModule::register_(GfModule* pModule) // Can't use 'register' as it is a C
 bool GfModule::unregister(GfModule* pModule)
 {
 	bool bStatus = false;
-	
+
 	if (pModule)
 	{
 		if (_mapModulesByLibName.find(pModule->getSharedLibName()) == _mapModulesByLibName.end())
 		{
-			GfLogError("Can't unregister module in %s (not yet registered)\n", 
+			GfLogError("Can't unregister module in %s (not yet registered)\n",
 					   pModule->getSharedLibName().c_str());
 		}
 		else

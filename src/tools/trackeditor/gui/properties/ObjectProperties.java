@@ -60,7 +60,7 @@ import utils.circuit.TrackObject;
 public class ObjectProperties extends PropertyPanel
 {
 	static private TrackObject	objectCopy			= null;
-	
+
 	private	Boolean				defaultObjects		= false;
 	private JButton				addObjectButton		= null;
 	private JButton				deleteObjectButton	= null;
@@ -88,7 +88,7 @@ public class ObjectProperties extends PropertyPanel
 		this.setLayout(null);
 		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 		this.add(getTabbedPane(), null);
-		
+
 		if (!defaultObjects)
 		{
 			this.add(getAddObjectButton(), null);
@@ -205,7 +205,7 @@ public class ObjectProperties extends PropertyPanel
 							tabbedPane.addTab(name, null, new ObjectPanel(object), null);
 							tabbedPane.setSelectedIndex(0);
 						}
-							
+
 						setPanelFromObject(objectCopy, (ObjectPanel) getTabbedPane().getSelectedComponent());
 					}
 				}
@@ -234,7 +234,7 @@ public class ObjectProperties extends PropertyPanel
 			}
 			else
 			{
-				objects = getEditorFrame().getTrackData().getObjects();	
+				objects = getEditorFrame().getTrackData().getObjects();
 			}
 
 			for (int i = 0; i < objects.size(); i++)
@@ -288,10 +288,10 @@ public class ObjectProperties extends PropertyPanel
 		private JLabel				scaleMinLabel			= new JLabel();
 		private JTextField			scaleMinTextField		= new JTextField();
 		private JLabel				scaleMaxLabel			= new JLabel();
-		private JTextField			scaleMaxTextField		= new JTextField();		
+		private JTextField			scaleMaxTextField		= new JTextField();
 		private JButton				objectButton			= null;
 		private JButton				colorButton				= null;
-		
+
 		private double				lastScale				= 1.0;
 		private double				lastScaleMin			= 0.5;
 		private double				lastScaleMax			= 2.0;
@@ -325,7 +325,7 @@ public class ObjectProperties extends PropertyPanel
 			setLayout(null);
 
 			addLabel(this, 0, nameLabel, "Name", 160);
-			addLabel(this, 1, objectLabel, "Object", 160);			
+			addLabel(this, 1, objectLabel, "Object", 160);
 			addLabel(this, 2, commentLabel, "Comment", 160);
 			addLabel(this, 3, colorLabel, "Color", 160);
 			addLabel(this, 4, orientationTypeLabel, "Orientation Type", 160);
@@ -371,7 +371,7 @@ public class ObjectProperties extends PropertyPanel
 				scaleTypeComboBox.setEnabled(false);
 				scaleTextField.setEnabled(false);
 				scaleMinTextField.setEnabled(false);
-				scaleMaxTextField.setEnabled(false);		
+				scaleMaxTextField.setEnabled(false);
 			}
 			else
 			{
@@ -505,10 +505,10 @@ public class ObjectProperties extends PropertyPanel
 				text = scaleMaxTextField.getText();
 				if (text != null && !text.isEmpty())
 				{
-					lastScaleMax = getDouble(text);			
+					lastScaleMax = getDouble(text);
 				}
 			}
-			
+
 			String type = scaleTypeComboBox.getSelectedItem().toString();
 			if (type.equals("none"))
 			{
@@ -525,7 +525,7 @@ public class ObjectProperties extends PropertyPanel
 				scaleTextField.setText(null);
 				scaleMinTextField.setEnabled(true);
 				setTextField(scaleMinTextField, lastScaleMin);
-				scaleMaxTextField.setEnabled(true);					
+				scaleMaxTextField.setEnabled(true);
 				setTextField(scaleMaxTextField, lastScaleMax);
 			}
 			else if (type.equals("fixed"))
@@ -538,7 +538,7 @@ public class ObjectProperties extends PropertyPanel
 				scaleMaxTextField.setText(null);
 			}
 		}
-		
+
 		/**
 		 * This method initializes objectButton
 		 *
@@ -564,8 +564,8 @@ public class ObjectProperties extends PropertyPanel
 
 		protected void objectFile()
 		{
-			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
@@ -817,7 +817,7 @@ public class ObjectProperties extends PropertyPanel
 
 		getEditorFrame().getProject().setPropertiesEditorObjectTab(this.tabbedPane.getSelectedIndex());
 	}
-	
+
 	private void setObjectFromPanel(TrackObject object, ObjectPanel panel)
 	{
 		object.setName(panel.nameTextField.getText());
@@ -839,11 +839,11 @@ public class ObjectProperties extends PropertyPanel
 		setTextField(panel.nameTextField, object.getName());
 		setTextField(panel.objectTextField, object.getObject());
 		setTextField(panel.colorTextField, toHexString(object.getColor()));
-		panel.orientationTypeComboBox.setSelectedItem(toNoneString(object.getOrientationType()));		
+		panel.orientationTypeComboBox.setSelectedItem(toNoneString(object.getOrientationType()));
 		setTextField(panel.orientationTextField, object.getOrientation());
 		setTextField(panel.deltaHeightTextField, object.getDeltaHeight());
 		setTextField(panel.deltaVertTextField, object.getDeltaVert());
-		panel.scaleTypeComboBox.setSelectedItem(toNoneString(object.getScaleType()));		
+		panel.scaleTypeComboBox.setSelectedItem(toNoneString(object.getScaleType()));
 		setTextField(panel.scaleTextField, object.getScale());
 		setTextField(panel.scaleMinTextField, object.getScaleMin());
 		setTextField(panel.scaleMaxTextField, object.getScaleMax());

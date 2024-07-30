@@ -325,7 +325,7 @@ public class Ac3d
 	public Ac3d()
 	{
 	}
-	
+
 	public void read(File file) throws Exception, IOException
 	{
 		try

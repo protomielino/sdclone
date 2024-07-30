@@ -2,7 +2,7 @@ Introduction
 ------------
 This is an all in one package of Speed Dreams. Be aware that some included
 artwork has non free (in the GPL sense) licenses, you will find a "readme.txt"
-in those directories. 
+in those directories.
 The rest is either licensed under the GPL V2 (see COPYING.txt) or the Free Art License.
 
 
@@ -30,7 +30,7 @@ See INSTALL.txt
 
 Testing
 -------
-If you find problems which should be already fixed or new ones 
+If you find problems which should be already fixed or new ones
 please report them to the speed-dreams-users mailing list.
 
 
@@ -51,7 +51,7 @@ Car Setups
 You can have you own version on the car setups for the human driver
 - Linux   : ~/.speed-dreams-2/drivers/human/...
 - Windows : <My documents>\speed-dreams-2.settings\human\...
-depending on the car used. You can change them with a text editor, 
+depending on the car used. You can change them with a text editor,
 for more information look into the robot tutorial chapter 5
 (http://www.berniw.org/tutorials/robot/).
 

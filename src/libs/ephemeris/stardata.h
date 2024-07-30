@@ -25,7 +25,7 @@
 #include <string>
 #include <SGMath.h>
 
-class ePhStarData 
+class ePhStarData
 {
 public:
     // Constructor

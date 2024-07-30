@@ -46,7 +46,7 @@ public class PreferencesDialog extends JDialog
 		this.editorFrame = editorFrame;
 		initialize();
 	}
-	
+
 	private void initialize()
 	{
 		this.setSize(600, 334);
@@ -67,7 +67,7 @@ public class PreferencesDialog extends JDialog
 		}
 		this.setTitle("Preferences Dialog");
 	}
-	
+
 	private JPanel getJPanel()
 	{
 		if (jPanel == null)
@@ -136,7 +136,7 @@ public class PreferencesDialog extends JDialog
 		}
 		return dataDirectoryButton;
 	}
-	
+
 	protected void selectDataDirectory()
 	{
 		JFileChooser fc = new JFileChooser();
@@ -186,7 +186,7 @@ public class PreferencesDialog extends JDialog
 		}
 		return binDirectoryButton;
 	}
-	
+
 	protected void selectBinDirectory()
 	{
 		JFileChooser fc = new JFileChooser();
@@ -236,7 +236,7 @@ public class PreferencesDialog extends JDialog
 		}
 		return libDirectoryButton;
 	}
-	
+
 	protected void selectLibDirectory()
 	{
 		JFileChooser fc = new JFileChooser();
@@ -370,7 +370,7 @@ public class PreferencesDialog extends JDialog
 		try
 		{
 			Integer.parseInt(getRecentFilesMaxTextField().getText());
-		
+
 			APPROVE = true;
 			cancel();
 		}
@@ -386,17 +386,17 @@ public class PreferencesDialog extends JDialog
 		editorFrame.getProject().setPreferencesDialogY(this.getY());
 		this.dispose();
 	}
-	
+
 	public String getDataDirectory()
 	{
 		return getDataDirectoryTextField().getText();
 	}
-	
+
 	public String getBinDirectory()
 	{
 		return getBinDirectoryTextField().getText();
 	}
-	
+
 	public String getLibDirectory()
 	{
 		return getLibDirectoryTextField().getText();

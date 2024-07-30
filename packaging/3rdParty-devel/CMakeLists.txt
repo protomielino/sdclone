@@ -366,7 +366,7 @@ if(OPTION_SDL2_MIXER)
    set(SDL2_MIXER_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL2MIXER_DEBUG_POSTFIX:STRING=''
                                                -DSDL2MIXER_VENDORED:BOOL=OFF
                                                -DSDL2MIXER_SAMPLES:BOOL=OFF
-                                               -DSDL2MIXER_OPUS:BOOL=OFF 
+                                               -DSDL2MIXER_OPUS:BOOL=OFF
                                                -DSDL2MIXER_FLAC:BOOL=OFF
                                                -DSDL2MIXER_MOD:BOOL=OFF
                                                -DSDL2MIXER_WAVPACK:BOOL=OFF
@@ -383,10 +383,10 @@ endif(OPTION_SDL2_MIXER)
 if(OPTION_EXPAT)
    if(MSVC_VERSION GREATER 1900)
       #disable building unneeded sub projects
-      set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off 
-                                             -DEXPAT_BUILD_EXAMPLES=off 
-                                             -DEXPAT_BUILD_TOOLS=off 
-                                             -DCMAKE_DEBUG_POSTFIX='' 
+      set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off
+                                             -DEXPAT_BUILD_EXAMPLES=off
+                                             -DEXPAT_BUILD_TOOLS=off
+                                             -DCMAKE_DEBUG_POSTFIX=''
                                              -DEXPAT_DEBUG_POSTFIX='')
       ExternalProject_Add(${EXPAT_PROJECT}
          DOWNLOAD_NAME ${EXPAT_FILE}
@@ -495,7 +495,7 @@ else(OPTION_CURL)
 endif(OPTION_CURL)
 
 if(OPTION_OSG)
-   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' 
+   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX=''
                                         -DUSE_3RDPARTY_BIN=Off
                                         -DBUILD_OSG_DEPRECATED_SERIALIZERS=OFF
                                         -DBUILD_OSG_APPLICATIONS=OFF
@@ -542,7 +542,7 @@ else(OPTION_GLM)
 endif(OPTION_GLM)
 
 if(OPTION_TINYGLTF)
-   set(TINYGLTF_ARGS ${EXTERNALS_CMAKE_ARGS} -D TINYGLTF_BUILD_LOADER_EXAMPLE=Off 
+   set(TINYGLTF_ARGS ${EXTERNALS_CMAKE_ARGS} -D TINYGLTF_BUILD_LOADER_EXAMPLE=Off
                                              -D CMAKE_DEBUG_POSTFIX= )
    ExternalProject_Add(${TINYGLTF_PROJECT}
       URL ${TINYGLTF_URL}
@@ -603,7 +603,7 @@ if(MSVC)
    string(SUBSTRING ${_TMP_NAME} ${_INDEX} -1 _VSYEAR)
 
    # This is now preferrred way to check 32 vs 64 bit
-   if(CMAKE_SIZEOF_VOID_P EQUAL 8 ) 
+   if(CMAKE_SIZEOF_VOID_P EQUAL 8 )
       set(SD_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-vs${_VSYEAR}-win64)
    else(CMAKE_SIZEOF_VOID_P EQUAL 8 )
       set(SD_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-vs${_VSYEAR}-win32)

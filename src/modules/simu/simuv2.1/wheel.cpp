@@ -132,14 +132,14 @@ void SimWheelUpdateRide(tCar *car, int index)
 	} else if (new_susp_x < wheel->susp.spring.packers) {
 		wheel->rel_vel = 0.0f;
 	}
- 
+
 	tdble prex = wheel->susp.x;
 	wheel->susp.x = new_susp_x;
 
 	// verify the suspension travel, beware, wheel->susp.x will be scaled by SimSuspCheckIn
 	SimSuspCheckIn(&(wheel->susp));
 	wheel->susp.v = (prex - wheel->susp.x) / SimDeltaTime;
-	
+
 	// update wheel brake
 	SimBrakeUpdate(car, wheel, &(wheel->brake));
 }

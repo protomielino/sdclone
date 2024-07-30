@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : racenetwork.h
-    copyright   : (C) 2009 by Brian Gavin 
-    web         : www.speed-dreams.org 
+    copyright   : (C) 2009 by Brian Gavin
+    web         : www.speed-dreams.org
     version     : $Id$
 
  ***************************************************************************/
@@ -15,9 +15,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	    Brian Gavin
     @version	$Id$
 */
@@ -30,4 +30,4 @@ extern int ReNetworkWaitReady();
 extern void ReNetworkCheckEndOfRace();
 
 
-#endif /* _RACENETWORK_H_ */ 
+#endif /* _RACENETWORK_H_ */

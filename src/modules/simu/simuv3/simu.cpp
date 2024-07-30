@@ -55,7 +55,7 @@ static int SimNbCars = 0;
 static double simu_total_time = 0.0f;
 static double simu_init_time = 0.0f;
 
-double SimTicks = 0.0;  // Time measurement of CalculateTorque 
+double SimTicks = 0.0;  // Time measurement of CalculateTorque
 double SimTicks2 = 0.0; // Time measurement of CalculateTorque2
 double SimTicksRtTrackSurfaceNormalL = 0.0; // Time measurement of RtTrackSurfaceNormalL
 
@@ -196,7 +196,7 @@ SimReConfig(tCarElt *carElt)
 			car->wheel[i].rotational_damage_z = 0.0;
 			car->wheel[i].susp.damper.efficiency = 1.0;
 		}
-		
+
 		// (no need to repair wings because effect depends on damage).
 		car->dammage -= carElt->pitcmd.repair;
 		if (car->dammage < 0) car->dammage = 0;
@@ -237,7 +237,7 @@ RemoveCar(tCar *car, tSituation *s)
 		}
 		return;
     }
-    
+
 
     if (carElt->_state & RM_CAR_STATE_PULLSIDE) {
 		carElt->_pos_X += car->restPos.vel.x * SimDeltaTime;
@@ -275,7 +275,7 @@ RemoveCar(tCar *car, tSituation *s)
     }
     carElt->_gear = car->transmission.gearbox.gear = 0;
     carElt->_enginerpm = car->engine.rads = 0;
-  
+
     if (!(carElt->_state & RM_CAR_STATE_DNF)) {
 		if (fabs(carElt->_speed_x) > 1.0) {
 			return;
@@ -351,7 +351,7 @@ SimUpdate(tSituation *s, double deltaTime)
 		SimCarTable[ncar].collision = 0;
 		SimCarTable[ncar].blocked = 0;
     }
-    
+
     for (ncar = 0; ncar < s->_ncars; ncar++) {
 		car = &(SimCarTable[ncar]);
 		carElt = car->carElt;
@@ -368,13 +368,13 @@ SimUpdate(tSituation *s, double deltaTime)
 				continue;
 			}
 		}
-	
-		if (s->_raceState & RM_RACE_PRESTART && 
+
+		if (s->_raceState & RM_RACE_PRESTART &&
 				(car->carElt->_skillLevel < PRO || !(s->_features & RM_FEATURE_PENALTIES))) {
 			car->ctrl->brakeCmd = 1.0;
 			car->ctrl->clutchCmd = 1.0;
 		}
-	
+
 		CHECK(car);
 		ctrlCheck(car);
 		CHECK(car);
@@ -412,7 +412,7 @@ SimUpdate(tSituation *s, double deltaTime)
 			}
 			CHECK(car);
             /* } else {
-            
+
             SimCarUpdateWheelPos(car);
             CHECK(car);
             for (i = 0; i < 4; i++){
@@ -442,7 +442,7 @@ SimUpdate(tSituation *s, double deltaTime)
     SimCarCollideCars(s);
 
     /* printf ("%f - ", s->currentTime); */
-    
+
     for (ncar = 0; ncar < s->_ncars; ncar++) {
 		car = &(SimCarTable[ncar]);
 		CHECK(car);
@@ -552,13 +552,13 @@ SimShutdown(void)
     }
 
 	PTrack = 0;
-	
+
 	// Profiling test
     GfOut("#Total Time RtTrackSurfaceNormalL used: %g sec\n",SimTicksRtTrackSurfaceNormalL/1000.0);
 }
 
 /* Used for network games to update client physics */
-void 
+void
 UpdateSimCarTable(tDynPt DynGCG,int index)
 {
 	tCar *pCar = SimCarTable;
@@ -566,7 +566,7 @@ UpdateSimCarTable(tDynPt DynGCG,int index)
 }
 
 /* Used for network games get current physics values*/
-tDynPt * 
+tDynPt *
 GetSimCarTable(int index)
 {
 	tCar *pCar = SimCarTable;
@@ -585,7 +585,7 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
     SimDeltaTime = (float)deltaTime;
 	SimCarTable[index].collision = 0;
 	SimCarTable[index].blocked = 0;
-    
+
 	car = &(SimCarTable[index]);
 	carElt = car->carElt;
 
@@ -625,7 +625,7 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
 
 	SimTransmissionUpdate(car);
 	CHECK(car);
-		
+
 	SimWheelUpdateRotation(car);
 	CHECK(car);
 	SimCarUpdate(car, s);
@@ -647,11 +647,11 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
 	carElt->pub.posMat[1][3] =  SG_ZERO ;
 	carElt->pub.posMat[2][3] =  SG_ZERO ;
 	carElt->pub.posMat[3][3] =  SG_ONE ;
-	
+
 	carElt->_yaw = car->DynGC.pos.az;
 	carElt->_roll = car->DynGC.pos.ax;
 	carElt->_pitch = car->DynGC.pos.ay;
-	
+
 #endif
 	carElt->_trkPos = car->trkPos;
 	for (i = 0; i < 4; i++) {
@@ -660,14 +660,14 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
 		carElt->_wheelSeg(i) = car->wheel[i].trkPos.seg;
 		carElt->_brakeTemp(i) = car->wheel[i].brake.temp;
 		carElt->pub.corner[i] = car->corner[i].pos;
-		
+
 	}
 	carElt->_gear = car->transmission.gearbox.gear;
 	carElt->_enginerpm = car->engine.rads;
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
-	
+
 	P[0] = -carElt->_statGC_x;
 	P[1] = -carElt->_statGC_y;
 	P[2] = -carElt->_statGC_z;

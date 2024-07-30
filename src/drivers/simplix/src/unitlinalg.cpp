@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------*
 // Hilfsfunktionen für 2D- und 3D-Vektoren
 // (C++-Portierung der Unit	UnitLinAlg.pas)
-// 
+//
 // File			:	unitlinalg.cpp
 // Created		: 2007.02.20
 // Last	changed	: 2014.11.29

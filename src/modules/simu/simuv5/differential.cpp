@@ -19,7 +19,7 @@
 
 #include "sim.h"
 
-void 
+void
 SimDifferentialConfig(tCar *car, int index)
 {
     void *hdle = car->params;
@@ -36,7 +36,7 @@ SimDifferentialConfig(tCar *car, int index)
         case TRANS_CENTRAL_DIFF:
             section = SECT_CENTRALDIFFERENTIAL;
             break;
-        default: 
+        default:
             GfLogWarning("No differential indexed %d exists, returning without configuration.", index);
             return;
     }
@@ -48,42 +48,42 @@ SimDifferentialConfig(tCar *car, int index)
     tCarSetupItem *setupDLT = &(car->carElt->setup.differentialLockingTq[index]);
     tCarSetupItem *setupDMaxSB = &(car->carElt->setup.differentialMaxSlipBias[index]);
     tCarSetupItem *setupDCMaxSB = &(car->carElt->setup.differentialCoastMaxSlipBias[index]);
-    
+
     differential->I     = GfParmGetNum(hdle, section, PRM_INERTIA, (char*)NULL, 0.1f);
     differential->efficiency    = GfParmGetNum(hdle, section, PRM_EFFICIENCY, (char*)NULL, 1.0f);
     //differential->bias is unused as of 2015.11.15.
     differential->bias      = GfParmGetNum(hdle, section, PRM_BIAS, (char*)NULL, 0.1f);
-    
+
     setupDRatio->desired_value = setupDRatio->min = setupDRatio->max = 1.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_RATIO, (char*)NULL, &(setupDRatio->desired_value), &(setupDRatio->min), &(setupDRatio->max));
     setupDRatio->changed = true;
     setupDRatio->stepsize = 0.1f;
-    
+
     setupDMinTB->desired_value = setupDMinTB->min = setupDMinTB->max = 0.05f;
     GfParmGetNumWithLimits(hdle, section, PRM_MIN_TQ_BIAS, (char*)NULL, &(setupDMinTB->desired_value), &(setupDMinTB->min), &(setupDMinTB->max));
     setupDMinTB->changed = true;
     setupDMinTB->stepsize = 0.01f;
-    
+
     setupDMaxTB->desired_value = setupDMaxTB->min = setupDMaxTB->max = 0.80f;
     GfParmGetNumWithLimits(hdle, section, PRM_MAX_TQ_BIAS, (char*)NULL, &(setupDMaxTB->desired_value), &(setupDMaxTB->min), &(setupDMaxTB->max));
     setupDMaxTB->changed = true;
     setupDMaxTB->stepsize = 0.01f;
-    
+
     setupDVisc->desired_value = setupDVisc->min = setupDVisc->max = 2.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_VISCOSITY_FACTOR, (char*)NULL, &(setupDVisc->desired_value), &(setupDVisc->min), &(setupDVisc->max));
     setupDVisc->changed = true;
     setupDVisc->stepsize = 0.1f;
-    
+
     setupDLT->desired_value = setupDLT->min = setupDLT->max = 300.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_LOCKING_TQ, (char*)NULL, &(setupDLT->desired_value), &(setupDLT->min), &(setupDLT->max));
     setupDLT->changed = true;
     setupDLT->stepsize = 10.0f;
-    
+
     setupDMaxSB->desired_value = setupDMaxSB->min = setupDMaxSB->max = 0.75f;
     GfParmGetNumWithLimits(hdle, section, PRM_MAX_SLIP_BIAS, (char*)NULL, &(setupDMaxSB->desired_value), &(setupDMaxSB->min), &(setupDMaxSB->max));
     setupDMaxSB->changed = true;
     setupDMaxSB->stepsize = 0.01f;
-    
+
     setupDCMaxSB->desired_value = setupDCMaxSB->min = setupDCMaxSB->max = setupDMaxSB->desired_value;
     GfParmGetNumWithLimits(hdle, section, PRM_COAST_MAX_SLIP_BIAS, (char*)NULL, &(setupDCMaxSB->desired_value), &(setupDCMaxSB->min), &(setupDCMaxSB->max));
     setupDCMaxSB->changed = true;
@@ -91,7 +91,7 @@ SimDifferentialConfig(tCar *car, int index)
 
     type = GfParmGetStr(hdle, section, PRM_TYPE, VAL_DIFF_NONE);
     if (strcmp(type, VAL_DIFF_LIMITED_SLIP) == 0) {
-        differential->type = DIFF_LIMITED_SLIP; 
+        differential->type = DIFF_LIMITED_SLIP;
     } else if (strcmp(type, VAL_DIFF_VISCOUS_COUPLER) == 0) {
         differential->type = DIFF_VISCOUS_COUPLER;
     } else if (strcmp(type, VAL_DIFF_SPOOL) == 0) {
@@ -103,7 +103,7 @@ SimDifferentialConfig(tCar *car, int index)
     }  else if (strcmp(type, VAL_DIFF_ELECTRONIC_LSD) == 0) {
         differential->type = DIFF_ELECTRONIC_LSD;
     } else {
-        differential->type = DIFF_NONE; 
+        differential->type = DIFF_NONE;
     }
     car->carElt->setup.differentialType[index] = differential->type;
     //TODO: get allowed differential types from xml and store them
@@ -116,7 +116,7 @@ SimDifferentialConfig(tCar *car, int index)
 }
 
 
-void 
+void
 SimDifferentialReConfig(tCar *car, int index)
 {/* called by SimTransmissionReConfig() in transmission.cpp */
     tDifferential *differential = &(car->transmission.differential[index]);
@@ -127,47 +127,47 @@ SimDifferentialReConfig(tCar *car, int index)
     tCarSetupItem *setupDLT = &(car->carElt->setup.differentialLockingTq[index]);
     tCarSetupItem *setupDMaxSB = &(car->carElt->setup.differentialMaxSlipBias[index]);
     tCarSetupItem *setupDCMaxSB = &(car->carElt->setup.differentialCoastMaxSlipBias[index]);
-    
+
     //TODO: check if type is available
     differential->type = car->carElt->setup.differentialType[index];
-    
+
     if (setupDRatio->changed) {
         differential->ratio = MIN(setupDRatio->max, MAX(setupDRatio->min, setupDRatio->desired_value));
         setupDRatio->value = differential->ratio;
         setupDRatio->changed = false;
     }
-    
+
     if (setupDMinTB->changed) {
         differential->dTqMin = MIN(setupDMinTB->max, MAX(setupDMinTB->min, setupDMinTB->desired_value));
         setupDMinTB->value = differential->dTqMin;
         setupDMinTB->changed = false;
     }
-    
+
     if (setupDMaxTB->changed) {
         differential->dTqMax = MIN(setupDMaxTB->max, MAX(setupDMaxTB->min, setupDMaxTB->desired_value));
         setupDMaxTB->value = differential->dTqMax;
         setupDMaxTB->changed = false;
     }
-    
+
     if (setupDVisc->changed) {
         differential->viscosity = MIN(setupDVisc->max, MAX(setupDVisc->min, setupDVisc->desired_value));
         setupDVisc->value = differential->viscosity;
         setupDVisc->changed = false;
         differential->viscomax  = 1 - exp(-differential->viscosity);
     }
-    
+
     if (setupDLT->changed) {
         differential->lockInputTq = MIN(setupDLT->max, MAX(setupDLT->min, setupDLT->desired_value));
         setupDLT->value = differential->lockInputTq;
         setupDLT->changed = false;
     }
-    
+
     if (setupDMaxSB->changed) {
         differential->dSlipMax = MIN(setupDMaxSB->max, MAX(setupDMaxSB->min, setupDMaxSB->desired_value));
         setupDMaxSB->value = differential->dSlipMax;
         setupDMaxSB->changed = false;
     }
-    
+
      if (setupDCMaxSB->changed) {
         differential->dCoastSlipMax = MIN(setupDCMaxSB->max, MAX(setupDCMaxSB->min, setupDCMaxSB->desired_value));
         setupDCMaxSB->changed = false;
@@ -189,7 +189,7 @@ updateSpool(tCar *car, tDifferential *differential, int first)
     tdble   engineReaction;
     tdble   I;
     tdble   inTq, brkTq;
-    
+
     DrTq = differential->in.Tq * differential->efficiency;
 
     I = differential->outAxis[0]->I + differential->outAxis[1]->I;
@@ -198,15 +198,15 @@ updateSpool(tCar *car, tDifferential *differential, int first)
 
     ndot = SimDeltaTime * (DrTq - inTq) / I;
     spinVel = differential->inAxis[0]->spinVel + ndot;
-    
+
     BrTq = (tdble) (- SIGN(spinVel) * brkTq);
     ndot = SimDeltaTime * BrTq / I;
-    
+
     if (((ndot * spinVel) < 0.0) && (fabs(ndot) > fabs(spinVel))) {
         ndot = -spinVel;
     }
     if ((spinVel == 0.0) && (ndot < 0.0)) ndot = 0;
-    
+
     spinVel += ndot;
     if (first) {
         engineReaction = SimEngineUpdateRpm(car, spinVel);
@@ -221,7 +221,7 @@ updateSpool(tCar *car, tDifferential *differential, int first)
 }
 
 
-void 
+void
 SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
 {
     tdble   DrTq, DrTq0, DrTq1;
@@ -243,7 +243,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
 
     spinVel0 = differential->inAxis[0]->spinVel;
     spinVel1 = differential->inAxis[1]->spinVel;
-    
+
     inTq0 = differential->inAxis[0]->Tq;
     inTq1 = differential->inAxis[1]->Tq;
 
@@ -264,7 +264,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             // immobile, so that DrTq/2=inTq0 for example, then the
             // reaction does not act against the drivetrain, but since
             // the spider gear can turn freely, it acts on the other wheel.
-            // 
+            //
             // This system is equivalent to a rotating gear attached
             // in between two parallel surfaces, with DrTq being
             // equivalent to a force acting in the center of the
@@ -290,7 +290,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             //
             // [1] For an object to remain at rest, all forces acting
             // on it must sum to 0.
-            
+
             {
                 float spiderTq = inTq1 - inTq0;
                 DrTq0 = DrTq*0.5f + spiderTq;
@@ -298,7 +298,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             }
             break;
 
-                       
+
         case DIFF_LIMITED_SLIP:
             // Limited slip differential with:
             // - Gradual frictive locking
@@ -315,7 +315,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             // the differential locks and dSlipMax to regulate how much
             // more torque should go to the slower moving wheel.
             {
-                float spiderTq = inTq1 - inTq0; 
+                float spiderTq = inTq1 - inTq0;
                 float propTq = DrTq/differential->lockInputTq;
                 float rate = 0.0f;
                 if (propTq > 0.0f) {
@@ -332,14 +332,14 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
 
         case DIFF_ELECTRONIC_LSD: ;
         case DIFF_15WAY_LSD:
-            //Similar to DIFF_LIMITED_SLIP, 
-            //but has different dSlipMax for power (acceleration) 
+            //Similar to DIFF_LIMITED_SLIP,
+            //but has different dSlipMax for power (acceleration)
             //and coast (deceleration), instead working as a free
             //differential in coast direction.
             //Electronic LSD has the same working, but its parameters
             //can be changed during driving.
             {
-                float spiderTq = inTq1 - inTq0; 
+                float spiderTq = inTq1 - inTq0;
                 float propTq = DrTq/differential->lockInputTq;
                 float rate = 0.0f;
                 rate = 1.0f - exp(-propTq*propTq);
@@ -351,7 +351,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
                 DrTq1 = DrTq*(0.5f-bias) - spiderTq*open;
             }
             break;
-        
+
         case DIFF_VISCOUS_COUPLER:
             if (spinVel0 >= spinVel1) {
                 DrTq0 = DrTq * differential->dTqMin;
@@ -362,7 +362,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
                 DrTq0 = DrTq * deltaTq;
                 DrTq1 = DrTq * (1 - deltaTq);
             }
-    
+
             break;
         default: /* NONE ? */
             DrTq0 = DrTq1 = 0;
@@ -386,7 +386,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
     }
     if ((spinVel0 == 0.0) && (ndot0 < 0.0)) ndot0 = 0;
     spinVel0 += ndot0;
-    
+
     BrTq = (tdble) (- SIGN(spinVel1) * differential->inAxis[1]->brkTq);
     ndot1 = SimDeltaTime * BrTq / differential->outAxis[1]->I;
     if (((ndot1 * spinVel1) < 0.0) && (fabs(ndot1) > fabs(spinVel1))) {

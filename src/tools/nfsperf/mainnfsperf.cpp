@@ -1,9 +1,9 @@
 /***************************************************************************
     file        : nfsperf.cpp
     created     : Tue Aug  5 23:20:23 CEST 2003
-    copyright   : (C) 2003 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2003 by Eric Espié
+    email       : eric.espie@torcs.org
+    version     : $Id$
  ***************************************************************************/
 /***************************************************************************
  *                                                                         *
@@ -13,7 +13,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-/** @file   
+/** @file
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
@@ -51,7 +51,7 @@ void init_args(int argc, char **argv)
 #ifdef WIN32
     int i;
 #else
-    int	c;    
+    int	c;
 #endif
 #ifndef WIN32
     while (1) {
@@ -63,7 +63,7 @@ void init_args(int argc, char **argv)
 	c = getopt_long(argc, argv, "c:i:o:",
 			long_options, &option_index);
 	if (c == -1)
-	    break;	     
+	    break;
 	switch (c) {
 	case 0:
 	    switch (option_index) {
@@ -151,12 +151,12 @@ int main (int argc, char **argv)
     int		idx;
     int		vald;
     tdble	valf;
-    init_args (argc, argv);    
+    init_args (argc, argv);
     fin = fopen (infile, "rb");
     if (!fin) {
 	perror (infile);
 	exit (1);
-    }    
+    }
 
     // Initialize the gaming framework
     // (set bLoggingEnabled to true to enable logging = to get debug traces).
@@ -174,7 +174,7 @@ int main (int argc, char **argv)
 	if (!s) {
 	    printf ("Syntax error: \"%s\"\n", buf);
 	    exit (1);
-	}	
+	}
 	idx = strtol (s + 1, NULL, 0);
 	switch (idx) {
 	case 2:			/* mass [kg] */
@@ -302,7 +302,7 @@ int main (int argc, char **argv)
 		    GfParmSetNum (param, "Front Differential", "ratio", NULL, 1.0);
 		}
 	    }
-	    break;	    
+	    break;
 	case 19:			/* front bias brake ratio */
 	    if (!fgets (buf, sizeof (buf), fin)) {
 		exit (1);
@@ -394,7 +394,7 @@ int main (int argc, char **argv)
 	    GfParmSetNum (param, "Rear Right Wheel", "rim diameter", "in", (tdble)vald);
 	    GfParmSetNum (param, "Rear Left Wheel", "rim diameter", "in", (tdble)vald);
 	    s = end;
-	    break;	    
+	    break;
 	default:
 	    if (!fgets (buf, sizeof (buf), fin)) {
 		exit (1);

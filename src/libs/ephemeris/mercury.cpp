@@ -44,5 +44,5 @@ ePhMercury::ePhMercury() :
 void ePhMercury::updatePosition(double mjd, ePhStar *ourSun)
 {
   	ePhCelestialBody::updatePosition(mjd, ourSun);
-  	magnitude = -0.36 + 5*log10( r*R ) + 0.027 * FV + 2.2E-13 * pow(FV, 6); 
+  	magnitude = -0.36 + 5*log10( r*R ) + 0.027 * FV + 2.2E-13 * pow(FV, 6);
 }

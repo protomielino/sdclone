@@ -39,58 +39,58 @@
 //==========================================================================*
 // Deklaration der Klasse TFixCarParam
 //--------------------------------------------------------------------------*
-class TFixCarParam	
+class TFixCarParam
 {
   private:
 	PDriver oDriver;
 
   public:
 	PtCarElt oCar;								  //	Pointer	to TORCS data of car
-	TTmpCarParam* oTmpCarParam;				  // Variable car parameters										 
+	TTmpCarParam* oTmpCarParam;				  // Variable car parameters
 
-	TFixCarParam();							  //	Default	constructor	
+	TFixCarParam();							  //	Default	constructor
 	~TFixCarParam();							  // Destructor
 
 	double	CalcAcceleration
-	  (										 
-		double Crv0, double Crvz0, 
+	  (
+		double Crv0, double Crvz0,
 		double Crv1, double Crvz1,
-		double Speed,	double Dist, 
+		double Speed,	double Dist,
 		double Friction,
 		double TrackRollAngle,
-	   double TrackTiltAngle) const;				 
+	   double TrackTiltAngle) const;
 
 	double	CalcBraking
-	  (TCarParam& CarParam,										 
-		double Crv0, double Crvz0, 
+	  (TCarParam& CarParam,
+		double Crv0, double Crvz0,
 		double Crv1, double Crvz1,
-		double Speed,	double Dist, 
+		double Speed,	double Dist,
 		double Friction,
 		double TrackRollAngle,
 		double TrackTiltAngle) const;
 
 	double	CalcBrakingPit
-	  (TCarParam& CarParam,										 
-		double Crv0, double Crvz0, 
+	  (TCarParam& CarParam,
+		double Crv0, double Crvz0,
 		double Crv1, double Crvz1,
-		double Speed,	double Dist, 
+		double Speed,	double Dist,
 		double Friction,
 		double TrackRollAngle,
-	   double TrackTiltAngle) const;				 
+	   double TrackTiltAngle) const;
 
 	double	CalcMaxSpeed
-	  (TCarParam& CarParam,										 
-		double Crv0, 
+	  (TCarParam& CarParam,
+		double Crv0,
 		double Crv1,
-		double Crvz, 
+		double Crvz,
 		double KFriction,
 		double TrackRollAngle,
-	   double TrackTiltAngle) const;				 
+	   double TrackTiltAngle) const;
 
 	double	CalcMaxLateralF
-	  (										 
-	   double Speed, 
-		double Friction, 
+	  (
+	   double Speed,
+		double Friction,
 		double Crvz =	0.0) const;
 
 	double	CalcMaxSpeedCrv() const;

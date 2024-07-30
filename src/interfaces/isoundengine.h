@@ -22,10 +22,10 @@
 
 #include "camera.h"
 
-class ISoundEngine 
+class ISoundEngine
 {
 public:
- 
+
     virtual void init(struct Situation* s) = 0;
     virtual void shutdown() = 0;
     virtual void refresh(struct Situation *s, Camera *camera) = 0;
@@ -33,5 +33,5 @@ public:
     virtual float getVolume() const = 0;
     virtual void setVolume(float g) = 0;
 };
- 
+
  #endif // __ISOUNDENGINE__H__

@@ -57,7 +57,7 @@ inline void Endpoint::insert(Endpoint *p) {
   pred = p->pred;
   succ->pred = this;
   pred->succ = this;
-} 
+}
 
 inline bool operator<(const Endpoint& a, const Endpoint& b) {
   return a.pos < b.pos || (a.pos == b.pos && a.side < b.side);
@@ -73,10 +73,10 @@ inline void update(const Endpoint& a, const Endpoint& b) {
   }
 }
 
-Endpoint::Endpoint(int axis, Side s, const Object *obj) : 
-  side(s), 
-  objPtr(obj), 
-  pos(INFINITY_) 
+Endpoint::Endpoint(int axis, Side s, const Object *obj) :
+  side(s),
+  objPtr(obj),
+  pos(INFINITY_)
 { insert(&endpointList[axis].tail); }
 
 void Endpoint::move(Scalar x) {

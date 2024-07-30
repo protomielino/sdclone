@@ -1,6 +1,6 @@
 # If the OPTION_TRACKEDITOR exists, then this is being built as part of
 # the Speed-Dreams build. To allow building the trackeditor without
-# building all of SD, set the _STANDALONE flag which is used to skip 
+# building all of SD, set the _STANDALONE flag which is used to skip
 # the SD specific calls
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)
@@ -200,7 +200,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
 
-   ADD_JAR(${_TARGET_NAME} 
+   ADD_JAR(${_TARGET_NAME}
             SOURCES ${_JAVA_SRC} gui/splash/Splash.png icon.png ${_ICONS} META-INF/MANIFEST.MF
             INCLUDE_JARS ${JAVA_JARS}
             MANIFEST META-INF/MANIFEST.MF

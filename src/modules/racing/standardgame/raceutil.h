@@ -3,7 +3,7 @@
     file        : racestate.h
     created     : Sat Nov 16 14:05:06 CET 2006
     copyright   : (C) 2006 Mart Kelder
-    email       : mart@kelder31.nl   
+    email       : mart@kelder31.nl
     version     : $Id$
 
  ***************************************************************************/
@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		Useful functions for race engine
     @author	<a href=mailto:mart@kelder31.nl>Mart Kelder</a>
     @version	$Id$
@@ -28,7 +28,7 @@
 
 extern int RmGetFeaturesList(void* param);
 
-#endif /* _RACEUTIL_H_ */ 
+#endif /* _RACEUTIL_H_ */
 
 
 

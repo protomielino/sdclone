@@ -30,21 +30,21 @@
 
 #include "Object.h"
 #include "AlgoTable.h"
-#include "Convex.h" 
-#include "Complex.h" 
+#include "Convex.h"
+#include "Complex.h"
 
 #include <new>
 
-Object::Object(DtObjectRef obj, ShapePtr shape) : 
-  ref(obj), 
+Object::Object(DtObjectRef obj, ShapePtr shape) :
+  ref(obj),
   shapePtr(shape),
-  bbox(Point(INFINITY_, INFINITY_, INFINITY_), 
+  bbox(Point(INFINITY_, INFINITY_, INFINITY_),
        Point(INFINITY_, INFINITY_, INFINITY_))
 {
   curr.setIdentity();
-  new (&lower[X]) Endpoint(X, MIN, this);    
-  new (&lower[Y]) Endpoint(Y, MIN, this);    
-  new (&lower[Z]) Endpoint(Z, MIN, this);    
+  new (&lower[X]) Endpoint(X, MIN, this);
+  new (&lower[Y]) Endpoint(Y, MIN, this);
+  new (&lower[Z]) Endpoint(Z, MIN, this);
   new (&upper[X]) Endpoint(X, MAX, this);
   new (&upper[Y]) Endpoint(Y, MAX, this);
   new (&upper[Z]) Endpoint(Z, MAX, this);
@@ -69,19 +69,19 @@ typedef AlgoTable<Intersect> IntersectTable;
 typedef AlgoTable<Common_point> Common_pointTable;
 
 
-bool intersectConvexConvex(const Shape& a, const Shape& b, 
+bool intersectConvexConvex(const Shape& a, const Shape& b,
 			   const Transform& a2w, const Transform& b2w,
 			   Vector& v) {
   return intersect((const Convex&)a, (const Convex&)b, a2w, b2w, v);
 }
 
-bool intersectComplexConvex(const Shape& a, const Shape& b, 
+bool intersectComplexConvex(const Shape& a, const Shape& b,
 			    const Transform& a2w, const Transform& b2w,
 			    Vector& v) {
   return intersect((const Complex&)a, (const Convex&)b, a2w, b2w, v);
 }
 
-bool intersectComplexComplex(const Shape& a, const Shape& b, 
+bool intersectComplexComplex(const Shape& a, const Shape& b,
 			     const Transform& a2w, const Transform& b2w,
 			     Vector& v) {
   return intersect((const Complex&)a, (const Complex&)b, a2w, b2w, v);
@@ -97,24 +97,24 @@ IntersectTable *intersectInitialize() {
 
 bool intersect(const Object& a, const Object& b, Vector& v) {
   static IntersectTable *intersectTable = intersectInitialize();
-  Intersect intersect = 
+  Intersect intersect =
     intersectTable->lookup(a.shapePtr->getType(), b.shapePtr->getType());
   return intersect(*a.shapePtr, *b.shapePtr, a.curr, b.curr, v);
 }
 
-bool common_pointConvexConvex(const Shape& a, const Shape& b, 
+bool common_pointConvexConvex(const Shape& a, const Shape& b,
 			      const Transform& a2w, const Transform& b2w,
 			      Vector& v, Point& pa, Point& pb) {
   return common_point((const Convex&)a, (const Convex&)b, a2w, b2w, v, pa, pb);
 }
 
-bool common_pointComplexConvex(const Shape& a, const Shape& b, 
+bool common_pointComplexConvex(const Shape& a, const Shape& b,
 			       const Transform& a2w, const Transform& b2w,
 			       Vector& v, Point& pa, Point& pb) {
   return common_point((const Complex&)a, (const Convex&)b, a2w, b2w, v, pa, pb);
 }
 
-bool common_pointComplexComplex(const Shape& a, const Shape& b, 
+bool common_pointComplexComplex(const Shape& a, const Shape& b,
 				const Transform& a2w, const Transform& b2w,
 				Vector& v, Point& pa, Point& pb) {
   return common_point((const Complex&)a, (const Complex&)b, a2w, b2w, v, pa, pb);
@@ -130,26 +130,26 @@ Common_pointTable *common_pointInitialize() {
 
 bool common_point(const Object& a, const Object& b, Vector& v, Point& pa, Point& pb) {
   static Common_pointTable *common_pointTable = common_pointInitialize();
-  Common_point common_point = 
+  Common_point common_point =
     common_pointTable->lookup(a.shapePtr->getType(), b.shapePtr->getType());
   return common_point(*a.shapePtr, *b.shapePtr, a.curr, b.curr, v, pa, pb);
 }
 
-bool prev_closest_points(const Object& a, const Object& b, 
+bool prev_closest_points(const Object& a, const Object& b,
 			 Vector& v, Point& pa, Point& pb) {
-  ShapePtr sa, sb;  
+  ShapePtr sa, sb;
   if (a.shapePtr->getType() == COMPLEX) {
     if (b.shapePtr->getType() == COMPLEX) {
-      if (!find_prim((const Complex&)*a.shapePtr, (const Complex&)*b.shapePtr, 
+      if (!find_prim((const Complex&)*a.shapePtr, (const Complex&)*b.shapePtr,
 		     a.curr, b.curr, v, sa, sb)) return false;
       ((Complex *)a.shapePtr)->swapBase();
       if (b.shapePtr != a.shapePtr) ((Complex *)b.shapePtr)->swapBase();
-      closest_points((const Convex&)*sa, (const Convex&)*sb, a.prev, b.prev, pa, pb); 
+      closest_points((const Convex&)*sa, (const Convex&)*sb, a.prev, b.prev, pa, pb);
       ((Complex *)a.shapePtr)->swapBase();
       if (b.shapePtr != a.shapePtr) ((Complex *)b.shapePtr)->swapBase();
     }
     else {
-      if (!find_prim((const Complex&)*a.shapePtr, (const Convex&)*b.shapePtr,  
+      if (!find_prim((const Complex&)*a.shapePtr, (const Convex&)*b.shapePtr,
 		a.curr, b.curr, v, sa)) return false;
       ((Complex *)a.shapePtr)->swapBase();
       closest_points((const Convex&)*sa, (const Convex&)*b.shapePtr, a.prev, b.prev, pa, pb);
@@ -159,7 +159,7 @@ bool prev_closest_points(const Object& a, const Object& b,
   else {
     if (!intersect(a, b, v)) return false;
     closest_points((const Convex&)*a.shapePtr, (const Convex&)*b.shapePtr, a.prev, b.prev, pa, pb);
-  } 
-  
+  }
+
   return true;
 }

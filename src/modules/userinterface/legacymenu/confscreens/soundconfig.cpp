@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @version	$Id$
 */
 
@@ -109,7 +109,7 @@ static void readSoundCfg(void)
 	VolumeValue = GfParmGetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (VolumeValue>100.0f) {
 		VolumeValue = 100.0f;
-	} 
+	}
 	else if (VolumeValue < 0.0f) {
 		VolumeValue = 0.0f;
 	}
@@ -133,7 +133,7 @@ static void readSoundCfg(void)
 	MusicVolumeValue = GfParmGetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", 100.0f);
 	if (MusicVolumeValue>100.0f) {
 		MusicVolumeValue = 100.0f;
-	} 
+	}
 	else if (MusicVolumeValue < 0.0f) {
 		MusicVolumeValue = 0.0f;
 	}
@@ -158,7 +158,7 @@ static void readSoundCfg(void)
 	MenuSfxVolumeValue = GfParmGetNum(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_VOLUME, "%", 100.0f);
 	if (MenuSfxVolumeValue>100.0f) {
 		MenuSfxVolumeValue = 100.0f;
-	} 
+	}
 	else if (MenuSfxVolumeValue < 0.0f) {
 		MenuSfxVolumeValue = 0.0f;
 	}
@@ -228,7 +228,7 @@ static void onAccept(void *)
 	GfuiScreenActivate(prevHandle);
 }
 
-// Reset any changes 
+// Reset any changes
 static void onCancel(void *)
 {
 	// Return to previous screen.
@@ -252,7 +252,7 @@ static void changeVolume(void * )
 		VolumeValue = 100.0f;
     else if (VolumeValue < 0.0f)
 		VolumeValue = 0.0f;
-	
+
     char buf[32];
     sprintf(buf, "%g", VolumeValue);
     GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
@@ -276,7 +276,7 @@ static void changeMusicVolume(void * )
 		MusicVolumeValue = 100.0f;
     else if (MusicVolumeValue < 0.0f)
 		MusicVolumeValue = 0.0f;
-	
+
     char buf[32];
     sprintf(buf, "%g", MusicVolumeValue);
     GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
@@ -300,7 +300,7 @@ static void changeMenuSfxVolume(void * )
 		MenuSfxVolumeValue = 100.0f;
 	else if (MenuSfxVolumeValue < 0.0f)
 		MenuSfxVolumeValue = 0.0f;
-	
+
 	char buf[32];
 	sprintf(buf, "%g", MenuSfxVolumeValue);
 	GfuiEditboxSetString(scrHandle, MenuSfxVolumeValueId, buf);

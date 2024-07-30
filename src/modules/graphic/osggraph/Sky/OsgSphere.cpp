@@ -45,7 +45,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
     imin = 0;
     imax = stacks;
 
-    for ( i = imin; i < imax; i++ ) 
+    for ( i = imin; i < imax; i++ )
     {
         osg::Geometry* geometry = new osg::Geometry;
         osg::Vec3Array* vl = new osg::Vec3Array;
@@ -87,7 +87,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
             GfOut("bad sphere1\n");
 	    	//return -1;
         }
-		
+
         if ( vl->size() != tl->size() )
         {
             GfOut("bad sphere2\n");

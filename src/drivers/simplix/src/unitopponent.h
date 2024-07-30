@@ -77,7 +77,7 @@ class TOpponent
 	  double CarDistLong;						  // Longitudinal dist.	to.	opp.
 
 	  // Lateral distance to opponent
-	  double CarDistLat;						   
+	  double CarDistLat;
 	  // CarDistLat > 0: Opponent is a	the	left side
 	  // CarDistLat < 0: Opponent is a	the	right
 

@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 /**
     @defgroup	racescreens	Race menus.
     The race manager menus.
@@ -190,10 +190,10 @@ class RmProgressiveTimeModifier
 	void terminate();
 
  private:
-	
+
 	// Should we run the manager at next simu step ?
 	bool _bExecRunning;
-	
+
 	// Log the manager activation time (real value will be stored on start())
 	double _fExecStartTime;
 
@@ -205,15 +205,15 @@ class RmProgressiveTimeModifier
 
 	// Log the integrated time acceleration change (needed when multiple start without terminate)
 	double _fResetterTimeMultiplier;
-	
+
  private:
-	
+
 	// Config: Set how much time will take to restore to normal speed (after the delay)
 	static const double _sfTimeMultiplier;
 
 	// Config: Set how much we wait before starting to apply the time acceleration
 	static const double _sfDelay;
-	
+
 	// Config: Set how much the time will be initially changed (as a fraction of the current time)
 	static const double _sfTimeLapse;
 

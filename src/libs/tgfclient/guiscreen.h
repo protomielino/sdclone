@@ -2,8 +2,8 @@
 
     file        : guiscreen.h
     created     : Sat Apr 19 23:37:41 CEST 2003
-    copyright   : (C) 2003 by Eric Espie                        
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		Constants for screen / Open GL features config file
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$

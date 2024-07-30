@@ -32,14 +32,14 @@ typedef struct
 
 typedef struct
 {
-    tdble	rep;	/* front/rear repartition */ 
+    tdble	rep;	/* front/rear repartition */
     tdble	coeff;
     tdble   ebrake_pressure;
 } tBrakeSyst;
 
 
 
-#endif /* _BRAKE_H_ */ 
+#endif /* _BRAKE_H_ */
 
 
 

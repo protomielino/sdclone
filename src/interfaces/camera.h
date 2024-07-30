@@ -29,5 +29,5 @@ struct Camera
     sndVec3 * Upv;
 };
 
- 
+
 #endif // __CAMERA__H__

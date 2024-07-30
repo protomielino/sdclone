@@ -18,7 +18,7 @@ public class UndoSplitSegment implements UndoInterface
 	private int			addedPos;
 
 	/**
-	 * 
+	 *
 	 */
 	public UndoSplitSegment(EditorFrame editorFrame, Segment changed, Segment original, Segment added)
 	{
@@ -53,7 +53,7 @@ public class UndoSplitSegment implements UndoInterface
 		else
 		{
 			int count = Editor.getProperties().getCurveNameCount() - 1;
-			Editor.getProperties().setCurveNameCount(count);			
+			Editor.getProperties().setCurveNameCount(count);
 		}
 		data.remove(addedPos);
 		redo = added;
@@ -85,8 +85,8 @@ public class UndoSplitSegment implements UndoInterface
 		else
 		{
 			int count = Editor.getProperties().getCurveNameCount() + 1;
-			Editor.getProperties().setCurveNameCount(count);			
-		}		
+			Editor.getProperties().setCurveNameCount(count);
+		}
 		data.insertElementAt(redo, addedPos);
 		added = redo;
 		redo = null;

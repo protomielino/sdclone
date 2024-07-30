@@ -43,7 +43,7 @@ int closeGfModule()
 	// Unregister it from the GfModule module manager.
 	if (SimuReplay::_pSelf)
 		GfModule::unregister(SimuReplay::_pSelf);
-	
+
 	// Delete the (only) module instance.
 	delete SimuReplay::_pSelf;
 	SimuReplay::_pSelf = 0;

@@ -2,7 +2,7 @@
                    modinfo.h -- Tools for legacy module interface management
 
     created              : Fri Aug 13 22:32:14 CEST 1999
-    copyright            : (C) 2008 by Jean-Philippe Meuret                         
+    copyright            : (C) 2008 by Jean-Philippe Meuret
     email                : jpmeuret@free.fr
     version              : $Id$
 ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
 	Tools for legacy module interface management.
     @author	<a href=mailto:jpmeuret@free.fr>Jean-Philippe Meuret</a>
     @version	$Id$
@@ -129,7 +129,7 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
 		if (array[itfInd].desc)
 			free(array[itfInd].desc);
 	}
-	
+
 	free(array);
 }
 
@@ -145,7 +145,7 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
  *	soPath   (in)	path of the loaded shared library
  *	gfid     (in)	id of the gaming framework that the module MUST implement to be initialized
  *	                (Not taken into account if == GfIdAny)
- *	mod      (in)	address of module entry to allocate and initialize  
+ *	mod      (in)	address of module entry to allocate and initialize
  *	                (0 if any error occured or modules not retained for bad GFId)
  *
  * Return
@@ -153,7 +153,7 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
  *	-1	if any error occured
  *
  * Remarks
- *	
+ *
  */
 int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, tModList **mod)
 {
@@ -164,14 +164,14 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
     char  soName[256];
     char  soDir[1024];
     char* lastSlash;
-    
+
     /* Allocate module entry in list */
     if (!(*mod = (tModList*)calloc(1, sizeof(tModList))))
     {
 		GfLogError("GfModInitialize: Failed to allocate tModList for module %s\n", soPath);
 		return -1;
     }
-    
+
     /* Determine the shared library / DLL name and load dir */
     strcpy(soDir, soPath);
     lastSlash = strrchr(soDir, '/');
@@ -189,7 +189,7 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 
     /* Welcome the module : exchange informations with it :
        1) Call the dedicated module function if present */
-    if ((fModInfoWelcome = (tfModInfoWelcome)dlsym(SOHandle(soHandle), GfModInfoWelcomeFuncName)) != 0) 
+    if ((fModInfoWelcome = (tfModInfoWelcome)dlsym(SOHandle(soHandle), GfModInfoWelcomeFuncName)) != 0)
     {
         /* Prepare information to give to the module */
 		tModWelcomeIn welcomeIn;
@@ -210,7 +210,7 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 			/* Save information given by the module */
 			(*mod)->modInfoSize = welcomeOut.maxNbItf;
 		}
-    } 
+    }
 
     /* 2) If not present, default number of interfaces (backward compatibility) */
     else
@@ -233,28 +233,28 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 		fModInfoInit = (tfModInfoInitialize)dlsym(SOHandle(soHandle), soName);
 		//GfLogDebug("GfModInitialize: fModInfoInit(%s) @ %p\n", soName, fModInfoInit);
 	}
-	
+
     /* Call module initialization function if welcome succeeded and init function found */
-    if (initSts == 0 && fModInfoInit) 
+    if (initSts == 0 && fModInfoInit)
     {
 		/* Allocate module interfaces info array according to the size we got */
 		tModInfo* constModInfo;
-		if ((constModInfo = GfModInfoAllocate((*mod)->modInfoSize)) != 0) 
+		if ((constModInfo = GfModInfoAllocate((*mod)->modInfoSize)) != 0)
 		{
 			/* Library loaded, init function exists, call it... */
 			if ((initSts = fModInfoInit(constModInfo)) == 0)
 			{
 				/* Duplicate strings in each interface, in case the module gave us static data ! */
-				if (((*mod)->modInfo = GfModInfoDuplicate(constModInfo, (*mod)->modInfoSize)) != 0) 
+				if (((*mod)->modInfo = GfModInfoDuplicate(constModInfo, (*mod)->modInfoSize)) != 0)
 				{
 					/* Reject module if not of requested gaming framework Id */
-					if (gfid != GfIdAny && (*mod)->modInfo[0].gfId != gfid) 
+					if (gfid != GfIdAny && (*mod)->modInfo[0].gfId != gfid)
 					{
 						GfLogTrace("GfModInitialize: Module not retained %s\n", soPath);
 						GfModInfoFreeNC((*mod)->modInfo, (*mod)->modInfoSize);
 						retained = 0;
 					}
-		    
+
 					/* Free the module info data returned by the module (we have a copy) */
 					GfModInfoFree(constModInfo);
 				}
@@ -262,7 +262,7 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 				{
 					initSts = -1;
 				}
-			} 
+			}
 			else
 			{
 				GfLogError("GfModInitialize: Module init function failed %s\n", soPath);
@@ -272,12 +272,12 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 		{
 			initSts = -1;
 		}
-    } 
+    }
 
     /* If init function not found, we have a problem ... */
     else
     {
-		GfLogError("GfModInitialize: Module init function %s not found\n", 
+		GfLogError("GfModInitialize: Module init function %s not found\n",
 				soPath);
 		initSts = -1;
     }
@@ -314,13 +314,13 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
  *	-1	if any error occured
  *
  * Remarks
- *	
+ *
  */
 int GfModTerminate(tSOHandle soHandle, const char *soPath)
 {
     tfModInfoTerminate fModInfoTerm;	/* Termination function of the module */
     int			termSts = 0;	/* Returned status */
-    
+
     /* Get the module termination function if any :
        1) Try the new sheme (fixed name) */
     if ((fModInfoTerm = (tfModInfoTerminate)dlsym(SOHandle(soHandle), GfModInfoTerminateFuncName)) == 0)
@@ -339,7 +339,7 @@ int GfModTerminate(tSOHandle soHandle, const char *soPath)
     /* Call the module termination function if any */
     if (fModInfoTerm)
 		termSts = fModInfoTerm();
-    
+
     GfOut("Terminated module %s\n", soPath);
 
     return termSts;

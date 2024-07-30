@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		GUI Images management
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -62,9 +62,9 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 		image->texture[i] = 0;
 
 	image->activeimage = 0;
-	
+
 	image->canDeform = canDeform;
-	
+
 	// We don't use returned POT width and height, but passing non NULL pointers
 	// for them enforces POT sizes for the loaded texture.
 	image->texture[0] =
@@ -226,7 +226,7 @@ gfuiDrawImage(tGfuiObject *obj)
 	{
 		const GLfloat rfactor = image->srcWidth * (GLfloat)(obj->ymax - obj->ymin)
 			                    / image->srcHeight / (GLfloat)(obj->xmax - obj->xmin);
-		
+
 		if (rfactor >= 1.0f) {
 			// If aspect ratio of image widget is smaller than source image's one, "cut off" sides.
 			const GLfloat tdx = image->srcWidth * (rfactor - 1.0f) / texPow2Width / 2.0f;
@@ -249,7 +249,7 @@ gfuiDrawImage(tGfuiObject *obj)
 
 	// Display texture.
 	glBegin(GL_TRIANGLE_STRIP);
-	
+
 	glTexCoord2f(tx1, ty1); glVertex2f(obj->xmin, obj->ymin);
 	glTexCoord2f(tx1, ty2); glVertex2f(obj->xmin, obj->ymax);
 	glTexCoord2f(tx2, ty1); glVertex2f(obj->xmax, obj->ymin);

@@ -37,11 +37,11 @@ class IndexArray {
 public:
   IndexArray() : indices(0), count(0) {}
   IndexArray(int n) : indices(new unsigned int[n]), count(n) {}
-  IndexArray(int n, const unsigned int v[]) : 
+  IndexArray(int n, const unsigned int v[]) :
     indices(new unsigned int[n]), count(n) { copy(&v[0], &v[n], &indices[0]); }
 
   ~IndexArray() { delete [] indices; }
-  
+
   int operator[](int i) const { return indices[i]; }
   int size() const { return count; }
 
@@ -52,6 +52,6 @@ private:
   unsigned int *indices;
   int count;
 };
-  
+
 #endif
 

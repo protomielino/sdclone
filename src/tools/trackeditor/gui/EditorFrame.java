@@ -127,7 +127,7 @@ public class EditorFrame extends JFrame
 	MoveAction					moveAction							= null;
 	SubdivideAction 			subdivideAction						= null;
 	DumpTextAction 				dumpTextAction						= null;
-	DumpAC3DAction 				dumpAC3DAction						= null;	
+	DumpAC3DAction 				dumpAC3DAction						= null;
 	HelpAction					helpAction							= null;
 	ImportAction				importAction						= null;
 	ExportAction				exportAction						= null;
@@ -196,9 +196,9 @@ public class EditorFrame extends JFrame
 	private JMenuItem			addLeftMenuItem						= null;
 	private JMenuItem			moveMenuItem						= null;
 	private JMenuItem			deleteMenuItem						= null;
-	private JMenuItem 			subdivideMenuItem					= null;	
+	private JMenuItem 			subdivideMenuItem					= null;
 	private JMenuItem 			dumpTextMenuItem					= null;
-	private JMenuItem 			dumpAC3DMenuItem					= null;	
+	private JMenuItem 			dumpAC3DMenuItem					= null;
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
 	private JMenuItem			showObjectsMenuItem					= null;
@@ -226,8 +226,8 @@ public class EditorFrame extends JFrame
 	private JMenu				exportMenu							= null;
 	private JMenuItem			exportMenuItem						= null;
 	private JMenuItem			exportAllMenuItem					= null;
-	private JMenuItem			exportAllACCMenuItem				= null;	
-	private JMenuItem			exportAllACCWithRacelineMenuItem	= null;	
+	private JMenuItem			exportAllACCMenuItem				= null;
+	private JMenuItem			exportAllACCWithRacelineMenuItem	= null;
 	private JMenuItem			exportAC3MenuItem					= null;
 	private JMenuItem			exportACCMenuItem					= null;
 	private JMenuItem			exportACCWithRacelineMenuItem		= null;
@@ -244,7 +244,7 @@ public class EditorFrame extends JFrame
 	private String 				sep									= System.getProperty("file.separator");
 
 	private JButton 			calculateDeltaButton				= null;
-	
+
 	private Preferences			preferences							= Preferences.userNodeForPackage(EditorFrame.class);
 	private List<String>		recentFiles							= new ArrayList<String>();
 	private final static String	RECENT_FILES_STRING					= "recent.files.";
@@ -260,7 +260,7 @@ public class EditorFrame extends JFrame
 	private final static String	CHECK_DEFAULT_OBJECTS				= "CheckDefaultObjects";
 	private boolean				carsSportsRacing					= false;
 	private final static String	CARS_SPORTS_RACING					= "CarsSportsRacing";
-	
+
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
 	private Vector<TrackObject>	defaultObjects						= new Vector<TrackObject>();
@@ -273,7 +273,7 @@ public class EditorFrame extends JFrame
 
 	private DefaultSurfacesDialog	defaultSurfacesDialog			= null;
 	private DefaultObjectsDialog	defaultObjectsDialog			= null;
-	
+
 	private String				originalTitle						= null;
 
 	private boolean				pasteObject							= false;
@@ -283,7 +283,7 @@ public class EditorFrame extends JFrame
 	private GraphicObjectData	currentGraphicObjectData			= null;
 
 	private GraphicObjectProperties	graphicObjectProperties			= null;
-	
+
 	public GraphicObjectData getCurrentGraphicObjectData() {
 		return currentGraphicObjectData;
 	}
@@ -348,17 +348,17 @@ public class EditorFrame extends JFrame
 		public String	copyright;
 		public String	description;
 	}
-	
+
 	public Rectangle2D.Double getBoundingRectangle()
 	{
 		return view.getBoundingRectangle();
 	}
-	
+
 	public TrackData getTrackData()
 	{
 		return trackData;
 	}
-	
+
 	public void setTrackData(TrackData trackData)
 	{
 		this.trackData = trackData;
@@ -424,7 +424,7 @@ public class EditorFrame extends JFrame
 					"load the default surfaces, textures and objects.\n" +
 					"Make sure you have write permission if you intend to edit or add\n" +
 					"tracks in this directory.\n\n" +
-					"You may need to specify the bin directory where " + 
+					"You may need to specify the bin directory where " +
 					(getCarsSportsRacing() ? "csr-trackgen" : "sd2-trackgen") + " is\n" +
 					"located if it is not in your executable path.",
 					"First Time Setup",
@@ -434,10 +434,10 @@ public class EditorFrame extends JFrame
 
 		readDefaultSurfaces();
 		readDefaultObjects();
-		
+
 		originalTitle = getTitle();
 	}
-	
+
 	private void readDefaultSurfaces()
 	{
 		if (dataDirectory != null && !dataDirectory.isEmpty())
@@ -486,11 +486,11 @@ public class EditorFrame extends JFrame
 	{
 		return dataDirectory;
 	}
-	
+
 	public void setDataDirectory(String dataDirectory)
 	{
 		this.dataDirectory = dataDirectory;
-		
+
 		preferences.put(SD_DATA_DIRECTORY, this.dataDirectory);
 	}
 
@@ -498,11 +498,11 @@ public class EditorFrame extends JFrame
 	{
 		return binDirectory;
 	}
-	
+
 	public void setBinDirectory(String binDirectory)
 	{
 		this.binDirectory = binDirectory;
-		
+
 		preferences.put(SD_BIN_DIRECTORY, this.binDirectory);
 	}
 
@@ -510,11 +510,11 @@ public class EditorFrame extends JFrame
 	{
 		return libDirectory;
 	}
-	
+
 	public void setLibDirectory(String libDirectory)
 	{
 		this.libDirectory = libDirectory;
-		
+
 		preferences.put(SD_LIB_DIRECTORY, this.libDirectory);
 	}
 
@@ -522,11 +522,11 @@ public class EditorFrame extends JFrame
 	{
 		return recentFilesMax;
 	}
-	
+
 	public void setRecentFilesMax(int recentFilesMax)
 	{
 		this.recentFilesMax = recentFilesMax;
-		
+
 		while (recentFiles.size() > recentFilesMax)
 		{
 			int index = recentFiles.size() - 1;
@@ -603,12 +603,12 @@ public class EditorFrame extends JFrame
 	{
 		recentFiles.remove(filename);
 		recentFiles.add(0, filename);
-		
+
 		if (recentFiles.size() > recentFilesMax)
 		{
 			recentFiles.remove(recentFiles.size() - 1);
 		}
-    
+
 		for (int i = 0; i < recentFilesMax; i++)
 		{
 			if (i < recentFiles.size())
@@ -620,7 +620,7 @@ public class EditorFrame extends JFrame
 				preferences.remove(RECENT_FILES_STRING+i);
 			}
 		}
-		
+
 		for (int i = 0; i < recentFiles.size(); i++)
 		{
 			if (i < (recentFilesMenu.getItemCount() - 2))
@@ -655,8 +655,8 @@ public class EditorFrame extends JFrame
 	 */
 	protected void openProject()
 	{
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -679,17 +679,17 @@ public class EditorFrame extends JFrame
 			openProject(fc.getSelectedFile().toString());
 		}
 	}
-	
+
 	private void openProject(String projectFileName)
 	{
 		//System.out.println("openProject reading : " + projectFileName);
-		
+
 		try
 		{
 			XMLDecoder decoder = new XMLDecoder(new FileInputStream(projectFileName));
 			Editor.setProperties((Properties)decoder.readObject());
 			decoder.close();
-			
+
 			// update path from project file location
 			Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));
 		}
@@ -698,19 +698,19 @@ public class EditorFrame extends JFrame
 			JOptionPane.showMessageDialog(this, "Opening project file : " + projectFileName + "\n\n" + ex.getLocalizedMessage(), "Project Open", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		String trackFileName = projectFileName.replaceAll(".prj.xml", ".xml");
 		File file = new File(trackFileName);
 		if (!file.exists())
 		{
-			JOptionPane.showMessageDialog(this, "File not found : " + trackFileName, "Project Open", JOptionPane.ERROR_MESSAGE);				
+			JOptionPane.showMessageDialog(this, "File not found : " + trackFileName, "Project Open", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		trackData = null;
-		trackData = new TrackData();		
+		trackData = new TrackData();
 		readFile(file);
 		updateRecentFiles(projectFileName);
-		
+
 		setTitle(originalTitle + " - Project: " + projectFileName);
 	}
 
@@ -731,9 +731,9 @@ public class EditorFrame extends JFrame
 			String filename = Editor.getProperties().getPath();
 			String trackname = filename.substring(filename.lastIndexOf(sep) + 1);
 			filename = filename + sep + trackname + ".prj.xml";
-			
+
 			//System.out.println("saveProject writing : " + filename);
-			
+
 			try
 			{
 				XMLEncoder encoder = new XMLEncoder(new FileOutputStream(filename));
@@ -770,7 +770,7 @@ public class EditorFrame extends JFrame
 	protected void newProjectDialog()
 	{
 		NewProjectInfo	newProjectInfo = new NewProjectInfo();
-		
+
 		NewProjectDialog newProject = new NewProjectDialog(this, newProjectInfo);
 		newProject.setVisible(true);
 		if (NewProjectDialog.APPROVE)
@@ -835,7 +835,7 @@ public class EditorFrame extends JFrame
 
         trackData = null;
         trackData = new TrackData();
-        
+
         trackData.getHeader().setName(newProjectInfo.name);
         trackData.getHeader().setCategory(newProjectInfo.category);
         trackData.getHeader().setSubcategory(newProjectInfo.subcategory);
@@ -853,7 +853,7 @@ public class EditorFrame extends JFrame
         trackData.getMainTrack().getRight().setNewTrackDefaults();
 
         trackData.setSegments(track);
-        
+
 		documentIsModified = true;
    }
 
@@ -883,7 +883,7 @@ public class EditorFrame extends JFrame
 		}
 		else
 		{
-			setLocation(point);		
+			setLocation(point);
 		}
 		menuFile.setText("File");
 		itemCloseCircuit.setText("Exit");
@@ -967,7 +967,7 @@ public class EditorFrame extends JFrame
 		{
 		}
 		this.setVisible(true);
-		
+
 		getProject().setSegmentEditorX(preferences.getInt("SegmentEditorX", 0));
 		getProject().setSegmentEditorY(preferences.getInt("SegmentEditorY", 0));
 		getProject().setPropertiesEditorX(preferences.getInt("PropertiesEditorX", 0));
@@ -987,7 +987,7 @@ public class EditorFrame extends JFrame
 		getProject().setPreferencesDialogX(preferences.getInt("PreferencesDialogX", 0));
 		getProject().setPreferencesDialogY(preferences.getInt("PreferencesDialogY", 0));
 		getProject().setNewProjectDialogX(preferences.getInt("NewProjectDialogX", 0));
-		getProject().setNewProjectDialogY(preferences.getInt("NewProjectDialogY", 0));		
+		getProject().setNewProjectDialogY(preferences.getInt("NewProjectDialogY", 0));
 		getProject().setCheckDialogX(preferences.getInt("CheckDialogX", 0));
 		getProject().setCheckDialogY(preferences.getInt("CheckDialogY", 0));
 		getProject().setCheckDialogWidth(preferences.getInt("CheckDialogWidth", 500));
@@ -1392,7 +1392,7 @@ public class EditorFrame extends JFrame
 		}
 		return defaultSurfacesItem;
 	}
-		
+
 	private void defaultSurfacesDialog()
 	{
 		if (defaultSurfacesDialog == null)
@@ -1401,7 +1401,7 @@ public class EditorFrame extends JFrame
 			defaultSurfacesDialog.setVisible(true);
 		}
 	}
-	
+
 	private JMenuItem getDefaultObjectsMenuItem()
 	{
 		if (defaultObjectsItem == null)
@@ -1417,7 +1417,7 @@ public class EditorFrame extends JFrame
 		}
 		return defaultObjectsItem;
 	}
-		
+
 	private void defaultObjectsDialog()
 	{
 		if (defaultObjectsDialog == null)
@@ -1426,7 +1426,7 @@ public class EditorFrame extends JFrame
 			defaultObjectsDialog.setVisible(true);
 		}
 	}
-	
+
 	/**
 	 * This method initializes editMenu
 	 *
@@ -1453,7 +1453,7 @@ public class EditorFrame extends JFrame
 		}
 		return editMenu;
 	}
-	
+
 	private void newPreferencesDialog()
 	{
 		PreferencesDialog preferencesDialog = new PreferencesDialog(this);
@@ -1476,7 +1476,7 @@ public class EditorFrame extends JFrame
 				view.segmentParamDialog.refresh();
 		}
 	}
-	
+
 	/**
 	 * This method initializes undoMenuItem
 	 *
@@ -1526,7 +1526,7 @@ public class EditorFrame extends JFrame
 	}
 	/**
 	 * This method initializes importMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	public JMenuItem getImportMenuItem()
@@ -1570,7 +1570,7 @@ public class EditorFrame extends JFrame
 	}
 	/**
 	 * This method initializes exportMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	public JMenuItem getExportMenuItem()
@@ -1688,7 +1688,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3E0MenuItem;
 	}
-	
+
 	/**
 	 * This method initializes exportAC3E1MenuItem
 	 *
@@ -1704,7 +1704,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3E1MenuItem;
 	}
-	
+
 	/**
 	 * This method initializes exportAC3E2MenuItem
 	 *
@@ -1720,7 +1720,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3E2MenuItem;
 	}
-	
+
 	/**
 	 * This method initializes exportAC3E3MenuItem
 	 *
@@ -1736,7 +1736,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3E3MenuItem;
 	}
-	
+
 	/**
 	 * This method initializes exportAC3E4MenuItem
 	 *
@@ -1752,7 +1752,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3E4MenuItem;
 	}
-	
+
 	/**
 	 * This method initializes exportAC3RacelineMenuItem
 	 *
@@ -1768,7 +1768,7 @@ public class EditorFrame extends JFrame
 		}
 		return exportAC3RacelineMenuItem;
 	}
-	
+
 	/**
 	 * This method initializes propertiesMenuItem
 	 *
@@ -2474,14 +2474,14 @@ public class EditorFrame extends JFrame
 			if (JOptionPane.showConfirmDialog(this, "Change graphics file type to acc?", "Exporting ACC", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 			{
 				getTrackData().getGraphic().setDescription(getTrackData().getGraphic().getDescription() + "c");
-			}		
+			}
 		}
 		else if (!acc && getTrackData().getGraphic().getDescription().endsWith(".acc"))
 		{
 			if (JOptionPane.showConfirmDialog(this, "Change graphics file type to ac?", "Exporting AC", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 			{
 				getTrackData().getGraphic().setDescription(getTrackData().getGraphic().getDescription().substring(0, getTrackData().getGraphic().getDescription().length() - 1));
-			}					
+			}
 		}
 		String reliefBorder = getTrackData().getGraphic().getTerrainGeneration().getReliefBorder();
 		String newArgs = additionalArgs;
@@ -2918,7 +2918,7 @@ public class EditorFrame extends JFrame
 			message("No track", "Nothing to check");
 			return;
 		}
-		
+
 		CheckDialog checkDialog = new CheckDialog(this);
 		checkDialog.setModal(true);
 		checkDialog.setVisible(true);
@@ -2970,11 +2970,11 @@ public class EditorFrame extends JFrame
 		String fileName = Editor.getProperties().getPath();
 		String trackName = fileName.substring(fileName.lastIndexOf(sep) + 1);
 		fileName = fileName + sep + trackName + ".xml";
-		
+
 		//System.out.println("exportTrack writing : " + fileName);
-	
+
 		XmlWriter xmlWriter = new XmlWriter(this);
-		
+
 		try
 		{
 			xmlWriter.writeXml(fileName, trackName);
@@ -3000,7 +3000,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportTrack();
 			exportAc3d(null, false);
 		}
@@ -3019,7 +3019,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportTrack();
 			exportAc3d(null, true);
 		}
@@ -3038,7 +3038,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportTrack();
 			exportAc3d(" -r", true);
 		}
@@ -3057,7 +3057,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(null, false);
 		}
 	}
@@ -3075,7 +3075,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(null, true);
 		}
 	}
@@ -3093,11 +3093,11 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -r", true);
 		}
 	}
-	
+
 	public class ExportAC3E0Action extends AbstractAction
 	{
 		public ExportAC3E0Action(String text, ImageIcon icon, String desc, Integer mnemonic)
@@ -3112,7 +3112,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -E 0", false);
 		}
 	}
@@ -3130,7 +3130,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -E 1", false);
 		}
 	}
@@ -3148,7 +3148,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -E 2", false);
 		}
 	}
@@ -3166,7 +3166,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -E 3", false);
 		}
 	}
@@ -3184,7 +3184,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -E 4", false);
 		}
 	}
@@ -3202,7 +3202,7 @@ public class EditorFrame extends JFrame
 			{
 				message("No track", "Nothing to export");
 				return;
-			}			
+			}
 			exportAc3d(" -r", false);
 		}
 	}
@@ -3254,9 +3254,9 @@ public class EditorFrame extends JFrame
 			if (canClose())
 				trackData = null;
 		}
-		
-		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
-		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
@@ -3269,7 +3269,7 @@ public class EditorFrame extends JFrame
 			trackDir = System.getProperty("user.dir");
 		fc.setCurrentDirectory(new File(trackDir + sep + "tracks"));
 		CustomFileFilter filter = new CustomFileFilter();
-		
+
 		filter.addValid(".xml");
 		filter.addInvalid(".prj.xml");
 		filter.setDescription("*.xml");
@@ -3288,17 +3288,17 @@ public class EditorFrame extends JFrame
 			readFile(file);
 		}
 	}
-	
+
 	public void readFile(File file)
 	{
 		//System.out.println("readFile : " + file.getAbsolutePath());
-		
+
 		try
 		{
 			XmlReader xmlReader = new XmlReader(this);
-			
+
 			xmlReader.readXml(file.getAbsolutePath());
-			
+
 			Vector<ObjectMap> objectMaps = trackData.getObjectMaps();
 			for (int i = 0; i < objectMaps.size(); i++)
 		 	{
@@ -3308,17 +3308,17 @@ public class EditorFrame extends JFrame
 				{
 					objects.get(j).setName(getObjectColorName(objects.get(j).getRGB()));
 				}
-		 	}			
-			
+		 	}
+
 		}
 		catch (Exception e)
 		{
 			JOptionPane.showMessageDialog(this,
 				"Read file : " + file.getAbsolutePath() + "\n\n" + e.getLocalizedMessage(),
-				"Read Track", JOptionPane.ERROR_MESSAGE);				
+				"Read Track", JOptionPane.ERROR_MESSAGE);
 		}
 		refresh();
-		
+
 		setTitle(originalTitle + " - Project: " + file.getAbsolutePath());
 	}
 
@@ -3401,7 +3401,7 @@ public class EditorFrame extends JFrame
 				}
 			}
 
-			if (trackSurface != null) 
+			if (trackSurface != null)
 			{
 				object.setTexture(trackSurface.getTextureName());
 			}
@@ -3509,17 +3509,17 @@ public class EditorFrame extends JFrame
 			getProject().setDefaultSurfacesDialogY(defaultSurfacesDialog.getY());
 			defaultSurfacesDialog.setVisible(false);
 		}
-		
+
 		if (defaultObjectsDialog != null)
 		{
 			getProject().setDefaultObjectsDialogX(defaultObjectsDialog.getX());
 			getProject().setDefaultObjectsDialogY(defaultObjectsDialog.getY());
 			defaultObjectsDialog.setVisible(false);
 		}
-		
+
 		getProject().setFrameX(this.getX());
 		getProject().setFrameY(this.getY());
-		
+
 		preferences.putInt("X", this.getX());
 		preferences.putInt("Y", this.getY());
 		preferences.putInt("Width", this.getWidth());
@@ -3543,12 +3543,12 @@ public class EditorFrame extends JFrame
 		preferences.putInt("PreferencesDialogX", getProject().getPreferencesDialogX());
 		preferences.putInt("PreferencesDialogY", getProject().getPreferencesDialogY());
 		preferences.putInt("NewProjectDialogX", getProject().getNewProjectDialogX());
-		preferences.putInt("NewProjectDialogY", getProject().getNewProjectDialogY());		
+		preferences.putInt("NewProjectDialogY", getProject().getNewProjectDialogY());
 		preferences.putInt("CheckDialogX", getProject().getCheckDialogX());
 		preferences.putInt("CheckDialogY", getProject().getCheckDialogY());
 		preferences.putInt("CheckDialogWidth", getProject().getCheckDialogWidth());
 		preferences.putInt("CheckDialogHeight", getProject().getCheckDialogHeight());
-		
+
 		System.exit(0);
 	}
 
@@ -3624,7 +3624,7 @@ public class EditorFrame extends JFrame
 		}
 		return calculateDeltaButton;
 	}
-	
+
 	public void clearDefaultSurfacesDialog()
 	{
 		defaultSurfacesDialog = null;
@@ -3703,17 +3703,17 @@ public class EditorFrame extends JFrame
 	{
 		return trackData.getSegments().getSegment(name);
 	}
-	
+
 	public TerrainGeneration getTerrainGeneration()
 	{
 		return trackData.getTerrainGeneration();
 	}
-	
+
 	public Vector<ObjectMap> getObjectMaps()
 	{
 		return trackData.getObjectMaps();
 	}
-	
+
 	public Vector<GraphicObject> getGraphicObjects()
 	{
 		return trackData.getGraphicObjects();
@@ -3723,7 +3723,7 @@ public class EditorFrame extends JFrame
 	{
 		return trackData.getReliefs();
 	}
-	
+
 	public Pits getPits()
 	{
 		return trackData.getMainTrack().getPits();

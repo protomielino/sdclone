@@ -45,7 +45,7 @@ Complex::~Complex() {
 }
 
 BBox Complex::bbox(const Transform& t) const {
-  Matrix abs_b = absolute(t.getBasis());  
+  Matrix abs_b = absolute(t.getBasis());
   BBox bb;
   bb.setCenter(t(root->bbox.getCenter()));
   bb.setExtent(Vector(dot(abs_b[X], root->bbox.getExtent()),
@@ -57,7 +57,7 @@ BBox Complex::bbox(const Transform& t) const {
 void Complex::changeBase(const void *ptr) {
   base = ptr;
   for (int i = 0; i < count; ++i) leaves[i].fitBBox();
-  for (int j = count-1; j;) ((BBoxInternal *)root)[--j].refitBBox(); 
+  for (int j = count-1; j;) ((BBoxInternal *)root)[--j].refitBBox();
 }
 
 void Complex::finish(int n, const Polytope **p) {
@@ -74,7 +74,7 @@ void Complex::finish(int n, const Polytope **p) {
 }
 
 
-bool intersect(const Complex& a, const Convex& b, 
+bool intersect(const Complex& a, const Convex& b,
 	       const Transform& a2w, const Transform& b2w,
 	       Vector& v) {
   Transform b2a;
@@ -83,7 +83,7 @@ bool intersect(const Complex& a, const Convex& b,
   return intersect(a.root, b, bb, b2a, v);
 }
 
-bool intersect(const Complex& a, const Complex& b, 
+bool intersect(const Complex& a, const Complex& b,
 	       const Transform& a2w, const Transform& b2w,
 	       Vector& v) {
   Transform b2a, a2b;
@@ -94,7 +94,7 @@ bool intersect(const Complex& a, const Complex& b,
   return intersect(a.root, b.root, b2a, abs_b2a, a2b, abs_a2b, v);
 }
 
-bool find_prim(const Complex& a, const Convex& b, 
+bool find_prim(const Complex& a, const Convex& b,
 	       const Transform& a2w, const Transform& b2w,
 	       Vector& v, ShapePtr& p) {
   Transform b2a;
@@ -103,7 +103,7 @@ bool find_prim(const Complex& a, const Convex& b,
   return find_prim(a.root, b, bb, b2a, v, p);
 }
 
-bool find_prim(const Complex& a, const Complex& b, 
+bool find_prim(const Complex& a, const Complex& b,
 	       const Transform& a2w, const Transform& b2w,
 	       Vector& v, ShapePtr& pa, ShapePtr& pb) {
   Transform b2a, a2b;
@@ -114,7 +114,7 @@ bool find_prim(const Complex& a, const Complex& b,
   return find_prim(a.root, b.root, b2a, abs_b2a, a2b, abs_a2b, v, pa, pb);
 }
 
-bool common_point(const Complex& a, const Convex& b, 
+bool common_point(const Complex& a, const Convex& b,
 		  const Transform& a2w, const Transform& b2w,
 		  Vector& v, Point& pa, Point& pb) {
   Transform b2a;
@@ -123,7 +123,7 @@ bool common_point(const Complex& a, const Convex& b,
   return common_point(a.root, b, bb, b2a, v, pb, pa);
 }
 
-bool common_point(const Complex& a, const Complex& b, 
+bool common_point(const Complex& a, const Complex& b,
 		  const Transform& a2w, const Transform& b2w,
 		  Vector& v, Point& pa, Point& pb) {
   Transform b2a, a2b;

@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The "legacy menu" user interface module
     @version    $Id$
 */
@@ -52,10 +52,10 @@ public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate();
-	
+
 	//! Request exit of the event loop.
 	virtual void quit();
-	
+
 	//! Termination of the user interface.
 	virtual void shutdown();
 
@@ -77,7 +77,7 @@ public:
 	virtual void onRaceEventFinishing();
 	virtual bool onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroupo);
 	virtual void onOptimizationInitializing();
-	
+
 	virtual bool onRaceStartingPaused();
 	virtual bool onRaceCooldownStarting();
 
@@ -115,7 +115,7 @@ public:
 
 	//! Protected constructor to avoid instanciation outside (but friends).
 	TextOnlyUI(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	//! Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -141,5 +141,5 @@ inline extern IRaceEngine& ToRaceEngine()
 {
 	return TextOnlyUI::self().raceEngine();
 }
-				  
-#endif /* _TEXTONLY_H_ */ 
+
+#endif /* _TEXTONLY_H_ */

@@ -30,7 +30,7 @@ class SDParticleSystem
 public:
     SDParticleSystem(osg::Group *MySceneRoot, osg::Group *myAttachToObj);
     ~SDParticleSystem(void);
-    
+
     osgParticle::Particle ptemplate;
     osgParticle::ParticleSystem *particleSystem = new osgParticle::ParticleSystem;
     osgParticle::ModularEmitter *emitter = new osgParticle::ModularEmitter;

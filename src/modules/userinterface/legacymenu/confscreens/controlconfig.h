@@ -3,7 +3,7 @@
     file        : controlconfig.h
     created     : Wed Mar 12 22:09:01 CET 2003
     copyright   : (C) 2003 by Eric Espie
-    email       : eric.espie@torcs.org   
+    email       : eric.espie@torcs.org
     version     : $Id$
 
 ***************************************************************************/
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -33,11 +33,11 @@
 
 extern void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode, int saveOnExit);
 
-/* Load control settings for player of given index (the current one if 0) 
+/* Load control settings for player of given index (the current one if 0)
    from preferences (if given parm handle is null, use current) */
 extern void ControlGetSettings(void *prefHdle = 0, unsigned index = 0);
 
-/* Save control settings for player of given index (the current one if 0) 
+/* Save control settings for player of given index (the current one if 0)
    into preference, according to its selected gear change mode
    (if given parm handle is null, use current) */
 extern void ControlPutSettings(void *prefHdle = 0, unsigned index = 0, tGearChangeMode gearChangeMode = GEAR_MODE_NONE);
@@ -60,7 +60,7 @@ typedef struct
     int         butIgnore;
 } tCmdInfo;
 
-#endif /* _CONTROLCONFIG_H_ */ 
+#endif /* _CONTROLCONFIG_H_ */
 
 
 

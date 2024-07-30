@@ -45,22 +45,22 @@ void Transform::setValue(const double m[16]) {
 Transform& Transform::operator*=(const Transform& t) {
   origin += basis * t.origin;
   basis *= t.basis;
-  type |= t.type; 
+  type |= t.type;
   return *this;
 }
 
-void Transform::translate(const Vector& v) { 
-  origin += basis * v; 
+void Transform::translate(const Vector& v) {
+  origin += basis * v;
   type |= TRANSLATION;
 }
 
-void Transform::rotate(const Quaternion& q) { 
-  basis *= Matrix(q); 
-  type |= ROTATION; 
+void Transform::rotate(const Quaternion& q) {
+  basis *= Matrix(q);
+  type |= ROTATION;
 }
 
-void Transform::scale(Scalar x, Scalar y, Scalar z) { 
-  basis *= Matrix(x, y, z);  
+void Transform::scale(Scalar x, Scalar y, Scalar z) {
+  basis *= Matrix(x, y, z);
   type |= SCALING;
 }
 
@@ -72,9 +72,9 @@ void Transform::setIdentity() {
 
 void Transform::invert(const Transform& t) {
   basis = t.type & SCALING ? inverse(t.basis) : transpose(t.basis);
-  origin.setValue(-dot(basis[X], t.origin), 
-		  -dot(basis[Y], t.origin), 
-		  -dot(basis[Z], t.origin));  
+  origin.setValue(-dot(basis[X], t.origin),
+		  -dot(basis[Y], t.origin),
+		  -dot(basis[Z], t.origin));
   type = t.type;
 }
 

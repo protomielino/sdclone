@@ -29,10 +29,10 @@ void GfuiApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 {
 	// Base initialization first.
 	GfApplication::initialize(bLoggingEnabled, argc, argv);
-	
+
 	// Register command line options.
 	registerOption("m", "hardmouse", /* nHasValue = */ false);
-	
+
 	// Help about these options.
 	addOptionsHelpSyntaxLine("[-m|--hardmouse]");
 	addOptionsHelpExplainLine("- hardmouse : Use hardware mouse cursor");
@@ -51,7 +51,7 @@ bool GfuiApplication::parseOptions()
 		// Not found in the command line => ignore / default value.
 		if (!itOpt->bFound)
 			continue;
-		
+
         // Allow the hardware mouse cursor
 		if (itOpt->strLongName == "hardmouse")
         {
@@ -82,7 +82,7 @@ GfuiEventLoop& GfuiApplication::eventLoop()
 		GfLogError("GfuiApplication has no event loop ; exiting\n");
 		exit(1);
 	}
-	
+
     return *dynamic_cast<GfuiEventLoop*>(_pEventLoop);
 }
 

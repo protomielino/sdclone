@@ -392,7 +392,7 @@ int Application::generate()
     if (Acc && !TiledFile.empty())
     {
         std::vector<Ac3d::Object *> polys;
-        
+
         allAc3d.getPolys(polys);
 
         for (auto *poly : polys)

@@ -48,16 +48,16 @@ ePhMoonPos::~ePhMoonPos()
 
 void ePhMoonPos::updatePosition(double mjd, double lst, double lat, ePhStar *ourSun)
 {
-  double 
+  double
     eccAnom, ecl, actTime,
     xv, yv, v, r, xh, yh, zh, xg, yg, zg, xe, ye, ze,
     Ls, Lm, D, F, mpar, gclat, rho, HA, g,
     geoRa, geoDec;
-  
+
   updateOrbElements(mjd);
   actTime = sdCalcActTime(mjd);
 
-  ecl = ((SGD_DEGREES_TO_RADIANS * 23.4393) - (SGD_DEGREES_TO_RADIANS * 3.563E-7) * actTime);  
+  ecl = ((SGD_DEGREES_TO_RADIANS * 23.4393) - (SGD_DEGREES_TO_RADIANS * 3.563E-7) * actTime);
   eccAnom = sdCalcEccAnom(M, e);  // Calculate the eccentric anomaly
   xv = a * (cos(eccAnom) - e);
   yv = a * (sqrt(1.0 - e*e) * sin(eccAnom));
@@ -75,7 +75,7 @@ void ePhMoonPos::updatePosition(double mjd, double lst, double lat, ePhStar *our
   Lm = M + w + N;
   D = Lm - Ls;
   F = Lm - N;
-  
+
   lonEcl += SGD_DEGREES_TO_RADIANS * (-1.274 * sin (M - 2*D)
 			  +0.658 * sin (2*D)
 			  -0.186 * sin(ourSun->getM())
@@ -100,7 +100,7 @@ void ePhMoonPos::updatePosition(double mjd, double lst, double lat, ePhStar *our
   xg = r * cos(lonEcl) * cos(latEcl);
   yg = r * sin(lonEcl) * cos(latEcl);
   zg = r *               sin(latEcl);
-  
+
   xe = xg;
   ye = yg * cos(ecl) -zg * sin(ecl);
   ze = yg * sin(ecl) +zg * cos(ecl);
@@ -112,18 +112,18 @@ void ePhMoonPos::updatePosition(double mjd, double lst, double lat, ePhStar *our
 
   gclat = lat - 0.003358 * sin (2 * SGD_DEGREES_TO_RADIANS * lat );
   rho = 0.99883 + 0.00167 * cos(2 * SGD_DEGREES_TO_RADIANS * lat);
- 
+
   if (geoRa < 0)
     geoRa += SGD_2PI;
-  
+
   HA = lst - (3.8197186 * geoRa);
   g = atan (tan(gclat) / cos ((HA / 3.8197186)));
 
   rightAscension = geoRa - mpar * rho * cos(gclat) * sin(HA) / cos (geoDec);
-  if (fabs(lat) > 0) 
+  if (fabs(lat) > 0)
   {
       declination = geoDec - mpar * rho * sin (gclat) * sin (g - geoDec) / sin(g);
-  } else 
+  } else
   {
       declination = geoDec;
   }

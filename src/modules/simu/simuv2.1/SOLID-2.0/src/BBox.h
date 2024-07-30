@@ -35,16 +35,16 @@
 
 class BBox {
 public:
-  BBox() {} 
+  BBox() {}
   BBox(const Point& min, const Point& max) { setValue(min, max); }
 
   const Point& getCenter() const { return center; }
   const Vector& getExtent() const { return extent; }
-  
+
   void setCenter(const Point& p)  { center = p; }
   void setExtent(const Vector& v) { extent = v; }
 
-  void setValue(const Point& min, const Point& max) { 
+  void setValue(const Point& min, const Point& max) {
     extent = (max - min) / 2;
     center = min + extent;
   }
@@ -59,8 +59,8 @@ public:
     setValue(lower, upper);
   }
 
-  void setEmpty() { 
-    center.setValue(0, 0, 0); 
+  void setEmpty() {
+    center.setValue(0, 0, 0);
     extent.setValue(-INFINITY_, -INFINITY_, -INFINITY_);
   }
 

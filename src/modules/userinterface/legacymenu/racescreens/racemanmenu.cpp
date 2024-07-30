@@ -2,8 +2,8 @@
 
     file        : racemanmenu.cpp
     created     : Fri Jan  3 22:24:41 CET 2003
-    copyright   : (C) 2003 by Eric Espie                        
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     		The race manager menu (where you can configure, load, save, start a race)
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -128,7 +128,7 @@ rmLoadRaceFromConfigFile(const char *filename)
 		GfLogError("Failed to load selected race config file %s", strMainFileName.c_str());
 		return;
 	}
-	
+
 	// Update the race manager.
 	void* hparmRaceMan =
 		GfParmReadFile(strMainFileName, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
@@ -142,7 +142,7 @@ rmLoadRaceFromConfigFile(const char *filename)
 		// Notify the race engine of the changes (this is a non-interactive config., actually).
 		LmRaceEngine().configureRace(/* bInteractive */ false);
 	}
-	
+
 	// Update GUI.
 	rmOnRaceDataChanged();
 }
@@ -168,7 +168,7 @@ rmLoadRaceFromResultsFile(const char *filename)
 		// Restore the race from the result file.
 		LmRaceEngine().restoreRace(hparmResults);
 	}
-	
+
 	// Update GUI.
 	rmOnRaceDataChanged();
 }
@@ -224,11 +224,11 @@ rmOnRaceDataChanged()
 					  bIsMultiEvent ? GFUI_VISIBLE : GFUI_INVISIBLE);
 
 	// Enable/Disable "Load/Save race" buttons as needed.
-	GfuiEnable(ScrHandle, SaveRaceConfigButtonId, 
+	GfuiEnable(ScrHandle, SaveRaceConfigButtonId,
 			   !bIsMultiEvent ? GFUI_ENABLE : GFUI_DISABLE);
-	GfuiEnable(ScrHandle, LoadRaceConfigButtonId, 
+	GfuiEnable(ScrHandle, LoadRaceConfigButtonId,
 			   !bIsMultiEvent && pRaceMan->hasSavedConfigsFiles() ? GFUI_ENABLE : GFUI_DISABLE);
-	GfuiEnable(ScrHandle, LoadRaceResultsButtonId, 
+	GfuiEnable(ScrHandle, LoadRaceResultsButtonId,
 			   bIsMultiEvent && pRaceMan->hasResultsFiles() ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// Show/Hide "Start / Resume race" buttons as needed.
@@ -294,11 +294,11 @@ rmOnRaceDataChanged()
 					  bIsMultiEvent ? GFUI_VISIBLE : GFUI_INVISIBLE);
 
 	// Enable/Disable "Load/Save race" buttons as needed.
-	GfuiEnable(ScrHandle, SaveRaceConfigButtonId, 
+	GfuiEnable(ScrHandle, SaveRaceConfigButtonId,
 			   !bIsMultiEvent ? GFUI_ENABLE : GFUI_DISABLE);
-	GfuiEnable(ScrHandle, LoadRaceConfigButtonId, 
+	GfuiEnable(ScrHandle, LoadRaceConfigButtonId,
 			   !bIsMultiEvent && pRaceMan->hasSavedConfigsFiles() ? GFUI_ENABLE : GFUI_DISABLE);
-	GfuiEnable(ScrHandle, LoadRaceResultsButtonId, 
+	GfuiEnable(ScrHandle, LoadRaceResultsButtonId,
 			   bIsMultiEvent && pRaceMan->hasResultsFiles() ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// Show/Hide "Start / Resume race" buttons as needed.
@@ -328,7 +328,7 @@ rmOnRaceDataChanged()
 	{
 		GfuiVisibilitySet(ScrHandle, TrackOutlineImageId, GFUI_INVISIBLE);
 		GfuiVisibilitySet(ScrHandle, TrackTitleLabelId, GFUI_INVISIBLE);
-		
+
 	}
 	else
 	{
@@ -392,7 +392,7 @@ static void
 rmOnLoadRaceFromConfigFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
-	
+
 	FileSelectData.title = pRaceMan->getName();
 	FileSelectData.prevScreen = pPrevMenu;
 	FileSelectData.mode = RmFSModeLoad;
@@ -411,7 +411,7 @@ static void
 rmOnLoadRaceFromResultsFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
-	
+
 	FileSelectData.title = pRaceMan->getName();
 	FileSelectData.prevScreen = pPrevMenu;
 	FileSelectData.mode = RmFSModeLoad;
@@ -430,7 +430,7 @@ static void
 rmOnSaveRaceToConfigFile(void *pPrevMenu)
 {
 	const GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
-	
+
 	// Fill-in file selection descriptor
 	FileSelectData.title = pRaceMan->getName();
 	FileSelectData.prevScreen = pPrevMenu;
@@ -473,7 +473,7 @@ RmRacemanMenu()
 	if (!strcmp(reInfo->_reName, "Online Race"))
 	{
 		// Temporary, as long as the networking menu are not ported to tgfdata.
-		
+
 		// Force any needed fix on the specified track for the race (may not exist)
 		const GfTrack* pTrack = LmRaceEngine().race()->getTrack();
 		GfLogTrace("Using track %s for Online Race", pTrack->getName().c_str());
@@ -482,7 +482,7 @@ RmRacemanMenu()
 		// in case the track was fixed.
 		if (LmRaceEngine().race()->isDirty())
 			LmRaceEngine().race()->store(); // Save data to params.
-		
+
 		// End of temporary.
 
 		if (NetGetNetwork())
@@ -518,10 +518,10 @@ RmRacemanMenu()
 
 
 	// Create screen, load menu XML descriptor and create static controls.
-	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate, 
+	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate,
 										 NULL, (tfuiCallback)NULL, 1);
 	void *menuXMLDescHdle = GfuiMenuLoad("racemanmenu.xml");
-	
+
 	GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
 	// Create and initialize static title label (race mode name).
@@ -538,7 +538,7 @@ RmRacemanMenu()
 	if (SupportsHumanDrivers)
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
 								NULL, rmOnPlayerConfig);
-	
+
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "BackButton",
 								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
@@ -575,7 +575,7 @@ RmRacemanMenu()
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
-	
+
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start the race",
@@ -587,7 +587,7 @@ RmRacemanMenu()
 	GfuiScreenActivate(ScrHandle);
 }
 
-#else // IS Client Server 
+#else // IS Client Server
 
 // Init. function for the current menu -----------------------------------------------------
 void
@@ -598,12 +598,12 @@ RmRacemanMenu()
 		GfuiScreenRelease(ScrHandle);
 
 	const GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
-	
+
 	// Ask the RaceEngine what types of races should be allowed here
 	bool SupportsHumanDrivers = LmRaceEngine().supportsHumanDrivers();
 	bool NetServer = false;
 	bool NetClient = false;
-	
+
 	std::string racID = pRaceMan->getId();
 	if (0 == strcmp(racID.c_str(), "netserver"))
 	{
@@ -618,10 +618,10 @@ RmRacemanMenu()
 
 
 	// Create screen, load menu XML descriptor and create static controls.
-	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate, 
+	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate,
 										 NULL, (tfuiCallback)NULL, 1);
 	void *menuXMLDescHdle = GfuiMenuLoad("racemanmenu.xml");
-	
+
 	GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
 	// Create and initialize static title label (race mode name).
@@ -638,7 +638,7 @@ RmRacemanMenu()
 	if (SupportsHumanDrivers)
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
 								NULL, rmOnPlayerConfig);
-	
+
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "BackButton",
 								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
@@ -660,7 +660,7 @@ RmRacemanMenu()
 	ResumeRaceButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ResumeRaceButton",
 							NULL, rmResumeRace);
-	
+
 
 	if(NetServer)
 	{
@@ -680,7 +680,7 @@ RmRacemanMenu()
 			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "StartNewRaceButton",
 			NULL, rmStartNewRace);
 	}
-	
+
 
 	// Track outline image.
 	TrackOutlineImageId =
@@ -693,7 +693,7 @@ RmRacemanMenu()
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
-	
+
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start the race",

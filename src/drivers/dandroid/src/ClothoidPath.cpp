@@ -132,7 +132,7 @@ void ClothoidPath::SmoothBetween( int step )
         else if( t > l.Wr() - m_margin_inside )
           t = l.Wr() - m_margin_inside;
       }
-  
+
       if( t < -m_maxL )
         t = -m_maxL;
       else if( t > m_maxR )
@@ -148,7 +148,7 @@ void ClothoidPath::SetOffset(
   double   k,
   double   t,
   PathPt*   l3,
-  const PathPt* l2, 
+  const PathPt* l2,
   const PathPt* l4 )
 {
   double wl  = -MN(m_maxL, l3->Wl());

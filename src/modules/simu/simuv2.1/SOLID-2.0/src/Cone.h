@@ -35,13 +35,13 @@
 
 class Cone : public Convex {
 public:
-  Cone(Scalar r, Scalar h) : 
-    bottomRadius(r), 
-    halfHeight(h / 2), 
-    sinAngle(r / sqrt(r * r + h * h))  {} 
-  
+  Cone(Scalar r, Scalar h) :
+    bottomRadius(r),
+    halfHeight(h / 2),
+    sinAngle(r / sqrt(r * r + h * h))  {}
+
   Point support(const Vector&) const;
-  
+
 protected:
   Scalar bottomRadius;
   Scalar halfHeight;

@@ -3,15 +3,15 @@ INCLUDE(../../../../cmake/macros.cmake)
 SET(SSGGRAPH_HEADERS grMoonpos.h grSky.h
                      grSphere.h grStars.cpp
                      grboard.h grcam.h grcar.h
-                     grcarlight.h grmain.h 
-                     grsimplestate.h 
-                     grmultitexstate.h 
+                     grcarlight.h grmain.h
+                     grsimplestate.h
+                     grmultitexstate.h
                      grloadac.h grssgext.h
-                     grscene.h grbackground.h 
-                     grscreen.h 
+                     grscene.h grbackground.h
+                     grscreen.h
                      grshadow.h grskidmarks.h
                      grsmoke.h grtexture.h loadsgi.h
-                     grtracklight.h 
+                     grtracklight.h
                      grtrackmap.h grutil.h
                      grvtxtable.h grrain.h
                      ssggraph.h)
@@ -19,15 +19,15 @@ SET(SSGGRAPH_SOURCES grMoonpos.cpp
                      grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp
                      grSkyDome.cpp grSphere.cpp grStars.cpp
                      grboard.cpp grcam.cpp grcar.cpp
-                     grcarlight.cpp grmain.cpp 
-                     grsimplestate.cpp 
-                     grmultitexstate.cpp 
+                     grcarlight.cpp grmain.cpp
+                     grsimplestate.cpp
+                     grmultitexstate.cpp
                      grloadac.cpp
-                     grscene.cpp grbackground.cpp 
+                     grscene.cpp grbackground.cpp
                      grscreen.cpp
                      grshadow.cpp grskidmarks.cpp
                      grsmoke.cpp grtexture.cpp
-                     grtracklight.cpp 
+                     grtracklight.cpp
                      grtrackmap.cpp grutil.cpp
                      grvtxtable.cpp grrain.cpp
                      ssggraph.cpp)
@@ -55,9 +55,9 @@ ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG 
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG
         "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmtd.lib")
-    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE 
+    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE
         "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
@@ -65,7 +65,7 @@ ENDIF(MSVC)
 # Note: Other sources and headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(ssggraph MODULE ${SSGGRAPH_SOURCES} ${SSGGRAPH_HEADERS} ${SSGGRAPH_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(ssggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_PLIB_LIBRARY(ssggraph ul sg ssg ssgaux)

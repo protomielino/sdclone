@@ -4,7 +4,7 @@
 #include <simgear/math/point3d.hxx>
 #include "SGMath.hxx"
 
-/** 
+/**
  * Convert from geocentric coordinates to geodetic coordinates
  * @param lat_geoc (in) Geocentric latitude, radians, + = North
  * @param radius (in) C.G. radius to earth center (meters)
@@ -128,11 +128,11 @@ inline Point3D sgGeodToCart(const Point3D& geod)
  * @param lon2 (out) degrees
  * @param az2 (out) return course in degrees
  */
-int geo_direct_wgs_84 ( double lat1, double lon1, double az1, 
+int geo_direct_wgs_84 ( double lat1, double lon1, double az1,
 			double s, double *lat2, double *lon2,
                         double *az2 );
 inline int geo_direct_wgs_84 ( double alt, double lat1,
-                        double lon1, double az1, 
+                        double lon1, double az1,
 			double s, double *lat2, double *lon2,
                         double *az2 )
 { return geo_direct_wgs_84(lat1, lon1, az1, s, lat2, lon2, az2); }

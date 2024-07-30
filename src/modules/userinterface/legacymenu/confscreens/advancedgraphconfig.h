@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id: graphconfig.h 3438 2011-03-11 13:43:24Z pouillot $
 */
@@ -30,4 +30,4 @@
 
 extern void *AdvancedGraphMenuInit(void *prevMenu);
 
-#endif /* _ADVANCEDGRAPHCONFIG_H_ */ 
+#endif /* _ADVANCEDGRAPHCONFIG_H_ */

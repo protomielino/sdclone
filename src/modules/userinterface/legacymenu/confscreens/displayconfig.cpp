@@ -188,7 +188,7 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
 
 bool DisplayMenu::restartNeeded()
 {
-	bool needRestart = ((_eDisplayMode != _eOriginalDisplayMode) 
+	bool needRestart = ((_eDisplayMode != _eOriginalDisplayMode)
 						|| (_nScreenWidth !=_nOriginalScreenWidth)
 						|| (_nScreenHeight != _nOriginalScreenHeight)
 						|| (_nOriginalMenuDisplay != _nMenuDisplay))
@@ -230,7 +230,7 @@ void DisplayMenu::updateControls()
 	nControlId = getDynamicControlId("ScreenSizeCombo");
 	GfuiEnable(getMenuHandle(),nControlId,enable);
 
-	
+
 	resetScreenSizes();
 
 	nControlId = getDynamicControlId("MonitorTypeCombo");
@@ -310,7 +310,7 @@ void DisplayMenu::storeSettings() const
 	// (will become 'validated' after a succesfull restart, once we are sure they are OK :
 	//  see guiscreen::GfScrShutdown).
 	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE, GFSCR_VAL_TODO);
-	
+
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_STARTUPDISPLAY, (char*)NULL, _nMenuDisplay);
@@ -327,7 +327,7 @@ void DisplayMenu::storeSettings() const
 
 void DisplayMenu::loadGraphicSettings()
 {
-	void* grHandle = 
+	void* grHandle =
 		GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Monitor Type : 4:3, 16:9 or 21:9
@@ -434,7 +434,7 @@ void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 	if (_eDisplayMode != eMode)
 	{
 		_eDisplayMode = eMode;
-		
+
 		updateControls();
 	}
 }
@@ -475,7 +475,7 @@ void DisplayMenu::resetScreenSizes()
 		ossSize << _vScreenSizes[nSizeIndex].width << " x " << _vScreenSizes[nSizeIndex].height;
 		GfuiComboboxAddText(getMenuHandle(), nComboId, ossSize.str().c_str());
 	}
-	
+
 	// Try and find the closest screen size to the current choice in the new list.
 	// 1) Is there an exact match ?
 	int nScreenSizeIndex = -1;
@@ -504,7 +504,7 @@ void DisplayMenu::resetScreenSizes()
 	// 4) Store new screen size.
 	_nScreenWidth = _vScreenSizes[nScreenSizeIndex].width;
 	_nScreenHeight = _vScreenSizes[nScreenSizeIndex].height;
-	
+
 	// Select the found one in the combo-box.
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nScreenSizeIndex);
 
@@ -596,9 +596,9 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	createMenu(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     openXMLDescriptor();
-    
+
     createStaticControls();
-    
+
 	createComboboxControl("ScreenSizeCombo", this, onChangeScreenSize);
 
 	const int nDisplayModeComboId =
@@ -650,7 +650,7 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 
 	// Load constant value lists in combo-boxes.
 	// 1) Color depths combo : not constant, as depends on selected video detection mode.
-	
+
 	// 2) Display modes combo.
 	for (int nDispModeInd = 0; nDispModeInd < nDisplayModes; nDispModeInd++)
 		GfuiComboboxAddText(getMenuHandle(), nDisplayModeComboId, ADisplayModes[nDispModeInd]);
@@ -690,7 +690,7 @@ void* DisplayMenuInit(void *pPreviousMenu)
 	if (!PDisplayMenu)
 	{
 		PDisplayMenu = new DisplayMenu;
-	
+
 		PDisplayMenu->initialize(pPreviousMenu);
 	}
 

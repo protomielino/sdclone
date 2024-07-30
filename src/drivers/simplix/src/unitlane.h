@@ -63,7 +63,7 @@
 //==========================================================================*
 // Class TLane
 //--------------------------------------------------------------------------*
-class TLane	
+class TLane
 {
   public:
 	struct	TPathPt
@@ -76,9 +76,9 @@ class TLane
 		float	CrvZ;								 // Curvature in z	direction... e.g. bumps
 		float	NextCrv;						   //	Cuvature comming next
 		float	WToL;							   // Lane specfic width to	left
-		float	WToR;							   // Lane specfic width to	right 
+		float	WToR;							   // Lane specfic width to	right
 		float	WPitToL;						   //	Lane specfic width to left
-		float	WPitToR;						   //	Lane specfic width to right	
+		float	WPitToR;						   //	Lane specfic width to right
 		bool Fix;
 
 		// Part 2: These data	could be stored, but is	recalculated from others

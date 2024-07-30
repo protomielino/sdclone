@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -140,7 +140,7 @@ InitFuncPt(int index, void *pt)
  *	welcomeOut : Module run-time information returned to the called
  *
  * Return
- *	0, if no error occured 
+ *	0, if no error occured
  *	non 0, otherwise
  *
  * Remarks
@@ -167,7 +167,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
  *
  * Return
  *	0 if no error occured
- *	-1, if any error occured 
+ *	-1, if any error occured
  *
  * Remarks
  *
@@ -275,7 +275,7 @@ static void endrace(int index, tCarElt* car, tSituation *s)
  *
  *
  * Remarks
- *	
+ *
  */
 static void drive_mt(int index, tCarElt* car, tSituation *s)
 {
@@ -292,10 +292,10 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
  *
  *
  * Return
- *	
+ *
  *
  * Remarks
- *	
+ *
  */
 static void drive_at(int index, tCarElt* car, tSituation *s)
 {
@@ -469,14 +469,14 @@ int NetworkHuman::get_human_index()
                 {
                     human_index = i;
                     break;
-                }	
+                }
             }
             while(name);
 
             return human_index;
         }
     }
-    
+
     return 0;
 }
 
