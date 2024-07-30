@@ -47,6 +47,3 @@ TXML_API txmlElement *xmlFindNextElt(txmlElement *startElt, char *name);
 TXML_API txmlElement *xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalue);
 
 #endif /* _XML_H_ */
-
-
-

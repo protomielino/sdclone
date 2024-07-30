@@ -51,4 +51,3 @@ void cgrSimpleState::setTexture(GLuint tex)
 }
 
 } // namespace ssggraph
-

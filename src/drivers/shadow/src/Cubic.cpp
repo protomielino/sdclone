@@ -107,4 +107,3 @@ int		Cubic::Solve( double* r1, double* r2, double* r3 ) const
 {
 	return Utils::SolveCubic(m_coeffs[0], m_coeffs[1], m_coeffs[2], m_coeffs[3], r1, r2, r3);
 }
-

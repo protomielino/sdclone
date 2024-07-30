@@ -97,9 +97,3 @@ bool common_point(const BBoxNode *a, const BBoxNode *b,
 		  Vector& v, Point& pa, Point& pb);
 
 #endif
-
-
-
-
-
-

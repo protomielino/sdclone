@@ -33,6 +33,3 @@ extern void ReCarsManageCar(tCarElt *car, bool& bestLapChanged);
 extern void ReCarsSortCars(void);
 
 #endif /* _RACECARS_H_ */
-
-
-

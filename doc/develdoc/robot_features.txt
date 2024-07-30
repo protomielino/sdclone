@@ -24,4 +24,3 @@ of laps after the time has finished. s->_totTime contains the time which must
 end first because the session is finished. If the session isn't timed, then
 s->_totTime is lower then zero (-60.0f in practice). The time left can be
 calculated from s->_totTime and s->currentTime.
-

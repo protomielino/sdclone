@@ -415,4 +415,3 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 }//cGrSkidmarks::Update
 
 } // namespace ssggraph
-

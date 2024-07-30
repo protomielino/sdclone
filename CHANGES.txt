@@ -1464,4 +1464,3 @@ Program:
 - new mode for the debug board (Gabor)
   * display segment name, distance form start, current camera
 - exhaust fires shown when RPM drops (Gabor)
-

@@ -157,4 +157,3 @@ bool cGrMoon::reposition(sgVec3 p, double angle, double moonrightAscension, doub
 }
 
 } // namespace ssggraph
-

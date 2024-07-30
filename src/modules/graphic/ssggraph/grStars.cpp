@@ -272,4 +272,3 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 }
 
 } // namespace ssggraph
-

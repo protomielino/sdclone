@@ -428,4 +428,3 @@ int printOb(FILE *ofile, ob_t &object);
 void smoothTriNorm(std::list<ob_t> &objects);
 
 #endif /* _ACCC_H_ */
-

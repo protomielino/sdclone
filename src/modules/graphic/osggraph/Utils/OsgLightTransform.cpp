@@ -114,4 +114,3 @@ void SDLightTransform::accept(osg::NodeVisitor &nv)
 }
 
 } // namespace osggraph
-

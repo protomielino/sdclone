@@ -191,4 +191,3 @@ double Correct::CorrectSteer(double steer, double linesteer, double line2left, i
  return steer;
 }
 #endif
-

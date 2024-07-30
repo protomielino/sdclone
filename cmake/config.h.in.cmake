@@ -183,4 +183,3 @@
 #define SD_LIBDIR "${SD_LIBDIR}/"
 #define SD_BINDIR "${SD_BINDIR}/"
 #define SD_LOCALDIR "${SD_LOCALDIR}/"
-

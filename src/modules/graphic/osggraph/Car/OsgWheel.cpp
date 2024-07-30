@@ -304,4 +304,3 @@ void SDWheels::updateWheels()
 }
 
 } // namespace osggraph
-

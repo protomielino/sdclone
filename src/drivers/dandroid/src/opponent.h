@@ -110,4 +110,3 @@ class Opponents {
 
 
 #endif // _OPPONENT_H_
-

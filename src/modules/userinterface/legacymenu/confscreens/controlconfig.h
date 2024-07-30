@@ -61,6 +61,3 @@ typedef struct
 } tCmdInfo;
 
 #endif /* _CONTROLCONFIG_H_ */
-
-
-

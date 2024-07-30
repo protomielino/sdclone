@@ -399,4 +399,3 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 }
 
 } // namespace ssggraph
-

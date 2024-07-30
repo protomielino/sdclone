@@ -128,4 +128,3 @@ protected:
 } // namespace ssggraph
 
 #endif //_GRVTXTABLE_H_
-

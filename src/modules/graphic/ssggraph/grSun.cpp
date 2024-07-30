@@ -404,4 +404,3 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
 }
 
 } // namespace ssggraph
-

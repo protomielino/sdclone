@@ -125,4 +125,3 @@ extern void grShutdownBoardCar(void);
 } // namespace ssggraph
 
 #endif /* _GRBOARD_H_ */
-

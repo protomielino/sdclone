@@ -51,6 +51,3 @@
 #define SND_VAL_MENUSFX_STATE_DISABLED "disabled"
 
 #endif /* _SOUND_H_ */
-
-
-

@@ -66,5 +66,3 @@ double sg_random();
 
 
 #endif // _SG_RANDOM_H
-
-

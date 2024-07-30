@@ -869,4 +869,3 @@ void GfMemoryManagerHistFree(size_t size)
 // ... Implementation
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 #endif
-

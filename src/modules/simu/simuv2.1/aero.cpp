@@ -144,4 +144,3 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         wing->forces.x = wing->forces.z = 0.0f;
     }
 }
-

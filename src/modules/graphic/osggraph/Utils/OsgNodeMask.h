@@ -65,4 +65,3 @@ enum NodeMask : osg::Node::NodeMask
 } // namespace osggraph
 
 #endif // _OSGNODEMASK_H
-

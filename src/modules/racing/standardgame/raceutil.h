@@ -29,6 +29,3 @@
 extern int RmGetFeaturesList(void* param);
 
 #endif /* _RACEUTIL_H_ */
-
-
-

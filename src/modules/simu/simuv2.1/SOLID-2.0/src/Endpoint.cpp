@@ -105,9 +105,3 @@ void Endpoint::move(Scalar x) {
     break;
   }
 }
-
-
-
-
-
-

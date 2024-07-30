@@ -114,4 +114,3 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
 }
 
 } // namespace osggraph
-

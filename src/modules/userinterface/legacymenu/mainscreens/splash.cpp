@@ -295,4 +295,3 @@ bool SplashScreen(bool (*fnBackWork)(void), bool (*fnOnClosed)(void), bool bInte
 
     return true;
 }
-

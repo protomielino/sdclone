@@ -32,6 +32,3 @@
 extern void *GraphMenuInit(void *prevMenu);
 
 #endif /* _GRAPHCONFIG_H_ */
-
-
-

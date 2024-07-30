@@ -895,4 +895,3 @@ void LRaceLine::SetSegmentCamber(const tTrackSeg *seg, const int div) {
 
   seg_[div].dCamber = dCamber;
 }  // SetSegmentCamber
-

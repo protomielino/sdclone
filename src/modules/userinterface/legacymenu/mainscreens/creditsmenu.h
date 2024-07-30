@@ -24,6 +24,3 @@ extern void CreditsMenuActivate(void *retScrHdle);
 
 
 #endif /* _CREDITSMENU_H_ */
-
-
-

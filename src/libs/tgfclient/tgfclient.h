@@ -897,5 +897,3 @@ void ScreenRelease(void* screen);
 void UnregisterScreens(void* screen);
 
 #endif /* __TGFCLIENT__H__ */
-
-

@@ -41,4 +41,3 @@ public :
 } // namespace osggraph
 
 #endif /* _OSGBRAKE_H_ */
-

@@ -25,6 +25,3 @@ extern void *OptionsMenuInit(void *precMenu);
 
 
 #endif /* _OPTIONSMENU_H_ */
-
-
-

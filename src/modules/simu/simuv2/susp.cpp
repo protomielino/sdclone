@@ -140,4 +140,3 @@ void SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0,
 
 	initDamper(susp);
 }
-

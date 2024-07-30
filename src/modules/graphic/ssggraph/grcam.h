@@ -307,4 +307,3 @@ extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *ca
 } // namespace ssggraph
 
 #endif /* _GRCAM_H_ */
-

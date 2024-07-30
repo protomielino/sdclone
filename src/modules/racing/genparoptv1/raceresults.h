@@ -45,6 +45,3 @@ extern void ReEventInitResults(void);
 extern void ReUpdateStandings();
 
 #endif /* _RACERESULTS_H_ */
-
-
-

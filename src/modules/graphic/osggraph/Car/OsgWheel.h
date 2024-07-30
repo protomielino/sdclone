@@ -53,4 +53,3 @@ public :
 } // namespace osggraph
 
 #endif /* _OSGWHEEL_H_ */
-

@@ -741,7 +741,3 @@ ReadTrack1(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     }
 
 }
-
-
-
-

@@ -152,4 +152,3 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         }
     }
 }
-

@@ -69,4 +69,3 @@ You find a robot programming tutorial on www.berniw.org in the TORCS section.
 Robot racing
 ------------
 Visit www.berniw.org/trb for more information.
-

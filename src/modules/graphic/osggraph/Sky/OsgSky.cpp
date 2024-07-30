@@ -317,4 +317,3 @@ void SDSky::modify_vis( float alt, float time_factor )
 }
 
 } // namespace osggraph
-

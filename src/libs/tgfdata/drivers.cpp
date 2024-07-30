@@ -859,4 +859,3 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
 
     return vecPossSkins;
 }
-

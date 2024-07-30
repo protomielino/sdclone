@@ -507,4 +507,3 @@ void calc_gc_course_dist( const sgVec2& start, const sgVec2& dest, double *cours
 }
 
 } // namespace ssggraph
-

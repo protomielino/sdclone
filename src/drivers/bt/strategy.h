@@ -106,5 +106,3 @@ class SimpleStrategy2 : public SimpleStrategy {
 
 
 #endif // _STRATEGY_H_
-
-

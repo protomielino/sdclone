@@ -772,4 +772,3 @@ gfuiReleaseScrollist(tGfuiObject *curObject)
     }
     free(curObject);
 }
-

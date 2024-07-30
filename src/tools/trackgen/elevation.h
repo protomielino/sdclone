@@ -32,6 +32,3 @@ extern void SaveElevation(tTrack *track, void *TrackHandle, const std::string &i
 
 
 #endif /* _ELEVATION_H_ */
-
-
-

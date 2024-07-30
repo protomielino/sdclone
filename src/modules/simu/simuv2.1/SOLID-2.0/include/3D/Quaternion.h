@@ -209,6 +209,3 @@ inline Quaternion Quaternion::random() {
 }
 
 #endif
-
-
-

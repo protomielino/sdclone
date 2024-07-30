@@ -457,4 +457,3 @@ void SDPit::build(tTrack *track)
 }  // SDPits::build
 
 } // namespace osggraph
-

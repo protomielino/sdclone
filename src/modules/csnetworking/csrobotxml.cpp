@@ -116,4 +116,3 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
     GfParmReleaseHandle(params);
     return true;
 }
-

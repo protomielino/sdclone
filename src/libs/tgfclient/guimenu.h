@@ -128,6 +128,3 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 #define GFMNU_ATTR_MUSIC_FILE "music file"
 
 #endif /* __MENU__H__ */
-
-
-

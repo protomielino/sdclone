@@ -269,4 +269,3 @@ void    PitPath::LocalToGlobalXY( double dist, double offs, double slope, Vec2d*
     *p = Vec3d(trackPoint + trackNormal * offs).GetXY();
     *v = Vec2d(trackTangent + trackNormal.GetXY() * slope).GetUnit();
 }
-

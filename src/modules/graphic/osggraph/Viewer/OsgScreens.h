@@ -72,4 +72,3 @@ public:
 } // namespace osggraph
 
 #endif //_OSGSCREENS_H_
-

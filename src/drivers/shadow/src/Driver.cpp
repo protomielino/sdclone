@@ -3627,4 +3627,3 @@ bool Driver::CheckPitSharing(tCarElt *car)
       return false;
   }
 }
-

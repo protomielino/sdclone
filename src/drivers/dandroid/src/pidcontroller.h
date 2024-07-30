@@ -41,4 +41,3 @@ public:
 
 
 #endif // _PIDCONTROLLER_H_
-

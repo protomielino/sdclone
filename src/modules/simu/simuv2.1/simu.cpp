@@ -551,4 +551,3 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
 }
-

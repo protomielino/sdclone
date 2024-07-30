@@ -1076,4 +1076,3 @@ void ReCareerNextSeason()
 	/* Clean temporaly data */
 	ReCareerNextCleanup( &info, &driverList, driverListLength );
 }
-

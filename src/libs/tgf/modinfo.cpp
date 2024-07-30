@@ -344,4 +344,3 @@ int GfModTerminate(tSOHandle soHandle, const char *soPath)
 
     return termSts;
 }
-

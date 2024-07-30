@@ -242,4 +242,3 @@ void GfFileSetup()
 	free( isIndexUsed );
 	free( filename );
 }
-

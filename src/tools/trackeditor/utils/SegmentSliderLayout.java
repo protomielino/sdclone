@@ -102,4 +102,3 @@ public class SegmentSliderLayout implements LayoutManager, Serializable
 	}
 
 }
-

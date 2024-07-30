@@ -775,4 +775,3 @@ SimCarCollideCars(tSituation *s)
 		}
 	}
 }
-

@@ -820,4 +820,3 @@ void cgrShader::Init(void)
 }
 
 } // namespace ssggraph
-

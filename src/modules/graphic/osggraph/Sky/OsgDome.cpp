@@ -305,4 +305,3 @@ bool SDSkyDome::reposition( const osg::Vec3f &p, double spin )
 }
 
 } // namespace osggraph
-

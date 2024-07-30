@@ -494,4 +494,3 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 }
 
 } // namespace ssggraph
-

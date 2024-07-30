@@ -125,6 +125,3 @@ typedef struct RobotItf {
 #define ROB_VAL_FEATURE_REALWEATHER     "real weather"
 
 #endif /* _ROBOTV1_H_ */
-
-
-

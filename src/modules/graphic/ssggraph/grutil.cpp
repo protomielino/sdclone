@@ -386,4 +386,3 @@ Maximum is 10
 */
 
 } // namespace ssggraph
-

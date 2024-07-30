@@ -112,4 +112,3 @@ bool	TeamInfo::IsTeamMate( const CarElt* pCar0, const CarElt* pCar1 ) const
 //	return false;
 //	return true;
 }
-

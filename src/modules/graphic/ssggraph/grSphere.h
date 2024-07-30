@@ -27,4 +27,3 @@ extern ssgBranch *grMakeSphere(ssgSimpleState *state, ssgColourArray *cl,
 							   ssgCallback predraw, ssgCallback postdraw );
 
 } // namespace ssggraph
-

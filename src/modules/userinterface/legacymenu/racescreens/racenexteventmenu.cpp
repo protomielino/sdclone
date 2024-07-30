@@ -124,4 +124,3 @@ RmNextEventMenu(void)
 	// Activate screen.
 	GfuiScreenActivate(rmScrHandle);
 }
-

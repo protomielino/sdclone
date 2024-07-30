@@ -71,6 +71,3 @@ typedef struct
 
 
 #endif /* _TRANSMISSION_H_ */
-
-
-

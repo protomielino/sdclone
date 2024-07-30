@@ -490,4 +490,3 @@ SimCarUpdate2(tCar *car, tSituation * /* s */)
 {
     if (SimTelemetry == car->carElt->index) SimTelemetryOut(car);
 }
-

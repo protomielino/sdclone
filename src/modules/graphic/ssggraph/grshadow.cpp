@@ -115,4 +115,3 @@ void ssgVtxTableShadow::draw_geometry ()
 }
 
 } // namespace ssggraph
-

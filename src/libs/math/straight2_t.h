@@ -67,5 +67,3 @@ template<class T> inline T straight2t<T>::dist(const v2t<T> &s) const
 }
 
 #endif //_STRAIGHT_2T_H_
-
-

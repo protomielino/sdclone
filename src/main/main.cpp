@@ -280,4 +280,3 @@ main(int argc, char *argv[])
 
 	return (piUserItf && piRaceEngine) ? 0 : 1;
 }
-

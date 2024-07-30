@@ -392,4 +392,3 @@ osg::Vec4f SDSun::get_scene_color() const
 }
 
 } // namespace osggraph
-

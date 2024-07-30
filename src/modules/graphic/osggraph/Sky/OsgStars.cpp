@@ -217,4 +217,3 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
 }
 
 } // namespace osggraph
-

@@ -239,7 +239,3 @@ bool common_point(const BBoxNode *a, const BBoxNode *b,
       common_point(((const BBoxInternal *)a)->rson, b, b2a, abs_b2a, a2b, abs_a2b, v, pa ,pb);
   }
 }
-
-
-
-

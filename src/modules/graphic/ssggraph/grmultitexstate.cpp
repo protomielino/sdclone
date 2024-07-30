@@ -234,4 +234,3 @@ void cgrMultiTexState::blend()
 }
 
 } // namespace ssggraph
-

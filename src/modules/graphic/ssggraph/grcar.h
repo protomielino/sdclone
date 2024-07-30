@@ -126,4 +126,3 @@ extern bool grShadowStatic;
 } // ssggraph
 
 #endif /* _GRCAR_H_ */
-

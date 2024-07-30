@@ -57,4 +57,3 @@ double grUpdateMoonPos(double timeOfDay)
 }
 
 } // namespace ssggraph
-

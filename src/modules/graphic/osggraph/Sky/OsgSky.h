@@ -182,4 +182,3 @@ public:
 } // namespace osggraph
 
 #endif // _OSGSKY_H
-

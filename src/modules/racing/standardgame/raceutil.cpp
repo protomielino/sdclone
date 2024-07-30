@@ -163,4 +163,3 @@ int RmGetFeaturesList( void* param )
 
 	return raceFeatureMask;
 }
-

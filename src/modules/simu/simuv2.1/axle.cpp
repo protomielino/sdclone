@@ -70,6 +70,3 @@ void SimAxleUpdate(tCar *car, int index)
 	// left
 	car->wheel[index*2+1].axleFz = - sgn * f;
 }
-
-
-

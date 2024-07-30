@@ -87,4 +87,3 @@ SDOptions::~SDOptions(void)
 }
 
 } // namespace osggraph
-

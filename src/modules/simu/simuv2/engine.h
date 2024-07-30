@@ -55,6 +55,3 @@ typedef struct
 } tEngine;
 
 #endif /* _ENGINE_H_ */
-
-
-

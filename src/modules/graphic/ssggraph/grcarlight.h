@@ -110,4 +110,3 @@ extern void grShutdownCarlight(void);
 } // namespace ssggraph
 
 #endif	//_GRCARLIGHT_H_
-

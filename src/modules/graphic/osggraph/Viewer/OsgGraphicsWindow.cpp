@@ -232,4 +232,3 @@ void OsgGraphicsWindowSDL2::raiseWindow()
 }
 
 } // namespace osggraph
-

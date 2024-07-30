@@ -203,4 +203,3 @@ protected:
 } // namespace ssggraph
 
 #endif /* __SHADER_H__ */
-

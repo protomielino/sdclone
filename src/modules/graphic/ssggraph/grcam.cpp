@@ -2636,4 +2636,3 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 }
 
 } // namespace ssggraph
-

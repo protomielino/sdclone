@@ -32,6 +32,3 @@ typedef struct
 
 
 #endif /* _STEER_H_ */
-
-
-

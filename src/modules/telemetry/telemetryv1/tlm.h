@@ -28,6 +28,3 @@ extern void TlmStopMonitoring(void);
 extern void TlmShutdown(void);
 
 #endif /* _TLM_H_ */
-
-
-

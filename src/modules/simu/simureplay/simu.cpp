@@ -434,4 +434,3 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 {
 	GfLogInfo("Replay UpdateSingleCar\n");
 }
-

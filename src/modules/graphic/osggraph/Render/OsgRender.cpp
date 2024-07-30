@@ -1285,4 +1285,3 @@ osg::Vec4f SDRender::getSceneColor(void)
 }
 
 } // namespace osggraph
-

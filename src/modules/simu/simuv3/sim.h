@@ -191,6 +191,3 @@ inline void QuatInverseRotate(t3Dd& src, sgQuat& q, t3Dd& dst)
 #define SIM_Z_OFFSET	2.0
 
 #endif /* _SIMFCT_H_ */
-
-
-

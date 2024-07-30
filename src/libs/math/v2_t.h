@@ -259,4 +259,3 @@ template<class T> inline T v2t<T>::fakeCrossProduct(const v2t<T>* b) const
 
 
 #endif // _LINALG_V2_T_H_
-

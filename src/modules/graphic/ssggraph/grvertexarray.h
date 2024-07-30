@@ -54,4 +54,3 @@ public:
 } // namespace ssggraph
 
 #endif //_GRVTXARRAY_H
-

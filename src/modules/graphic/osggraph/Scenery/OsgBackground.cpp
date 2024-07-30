@@ -90,4 +90,3 @@ void SDBackground::reposition(double X, double Y, double Z)
 }
 
 } // namespace osggraph
-

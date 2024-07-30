@@ -305,5 +305,3 @@ int SimpleStrategy::pitRepair(tCarElt* car, tSituation *s, Opponents *opp)
  fprintf(stderr,"%s: repairing %d damage\n",car->_name,dammage);fflush(stderr);
  return dammage;
 }
-
-

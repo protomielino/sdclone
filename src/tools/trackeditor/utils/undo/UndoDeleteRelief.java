@@ -34,4 +34,3 @@ public class UndoDeleteRelief implements UndoInterface
 		redo = null;
 	}
 }
-

@@ -156,11 +156,3 @@ typedef struct
 #endif
 
 #endif /* _CAR__H_ */
-
-
-
-
-
-
-
-

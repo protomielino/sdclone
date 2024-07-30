@@ -48,4 +48,3 @@ ADD_SOLID_LIBRARY(simuv2.1) # Ignored if not OPTION_3RDPARTY_SOLID
 ADD_SDLIB_LIBRARY(simuv2.1 portability tgf robottools solid) # solid ignored if not OPTION_3RDPARTY_SOLID
 
 SD_INSTALL_FILES(LIB modules/simu TARGETS simuv2.1)
-

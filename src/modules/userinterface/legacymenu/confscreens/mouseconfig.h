@@ -33,6 +33,3 @@
 extern void *MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _MOUSECONFIG_H_ */
-
-
-

@@ -26,4 +26,3 @@
 #define __CONFSCREENS_H__
 
 #endif /* __CONFSCREENS_H__ */
-

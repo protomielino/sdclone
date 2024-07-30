@@ -288,4 +288,3 @@ inline void v3d::dirVector(const v3d* b, v3d* r) {
 }
 
 #endif  // SRC_DRIVERS_KILO2008_LINALG_H_
-

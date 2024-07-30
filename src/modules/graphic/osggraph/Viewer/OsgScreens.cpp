@@ -324,4 +324,3 @@ SDScreens::~SDScreens()
 }
 
 } // namespace osggraph
-

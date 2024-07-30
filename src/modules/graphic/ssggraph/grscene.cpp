@@ -791,4 +791,3 @@ void grLoadPitsIndicator(tdble x, tdble y, tdble z, char *buf, int Pitind)
 }
 
 } // namespace ssggraph
-

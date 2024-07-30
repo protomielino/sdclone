@@ -49,6 +49,3 @@ typedef struct
 
 
 #endif /* _AERO_H_  */
-
-
-

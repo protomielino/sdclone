@@ -47,4 +47,3 @@ class cgrSimpleState : public ssgSimpleState
 } // namespace ssggraph
 
 #endif // _GRSIMPLESTATE_H_
-

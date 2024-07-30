@@ -3541,4 +3541,3 @@ SDHUD::~SDHUD()
 }
 
 } // namespace osggraph
-

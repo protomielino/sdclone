@@ -137,4 +137,3 @@ Point Polyhedron::support(const Vector& v) const {
 }
 
 #endif
-

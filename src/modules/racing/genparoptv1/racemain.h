@@ -54,6 +54,3 @@ extern void ReRaceSkipSession();
 extern void ReRaceRestart();
 
 #endif /* _RACEMAIN_H_ */
-
-
-

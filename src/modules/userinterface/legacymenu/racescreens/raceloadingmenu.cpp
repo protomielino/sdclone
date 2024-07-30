@@ -185,4 +185,3 @@ RmLoadingScreenSetText(const char *text)
     GfuiApp().eventLoop().forceRedisplay();
 	#endif //WEBSERVER
 }
-

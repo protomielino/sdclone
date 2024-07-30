@@ -134,4 +134,3 @@ protected:
 };
 
 #endif /* __TGFRACE_H__ */
-

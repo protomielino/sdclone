@@ -557,4 +557,3 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
 	carElt->_dammage = car->dammage;
 
 }
-

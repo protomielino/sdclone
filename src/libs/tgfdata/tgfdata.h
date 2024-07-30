@@ -50,5 +50,3 @@ class TGFDATA_API GfData
 };
 
 #endif /* __TGFDATA__H__ */
-
-

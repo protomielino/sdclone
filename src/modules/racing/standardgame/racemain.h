@@ -49,6 +49,3 @@ extern void ReRaceRestart();
 extern void ReStopPreracePause();
 
 #endif /* _RACEMAIN_H_ */
-
-
-

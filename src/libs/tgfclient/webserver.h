@@ -148,5 +148,3 @@ class TGFCLIENT_API WebServer {
 
 #endif //__SD_WEBSERVER_H__
 #endif //WEBSERVER
-
-

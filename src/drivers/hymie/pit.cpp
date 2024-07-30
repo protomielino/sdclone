@@ -328,4 +328,3 @@ float Pit::getSpeedLimitBrake(float speedsqr)
 {
  return (speedsqr-speedlimitsqr)/(pitspeedlimitsqr-speedlimitsqr);
 }
-

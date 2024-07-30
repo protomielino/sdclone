@@ -64,4 +64,3 @@ every new robot gets a higher index.
 
 There exists a function in robottools to find out which car a robot
 with a specific index is driving.
-

@@ -84,6 +84,3 @@ tdble MaximumLiftGivenDrag (tdble drag, tdble A = 1.0);
 
 
 #endif /* _AERO_H_  */
-
-
-

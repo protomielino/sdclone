@@ -108,4 +108,3 @@ public:
 } // namespace osggraph
 
 #endif /* OSGGRAPHICSWINDOW_H */
-

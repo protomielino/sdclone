@@ -38,4 +38,3 @@ Point Sphere::support(const Vector& v) const {
   }
   else return Point(0, 0, 0);
 }
-

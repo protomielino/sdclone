@@ -157,4 +157,3 @@ class TGFCLIENT_API GfglFeatures
 };
 
 #endif // _GLFEATURES_H_
-

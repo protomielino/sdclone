@@ -76,4 +76,3 @@ public:
 } // namespace osggraph
 
 #endif // _OSGMOON_H
-

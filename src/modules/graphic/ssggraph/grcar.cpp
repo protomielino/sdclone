@@ -1721,4 +1721,3 @@ void grDrawCarShadow(void)
 }
 
 } // namespace ssggraph
-

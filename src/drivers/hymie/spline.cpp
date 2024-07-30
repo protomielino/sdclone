@@ -55,4 +55,3 @@ float Spline::evaluate(float z)
 	a3 -= a2;
 	return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }
-

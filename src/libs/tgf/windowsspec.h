@@ -23,4 +23,3 @@
 extern void WindowsSpecInit(void);
 
 #endif /* _WINDOWSSPEC_H_ */
-

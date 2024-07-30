@@ -1921,4 +1921,3 @@ double KDriver::FilterAccel(const double accel) {
     ret = MIN(1.0, last_accel_ + 0.05);
   return ret;
 }   // FilterAccel
-

@@ -98,4 +98,3 @@ void osgMakeCoordMat4 ( osgMat4 m, const float x, const float y, const float z, 
 }
 
 } // namespace osggraph
-

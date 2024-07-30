@@ -1012,4 +1012,3 @@ float Driver::brakedist(float allowedspeed, float mu)
 	float v2sqr = allowedspeed*allowedspeed;
 	return -log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d);
 }
-

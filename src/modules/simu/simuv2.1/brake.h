@@ -40,6 +40,3 @@ typedef struct
 
 
 #endif /* _BRAKE_H_ */
-
-
-

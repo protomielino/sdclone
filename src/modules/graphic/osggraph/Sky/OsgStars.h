@@ -46,4 +46,3 @@ public:
 } // namespace osggraph
 
 #endif // _OSGSTARS_H_
-

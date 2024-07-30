@@ -92,4 +92,3 @@ inline double ePhCelestialBody::getLat() const
 }
 
 #endif // _CELESTIALBODY_H_
-

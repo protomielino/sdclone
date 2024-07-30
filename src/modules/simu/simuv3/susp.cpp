@@ -222,4 +222,3 @@ SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0, tdbl
     susp->link.z = 0.2f; //space between fishbone links on the wheel
     initDamper(susp);
 }
-

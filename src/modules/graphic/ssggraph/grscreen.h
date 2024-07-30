@@ -106,4 +106,3 @@ class cGrScreen {
 } // namespace ssggraph
 
 #endif //_GRSCREEN_H_
-

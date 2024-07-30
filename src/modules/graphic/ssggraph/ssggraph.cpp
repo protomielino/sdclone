@@ -143,4 +143,3 @@ Camera* SsgGraph::getCurCam()
 
     return cam;
 }
-

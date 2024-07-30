@@ -21,4 +21,3 @@ namespace ssggraph {
 double grUpdateMoonPos(double timeOfDay);
 
 } // namespace ssggraph
-

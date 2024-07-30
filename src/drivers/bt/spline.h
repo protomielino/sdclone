@@ -40,4 +40,3 @@ class Spline {
 };
 
 #endif // _SPLINE_H_
-

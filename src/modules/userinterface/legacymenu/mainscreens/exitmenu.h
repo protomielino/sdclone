@@ -25,6 +25,3 @@
 extern void* ExitMenuInit(void *prevMenu);
 
 #endif /* _EXITMENU_H_ */
-
-
-

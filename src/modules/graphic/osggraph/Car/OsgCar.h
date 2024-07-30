@@ -138,4 +138,3 @@ public :
 } // namespace osggraph
 
 #endif /* _OSGCAR_H_ */
-

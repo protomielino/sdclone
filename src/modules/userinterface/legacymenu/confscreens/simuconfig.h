@@ -31,6 +31,3 @@
 extern void *SimuMenuInit(void *prevMenu);
 
 #endif /* _SIMUCONFIG_H_ */
-
-
-

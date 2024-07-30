@@ -170,5 +170,3 @@ double sg_random()
     return (double)y * (1.0/4294967295.0);
     /* divided by 2^32-1 */
 }
-
-

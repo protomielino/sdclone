@@ -101,4 +101,3 @@ private:
 } // namespace osggraph
 
 #endif
-

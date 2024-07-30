@@ -207,7 +207,3 @@ void Opponents::setTeamMate(const char *teammate)
 		}
 	}
 }
-
-
-
-

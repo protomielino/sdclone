@@ -46,6 +46,3 @@ typedef struct
 
 
 #endif /* _TELEMETRY_H_ */
-
-
-

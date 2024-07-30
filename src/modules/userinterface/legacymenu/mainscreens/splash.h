@@ -26,8 +26,3 @@ extern bool SplashScreen(bool (*fnBackWork)(void), bool (*fnOnClosed)(void),
 
 
 #endif /* _SPLASH_H_ */
-
-
-
-
-

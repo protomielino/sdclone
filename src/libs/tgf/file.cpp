@@ -197,4 +197,3 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 
 	return res;
 }
-

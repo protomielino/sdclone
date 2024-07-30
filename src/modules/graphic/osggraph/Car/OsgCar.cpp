@@ -1050,4 +1050,3 @@ void SDCars::unLoad()
 }
 
 } // namespace osggraph
-

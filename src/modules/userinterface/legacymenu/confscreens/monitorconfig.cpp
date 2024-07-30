@@ -263,4 +263,3 @@ void* MonitorMenuInit(void *pPreviousMenu)
 
 	return PMonitorMenu->getMenuHandle();
 }
-

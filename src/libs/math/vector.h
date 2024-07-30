@@ -161,5 +161,3 @@ void sgPostMultMat4ByTransMat4( sgMat4 src, const sgVec3 trans );
 
 
 #endif // _VECTOR_HXX
-
-

@@ -277,4 +277,3 @@ inline void v3d::dirVector(const v3d* b, v3d* r) {
 }
 
 #endif // _LINALG_H_
-

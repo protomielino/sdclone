@@ -846,4 +846,3 @@ shutdownView(void)
 //}
 
 } // namespace ssggraph
-

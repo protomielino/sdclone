@@ -119,4 +119,3 @@ extern cDoV	UnPlayableDistanceOfView;
 } // namespace ssggraph
 
 #endif //_GRSCENE_H_
-

@@ -2364,4 +2364,3 @@ void cGrBoard::ReadDashColor(void *hdle, const string &color_name, float **color
 }
 
 } // namespace ssggraph
-

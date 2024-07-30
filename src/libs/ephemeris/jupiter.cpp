@@ -46,7 +46,3 @@ void ePhJupiter::updatePosition(double mjd, ePhStar *ourSun)
   	ePhCelestialBody::updatePosition(mjd, ourSun);
   	magnitude = -9.25 + 5*log10( r*R ) + 0.014 * FV;
 }
-
-
-
-

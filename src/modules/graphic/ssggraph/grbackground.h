@@ -51,4 +51,3 @@ extern const tdble grSkyDomeNeutralFOVDistance;
 } // namespace ssggraph
 
 #endif //_GRBACKGROUND_H_
-

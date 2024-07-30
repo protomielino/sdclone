@@ -74,4 +74,3 @@ public:
 
 
 #endif // _SG_TYPES_HXX
-

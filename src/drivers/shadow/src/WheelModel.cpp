@@ -145,4 +145,3 @@ void    WheelModel::updateSlip( const tCarElt* car, const tSituation* sit, const
         _sy = sin(_sa); // should be tan(_sa)???
     }
 }
-

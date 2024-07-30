@@ -247,4 +247,3 @@ void SegLearn::update(tSituation *s, tTrack *t, tCarElt *car, int alone, int avo
 
  last_dammage = car->_dammage;
 }
-

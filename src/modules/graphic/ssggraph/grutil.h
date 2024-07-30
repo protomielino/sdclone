@@ -70,4 +70,3 @@ inline float urandom() { return(((float)rand() / (1.0 + (float)RAND_MAX)));}
 } // namespace ssggraph
 
 #endif /* _GRUTIL_H_ */
-

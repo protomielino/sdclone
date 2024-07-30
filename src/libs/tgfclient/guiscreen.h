@@ -172,6 +172,3 @@
 #define GFSCR_SECT_GLDETSPECS                       "OpenGL Detection Specs"
 
 #endif /* _GUISCREEN_H_ */
-
-
-

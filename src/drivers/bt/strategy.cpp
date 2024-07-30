@@ -293,4 +293,3 @@ float SimpleStrategy2::pitRefuel(tCarElt* car, tSituation *s)
 	m_lastpitfuel = fuel;
 	return fuel;
 }
-

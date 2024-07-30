@@ -95,4 +95,3 @@ class ssgSGIHeader {
 //} // namespace ssggraph
 
 #endif // _GRLOADSGI_H_
-

@@ -74,6 +74,3 @@ typedef struct
 } tWing;
 
 #endif /* _AERO_H_  */
-
-
-

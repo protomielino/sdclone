@@ -112,4 +112,3 @@ extern cGrRain grRain;
 } // namespace ssggraph
 
 #endif // _GRRAIN_H
-

@@ -32,4 +32,3 @@ const bool IS_DANDROID_SPEEDDREAMS = true;
 #endif
 
 #endif // _TORCS_OR_SD_H_
-

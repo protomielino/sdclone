@@ -24,6 +24,3 @@
 extern void LinuxSpecInit(void);
 
 #endif /* _LINUXSPEC_H_ */
-
-
-

@@ -59,5 +59,3 @@ class Correct {
 };
 
 #endif // _CORRECT_H_
-
-

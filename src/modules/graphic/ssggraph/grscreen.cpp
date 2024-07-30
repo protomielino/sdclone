@@ -636,4 +636,3 @@ void cGrScreen::initBoard(void)
 }
 
 } // namespace ssggraph
-

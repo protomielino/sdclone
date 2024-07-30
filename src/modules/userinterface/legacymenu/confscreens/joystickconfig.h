@@ -33,6 +33,3 @@
 extern void *JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _JOYSTICKCONFIG_H_ */
-
-
-

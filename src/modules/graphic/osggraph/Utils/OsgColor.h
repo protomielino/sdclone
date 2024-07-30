@@ -77,5 +77,3 @@ inline void sd_gamma_restore_c(float *color,
 } // namespace osggraph
 
 #endif // _OSGCOLORS_H
-
-

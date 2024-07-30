@@ -215,4 +215,3 @@ static void shutdown(int index)
 	}
 #endif
 }
-

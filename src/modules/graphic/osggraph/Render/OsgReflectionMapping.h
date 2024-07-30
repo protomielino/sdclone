@@ -58,4 +58,3 @@ public:
 } // namespace osggraph
 
 #endif //_OSGREFLECTIONMAPPING_H_
-

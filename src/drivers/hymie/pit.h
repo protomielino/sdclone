@@ -92,5 +92,3 @@ class Pit {
 };
 
 #endif // _PIT_H_
-
-

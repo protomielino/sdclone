@@ -1459,4 +1459,3 @@ void grssgSetCurrentOptions(grssgLoaderOptions* options)
 }
 
 } // namespace ssggraph
-

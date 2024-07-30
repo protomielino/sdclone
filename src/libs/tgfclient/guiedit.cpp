@@ -440,4 +440,3 @@ gfuiReleaseEditbox(tGfuiObject *curObject)
     free(label->text);
     free(curObject);
 }
-

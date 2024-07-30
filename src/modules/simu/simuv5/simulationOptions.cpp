@@ -140,4 +140,3 @@ bool SimulationOptions::StrToBool (const char* s, bool dontcare)
 
     return dontcare;
 }
-

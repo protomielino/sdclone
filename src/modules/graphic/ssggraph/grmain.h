@@ -101,4 +101,3 @@ class cGrFrameInfo
 } // namespace ssggraph
 
 #endif /* _GRMAIN_H_ */
-

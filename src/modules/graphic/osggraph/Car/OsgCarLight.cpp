@@ -186,4 +186,3 @@ void SDCarLights::loadStates()
 }
 
 } // namespace osggraph
-

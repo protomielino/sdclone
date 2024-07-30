@@ -479,4 +479,3 @@ int NetworkHuman::get_human_index()
 
     return 0;
 }
-

@@ -56,6 +56,3 @@ extern sqlite3_stmt *ghostcarBlob;
 #endif
 
 #endif /* __REPLAYV1_H__ */
-
-
-

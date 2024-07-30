@@ -66,6 +66,3 @@ typedef struct Suspension
 
 
 #endif /* _SUSP_H__ */
-
-
-

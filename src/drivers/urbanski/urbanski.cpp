@@ -110,4 +110,3 @@ static void endrace(int index, tCarElt *car, tSituation *s) {
 /* Called before the module is unloaded */
 static void shutdown(int index) {
 }
-

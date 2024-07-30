@@ -157,4 +157,3 @@ public:
 } // namespace osggraph
 
 #endif //_OSGSCENERY_H_
-

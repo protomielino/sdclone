@@ -60,5 +60,3 @@ SimSteerUpdate(tCar *car)
 		car->wheel[FRNT_LFT].steer = -steer2;
     }
 }
-
-

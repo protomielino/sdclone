@@ -110,4 +110,3 @@ public:
 } // namespace osggraph
 
 #endif //_OSGVIEWER_H_
-

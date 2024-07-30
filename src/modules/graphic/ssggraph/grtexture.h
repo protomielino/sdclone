@@ -72,4 +72,3 @@ class cgrSGIHeader : public ssgSGIHeader
 } // namespace ssggraph
 
 #endif // _GRTEXTURE_H_
-

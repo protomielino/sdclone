@@ -81,6 +81,3 @@ class TRACK_API TrackModule : public GfModule, public ITrackLoader //, public IT
 };
 
 #endif /* _TRACKITF_H__ */
-
-
-

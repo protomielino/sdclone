@@ -2621,4 +2621,3 @@ void SDCameras::loadSpanValues()
 }
 
 } // namespace osggraph
-

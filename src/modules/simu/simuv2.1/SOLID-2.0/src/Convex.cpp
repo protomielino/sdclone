@@ -432,6 +432,3 @@ void closest_points(const Convex& a, const Convex& b,
   }
   compute_points(bits, pa, pb);
 }
-
-
-

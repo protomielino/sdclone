@@ -790,6 +790,3 @@ typedef struct Track
 #define TRK_ATT_BORDER_DISTANCE     "border distance"
 
 #endif /* _TRACKV1_H_ */
-
-
-

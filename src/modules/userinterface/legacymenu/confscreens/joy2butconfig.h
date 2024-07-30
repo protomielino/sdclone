@@ -33,6 +33,3 @@
 extern void *Joy2butCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _JOY2BUTCONFIG_H_ */
-
-
-

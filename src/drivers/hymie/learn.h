@@ -69,4 +69,3 @@ class SegLearn {
 
 
 #endif //_SEGLEARN_H_
-

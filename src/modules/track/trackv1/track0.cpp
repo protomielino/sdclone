@@ -371,4 +371,3 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
 	curSeg = curSeg->next;
     }
 }
-

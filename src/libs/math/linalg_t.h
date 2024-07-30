@@ -39,4 +39,3 @@ typedef straight2t<float> straight2f;
 typedef straight2t<double> straight2d;
 
 #endif // _LINALG_T_H_
-

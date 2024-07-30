@@ -522,4 +522,3 @@ inline void grGammaRestoreC(float *color, float reff = 2.5, float system = syste
 } // namespace ssggraph
 
 #endif
-

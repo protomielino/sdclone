@@ -124,4 +124,3 @@ extern void grShutdownSmoke();
 } // namespace ssggraph
 
 #endif //_GRSMOKE_H_
-

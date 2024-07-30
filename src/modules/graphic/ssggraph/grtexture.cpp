@@ -508,4 +508,3 @@ bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
 }
 
 } // namespace ssggraph
-

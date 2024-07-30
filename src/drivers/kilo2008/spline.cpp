@@ -58,4 +58,3 @@ double Spline::evaluate(double z) {
   a3 -= a2;
   return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }
-

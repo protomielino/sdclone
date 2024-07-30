@@ -56,4 +56,3 @@ private:
 } // namespace osggraph
 
 #endif // OSGSKYDOME_H
-

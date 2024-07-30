@@ -769,4 +769,3 @@ ssgBase *cgrVtxTableCarPart::clone (int clone_flags)
 }
 
 } // namespace ssggraph
-

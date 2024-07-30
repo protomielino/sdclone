@@ -71,4 +71,3 @@ public:
 } // namespace ssggraph
 
 #endif /* _GRSSGEXT_H_ */
-

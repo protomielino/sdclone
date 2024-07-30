@@ -50,8 +50,3 @@ Point Polygon::support(const Vector& v) const {
   }
   return (*this)[ci];
 }
-
-
-
-
-

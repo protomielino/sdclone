@@ -88,4 +88,3 @@ protected:
 } // namespace osggraph
 
 #endif
-

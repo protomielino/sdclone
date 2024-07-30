@@ -79,4 +79,3 @@ extern double carTrackRatioY;
 } // namespace ssggraph
 
 #endif /* _GRLOADAC_H_ */
-

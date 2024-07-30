@@ -38,4 +38,3 @@ class SDDebugHUD
 } // namespace osggraph
 
 #endif //_OSGDEBUGHUD_H_
-

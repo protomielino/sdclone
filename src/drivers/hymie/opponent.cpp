@@ -1007,4 +1007,3 @@ void Opponents::update(tSituation *s, Driver *driver)
   opponent[i].update(s, driver);
  }
 }
-

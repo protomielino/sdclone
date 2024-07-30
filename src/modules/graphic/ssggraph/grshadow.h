@@ -55,4 +55,3 @@ public:
 } // namespace ssggraph
 
 #endif	//_GRSHADOW_H_
-

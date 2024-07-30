@@ -83,4 +83,3 @@ yellow start lights
 role: st_yellow
 index: phase (even or odd)
 remark: flashes, not used at the moment
-

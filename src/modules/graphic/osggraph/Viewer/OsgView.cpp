@@ -308,4 +308,3 @@ void SDView::saveCamera()
 }
 
 } // namespace osggraph
-

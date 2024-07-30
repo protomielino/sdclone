@@ -38,4 +38,3 @@ Point Cylinder::support(const Vector& v) const {
   }
   else return Point(0, v[Y] < 0 ? -halfHeight : halfHeight, 0);
 }
-

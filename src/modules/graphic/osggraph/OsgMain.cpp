@@ -528,4 +528,3 @@ Camera * getCamera(void)
 }
 
 } // namespace osggraph
-

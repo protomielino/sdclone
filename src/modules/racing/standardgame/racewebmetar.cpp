@@ -1859,4 +1859,3 @@ void ReWebMetarVisibility::set(double dist, int dir, int mod, int tend)
 
     GfLogInfo(" METAR visibility set distance = %.2f - direction = %i - modifier = %i - tendency = %.2d\n", _distance, _direction, _modifier, _tendency);
 }
-

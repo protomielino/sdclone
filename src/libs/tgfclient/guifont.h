@@ -59,6 +59,3 @@ public:
 extern GfuiFontClass	*gfuiFont[];
 
 #endif /* _GUIFONT_H_ */
-
-
-

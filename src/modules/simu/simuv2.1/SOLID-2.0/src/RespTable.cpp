@@ -61,4 +61,3 @@ void RespTable::cleanObject(DtObjectRef obj) {
     partnerList.pop_back();
   }
 }
-

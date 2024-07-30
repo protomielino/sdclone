@@ -1317,4 +1317,3 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		editorFrame.getProject().setSegmentEditorY(this.getY());
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"
-

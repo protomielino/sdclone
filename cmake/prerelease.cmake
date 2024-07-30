@@ -68,4 +68,3 @@ check_tracks("${SD_TRACK_LIST_ITEMS}")
 
 message("==== Checking robots ====")
 check_robots("${SD_ROBOT_LIST_ITEMS}")
-

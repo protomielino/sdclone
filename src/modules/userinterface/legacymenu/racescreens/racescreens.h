@@ -220,4 +220,3 @@ class RmProgressiveTimeModifier
 };
 
 #endif /* __RACESCREENS_H__ */
-

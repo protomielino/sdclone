@@ -540,4 +540,3 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 }
 
 } // namespace ssggraph
-

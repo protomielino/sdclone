@@ -46,4 +46,3 @@ I - Main changes since 2.0.0 (r4687)
 
  Race engine
  * Cmake 'OPTION_REPEATABLE_RANDOM' for constant randomness
-

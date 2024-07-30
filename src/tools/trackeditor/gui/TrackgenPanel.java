@@ -416,4 +416,3 @@ public class TrackgenPanel extends JDialog implements Runnable
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"
-

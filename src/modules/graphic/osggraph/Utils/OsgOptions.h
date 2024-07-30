@@ -67,4 +67,3 @@ private:
 } // namespace osggraph
 
 #endif /* _OSGOPTIONS_H_ */
-

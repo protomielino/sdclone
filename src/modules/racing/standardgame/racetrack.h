@@ -26,4 +26,3 @@ extern void ReTrackUpdate(void);
 extern int ReTrackShutdown(void);
 
 #endif //_RACETRACK_H
-

@@ -303,4 +303,3 @@ void SDTrackLights::update(double currentTime, double totTime, int raceType)
 }
 
 } // namespace osggraph
-

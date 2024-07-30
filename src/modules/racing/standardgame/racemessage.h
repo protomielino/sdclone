@@ -34,6 +34,3 @@ extern void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life
 
 
 #endif /* _RACEMESSAGE_H_ */
-
-
-

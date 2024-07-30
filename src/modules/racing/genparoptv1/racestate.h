@@ -31,6 +31,3 @@ extern void ReStateManage(void);
 extern void ReStateApply(void *state);
 
 #endif /* _RACESTATE_H_ */
-
-
-

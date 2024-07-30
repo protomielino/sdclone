@@ -560,7 +560,3 @@ typedef struct RmInfo
 #define RE_SECT_CLASSPOINTS	"Class Points"
 
 #endif /* _RACEMANV1_H_ */
-
-
-
-

@@ -238,4 +238,3 @@ template<class T> inline v3t<T> crossProduct(const v3t<T>& a, const v3t<T>& b)
 
 
 #endif // _LINALG_V3_T_H_
-

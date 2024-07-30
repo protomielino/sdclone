@@ -152,4 +152,3 @@ bool SDMoon::reposition(osg::Vec3d p, double angle )
 }
 
 } // namespace osggraph
-

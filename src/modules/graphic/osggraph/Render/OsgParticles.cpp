@@ -289,4 +289,3 @@ void SDParticleSystemManager::shutdown(){
 };
 
 } // namespace osggraph
-

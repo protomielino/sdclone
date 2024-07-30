@@ -44,4 +44,3 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 SD_INSTALL_FILES(INCLUDE FILES robottools.h teammanager.h)
-

@@ -1299,4 +1299,3 @@ void grUpdateFogColor(double sol_angle)
 }
 
 } // namespace ssggraph
-

@@ -609,9 +609,3 @@ xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalu
     }
     return (txmlElement*)NULL;
 }
-
-
-
-
-
-

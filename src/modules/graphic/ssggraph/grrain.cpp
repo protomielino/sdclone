@@ -214,4 +214,3 @@ void cGrRain::drawPrecipitation(int rain, double rain_norm, double pitch, double
 }
 
 } // namespace ssggraph
-

@@ -1828,4 +1828,3 @@ static tFormAnswer func_toAlpha( tFormNode *node, void *parmHandle, char const *
 
 	return result;
 }
-

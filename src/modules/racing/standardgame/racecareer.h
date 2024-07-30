@@ -5,4 +5,3 @@ void ReCareerNew();
 void ReCareerNextSeason();
 
 #endif //MK_RACECAREER_H
-

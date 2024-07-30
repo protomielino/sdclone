@@ -1027,5 +1027,3 @@ TGF_API void GfFormFreeCommandNew(void *cmd);
 #define GF_MAX_KEYCODE	0x1FF
 
 #endif /* __TGF__H__ */
-
-

@@ -442,6 +442,3 @@ extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
 #endif /* _GUI_H__ */
-
-
-

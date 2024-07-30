@@ -41,4 +41,3 @@ Point Cone::support(const Vector& v) const {
     else  return Point(0, -halfHeight, 0);
   }
 }
-

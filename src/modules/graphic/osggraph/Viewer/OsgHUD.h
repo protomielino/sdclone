@@ -200,4 +200,3 @@ public:
 } // namespace osggraph
 
 #endif //_OSGHUD_H_
-

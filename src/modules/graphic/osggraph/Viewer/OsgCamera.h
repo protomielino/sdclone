@@ -239,4 +239,3 @@ public:
 } // namespace osggraph
 
 #endif // _OSGCAMERA_H_
-

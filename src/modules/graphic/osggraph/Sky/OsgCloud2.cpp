@@ -571,4 +571,3 @@ void SDCloudLayer::set_enable3dClouds(bool enable)
 }
 
 } // namespace osggraph
-

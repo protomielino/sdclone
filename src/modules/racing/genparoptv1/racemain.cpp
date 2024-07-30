@@ -1896,5 +1896,3 @@ ReEvolution()
 	else
 		return RM_SYNC;					// All planned loops are done!
 }
-
-

@@ -61,6 +61,3 @@ typedef struct
 
 
 #endif /* _DIFFERENTIAL_H_ */
-
-
-

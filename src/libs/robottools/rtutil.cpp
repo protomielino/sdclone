@@ -53,4 +53,3 @@ void RtGetCarindexString( int index, const char *bot_dname, char extended, char 
 
 	result[ resultLength - 1 ] = '\0';
 }
-

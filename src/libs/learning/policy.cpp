@@ -854,5 +854,3 @@ int DiscretePolicy::argMax(real* Qs) {
 	}
 	return arg_max;
 }
-
-

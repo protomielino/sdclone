@@ -134,6 +134,3 @@ void SimAxleUpdate(tCar *car, int index)
 	car->wheel[index*2].axleFz3rd = f;
 	car->wheel[index*2+1].axleFz3rd = f;
 }
-
-
-

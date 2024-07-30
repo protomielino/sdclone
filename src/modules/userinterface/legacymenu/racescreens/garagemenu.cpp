@@ -474,4 +474,3 @@ const GfRace* RmGarageMenu::getRace() const
 {
 	return _pRace;
 }
-

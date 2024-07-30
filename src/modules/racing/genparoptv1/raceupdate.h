@@ -43,6 +43,3 @@ struct RmInfo;
 extern const struct RmInfo* ReOutputSituation();
 
 #endif /* _RACEUPDATE_H_ */
-
-
-

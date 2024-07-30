@@ -120,4 +120,3 @@ ssgBranch *grMakeSphere(
 }
 
 } // namespace ssggraph
-

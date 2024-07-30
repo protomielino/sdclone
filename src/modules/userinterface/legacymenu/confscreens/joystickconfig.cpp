@@ -292,8 +292,3 @@ JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     return ScrHandle;
 }
-
-
-
-
-

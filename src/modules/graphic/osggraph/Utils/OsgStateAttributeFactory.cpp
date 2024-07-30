@@ -94,4 +94,3 @@ SDStateAttributeFactory::~SDStateAttributeFactory()
 }
 
 } // namespace osggraph
-

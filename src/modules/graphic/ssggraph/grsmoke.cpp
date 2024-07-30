@@ -721,4 +721,3 @@ cGrSmoke::Add(tCarElt *car, const int i, const double t,
 }//cGrSmoke::Add
 
 } // namespace ssggraph
-

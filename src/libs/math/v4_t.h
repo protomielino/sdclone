@@ -222,4 +222,3 @@ template<class T> inline void v4t<T>::normalize(void)
 
 
 #endif // _LINALG_V4_T_H_
-

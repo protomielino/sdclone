@@ -719,4 +719,3 @@ void NetClient::SetLocalDrivers()
     m_setLocalDrivers.insert(m_driverIdx-1);
     GfLogTrace("Adding Human start rank: %i\n",m_driverIdx-1);
 }
-

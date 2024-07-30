@@ -45,6 +45,3 @@ extern void generateRaceLine(tTrack* pTrack, const double SideDistExt, const dou
 extern double getTexureOffset(double length);
 
 #endif /* _TRACKGEN_H_ */
-
-
-

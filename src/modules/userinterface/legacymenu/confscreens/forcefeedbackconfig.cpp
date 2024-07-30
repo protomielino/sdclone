@@ -254,8 +254,3 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 
     return ScrHandle;
 }
-
-
-
-
-

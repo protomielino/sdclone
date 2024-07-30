@@ -139,4 +139,3 @@ protected:
 };
 
 #endif /* __TGFTRACKS_H__ */
-

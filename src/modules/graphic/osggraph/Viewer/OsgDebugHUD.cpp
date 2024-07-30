@@ -66,4 +66,3 @@ SDDebugHUD::~SDDebugHUD()
 }
 
 } // namespace osggraph
-

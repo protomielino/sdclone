@@ -318,5 +318,3 @@ inline GfApplication& GfApp()
 }
 
 #endif // __TGF__HPP__
-
-

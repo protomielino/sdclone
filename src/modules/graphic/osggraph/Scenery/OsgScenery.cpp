@@ -269,4 +269,3 @@ void SDScenery::update_tracklights(double currentTime, double totTime, int raceT
 }
 
 } // namespace osggraph
-

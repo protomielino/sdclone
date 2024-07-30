@@ -1193,7 +1193,3 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	} while (curCam != *camList);
     }
 }
-
-
-
-

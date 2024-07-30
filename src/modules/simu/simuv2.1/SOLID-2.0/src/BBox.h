@@ -96,5 +96,3 @@ inline bool intersect(const BBox& a, const BBox& b) {
 }
 
 #endif
-
-

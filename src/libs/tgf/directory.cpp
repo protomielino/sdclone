@@ -182,4 +182,3 @@ int GfDirCreate(const char *path)
 
 	return (err == -1 && errno != EEXIST) ? GF_DIR_CREATION_FAILED : GF_DIR_CREATED;
 }
-

@@ -73,8 +73,3 @@ bool common_point(const Object&, const Object&, Vector&, Point&, Point&);
 bool prev_closest_points(const Object&, const Object&,
 			 Vector&, Point&, Point&);
 #endif
-
-
-
-
-

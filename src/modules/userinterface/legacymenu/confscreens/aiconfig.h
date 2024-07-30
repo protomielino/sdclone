@@ -30,6 +30,3 @@
 extern void *AIMenuInit(void *prevMenu);
 
 #endif /* _AICONFIG_H_ */
-
-
-

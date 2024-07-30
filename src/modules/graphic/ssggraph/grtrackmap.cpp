@@ -797,4 +797,3 @@ void cGrTrackMap::initColors(const float *current_color,
 }
 
 } // namespace ssggraph
-

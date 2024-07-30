@@ -193,4 +193,3 @@ void SDBrakes::updateBrakes()
 }
 
 } // namespace osggraph
-

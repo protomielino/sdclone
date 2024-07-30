@@ -31,6 +31,3 @@ extern void CountRelief(bool interior, int *nb_vert, int *nb_seg);
 extern void GenRelief(bool interior);
 
 #endif /* _RELIEF_H_ */
-
-
-

@@ -87,4 +87,3 @@ void SDCarShader::update(const osg::Matrixf &view)
 }
 
 } // namespace osggraph
-

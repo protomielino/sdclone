@@ -335,4 +335,3 @@ void grTrackLightShutdown()
 }
 
 } // namespace ssggraph
-

@@ -37,6 +37,3 @@ extern bool loadJpegTexture(const char *fname, ssgTextureInfo *info);
 extern void dumpTrackSegs(tTrack *track);
 
 #endif /* _UTIL_H_ */
-
-
-

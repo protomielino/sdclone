@@ -39,6 +39,3 @@ typedef struct
 
 
 #endif /* _AXLE_H__ */
-
-
-

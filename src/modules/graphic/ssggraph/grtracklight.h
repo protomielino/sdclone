@@ -12,4 +12,3 @@ void grTrackLightShutdown();
 } // namespace ssggraph
 
 #endif //MK_TRACKLIGHT_H
-

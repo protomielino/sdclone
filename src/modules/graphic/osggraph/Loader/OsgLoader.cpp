@@ -103,4 +103,3 @@ osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std
 }
 
 } // namespace osggraph
-

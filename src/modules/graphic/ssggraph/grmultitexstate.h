@@ -66,4 +66,3 @@ class cgrMultiTexState : public cgrSimpleState
 } // namespace ssggraph
 
 #endif // __GRMULTITEXSTATE
-

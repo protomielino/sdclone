@@ -27,4 +27,3 @@ Exception::Exception(const std::string &error) :
 }
 
 Exception::~Exception(){}
-

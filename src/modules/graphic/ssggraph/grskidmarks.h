@@ -91,4 +91,3 @@ public:
 } // namespace ssggraph
 
 #endif //_GRSKIDMARKS_
-
