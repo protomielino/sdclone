@@ -380,7 +380,7 @@ MACRO(CHECK_LIBRARIES)
 		SET(HAVE_MINIZIP 1)
 		MESSAGE(STATUS "Looking for library minizip - found")
 	ELSE(MINIZIP_FOUND)
-		MESSAGE(STATUS "Looking for library GLM - NOT found")
+		MESSAGE(STATUS "Looking for library minizip - NOT found")
 	ENDIF(MINIZIP_FOUND)
 
 ENDMACRO(CHECK_LIBRARIES)
