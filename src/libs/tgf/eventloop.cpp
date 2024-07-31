@@ -46,9 +46,9 @@ class GfEventLoop::Private
     void (*cbKeyboardDown)(int key, int modifiers, int x, int y);
     void (*cbKeyboardUp)(int key, int modifiers, int x, int y);
 
-    void (*cbRecompute)(void) = nullptr;
-    void (*cbRecomputeArgsFn)(unsigned ms, void *args) = nullptr;
-    void *cbRecomputeArgsData = nullptr;
+    void (*cbRecompute)(void);
+    void (*cbRecomputeArgsFn)(unsigned ms, void *args);
+    void *cbRecomputeArgsData;
 
     void (*cbTimer)(int value);
 
@@ -67,8 +67,15 @@ private: // Private data members.
     std::map<Uint32, Uint16> _mapUnicodes;
 };
 
-GfEventLoop::Private::Private()
-: cbKeyboardDown(0), cbKeyboardUp(0), cbRecompute(0), cbTimer(0), bQuit(false), nLockedModifiers(KMOD_NONE)
+GfEventLoop::Private::Private() :
+    cbKeyboardDown(nullptr),
+    cbKeyboardUp(nullptr),
+    cbRecompute(nullptr),
+    cbRecomputeArgsFn(nullptr),
+    cbRecomputeArgsData(nullptr),
+    cbTimer(nullptr),
+    bQuit(false),
+    nLockedModifiers(KMOD_NONE)
 {
 }
 
