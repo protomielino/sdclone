@@ -34,7 +34,7 @@ static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", 
 static const char* MonitorTypes[DisplayMenu::nDisplayTypes] = { "none", "4:3", "16:9", "21:9" };
 static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
 static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
-static const int AMaxRefreshRates[] = {30, 40, 50, 60, 75, 85, 100, 120, 150, 200 };
+static const int AMaxRefreshRates[] = {30, 40, 50, 60, 72, 75, 85, 100, 120, 144, 150, 200, 240, 360, 480, 1000 };
 static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefreshRates[0]);
 
 
