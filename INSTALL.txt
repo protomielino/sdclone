@@ -54,6 +54,9 @@ I - Pre-requisites
 - FreeSOLID 2.1.2 http://sourceforge.net/projects/freesolid
 - FreeType 2 https://sourceforge.net/projects/freetype/files/
 - SDL2_mixer 2.x.x https://github.com/libsdl-org/SDL_mixer/releases
+- cJSON 1.x https://github.com/DaveGamble/cJSON
+- minizip 1.x http://www.winimage.com/zLibDll/minizip.html OR https://github.com/madler/zlib/releases
+- OpenSSL 3.x http://openssl.org
 
 WARNING: Under Windows, be careful to compile everything for multi-threaded DLL integration (/MD[d])
 
