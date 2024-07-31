@@ -553,15 +553,18 @@ else(OPTION_TINYGLTF)
 endif(OPTION_TINYGLTF)
 
 if(OPTION_MINIZIP)
-   set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX=
-                                            -D MZ_ZSTD=OFF
-                                            -D MZ_BZIP2=OFF
-                                            -D MZ_LZMA=OFF )
+   set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX= _D ZEXPORT="dllexport")
    ExternalProject_Add(${MINIZIP_PROJECT}
       URL ${MINIZIP_URL}
       URL_HASH ${MINIZIP_HASH}
       CMAKE_ARGS ${MINIZIP_ARGS}
       DEPENDS ${ZLIB_PROJECT})
+   ExternalProject_Add_Step(${MINIZIP_PROJECT} minizip_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/minizip-1.3.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 else(OPTION_MINIZIP)
    set(MINIZIP_PROJECT )
 endif(OPTION_MINIZIP)

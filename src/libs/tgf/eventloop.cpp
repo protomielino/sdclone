@@ -46,9 +46,9 @@ class GfEventLoop::Private
     void (*cbKeyboardDown)(int key, int modifiers, int x, int y);
     void (*cbKeyboardUp)(int key, int modifiers, int x, int y);
 
-    void (*cbRecompute)(void);
-    void (*cbRecomputeArgsFn)(unsigned ms, void *args);
-    void *cbRecomputeArgsData;
+    void (*cbRecompute)(void) = nullptr;
+    void (*cbRecomputeArgsFn)(unsigned ms, void *args) = nullptr;
+    void *cbRecomputeArgsData = nullptr;
 
     void (*cbTimer)(int value);
 

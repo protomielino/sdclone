@@ -201,6 +201,18 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 	ENDIF(ZLIB_FOUND)
 
+	# GLM.
+	_FIND_3RDPARTY_DEPENDENCY(GLM glm/glm.hpp.h "" "glm;libglm" ${ROOT_DIR} "")
+	
+	# TinyGLTF.
+	_FIND_3RDPARTY_DEPENDENCY(TINYGLTF tinygltf.h "" "gltf;libgltf" ${ROOT_DIR} "")
+	
+	# minizip.
+	_FIND_3RDPARTY_DEPENDENCY(MINIZIP minizip/zip.h "" "minizip;libminizip" ${ROOT_DIR} "")
+	
+	# cJSON.
+	_FIND_3RDPARTY_DEPENDENCY(CJSON cjson/cJSON.h "" "cjson;libcjson" ${ROOT_DIR} "")
+	
 ENDMACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 ################################################################################################
@@ -385,7 +397,16 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	_FIND_3RDPARTY_DLL("${CURL_LIBRARY}" "curl" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
+	_FIND_3RDPARTY_DLL("${GLM_LIBRARY}" "glm" "lib" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
 	_FIND_3RDPARTY_DLL("${TINYGLTF_LIBRARY}" "tinygltf" "lib" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+	_FIND_3RDPARTY_DLL("${CJSON_LIBRARY}" "cjson" "lib" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+	_FIND_3RDPARTY_DLL("${MINIZIP_LIBRARY}" "minizip" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	# 2) Copy found 3rd party DLL files to the bin folder (for running without installing).

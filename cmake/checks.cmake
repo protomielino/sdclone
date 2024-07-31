@@ -363,4 +363,24 @@ MACRO(CHECK_LIBRARIES)
 		MESSAGE(STATUS "Looking for library TinyGLTF - NOT found")
 	ENDIF(TINYGLTF_FOUND)
 
+	# cJSON
+	Find_Package(cJSON)
+
+	IF(CJSON_FOUND)
+		SET(HAVE_CJSON 1)
+		MESSAGE(STATUS "Looking for library cJSON - found")
+	ELSE(CJSON_FOUND)
+		MESSAGE(STATUS "Looking for library cJSON - NOT found")
+	ENDIF(CJSON_FOUND)
+
+	# minizip
+	Find_Package(minizip)
+
+	IF(MINIZIP_FOUND)
+		SET(HAVE_MINIZIP 1)
+		MESSAGE(STATUS "Looking for library minizip - found")
+	ELSE(MINIZIP_FOUND)
+		MESSAGE(STATUS "Looking for library GLM - NOT found")
+	ENDIF(MINIZIP_FOUND)
+
 ENDMACRO(CHECK_LIBRARIES)
