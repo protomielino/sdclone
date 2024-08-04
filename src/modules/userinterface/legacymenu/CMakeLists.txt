@@ -97,16 +97,13 @@ ENDIF(OPTION_CLIENT_SERVER)
 ADD_SDLIB_INCLUDEDIR(math portability tgf tgfclient tgfdata ${NETWORKING_INC})
 
 ADD_PLIB_INCLUDEDIR()
-
 ADD_SDL2_INCLUDEDIR()
-
 ADD_ENET_INCLUDEDIR()
-
 ADD_CURL_INCLUDEDIR()
-
-find_package(minizip REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(cJSON 1.0 REQUIRED)
+ADD_CJSON_INCLUDEDIR()
+ADD_ZLIB_INCLUDEDIR()
+ADD_MINIZIP_INCLUDEDIR()
+#ADD_OPENSSL_INCLUDEDIR()
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
@@ -115,7 +112,10 @@ ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG
+        "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmtd.lib")
+    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE
+        "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
 # Disable developer warning
@@ -131,16 +131,19 @@ SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 
 find_package(OpenSSL 2.0 REQUIRED)
 
-IF(WIN32)
-    ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
-        cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB bcrypt)
-ELSE(WIN32)
-    ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB}
-        cjson OpenSSL::SSL ${minizip_LIBRARIES} ZLIB::ZLIB)
-ENDIF(WIN32)
+ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB} OpenSSL::SSL)
+#ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB})
 
 target_compile_features(legacymenu PRIVATE cxx_std_11)
 set_target_properties(legacymenu PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)
+
+ADD_PLIB_LIBRARY(legacymenu)
+ADD_SDL2_LIBRARY(legacymenu)
+ADD_ENET_LIBRARY(legacymenu)
 ADD_CURL_LIBRARY(legacymenu)
+ADD_CJSON_LIBRARY(legacymenu)
+ADD_ZLIB_LIBRARY(legacymenu)
+ADD_MINIZIP_LIBRARY(legacymenu)
+#ADD_OPENSSL_LIBRARY(legacymenu)
 
 SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)
