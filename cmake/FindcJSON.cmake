@@ -36,14 +36,7 @@ set(CJSON_ROOT_DIR
 
 include(FindPackageHandleStandardArgs)
 
-# Check for CMake config first.
-find_package(cJSON QUIET CONFIG)
-if(cJSON_FOUND AND TARGET cjson)
-    # Found config, let's prefer it.
-    find_package_handle_standard_args(cJSON CONFIG_MODE)
-    set(CJSON_LIBRARY cjson)
-
-else()
+if(WIN32)
     # Manually find
     find_path(
         CJSON_INCLUDE_DIR
@@ -58,6 +51,30 @@ else()
 
     find_package_handle_standard_args(cJSON REQUIRED_VARS CJSON_INCLUDE_DIR
                                                           CJSON_LIBRARY)
+else()
+   # Check for CMake config first.
+   find_package(cJSON QUIET CONFIG)
+   if(cJSON_FOUND AND TARGET cjson)
+       # Found config, let's prefer it.
+       find_package_handle_standard_args(cJSON CONFIG_MODE)
+       set(CJSON_LIBRARY cjson)
+
+   else()
+       # Manually find
+       find_path(
+           CJSON_INCLUDE_DIR
+           NAMES cjson/cJSON.h
+           PATHS ${CJSON_ROOT_DIR}
+           PATH_SUFFIXES include)
+       find_library(
+           CJSON_LIBRARY
+           NAMES cjson
+           PATHS ${CJSON_ROOT_DIR}
+           PATH_SUFFIXES lib)
+
+       find_package_handle_standard_args(cJSON REQUIRED_VARS CJSON_INCLUDE_DIR
+                                                             CJSON_LIBRARY)
+   endif()
 endif()
 
 if(CJSON_FOUND)
