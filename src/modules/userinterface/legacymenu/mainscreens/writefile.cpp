@@ -20,7 +20,7 @@ writefile::writefile(const char *path, size_t max, progress cb, void *args) :
     path(path),
     args(args),
     cb(cb),
-    f(path)
+    f(path, std::ios::binary)
 {
 }
 
