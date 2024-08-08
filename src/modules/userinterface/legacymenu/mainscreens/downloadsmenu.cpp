@@ -824,13 +824,14 @@ int DownloadsMenu::fetch_thumbnails(const std::vector<Asset> &assets)
         static const size_t max = 1 * MB;
         writefile *w = new writefile(path.c_str(), max);
 
-        entries.push_back(new entry(a, path));
-
         if (add(a.thumbnail.c_str(), &DownloadsMenu::thumbnail_fetched, w, max))
         {
             GfLogError("add failed\n");
+            delete w;
             return -1;
         }
+
+        entries.push_back(new entry(a, path));
     }
 
     return 0;
@@ -969,6 +970,7 @@ void DownloadsMenu::pressed(thumbnail *t)
         if (add(a.url.c_str(), &DownloadsMenu::asset_fetched, w, a.size))
         {
             GfLogError("add failed\n");
+            delete w;
             return;
         }
 
