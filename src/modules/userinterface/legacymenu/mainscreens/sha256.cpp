@@ -35,7 +35,7 @@ sha256::~sha256()
 
 int sha256::run(const std::string &path, std::string &out)
 {
-    std::ifstream f(path);
+    std::ifstream f(path, std::ios::binary);
 
     if (!EVP_DigestInit_ex(c, md, NULL))
     {

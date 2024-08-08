@@ -563,7 +563,7 @@ int DownloadsMenu::check_hash(const entry *e, const std::string &path,
 
 static int write_revision(const Asset &a, const std::string &path)
 {
-    std::ofstream f(path + "/.revision");
+    std::ofstream f(path + "/.revision", std::ios::binary);
 
     f << std::to_string(a.revision) << std::endl;
     return 0;
@@ -710,7 +710,7 @@ static int needs_update(const Asset &a, bool &out)
     }
 
     std::string path = data + a.path() + a.directory + "/.revision";
-    std::ifstream f(path);
+    std::ifstream f(path, std::ios::binary);
 
     if (!f.is_open())
         return -1;
