@@ -640,10 +640,6 @@ public class ObjectProperties extends PropertyPanel
 							{
 								colorChooser.removeChooserPanel(panel);
 							}
-							else
-							{
-								panel.setColorTransparencySelectionEnabled(false);
-							}
 						}
 
 						MyColorTracker ok = new MyColorTracker(colorChooser);
