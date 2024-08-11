@@ -593,7 +593,7 @@ public class GraphicObjectProperties extends PropertyPanel
 					graphicObjects.lastElement().setHeight(datum.height);
 				}
 
-				if (datum.useMaterial != null && !datum.useMaterial.isBlank())
+				if (datum.useMaterial != null && !datum.useMaterial.trim().isEmpty())
 				{
 					graphicObjects.lastElement().setUseMaterial(datum.useMaterial);
 				}
