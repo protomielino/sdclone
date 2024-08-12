@@ -8,10 +8,9 @@
  * (at your option) any later version.
  */
 
-#include <portability.h>
-
 #include <tgfclient.h>
 #include <tgf.hpp>
+#include <portability.h>
 #include "assets.h"
 #include "downloadsmenu.h"
 #include "downloadservers.h"
@@ -22,8 +21,6 @@
 #include "writebuf.h"
 #include "writefile.h"
 #include <curl/curl.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
@@ -75,10 +72,9 @@ static int randname(std::string &name)
     {
         unsigned char b;
 
-        if (RAND_bytes(&b, sizeof b) != 1)
+        if (portability::rand(&b, sizeof b))
         {
-            GfLogError("%s: RAND_bytes failed with %lu\n",
-                __func__, ERR_get_error());
+            GfLogError("%s: portability::rand failed\n", __func__);
             return -1;
         }
 

@@ -12,19 +12,16 @@
 #define SHA256_H
 
 #include "hash.h"
-#include <openssl/evp.h>
 #include <string>
 
 class sha256 : public hash
 {
 public:
     sha256();
-    ~sha256();
     int run(const std::string &path, std::string &hash);
 
 private:
-    EVP_MD_CTX *const c;
-    EVP_MD *md;
+    static bool init;
 };
 
 #endif
