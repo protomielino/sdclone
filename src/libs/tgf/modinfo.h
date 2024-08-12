@@ -87,6 +87,7 @@ typedef struct ModInfoNC {
 typedef void* tSOHandle;
 
 #ifdef WIN32
+#include <windows.h>
 #define SOHandle(h) ((HMODULE)(h))
 #else
 #define SOHandle(h) ((void*)(h))

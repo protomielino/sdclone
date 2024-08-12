@@ -10,6 +10,7 @@
 
 #include "portability.h"
 
+#include <windows.h>
 #include <winerror.h>
 #include <shellapi.h>
 #include <cerrno>
