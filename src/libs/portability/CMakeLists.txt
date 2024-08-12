@@ -13,9 +13,11 @@ ENDIF(COMMAND CMAKE_POLICY)
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
 	ADD_DEFINITIONS(-DPORTABILITY_DLL)
-	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES} win32.cpp)
+	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES}
+		win32/rmdir_r.cpp)
 ELSEIF(UNIX)
-	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES} posix.cpp)
+	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES}
+		posix/rmdir_r.cpp)
 ENDIF(WIN32)
 
 # Note: Headers needed for having them available in IDEs.
