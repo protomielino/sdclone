@@ -254,7 +254,7 @@ GfuiIdle(void)
 		if (GfuiScreen->mouse == 1) {
 			/* button down */
 			gfuiUpdateFocus();
-			gfuiMouseAction((void*)0);
+			gfuiMouseAction(0);
 			GfuiApp().eventLoop().postRedisplay();
 		}
 	}
@@ -570,13 +570,13 @@ gfuiMouseButton(int button, int state, int x, int y)
 		{
 			GfuiScreen->mouse = 1;
 			gfuiUpdateFocus();
-			gfuiMouseAction((void*)0);
+			gfuiMouseAction(0);
 		}
 		else
 		{
 			GfuiScreen->mouse = 0;
 			gfuiUpdateFocus();
-			gfuiMouseAction((void*)1);
+			gfuiMouseAction(1);
 		}
 		GfuiApp().eventLoop().postRedisplay();
 	}
@@ -588,7 +588,7 @@ gfuiMouseMotion(int x, int y)
 	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
-	gfuiMouseAction((void*)(long)(1 - GfuiScreen->mouse));
+	gfuiMouseAction(1 - GfuiScreen->mouse);
 	GfuiApp().eventLoop().postRedisplay();
 	DelayRepeat = REPEAT1;
 }

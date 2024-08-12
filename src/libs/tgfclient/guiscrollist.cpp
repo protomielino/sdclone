@@ -41,13 +41,9 @@ gfuiInitScrollList(void)
 static void
 gfuiScroll(tScrollBarInfo *sinfo)
 {
-    tGfuiObject		*object;
+    tGfuiObject		*object = static_cast<tGfuiObject *>(sinfo->userData);
     tGfuiScrollList	*scrollist;
 
-    object = gfuiGetObject(GfuiScreen, (long)(sinfo->userData));
-    if (object == NULL) {
-		return;
-    }
     if (object->widget != GFUI_SCROLLIST) {
 		return;
     }
@@ -174,14 +170,14 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
 				GfuiScrollBarCreate(scr, x + width, y,
 									height, scrollBarWidth, scrollBarButHeight,
 									GFUI_VERT_SCROLLBAR, GFUI_SB_RIGHT,
-									0, 10, 10, 10, (void *)(long)(object->id), gfuiScroll);
+									0, 10, 10, 10, object, gfuiScroll);
 			break;
 		case GFUI_SB_LEFT:
 			scrollist->scrollBar =
 				GfuiScrollBarCreate(scr, x - scrollBarWidth, y,
 									height, scrollBarWidth, scrollBarButHeight,
 									GFUI_VERT_SCROLLBAR, GFUI_SB_LEFT,
-									0, 10, 10, 10, (void *)(long)(object->id), gfuiScroll);
+									0, 10, 10, 10, object, gfuiScroll);
 			break;
 		case GFUI_SB_NONE:
 		default:

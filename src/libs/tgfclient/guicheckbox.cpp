@@ -34,12 +34,10 @@ gfuiCheckboxInit(void)
 static void
 gfuiChecked(void *idv)
 {
-	GfuiCheckboxSetChecked(GfuiScreen, (long)idv, false);
-	GfuiUnSelectCurrent();
+	tGfuiObject* object = static_cast <tGfuiObject *>(idv);
 
-    tGfuiObject* object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (!object)
-		return;
+	GfuiCheckboxSetChecked(GfuiScreen, object->id, false);
+	GfuiUnSelectCurrent();
 
 	tGfuiCheckbox* checkbox = &(object->u.checkbox);
 
@@ -51,12 +49,10 @@ gfuiChecked(void *idv)
 static void
 gfuiUnchecked(void *idv)
 {
-	GfuiCheckboxSetChecked(GfuiScreen, (long)idv, true);
-	GfuiUnSelectCurrent();
+	tGfuiObject* object = static_cast <tGfuiObject *>(idv);
 
-    tGfuiObject* object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (!object)
-		return;
+	GfuiCheckboxSetChecked(GfuiScreen, object->id, true);
+	GfuiUnSelectCurrent();
 
 	tGfuiCheckbox* checkbox = &(object->u.checkbox);
 
@@ -99,14 +95,14 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
 		GfuiGrButtonCreate(scr, "data/img/checked.png", "data/img/checked.png",
 						   "data/img/checked.png", "data/img/checked.png",
 						   x, y, imagewidth, imageheight, GFUI_MIRROR_NONE, false, GFUI_MOUSE_UP,
-						   (void*)(long)(object->id), gfuiChecked,
+						   object, gfuiChecked,
 						   userDataOnFocus, onFocus, onFocusLost);
 
 	checkbox->uncheckId =
 		GfuiGrButtonCreate(scr, "data/img/unchecked.png", "data/img/unchecked.png",
 						   "data/img/unchecked.png", "data/img/unchecked.png",
 						   x, y, imagewidth, imageheight, GFUI_MIRROR_NONE, false, GFUI_MOUSE_UP,
-						   (void*)(long)(object->id), gfuiUnchecked,
+						   object, gfuiUnchecked,
 						   userDataOnFocus, onFocus, onFocusLost);
 
 	// Compute total height (text or buttons)

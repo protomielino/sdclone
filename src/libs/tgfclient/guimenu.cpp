@@ -57,6 +57,12 @@ onFocusLostHideTip(void* cbinfo)
                       ((tMenuCallbackInfo*)cbinfo)->labelId, GFUI_INVISIBLE);
 }
 
+static void
+onPerformAction(void* cbinfo)
+{
+    gfuiMouseAction(2);
+}
+
 /***********************************************************************************
  * Menu XML descriptor management
 */
@@ -78,7 +84,7 @@ void
 GfuiMenuDefaultKeysAdd(void* scr)
 {
     GfuiAddKey(scr, GFUIK_TAB, "Select Next Entry", NULL, gfuiSelectNext, NULL);
-    GfuiAddKey(scr, GFUIK_RETURN, "Perform Action", (void*)2, gfuiMouseAction, NULL);
+    GfuiAddKey(scr, GFUIK_RETURN, "Perform Action", NULL, onPerformAction, NULL);
     GfuiAddKey(scr, GFUIK_UP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);
     GfuiAddKey(scr, GFUIK_DOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
     GfuiAddKey(scr, GFUIK_PAGEUP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);

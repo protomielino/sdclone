@@ -560,36 +560,35 @@ GfuiEnable(void *scr, int id, int flag)
 }
 
 void
-gfuiMouseAction(void *vaction)
+gfuiMouseAction(int action)
 {
     tGfuiObject *curObject;
-    long	action = (long)vaction;
 
     curObject = GfuiScreen->hasFocus;
     if (curObject != NULL) {
 	switch (curObject->widget) {
 	case GFUI_BUTTON:
-	    gfuiButtonAction((int)action);
+	    gfuiButtonAction(action);
 		if(action)
 			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_GRBUTTON:
-		gfuiGrButtonAction((int)action);
+		gfuiGrButtonAction(action);
 		if(action)
 			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_SCROLLIST:
-		gfuiScrollListAction((int)action);
+		gfuiScrollListAction(action);
 		if(action)
 			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_EDITBOX:
-		gfuiEditboxAction((int)action);
+		gfuiEditboxAction(action);
 		if(action)
 			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_COMBOBOX:
-		gfuiComboboxAction((int)action);
+		gfuiComboboxAction(action);
 		if(action)
 			playMenuSfx(SFX_CLICK);
 	    break;

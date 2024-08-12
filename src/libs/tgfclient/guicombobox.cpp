@@ -31,12 +31,8 @@ gfuiInitCombobox(void)
 static void
 gfuiLeftArrow(void *idv)
 {
-    tGfuiObject		*object;
+    tGfuiObject		*object = static_cast<tGfuiObject *>(idv);
     tGfuiCombobox	*combobox;
-
-    object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (!object)
-		return;
 
 	combobox = &(object->u.combobox);
 
@@ -58,12 +54,8 @@ gfuiLeftArrow(void *idv)
 static void
 gfuiRightArrow(void *idv)
 {
-    tGfuiObject		*object;
+    tGfuiObject		*object = static_cast<tGfuiObject *>(idv);
     tGfuiCombobox	*combobox;
-
-    object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (!object)
-		return;
 
 	combobox = &(object->u.combobox);
 
@@ -142,13 +134,13 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 					 "data/img/arrowleft-disabled.png", "data/img/arrowleft-normal.png",
 					 "data/img/arrowleft-focused.png", "data/img/arrowleft-pushed.png",
 					 x, y, arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
-					 GFUI_MOUSE_UP,	 (void*)(long)(object->id), gfuiLeftArrow, 0, 0, 0);
+					 GFUI_MOUSE_UP,	 object, gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
 					 "data/img/arrowright-disabled.png", "data/img/arrowright-normal.png",
 					 "data/img/arrowright-focused.png", "data/img/arrowright-pushed.png",
 					 x + width - combobox->leftButton.width, y,
 					 arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
-					 GFUI_MOUSE_UP, (void*)(long)(object->id), gfuiRightArrow, 0, 0, 0);
+					 GFUI_MOUSE_UP, object, gfuiRightArrow, 0, 0, 0);
 
 
 
