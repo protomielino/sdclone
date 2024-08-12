@@ -20,6 +20,7 @@
 #ifndef _SD_PORTABILITY_H_
 #define _SD_PORTABILITY_H_
 
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 
@@ -244,6 +245,7 @@ PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...)
 namespace portability
 {
     PORTABILITY_API int rmdir_r(const char *path);
+    PORTABILITY_API int rand(void *buf, size_t n);
 }
 
 #endif // _SD_PORTABILITY_H_

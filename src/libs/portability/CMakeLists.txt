@@ -14,9 +14,11 @@ IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
 	ADD_DEFINITIONS(-DPORTABILITY_DLL)
 	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES}
+		win32/rand.cpp
 		win32/rmdir_r.cpp)
 ELSEIF(UNIX)
 	set(PORTABILITY_SOURCES ${PORTABILITY_SOURCES}
+		posix/rand.cpp
 		posix/rmdir_r.cpp)
 ENDIF(WIN32)
 
