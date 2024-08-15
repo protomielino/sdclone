@@ -38,7 +38,7 @@ int portability::rand(void *buf, size_t n)
         fprintf(stderr, "ensure failed\n");
         return -1;
     }
-    else if (!CryptGenRandom(prov, n, buf))
+    else if (!CryptGenRandom(prov, n, static_cast<BYTE *>(buf)))
     {
         fprintf(stderr, "CryptGenRandom failed with %#x\n", GetLastError());
         goto end;
