@@ -29,6 +29,8 @@
 #include "tgf.hpp"
 
 #ifdef WIN32
+/* Prevent inclusion of winsock.h in windows.h */
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 # define dlopen(pszShLibFileName) (void*)LoadLibrary(pszShLibFileName)
 # define dlsym(pvHandle, pszFuncName) GetProcAddress((HMODULE)pvHandle, pszFuncName)

@@ -8,6 +8,7 @@
  * (at your option) any later version.
  */
 
+#define WIN32_LEAN_AND_MEAN
 #include "portability.h"
 #include <windows.h>
 #include <wincrypt.h>
