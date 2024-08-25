@@ -178,7 +178,7 @@ void StandardGame::updateState(void)
 
 void StandardGame::applyState(int state)
 {
-	::ReStateApply((void*)(long)state);
+	::ReStateApply(state);
 }
 
 void StandardGame::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)

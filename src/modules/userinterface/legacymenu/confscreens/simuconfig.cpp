@@ -220,17 +220,17 @@ static void storeSimuCfg(void * /* dummy */)
 
 /* Change the simulation version (but only show really available modules) */
 static void
-onChangeSimuVersion(void *vp)
+onChangeSimuVersion(int dir)
 {
     char buf[1024];
 
-    if (!vp)
+    if (!dir)
         return;
 
     const int oldSimuVersion = CurSimuVersion;
     do
     {
-        CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
+        CurSimuVersion = (CurSimuVersion + NbSimuVersions + dir) % NbSimuVersions;
 
         snprintf(buf, sizeof(buf), "%smodules/simu/%s%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
     }
@@ -239,57 +239,128 @@ onChangeSimuVersion(void *vp)
     GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 }
 
+static void
+onChangeSimuLeft(void *)
+{
+    onChangeSimuVersion(-1);
+}
+
+static void
+onChangeSimuRight(void *)
+{
+    onChangeSimuVersion(1);
+}
+
 /* Change the multi-threading scheme */
 static void
-onChangeMultiThreadScheme(void *vp)
+onChangeMultiThreadScheme(int dir)
 {
     CurMultiThreadScheme =
-        (CurMultiThreadScheme + NbMultiThreadSchemes + (int)(long)vp) % NbMultiThreadSchemes;
+        (CurMultiThreadScheme + NbMultiThreadSchemes + dir) % NbMultiThreadSchemes;
 
     GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 }
 
+static void
+onChangeMultiThreadLeft(void *)
+{
+    onChangeMultiThreadScheme(-1);
+}
+
+static void
+onChangeMultiThreadRight(void *)
+{
+    onChangeMultiThreadScheme(1);
+}
 
 /* Change the thread affinity scheme */
 static void
-onChangeThreadAffinityScheme(void *vp)
+onChangeThreadAffinityScheme(int dir)
 {
     CurThreadAffinityScheme =
-        (CurThreadAffinityScheme + NbThreadAffinitySchemes + (int)(long)vp) % NbThreadAffinitySchemes;
+        (CurThreadAffinityScheme + NbThreadAffinitySchemes + dir) % NbThreadAffinitySchemes;
 
     GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
+}
+
+static void
+onChangeThreadAffinityLeft(void *)
+{
+    onChangeThreadAffinityScheme(-1);
+}
+
+static void
+onChangeThreadAffinityRight(void *)
+{
+    onChangeThreadAffinityScheme(1);
 }
 
 #ifdef THIRD_PARTY_SQLITE3
 /* Change the replay rate scheme */
 static void
-onChangeReplayRateScheme(void *vp)
+onChangeReplayRateScheme(int dir)
 {
     CurReplayScheme =
-        (CurReplayScheme + NbReplaySchemes + (int)(long)vp) % NbReplaySchemes;
+        (CurReplayScheme + NbReplaySchemes + dir) % NbReplaySchemes;
 
     GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
+}
+
+static void
+onChangeReplayRateLeft(void *)
+{
+    onChangeReplayRateScheme(-1);
+}
+
+static void
+onChangeReplayRateRight(void *)
+{
+    onChangeReplayRateScheme(1);
 }
 #endif
 
 /* Change the startpaused scheme */
 static void
-onChangeStartPausedScheme(void *vp)
+onChangeStartPausedScheme(int dir)
 {
     CurStartPausedScheme =
-        (CurStartPausedScheme + NbStartPausedSchemes + (int)(long)vp) % NbStartPausedSchemes;
+        (CurStartPausedScheme + NbStartPausedSchemes + dir) % NbStartPausedSchemes;
 
     GfuiLabelSetText(ScrHandle, StartPausedSchemeId, StartPausedSchemeList[CurStartPausedScheme]);
 }
 
+static void
+onChangeStartPausedLeft(void *)
+{
+    onChangeStartPausedScheme(-1);
+}
+
+static void
+onChangeStartPausedRight(void *)
+{
+    onChangeStartPausedScheme(1);
+}
+
 /* Change the cooldown scheme */
 static void
-onChangeCooldownScheme(void *vp)
+onChangeCooldownScheme(int dir)
 {
     CurCooldownScheme =
-        (CurCooldownScheme + NbCooldownSchemes + (int)(long)vp) % NbCooldownSchemes;
+        (CurCooldownScheme + NbCooldownSchemes + dir) % NbCooldownSchemes;
 
     GfuiLabelSetText(ScrHandle, CooldownSchemeId, CooldownSchemeList[CurCooldownScheme]);
+}
+
+static void
+onChangeCooldownLeft(void *)
+{
+    onChangeCooldownScheme(-1);
+}
+
+static void
+onChangeCooldownRight(void *)
+{
+    onChangeCooldownScheme(1);
 }
 
 static void onActivate(void * /* dummy */)
@@ -314,35 +385,35 @@ SimuMenuInit(void *prevMenu)
     GfuiMenuCreateStaticControls(ScrHandle, menuDescHdle);
 
     SimuVersionId = GfuiMenuCreateLabelControl(ScrHandle,menuDescHdle,"simulabel");
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simuleftarrow", (void*)-1, onChangeSimuVersion);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simurightarrow", (void*)1, onChangeSimuVersion);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simuleftarrow", NULL, onChangeSimuLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simurightarrow", NULL, onChangeSimuRight);
 
     MultiThreadSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "mthreadlabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", NULL, onChangeMultiThreadLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", NULL, onChangeMultiThreadRight);
 
     ThreadAffinitySchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "threadafflabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", NULL, onChangeThreadAffinityLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", NULL, onChangeThreadAffinityRight);
 
     ReplayRateSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "replayratelabel");
 #ifdef THIRD_PARTY_SQLITE3
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayrateleftarrow", (void*)-1, onChangeReplayRateScheme);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayraterightarrow", (void*)1, onChangeReplayRateScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayrateleftarrow", NULL, onChangeReplayRateLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayraterightarrow", NULL, onChangeReplayRateRight);
 #endif
 
     StartPausedSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "startpausedlabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedleftarrow", (void*)-1, onChangeStartPausedScheme);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedrightarrow", (void*)1, onChangeStartPausedScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedleftarrow", NULL, onChangeStartPausedLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedrightarrow", NULL, onChangeStartPausedRight);
 
 
     CooldownSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "cooldownlabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownleftarrow", (void*)-1, onChangeCooldownScheme);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownrightarrow", (void*)1, onChangeCooldownScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownleftarrow", NULL, onChangeCooldownLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownrightarrow", NULL, onChangeCooldownRight);
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "ApplyButton", PrevScrHandle, storeSimuCfg);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "CancelButton", PrevScrHandle, GfuiScreenActivate);
@@ -353,10 +424,10 @@ SimuMenuInit(void *prevMenu)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, storeSimuCfg, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", PrevScrHandle, GfuiScreenActivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous simu engine version", (void*)-1, onChangeSimuVersion, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next simu engine version", (void*)1, onChangeSimuVersion, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous multi-threading scheme", (void*)-1, onChangeMultiThreadScheme, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next multi-threading scheme", (void*)1, onChangeMultiThreadScheme, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous simu engine version", NULL, onChangeSimuLeft, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next simu engine version", NULL, onChangeSimuRight, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous multi-threading scheme", NULL, onChangeMultiThreadLeft, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next multi-threading scheme", NULL, onChangeMultiThreadRight, NULL);
 
     return ScrHandle;
 }

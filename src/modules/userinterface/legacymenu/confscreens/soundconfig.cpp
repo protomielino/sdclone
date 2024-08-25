@@ -236,11 +236,21 @@ static void onCancel(void *)
 }
 
 // Toggle sound state openal/plib/disabled.
-static void changeSoundState(void *vp)
+static void changeSoundState(int dir)
 {
-	curOption = (curOption + (int)(long)vp + nbOptions) % nbOptions;
+	curOption = (curOption + dir + nbOptions) % nbOptions;
 
 	GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
+}
+
+static void changeSoundLeft(void *)
+{
+	changeSoundState(-1);
+}
+
+static void changeSoundRight(void *)
+{
+	changeSoundState(1);
 }
 
 // Volume
@@ -259,12 +269,22 @@ static void changeVolume(void * )
 }
 
 // Toggle music state enabled/disabled.
-static void changeMusicState(void *vp)
+static void changeMusicState(int dir)
 {
-	curMusicState = (curMusicState + (int)(long)vp + nbMusicStates) % nbMusicStates;
+	curMusicState = (curMusicState + dir + nbMusicStates) % nbMusicStates;
 
 	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
 
+}
+
+static void changeMusicLeft(void *)
+{
+	changeMusicState(-1);
+}
+
+static void changeMusicRight(void *)
+{
+	changeMusicState(1);
 }
 
 // Music Volume
@@ -283,12 +303,22 @@ static void changeMusicVolume(void * )
 }
 
 // Toggle Menu SFX state enabled/disabled.
-static void changeMenuSfxState(void *vp)
+static void changeMenuSfxState(int dir)
 {
-	curMenuSfxState = (curMenuSfxState + (int)(long)vp + nbMenuSfxStates) % nbMenuSfxStates;
+	curMenuSfxState = (curMenuSfxState + dir + nbMenuSfxStates) % nbMenuSfxStates;
 
 	GfuiLabelSetText(scrHandle, MenuSfxStateId, menusfxStateList[curMenuSfxState]);
 
+}
+
+static void changeMenuSfxLeft(void *)
+{
+	changeMenuSfxState(-1);
+}
+
+static void changeMenuSfxRight(void *)
+{
+	changeMenuSfxState(1);
 }
 
 //  Menu SFX Volume
@@ -327,8 +357,8 @@ void* SoundMenuInit(void *prevMenu)
 	void *param = GfuiMenuLoad("soundconfigmenu.xml");
 	GfuiMenuCreateStaticControls(scrHandle, param);
 
-	GfuiMenuCreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
-	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"soundleftarrow",NULL,changeSoundLeft);
+	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",NULL,changeSoundRight);
 
 	SoundOptionId = GfuiMenuCreateLabelControl(scrHandle,param,"soundlabel");
 	GfuiMenuCreateButtonControl(scrHandle,param,"ApplyButton",NULL,onAccept);
@@ -336,15 +366,15 @@ void* SoundMenuInit(void *prevMenu)
 
 	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
-	GfuiMenuCreateButtonControl(scrHandle,param,"musicleftarrow",(void*)-1,changeMusicState);
-	GfuiMenuCreateButtonControl(scrHandle,param,"musicrightarrow",(void*)1,changeMusicState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"musicleftarrow",NULL,changeMusicLeft);
+	GfuiMenuCreateButtonControl(scrHandle,param,"musicrightarrow",NULL,changeMusicRight);
 
 	MusicStateId = GfuiMenuCreateLabelControl(scrHandle,param,"musiclabel");
 
 	MusicVolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"musicvolumeedit",NULL,NULL,changeMusicVolume);
 
-	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxleftarrow",(void*)-1,changeMenuSfxState);
-	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxrightarrow",(void*)1,changeMenuSfxState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxleftarrow",NULL,changeMenuSfxLeft);
+	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxrightarrow",NULL,changeMenuSfxRight);
 
 	MenuSfxStateId = GfuiMenuCreateLabelControl(scrHandle,param,"menusfxlabel");
 
@@ -355,8 +385,8 @@ void* SoundMenuInit(void *prevMenu)
 	GfuiMenuDefaultKeysAdd(scrHandle);
 	GfuiAddKey(scrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", NULL, onCancel, NULL);
-	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)-1, changeSoundState, NULL);
-	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", NULL, changeSoundLeft, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Option in list", NULL, changeSoundRight, NULL);
 
 	return scrHandle;
 }

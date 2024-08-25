@@ -128,26 +128,99 @@ static void SDNextCar(void * /* dummy */)
     screens->getActiveView()->selectNextCar();
 }
 
-void SDSelectCamera(void *vp)
+static void SDSelectCamera(int cam)
 {
-    long t = (long)vp;
-    screens->changeCamera(t);
+    screens->changeCamera(cam);
 }
 
-void SDSelectCameraTemporaryOn(void *vp)//temporary select a different camera
+static void SDDriverView(void *)
+{
+    SDSelectCamera(0);
+}
+
+static void SDCarView(void *)
+{
+    SDSelectCamera(1);
+}
+
+static void SDSideCarView(void *)
+{
+    SDSelectCamera(2);
+}
+
+static void SDUpCarView(void *)
+{
+    SDSelectCamera(3);
+}
+
+static void SDPerspCarView(void *)
+{
+    SDSelectCamera(4);
+}
+
+static void SDAllCircuitView(void *)
+{
+    SDSelectCamera(5);
+}
+
+static void SDTrackView(void *)
+{
+    SDSelectCamera(6);
+}
+
+static void SDTrackViewZoomed(void *)
+{
+    SDSelectCamera(7);
+}
+
+static void SDFollowCarZoomed(void *)
+{
+    SDSelectCamera(8);
+}
+
+static void SDTVDirectorView(void *)
+{
+    SDSelectCamera(9);
+}
+
+static void SDSelectCameraTemporaryOn(void *vp)//temporary select a different camera
 {
     screens->changeCameraTemporaryOn();
 }
 
-void SDSelectCameraTemporaryOff(void *vp)//temporary select a different camera
+static void SDSelectCameraTemporaryOff(void *vp)//temporary select a different camera
 {
     screens->changeCameraTemporaryOff();
 }
 
-void SDSetZoom(void *vp)
+static void SDSetZoom(int zoom)
 {
-    long t = (long)vp;
-    screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
+    screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(zoom);
+}
+
+static void SDSetZoomIn(void *vp)
+{
+    SDSetZoom(GR_ZOOM_IN);
+}
+
+static void SDSetZoomOut(void *vp)
+{
+    SDSetZoom(GR_ZOOM_OUT);
+}
+
+static void SDSetZoomMinimum(void *vp)
+{
+    SDSetZoom(GR_ZOOM_MIN);
+}
+
+static void SDSetZoomMaximum(void *vp)
+{
+    SDSetZoom(GR_ZOOM_MAX);
+}
+
+static void SDSetZoomDefault(void *vp)
+{
+    SDSetZoom(GR_ZOOM_DFLT);
 }
 
 void SDSwitchMirror(void *vp)
@@ -182,45 +255,60 @@ void SDToggleHUDeditmode(void *vp)
 }
 
 /*Driver position change*/
-void SDMoveSeatUpDown(void *move)
+static void SDMoveSeatUpDown(float z)
 {
     //if positive up if negative down
-    float movement = 0.005;
-    if((long)move == 1){
-        movement = movement*1;
-    }
-    if((long)move == -1){
-        movement = movement*-1;
-    }
+    float movement = 0.005 * z;
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_z+=movement;
 }
-void SDMoveSeatLeftRight(void *move)
+
+static void SDMoveSeatUp(void *)
+{
+    SDMoveSeatUpDown(1);
+}
+
+static void SDMoveSeatDown(void *)
+{
+    SDMoveSeatUpDown(-1);
+}
+
+static void SDMoveSeatLeftRight(float y)
 {
     //if positive left if negative right
-    float movement = 0.005;
-    if((long)move == 1){
-        movement = movement*1;
-    }
-    if((long)move == -1){
-        movement = movement*-1;
-    }
+    float movement = 0.005 * y;
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_y+=movement;
 }
-void SDMoveSeatForwardBackward(void *move)
+
+static void SDMoveSeatLeft(void *)
+{
+    SDMoveSeatLeftRight(1);
+}
+
+static void SDMoveSeatRight(void *)
+{
+    SDMoveSeatLeftRight(-1);
+}
+
+static void SDMoveSeatForwardBackward(float x)
 {
     //if positive forward if negative backward
-    float movement = 0.005;
-    if((long)move == 1){
-        movement = movement*1;
-    }
-    if((long)move == -1){
-        movement = movement*-1;
-    }
+    float movement = 0.005 * x;
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_x+=movement;
 }
+
+static void SDMoveSeatForward(void *)
+{
+    SDMoveSeatForwardBackward(1);
+}
+
+static void SDMoveSeatBackward(void *)
+{
+    SDMoveSeatForwardBackward(-1);
+}
+
 void SDToggleStats(void *vp)
 {
     screens->toggleStats();
@@ -250,23 +338,23 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
 
-    GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	SDSetZoom, NULL);
-    GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	SDSetZoom, NULL);
-    GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	SDSetZoom, NULL);
+    GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", NULL,	SDSetZoomMinimum, NULL);
+    GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", NULL,	SDSetZoomMaximum, NULL);
+    GfuiAddKey(screen, '*',            "Zoom Default", NULL,	SDSetZoomDefault, NULL);
 
     GfuiAddKey( screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, SDPrevCar, NULL);
     GfuiAddKey( screen, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, SDNextCar, NULL);
 
-    GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    (void*)2, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       (void*)3, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    (void*)4, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", (void*)5, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F8,       "Track View",        (void*)6, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      NULL, SDDriverView, NULL);
+    GfuiAddKey(screen, GFUIK_F3,       "Car Views",         NULL, SDCarView, NULL);
+    GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    NULL, SDSideCarView, NULL);
+    GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       NULL, SDUpCarView, NULL);
+    GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    NULL, SDPerspCarView, NULL);
+    GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", NULL, SDAllCircuitView, NULL);
+    GfuiAddKey(screen, GFUIK_F8,       "Track View",        NULL, SDTrackView, NULL);
+    GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", NULL, SDTrackViewZoomed, NULL);
+    GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", NULL, SDFollowCarZoomed, NULL);
+    GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  NULL, SDTVDirectorView, NULL);
 
     GfuiAddKey(screen, '?',            "Toggle OSG Stats",  (void *)0, SDToggleStats, NULL);
 
@@ -286,7 +374,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '5', GFUIM_CTRL, "Toggle HUD graphSpeedWidget",  (void*)"graphSpeedWidget",  SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
     GfuiAddKey(screen, '6', GFUIM_CTRL, "Toggle HUD graphFFBWidget",    (void*)"graphFFBWidget",    SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
     GfuiAddKey(screen, '7', GFUIM_CTRL, "Toggle HUD graphInputsWidget", (void*)"graphInputsWidget", SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
-    GfuiAddKey(screen, '8', GFUIM_CTRL, "Toggle HUD edit mode",         (void*)1,                   SDToggleHUDeditmode, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '8', GFUIM_CTRL, "Toggle HUD edit mode",         NULL,                   SDToggleHUDeditmode, NULL, GFUI_HELP_RIGHT);
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
@@ -297,9 +385,9 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
 
     //GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
-    GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
-    GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
-    GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
+    GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           NULL,	 SDSetZoomIn, NULL);
+    GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           NULL,	 SDSetZoomIn, NULL);
+    GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          NULL, SDSetZoomOut, NULL);
     //GfuiAddKey(screen, '>',             "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     //GfuiAddKey(screen, '<',             "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
     //GfuiAddKey(screen, '(',            "Split Screen",   (void*)SD_SPLIT_ADD, SDSplitScreen, NULL);
@@ -308,12 +396,12 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     //GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)SD_NEXT_SCREEN, SDChangeScreen, NULL);
     /*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
 
-    GfuiAddKey(screen, '+',        GFUIM_ALT,   "Move seat up",         (void*)1,  SDMoveSeatUpDown, NULL);
-    GfuiAddKey(screen, '-',        GFUIM_ALT,   "Move seat down",       (void*)-1, SDMoveSeatUpDown, NULL);
-    GfuiAddKey(screen, GFUIK_LEFT, GFUIM_ALT,   "Move seat left",       (void*)1,  SDMoveSeatLeftRight, NULL);
-    GfuiAddKey(screen, GFUIK_RIGHT,GFUIM_ALT,   "Move seat right",      (void*)-1, SDMoveSeatLeftRight, NULL);
-    GfuiAddKey(screen, GFUIK_UP,   GFUIM_ALT,   "Move seat forward",    (void*)1,  SDMoveSeatForwardBackward, NULL);
-    GfuiAddKey(screen, GFUIK_DOWN, GFUIM_ALT,   "Move seat backward",   (void*)-1, SDMoveSeatForwardBackward, NULL);
+    GfuiAddKey(screen, '+',        GFUIM_ALT,   "Move seat up",         NULL,  SDMoveSeatUp, NULL);
+    GfuiAddKey(screen, '-',        GFUIM_ALT,   "Move seat down",       NULL, SDMoveSeatDown, NULL);
+    GfuiAddKey(screen, GFUIK_LEFT, GFUIM_ALT,   "Move seat left",       NULL,  SDMoveSeatLeft, NULL);
+    GfuiAddKey(screen, GFUIK_RIGHT,GFUIM_ALT,   "Move seat right",      NULL, SDMoveSeatRight, NULL);
+    GfuiAddKey(screen, GFUIK_UP,   GFUIM_ALT,   "Move seat forward",    NULL,  SDMoveSeatForward, NULL);
+    GfuiAddKey(screen, GFUIK_DOWN, GFUIM_ALT,   "Move seat backward",   NULL, SDMoveSeatBackward, NULL);
 
     if(GfScrUsingResizableWindow())
         GfuiAddKey(screen, GFUIK_RETURN, GFUIM_ALT, "Toggle Full-screen", (void*)0, GfScrToggleFullScreen, NULL);

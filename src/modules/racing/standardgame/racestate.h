@@ -28,6 +28,6 @@
 
 extern void ReStateInit(void *prevMenu);
 extern void ReStateManage(void);
-extern void ReStateApply(void *state);
+extern void ReStateApply(int state);
 
 #endif /* _RACESTATE_H_ */

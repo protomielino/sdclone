@@ -88,15 +88,26 @@ static void SaveSkillLevel(void * /* dummy */)
 
 /* Change the global AI skill level */
 static void
-ChangeSkillLevel(void *vp)
+ChangeSkillLevel(int dir)
 {
-    const int delta = ((long)vp < 0) ? -1 : 1;
+    const int delta = (dir < 0) ? -1 : 1;
 
 	CurSkillLevelIndex = (CurSkillLevelIndex + delta + NSkillLevels) % NSkillLevels;
 
     GfuiLabelSetText(ScrHandle, SkillLevelId, SkillLevels[CurSkillLevelIndex]);
 }
 
+static void
+ChangeSkillLeft(void *)
+{
+    ChangeSkillLevel(-1);
+}
+
+static void
+ChangeSkillRight(void *)
+{
+    ChangeSkillLevel(1);
+}
 
 static void onActivate(void * /* dummy */)
 {
@@ -119,8 +130,8 @@ AIMenuInit(void *prevMenu)
 	void *param = GfuiMenuLoad("aiconfigmenu.xml");
     GfuiMenuCreateStaticControls(ScrHandle, param);
 
-    GfuiMenuCreateButtonControl(ScrHandle,param,"skillleftarrow",(void*)-1,ChangeSkillLevel);
-    GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1,ChangeSkillLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillleftarrow",NULL,ChangeSkillLeft);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",NULL,ChangeSkillRight);
 
     SkillLevelId = GfuiMenuCreateLabelControl(ScrHandle,param,"skilllabel");
     GfuiMenuCreateButtonControl(ScrHandle,param,"ApplyButton",prevMenu,SaveSkillLevel);
@@ -131,8 +142,8 @@ AIMenuInit(void *prevMenu)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, SaveSkillLevel, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", NULL, ChangeSkillLeft, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", NULL, ChangeSkillRight, NULL);
 
     return ScrHandle;
 }

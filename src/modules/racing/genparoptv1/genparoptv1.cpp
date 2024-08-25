@@ -182,7 +182,7 @@ void GenParOptV1::updateState(void)
 
 void GenParOptV1::applyState(int state)
 {
-	::ReStateApply((void*)(long)state);
+	::ReStateApply(state);
 }
 
 void GenParOptV1::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)

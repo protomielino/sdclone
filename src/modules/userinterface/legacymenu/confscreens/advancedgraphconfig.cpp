@@ -134,37 +134,80 @@ saveOptions()
 // GUI callback functions ===================================================================
 
 static void
-onChangeShadow(void* vp)
+onChangeShadow(int delta)
 {
-    const long delta = (long)vp;
     ShadowIndex = (ShadowIndex + NbShadowValues + delta) % NbShadowValues;
     GfuiLabelSetText(ScrHandle, ShadowLabelId, ShadowValues[ShadowIndex]);
 }
 
 static void
-onChangeTexSize(void* vp)
+onChangeShadowLeft(void *)
 {
-    const long delta = (long)vp;
+    onChangeShadow(-1);
+}
+
+static void
+onChangeShadowRight(void *)
+{
+    onChangeShadow(1);
+}
+
+static void
+onChangeTexSize(int delta)
+{
     TexSizeIndex = (TexSizeIndex + NbTexSizeValues + delta) % NbTexSizeValues;
     GfuiLabelSetText(ScrHandle, TexSizeLabelId, TexSizeValues[TexSizeIndex]);
 }
 
 static void
-onChangeQuality(void* vp)
+onChangeTexSizeLeft(void *)
 {
-    const long delta = (long)vp;
+    onChangeTexSize(-1);
+}
+
+static void
+onChangeTexSizeRight(void *)
+{
+    onChangeTexSize(1);
+}
+
+static void
+onChangeQuality(int delta)
+{
     QualityIndex = (QualityIndex + NbQualityValues + delta) % NbQualityValues;
     GfuiLabelSetText(ScrHandle, QualityLabelId, QualityValues[QualityIndex]);
 }
 
 static void
-onChangeShaders(void* vp)
+onChangeQualityLeft(void *)
 {
-    const long delta = (long)vp;
+    onChangeQuality(-1);
+}
+
+static void
+onChangeQualityRight(void *)
+{
+    onChangeQuality(1);
+}
+
+static void
+onChangeShaders(int delta)
+{
     ShadersIndex = (ShadersIndex + NbShadersValues + delta) % NbShadersValues;
     GfuiLabelSetText(ScrHandle, ShadersLabelId, ShadersValues[ShadersIndex]);
 }
 
+static void
+onChangeShadersLeft(void *)
+{
+    onChangeShaders(-1);
+}
+
+static void
+onChangeShadersRight(void *)
+{
+    onChangeShaders(-1);
+}
 
 static void
 onActivate(void* /* dummy */)
@@ -209,27 +252,27 @@ AdvancedGraphMenuInit(void* prevMenu)
     GfuiMenuCreateStaticControls(ScrHandle, param);
 
     ShadowLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "shadowleftarrow", (void*)-1, onChangeShadow);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "shadowleftarrow", NULL, onChangeShadowLeft);
     ShadowRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "shadowrightarrow", (void*)1, onChangeShadow);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "shadowrightarrow", NULL, onChangeShadowRight);
     ShadowLabelId =	GfuiMenuCreateLabelControl(ScrHandle, param, "shadowlabel");
 
     TexSizeLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "texsizeleftarrow", (void*)-1, onChangeTexSize);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "texsizeleftarrow", NULL, onChangeTexSizeLeft);
     TexSizeRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "texsizerightarrow", (void*)1, onChangeTexSize);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "texsizerightarrow", NULL, onChangeTexSizeRight);
     TexSizeLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "texsizelabel");
 
     QualityLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "qualityleftarrow", (void*)-1, onChangeQuality);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "qualityleftarrow", NULL, onChangeQualityLeft);
     QualityRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "qualityrightarrow", (void*)1, onChangeQuality);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "qualityrightarrow", NULL, onChangeQualityRight);
     QualityLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "qualitylabel");
 
     ShadersLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "carleftarrow", (void*)-1, onChangeShaders);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "carleftarrow", NULL, onChangeShadersLeft);
     ShadersRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "carrightarrow", (void*)1, onChangeShaders);
+        GfuiMenuCreateButtonControl(ScrHandle, param, "carrightarrow", NULL, onChangeShadersRight);
     ShadersLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "carlabel");
 
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);

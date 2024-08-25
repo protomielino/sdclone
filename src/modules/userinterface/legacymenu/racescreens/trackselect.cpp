@@ -178,9 +178,9 @@ rmtsActivate(void * /* dummy */)
 
 /* Select next/previous track from currently selected track category */
 static void
-rmtsTrackPrevNext(void *vsel)
+rmtsTrackPrevNext(int dir)
 {
- 	const int nSearchDir = (long)vsel > 0 ? +1 : -1;
+	const int nSearchDir = dir > 0 ? +1 : -1;
 
 	// Select next usable track in the current catergory in the requested direction.
 	PCurTrack = GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(),
@@ -190,12 +190,23 @@ rmtsTrackPrevNext(void *vsel)
 	rmtsUpdateTrackInfo();
 }
 
+static void
+rmtsTrackPrev(void *)
+{
+	rmtsTrackPrevNext(-1);
+}
+
+static void
+rmtsTrackNext(void *)
+{
+	rmtsTrackPrevNext(1);
+}
 
 /* Select next/previous track category */
 static void
-rmtsTrackCatPrevNext(void *vsel)
+rmtsTrackCatPrevNext(int dir)
 {
- 	const int nSearchDir = (long)vsel > 0 ? +1 : -1;
+	const int nSearchDir = dir > 0 ? +1 : -1;
 
 	// Select first usable track in the next catergory in the requested direction.
 	PCurTrack = GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(),
@@ -215,6 +226,17 @@ rmtsTrackCatPrevNext(void *vsel)
 	}
 }
 
+static void
+rmtsTrackCatPrev(void *)
+{
+	rmtsTrackCatPrevNext(-1);
+}
+
+static void
+rmtsTrackCatNext(void *)
+{
+	rmtsTrackCatPrevNext(1);
+}
 
 static void
 rmtsSelect(void * /* dummy */)
@@ -233,10 +255,10 @@ rmtsAddKeys(void)
 	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", MenuData->prevScreen, rmtsDeactivate, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)-1, rmtsTrackPrevNext, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)+1, rmtsTrackPrevNext, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)-1, rmtsTrackCatPrevNext, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)+1, rmtsTrackCatPrevNext, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", NULL, rmtsTrackPrev, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", NULL, rmtsTrackNext, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", NULL, rmtsTrackCatPrev, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", NULL, rmtsTrackCatNext, NULL);
 }
 
 
@@ -288,15 +310,15 @@ RmTrackSelect(void *vs)
 	GfuiMenuCreateStaticControls( ScrHandle, hparmMenu);
 
 	PrevCategoryArrowId =
-		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatleftarrow",(void*)-1, rmtsTrackCatPrevNext);
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatleftarrow",NULL, rmtsTrackCatPrev);
 	NextCategoryArrowId =
-		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatrightarrow",(void*)1, rmtsTrackCatPrevNext);
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatrightarrow",NULL, rmtsTrackCatNext);
 	CategoryEditId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "trackcatlabel");
 
 	PrevTrackArrowId =
-		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackleftarrow", (void*)-1, rmtsTrackPrevNext);
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackleftarrow", NULL, rmtsTrackPrev);
 	NextTrackArrowId =
-		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackrightarrow", (void*)1, rmtsTrackPrevNext);
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackrightarrow", NULL, rmtsTrackNext);
 	NameEditId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "tracklabel");
 
 	OutlineImageId = GfuiMenuCreateStaticImageControl(ScrHandle, hparmMenu, "outlineimage");

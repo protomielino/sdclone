@@ -25,6 +25,8 @@
 
 #include <map>
 #include <algorithm>
+#include <list>
+#include <string>
 
 #include <tgfclient.h>
 
@@ -42,6 +44,7 @@ void *RmRaceSelectMenuHandle = NULL;
 
 
 static std::map<std::string, int> rmMapSubTypeComboIds;
+static std::list<std::string> rmRaceTypes;
 
 
 /* Called when the menu is activated */
@@ -57,6 +60,8 @@ rmOnActivate(void * /* dummy */)
 static void
 rmOnRaceSelectShutdown(void *prevMenu)
 {
+	rmRaceTypes.clear();
+
     GfuiScreenActivate(prevMenu);
 
     LmRaceEngine().cleanup();
@@ -70,15 +75,34 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 {
 	// Get the race managers with the given type
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
-	const std::string strRaceManType = vecRaceManTypes[(long)pvRaceManTypeIndex];
+	std::string *strRaceManType = static_cast<std::string *>(pvRaceManTypeIndex);
+	bool found = false;
+
+	for (std::vector<std::string>::const_iterator it = vecRaceManTypes.begin();
+		it != vecRaceManTypes.end(); it++)
+	{
+		if (*it == *strRaceManType)
+		{
+			found = true;
+			break;
+		}
+	}
+
+	if (!found)
+	{
+		GfLogError("Race type %s not found on GfRaceManagers\n",
+			strRaceManType->c_str());
+		return;
+	}
+
 	const std::vector<GfRaceManager*> vecRaceMans =
-		GfRaceManagers::self()->getRaceManagersWithType(strRaceManType);
+		GfRaceManagers::self()->getRaceManagersWithType(*strRaceManType);
 
 	// If more than 1, get the one with the currently selected sub-type.
 	GfRaceManager* pSelRaceMan = 0;
 	if (vecRaceMans.size() > 1)
 	{
-		const int nSubTypeComboId = rmMapSubTypeComboIds[strRaceManType];
+		const int nSubTypeComboId = rmMapSubTypeComboIds[*strRaceManType];
 		const char* pszSelSubType = GfuiComboboxGetText(RmRaceSelectMenuHandle, nSubTypeComboId);
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
@@ -108,7 +132,7 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 	}
 	else
 	{
-		GfLogError("No such race manager (type '%s')\n", strRaceManType.c_str());
+		GfLogError("No such race manager (type '%s')\n", strRaceManType->c_str());
 	}
 }
 
@@ -138,6 +162,7 @@ RmRaceSelectInit(void *prevMenu)
 	void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
 #endif
     GfuiMenuCreateStaticControls(RmRaceSelectMenuHandle, hMenuXMLDesc);
+	rmRaceTypes.clear();
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
@@ -164,10 +189,11 @@ RmRaceSelectInit(void *prevMenu)
 				continue;
 		}
 
+		rmRaceTypes.push_back(*itRaceManType);
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
 		GfuiMenuCreateButtonControl(RmRaceSelectMenuHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
-							(void*)(itRaceManType - vecRaceManTypes.begin()),
+							&rmRaceTypes.back(),
 							rmOnSelectRaceMan);
 
 		// Look for sub-types : if any, we have a sub-type combo box for this type.

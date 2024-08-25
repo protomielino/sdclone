@@ -214,9 +214,9 @@ ReStateManage(void)
 
 // Change and Execute a New State
 void
-ReStateApply(void *pvState)
+ReStateApply(int pvState)
 {
-	ReInfo->_reState = (int)(long)pvState;
+	ReInfo->_reState = pvState;
 
 	ReStateManage();
 }

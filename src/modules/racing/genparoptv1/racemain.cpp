@@ -142,7 +142,7 @@ void ReRaceAbandon()
 	}
 
 	// Return to race configuration step
-	ReStateApply((void*)RE_STATE_CONFIG);
+	ReStateApply(RE_STATE_CONFIG);
 }
 
 void ReRaceAbort()
@@ -168,12 +168,12 @@ void ReRaceAbort()
 	}
 
 	// Return to race configuration step
-	ReStateApply((void*)RE_STATE_CONFIG);
+	ReStateApply(RE_STATE_CONFIG);
 }
 
 void ReRaceSkipSession()
 {
-	ReStateApply((void*)RE_STATE_RACE_END);
+	ReStateApply(RE_STATE_RACE_END);
 }
 
 int
@@ -749,7 +749,7 @@ void ReRaceRestart()
 
 	ReRaceCleanup();
 
-	ReStateApply((void*)RE_STATE_PRE_RACE);
+	ReStateApply(RE_STATE_PRE_RACE);
 }
 
 int

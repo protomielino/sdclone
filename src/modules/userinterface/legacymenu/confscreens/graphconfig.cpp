@@ -194,18 +194,29 @@ saveOptions()
 
 
 static void
-onChangeVisibility(void* vp)
+onChangeVisibility(int delta)
 {
-    const long delta = (long)vp;
     VisibilityIndex = (VisibilityIndex + NbVisibilityValues + delta) % NbVisibilityValues;
     snprintf(buf, sizeof(buf), "%d", VisibilityValues[VisibilityIndex]);
     GfuiLabelSetText(ScrHandle, VisibilityLabelId, buf);
 }
 
 static void
-onChangeFov(void* vp)
+onVisibilityLeft(void *)
 {
-	if (vp)
+	onChangeVisibility(-1);
+}
+
+static void
+onVisibilityRight(void *)
+{
+	onChangeVisibility(1);
+}
+
+static void
+onChangeFov(int edit)
+{
+	if (edit)
 	{
 		// Get new value from the edit control
 		char* val = GfuiEditboxGetString(ScrHandle, FovEditId);
@@ -218,9 +229,15 @@ onChangeFov(void* vp)
 }
 
 static void
-onChangeLodFactor(void* vp)
+onFovEdit(void *)
 {
-	if (vp)
+	onChangeFov(1);
+}
+
+static void
+onChangeLodFactor(int edit)
+{
+	if (edit)
 	{
 		// Get new value from the edit control
 		char* val = GfuiEditboxGetString(ScrHandle, LodFactorEditId);
@@ -233,9 +250,15 @@ onChangeLodFactor(void* vp)
 }
 
 static void
-onChangeSmoke(void* vp)
+onLodEdit(void *)
 {
-	if (vp)
+	onChangeLodFactor(1);
+}
+
+static void
+onChangeSmoke(int edit)
+{
+	if (edit)
 	{
 		// Get new value from the edit control
 		char* val = GfuiEditboxGetString(ScrHandle, SmokeEditId);
@@ -248,9 +271,15 @@ onChangeSmoke(void* vp)
 }
 
 static void
-onChangeSkid(void* vp)
+onSmokeEdit(void *)
 {
-	if (vp)
+	onChangeSmoke(1);
+}
+
+static void
+onChangeSkid(int edit)
+{
+	if (edit)
 	{
 		// Get new value from the edit control
 		char* val = GfuiEditboxGetString(ScrHandle, SkidEditId);
@@ -263,34 +292,72 @@ onChangeSkid(void* vp)
 }
 
 static void
-onChangeDynamicTimeOfDay(void* vp)
+onSkidEdit(void *)
 {
-    const long delta = (long)vp;
+	onChangeSkid(1);
+}
+
+static void
+onChangeDynamicTimeOfDay(int delta)
+{
     DynamicTimeOfDayIndex = (DynamicTimeOfDayIndex + NbDynamicTimeOfDayValues + delta) % NbDynamicTimeOfDayValues;
     GfuiLabelSetText(ScrHandle, DynamicTimeOfDayLabelId, DynamicTimeOfDayValues[DynamicTimeOfDayIndex]);
 }
 
 static void
-onChangeBackgroundLandscape(void* vp)
+onDynamicTimeOfDayLeft(void *)
 {
-    const long delta = (long)vp;
+	onChangeDynamicTimeOfDay(-1);
+}
+
+static void
+onDynamicTimeOfDayRight(void *)
+{
+	onChangeDynamicTimeOfDay(1);
+}
+
+static void
+onChangeBackgroundLandscape(int delta)
+{
     BackgroundLandscapeIndex = (BackgroundLandscapeIndex + NbBackgroundLandscapeValues + delta) % NbBackgroundLandscapeValues;
     GfuiLabelSetText(ScrHandle, BackgroundLandscapeLabelId, BackgroundLandscapeValues[BackgroundLandscapeIndex]);
 }
 
 static void
-onChangeCloudLayers(void* vp)
+onBackgroundLandscapeLeft(void *)
 {
-    const long delta = (long)vp;
+	onChangeBackgroundLandscape(-1);
+}
+
+static void
+onBackgroundLandscapeRight(void *)
+{
+	onChangeBackgroundLandscape(1);
+}
+
+static void
+onChangeCloudLayers(int delta)
+{
     CloudLayerIndex = (CloudLayerIndex + NbCloudLayersValues + delta) % NbCloudLayersValues;
     snprintf(buf, sizeof(buf), "%d", CloudLayersValues[CloudLayerIndex]);
     GfuiLabelSetText(ScrHandle, CloudLayersLabelId, buf);
 }
 
 static void
-onChangeSkyDomeDistance(void* vp)
+onCloudLayerLeft(void *)
 {
-    const long delta = (long)vp;
+	onChangeCloudLayers(-1);
+}
+
+static void
+onCloudLayerRight(void *)
+{
+	onChangeCloudLayers(1);
+}
+
+static void
+onChangeSkyDomeDistance(int delta)
+{
     SkyDomeDistanceIndex = (SkyDomeDistanceIndex + NbSkyDomeDistanceValues + delta) % NbSkyDomeDistanceValues;
     snprintf(buf, sizeof(buf), "%d", SkyDomeDistanceValues[SkyDomeDistanceIndex]);
     GfuiLabelSetText(ScrHandle, SkyDomeDistanceLabelId, buf);
@@ -334,12 +401,35 @@ onChangeSkyDomeDistance(void* vp)
 }
 
 static void
-onChangePrecipDensity(void* vp)
+onSkyDomeDistanceLeft(void *)
 {
-    const long delta = (long)vp;
+	onChangeSkyDomeDistance(-1);
+}
+
+static void
+onSkyDomeDistanceRight(void *)
+{
+	onChangeSkyDomeDistance(1);
+}
+
+static void
+onChangePrecipDensity(int delta)
+{
     PrecipDensityIndex = (PrecipDensityIndex + NbPrecipDensityValues + delta) % NbPrecipDensityValues;
     snprintf(buf, sizeof(buf), "%d", PrecipDensityValues[PrecipDensityIndex]);
     GfuiLabelSetText(ScrHandle, PrecipDensityLabelId, buf);
+}
+
+static void
+onPrecipDensityLeft(void *)
+{
+	onChangePrecipDensity(-1);
+}
+
+static void
+onPrecipDensityRight(void *)
+{
+	onChangePrecipDensity(1);
 }
 
 static void
@@ -388,49 +478,49 @@ GraphMenuInit(void* prevMenu)
     GfuiMenuCreateStaticControls(ScrHandle, param);
 
     FovEditId =
-		GfuiMenuCreateEditControl(ScrHandle, param, "fovedit", (void*)1, NULL, onChangeFov);
+		GfuiMenuCreateEditControl(ScrHandle, param, "fovedit", NULL, NULL, onFovEdit);
     SmokeEditId =
-		GfuiMenuCreateEditControl(ScrHandle, param, "smokeedit", (void*)1, NULL, onChangeSmoke);
+		GfuiMenuCreateEditControl(ScrHandle, param, "smokeedit", NULL, NULL, onSmokeEdit);
     SkidEditId =
-		GfuiMenuCreateEditControl(ScrHandle, param, "skidedit", (void*)1, NULL, onChangeSkid);
+		GfuiMenuCreateEditControl(ScrHandle, param, "skidedit", NULL, NULL, onSkidEdit);
     LodFactorEditId =
-		GfuiMenuCreateEditControl(ScrHandle, param, "lodedit", (void*)1, NULL, onChangeLodFactor);
+		GfuiMenuCreateEditControl(ScrHandle, param, "lodedit", NULL, NULL, onLodEdit);
 
-    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistleftarrow", (void*)-1, onChangeSkyDomeDistance);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistrightarrow", (void*)1, onChangeSkyDomeDistance);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistleftarrow", NULL, onSkyDomeDistanceLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistrightarrow", NULL, onSkyDomeDistanceRight);
     SkyDomeDistanceLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "skydomedistlabel");
 
     DynamicTimeOfDayLeftButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomeleftarrow", (void*)-1, onChangeDynamicTimeOfDay);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomeleftarrow", NULL, onDynamicTimeOfDayLeft);
     DynamicTimeOfDayRightButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomerightarrow", (void*)1, onChangeDynamicTimeOfDay);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomerightarrow", NULL, onDynamicTimeOfDayRight);
     DynamicTimeOfDayLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "dynamicskydomelabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityleftarrow", (void*)-1, onChangePrecipDensity);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityrightarrow", (void*)1, onChangePrecipDensity);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityleftarrow", NULL, onPrecipDensityLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityrightarrow", NULL, onPrecipDensityRight);
     PrecipDensityLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "precipdensitylabel");
 
 	CloudLayersLeftButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "cloudlayernbleftarrow", (void*)-1, onChangeCloudLayers);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "cloudlayernbleftarrow", NULL, onCloudLayerLeft);
 	CloudLayersRightButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "cloudlayernbrightarrow", (void*)1, onChangeCloudLayers);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "cloudlayernbrightarrow", NULL, onCloudLayerRight);
     CloudLayersLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "cloudlayerlabel");
 
 	BackgroundLandscapeLeftButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyleftarrow", (void*)-1, onChangeBackgroundLandscape);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyleftarrow", NULL, onBackgroundLandscapeLeft);
     BackgroundLandscapeRightButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyrightarrow", (void*)1, onChangeBackgroundLandscape);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyrightarrow", NULL, onBackgroundLandscapeRight);
     BackgroundLandscapeLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "bgskydomelabel");
 
 	VisibilityLeftButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityleftarrow", (void*)-1, onChangeVisibility);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityleftarrow", NULL, onVisibilityLeft);
     VisibilityRightButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityrightarrow", (void*)1, onChangeVisibility);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityrightarrow", NULL, onVisibilityRight);
     VisibilityLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "visibilitylabel");
 

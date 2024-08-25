@@ -1063,14 +1063,14 @@ onChangeNum(void * /* dummy */)
 }
 
 static void
-onChangeNation(void *vp)
+onChangeNation(int dir)
 {
     if (CurrPlayer == PlayersInfo.end())
     {
         return;
     }
 
-    if (vp == 0)
+    if (dir == 0)
     {
         if (SelectedNation == 0)
             SelectedNation = NbNations - 1;
@@ -1091,6 +1091,18 @@ onChangeNation(void *vp)
 }
 
 static void
+onNationLeft(void *)
+{
+    onChangeNation(0);
+}
+
+static void
+onNationRight(void *)
+{
+    onChangeNation(1);
+}
+
+static void
 onChangePits(void * /* dummy */)
 {
     char	*val;
@@ -1104,14 +1116,14 @@ onChangePits(void * /* dummy */)
 }
 
 static void
-onChangeLevel(void *vp)
+onChangeLevel(int dir)
 {
     if (CurrPlayer == PlayersInfo.end()) {
         return;
     }
 
     tSkillLevel skillLevel = (*CurrPlayer)->skillLevel();
-    if (vp == 0) {
+    if (dir == 0) {
         if (skillLevel == ARCADE)
             skillLevel = PRO;
         else
@@ -1128,10 +1140,20 @@ onChangeLevel(void *vp)
 }
 
 static void
-onChangeReverse(void *vdelta)
+onSkillLeft(void *)
 {
-    const long delta = (long)vdelta;
+    onChangeLevel(0);
+}
 
+static void
+onSkillRight(void *)
+{
+    onChangeLevel(1);
+}
+
+static void
+onChangeReverse(int delta)
+{
     if (CurrPlayer == PlayersInfo.end()) {
         return;
     }
@@ -1148,16 +1170,27 @@ onChangeReverse(void *vdelta)
     refreshEditVal();
 }
 
+static void
+onReverseLeft(void *)
+{
+    onChangeReverse(-1);
+}
+
+static void
+onReverseRight(void *)
+{
+    onChangeReverse(1);
+}
 
 /* Gear change mode change callback */
 static void
-onChangeGearChange(void *vp)
+onChangeGearChange(int dir)
 {
     if (CurrPlayer == PlayersInfo.end()) {
         return;
     }
     tGearChangeMode gearChangeMode = (*CurrPlayer)->gearChangeMode();
-    if (vp == 0) {
+    if (dir == 0) {
         if (gearChangeMode == GEAR_MODE_AUTO) {
             gearChangeMode = GEAR_MODE_HBOX;
         } else if (gearChangeMode == GEAR_MODE_SEQ) {
@@ -1183,6 +1216,18 @@ onChangeGearChange(void *vp)
     (*CurrPlayer)->setGearChangeMode(gearChangeMode);
 
     refreshEditVal();
+}
+
+static void
+onGearLeft(void *)
+{
+    onChangeGearChange(0);
+}
+
+static void
+onGearRight(void *)
+{
+    onChangeGearChange(1);
 }
 
 static void
@@ -1233,13 +1278,13 @@ PlayerConfigMenuInit(void *prevMenu)
     NameEditId = GfuiMenuCreateEditControl(ScrHandle, param, "nameedit", NULL, onActivateName, onChangeName);
 
     /* Player skill level "combobox" (left arrow, label, right arrow) */
-    GfuiMenuCreateButtonControl(ScrHandle, param, "skillleftarrow", (void*)0, onChangeLevel);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "skillrightarrow", (void*)1, onChangeLevel);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skillleftarrow", NULL, onSkillLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skillrightarrow", NULL, onSkillRight);
     SkillEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "skilltext");
 
     /* Player nationality "combobox" (left arrow, label, right arrow) */
-    GfuiMenuCreateButtonControl(ScrHandle, param, "nationleftarrow", (void *)0, onChangeNation);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "nationrightarrow", (void *)1, onChangeNation);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "nationleftarrow", NULL, onNationLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "nationrightarrow", NULL, onNationRight);
     NationEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "nationtext");
 
     /* Races and pits numbers editboxes (Must they really stay here ?) */
@@ -1248,14 +1293,14 @@ PlayerConfigMenuInit(void *prevMenu)
     PitsEditId = GfuiMenuCreateEditControl(ScrHandle, param, "pitstopedit", NULL, NULL, onChangePits);
 
     /* Gear changing mode and associated "combobox" (left arrow, label, right arrow) */
-    GfuiMenuCreateButtonControl(ScrHandle, param, "gearleftarrow", (void*)0, onChangeGearChange);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "gearrightarrow", (void*)1, onChangeGearChange);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "gearleftarrow", NULL, onGearLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "gearrightarrow", NULL, onGearRight);
     GearChangeEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "geartext");
 
     /* Gear changing auto-reverse flag and associated "combobox" (left arrow, label, right arrow) */
     AutoReverseLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "autoreversetext");
-    AutoReverseLeftId = GfuiMenuCreateButtonControl(ScrHandle, param, "autoleftarrow", (void*)-1, onChangeReverse);
-    AutoReverseRightId = GfuiMenuCreateButtonControl(ScrHandle, param, "autorightarrow", (void*)1, onChangeReverse);
+    AutoReverseLeftId = GfuiMenuCreateButtonControl(ScrHandle, param, "autoleftarrow", NULL, onReverseLeft);
+    AutoReverseRightId = GfuiMenuCreateButtonControl(ScrHandle, param, "autorightarrow", NULL, onReverseRight);
     AutoReverseEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "autotext");
 
     // Accept and Cancel buttons.

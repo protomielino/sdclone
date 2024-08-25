@@ -475,7 +475,7 @@ rmToggleSound(void * /* dummy */)
 }
 
 static void
-rmVolumeMod (void *pvCmd)
+rmVolumeMod (int cmd)
 {
 	// If not paused ...
 	if ((!rmRacePaused)&&(!rmPreRacePause))
@@ -484,12 +484,12 @@ rmVolumeMod (void *pvCmd)
 		{
 			float curr = LegacyMenu::self().soundEngine()->getVolume();
 
-			if ((long)pvCmd > 0)
+			if (cmd > 0)
 			{
 				curr += 0.1f;
 				LegacyMenu::self().soundEngine()->setVolume(curr);
 			}
-			else if ((long)pvCmd < 0)
+			else if (cmd < 0)
 			{
 				curr -= 0.1f;
 				LegacyMenu::self().soundEngine()->setVolume(curr);
@@ -499,14 +499,44 @@ rmVolumeMod (void *pvCmd)
 }
 
 static void
-rmTimeMod (void *pvCmd)
+rmVolumeUp(void *)
+{
+	rmVolumeMod(1);
+}
+
+static void
+rmVolumeDown(void *)
+{
+	rmVolumeMod(-1);
+}
+
+static void
+rmTimeMod (int cmd)
 {
 	double fMultFactor = 0.0; // The mult. factor for resetting "real time" simulation step.
-	if ((long)pvCmd > 0)
+	if (cmd > 0)
 		fMultFactor = 0.5; // Accelerate time means reduce the simulation time step.
-	else if ((long)pvCmd < 0)
+	else if (cmd < 0)
 		fMultFactor = 2.0; // Slow-down time means increase the simulation time step.
 	LmRaceEngine().accelerateTime(fMultFactor);
+}
+
+static void
+rmTimeSlowDown(void *)
+{
+	rmTimeMod(-1);
+}
+
+static void
+rmTimeAccelerate(void *)
+{
+	rmTimeMod(1);
+}
+
+static void
+rmTimeRestore(void *)
+{
+	rmTimeMod(0);
 }
 
 static void
@@ -556,9 +586,21 @@ rmHideShowMouseCursor(void * /* dummy */)
 }
 
 static void
-rmApplyState(void *pvState)
+rmApplyState(int state)
 {
-    LmRaceEngine().applyState((int)(long)pvState);
+    LmRaceEngine().applyState(state);
+}
+
+static void
+rmStateStop(void *)
+{
+	rmApplyState(RE_STATE_RACE_STOP);
+}
+
+static void
+rmStateExit(void *)
+{
+	rmApplyState(RE_STATE_EXIT);
 }
 
 // Not used : see below the commented-out call.
@@ -586,17 +628,17 @@ rmAddKeys()
 
     GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", NULL, rmOpenHelpScreen, NULL);
 
-    GfuiAddKey(rmScreenHandle, '-', "Slow down time",    (void*)-1, rmTimeMod, NULL);
-    GfuiAddKey(rmScreenHandle, '+', "Accelerate time",   (void*)+1, rmTimeMod, NULL);
-    GfuiAddKey(rmScreenHandle, '.', "Restore real time", (void*)0, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '-', "Slow down time",    NULL, rmTimeSlowDown, NULL);
+    GfuiAddKey(rmScreenHandle, '+', "Accelerate time",   NULL, rmTimeAccelerate, NULL);
+    GfuiAddKey(rmScreenHandle, '.', "Restore real time", NULL, rmTimeRestore, NULL);
 
     GfuiAddKey(rmScreenHandle, 'p', "Pause Race",        (void*)0, rmRacePause, NULL);
-    GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop current race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
-    GfuiAddKey(rmScreenHandle, 'q', GFUIM_ALT, "Quit (without saving)",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop current race", NULL, rmStateStop, NULL);
+    GfuiAddKey(rmScreenHandle, 'q', GFUIM_ALT, "Quit (without saving)", NULL, rmStateExit, NULL);
     GfuiAddKey(rmScreenHandle, ' ', "Skip pre-start",    (void*)0, rmSkipPreStart, NULL);
 
-    GfuiAddKey(rmScreenHandle, '>', "SFX volume up", (void*)+1, rmVolumeMod, NULL);
-    GfuiAddKey(rmScreenHandle, '<', "SFX volume down", (void*)-1, rmVolumeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '>', "SFX volume up", NULL, rmVolumeUp, NULL);
+    GfuiAddKey(rmScreenHandle, '<', "SFX volume down", NULL, rmVolumeDown, NULL);
     //GfuiAddKey(rmScreenHandle, '?', "Toggle Sound FX",     (void*)0, rmToggleSound, NULL);
 
 	// WARNING: Sure this won't work with multi-threading On/Auto ...
@@ -900,9 +942,9 @@ RmResScreenInit()
 
     // Register keyboard shortcuts
     GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE, "Stop current race",
-			   (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+			   NULL, rmStateStop, NULL);
     GfuiAddKey(rmResScreenHdle, 'q', GFUIM_ALT, "Quit (without saving)",
-			   (void*)RE_STATE_EXIT, rmApplyState, NULL);
+			   NULL, rmStateExit, NULL);
 
     // Initialize current result row.
     rmCurRowIndex = 0;

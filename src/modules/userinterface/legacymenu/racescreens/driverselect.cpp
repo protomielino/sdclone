@@ -228,10 +228,10 @@ rmdsDeactivate(void *nextScreenHdle)
 }
 
 static void
-rmdsChangeCarCategory(void *vp)
+rmdsChangeCarCategory(int dir)
 {
 	CurCarCategoryIndex =
-		(CurCarCategoryIndex + VecCarCategoryIds.size() + (int)(long)vp) % VecCarCategoryIds.size();
+		(CurCarCategoryIndex + VecCarCategoryIds.size() + dir) % VecCarCategoryIds.size();
 
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
 
@@ -243,10 +243,22 @@ rmdsChangeCarCategory(void *vp)
 }
 
 static void
-rmdsChangeDriverType(void *vp)
+rmdsChangeCarCategoryLeft(void *)
+{
+	rmdsChangeCarCategory(-1);
+}
+
+static void
+rmdsChangeCarCategoryRight(void *)
+{
+	rmdsChangeCarCategory(1);
+}
+
+static void
+rmdsChangeDriverType(int dir)
 {
  	CurDriverTypeIndex =
-		(CurDriverTypeIndex + VecDriverTypes.size() + (int)(long)vp) % VecDriverTypes.size();
+		(CurDriverTypeIndex + VecDriverTypes.size() + dir) % VecDriverTypes.size();
 
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
 
@@ -258,7 +270,19 @@ rmdsChangeDriverType(void *vp)
 }
 
 static void
-rmdsChangeSkin(void *vp)
+rmdsChangeDriverTypeLeft(void *)
+{
+	rmdsChangeDriverType(-1);
+}
+
+static void
+rmdsChangeDriverTypeRight(void *)
+{
+	rmdsChangeDriverType(1);
+}
+
+static void
+rmdsChangeSkin(int dir)
 {
 	if (VecCurDriverPossSkins.empty())
 	{
@@ -269,7 +293,7 @@ rmdsChangeSkin(void *vp)
 
 	// Update skin combo-box.
  	CurSkinIndex = (CurSkinIndex + VecCurDriverPossSkins.size()
-					+ (int)(long)vp) % VecCurDriverPossSkins.size();
+					+ dir) % VecCurDriverPossSkins.size();
 
 	const GfDriverSkin& curSkin = VecCurDriverPossSkins[CurSkinIndex];
 	std::string strCurSkinDispName =
@@ -287,6 +311,18 @@ rmdsChangeSkin(void *vp)
 	// Update highlighted driver skin.
 	if (PCurrentDriver)
 		PCurrentDriver->setSkin(curSkin); // TODO: Can we do this for the whole game session (not only this race if it ever starts) ?
+}
+
+static void
+rmdsChangeSkinLeft(void *)
+{
+	rmdsChangeSkin(-1);
+}
+
+static void
+rmdsChangeSkinRight(void *)
+{
+	rmdsChangeSkin(1);
 }
 
 #ifdef FOCUS
@@ -332,15 +368,15 @@ rmdsGarageMenu(void *pPreviousMenu)
 }
 
 static void
-rmdsMoveCompetitor(void *vd)
+rmdsMoveCompetitor(int dir)
 {
 	if (PCurrentDriver)
 	{
 		// Move the competitor in the scroll-list.
-		GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollListId, (int)(long)vd);
+		GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollListId, dir);
 
 		// Move the competitor in the race.
-		MenuData->pRace->moveCompetitor(PCurrentDriver, (int)(long)vd);
+		MenuData->pRace->moveCompetitor(PCurrentDriver, dir);
 
 		// Disable moveUp/Down according to the position of the selected competitor.
 		const unsigned nCompetitors = MenuData->pRace->getCompetitorsCount();
@@ -351,6 +387,18 @@ rmdsMoveCompetitor(void *vd)
 		GfuiEnable(ScrHandle, MoveDownButtonId,
 				   nSelCompInd < (int)nCompetitors -1 ? GFUI_ENABLE : GFUI_DISABLE);
 	}
+}
+
+static void
+rmdsMoveCompetitorUp(void *)
+{
+	rmdsMoveCompetitor(-1);
+}
+
+static void
+rmdsMoveCompetitorDown(void *)
+{
+	rmdsMoveCompetitor(1);
 }
 
 static void
@@ -653,8 +701,8 @@ rmdsAddKeys(void)
 
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Previous menu", MenuData->prevScreen, rmdsPreviousMenu, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Next menu", NULL, rmdsNextMenu, NULL);
-    GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMoveCompetitor, NULL);
-    GfuiAddKey(ScrHandle, '+', "Move Down", (void*)+1, rmdsMoveCompetitor, NULL);
+    GfuiAddKey(ScrHandle, '-', "Move Up", NULL, rmdsMoveCompetitorUp, NULL);
+    GfuiAddKey(ScrHandle, '+', "Move Down", NULL, rmdsMoveCompetitorDown, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselectDriver, NULL);
 #ifdef FOCUS
     GfuiAddKey(ScrHandle, 'f', "Set Focus", NULL, rmdsSetFocus, NULL);
@@ -683,26 +731,26 @@ RmDriversSelect(void *vs)
     // Car category filtering "combobox" (left arrow, label, right arrow)
 	const int nCatPrevButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow",
-							(void*)-1, rmdsChangeCarCategory);
+							NULL, rmdsChangeCarCategoryLeft);
 	const int nCatNextButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carcategoryrightarrow",
-							(void*)1, rmdsChangeCarCategory);
+							NULL, rmdsChangeCarCategoryRight);
     CarCategoryEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "carcategorytext");
 
     // Driver type filtering "combobox" (left arrow, label, right arrow)
 	const int nDrvTypPrevButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "drivertypeleftarrow",
-							(void*)-1, rmdsChangeDriverType);
+							NULL, rmdsChangeDriverTypeLeft);
 	const int nDrvTypNextButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "drivertyperightarrow",
-							(void*)1, rmdsChangeDriverType);
+							NULL, rmdsChangeDriverTypeRight);
     DriverTypeEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "drivertypetext");
 
     // Scroll-lists manipulation buttons
 	MoveUpButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", NULL, rmdsMoveCompetitorUp);
 	MoveDownButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", NULL, rmdsMoveCompetitorDown);
 
     SelectButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
@@ -716,8 +764,8 @@ RmDriversSelect(void *vs)
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
-    SkinLeftButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
-    SkinRightButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinrightarrow", (void*)1, rmdsChangeSkin);
+    SkinLeftButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", NULL, rmdsChangeSkinLeft);
+    SkinRightButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinrightarrow", NULL, rmdsChangeSkinRight);
     SkinEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "skintext");
 	GfuiEnable(ScrHandle, SkinRightButtonId, GFUI_DISABLE);
 	GfuiEnable(ScrHandle, SkinLeftButtonId, GFUI_DISABLE);

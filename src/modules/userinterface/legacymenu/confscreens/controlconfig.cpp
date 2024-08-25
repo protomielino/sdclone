@@ -495,7 +495,7 @@ configure_for_joy_axis:
 static void
 onPush(void *vi)
 {
-    long    i = (long)vi;
+    tCmdInfo *cmd = static_cast<tCmdInfo *>(vi);
 
     /* Do nothing if mouse button clicks are to be refused */
     if (!AcceptMouseClicks) {
@@ -504,17 +504,17 @@ onPush(void *vi)
     }
 
     /* Selected given command as the currently awaited one */
-    CurrentCmd = i;
+    CurrentCmd = cmd - Cmd;
 
     /* Empty button text to tell the user we will soon be waiting for its input */
-    GfuiButtonSetText (ScrHandle, Cmd[i].Id, "");
+    GfuiButtonSetText (ScrHandle, cmd->Id, "");
 
     /* Reset selected command action */
-    Cmd[i].ref.index = -1;
-    Cmd[i].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
+    cmd->ref.index = -1;
+    cmd->ref.type = GFCTRL_TYPE_NOT_AFFECTED;
 
     /* State that a keyboard action is awaited */
-    if (Cmd[CurrentCmd].keyboardPossible)
+    if (cmd->keyboardPossible)
         InputWaited = 1;
 
     /* Read initial mouse status */
@@ -627,7 +627,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
         Cmd[i].labelId = GfuiMenuCreateLabelControl(ScrHandle,param,Cmd[i].name);
         std::string strCmdEdit(Cmd[i].name);
         strCmdEdit += " button";
-        Cmd[i].Id = GfuiMenuCreateButtonControl(ScrHandle,param,strCmdEdit.c_str(),(void*)(long)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+        Cmd[i].Id = GfuiMenuCreateButtonControl(ScrHandle,param,strCmdEdit.c_str(),&Cmd[i],onPush,NULL,(tfuiCallback)NULL,onFocusLost);
     }
 
     /* Steer Sensibility label and associated editbox */

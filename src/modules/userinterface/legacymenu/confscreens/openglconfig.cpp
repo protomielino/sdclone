@@ -167,34 +167,62 @@ static void onAccept(void *)
 }
 
 // Toggle texture compression state enabled/disabled.
-static void changeTextureCompressionState(void *vp)
+static void changeTextureCompressionState(int dir)
 {
-    NCurTextureCompIndex = (NCurTextureCompIndex + (int)(long)vp + NTextureComps) % NTextureComps;
+    NCurTextureCompIndex = (NCurTextureCompIndex + dir + NTextureComps) % NTextureComps;
     GfuiLabelSetText(ScrHandle, TextureCompLabelId, ATextureCompTexts[NCurTextureCompIndex]);
 }
 
-// Toggle multi-texturing state enabled/disabled.
-static void changeMultiTextureState(void *vp)
+static void changeTextureCompressionLeft(void *)
 {
-    NCurMultiTextureIndex = (NCurMultiTextureIndex + (int)(long)vp + NMultiTextures) % NMultiTextures;
+    changeTextureCompressionState(-1);
+}
+
+static void changeTextureCompressionRight(void *)
+{
+    changeTextureCompressionState(1);
+}
+
+// Toggle multi-texturing state enabled/disabled.
+static void changeMultiTextureState(int dir)
+{
+    NCurMultiTextureIndex = (NCurMultiTextureIndex + dir + NMultiTextures) % NMultiTextures;
     GfuiLabelSetText(ScrHandle, MultiTextureLabelId, AMultiTextureTexts[NCurMultiTextureIndex]);
 }
 
-// Toggle multi-sampling state enabled/disabled.
-static void changeMultiSampleState(void *vp)
+static void changeMultiTextureLeft(void *)
 {
-    NCurMultiSampleIndex = (NCurMultiSampleIndex + (int)(long)vp + NMultiSamples) % NMultiSamples;
+    changeMultiTextureState(-1);
+}
+
+static void changeMultiTextureRight(void *)
+{
+    changeMultiTextureState(1);
+}
+
+// Toggle multi-sampling state enabled/disabled.
+static void changeMultiSampleState(int dir)
+{
+    NCurMultiSampleIndex = (NCurMultiSampleIndex + dir + NMultiSamples) % NMultiSamples;
     GfuiLabelSetText(ScrHandle, MultiSampleLabelId,
                      VecMultiSampleTexts[NCurMultiSampleIndex].c_str());
 }
 
+static void changeMultiSampleLeft(void *)
+{
+    changeMultiSampleState(-1);
+}
+
+static void changeMultiSampleRight(void *)
+{
+    changeMultiSampleState(1);
+}
 
 // Scroll through texture sizes smaller or equal the system limit.
-static void changeMaxTextureSizeState(void *vp)
+static void changeMaxTextureSizeState(int delta)
 {
     char valuebuf[10];
 
-    long delta = (long)vp;
     NCurMaxTextureSizeIndex += delta;
     if (NCurMaxTextureSizeIndex < 0)
     {
@@ -208,33 +236,63 @@ static void changeMaxTextureSizeState(void *vp)
     GfuiLabelSetText(ScrHandle, MaxTextureSizeLabelId, valuebuf);
 }
 
-// Toggle bumpmapping state enabled/disabled.
-static void changeBumpMappingState(void *vp)
+static void changeMaxTextureSizeLeft(void *)
 {
-    NCurBumpMappingIndex = (NCurBumpMappingIndex + (int)(long)vp + NBumpMapping) % NBumpMapping;
+    changeMaxTextureSizeState(-1);
+}
+
+static void changeMaxTextureSizeRight(void *)
+{
+    changeMaxTextureSizeState(1);
+}
+
+// Toggle bumpmapping state enabled/disabled.
+static void changeBumpMappingState(int dir)
+{
+    NCurBumpMappingIndex = (NCurBumpMappingIndex + dir + NBumpMapping) % NBumpMapping;
     GfuiLabelSetText(ScrHandle, BumpMappingLabelId, ABumpMappingTexts[NCurBumpMappingIndex]);
 }
 
-// Toggle anisotropic filtering state enabled/disabled.
-static void changeAnisotropicFilteringState(void *vp)
+static void changeBumpMappingLeft(void *)
 {
-    NCurAnisotropicFilteringIndex = (NCurAnisotropicFilteringIndex + (int)(long)vp + NAnisotropicFiltering) % NAnisotropicFiltering;
+    changeBumpMappingState(-1);
+}
+
+static void changeBumpMappingRight(void *)
+{
+    changeBumpMappingState(1);
+}
+
+// Toggle anisotropic filtering state enabled/disabled.
+static void changeAnisotropicFilteringState(int dir)
+{
+    NCurAnisotropicFilteringIndex = (NCurAnisotropicFilteringIndex + dir + NAnisotropicFiltering) % NAnisotropicFiltering;
     GfuiLabelSetText(ScrHandle, AnisotropicFilteringLabelId, AAnisotropicFilteringTexts[NCurAnisotropicFilteringIndex]);
+}
+
+static void changeAnisotropicFilteringLeft(void *)
+{
+    changeAnisotropicFilteringState(-1);
+}
+
+static void changeAnisotropicFilteringRight(void *)
+{
+    changeAnisotropicFilteringState(1);
 }
 
 /* Change the graphc engine version (but only show really available modules) */
 static void
-onChangeGraphicVersion(void *vp)
+onChangeGraphicVersion(int dir)
 {
     char buf[1024];
 
-    if (!vp)
+    if (!dir)
         return;
 
     const int oldGraphicVersion = CurGraphicScheme;
     do
     {
-        CurGraphicScheme = (CurGraphicScheme + NbGraphicScheme + (int)(long)vp) % NbGraphicScheme;
+        CurGraphicScheme = (CurGraphicScheme + NbGraphicScheme + dir) % NbGraphicScheme;
 
         snprintf(buf, sizeof(buf), "%smodules/graphic/%s%s", GfLibDir(), GraphicSchemeList[CurGraphicScheme], DLLEXT);
     }
@@ -243,7 +301,15 @@ onChangeGraphicVersion(void *vp)
     GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicDispNameList[CurGraphicScheme]);
 }
 
+static void onChangeGraphicLeft(void *)
+{
+    onChangeGraphicVersion(-1);
+}
 
+static void onChangeGraphicRight(void *)
+{
+    onChangeGraphicVersion(1);
+}
 
 static void onActivate(void * /* dummy */)
 {
@@ -459,60 +525,60 @@ void* OpenGLMenuInit(void *prevMenu)
 
     // Texture compression.
     TextureCompLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionLeftArrowButton", (void*)-1,
-                            changeTextureCompressionState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionLeftArrowButton", NULL,
+                            changeTextureCompressionLeft);
     TextureCompRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionRightArrowButton", (void*)+1,
-                            changeTextureCompressionState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionRightArrowButton", NULL,
+                            changeTextureCompressionRight);
     TextureCompLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"TextureCompressionLabel");
 
     // Texture sizing.
-    GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeLeftArrowButton", (void*)-1,
-                        changeMaxTextureSizeState);
-    GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeRightArrowButton", (void*)+1,
-                        changeMaxTextureSizeState);
+    GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeLeftArrowButton", NULL,
+                        changeMaxTextureSizeLeft);
+    GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeRightArrowButton", NULL,
+                        changeMaxTextureSizeRight);
     MaxTextureSizeLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MaxTextureSizeLabel");
 
     // Multi-texturing.
     MultiTextureLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureLeftArrowButton", (void*)-1,
-                            changeMultiTextureState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureLeftArrowButton", NULL,
+                            changeMultiTextureLeft);
     MultiTextureRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureRightArrowButton", (void*)+1,
-                            changeMultiTextureState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureRightArrowButton", NULL,
+                            changeMultiTextureRight);
     MultiTextureLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiTextureLabel");
 
     // Multi-sampling.
     MultiSampleLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleLeftArrowButton", (void*)-1,
-                            changeMultiSampleState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleLeftArrowButton", NULL,
+                            changeMultiSampleLeft);
     MultiSampleRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", (void*)+1,
-                            changeMultiSampleState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", NULL,
+                            changeMultiSampleRight);
     MultiSampleLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
 
     // Bump Mapping.
     BumpMappingLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingLeftArrowButton", (void*)-1,
-                            changeBumpMappingState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingLeftArrowButton", NULL,
+                            changeBumpMappingLeft);
     BumpMappingRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingRightArrowButton", (void*)+1,
-                            changeBumpMappingState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingRightArrowButton", NULL,
+                            changeBumpMappingRight);
     BumpMappingLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"BumpMappingLabel");
 
     // Anisotropic Filtering.
     AnisotropicFilteringLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringLeftArrowButton", (void*)-1,
-                            changeAnisotropicFilteringState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringLeftArrowButton", NULL,
+                            changeAnisotropicFilteringLeft);
     AnisotropicFilteringRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringRightArrowButton", (void*)+1,
-                            changeAnisotropicFilteringState);
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringRightArrowButton", NULL,
+                            changeAnisotropicFilteringRight);
     AnisotropicFilteringLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"AnisotropicFilteringLabel");
 
     GraphicSchemeId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "graphiclabel");
 #ifndef OFFICIAL_ONLY
-    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "graphicleftarrow", (void*)-1, onChangeGraphicVersion);
-    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "graphicrightarrow", (void*)1, onChangeGraphicVersion);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "graphicleftarrow", NULL, onChangeGraphicLeft);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "graphicrightarrow", NULL, onChangeGraphicRight);
 #endif
 
     GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"ApplyButton",NULL, onAccept);
@@ -523,9 +589,9 @@ void* OpenGLMenuInit(void *prevMenu)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeMaxTextureSizeState, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeMaxTextureSizeState, NULL);
-    GfuiAddKey(ScrHandle, ' ', "Toggle Texture Compression", (void*)1, changeTextureCompressionState, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", NULL, changeMaxTextureSizeLeft, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", NULL, changeMaxTextureSizeRight, NULL);
+    GfuiAddKey(ScrHandle, ' ', "Toggle Texture Compression", NULL, changeTextureCompressionRight, NULL);
 
     // Initialize multi-sampling levels.
     NMultiSamples = 1;

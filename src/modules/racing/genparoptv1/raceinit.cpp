@@ -136,7 +136,7 @@ ReRaceConfigure(bool bInteractive)
 
     // Enter CONFIG state and return to the race engine automaton if interactive mode.
     if (bInteractive)
-        ReStateApply((void*)RE_STATE_CONFIG);
+        ReStateApply(RE_STATE_CONFIG);
 }
 
 // Restore the race from the given results file
@@ -171,7 +171,7 @@ ReStartNewRace()
     //ReInitResults();
 
     // Enter EVENT_INIT state and return to the race engine automaton.
-    ReStateApply((void*)RE_STATE_EVENT_INIT);
+    ReStateApply(RE_STATE_EVENT_INIT);
 }
 
 // Resume the previously restored race from a results file
