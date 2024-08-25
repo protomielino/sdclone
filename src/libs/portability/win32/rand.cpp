@@ -21,7 +21,7 @@ static int ensure(HCRYPTPROV *prov)
         && !CryptAcquireContextA(prov, NULL, NULL, PROV_RSA_FULL,
             CRYPT_NEWKEYSET))
     {
-        fprintf(stderr, "CryptAcquireContextA failed with %#x\n",
+        fprintf(stderr, "CryptAcquireContextA failed with %#lx\n",
             GetLastError());
         return -1;
     }
@@ -41,7 +41,7 @@ int portability::rand(void *buf, size_t n)
     }
     else if (!CryptGenRandom(prov, n, static_cast<BYTE *>(buf)))
     {
-        fprintf(stderr, "CryptGenRandom failed with %#x\n", GetLastError());
+        fprintf(stderr, "CryptGenRandom failed with %#lx\n", GetLastError());
         goto end;
     }
 
@@ -51,7 +51,7 @@ end:
 
     if (!CryptReleaseContext(prov, 0))
     {
-        fprintf(stderr, "CryptReleaseContext failed with %#x\n",
+        fprintf(stderr, "CryptReleaseContext failed with %#lx\n",
             GetLastError());
         ret = -1;
     }
