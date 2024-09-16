@@ -62,6 +62,8 @@ rmOnRaceSelectShutdown(void *prevMenu)
 {
 	rmRaceTypes.clear();
 
+	GfuiScreenRelease(RmRaceSelectMenuHandle);
+	RmRaceSelectMenuHandle = NULL;
 	GfuiScreenActivate(prevMenu);
 
 	LmRaceEngine().cleanup();
@@ -145,9 +147,6 @@ rmOnChangeRaceMan(tComboBoxInfo *)
 void *
 RmRaceSelectInit(void *prevMenu)
 {
-	if (RmRaceSelectMenuHandle)
-		return RmRaceSelectMenuHandle;
-
 	// Ask the RaceEngine what types of races should be allowed here
 	bool SupportsHumanDrivers = LmRaceEngine().supportsHumanDrivers();
 
