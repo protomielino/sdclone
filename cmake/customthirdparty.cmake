@@ -202,16 +202,16 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 	# GLM.
 	_FIND_3RDPARTY_DEPENDENCY(GLM glm/glm.hpp.h "" "glm;libglm" ${ROOT_DIR} "")
-	
+
 	# TinyGLTF.
 	_FIND_3RDPARTY_DEPENDENCY(TINYGLTF tinygltf.h "" "gltf;libgltf" ${ROOT_DIR} "")
-	
+
 	# minizip.
 	_FIND_3RDPARTY_DEPENDENCY(MINIZIP minizip/zip.h "" "minizip;libminizip" ${ROOT_DIR} "")
-	
+
 	# cJSON.
 	_FIND_3RDPARTY_DEPENDENCY(CJSON cjson/cJSON.h "" "cjson;libcjson" ${ROOT_DIR} "")
-	
+
 ENDMACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 ################################################################################################
