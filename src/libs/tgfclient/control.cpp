@@ -2,7 +2,7 @@
 
     file        : control.cpp
     created     : Thu Mar  6 22:01:33 CET 2003
-    copyright   : (C) 2003 by Eric Espi�
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org
 
  ***************************************************************************/

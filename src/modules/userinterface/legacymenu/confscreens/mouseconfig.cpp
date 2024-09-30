@@ -2,7 +2,7 @@
 
     file        : mouseconfig.cpp
     created     : Thu Mar 13 21:27:03 CET 2003
-    copyright   : (C) 2003 by Eric Espi�
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org
 
  ***************************************************************************/

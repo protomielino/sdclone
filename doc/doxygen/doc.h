@@ -2,7 +2,7 @@
 
     file                 : torcsdoc.h
     created              : Sat Jul 27 14:24:31 CEST 2002
-    copyright            : (C) 2001 by Eric Espié
+    copyright            : (C) 2001 by Eric Espie
     email                : Eric.Espie@torcs.org
 
  ***************************************************************************/

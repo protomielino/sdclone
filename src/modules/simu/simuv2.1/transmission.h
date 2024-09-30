@@ -2,7 +2,7 @@
 
     file                 : transmission.h
     created              : Mon Apr 16 16:04:36 CEST 2001
-    copyright            : (C) 2001 by Eric Espi�
+    copyright            : (C) 2001 by Eric Espie
     email                : Eric.Espie@torcs.org
 
  ***************************************************************************/

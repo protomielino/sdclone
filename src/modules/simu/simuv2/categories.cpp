@@ -2,7 +2,7 @@
 
     file        : categories.cpp
     created     : Sun Dec 15 11:12:56 CET 2002
-    copyright   : (C) 2002 by Eric Espi�
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org
 
  ***************************************************************************/
