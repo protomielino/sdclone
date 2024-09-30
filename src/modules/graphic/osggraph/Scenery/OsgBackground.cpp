@@ -4,7 +4,6 @@
     created              : Mon Aug 21 20:13:56 CEST 2012
     copyright            : (C) 2012 Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgBackground.cpp 2436 2010-05-08 14:22:43Z torcs-ng $
 
  ***************************************************************************/
 

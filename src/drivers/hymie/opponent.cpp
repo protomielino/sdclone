@@ -3,7 +3,6 @@
     file                 : opponent.cpp
     created              : Thu Apr 22 01:20:19 CET 2003
     copyright            : (C) 2007 Andrew Sumner, 2003-2004 Bernhard Wymann
-    version              : $Id$
 
  ***************************************************************************/
 

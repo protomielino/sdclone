@@ -4,7 +4,6 @@
     created                  : Sat Jan 13 00:00:41 CEST 2013
     copyright                : (C) 2012 by Xavier Bertaux
     email                    : bertauxx@yahoo.fr
-    version                  : $Id: OsgColor.h 4693 2013-01-12 03:12:09Z torcs-ng $
 
  ***************************************************************************/
 

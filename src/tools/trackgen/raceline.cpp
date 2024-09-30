@@ -4,7 +4,6 @@
     created              : Tue Sep 4 09:54:50 CEST 2012
     copyright            : (C) 2012 by Bernhard Wymann, Remi Coulom
     email                : berniw@bluewin.ch
-    version              : $Id$
 
  ***************************************************************************/
 

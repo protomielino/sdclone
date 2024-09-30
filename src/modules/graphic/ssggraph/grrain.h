@@ -3,7 +3,6 @@
     file                 : grrain.h
     created              : March 2009
     copyright            : (C) 2009 Xavier Bertaux
-    version              : $Id$
 
 ***************************************************************************/
 

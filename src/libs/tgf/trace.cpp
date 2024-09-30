@@ -4,7 +4,6 @@
     created              : Fri Aug 13 22:32:45 CEST 1999
     copyright            : (C) 2010, 2013 by Jean-Philippe Meuret
     web                  : www.speed-dreams.org
-    version              : $Id$
 
 ***************************************************************************/
 

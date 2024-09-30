@@ -3,7 +3,6 @@
  file        : ac3dload.cpp
  created     : Fri Apr 18 23:00:28 CEST 2003
  copyright   : (C) 2003 by Christophe Guionneau
- version     : $Id$
 
  ***************************************************************************/
 

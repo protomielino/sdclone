@@ -4,7 +4,6 @@
     created              : Sun May  13 16:30:25 CEST 2012
     copyright            : (C) 2012 by Xavier Bertaux
     email                :  bertauxx@yahoo.fr
-    version              : $Id: advancedgraphconfig.cpp 4542 2012-05-13 17:24:29Z torcs-ng $
 
  ***************************************************************************/
 

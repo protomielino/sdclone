@@ -3,7 +3,6 @@
  file        : accc.h
  created     : Fri Apr 18 23:09:53 CEST 2003
  copyright   : (C) 2003 by Christophe Guionneau
- version     : $Id$
 
  ***************************************************************************/
 

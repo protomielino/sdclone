@@ -3,7 +3,6 @@
     file                 : grsmoke.cpp
     created              : Fri Mar 22 23:17:54 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id$
 
 ***************************************************************************/
 

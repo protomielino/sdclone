@@ -3,7 +3,6 @@
     file        : grMoonpos.cpp
     copyright   : (C) 2012 by Xavier Bertaux (based on simgear code)
     web         : http://www.speed-dreams.org
-    version     : $Id: grSphere.h 3162 2012-07-05 13:11:22Z torcs-ng $
 
  ***************************************************************************/
 

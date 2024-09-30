@@ -4,7 +4,6 @@
     created                  : Wen Mar 27 00:00:41 CEST 2013
     copyright                : (C)2013 by Xavier Bertaux
     email                    : bertauxx@yahoo.fr
-    version                  : $Id: OsgCloud.h 4693 2013-03-27 03:12:09Z torcs-ng $
 
  ***************************************************************************/
 

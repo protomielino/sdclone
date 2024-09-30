@@ -3,7 +3,6 @@
     created              : Tue Jul 18 19:57:35 CEST 2011
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id$
 
 ***************************************************************************/
 

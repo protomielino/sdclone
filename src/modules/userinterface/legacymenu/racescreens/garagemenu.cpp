@@ -4,7 +4,6 @@
     created              : December 2009
     copyright            : (C) 2009 Brian Gavin, 2010 Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
-    version              : $Id$
 
  ***************************************************************************/
 

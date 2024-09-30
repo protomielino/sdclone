@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:09:06 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: wheel.cpp 4983 2012-10-07 13:53:17Z pouillot $
 
  ***************************************************************************/
 

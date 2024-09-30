@@ -3,7 +3,6 @@
     file        : racenetwork.h
     copyright   : (C) 2009 by Brian Gavin
     web         : www.speed-dreams.org
-    version     : $Id$
 
  ***************************************************************************/
 

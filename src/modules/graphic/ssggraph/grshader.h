@@ -3,7 +3,6 @@
     file                 : grshader.h
     created              : Fri Oct 10 23:16:44 CET 2015
     copyright            : (C) 2015 by Xavier Bertaux
-    version              : $Id: grshader.h 4374 2015-10-10 23:20:37Z torcs-ng $
 
  ***************************************************************************/
 

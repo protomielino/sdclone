@@ -5,7 +5,6 @@
     copyright	: (C) 2001-2005 by Christophe Guionneau
                                  Christos Dimitrakakis
                                  Bernhard Wymann
-    version		: $Id$
 
  ***************************************************************************/
 

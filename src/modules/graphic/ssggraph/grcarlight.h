@@ -3,7 +3,6 @@
     file        : grcarlight.h
     created     : Sun Oct 26 15:15:11 CET 2003
     copyright   : (C) 2003 by Christophe Guionneau
-    version     : $Id$
 
  ***************************************************************************/
 

@@ -3,7 +3,6 @@
 #   file        : macros.cmake
 #   copyright   : (C) 2008 by Mart Kelder
 #   web         : www.speed-dreams.org
-#   version     : $Id$
 #
 ############################################################################
 

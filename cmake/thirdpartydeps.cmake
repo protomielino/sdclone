@@ -3,7 +3,6 @@
 #   file        : thirdpartydeps.cmake
 #   copyright   : (C) 2008 by Mart Kelder, 2010 by J.-P. Meuret
 #   web         : www.speed-dreams.org
-#   version     : $Id$
 #
 ############################################################################
 

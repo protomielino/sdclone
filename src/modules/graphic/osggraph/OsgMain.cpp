@@ -4,7 +4,6 @@
     created              : Thu Aug 17 23:23:49 CEST 2000
     copyright            : (C)2013 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgMain.cpp 4712 2012-05-10 06:02:49Z mungewell $
 
  ***************************************************************************/
 

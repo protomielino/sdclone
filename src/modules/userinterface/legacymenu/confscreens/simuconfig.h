@@ -4,7 +4,6 @@
     created     : Wed Nov  3 21:48:57 CET 2004
     copyright   : (C) 2004 by Eric Espié
     email       : eric.espie@free.fr
-    version     : $Id$
 
  ***************************************************************************/
 

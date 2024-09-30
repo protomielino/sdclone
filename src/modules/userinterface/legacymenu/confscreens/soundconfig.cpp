@@ -4,7 +4,6 @@
     created     : Thu Dec 12 15:12:07 CET 2004
     copyright   : (C) 2004 Eric Espi�, Bernhard Wymann, baseed on simuconfig.cpp
     email       : berniw@bluewin.ch
-    version     : $Id$
 
  ***************************************************************************/
 

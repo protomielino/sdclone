@@ -3,7 +3,6 @@
     file                 : grsimplestate.cpp
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id$
 
 ***************************************************************************/
 

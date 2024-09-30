@@ -3,7 +3,6 @@
     file                 : driver.h
     created              : Thu Dec 20 01:20:19 CET 2002
     copyright            : (C) 2007 Andrew Sumner, 2004 Remi Coulom, 2002-2004 Bernhard Wymann
-    version              : $Id$
 
  ***************************************************************************/
 

@@ -4,7 +4,6 @@
     created              : Thu Aug 17 23:19:19 CEST 2000
     copyright            : (C) 2012 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: osggraph.cpp 3741 2011-07-21 22:29:34Z torcs-ng $
 
  ***************************************************************************/
 

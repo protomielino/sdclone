@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:09:18 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: wheel.h 3087 2010-11-03 23:42:34Z kakukri $
 
  ***************************************************************************/
 

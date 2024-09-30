@@ -5,7 +5,6 @@
 #    created              : June 22 2020
 #    copyright            : (C) 2020 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id:  $
 #
 #==============================================================================
 #

@@ -5,7 +5,6 @@
     created              : Mon Aug 21 18:24:02 CEST 2012
     copyright            : (C)2012 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id$
 
 ***************************************************************************/
 

@@ -4,7 +4,6 @@
     copyright   : (C) 2011 by Jean-Philippe Meuret
                   (C) 2013 by Wolf-Dieter Beelitz
     email       : pouillot@users.sourceforge.net
-    version     : $Id: simuv4.h 4903 2012-08-27 11:31:33Z kmetykog $
 
  ***************************************************************************/
 

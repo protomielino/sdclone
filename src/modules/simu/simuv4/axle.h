@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:05:17 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: axle.h 2917 2010-10-17 19:03:40Z pouillot $
 
  ***************************************************************************/
 

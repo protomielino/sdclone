@@ -4,7 +4,6 @@
     created              : Wed Apr 20 18:31:16 CET 2020
     copyright            : (C) 2002-2020 Andrew Sumner
     email                : bertauxx@gmail.com
-    version              : $Id: axiom.cpp 6636 2020-04-20 12:27:06Z torcs-ng $
 
  ***************************************************************************/
 

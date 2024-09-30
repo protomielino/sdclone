@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:08:04 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simuv4.cpp 3568 2011-05-15 15:55:24Z pouillot $
 
  ***************************************************************************/
 

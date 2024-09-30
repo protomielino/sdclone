@@ -4,7 +4,6 @@
     created     : Sat Dec  26 12:00:00 CET 2009
 	copyright   : (C) 2009 The Speed Dreams Team
 	web         : speed-dreams.sourceforge.net
-    version     : $Id$
 
  ***************************************************************************/
 

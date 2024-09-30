@@ -4,7 +4,6 @@
     created              : Sun Sep 07 20:13:56 CEST 2014
     copyright            : (C)2014 Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgPit.cpp 2436 2014-09-07 14:22:43Z torcs-ng $
 
  ***************************************************************************/
 

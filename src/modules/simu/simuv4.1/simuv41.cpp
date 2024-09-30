@@ -5,7 +5,6 @@
     copyright            : (C) 2000 by Eric Espie
     					   (C) 2023 by Xavier Bertaux
     email                : bertauxx@gmail.com
-    version              : $Id: simuv41.cpp 3568 2011-05-15 15:55:24Z pouillot $
 
  ***************************************************************************/
 

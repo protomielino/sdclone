@@ -3,7 +3,6 @@
  file        : ac3dgroup.cpp
  created     : Fri Apr 18 23:11:36 CEST 2003
  copyright   : (C) 2003 by Christophe Guionneau
- version     : $Id$
 
  ***************************************************************************/
 

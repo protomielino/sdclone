@@ -4,7 +4,6 @@
     created              : Sun Feb 25 00:34:46 2001
     copyright            : (C) 2000 by Eric Espie (C) 2014 by Wolf-Dieter Beelitz
     email                : eric.espie@torcs.org
-    version              : $Id: raceoptimization.cpp 4361 2012-01-07 14:05:16Z pouillot $
 
  ***************************************************************************/
 

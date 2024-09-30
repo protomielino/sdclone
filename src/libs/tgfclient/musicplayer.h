@@ -7,7 +7,6 @@
     created              : Fri Dec 23 17:35:18 CET 2011
     copyright            : (C) 2011 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id$
 
  ***************************************************************************/
 

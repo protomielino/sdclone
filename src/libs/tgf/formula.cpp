@@ -4,7 +4,6 @@
     copyright            : (C) 2009 by Mart Kelder
     web                  : http://speed-dreams.sourceforge.net
     web                  : speed-dreams.sourceforge.net
-    version              : $Id$
 
  ***************************************************************************/
 

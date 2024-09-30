@@ -4,7 +4,6 @@
     created              : Sun Oct 05 20:13:56 CEST 2014
     copyright            : (C) 2014 Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgTrackLight.cpp 2436 2014-10-05 20:22:43Z torcs-ng $
 
  ***************************************************************************/
 

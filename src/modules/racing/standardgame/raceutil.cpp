@@ -4,7 +4,6 @@
     created     : Sat Nov 16 12:13:31 CET 2006
     copyright   : (C) 2006 Mart Kelder
     email       : mart@kelder31.nl
-    version     : $Id$
 
  ***************************************************************************/
 

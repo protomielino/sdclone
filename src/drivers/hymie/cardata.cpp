@@ -4,7 +4,6 @@
     created              : Thu Sep 23 12:31:37 CET 2004
     copyright            : (C) 2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id$
 
  ***************************************************************************/
 

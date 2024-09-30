@@ -4,7 +4,6 @@
     created              : Sun Aug 02 22:54:56 CET 2012
     copyright            : (C) 1997  Durk Talsma - (C)2012 Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: jupiter.h 4811 2012-07-29 17:16:37Z torcs-ng $
 
  ****************************************************************************/
 

@@ -4,7 +4,6 @@
     created              : Mon Dec 31 10:24:02 CEST 2012
     copyright            : (C)201 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id$
 
 ***************************************************************************/
 

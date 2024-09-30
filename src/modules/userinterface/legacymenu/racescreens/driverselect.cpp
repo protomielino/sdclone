@@ -4,7 +4,6 @@
     created              : Mon Aug 16 20:40:44 CEST 1999
     copyright            : (C) 1999 by Eric Espie, 2009 Jean-Philippe Meuret
     email                : torcs@free.fr
-    version              : $Id$
 
 ***************************************************************************/
 

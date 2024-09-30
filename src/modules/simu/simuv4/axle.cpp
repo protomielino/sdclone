@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:05:09 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: axle.cpp 3948 2011-10-08 07:27:25Z wdbee $
 
  ***************************************************************************/
 

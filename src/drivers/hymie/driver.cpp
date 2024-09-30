@@ -4,7 +4,6 @@
     created              : Thu Dec 20 01:21:49 CET 2002
     copyright            : (c) 2005-2006 Andrew Sumner, 2000 Remi Coulom, 2004 Bernhard Wymann
     email                : andrew@onepixel.com.au
-    version              : $Id$
 
  ***************************************************************************/
 

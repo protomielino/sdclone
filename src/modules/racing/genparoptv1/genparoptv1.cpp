@@ -3,7 +3,6 @@
     file        : genparoptv1.cpp
     copyright   : (C) 2012 by Wolf-Dieter Beelitz
     email       : pouillot@users.sourceforge.net
-    version     : $Id$
 
  ***************************************************************************/
 

@@ -3,7 +3,6 @@
     file        : simuv21.h
     copyright   : (C) 2011 by Jean-Philippe Meuret
     email       : pouillot@users.sourceforge.net
-    version     : $Id$
 
  ***************************************************************************/
 

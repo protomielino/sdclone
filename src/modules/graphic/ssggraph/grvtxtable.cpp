@@ -3,7 +3,6 @@
     file                 : grvtxtable.cpp
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id$
 
  ***************************************************************************/
 

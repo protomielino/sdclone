@@ -3,7 +3,6 @@
     file        : standardgame.cpp
     copyright   : (C) 2010 by Jean-Philippe Meuret
     email       : pouillot@users.sourceforge.net
-    version     : $Id$
 
  ***************************************************************************/
 

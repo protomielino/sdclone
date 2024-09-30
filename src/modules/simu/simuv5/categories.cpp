@@ -4,7 +4,6 @@
     created     : Sun Dec 15 11:12:56 CET 2002
     copyright   : (C) 2002 by Eric Espi�
     email       : eric.espie@torcs.org
-    version     : $Id: categories.cpp 4029 2011-11-01 19:40:49Z kakukri $
 
  ***************************************************************************/
 

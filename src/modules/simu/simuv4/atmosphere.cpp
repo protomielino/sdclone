@@ -4,7 +4,6 @@
     created              : Sun Feb 12 17:37:50 CET 2017
     copyright            : (C) 2017-2017 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: atmosphere.cpp,v 1.1.2.1 2017/02/12 17:52:38 berniw Exp $
 
  ***************************************************************************/
 

@@ -3,7 +3,6 @@
     file        : OsgGraph.h
     copyright   : (C) 2012 by Xavier Bertaux
     email       : bertauxx@yahoo.fr
-    version     : $Id: OsgGraph.h 3741 2011-07-21 22:29:34Z torcs-ng $
 
  ***************************************************************************/
 

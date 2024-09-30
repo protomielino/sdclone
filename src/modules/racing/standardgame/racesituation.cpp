@@ -3,7 +3,6 @@
     file        : racesituation.cpp
     copyright   : (C) 2010 by Jean-Philippe Meuret
     web         : www.speed-dreams.org
-    version     : $Id$
 
  ***************************************************************************/
 

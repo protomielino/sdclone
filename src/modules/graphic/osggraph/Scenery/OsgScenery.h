@@ -4,7 +4,6 @@
     created              : Mon Aug 21 20:09:40 CEST 2012
     copyright            : (C) 2012 Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgScenery.h 1813 2012-11-10 13:45:43Z torcs-ng $
 
  ***************************************************************************/
 

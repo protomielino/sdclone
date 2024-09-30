@@ -3,7 +3,6 @@
     file        : main.cpp
     created     : Tue Jul 29 19:45:27 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau
-    version     : $Id$
 
  ***************************************************************************/
 

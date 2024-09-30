@@ -5,7 +5,6 @@
     Original Location    : http://www-dinma.univ.trieste.it/~nirftc/research/easymesh/easymesh.html
     modified             : Eric Espie (eric.espie@torcs.org)
     copyright            : Bojan NICENO & Eric Espie (parts)
-    version              : $Id$
 
  ************************************************************************************************/
 

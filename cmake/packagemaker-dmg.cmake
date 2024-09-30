@@ -4,7 +4,6 @@
 #   copyright   : (C) 2020 Joe Thompson
 #   email       : beaglejoe@users.sourceforge.net
 #   web         : www.speed-dreams.org
-#   version     : $Id:$
 #
 #==============================================================================
 #

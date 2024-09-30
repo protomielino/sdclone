@@ -4,7 +4,6 @@
     created                  : Wen Nov 13 15:52:56 UTC 2019
     .........                : ... 2019 by Ivan Mahonin
     email                    : bh@icystar.com
-    version                  : $Id$
 
  ***************************************************************************/
 

@@ -3,7 +3,6 @@
     created              : Sat Mar 18 23:16:38 CET 2006
     copyright            : (C) 2006 by Tim Foden, 2015 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: AverageData.cpp 6004 2015-05-09 21:03:25Z torcs-ng $
 
  ***************************************************************************/
 

@@ -4,7 +4,6 @@
     created              : Mon Aug 21 18:24:02 CEST 2012
     copyright            : (C)2012 by Gaétan André, (C)2014 Xavier Bertaux
     email                : gaetan.andre@gmail.com
-    version              : $Id$
 
 ***************************************************************************/
 

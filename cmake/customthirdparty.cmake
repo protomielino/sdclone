@@ -3,7 +3,6 @@
 #   file        : FindCustom3rdParty.cmake
 #   copyright   : (C) 2009 by Brian Gavin, 2012 Jean-Philippe Meuret
 #   web         : www.speed-dreams.org
-#   version     : $Id$
 #
 ############################################################################
 

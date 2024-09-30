@@ -3,7 +3,6 @@
     file        : grSky.h
     copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
     web         : http://www.speed-dreams.org
-    version     : $Id$
 
  ***************************************************************************/
 

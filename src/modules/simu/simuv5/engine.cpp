@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:06:55 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: engine.cpp 4786 2012-07-01 18:26:31Z kakukri $
 
 ***************************************************************************/
 

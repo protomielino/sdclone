@@ -4,7 +4,6 @@
     created              : Thu Sep 15 15:23:49 CEST 2015
     copyright            : (C)2015 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
-    version              : $Id: OsgGraphicsWindows.cpp 6125 2015-09-15 06:02:49Z torcs-ng $
 
  ***************************************************************************/
 

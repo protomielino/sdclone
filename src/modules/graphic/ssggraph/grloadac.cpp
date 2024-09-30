@@ -3,7 +3,6 @@
     file                 : grloadac.cpp
     copyright            : (C) 2000 by Eric Espie
     web                  : www.speed-dreams.org
-    version              : $Id$
 
  ***************************************************************************/
 

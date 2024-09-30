@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:07:19 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: transmission.cpp 4985 2012-10-07 16:15:40Z pouillot $
 
 ***************************************************************************/
 

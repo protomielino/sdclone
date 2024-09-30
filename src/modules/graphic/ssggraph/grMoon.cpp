@@ -3,7 +3,6 @@
     file        : grMoon.cpp
     copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
     web         : http://www.speed-dreams.org
-    version     : $Id: grSky.cpp 3162 2010-12-05 13:11:22Z pouillot $
 
  ***************************************************************************/
 

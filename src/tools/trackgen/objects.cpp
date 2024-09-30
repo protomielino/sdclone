@@ -4,7 +4,6 @@
     created              : Fri May 24 20:09:20 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id$
 
  ***************************************************************************/
 

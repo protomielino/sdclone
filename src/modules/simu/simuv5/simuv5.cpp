@@ -4,7 +4,6 @@
     created              : Sun Mar 19 00:08:04 CET 2000
     copyright            : (C) 2023 Xavier Bertaux
     email                : bertauxx@gmail.com
-    version              : $Id: simuv5.cpp 3568 2011-05-15 15:55:24Z torcs-ng $
 
  ***************************************************************************/
 

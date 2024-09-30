@@ -3,7 +3,6 @@
     file                 : hymie.cpp
     created              : Wed Jan 8 18:31:16 CET 2003
     copyright            : (C) 2007 Andrew Sumner, 2002-2004 Bernhard Wymann
-    version              : $Id$
 
  ***************************************************************************/
 

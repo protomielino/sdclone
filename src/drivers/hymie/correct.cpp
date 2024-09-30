@@ -3,7 +3,6 @@
     file                 : correct.cpp
     created              : Wed Mai 14 20:10:00 CET 2003
     copyright            : (C) 2007 Andrew Sumner
-    version              : $Id$
 
  ***************************************************************************/
 

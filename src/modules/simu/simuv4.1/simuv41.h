@@ -5,7 +5,6 @@
                   (C) 2013 by Wolf-Dieter Beelitz
                   (C) 2023 by Xavier Bertaux
     email       : bertauxx@gmail.com
-    version     : $Id: simuv41.h 4903 2012-08-27 11:31:33Z kmetykog $
 
  ***************************************************************************/
 
