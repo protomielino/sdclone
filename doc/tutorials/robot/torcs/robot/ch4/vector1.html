@@ -3,7 +3,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -36,16 +35,16 @@ Free Documentation License".
           we try to compute the steer angle or distances and angles to other cars in the later chapters.
 		  After that we improve the steering of the car and reduce the lap times. We will do it this time
 		  with a more heuristic approach, because the other methods are not that easy to implement. At the
-		  end of this chapter we will discuss some other methods for finding a path around the track.   
+		  end of this chapter we will discuss some other methods for finding a path around the track.
 		</p>
-		
+
         <h3>Implementation</h3>
         <p>
 		  I will simply show you the vector class "v2d" here. Look up the implementation for
 		  details. We implement operators for vector addition, subtraction, negation, multiplication
 		  with a scalar and the dot product. Further we want also be able to normalize the vector, to
 		  rotate it around a center and to get it's length. Put the following code in a new file called
-		  linalg.h.  
+		  linalg.h.
 		</p>
 
         <p>

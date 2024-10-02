@@ -2,7 +2,6 @@
 ;        Windows NSIS configuration file for the base=main=minimal=core installer
 ;
 ;        copyright  : (C) 2005 Bernhard Wymann, 2009-2012 Xavier Bertaux, Jean-Philippe Meuret
-;        $Id: speed-dreams.nsi 1855 2009-11-21 17:01:00Z pouillot $
 ;
 ;        This program is free software; you can redistribute it and/or modify
 ;        it under the terms of the GNU General Public License as published by
@@ -508,4 +507,3 @@ Function un.onUninstSuccess
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully uninstalled."
 
 FunctionEnd
-

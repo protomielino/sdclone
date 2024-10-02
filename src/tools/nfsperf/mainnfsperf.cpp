@@ -1,9 +1,8 @@
 /***************************************************************************
     file        : nfsperf.cpp
     created     : Tue Aug  5 23:20:23 CEST 2003
-    copyright   : (C) 2003 by Eric Espié
+    copyright   : (C) 2003 by Eric Espiï¿½
     email       : eric.espie@torcs.org
-    version     : $Id$
  ***************************************************************************/
 /***************************************************************************
  *                                                                         *
@@ -15,7 +14,6 @@
  ***************************************************************************/
 /** @file
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <portability.h>

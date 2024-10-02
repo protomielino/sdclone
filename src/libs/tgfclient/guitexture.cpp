@@ -4,7 +4,6 @@
     created              : Tue Aug 17 20:13:08 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,7 +19,6 @@
     		Images manipulation tools.
 		Load and store png images with easy interface.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	img
 */
 

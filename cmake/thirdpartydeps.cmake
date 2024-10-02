@@ -17,7 +17,6 @@
 
 # @file     3rd party dependencies (include and libs)
 # @author   Mart Kelder, J.-P. Meuret
-# @version  $Id$
 
 MACRO(ADD_SQLITE3_INCLUDEDIR)
 

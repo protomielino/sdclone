@@ -4,7 +4,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -41,37 +40,37 @@ Free Documentation License".
 		  the test runs in the practice mode, set laps to 2 and display to normal so that you
 		  can analyse the behaviour. You will need to edit the file "0/practice/g-track-3.xml"
 		  (relative to the <span style="color:red;">bt</span> directory). To deploy the changed
-		  setup you have to run "make install" from the directory "0/practice". 
+		  setup you have to run "make install" from the directory "0/practice".
 		</p>
-		
+
 		<h3>Test Drive 1</h3>
 		<p>
 		  First we run a test without any changes. The lap time is 1:08:86.
 		</p>
-		
+
 		<table class="thumbnail">
 		  <tr>
-			<td class="thumbnail">			
+			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot1.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326115625.jpg" 
+				<img src="images/tn/torcs-20030326115625.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
-			<td class="thumbnail">			
+			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot2.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326115631.jpg" 
+				<img src="images/tn/torcs-20030326115631.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
 			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot3.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326115642.jpg" 
+				<img src="images/tn/torcs-20030326115642.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
 			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot4.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326115748.jpg" 
+				<img src="images/tn/torcs-20030326115748.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
@@ -91,11 +90,11 @@ Free Documentation License".
 			</td>
 		  </tr>
 		</table>
-		
+
 		<p>
-		  You can see on picture 1 the heavy understeering of the car in this narrow turn. It 
+		  You can see on picture 1 the heavy understeering of the car in this narrow turn. It
 		  happens in
-		  the acceleration part of it, so we can conclude that the "Limited Slip" 
+		  the acceleration part of it, so we can conclude that the "Limited Slip"
 		  differential on the
 		  driven rear wheels disallows us to pass the turn. So we will set the differential to
 		  type "Free".
@@ -119,35 +118,35 @@ Free Documentation License".
 		  </ul>
 		</p>
 
-						
+
 		<h3>Test Drive 2</h3>
 		<p>
 		  The resulting lap time is 1:07:85, that's 1.01 seconds faster than the previous result.
 		</p>
-		
+
 		<table class="thumbnail">
 		  <tr>
-			<td class="thumbnail">			
+			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot5.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326161354.jpg" 
+				<img src="images/tn/torcs-20030326161354.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
-			<td class="thumbnail">			
+			<td class="thumbnail">
 			  <a			  href="javascript:changetwoframes('images/shot6.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326161422.jpg" 
+				<img src="images/tn/torcs-20030326161422.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
 			<td class="thumbnail">
 			  <a  href="javascript:changetwoframes('images/shot7.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326161428.jpg" 
+				<img src="images/tn/torcs-20030326161428.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
 			<td class="thumbnail">
 			  <a href="javascript:changetwoframes('images/shot8.html','content','navigation/backcarsetup.html','navigation')">
-				<img src="images/tn/torcs-20030326161440.jpg" 
+				<img src="images/tn/torcs-20030326161440.jpg"
 				  border="0" width="150" height="112"/>
 			  </a>
 			</td>
@@ -173,9 +172,9 @@ Free Documentation License".
 		  trouble. But we face a new problem on the next turn like you can see on the pictures
 		  6, 7 and 8. If you watch the practice session carefully you can observe that the
 		  reason for this are locking front wheels. We can conclude that we have to move
-		  the braking balance toward the rear wheels and to reduce the pressure. 
+		  the braking balance toward the rear wheels and to reduce the pressure.
 		</p>
-		<p>  
+		<p>
 		  <ul>
 		    <li>Set the brakes "front-rear brake repartition" to 0.47.</li>
 			<li>Set the "max pressure" to 9000.</li>
@@ -186,7 +185,7 @@ Free Documentation License".
 		<p>
 		  The resulting lap time is 1:07:03, that's 1.83 seconds faster than the first result.
 		  The car stays now quite good on the track so you can start the refinement of the setup.
-		  After I changed the gearbox, suspension, brake and rear wing settings I got finally a 
+		  After I changed the gearbox, suspension, brake and rear wing settings I got finally a
 		  1:05:95, that's
 		  2.88 seconds faster than the default setup. Play now with different values to get a
 		  feeling for the settings. An approach to find the optimal values is:
@@ -205,17 +204,17 @@ Free Documentation License".
 			<li>Finally copy the setup to the right directory.</li>
 		  </ol>
 		</p>
-		<p> 
+		<p>
 		  You have also to keep an eye on the damage you get per lap. Because you drive just a few
 		  laps in the qualifying it doesn't matter if you get some damage. But for long races it
 		  can be a problem. Damage causes additional drag and if it reaches a certain limit your
 		  car is not able to drive further.
 		</p>
-		
+
 		<h3>Downloads</h3>
         <p>
           In case you got lost, you can <a href="../download/bt56.tar.gz">download</a> my robot for TORCS 1.2.0 or later.
-        </p> 
+        </p>
 
 		<h3>Feedback</h3>
         <p>
@@ -225,7 +224,7 @@ Free Documentation License".
           also spelling, grammar, math and code corrections. Thank you for the feedback.
         </p>
 
-		
+
 		<h3>Summary</h3>
         <ul style="list-style-type:disk; color:black;">
            <li>You know how to setup the car.</li>

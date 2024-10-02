@@ -1,5 +1,4 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: SimulationOptions.h 8084 2022-03-22 23:18:49Z iobyte $ */
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

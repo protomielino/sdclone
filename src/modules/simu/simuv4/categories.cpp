@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: categories.cpp 4029 2011-11-01 19:40:49Z kakukri $
 */
 
 #include <cstdio>

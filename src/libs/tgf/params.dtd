@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-                          Definitions for params files                                
+<!--
+                          Definitions for params files
     file                 : params.dtd
     created              : Fri Aug 13 22:29:02 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id: params.dtd,v 1.3 2002/11/16 07:20:36 torcs Exp $                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
 -->
 
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -27,7 +26,7 @@
 >
 
 <!ELEMENT attnum EMPTY>
-<!ATTLIST attnum 
+<!ATTLIST attnum
           name CDATA #REQUIRED
 	  min  CDATA #IMPLIED
 	  max  CDATA #IMPLIED
@@ -36,13 +35,8 @@
 >
 
 <!ELEMENT attstr EMPTY>
-<!ATTLIST attstr 
+<!ATTLIST attstr
           name CDATA #REQUIRED
 	  in   CDATA #IMPLIED
           val  CDATA #REQUIRED
 >
-
-
-
-
-

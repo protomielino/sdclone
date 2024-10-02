@@ -19,7 +19,6 @@
 /** @file
     		Human control (joystick, mouse and keyboard).
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
     @ingroup	ctrl
 */
 

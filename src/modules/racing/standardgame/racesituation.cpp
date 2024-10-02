@@ -18,7 +18,6 @@
 /** @file
             The central raceman data structure (situation + other race infos)
     @author	    Jean-Philippe Meuret
-    @version	$Id$
 */
 
 #include <cstdlib>

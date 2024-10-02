@@ -4,7 +4,6 @@
     created              : Mon Mar 7 19:32:14 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +17,6 @@
 
 /** @file
     	Interface for any race engine
-    @version	$Id$
 */
 
 #ifndef __IRACEENGINE__H__

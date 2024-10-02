@@ -18,7 +18,6 @@
 /** @file
 
     @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
-    @version    $Id$
 */
 
 #ifndef _LEARNING_H_

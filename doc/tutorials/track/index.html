@@ -3,7 +3,6 @@
 <!--
 copyright   : (C) 2005 Christos Dimitrakakis
 email       : dimitrak@idiap.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -107,7 +106,7 @@ The maximum and mimimum altitude specify what the altitude corresponding to the 
 
 <H2>Other .xml attrributes</h2>
 	<H3>group size</h3>
-	
+
 	<P>The group size is used to split the terrain in smaller objects to help
 	  the scene graph make his job. If all the terrain is done in one object,
 	  it will never be culled and performance will be awful. This is done
@@ -122,22 +121,22 @@ The maximum and mimimum altitude specify what the altitude corresponding to the 
 	  mesh, thus possibly resulting in a better mesh.  If a
 	  &lt;track&gt;-relief.ac file exists in the directory it will be used for the
 	  terrain generation by trackgen.
-	  
+
 	<P>You can use additional ac3d files (see e-track-6-relief.ac in the sources)
 	  initially for setting altitude on the terrain but as the points
 	  are used in the generated mesh, it can be useful to give better mesh.
-                                                                                
+
 	<P>If a &lt;track&gt;-relief.ac file exists in the directory it
 	  will be used for the terrain generation by trackgen.
-	  
+
 	<P>The mesh generator stops on closed polys, so if you want a hole in the mesh,
 	  you can draw closed polys, else you draw lines and they participate to the
 	  mesh.
-                                                                                
+
 	<P>If you supply the external border in the "relief" file, you can used
 	  the trackgen option "-B" to use it as external border instead of generating
 	  the default rectangular border.
-                                                                                
+
 	<P>Lastly, you have to set properties to your lines and polys in the
 	  "relief" files : "internal" for the inner mesh and "external" for outer
 	  mesh.

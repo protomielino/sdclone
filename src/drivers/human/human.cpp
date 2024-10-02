@@ -18,7 +18,6 @@
 /** @file
 
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 /* 2013/3/21 Tom Low-Shang

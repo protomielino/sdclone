@@ -18,7 +18,6 @@
 
 /** @file
              Open GL options menu
-    @version	$Id$
 */
 
 #include <cstdio>

@@ -20,7 +20,6 @@
     		Pit menu for human drivers
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <cstdlib>

@@ -19,7 +19,6 @@
 /** @file
                 This is the race information structures.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	raceinfo
 */
 

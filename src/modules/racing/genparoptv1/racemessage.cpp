@@ -19,7 +19,6 @@
 /** @file
     		Race message management. Don't use directly, call ReSituation::setRaceMessage.
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <limits>

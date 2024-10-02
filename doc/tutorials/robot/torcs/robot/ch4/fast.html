@@ -3,7 +3,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -38,47 +37,47 @@ Free Documentation License".
 		  heuristic approximation we take first the turns outside radius. Further we divide the radius
 		  by the square root of the remaining angle of the turn (remember, this is a heuristic!). This
 		  will lead to a problem, but we will fix that later.
-		  An interesting feature of this approach is the growing acceleration toward the end of a turn. 
+		  An interesting feature of this approach is the growing acceleration toward the end of a turn.
 		</p>
-		
+
         <h3>Implementation</h3>
         <p>
 		  Replace getAllowedSpeed in driver.cpp with the following version:
 		</p>
-		
+
 		<p><pre class="lcolor">/* Compute the allowed speed on a segment */
 float Driver::getAllowedSpeed(tTrackSeg *segment)
 {
     if (segment-&gt;type == TR_STR) {
         return FLT_MAX;
     } else {</pre></p>
-	
+
 		<p>
 		  No changes so far. In the next part we compute the remaining angle (arc) of the turn. We
 		  need a loop because large turns can be composed from a lot of small turns.
 		</p>
-        
+
 		<p><pre class="lcolor">        float arc = 0.0;
         tTrackSeg *s = segment;
-        
+
         while (s-&gt;type == segment->type && arc &lt; PI/2.0) {
             arc += s-&gt;arc;
             s = s-&gt;next;
         }</pre></p>
-		
+
 		<p>
 		  Because we divide the radius by this angle it makes no sense to have values greater than 1.0,
 		  so we normalize it.
 		</p>
-        
+
 		<p><pre class="lcolor">        arc /= PI/2.0;
         float mu = segment->surface->kFriction;</pre>
 		</p>
-		
+
 		<p>
 		  Compute the magic radius.
 		</p>
-		
+
         <p><pre class="lcolor">        float r = (segment->radius + segment->width/2.0)/sqrt(arc);
         return sqrt((mu*G*r)/(1.0 - MIN(1.0, r*CA*mu/mass)));
     }

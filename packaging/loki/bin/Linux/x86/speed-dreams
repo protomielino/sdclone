@@ -7,7 +7,6 @@
 #    created              : Sat Sep 11 20:20:04 CEST 1999
 #    copyright            : (C) 1999 by Eric Espie
 #    email                : torcs@free.fr
-#    version              : $Id: speed-dreams.in,v 1.5.2.1 2008/06/01 20:19:38 berniw Exp $
 #
 ##############################################################################
 #
@@ -102,5 +101,3 @@ EOF
 fi
 
 echo "Speed Dreams location not found"
-	
-	

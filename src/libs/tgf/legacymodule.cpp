@@ -4,7 +4,6 @@
     created              : Fri Aug 13 22:25:53 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -49,7 +48,6 @@
 		<br>
 		<br>This API is not used for shared libraries linked statically at compilation time.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	module
 */
 #include "tgf.h"

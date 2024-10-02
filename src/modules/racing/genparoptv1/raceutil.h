@@ -19,7 +19,6 @@
 /** @file
     		Useful functions for race engine
     @author	<a href=mailto:mart@kelder31.nl>Mart Kelder</a>
-    @version	$Id$
 */
 
 #ifndef _RACEUTIL_H_

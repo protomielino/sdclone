@@ -24,7 +24,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// $Id: point3d.hxx,v 1.6 2006-03-08 18:16:08 mfranz Exp $
 
 
 #ifndef _POINT3D_H

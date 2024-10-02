@@ -17,7 +17,6 @@
 
 /** @file
     		The "snddefault" sound engine module
-    @version    $Id$
 */
 
 #ifndef _SNDDEFAULT_H_

@@ -18,7 +18,6 @@
 
 /** @file
     	The Gaming Framework Data Manager API.
-    @version	$Id$
 */
 
 #ifndef __TGFDATA__H__

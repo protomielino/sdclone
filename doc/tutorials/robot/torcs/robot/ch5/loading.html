@@ -4,7 +4,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -41,9 +40,9 @@ Free Documentation License".
 		  the default settings are active. If we load a custom setup it just overwrites the
 		  default settings, if we don't specify a certain value the default value is active.
 		  To create a custom setup we make just a copy of the default setup, remove the stuff we
-		  don't want to change and edit the values.  
+		  don't want to change and edit the values.
 		</p>
-		
+
         <h3>Loading Setups</h3>
         <p>
 		  The following implementation will first try to load a custom car setup for the
@@ -51,23 +50,23 @@ Free Documentation License".
 		  setup. If this fails also, the TORCS default setup stays active. Our custom
 		  setup files will
 		  be located e. g. for the driver with index 0 in the subdirectories 0, 0/practice,
-		  0/qualifying and 0/race (relative to the <span style="color:red;">bt</span> directory). 
+		  0/qualifying and 0/race (relative to the <span style="color:red;">bt</span> directory).
 		  Put the following code into driver.cpp, method Driver::initTrack().
 		</p>
-		
+
 		<p>
 		  <pre class="lcolor">/* Called for every track change or new race. */
 void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s)
 {
     track = t;</pre>
 		</p>
-		
+
 		<p>
 		  First we compute a pointer to the tracks filename from the whole path. The
 		  filename starts after the last "/", so we need to add 1 to the location found with
-		  strrchr. 
+		  strrchr.
 		</p>
-		
+
 		<p><pre class="lcolor">    char buffer[256];
     /* get a pointer to the first char of the track filename */
     char* trackname = strrchr(track-&gt;filename, '/') + 1;</pre>
@@ -76,7 +75,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 		<p>
 		  Depending on the race type, we want to load the fitting setup. For that we assemble
 		  the required path to our setup file relative to the /usr/local/share/games/torcs
-		  directory. 
+		  directory.
 		</p>
 		<p><pre class="lcolor">    switch (s-&gt;_raceType) {
         case RM_TYPE_PRACTICE:
@@ -86,33 +85,33 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
             sprintf(buffer, "drivers/<span style="color:red;">bt</span>/%d/qualifying/%s", INDEX, trackname);
             break;
         case RM_TYPE_RACE:
-            sprintf(buffer, "drivers/<span style="color:red;">bt</span>/%d/race/%s", INDEX, trackname);	
+            sprintf(buffer, "drivers/<span style="color:red;">bt</span>/%d/race/%s", INDEX, trackname);
             break;
         default:
             break;
     }</pre>
 		</p>
-		
+
 		<p>
 		  Now we try to load the setup file. After that we check if the file has been loaded. If
 		  not we assemble the path to the default setup file and try to read it. If you are not
 		  sure about the setup file name you need for a certain track you can add a printf or
 		  cout to print the filename to the terminal.
 		</p>
-		
+
 		<p><pre class="lcolor">    *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     if (*carParmHandle == NULL) {
         sprintf(buffer, "drivers/<span style="color:red;">bt</span>/%d/default.xml", INDEX);
         *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-    } 
+    }
 }</pre>
 		</p>
-		
+
 		<p>
 		  Because we haven't created any setups yet the loader will fail for now. In the next
 		  section we will create the directory structure for the setups.
 		</p>
-        
+
 		<h3>Summary</h3>
         <ul style="list-style-type:disk; color:black;">
            <li>You know where the default setup files are located.</li>

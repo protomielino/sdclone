@@ -20,7 +20,6 @@
     		The menu for when the optimiztion is running
     @ingroup	racemantools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: raceloadingmenu.cpp 4361 2012-01-07 14:05:16Z pouillot $
 */
 
 #include <cstring>

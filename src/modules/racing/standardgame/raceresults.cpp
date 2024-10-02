@@ -19,7 +19,6 @@
 /** @file
             Results managment for all race types
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <ctime>

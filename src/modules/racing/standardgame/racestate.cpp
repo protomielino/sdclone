@@ -4,7 +4,6 @@
     created     : Sat Nov 16 12:00:42 CET 2002
     copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org
-    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     		The Race Engine State Automaton
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <raceman.h>

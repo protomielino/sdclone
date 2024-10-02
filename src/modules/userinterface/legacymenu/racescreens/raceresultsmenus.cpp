@@ -20,7 +20,6 @@
             This is a set of tools useful for race managers to display results.
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <portability.h>

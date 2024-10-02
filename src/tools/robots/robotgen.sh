@@ -4,9 +4,8 @@
 #
 #    file                 : robotgen
 #    created              : Mon Jul 29 21:01:37 CEST 2002
-#    copyright            : (C) 2002 by Eric Espié                        
-#    email                : Eric.Espie@torcs.org   
-#    version              : $Id: sd-robotgen.sh 3254 2011-01-09 22:17:22Z pouillot $                                  
+#    copyright            : (C) 2002 by Eric Espiï¿½
+#    email                : Eric.Espie@torcs.org
 #
 ##############################################################################
 #
@@ -348,31 +347,31 @@ echo '!MESSAGE This is not a valid makefile. To build this project using NMAKE,
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE use the Export Makefile command and run
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE NMAKE /f "'$NAME'.mak".
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE You can specify a configuration when running NMAKE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE by defining the macro CFG on the command line. For example:
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE NMAKE /f "'$NAME'.mak" CFG="'$NAME' - Win32 Debug"
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE Possible choices for configuration are:
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE "'$NAME' - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 ' >> $DSPFILE || exit 1
 echo '!MESSAGE "'$NAME' - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 ' >> $DSPFILE || exit 1
-echo '!MESSAGE 
+echo '!MESSAGE
 ' >> $DSPFILE || exit 1
 echo '
 ' >> $DSPFILE || exit 1
@@ -520,7 +519,7 @@ echo '# End Special Build Tool
 ' >> $DSPFILE || exit 1
 echo '
 ' >> $DSPFILE || exit 1
-echo '!ENDIF 
+echo '!ENDIF
 ' >> $DSPFILE || exit 1
 echo '
 ' >> $DSPFILE || exit 1

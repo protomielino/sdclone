@@ -18,7 +18,6 @@
 
 /** @file
     Tracing / logging system
-    @version	$Id$
     @ingroup	trace
 */
 

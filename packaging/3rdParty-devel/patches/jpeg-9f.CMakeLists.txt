@@ -5,7 +5,6 @@
 #    created              : Feb 11 2020
 #    copyright            : (C) 2020 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id: jpeg-9e.CMakeLists.txt 7914 2022-01-17 17:16:37Z beaglejoe $
 #
 #==============================================================================
 #

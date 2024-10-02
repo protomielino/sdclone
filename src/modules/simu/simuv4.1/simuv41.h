@@ -19,7 +19,6 @@
 
 /** @file
             The "Simu V4.1" physics engine module
-    @version    $Id: simuv41.h 4903 2012-08-27 11:31:33Z kmetykog $
 */
 
 #ifndef _SIMUV41_H_

@@ -82,7 +82,7 @@ IF(NOT OPTION_AUTOVERSION)
 ELSE(NOT OPTION_AUTOVERSION)
 
 	# Use SVN HeadURL property on this CMakeLists.txt file in order to automatically get the current version
-	SET(HEAD_URL "$HeadURL$")
+	SET(HEAD_URL "$HeadURL: svn+ssh://xavi92@svn.code.sf.net/p/speed-dreams/code/trunk/CMakeLists.txt $")
 
 	# Define regular expressions
 	SET(REGEX_TAG        "^\\$HeadURL:.*speed-dreams/code/tags/([^/\\$ ]*).*\\$$")

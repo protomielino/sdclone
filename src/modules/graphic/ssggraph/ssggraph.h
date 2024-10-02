@@ -17,7 +17,6 @@
 
 /** @file
     		The "ssggraph" graphics engine module
-    @version    $Id$
 */
 
 #ifndef _SSGGRAPH_H_

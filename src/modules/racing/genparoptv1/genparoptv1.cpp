@@ -18,7 +18,6 @@
 /** @file
   		A race engine module designed for optimising car and AI driver setups
 		(parameters) through a genetic algorithm
-    @version    $Id$
 */
 
 #include <sstream>

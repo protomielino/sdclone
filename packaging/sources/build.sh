@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Script for building source packages
-# 
+#
 # Usage (example) :
 #  cd my/svn/sandbox/tags/2.0.0-rc1
 #  ./packaging/sources/build.sh 2.0.0-rc1-r4420
@@ -10,7 +10,6 @@
 #          you need to get and extract all of them before building.
 #
 # copyright  : (C) 2011 onwards Jean-Philippe Meuret
-# $Id$
 
 # This program is free software ; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +20,7 @@
 if [ -f CMakeLists.txt -a -f data/data/credits.xml -a -d cmake -a -d data -a -d src ] ; then
 
   echo "Building $1 source packages (`date`) ..."
-  
+
   specDir="./packaging/sources"
 
   echo "* 'Base' package ..."
@@ -50,7 +49,7 @@ tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-more-h
   ls -l speed-dreams-src-unmaintained*.tar.xz
 
   echo "Done (`date`)."
-  
+
 else
 
   echo "Bad current dir for that ; please run from the root folder of an SD source tree."

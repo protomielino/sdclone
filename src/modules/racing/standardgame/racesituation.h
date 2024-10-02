@@ -18,7 +18,6 @@
 /** @file
 
     @author	    Jean-Philippe Meuret
-    @version	$Id$
 */
 
 #ifndef _RACESITUATION_H_

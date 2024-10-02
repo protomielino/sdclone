@@ -19,7 +19,6 @@
 /** @file
     		Constants for screen / Open GL features config file
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 #ifndef _GUISCREEN_H_

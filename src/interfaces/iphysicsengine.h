@@ -4,7 +4,6 @@
     created              : Tue May 10 22:40:04 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +17,6 @@
 
 /** @file
     	Interface for physics engines
-    @version	$Id$
 */
 
 #ifndef __IPHYSICSENGINE__H__

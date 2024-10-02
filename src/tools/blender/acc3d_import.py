@@ -27,7 +27,7 @@ Missing:<br>
 
 Known issues:<br>
     - Some objects may be imported with wrong normals due to wrong information in the model itself. This can be noticed by strange shading, like darker than expected parts in the model. To fix this, select the mesh with wrong normals, enter edit mode and tell Blender to recalculate the normals, either to make them point outside (the usual case) or inside.<br>
- 
+
 Config Options:<br>
     - textures dir (string): if non blank, when imported texture paths are
 wrong in the .ac file, Blender will also look for them at this dir.
@@ -38,7 +38,6 @@ paths from the .ac file, the .ac file's dir and the default textures dir path
 users can configure (see config options above).
 """
 
-# $Id$
 #
 # --------------------------------------------------------------------------
 # AC3DImport version 2.43 Feb 12, 2007
@@ -117,7 +116,7 @@ if rd:
 	if rd.has_key('verbose'):
 		VERBOSE = rd['verbose']
 
-	
+
 errmsg = ""
 
 # Matrix to align ac3d's coordinate system with Blender's one,
@@ -147,7 +146,7 @@ def euler_in_radians(eul):
 	return eul
 
 class Obj:
-	
+
 	def __init__(self, type):
 		self.type = type
 		self.dad = None
@@ -175,7 +174,7 @@ class Obj:
 class AC3DImport:
 
 	def __init__(self, filename):
-		
+
 		inform('Speed Dreams / Torcs ACC file importer version 1.0')
 
 		global errmsg
@@ -228,9 +227,9 @@ class AC3DImport:
 		self.lines.append('')
 		self.parse_file()
 		file.close()
-		
+
 		self.testAC3DImport()
-				
+
 	def parse_obj(self, value):
 		kidsnumlist = self.kidsnumlist
 		if kidsnumlist:
@@ -272,9 +271,9 @@ class AC3DImport:
 			else:
 				texture2 = texture.split('"')[1]
 				self.objlist[-1].tex2 = texture2
-				
 
-		
+
+
 	def parse_texrep(self, trash):
 		trep = self.lines[self.i - 1]
 		trep = trep.split()
@@ -287,7 +286,7 @@ class AC3DImport:
 		toff = toff.split()
 		toff = [float(toff[1]), float(toff[2])]
 		self.objlist[-1].texoff = toff
-		
+
 	def parse_mat(self, value):
 		i = self.i - 1
 		lines = self.lines
@@ -352,7 +351,7 @@ class AC3DImport:
 				del line[4]
 			if len(line)>3:
 				del line[3]
-		
+
 			vlist.append(line)
 			n -= 1
 			i += 1
@@ -379,13 +378,13 @@ class AC3DImport:
 			flag = lines[i].split()[1]
 			tristrip = False
 			trifan = False
-		
+
 			if ((flag=='0x14')|(flag=='0x24')|(flag=='0x34')):
 				tristrip = True
 
 			if flag =='0x30':
 				trifan = True
-			
+
 			if len(flags) > 1:
 				flaghigh = int(flags[0])
 				flaglow = int(flags[1])
@@ -409,24 +408,24 @@ class AC3DImport:
 			fuvs = []
 			fuvs2 = []
 			rfs = refs
-	
+
 			while rfs:
 				line = lines[i].split()
 				v = int(line[0]) + 1 # + 1 to avoid vindex == 0
 				uv = [float(line[1]), float(line[2])]
-				
+
 				if len(line)>4:
 					uv2 = [float(line[3]), float(line[4])]
 					fuv2.append(Vector(uv2))
-					
+
 				face.append(v)
 				fuv.append(Vector(uv))
-				
+
 				rfs -= 1
 				i += 1
 
 
-                                
+
 			#handle triangle strip convert into triangles
 			if tristrip==True:
 				index = 0
@@ -443,56 +442,56 @@ class AC3DImport:
 						if len(fuv2)>0:
 							uv2 = fuv2[index];
 							fuvt2.append(uv2)
-						
+
 						facet.append(face[index+1])
 						uv = fuv[index+1];
 						fuvt.append(uv)
 						if len(fuv2)>0:
 							uv2 = fuv2[index+1];
 							fuvt2.append(uv2)
-						
+
 						facet.append(face[index+2])
 						uv = fuv[index+2];
-						fuvt.append(uv)			
+						fuvt.append(uv)
 						if len(fuv2)>0:
 							uv2 = fuv2[index+2];
 							fuvt2.append(uv2)
-						
+
 						even = False
 					else:
 						facet.append(face[index])
 						uv = fuv[index];
-						fuvt.append(uv)	
-						if len(fuv2)>0:						
+						fuvt.append(uv)
+						if len(fuv2)>0:
 							uv2 = fuv2[index];
 							fuvt2.append(uv2)
-						
+
 						facet.append(face[index+2])
-				
+
 						uv = fuv[index+2];
-						
+
 						fuvt.append(uv)
 						if len(fuv2)>0:
 							uv2 = fuv2[index+2];
 							fuvt2.append(uv2)
-						
+
 						facet.append(face[index+1])
 						uv = fuv[index+1];
 						fuvt.append(uv)
-						if len(fuv2)>0:						
+						if len(fuv2)>0:
 							uv2 = fuv2[index+1];
 							fuvt2.append(uv2)
 
 						even = True
-					
-					
+
+
 					index+=1
 					#Don't add degenerate triangles this messes up Blender
-					if facet[0]!=facet[1] and facet[0]!=facet[2]:			
+					if facet[0]!=facet[1] and facet[0]!=facet[2]:
 						faces.append(facet)
 						fuvs.append(fuvt)
 						fuvs2.append(fuvt2)
-					
+
 					elif trifan==True:
 						index = 1
 						while index<refs-2:
@@ -505,23 +504,23 @@ class AC3DImport:
 							if len(fuv2)>0:
 								uv2 = fuv2[0];
 								fuvt2.append(uv2)
-								
+
 							facet.append(face[index])
 							uv = fuv[index];
 							fuvt.append(uv)
 							if len(fuv2)>0:
 								uv2 = fuv2[index];
 								fuvt2.append(uv2)
-								
+
 							facet.append(face[index+1])
 							uv = fuv[index+1];
-							fuvt.append(uv)			
+							fuvt.append(uv)
 							if len(fuv2)>0:
 								uv2 = fuv2[index+1];
-								fuvt2.append(uv2)					
-						
+								fuvt2.append(uv2)
+
 						index+=2
-					
+
 			elif flaglow: # it's a line or closed line, not a polygon
 				while len(face) >= 2:
 					cut = face[:2]
@@ -564,7 +563,7 @@ class AC3DImport:
 			obj.flist_uv2.extend(fuvs2)
 			obj.elist.extend(edges) # loose edges
 
-			numsurf -= 1	  
+			numsurf -= 1
 
 		if badface_notpoly or badface_multirefs:
 			inform('Object "%s" - ignoring bad faces:' % obj.name)
@@ -633,7 +632,7 @@ class AC3DImport:
 						o.bl_obj = empty
 
 				bl_children = [c.bl_obj for c in children if c.bl_obj != None]
-				
+
 				o.bl_obj.makeParent(bl_children, 0, 1)
 				for child in children:
 					blob = child.bl_obj
@@ -702,7 +701,7 @@ class AC3DImport:
 			name = 'BaseMaterial'
 			if m== None:
 				m = Material.New(name)
-			
+
 			m.rgbCol = (mat[1][0], mat[1][1], mat[1][2])
 			m.amb = mat[2]
 			m.emit = mat[3]
@@ -740,7 +739,7 @@ class AC3DImport:
 				obj.type = AC_GROUP
 				continue
 
-				
+
 
 			mesh = Mesh.New()
 			object = scene.objects.new(mesh, obj.name)
@@ -751,12 +750,12 @@ class AC3DImport:
 
 			if not obj.vlist: # no vertices? nothing more to do
 				continue
-			
+
 			#Setup UV Layers
 			mesh.addUVLayer("ImageUV")
 			mesh.addUVLayer("ShadowUV")
 			mesh.activeUVLayer ="ImageUV"
-			
+
 			mesh.verts.extend(obj.vlist)
 
 			objmat_indices = []
@@ -795,7 +794,7 @@ class AC3DImport:
 
 				img = None
 				img2 = None
-					
+
 				if obj.tex != '':
 					if obj.tex in bl_images.keys():
 						img = bl_images[obj.tex]
@@ -824,13 +823,13 @@ class AC3DImport:
 								#img.xrep = int(obj.texrep[0])
 								#img.yrep = int(obj.texrep[1])
 								if img:
-									bl_images[obj.tex] = img															
+									bl_images[obj.tex] = img
 							except:
 								inform("THROW:  Couldn't load texture: %s" % baseimgname)
 						else:
 							missing_textures.append(obj.tex)
 							inform("Couldn't find texture: %s" % baseimgname)
-							
+
 				if obj.tex2 != '':
 					if obj.tex2 in bl_images.keys():
 						img2 = bl_images[obj.tex2]
@@ -860,14 +859,14 @@ class AC3DImport:
 								#img.xrep = int(obj.texrep[0])
 								#img.yrep = int(obj.texrep[1])
 								if img2:
-									bl_images[obj.tex2] = img2															
+									bl_images[obj.tex2] = img2
 							except:
 								inform("THROW:  Couldn't load texture: %s" % baseimgname)
 						else:
 							missing_textures.append(obj.tex2)
 							inform("Couldn't find texture: %s" % baseimgname)
-							
-				if obj.tex not in bmat.keys():							
+
+				if obj.tex not in bmat.keys():
 					if img:
 						#Create a new material with a texture attached to it
 						m1 = Material.New(obj.tex)
@@ -879,7 +878,7 @@ class AC3DImport:
 						m1.alpha = m.alpha
 						texname = 'Tex%s' %obj.tex
 						texname2 = 'Tex2%s' %obj.tex
-						
+
 						if img:
 							iname = img.getName()
 							if iname not in bl_textures.keys():
@@ -888,10 +887,10 @@ class AC3DImport:
 								map1=Texture.MapTo.COL|Texture.MapTo.ALPHA
 								basetex.image = img
 								bl_textures[iname] = basetex
-							
+
 							basetex = bl_textures[iname]
 							m1.setTexture(0,basetex,Texture.TexCo.UV,map1)
-						
+
 						if img2:
 							iname2 = img2.getName()
 							if iname2 not in bl_textures.keys():
@@ -899,25 +898,25 @@ class AC3DImport:
 								basetex2.setType('Image')
 								map2=Texture.MapTo.COL
 								basetex2.image = img2
-								bl_textures[iname2] = basetex2					
+								bl_textures[iname2] = basetex2
 							else:
-								map2=Texture.MapTo.COL							
-								
-							basetex2 = bl_textures[iname2]					
+								map2=Texture.MapTo.COL
+
+							basetex2 = bl_textures[iname2]
 							m1.setTexture(1,basetex2,Texture.TexCo.UV,map2)
-										
+
 						if m1.alpha < 1.0:
 							m1.mode |= MAT_MODE_ZTRANSP
-							has_transp_mats = True				
-					
+							has_transp_mats = True
+
 						mtextures = m1.getTextures()
-						tunit = 0				    
+						tunit = 0
 						for mtex in mtextures:
 							if not ( mtex == None ):
 								if tunit == 1:
 									mtex.uvlayer ="ShadowUV"
-									mtex.colfac=0.3									
-									tunit = tunit+1							
+									mtex.colfac=0.3
+									tunit = tunit+1
 								if tunit ==0:
 									mtex.uvlayer ="ImageUV"
 
@@ -925,7 +924,7 @@ class AC3DImport:
 
 						bmat[obj.tex]=m1
 
-	
+
 				if obj.tex != '':
 					if obj.tex in bl_images.keys():
 						img = bl_images[obj.tex]
@@ -950,12 +949,12 @@ class AC3DImport:
 						bface.mode |= FACE_TEX
 						bface.image = img
 					#TODO handle material properly
-					#bface.mat = objmat_indices.index(fmat)			
+					#bface.mat = objmat_indices.index(fmat)
 					bface.mat = 0
 					fuv = obj.flist_uv[i]
 					if len(obj.flist_uv2)>0:
 						fuv2 = obj.flist_uv2[i]
-						
+
 					if obj.texoff:
 						uoff = obj.texoff[0]
 						voff = obj.texoff[1]
@@ -976,15 +975,15 @@ class AC3DImport:
 
 					mesh.activeUVLayer ="ImageUV"
 					mesh.faces[i].uv = fuv
-					
+
 					if len(fuv2)>0:
 						mesh.activeUVLayer ="ShadowUV"
 						mesh.faces[i].uv = fuv2
 #						for uv2 in fuv2:
 #							inform('UV2 coords %.5f %.5f\n' % (uv2[0],uv2[1]))
 
-					mesh.activeUVLayer ="ImageUV"						
-					
+					mesh.activeUVLayer ="ImageUV"
+
 				# finally, delete the 1st vertex we added to prevent vindices == 0
 				mesh.verts.delete(0)
 

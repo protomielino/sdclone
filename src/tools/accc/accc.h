@@ -18,7 +18,6 @@
 /** @file
 
  @author Christophe Guionneau
- @version    $Id$
  */
 
 #ifndef _ACCC_H_

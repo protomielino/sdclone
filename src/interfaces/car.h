@@ -19,7 +19,6 @@
 /** @file
                 This is the car structure.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	carstruct
     @note	Short cuts are to be used with the carElt structure.
 */

@@ -69,7 +69,6 @@ Notes:<br>
     Start mesh object names (OB: field) with "=" or "$" to prevent them from being split (meshes with multiple textures or both textured and non textured faces are split unless this trick is used or the "no split" option is set.
 """
 
-# $Id: ac3d_export.py 14530 2008-04-23 14:04:05Z campbellbarton $
 #
 # --------------------------------------------------------------------------
 # AC3DExport version 2.44
@@ -219,7 +218,7 @@ def Round_s(f):
 		return str(int(r))
 	else:
 		return str(r)
- 
+
 def transform_verts(verts, m):
 	vecs = []
 	for v in verts:
@@ -376,7 +375,7 @@ class AC3DExport: # the ac3d exporter part
 					localmatrix = obj.getMatrix('localspace')
 					if not obj.getParent():
 						localmatrix *= BLEND_TO_AC3D_MATRIX
-					self.rot(localmatrix.rotationPart()) 
+					self.rot(localmatrix.rotationPart())
 					self.loc(localmatrix.translationPart())
 				self.kids(kidsnum)
 
@@ -547,7 +546,7 @@ class AC3DExport: # the ac3d exporter part
 					shi = "shi %s" % shival
 					trans = "trans %s" % (Round_s(1 - M.alpha))
 					if MIRCOL_AS_AMB:
-						amb = "amb %s" % mirCol 
+						amb = "amb %s" % mirCol
 					if MIRCOL_AS_EMIS:
 						emis = "emis %s" % mirCol
 					#mbuf.append("%s %s %s %s %s %s %s\n" \
@@ -601,7 +600,7 @@ class AC3DExport: # the ac3d exporter part
 				matstr.append(' %s' % r[j])
 		if not_I: # no need to write identity
 			self.file.write('rot%s\n' % "".join(matstr))
-				
+
 	def loc(self, loc):
 		loc = map(Round_s, loc)
 		if loc != ['0', '0', '0']: # no need to write default
@@ -647,7 +646,7 @@ class AC3DExport: # the ac3d exporter part
 			looseEdges = get_loose_edges(mesh)
 
 		file = self.file
- 
+
 		file.write("numsurf %s\n" % (len(faces) + len(looseEdges)))
 
 		if not foomesh: verts = list(self.mesh.verts)
@@ -761,7 +760,7 @@ def report_data():
 	}
 	if NO_SPLIT:
 		l = msgs['3nosplit']
-		l = "%s (because OPTION NO_SPLIT is set)" % l.split('(')[0] 
+		l = "%s (because OPTION NO_SPLIT is set)" % l.split('(')[0]
 		msgs['3nosplit'] = l
 	keys = msgs.keys()
 	keys.sort()

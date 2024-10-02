@@ -3,7 +3,6 @@
 ;        (obsolete physics engines, ...)
 ;
 ;        copyright  : (C) 2012 onwards Jean-Philippe Meuret
-;        $Id$
 ;
 ;        This program is free software; you can redistribute it and/or modify
 ;        it under the terms of the GNU General Public License as published by
@@ -78,7 +77,7 @@ Section -Drivers
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
   ; SetOutPath "$INSTDIR\lib\drivers\kilo2008"
   ; File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
-  
+
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
   ; SetOutPath "$INSTDIR\data\drivers\kilo2008"
   ; File /r "${BUILD_INST_DIR}\data\drivers\kilo2008\*.*"
@@ -104,4 +103,3 @@ Function .onInit
   !insertmacro CheckIfBasePackageInstalled
 
 FunctionEnd
-

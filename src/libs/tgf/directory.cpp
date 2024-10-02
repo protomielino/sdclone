@@ -4,7 +4,6 @@
     created              : Fri Aug 13 21:58:55 CEST 1999
     copyright            : (C) 1999 by
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     		This is used for directory manipulation.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	dir
 */
 

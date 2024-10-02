@@ -5,7 +5,6 @@
         created     : Wed Feb  25 18:27:13 CET 2004
         copyright   : (C) 2004-2006 by Bernhard Wymann, 2009 The Speed Dreams Team
         web         : speed-dreams.sourceforge.net
-        version     : $Id$
 
         Permission is granted to copy, distribute and/or modify this document
         under the terms of the GNU Free Documentation License, Version 1.2
@@ -155,7 +154,7 @@
           <a href="http://speed-dreams.sourceforge.net" target="_parent">Speed Dreams</a>, <b>an Open Motorsport Sim</b>,
           is a motorsport simulation, which allows you to drive in races against AI opponents (simulated by
                   the computer). You can also develop your own computer-controlled driver (also called a robot) in
-                  C or C++ (or even in Delphi, as <a href="http://?????">Wolf-Dieter Beelitz</a>). 
+                  C or C++ (or even in Delphi, as <a href="http://?????">Wolf-Dieter Beelitz</a>).
                 </p>
                 <p>
                   Speed Dreams is "Open Source" (GNU General Public License Version 2 or later).
@@ -170,7 +169,7 @@
                   more challenging AI opponents, and many other exciting new features to come soon (network, force feedback, career mode ...).
                 </p>
                 <p>
-                  Some long time TORCS-addicted developers and artists immediately joined them in the core developers team : 
+                  Some long time TORCS-addicted developers and artists immediately joined them in the core developers team :
                   Andrew Sumner, Brian Gavin, Eckhard Jager, Mart Kelder and Wolf-Dieter Beelitz,
                   quickly followed by Gabor Kmetyko and Haruna Say.
                   Christos Dimitrakakis, Sebastian Heni and Kristof Kaly-Kullai also contribute a lot.
@@ -189,10 +188,10 @@
                 <p>
                   Yes, there is some documentation available. Look at the official
                   <a href="http://speed-dreams.sourceforge.net" target="_parent">Speed Dreams site</a> and on
-                  the under-construction <a href="http://sourceforge.net/apps/trac/speed-dreams">SF.net Wiki</a>. 
+                  the under-construction <a href="http://sourceforge.net/apps/trac/speed-dreams">SF.net Wiki</a>.
                   You can find installation instructions <a href="http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/trunk/INSTALL?view=markup">here</a>,
                   the TORCS robot tutorial <a href="http://www.torcs.org">here</a>,
-                  instructions about how to use Speed Dreams <a href="http://???/how_to_driver.html">here</a>. 
+                  instructions about how to use Speed Dreams <a href="http://???/how_to_driver.html">here</a>.
                   A very brief track howto is available
                   <a href="http://www.idiap.ch/~dimitrak/torcs/track-howto.html" target="_parent">here</a>,
                   there is as well a <a href="http://katergo.rege.org/projects/trackeditor" target="_parent">track editor</a> available,
@@ -214,7 +213,7 @@
                 <h3><a name="c1_5">1.5 What are the future plans ?</a></h3>
                 <p>
                   Besides maintenance and bugfixing, the develoment team is currently working
-                  on network gaming, racer life-time career mode, full weather simulation, improved engine sound, new tracks ; 
+                  on network gaming, racer life-time career mode, full weather simulation, improved engine sound, new tracks ;
                   force feedback, new car sets with AI opponents will also be there for the next release (2.0) ;
                   improved physics, better inside view, replay, improved graphic rendering, improved performances are also domains in which we'll be working in the mid-term.
                 </p>
@@ -235,13 +234,13 @@
                 </p>
 
                 <h3><a name="c1_8">1.8 Why don't you replace GLUT with SDL ?</a></h3>
-                
+
                 <p>
                   We actually are doing so : next release will no more use GLUT.
                 </p>
 
                 <h3><a name="c1_9">1.9 Why don't you replace PLib with OGRE 3D / OSG ?</a></h3>
-                
+
                 <p>
                   We are currently thinking about starting to move that way ;
                   but we have to rewrite the whole 3D graphics module from scratch ...
@@ -251,7 +250,7 @@
 
                 <h3><a name="c1_10">1.10 Are there official championships ?</a></h3>
                 <p>
-                        Yes, you can find offline robot championships in the 
+                        Yes, you can find offline robot championships in the
                         <a href="http://www.berniw.org/trb" target="_parent">TORCS Racing Board</a>.
                 </p>
                 <p>
@@ -315,7 +314,7 @@
 
                 <h3><a name="c2_3">2.3 What are the software requirements ?</a></h3>
                 <p>
-                  You need recent, working and properly configured OpenGL/DRI drivers. 
+                  You need recent, working and properly configured OpenGL/DRI drivers.
                 </p>
                 <p>
                   You need also several 3rd party libraries :
@@ -334,8 +333,8 @@
                 </p>
                 <p>
                   Note: Under x86_64 Linux, you need to set the <b>&quot;-fPIC&quot;</b> compiler switch when
-                  compiling PLib (export CFLAGS=&quot;-fPIC&quot;, export CPPFLAGS=&quot;-fPIC&quot;, 
-                  export CXXFLAGS=&quot;-fPIC&quot;). 
+                  compiling PLib (export CFLAGS=&quot;-fPIC&quot;, export CPPFLAGS=&quot;-fPIC&quot;,
+                  export CXXFLAGS=&quot;-fPIC&quot;).
                   Under Windows, make sure you compile all the 3rd party libraries using
                   the <b>&quot;Multi-threaded DLL&quot;</b> run-time C library.
                 </p>
@@ -410,8 +409,8 @@
                 <p>
                   If the compiler stops with the above message you have probably OpenGL header files installed which do
                   not define the GL_TEXTURE0_ARB and other symbols. If you have updated your NVidia drivers to 6xxx
-                  you will experience this error (NVidia removed those definitions...). 
-                  To fix it, you need to install a gl.h which defines the missing symbols. 
+                  you will experience this error (NVidia removed those definitions...).
+                  To fix it, you need to install a gl.h which defines the missing symbols.
                   You can get it from your old (5xxx) NVidia drivers or from Mesa (the problem is not the driver itself).
                 </p>
 
@@ -504,7 +503,7 @@ exception$LIBDIR/speed-dreams-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*</pre>
                 <h4><a name="c4_3_5">4.3.5 My screen resolution is not supported.</a></h4>
                 <p>
                   You have a screen resolution which is not available in the Options / Display menu of Speed Dreams :
-                   exit Speed Dreams and edit the file ~/.speed-dreams/config/screen.xml 
+                   exit Speed Dreams and edit the file ~/.speed-dreams/config/screen.xml
                   (or <My documents>/config/screen.xml under Windows), change the x, y,
                   window width and height to your values, and then restart sped-dreams.
                 </p>
@@ -517,7 +516,7 @@ exception$LIBDIR/speed-dreams-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*</pre>
                   You switched Speed Dreams to fullscreen and got a scrolling screen,
                   or the screen size is not fully utilized : if you use the original GLUT library,
                   you should choose the real resolution of your screen in the display settings.
-                  To fix the problem, you can also download and install FreeGLUT, 
+                  To fix the problem, you can also download and install FreeGLUT,
                   then recompile and reinstall plib and Speed Dreams.
                 </p>
 
@@ -531,7 +530,7 @@ exception$LIBDIR/speed-dreams-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*</pre>
                 <p>
                         Shutdown Speed Dreams and restart it, go to the sound menu and disable the
                         sound or try the other backend (PLib or OpenAL).
-                        One of us already experienced this issue with built-in OpenAL under Mandriva 2008.0 
+                        One of us already experienced this issue with built-in OpenAL under Mandriva 2008.0
                         Linux x86_64, and the solution was to install from sources and self-compile OpenAL.
                 </p>
 
@@ -613,7 +612,7 @@ Trying generic initialization, fallback.</pre>
 
                 <p>
                   You have probably two OpenAL libraries installed on your system and Speed Dreams has been linked
-                  to one, and uses another one at run-time (when starting a race). 
+                  to one, and uses another one at run-time (when starting a race).
                   Fix this issue in your build environment (CXX/CPP/LD_FLAGS) and / or run-time one (LD_LIBRARY_PATH).
                   Now recomplie and reinstall Speed Dreams.
                 </p>
@@ -795,7 +794,3 @@ Trying generic initialization, fallback.</pre>
 
 </body>
 </html>
-
-
-
-

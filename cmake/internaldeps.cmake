@@ -17,7 +17,6 @@
 
 # @file     Internal dependencies (include and libs)
 # @author   Mart Kelder, J.-P. Meuret
-# @version  $Id$
 
 # SD include dirs macros.
 MACRO(ADD_INTERFACE_INCLUDEDIR)

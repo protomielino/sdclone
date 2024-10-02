@@ -18,7 +18,6 @@
 
 /** @file
     		The "Simu V5" physics engine module
-    @version    $Id: simuv5.h 4903 2012-08-27 11:31:33Z kmetykog $
 */
 
 #ifndef _SIMUV5_H_

@@ -19,7 +19,6 @@
 /** @file
     		GUI Images management
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
     @ingroup	gui
 */
 

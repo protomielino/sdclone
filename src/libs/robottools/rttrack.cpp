@@ -4,7 +4,6 @@
     created              : Sat Aug 14 23:03:22 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
             This is a collection of useful functions for programming a robot.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	robottools
 */
 

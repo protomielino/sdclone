@@ -4,7 +4,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -33,12 +32,12 @@ Free Documentation License".
 
         <h3>Introduction</h3>
         <p>
-		  In this section we will create the directory structure and the Makefiles 
+		  In this section we will create the directory structure and the Makefiles
 		  for the cg-nascar-rwd (the car with index <span style="color:green;">0</span>).
 		  For the other cars it works the same way. We need Makefiles just to ease
-		  the deployment, we could also copy the setup files manually to the torcs directory.  
+		  the deployment, we could also copy the setup files manually to the torcs directory.
 		</p>
-		
+
         <h3>Creating the Directories</h3>
         <p>
 		  Make sure you are in the <span style="color:red;">bt</span> source directory:
@@ -48,11 +47,11 @@ Free Documentation License".
             $ cd $TORCS_BASE/src/drivers/<span style="color:red;">bt</span><br/>
 		  </tt>
 		</p>
-		
+
 		<p>
 		  Now we create the subdirectories for the setups:
 		</p>
-		
+
 		<p>
 		  <tt>
             $ mkdir -p <span style="color:green;">0</span>/practice<br/>
@@ -60,32 +59,32 @@ Free Documentation License".
 			$ mkdir <span style="color:green;">0</span>/race<br/>
 		  </tt>
 		</p>
-		
+
 		<p>
 		  For another car replace <span style="color:green;">0</span> with its index and do it
 		  the same way.
 		</p>
         <h3>The Makefiles</h3>
 		<p>
-		  First we change the main Makefile of <span style="color:red;">bt</span> to process 
-		  the subdirectory <span style="color:green;">0</span>. Change the line 
+		  First we change the main Makefile of <span style="color:red;">bt</span> to process
+		  the subdirectory <span style="color:green;">0</span>. Change the line
 		</p>
-		
+
 		<p>
 		  <pre class="lbcolor">SHIPSUBDIRS =</pre>
 		</p>
-		
+
 		<p>
 		  to
 		</p>
-		
+
 		<p>
 		  <pre class="lcolor">SHIPSUBDIRS = <span style="color:green;">0</span></pre>
 		</p>
-		
+
 		<p>
 		  When you want to add more subdirectories append them to this line, e. g. "0 1". Now
-		  create the Makefile in directory <span style="color:green;">0</span> with the 
+		  create the Makefile in directory <span style="color:green;">0</span> with the
 		  following content:
 		</p>
 
@@ -100,14 +99,14 @@ src-robots-bt_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-bt_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}</pre>
 		</p>
-		
+
 		<p>
 		  Like you can see it deploys the file default.xml and the subdirectories practice,
 		  qualifying and race. In this subdirectories we need also Makefiles to deploy
 		  the setup files. Here is the Makefile for the
 		  <span style="color:green;">0</span>/practice directory.
 		</p>
-		
+
 		<p>
 		  <pre class="lcolor">ROBOT       = <span style="color:red;">bt</span>
 SHIPDIR     = drivers/${ROBOT}/<span style="color:green;">0</span>/practice
@@ -117,11 +116,11 @@ src-robots-bt_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-bt_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}</pre>
 		</p>
-		
+
 		<p>
 		  Here the Makefile for the <span style="color:green;">0</span>/qualifying directory.
 		</p>
-		
+
 		<p>
 		  <pre class="lcolor">ROBOT       = <span style="color:red;">bt</span>
 SHIPDIR     = drivers/${ROBOT}/<span style="color:green;">0</span>/qualifying
@@ -135,7 +134,7 @@ include ${MAKE_DEFAULT}</pre>
 		<p>
 		  And finally the Makefile for the <span style="color:green;">0</span>/race directory.
 		</p>
-		
+
 		<p>
 		  <pre class="lcolor">ROBOT       = <span style="color:red;">bt</span>
 SHIPDIR     = drivers/${ROBOT}/<span style="color:green;">0</span>/race
@@ -145,13 +144,13 @@ src-robots-bt_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-bt_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}</pre>
 		</p>
-		
+
 		<p>
 		  Before the Makefiles work there has to be at least one XML file in every directory.
 		  Put <a href="../download/default.xml">this</a> stripped down default setup of cg-nascar-rwd into the file
 		  <span style="color:green;">0</span>/default.xml. Copy it also to the following locations:
 		</p>
-		
+
 		<p>
 		  <tt>
 		    $ cp <span style="color:green;">0</span>/default.xml <span style="color:green;">0</span>/practice/g-track-3.xml</br>
@@ -159,18 +158,18 @@ include ${MAKE_DEFAULT}</pre>
 			$ cp <span style="color:green;">0</span>/default.xml <span style="color:green;">0</span>/race/g-track-3.xml</br>
 		  </tt>
 		</p>
-		
+
 		<p>
 		  This should be enough for a litte test run. Do a "make install", check if it works
 		  without errors and look up in the target directory if everything is in place. In the
 		  next sections we will work with these files.
 		</p>
-		
+
 		<h3>Downloads</h3>
         <p>
           In case you got lost, you can <a href="../download/bt53.tar.gz">download</a> my robot for TORCS 1.2.0 or later.
-        </p> 
-		
+        </p>
+
 		<h3>Summary</h3>
         <ul style="list-style-type:disk; color:black;">
            <li>You know the directory structure.</li>

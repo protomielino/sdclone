@@ -19,7 +19,6 @@
 /** @file
     		The race manager menu (where you can configure, load, save, start a race)
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <vector>

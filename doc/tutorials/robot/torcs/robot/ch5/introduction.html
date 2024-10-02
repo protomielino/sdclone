@@ -4,7 +4,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -42,9 +41,9 @@ Free Documentation License".
 		  (with n the number of parameters) which computes the lap time. We want to find the
 		  minimal lap time, so we have to minimize this function. Because this function has
 		  (at least!) around 10 dimensions it's almost impossible to find the global minimum. What you can
-		  get is a local minimum, which can be much worse than the optimal (global) one.      
+		  get is a local minimum, which can be much worse than the optimal (global) one.
 		</p>
-		
+
         <h3>Qualifying Setup</h3>
         <p>
 		  In the qualifying the goal is to get the minimal lap time. Because there are no other
@@ -56,13 +55,13 @@ Free Documentation License".
 		<p>
 		  The racing setup is a bit different. Of course you still would like to minimize the lap
 		  time, but other things become also important. For example it is much easier to overtake
-		  on a straight than in a turn, so you want to optimize the setup also for top speed on 
-		  a straight, 
+		  on a straight than in a turn, so you want to optimize the setup also for top speed on
+		  a straight,
 		  altough it probably will increase the lap time. The car needs also to be more stable,
 		  so that it doesn't spin of the track when it tries to overtake or to avoid a collision.
 		  Keep in mind if you want to win a race you have to reach at least the finish line...
 		</p>
-		
+
 		<h3>Skill Level</h3>
 		<p>
 		  There are four skill levels available, namely rookie, amateur, semi-pro, and pro.
@@ -72,13 +71,13 @@ Free Documentation License".
 		  in the <span style="color:red;">bt</span>.xml file. Add the skill level line in the
 		  section of the car you want to configure, e. g. for the car with index 0:
 		</p>
-		          
+
 		<p>
 		  <pre class="lbcolor">    &lt;section name="0"&gt;
         &lt;attstr name="skill level" val="semi-pro"/&gt;
     &lt;/section&gt;</pre>
 		</p>
-		
+
         <h3>Summary</h3>
         <ul style="list-style-type:disk; color:black;">
            <li>You know what a car setup is.</li>

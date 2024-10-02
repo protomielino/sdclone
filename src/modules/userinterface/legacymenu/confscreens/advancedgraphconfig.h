@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: graphconfig.h 3438 2011-03-11 13:43:24Z pouillot $
 */
 
 #ifndef _ADVANCEDGRAPHCONFIG_H_

@@ -4,7 +4,6 @@
     created              : Thu Oct 12 21:58:55 CEST 2010
     copyright            : (C) 2010 by Mart Kelder, Jean-Philippe Meuret
     web                  : http://www.speed-reams.org
-    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     		This is used for file manipulations.
     @author	Mart Kelder, Jean-Philippe Meuret
-    @version	$Id$
     @ingroup	file
 */
 

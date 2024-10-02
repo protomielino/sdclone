@@ -18,7 +18,6 @@
 
 /** @file
     		The "Simu V4" physics engine module
-    @version    $Id: simuv4.h 4903 2012-08-27 11:31:33Z kmetykog $
 */
 
 #ifndef _SIMUREPLAY_H_

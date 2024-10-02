@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 #ifndef _FORCEFEEDBACKCONFIG_H_
 #define _FORCEFEEDBACKCONFIG_H_

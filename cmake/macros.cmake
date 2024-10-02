@@ -17,7 +17,6 @@
 
 # @file     Main CMake configuration file (to be included in every CMakeLists.txt)
 # @author   Mart Kelder
-# @version  $Id$
 
 #MESSAGE(STATUS "Processing ${CMAKE_CURRENT_SOURCE_DIR} ...")
 

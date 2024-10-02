@@ -4,7 +4,6 @@
     created              : 04/11/2015
     copyright            : (C) 2015 by MadBad
     email                : madbad82@gmail.com
-    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
         The Gaming Framework API (client part).
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
-    @version    $Id$
 */
 #ifdef WEBSERVER
 #include <cstdio>

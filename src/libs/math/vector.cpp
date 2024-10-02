@@ -18,7 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// $Id: vector.cxx,v 1.4 2006-03-08 18:16:08 mfranz Exp $
 
 
 #include <math.h>

@@ -1,10 +1,9 @@
-<!DOCTYPE public "-//w3c//dtd html 4.01 transitional//en" 
+<!DOCTYPE public "-//w3c//dtd html 4.01 transitional//en"
 		"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -24,11 +23,11 @@ Free Documentation License".
   <script src="../../../js/utilities.js" type="text/javascript"></script>
   <style type="text/css">
     <!--
-    #pic1 { float:left; border:0px; width:150px; height:77px; border-style:hidden; 
+    #pic1 { float:left; border:0px; width:150px; height:77px; border-style:hidden;
 			margin-bottom:5px; margin-right:10px; }
-    #pic2 { float:left; border:0px; width:200px; height:100px; border-style:hidden; 
+    #pic2 { float:left; border:0px; width:200px; height:100px; border-style:hidden;
 			margin-bottom:5px; margin-right:10px; }
-	#pic3 { float:left; border:0px; width:120px; height:84px; border-style:hidden; 
+	#pic3 { float:left; border:0px; width:120px; height:84px; border-style:hidden;
 			margin-bottom:5px; margin-right:10px; }
     -->
   </style>
@@ -46,37 +45,37 @@ Free Documentation License".
         <p>
 		  This section will introduce you in the format of the setup files, the settings
 		  constraints and the most important
-		  properties (parameters, settings) of the TORCS cars. 
+		  properties (parameters, settings) of the TORCS cars.
 		  If you look up the default settings files there are many more settings available than
 		  presented here, but most of them you can't change (e. g. the engine). I want to
 		  mention here that you can set all these properties up without a setup file, so you
-		  are able to compute settings at the startup of the race. 
+		  are able to compute settings at the startup of the race.
 		</p>
-		
+
         <h3>Setup File Format</h3>
 		<p>
 		  The setup files are XML files. The structure is very simple, you will see just sections,
 		  subsections and attributes. Numerical attributes are usually defined with a name,
-		  a unit and the boundaries which define the range of the allowed values. 
+		  a unit and the boundaries which define the range of the allowed values.
 		</p>
-		
+
 		<h3>Settings Constraints</h3>
 		<p>
 		  The car belongs to a car category, which defines some constraints like the range of
 		  the allowed size, engine power, weight and more. The car model settings defines then
 		  the values for its specific car and must not conflict with the constraints from the
 		  car category. After that we will load our own setup files which must not violate
-		  the constraints from the above definitions.  
+		  the constraints from the above definitions.
 		</p>
-		
+
 		<h3>Properties</h3>
         <p>
 		  You can find all mentioned properties in the file 0/default.xml (relative to
 		  the <span style="color:red;">bt</span> directory).
 		</p>
-		
+
 		<h4>Initial Fuel</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Car"&gt;
         &lt;attnum name="initial fuel" unit="l" min="1.0" max="100.0" val="100.0"/&gt;
     &lt;/section&gt;</pre>
@@ -85,17 +84,17 @@ Free Documentation License".
 		  The amount of initial fuel for the setup. Perhaps you want to compute that
 		  setting at startup instead of putting it into a setup file. Feel free to improve it.
 		  For qualifying and short races you want just the minimal amount of fuel you need, for
-		  longer races it will depend on your strategy (but we need to implement pit stops first). 
+		  longer races it will depend on your strategy (but we need to implement pit stops first).
 		</p>
       </td>
     </tr>
   </table>
-		
+
   <table class="maincontent">
     <tr>
       <td class="maincontent">
 		<h4>Spoilers</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Rear Wing"&gt;
         &lt;attnum name="angle" unit="deg" min="0" max="30" val="10"/&gt;
     &lt;/section&gt;</pre>
@@ -114,13 +113,13 @@ Free Documentation License".
 	  </td>
     </tr>
   </table>
-		
+
   <table class="maincontent">
     <tr>
       <td class="maincontent">
-		
+
 		<h4>Gearbox</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Gearbox"&gt;
         &lt;section name="gears"&gt;
             &lt;section name="r"&gt;
@@ -138,14 +137,14 @@ Free Documentation License".
 		  the highest gear you need the least value. For quick starts you need a very high value
 		  for the first gear.
 		</p>
-		
+
 		<h4>Differential</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Rear Differential"&gt;
         &lt;attstr name="type" in="SPOOL,FREE,LIMITED SLIP" val="LIMITED SLIP"/&gt;
     &lt;/section&gt;</pre>
 		</p>
-		
+
 		<p>
 		  Here the differential type is defined. The "Free" type distributes the power without
 		  any control, so it is the classic differential you can find in most of the normal
@@ -159,12 +158,12 @@ Free Documentation License".
 		  This is most often the best setting for races.
 		</p>
 		<p>
-		  The "Spool" setting links together the right and the left wheel, so it's usually a bad 
+		  The "Spool" setting links together the right and the left wheel, so it's usually a bad
 		  setting for all turns. It could make sense on a very bumpy road or for offroad races.
 		</p>
-		
+
 		<h4>Brakes</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Brake System"&gt;
         &lt;attnum name="front-rear brake repartition" min="0.3" max="0.7" val="0.52"/&gt;
         &lt;attnum name="max pressure" unit="kPa" min="100" max="150000" val="11000"/&gt;
@@ -174,18 +173,18 @@ Free Documentation License".
 		  The front-rear brake repartition defines how to distribute the pressure in the brake
 		  system. If the value is 0.0 all pressure goes to the rear brakes, if it is 1.0 all
 		  pressure hits the front brakes.
-		  The max pressure setting defines the pressure for applying full brakes. 
+		  The max pressure setting defines the pressure for applying full brakes.
 		</p>
 	  </td>
     </tr>
   </table>
-  
+
   <table class="maincontent">
     <tr>
       <td class="maincontent">
-		
-		<h4>Wheels</h4>		
-		
+
+		<h4>Wheels</h4>
+
 		<p><pre class="lbcolor">    &lt;section name="Front Right Wheel"&gt;
         &lt;attnum name="ride height" unit="mm" min="100" max="200" val="100"/&gt;
         &lt;attnum name="toe" unit="deg" min="-5" max="5" val="0"/&gt;
@@ -201,7 +200,7 @@ Free Documentation License".
 		  car. You can improve the stability or the response to steer commands with these
 		  settings.
 		  Camber (on the right on the sketch) defines the angle of the wheel to the track. At the
-		  moment it increases simply the adherence on the track in the simulation when you 
+		  moment it increases simply the adherence on the track in the simulation when you
 		  decrease the angle (toward negative values).
 		</p>
 	  </td>
@@ -213,7 +212,7 @@ Free Documentation License".
       <td class="maincontent">
 
 		<h4>Anti Roll Bar</h4>
-		  
+
 		<p><pre class="lbcolor">    &lt;section name="Rear Anti-Roll Bar"&gt;
         &lt;attnum name="spring" unit="lbs/in" min="0" max="5000" val="0"/&gt;
         &lt;attnum name="suspension course" unit="m" min="0" max="0.2" val="0.2"/&gt;
@@ -224,7 +223,7 @@ Free Documentation License".
 		  <img id="pic3" src="images/rotate.jpg" alt="rotation of car body" border="0"></img>
 
 		  The anti-roll bars prevents the car body from rolling (e. g. in fast turns). When the
-		  car body rolls (on the bottom of the sketch) the tire contact patch becomes smaller and 
+		  car body rolls (on the bottom of the sketch) the tire contact patch becomes smaller and
 		  the grip drops down. The spring
 		  setting defines how strong the anti-roll bar is linked. With a high bellcrank value
 		  you can increase the strength of the link further.
@@ -237,9 +236,9 @@ Free Documentation License".
   <table class="maincontent">
     <tr>
       <td class="maincontent">
-		
+
 		<h4>Suspension</h4>
-		
+
 		<p><pre class="lbcolor">    &lt;section name="Front Right Suspension"&gt;
         &lt;attnum name="spring" unit="lbs/in" min="0" max="10000" val="2500"/&gt;
         &lt;attnum name="suspension course" unit="m" min="0" max="0.2" val="0.2"/&gt;
@@ -259,9 +258,9 @@ Free Documentation License".
 		  the car floor hitting the track on fast track sections. Slow bump and rebound allow you
 		  to set up the damping of low frequency oscillations, e. g. caused by braking and steering. Fast
 		  bump and rebound are for damping high frequency oscillations, e. g. caused by bumps on
-		  the track or if you hit the curbs. 
+		  the track or if you hit the curbs.
 		</p>
-		
+
 		<h3>Summary</h3>
         <ul style="list-style-type:disk; color:black;">
            <li>You know the most important car parameters and what they are good for.</li>

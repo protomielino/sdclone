@@ -18,7 +18,6 @@
 
 /** @file
 
-    @version	$Id$
 */
 
 #include <cstdio>

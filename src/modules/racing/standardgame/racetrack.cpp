@@ -18,7 +18,6 @@
 /** @file
             Track related functions
     @author	    Xavier Bertaux
-    @version	$Id$
 */
 
 #include <cstdlib>

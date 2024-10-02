@@ -20,7 +20,6 @@
     		The menu for when the race is running
     @ingroup	racemantools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <cstring>

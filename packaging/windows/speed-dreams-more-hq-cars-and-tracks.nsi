@@ -3,7 +3,6 @@
 ;        (HQ tracks and cars with full AI support)
 ;
 ;        copyright  : (C) 2011 onwards Jean-Philippe Meuret
-;        $Id: speed-dreams-cars-and-tracks.nsi 3306 2011-02-03 23:07:43Z pouillot $
 ;
 ;        This program is free software; you can redistribute it and/or modify
 ;        it under the terms of the GNU General Public License as published by
@@ -291,4 +290,3 @@ Function .onInit
   !insertmacro CheckIfBasePackageInstalled
 
 FunctionEnd
-

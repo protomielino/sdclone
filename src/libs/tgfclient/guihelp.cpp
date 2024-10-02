@@ -4,7 +4,6 @@
     created              : Fri Aug 13 22:20:37 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     		GUI help screen management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	gui
 */
 

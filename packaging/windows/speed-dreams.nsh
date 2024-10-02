@@ -2,7 +2,6 @@
 ;        Common definitions for all the Speed Dreams installers
 ;
 ;        copyright  : (C) 2011 onwards Jean-Philippe Meuret
-;        $Id$
 ;
 ;        This program is free software; you can redistribute it and/or modify
 ;        it under the terms of the GNU General Public License as published by
@@ -110,7 +109,7 @@ SetCompressor /SOLID lzma ; 1-block compression, smaller but longer (generation,
 ; Adapted from StrLoc 2.0 by Diego Pedroso (http://nsis.sourceforge.net/StrLoc)
 
 !define StrLoc "!insertmacro _StrLoc"
- 
+
 !macro _StrLoc Result String SubString StartPoint
   Push `${String}`
   Push `${SubString}`
@@ -118,7 +117,7 @@ SetCompressor /SOLID lzma ; 1-block compression, smaller but longer (generation,
   Call StrLoc
   Pop `${Result}`
 !macroend
- 
+
 Function StrLoc
 
   ;Get arguments from the stack
@@ -131,20 +130,20 @@ Function StrLoc
   Push $R4
   Push $R5
   Push $R6
- 
+
   ;Get "String" and "SubString" length
   StrLen $R3 $R1 ; R3 : SubStringLen
   StrLen $R4 $R2 ; R4 : StringLen
 
   ;Start "StartCharPos" counter
   StrCpy $R5 0 ; R5 : StartCharPos
- 
+
   ;Loop until "SubString" is found or "String" reaches its end
   ${Do}
 
     ;Remove everything before and after the searched part ("TempStr")
     StrCpy $R6 $R2 $R3 $R5 ; R6 : TmpString
- 
+
     ;Compare "TempStr" with "SubString"
     ${If} $R6 == $R1
       ${If} $R0 == "<"
@@ -163,7 +162,7 @@ Function StrLoc
     ;If not, continue the loop
     IntOp $R5 $R5 + 1
   ${Loop}
- 
+
   ;Return
   Pop $R6
   Pop $R5
@@ -179,13 +178,13 @@ FunctionEnd
 ; Parse the given SF.net download page ========================================
 ; and retrieve the URL of the target file on the default (auto-select) mirror.
 !define GetAutoSelectMirrorURL "!insertmacro _GetAutoSelectMirrorURL"
- 
+
 !macro _GetAutoSelectMirrorURL ResultURL HTMLFile
   Push "${HTMLFile}"
   Call GetAutoSelectMirrorURL
   Pop "${ResultURL}"
 !macroend
- 
+
 Function GetAutoSelectMirrorURL
 
   ;Get arguments from the stack
@@ -195,17 +194,17 @@ Function GetAutoSelectMirrorURL
   Push $R3
   Push $R4
   Push $R5
- 
-  ;DetailPrint "GetAutoSelectMirrorURL:" 
-  ;DetailPrint "  HTMLFile='$R0' ..." 
+
+  ;DetailPrint "GetAutoSelectMirrorURL:"
+  ;DetailPrint "  HTMLFile='$R0' ..."
 
   StrCpy $R2 "" ; R2 : ResultURL
 
   ClearErrors
   FileOpen $R1 $R0 r ; R1 : FileHdle
   IfErrors Done
- 
-  ;DetailPrint "  File open ..." 
+
+  ;DetailPrint "  File open ..."
 
   StrCpy $R3 "" ; R3 : Line
 
@@ -215,9 +214,9 @@ Function GetAutoSelectMirrorURL
     StrCpy $R4 $R3 ; R4 : PrevLine
     FileRead $R1 $R3
     IfErrors DoneRead
- 
-    ;DetailPrint "  Line read ..." 
-    ;DetailPrint "  '$R3'" 
+
+    ;DetailPrint "  Line read ..."
+    ;DetailPrint "  '$R3'"
 
     ${StrLoc} $R5 $R3 "direct link</a>, or try another" 0 ; R5 : StringPos
     ;DetailPrint "Found direct link ? $R5"
@@ -261,14 +260,14 @@ FunctionEnd
 ; Download a file from SF.net using the default mirror =========================
 ; ${Status} = "success" on success, or else "<error message>"
 !define DownloadFromSFNet "!insertmacro _DownloadFromSFNet"
- 
+
 !macro _DownloadFromSFNet StatusVar SourceURL TargetPathName
   Push "${SourceURL}"
   Push "${TargetPathName}"
   Call DownloadFromSFNet
   Pop "${StatusVar}"
 !macroend
- 
+
 Function DownloadFromSFNet
 
   ;Get arguments from the stack
@@ -283,52 +282,52 @@ Function DownloadFromSFNet
 
   StrCpy $R3 "success" ; R3 : Status
 
-  DetailPrint "1) Downloading default mirror URL (auto-selected by SF.net) ..." 
+  DetailPrint "1) Downloading default mirror URL (auto-selected by SF.net) ..."
   inetc::get "$R1" "$R2.html" /end
   Pop $R0
   ${If} $R0 != "OK"
-    
+
     ${If} $R0 == "cancel"
       StrCpy $R3 "Mirror selection page download was cancelled"
-      DetailPrint "... cancelled." 
+      DetailPrint "... cancelled."
     ${Else}
       StrCpy $R3 "Mirror selection page download failed$\n($R0)"
-      DetailPrint "... failed." 
+      DetailPrint "... failed."
     ${EndIf}
     MessageBox MB_OK|MB_ICONSTOP "$R3"
 
   ${Else}
 
     ${GetAutoSelectMirrorURL} $R4 $R2.html ; R4 : RealURL
-    ;DetailPrint "  File='$R2.html' ..." 
-    ;DetailPrint "  URL='$R4' ..." 
+    ;DetailPrint "  File='$R2.html' ..."
+    ;DetailPrint "  URL='$R4' ..."
 
     ${If} $R4 == ""
-    
+
         StrCpy $R3 "Failed to get file URL on default mirror$\nfrom $R1"
         MessageBox MB_OK|MB_ICONSTOP "$R3"
-        DetailPrint "... failed to extract default mirror URL." 
+        DetailPrint "... failed to extract default mirror URL."
 
     ${Else}
 
-      DetailPrint "2) Downloading file from $R4 ..." 
+      DetailPrint "2) Downloading file from $R4 ..."
       inetc::get "$R4" "$R2" /end
       Pop $R0
       ${If} $R0 != "OK"
-    
+
         ${If} $R0 == "cancel"
           StrCpy $R3 "File download was cancelled"
-          DetailPrint "... cancelled." 
+          DetailPrint "... cancelled."
         ${Else}
           StrCpy $R3 "Failed to download file$\nfrom $R4$\n($R0)"
-          DetailPrint "... failed." 
+          DetailPrint "... failed."
         ${EndIf}
         Delete "$R2"
         MessageBox MB_OK|MB_ICONSTOP "$R3"
 
       ${Else}
 
-        DetailPrint "3) Done in $R2." 
+        DetailPrint "3) Done in $R2."
 
       ${EndIf}
 
@@ -353,17 +352,17 @@ FunctionEnd
 
   ; Check if the target installer file is already here, next to the current one.
   ${IfNot} ${FileExists} "$EXEDIR\${PackageFileName}"
-      
+
     ; If not, ask the user if he really wants to download.
     MessageBox MB_OKCANCEL|MB_ICONQUESTION "${PackageFileName} not found$\nnext to $EXEFILE on your disk.$\n$\nClick OK to download it from ${GAME_DOWNLOAD_URL},$\nor Cancel to skip.$\n$\nNote: This might take several minutes, as it's about ${PackageSizeMb} megabytes." IDCANCEL SkipDownload
 
     ; Download
-    DetailPrint "Downloading ${PackageTitle} ..." 
+    DetailPrint "Downloading ${PackageTitle} ..."
     ${DownloadFromSFNet} $0 "${GAME_DOWNLOAD_URL}/${PackageFileName}" "$EXEDIR\${PackageFileName}"
 
     ${If} $0 != "success"
 
-      MessageBox MB_OK|MB_ICONSTOP "Skipping installation of ${PackageTitle}." 
+      MessageBox MB_OK|MB_ICONSTOP "Skipping installation of ${PackageTitle}."
 
       SetAutoClose false
 
@@ -373,7 +372,7 @@ FunctionEnd
 
   ${EndIf}
 
-  DetailPrint "Installing ${PackageTitle} ..." 
+  DetailPrint "Installing ${PackageTitle} ..."
   ExecWait '$EXEDIR\${PackageFileName}' $0
   DetailPrint "Done (exit code $0)."
   ${If} $0 != "0"
@@ -384,7 +383,7 @@ FunctionEnd
 
   SkipDownload:
 
-    DetailPrint "Skipping installation of ${PackageTitle} on user's request." 
+    DetailPrint "Skipping installation of ${PackageTitle} on user's request."
 
 !macroend
 
@@ -405,4 +404,3 @@ FunctionEnd
   ${EndIf}
 
 !macroend
-

@@ -4,7 +4,6 @@
 ;         because of lower quality graphics, unfinished AI support, ...)
 ;
 ;        copyright  : (C) 2011 onwards Jean-Philippe Meuret
-;        $Id$
 ;
 ;        This program is free software; you can redistribute it and/or modify
 ;        it under the terms of the GNU General Public License as published by
@@ -388,4 +387,3 @@ Function .onInit
   !insertmacro CheckIfBasePackageInstalled
 
 FunctionEnd
-

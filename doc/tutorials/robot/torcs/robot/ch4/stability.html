@@ -4,7 +4,6 @@
 <!--
 copyright   : (C) 2003-2004 Bernhard Wymann
 email       : berniw@bluewin.ch
-version     : $Id$
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -36,9 +35,9 @@ Free Documentation License".
 		  Now we make the car stay again on the track (at least on most of the tracks). We will introduce
 		  a margin around the middle of the track. When we are farther away from the middle we set the
 		  accelerator to zero. We will refine this by distinguish between inside and outside in the turns.
-		  When we are inside we can accelerate further, because the centrifugal force pushes the car outside. 
+		  When we are inside we can accelerate further, because the centrifugal force pushes the car outside.
 		</p>
-		
+
         <h3>Implementation</h3>
         <p>
 		  Here follows the implementation, put it in driver.cpp.
@@ -51,33 +50,33 @@ float Driver::filterTrk(float accel)
 
     if (car-&gt;_speed_x &lt; MAX_UNSTUCK_SPEED) return accel;</pre>
 		</p>
-		
+
 		<p>
 		  If we are very slow do nothing. Then check if we are on a straight. If that's the case,
-		  check both sides. 
+		  check both sides.
 		</p>
-		
+
 		<p><pre class="lcolor">    if (seg->type == TR_STR) {
         float tm = fabs(car->_trkPos.toMiddle);
         float w = seg->width/WIDTHDIV;
         if (tm > w) return 0.0; else return accel;</pre>
 		</p>
-		
+
 		<p>
 		  If we are in a turn check if we are inside or outside. If we are inside do nothing.
 		</p>
-        
+
 		<p><pre class="lcolor">    } else {
         float sign = (seg->type == TR_RGT) ? -1 : 1;
         if (car->_trkPos.toMiddle*sign > 0.0) {
             return accel;</pre>
 		</p>
-		
+
 		<p>
 		  If we are outside and more than "w" from the middle away set accelerator to zero.
 		</p>
-						
-                
+
+
 		<p><pre class="lcolor">        } else {
             float tm = fabs(car->_trkPos.toMiddle);
             float w = seg->width/WIDTHDIV;
@@ -86,43 +85,43 @@ float Driver::filterTrk(float accel)
     }
 }</pre>
 		</p>
-		
+
 		<p>
 		  We need to define WIDTHDIV in driver.cpp.
 		</p>
 
 		<p><pre class="lcolor">const float Driver::WIDTHDIV = 4.0;    /* [-] */</pre>
 		</p>
-		
+
 		<p>
-		  Add the call in Driver::drive(). Change 
+		  Add the call in Driver::drive(). Change
 		</p>
-		
+
 		<p><pre class="lbcolor">            car->ctrl.accelCmd = filterTCL(getAccel());</pre>
 		</p>
-		
+
 		<p>
 		  to
 		</p>
-		
+
 		<p><pre class="lcolor">            car->ctrl.accelCmd = filterTCL(filterTrk(getAccel()));</pre>
-		
+
 		<p>
 		  Finally we declare the new method and constant in driver.h.
 		</p>
-		
+
 		<p><pre class="lcolor">        float filterTrk(float accel);</pre>
 		</p>
-		
+
 		<p><pre class="lcolor">        static const float WIDTHDIV;</pre>
 		</p>
-		
+
 		<h3>Testdrive</h3>
         <p>
 		  What you got till now is not too bad. You've written a robot that is able to master most of
 		  the tracks. We also reduced the lap times very much:
 		</p>
-		
+
 		<ul style="list-style-type:disk; color:black;">
 		  <li>mixed-2: 1:14:70, 0 damage.</li>
 		  <li>e-track-2: 1:24:45, 0 damage.</li>

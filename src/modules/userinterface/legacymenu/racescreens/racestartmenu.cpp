@@ -19,7 +19,6 @@
 /** @file
                 The race start menu
     @author     <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version    $Id$
 */
 
 #include <cstdio>

@@ -19,7 +19,6 @@
 /** @file
 	GUI scroll-list management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	gui
 */
 

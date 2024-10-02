@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 #ifndef _RACERESULTS_H_

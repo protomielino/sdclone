@@ -17,7 +17,6 @@
 
 # @file     Generic macro argument parser
 # @author   Mart Kelder
-# @version  $Id$
 
 # Internal use only : Get the list of specified keywords
 MACRO(SPLIT_ARGN_KEYWORDS SAK_RESULT)

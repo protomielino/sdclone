@@ -19,7 +19,6 @@
 /** @file
 			Race selection menu
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-	@version	$Id$
 */
 
 #include <map>

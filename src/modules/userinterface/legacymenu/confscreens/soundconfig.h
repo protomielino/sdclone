@@ -18,7 +18,6 @@
 
 /** @file
 
-    @version	$Id$
 */
 
 #ifndef _SOUNDCONFIG_H_

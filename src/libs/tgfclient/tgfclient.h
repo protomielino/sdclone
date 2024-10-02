@@ -18,7 +18,6 @@
 /** @file
         The Gaming Framework API (client part).
     @author     <a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version    $Id$
 */
 
 #ifndef __TGFCLIENT__H__

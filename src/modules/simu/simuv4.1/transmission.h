@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: transmission.h 2917 2010-10-17 19:03:40Z pouillot $
 */
 
 #ifndef _TRANSMISSION_H_

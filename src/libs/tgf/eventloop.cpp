@@ -4,7 +4,6 @@
     created              : Mon Apr 21 22:30:04 CEST 2011
     copyright            : (C) 2009 Brian Gavin, 2011 Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************

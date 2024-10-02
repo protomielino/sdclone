@@ -17,7 +17,6 @@
 
 # @file     CMake install macros
 # @author   Mart Kelder, J.-P. Meuret
-# @version  $Id$
 
 
 # Get the real pathname of a target (taking care of the MSVC configuration-driven variables).

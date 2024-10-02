@@ -18,7 +18,6 @@
 /** @file
 
     @author	    Brian Gavin
-    @version	$Id$
 */
 
 #ifdef CLIENT_SERVER

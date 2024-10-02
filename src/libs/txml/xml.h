@@ -1,7 +1,6 @@
 /*
  * xml.h -- Interface file for XML
  *
- * @(#) $Id$
  */
 
 #ifndef _XML_H_

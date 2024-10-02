@@ -18,7 +18,6 @@
 /** @file
 
     @author	    Brian Gavin
-    @version	$Id$
 */
 
 #ifndef _RACENETWORK_H_

@@ -4,7 +4,6 @@
     created     : Sun Feb 16 13:09:23 CET 2003
     copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org
-    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,7 +19,6 @@
 			Files open/save menu screens.
 	@ingroup	racemantools
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-	@version	$Id$
 */
 
 

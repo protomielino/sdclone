@@ -4,7 +4,6 @@
     created              : Mon Aug 16 21:43:00 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     @ingroup    racemantools
     @author <a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version    $Id$
 */
 
 #include <sstream>

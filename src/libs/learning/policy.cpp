@@ -1,5 +1,4 @@
 // -*- Mode: c++ -*-
-// $Id$
 
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************

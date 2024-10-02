@@ -4,7 +4,6 @@
     created              : Mon Mar 28 19:48:14 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +17,6 @@
 
 /** @file
     	Interface for graphics engines
-    @version	$Id$
 */
 
 #ifndef __IGRAPHICSENGINE__H__

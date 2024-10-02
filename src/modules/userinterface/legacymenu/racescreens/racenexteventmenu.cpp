@@ -19,7 +19,6 @@
 /** @file
     		The Next Event menu (where one sees which track the next event is run on)
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <cstdlib>

@@ -17,7 +17,6 @@
 
 /** @file
     		The "Simu V2.1" physics engine module
-    @version    $Id$
 */
 
 #ifndef _SIMUV21_H_

@@ -17,7 +17,6 @@
 
 # @file     Robots-related macros
 # @author   Mart Kelder
-# @version  $Id$
 
 # Robot .def file generation for Windows builds with MSVC compilers
 #  ROBOTNAME  : Name of the robot

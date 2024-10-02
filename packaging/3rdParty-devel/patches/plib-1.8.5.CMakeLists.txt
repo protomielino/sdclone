@@ -5,7 +5,6 @@
 #    created              : Aug 9 2015
 #    copyright            : (C) 2015 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id:$
 #
 #==============================================================================
 #

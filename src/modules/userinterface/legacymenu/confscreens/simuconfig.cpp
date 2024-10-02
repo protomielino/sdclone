@@ -18,7 +18,6 @@
 
 /** @file
             Simutation option menu
-    @version	$Id$
 */
 
 #include <cstdio>

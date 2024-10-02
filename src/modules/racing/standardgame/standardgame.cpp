@@ -17,7 +17,6 @@
 
 /** @file
     		The standard game race engine module
-    @version    $Id$
 */
 
 #include <sstream>

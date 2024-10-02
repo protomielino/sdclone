@@ -4,7 +4,6 @@
     created              : Wed Mar 31 22:12:01 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +17,6 @@
 
 /** @file
     	Interface for track loaders
-    @version	$Id$
 */
 
 #ifndef __ITRACKLOADER__H__

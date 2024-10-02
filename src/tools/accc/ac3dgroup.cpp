@@ -18,7 +18,6 @@
 /** @file
 
  @author Christophe Guionneau
- @version    $Id$
  */
 
 #include <cstdio>

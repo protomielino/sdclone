@@ -4,7 +4,6 @@
     created              : Fri Aug 13 22:29:56 CEST 1999
     copyright            : (C) 1999, 2004 by Eric Espie, Bernhard Wymann
     email                : torcs@free.fr
-    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +18,6 @@
 /** @file
     Screen management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
     @ingroup	screen
 */
 

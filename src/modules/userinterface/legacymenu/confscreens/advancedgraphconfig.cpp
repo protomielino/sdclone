@@ -19,7 +19,6 @@
 /** @file
 
     @author	<a href=mailto:bertauxx@yahoo.fr>Xavier Bertaux</a>
-    @version	$Id: advancedgraphconfig.cpp 4542 2012-05-13 17:24:29Z torcs-ng $
 */
 
 #include <portability.h>

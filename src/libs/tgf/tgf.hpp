@@ -4,7 +4,6 @@
     created              : Mod Mar 14 20:32:14 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
-    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +17,6 @@
 
 /** @file
     	The Gaming Framework API, with C++-specific extensions.
-    @version	$Id$
 */
 
 #ifndef __TGF__HPP__

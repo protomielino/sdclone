@@ -17,7 +17,6 @@
 
 /** @file
     		The "legacy menu" user interface module
-    @version    $Id$
 */
 
 #ifndef _LEGACYMENU_H_

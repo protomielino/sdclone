@@ -20,7 +20,6 @@
     		Driver selection menu.
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
 */
 
 

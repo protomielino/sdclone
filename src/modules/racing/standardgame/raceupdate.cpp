@@ -19,7 +19,6 @@
 /** @file
     		Race engine core : physics engine, drivers and graphics direction
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <cstdlib>

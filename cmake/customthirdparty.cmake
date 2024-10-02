@@ -20,7 +20,6 @@
 #            it the way we need, so we needed another solution).
 #           Heavily based on OpenScenGraph cmake scripts.
 # @author   Brian Gavin, Jean-Philippe Meuret
-# @version  $Id$
 
 ################################################################################################
 # Find a generic dependency, handling debug suffix

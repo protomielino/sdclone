@@ -17,7 +17,6 @@
 
 # @file     CMake configuration options
 # @author   Mart Kelder, J.-P. Meuret
-# @version  $Id$
 
 INCLUDE(CMakeDependentOption)
 

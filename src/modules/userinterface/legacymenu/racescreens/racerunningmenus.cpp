@@ -19,7 +19,6 @@
 /** @file
     		The menus for when the race is running
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id$
 */
 
 #include <cstdlib>
