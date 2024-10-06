@@ -253,6 +253,7 @@ static ssgState *get_simple_state ( _ssgMaterial *mat )
 
   if (isawindow)
   {
+      st->enable (GL_CULL_FACE);
       st->enable  ( GL_BLEND );
       st->setTranslucent () ;
   }
