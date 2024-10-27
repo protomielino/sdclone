@@ -1,12 +1,10 @@
-# modified to remove the CMAKE_DEBUG_POSTFIX
-
 cmake_minimum_required(VERSION 2.8.8)
 
 project(FreeSOLID)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;${CMAKE_MODULE_PATH}")
 
-#set(CMAKE_DEBUG_POSTFIX  "_d")
+set(CMAKE_DEBUG_POSTFIX  "_d")
 
 set(OUTPUT_BINDIR ${PROJECT_BINARY_DIR}/bin)
 make_directory(${OUTPUT_BINDIR})
