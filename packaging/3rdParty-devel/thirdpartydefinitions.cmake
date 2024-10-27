@@ -226,9 +226,8 @@ set(TINYGLTF_URL https://github.com/syoyo/tinygltf/archive/refs/tags/v${TINYGLTF
 set(TINYGLTF_HASH SHA256=97c3eb1080c1657cd749d0b49af189c6a867d5af30689c48d5e19521e7b5a070)
 
 # minizip
-set(MINIZIP_VERSION 1.3)
+set(MINIZIP_VERSION 1.3.1)
 set(MINIZIP_PROJECT minizip-${MINIZIP_VERSION})
-set(MINIZIP_FILE ${MINIZIP_PROJECT}.tar.gz)
 set(MINIZIP_URL https://github.com/F2I-Consulting/Minizip/archive/refs/tags/v1.3_cmake0.1.tar.gz)
 set(MINIZIP_HASH SHA256=4ab1ffdc954e10faf2e756bd26e52ac4c339389159725dacb3d9104560f7f1a3)
 
