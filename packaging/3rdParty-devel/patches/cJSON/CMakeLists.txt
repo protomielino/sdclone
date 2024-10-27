@@ -223,12 +223,20 @@ if(ENABLE_CJSON_UTILS)
 endif()
 
 # create the other package config files
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/library_config/cJSONConfig.cmake.in"
-    ${PROJECT_BINARY_DIR}/cJSONConfig.cmake @ONLY)
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/library_config/cJSONConfigVersion.cmake.in"
-    ${PROJECT_BINARY_DIR}/cJSONConfigVersion.cmake @ONLY)
+include(CMakePackageConfigHelpers)
+set(include_dir "${CMAKE_INSTALL_INCLUDEDIR}/cjson")
+configure_package_config_file(cJSONConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cJSONConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cJSON
+    PATH_VARS
+        include_dir
+        CMAKE_INSTALL_LIBDIR
+)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/cJSONConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
 
 if(ENABLE_TARGET_EXPORT)
     # Install package config files

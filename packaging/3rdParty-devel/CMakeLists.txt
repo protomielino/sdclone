@@ -682,6 +682,18 @@ if(OPTION_CJSON)
       URL ${CJSON_URL}
       URL_HASH ${CJSON_HASH}
       CMAKE_ARGS ${CJSON_ARGS})
+   ExternalProject_Add_Step(${CJSON_PROJECT} cjson_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/cJSON/CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+   ExternalProject_Add_Step(${CJSON_PROJECT} cjson_add_cmakeconfig
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/cJSON/cJSONConfig.cmake.in"
+              "<SOURCE_DIR>/cJSONConfig.cmake.in"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 else()
    set(CJSON_PROJECT )
 endif()
