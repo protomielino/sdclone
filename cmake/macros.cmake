@@ -38,12 +38,8 @@ ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 # Determine the source folder if ???
 IF(NOT SOURCE_DIR AND IN_SOURCETREE)
-  FIND_PATH(SOURCE_CMAKE_PATH cmake/macros.cmake PATHS . .. ../.. ../../.. ../../../.. ../../../../.. ../../../../../.. ../../../../../../.. ../../../../../../../.. ${CMAKE_SOURCE_DIR} NO_DEFAULT_PATH)
-  FIND_PATH(SOURCE_CMAKE_PATH cmake/macros.cmake PATHS . .. ../.. ../../.. ../../../.. ../../../../.. ../../../../../.. ../../../../../../.. ../../../../../../../.. ${CMAKE_SOURCE_DIR})
-  GET_FILENAME_COMPONENT(SOURCE_DIR ${SOURCE_CMAKE_PATH} ABSOLUTE CACHE)
+  SET(SOURCE_DIR ${CMAKE_SOURCE_DIR})
   MARK_AS_ADVANCED(SOURCE_DIR)
-  SET(SOURCE_CMAKE_PATH "")
-  MARK_AS_ADVANCED(SOURCE_CMAKE_PATH)
 ENDIF(NOT SOURCE_DIR AND IN_SOURCETREE)
 
 # The path of the folder of the current CMakeLists.txt
