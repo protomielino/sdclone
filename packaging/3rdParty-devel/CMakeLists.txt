@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
 
 IF(POLICY CMP0135)
    CMAKE_POLICY(SET CMP0135 NEW)
-ENDIF(POLICY CMP0135)
+endif()
 
 project(3rdParty VERSION 2.4.0)
 
@@ -46,18 +46,18 @@ if(NOT CMAKE_BUILD_TYPE)
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
     message(STATUS "No CMAKE_BUILD_TYPE specified, defaulting to ${CMAKE_BUILD_TYPE}")
-endif(NOT CMAKE_BUILD_TYPE)
+endif()
 
 # Setup the install prefix.
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "./installed" CACHE PATH "Prefix prepended to install directories" FORCE)
-endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+endif()
 
 
 if(MINGW)
    link_directories(/usr/lib /usr/local/lib)
    include_directories(AFTER /usr/include /usr/local/include)
-endif(MINGW)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
@@ -69,13 +69,13 @@ set(EXTERNALS_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALS_INSTALL_DIR} CACHE P
 # where build is targeting newer system than the build host
 if(CMAKE_SYSTEM_VERSION)
    list(APPEND EXTERNALS_CMAKE_ARGS "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
-endif(CMAKE_SYSTEM_VERSION)
+endif()
 
 # CMake's built-in FindCURL.cmake module doesn't set CURL_INCLUDE_DIR and CURL_LIBRARIES
 # if it finds CURLConfig.cmake it just returns after setting CURL_FOUND and CURL_DIR
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
    list(APPEND EXTERNALS_CMAKE_ARGS -DCURL_NO_CURL_CMAKE=ON)
-endif(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
+endif()
 
 if(WIN32)
    set(_max_ext_path "64")
@@ -92,7 +92,7 @@ set_property(DIRECTORY PROPERTY EP_BASE ${EXTERNALS_PREFIX})
 
 if(WIN32)
    set(OPTION_OPENGL_HEADERS true CACHE BOOL "Download the OpenGL headers")
-endif(WIN32)
+endif()
 
 option(OPTION_SDL2 "Download and Build SDL2" true)
 cmake_dependent_option(OPTION_SDL2_MIXER "Download and Build SDL2_Mixer" true "OPTION_SDL2" false)
@@ -183,9 +183,9 @@ if(OPTION_ZLIB)
    ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
       COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib
       DEPENDEES sd_zlib_remove_lib)
-else(OPTION_ZLIB)
+else()
    set(ZLIB_PROJECT )
-endif(OPTION_ZLIB)
+endif()
 
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
@@ -198,7 +198,7 @@ if(OPTION_SDL2)
          URL_HASH ${SDL2_HASH}
          CMAKE_ARGS ${SDL2_ARGS}
          DEPENDS OpenGL-headers)
-   else(MSVC_VERSION GREATER 1700)
+   else()
       set(SDL2_PROJECT ${SDL2_LEGACY_PROJECT})
       set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
       ExternalProject_Add(${SDL2_PROJECT}
@@ -206,10 +206,10 @@ if(OPTION_SDL2)
          URL_HASH ${SDL2_LEGACY_HASH}
          CMAKE_ARGS ${SDL2_ARGS}
          DEPENDS OpenGL-headers)
-   endif(MSVC_VERSION GREATER 1700)
-else(OPTION_SDL2)
+   endif()
+else()
    set(SDL2_PROJECT )
-endif(OPTION_SDL2)
+endif()
 
 if(OPTION_OPENAL)
    set(OPENAL_ARGS ${EXTERNALS_CMAKE_ARGS})
@@ -244,7 +244,7 @@ if(OPTION_OPENAL)
          CMAKE_ARGS ${OPENAL_ARGS}
          DEPENDS ${SDL2_PROJECT} ${ZLIB_PROJECT})
    endif()
-endif(OPTION_OPENAL)
+endif()
 
 if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
@@ -274,7 +274,7 @@ if(OPTION_PLIB)
             DEPENDEES update # do after update
             DEPENDERS patch)  # do before patch
       endif()
-   else(OPTION_PLIB_USE_HEAD)
+   else()
       # this archive corresponds to revision 2131
       ExternalProject_Add(${PLIB_PROJECT}
          URL ${PLIB_URL}
@@ -287,8 +287,8 @@ if(OPTION_PLIB)
                  "<SOURCE_DIR>/CMakeLists.txt"
          DEPENDEES update # do after update
          DEPENDERS patch)  # do before patch
-   endif(OPTION_PLIB_USE_HEAD)
-endif(OPTION_PLIB)
+   endif()
+endif()
 
 if(OPTION_JPEG)
    #set(JPEG_PROJECT jpeg-9d)
@@ -308,9 +308,9 @@ if(OPTION_JPEG)
               "<SOURCE_DIR>/jconfig.h"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_JPEG)
+else()
    set(JPEG_PROJECT )
-endif(OPTION_JPEG)
+endif()
 
 if(OPTION_FREESOLID)
    set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
@@ -325,7 +325,7 @@ if(OPTION_FREESOLID)
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-endif(OPTION_FREESOLID)
+endif()
 
 if(OPTION_ENET)
    ExternalProject_Add(${ENET_PROJECT}
@@ -338,9 +338,9 @@ if(OPTION_ENET)
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_ENET)
+else()
    set(ENET_PROJECT )
-endif(OPTION_ENET)
+endif()
 
 if(OPTION_OGG)
    set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off)
@@ -348,9 +348,9 @@ if(OPTION_OGG)
       URL ${OGG_URL}
       URL_HASH ${OGG_HASH}
       CMAKE_ARGS ${OGG_ARGS})
-else(OPTION_OGG)
+else()
    set(OGG_PROJECT )
-endif(OPTION_OGG)
+endif()
 
 if(OPTION_VORBIS)
    set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on)
@@ -359,9 +359,9 @@ if(OPTION_VORBIS)
       URL_HASH ${VORBIS_HASH}
       CMAKE_ARGS ${VORBIS_ARGS}
       DEPENDS ${OGG_PROJECT})
-else(OPTION_VORBIS)
+else()
    set(VORBIS_PROJECT )
-endif(OPTION_VORBIS)
+endif()
 
 if(OPTION_SDL2_MIXER)
    set(SDL2_MIXER_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL2MIXER_DEBUG_POSTFIX:STRING=''
@@ -377,9 +377,9 @@ if(OPTION_SDL2_MIXER)
       URL_HASH ${SDL2_MIXER_HASH}
       CMAKE_ARGS ${SDL2_MIXER_ARGS}
       DEPENDS ${SDL2_PROJECT} ${VORBIS_PROJECT} ${OGG_PROJECT} )
-else(OPTION_SDL2_MIXER)
+else()
    set(SDL2_MIXER_PROJECT )
-endif(OPTION_SDL2_MIXER)
+endif()
 
 if(OPTION_EXPAT)
    if(MSVC_VERSION GREATER 1900)
@@ -405,9 +405,9 @@ if(OPTION_EXPAT)
          URL_HASH ${EXPAT_LEGACY_HASH}
          CMAKE_ARGS ${EXPAT_LEGACY_ARGS})
     endif()
-else(OPTION_EXPAT)
+else()
    set(EXPAT_PROJECT )
-endif(OPTION_EXPAT)
+endif()
 
 if(OPTION_PNG)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off)
@@ -420,9 +420,9 @@ if(OPTION_PNG)
       ExternalProject_Add_Step(${PNG_PROJECT} sd_libpng_rename
          COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
          DEPENDEES install)
-else(OPTION_PNG)
+else()
    set(PNG_PROJECT )
-endif(OPTION_PNG)
+endif()
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
@@ -436,9 +436,9 @@ if(OPTION_SQLITE3)
            "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_SQLITE3)
+else()
    set(SQLITE3_PROJECT )
-endif(OPTION_SQLITE3)
+endif()
 
    # ========== For OpenSceneGraph =============
 
@@ -479,10 +479,10 @@ if(OPTION_FREETYPE)
          CMAKE_ARGS ${FREETYPE_LEGACY_ARGS}
          DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT})
       endif()
-else(OPTION_FREETYPE)
+else()
    set(FREETYPE_PROJECT )
    set(FREETYPE_LEGACY_PROJECT )
-endif(OPTION_FREETYPE)
+endif()
 
 if(OPTION_CURL)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX= -DCURL_USE_SCHANNEL=On -DCURL_WINDOWS_SSPI=On)
@@ -491,9 +491,9 @@ if(OPTION_CURL)
       URL_HASH ${CURL_HASH}
       CMAKE_ARGS ${CURL_ARGS}
       DEPENDS ${ZLIB_PROJECT})
-else(OPTION_CURL)
+else()
    set(CURL_PROJECT )
-endif(OPTION_CURL)
+endif()
 
 if(OPTION_OSG)
    set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX=''
@@ -521,7 +521,7 @@ if(OPTION_OSG)
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL2_PROJECT})
-endif(OPTION_OSG)
+endif()
 
 if(OPTION_GLM)
    set(GLM_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX=''
@@ -538,9 +538,9 @@ if(OPTION_GLM)
            "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_GLM)
+else()
    set(GLM_PROJECT )
-endif(OPTION_GLM)
+endif()
 
 if(OPTION_TINYGLTF)
    set(TINYGLTF_ARGS ${EXTERNALS_CMAKE_ARGS} -D TINYGLTF_BUILD_LOADER_EXAMPLE=Off
@@ -549,9 +549,9 @@ if(OPTION_TINYGLTF)
       URL ${TINYGLTF_URL}
       URL_HASH ${TINYGLTF_HASH}
       CMAKE_ARGS ${TINYGLTF_ARGS})
-else(OPTION_TINYGLTF)
+else()
    set(TINYGLTF_PROJECT )
-endif(OPTION_TINYGLTF)
+endif()
 
 if(OPTION_MINIZIP)
    set(MINIZIP_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX='')
@@ -566,9 +566,9 @@ if(OPTION_MINIZIP)
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_MINIZIP)
+else()
    set(MINIZIP_PROJECT )
-endif(OPTION_MINIZIP)
+endif()
 
 if(OPTION_CJSON)
    set(CJSON_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX= )
@@ -577,9 +577,9 @@ if(OPTION_CJSON)
       URL_HASH ${CJSON_HASH}
       CMAKE_ARGS ${CJSON_ARGS}
       DEPENDS ${MINIZIP_PROJECT})
-else(OPTION_CJSON)
+else()
    set(CJSON_PROJECT )
-endif(OPTION_CJSON)
+endif()
 
 if(OPTION_RHASH)
    set(RHASH_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX='')
@@ -600,9 +600,9 @@ if(OPTION_RHASH)
       INSTALL_COMMAND
          make install-lib-shared LIBRHASH_SHARED=librhash.dll
    )
-else(OPTION_RHASH)
+else()
    set(RHASH_PROJECT )
-endif(OPTION_RHASH)
+endif()
 
 # no-output target, for having some files available in IDEs.
 set(DOCSOURCES COPYING LICENSE readme.txt)
@@ -632,12 +632,12 @@ if(MSVC)
    # This is now preferrred way to check 32 vs 64 bit
    if(CMAKE_SIZEOF_VOID_P EQUAL 8 )
       set(SD_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-vs${_VSYEAR}-win64)
-   else(CMAKE_SIZEOF_VOID_P EQUAL 8 )
+   else()
       set(SD_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-vs${_VSYEAR}-win32)
-   endif(CMAKE_SIZEOF_VOID_P EQUAL 8 )
-else(MSVC)
+   endif()
+else()
    set(SD_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION}-${CMAKE_C_COMPILER_ID}-${CMAKE_C_COMPILER_VERSION})
-endif(MSVC)
+endif()
 
 # If this is NOT a Release build, append the build type to the filename
 string(TOLOWER "${CMAKE_BUILD_TYPE}" _CMAKE_BUILD_TYPE_LOWCASE)
