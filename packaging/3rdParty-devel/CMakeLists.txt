@@ -414,9 +414,6 @@ if(OPTION_PNG)
       URL_HASH ${PNG_HASH}
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS ${ZLIB_PROJECT})
-      ExternalProject_Add_Step(${PNG_PROJECT} sd_libpng_rename
-         COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
-         DEPENDEES install)
 else()
    set(PNG_PROJECT )
 endif()
