@@ -588,24 +588,32 @@ else()
 endif()
 
 if(OPTION_RHASH)
-   set(RHASH_ARGS ${EXTERNALS_CMAKE_ARGS} -D CMAKE_DEBUG_POSTFIX='')
+   set(RHASH_ARGS ${EXTERNALS_CMAKE_ARGS} -D USE_GETTEXT=OFF)
    ExternalProject_Add(${RHASH_PROJECT}
       URL ${RHASH_URL}
       URL_HASH ${RHASH_HASH}
-      BINARY_DIR
-         # rhash does not support out-of-tree builds.
-         ${EXTERNALS_PREFIX}/Source/${RHASH_PROJECT}
-      CONFIGURE_COMMAND
-         ./configure
-            --prefix=${EXTERNALS_INSTALL_DIR}
-            --cc=${CMAKE_C_COMPILER}
-            --enable-lib-shared
-            --disable-lib-static
-      BUILD_COMMAND
-         make lib-shared LIBRHASH_SHARED=librhash.dll
-      INSTALL_COMMAND
-         make install-lib-shared LIBRHASH_SHARED=librhash.dll
-   )
+      CMAKE_ARGS ${RHASH_ARGS})
+
+   ExternalProject_Add_Step(${RHASH_PROJECT} rhash_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/rhash/CMakeLists.txt"
+            "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${RHASH_PROJECT} rhash_add_rhash_tohex
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/rhash/rhash-tohex.cmake"
+            "<SOURCE_DIR>/rhash-tohex.cmake"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${RHASH_PROJECT} rhash_add_lib_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/rhash/librhash/CMakeLists.txt"
+            "<SOURCE_DIR>/librhash/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 else()
    set(RHASH_PROJECT )
 endif()
