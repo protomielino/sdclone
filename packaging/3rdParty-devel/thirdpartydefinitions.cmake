@@ -66,15 +66,19 @@ set(OPENAL_HASH SHA256=dfddf3a1f61059853c625b7bb03de8433b455f2f79f89548cbcbd5edc
 # https://github.com/kcat/openal-soft/releases/tag/1.23.1
 # https://github.com/kcat/openal-soft/archive/refs/tags/1.23.1.tar.gz
 
-message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
+if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
+endif()
 set(OPENAL_C11_VERSION 1.19.1)
 set(OPENAL_C11_PROJECT openal-soft-${OPENAL_C11_VERSION})
 set(OPENAL_C11_FILE ${OPENAL_C11_PROJECT}.tar.gz)
 set(OPENAL_C11_URL https://github.com/kcat/openal-soft/archive/refs/tags/${OPENAL_C11_FILE})
 set(OPENAL_C11_HASH SHA256=9f3536ab2bb7781dbafabc6a61e0b34b17edd16bd6c2eaf2ae71bc63078f98c7)
 
-message(STATUS "openal-soft versions newer than 1.18.2 need Visual Studio 2015 or newer")
-message(STATUS "so for older versions of Visual Studio, also download this version")
+if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    message(STATUS "openal-soft versions newer than 1.18.2 need Visual Studio 2015 or newer")
+    message(STATUS "so for older versions of Visual Studio, also download this version")
+endif()
 set(OPENAL_LEGACY_VERSION 1.18.2)
 set(OPENAL_LEGACY_PROJECT openal-soft-${OPENAL_LEGACY_VERSION})
 set(OPENAL_LEGACY_FILE ${OPENAL_LEGACY_PROJECT}.tar.gz)

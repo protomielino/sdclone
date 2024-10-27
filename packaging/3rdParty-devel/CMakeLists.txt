@@ -395,8 +395,10 @@ if(OPTION_EXPAT)
          URL_HASH ${EXPAT_HASH}
          CMAKE_ARGS ${EXPAT_ARGS})
     else()
-      message(WARNING "expat versions newer than 2.2.10 need Visual Studio 2017")
-      message(WARNING "expat no longer officially supports Visual Studio 2015 and older")
+      if(CMAKE_GENERATOR MATCHES "Visual Studio")
+         message(WARNING "expat versions newer than 2.2.10 need Visual Studio 2017")
+         message(WARNING "expat no longer officially supports Visual Studio 2015 and older")
+      endif()
       #disable building unneeded sub projects (they failed with VS2008)
       set(EXPAT_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
       ExternalProject_Add(${EXPAT_LEGACY_PROJECT}
@@ -464,7 +466,9 @@ if(OPTION_FREETYPE)
       # Set FREETYPE_PROJECT to empty string, because we will use FREETYPE_LEGACY_PROJECT,
       # OpenScenegraph DEPENDS on freetype, so only one can be defined
       set(FREETYPE_PROJECT )
-      message(WARNING "freetype versions newer than 2.10.4 need Visual Studio 2013 or newer")
+      if(CMAKE_GENERATOR MATCHES "Visual Studio")
+         message(WARNING "freetype versions newer than 2.10.4 need Visual Studio 2013 or newer")
+      endif()
       set(FREETYPE_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
                                                        -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                                        -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
