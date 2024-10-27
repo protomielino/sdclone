@@ -536,6 +536,20 @@ if(OPTION_OSG)
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL2_PROJECT})
+
+   ExternalProject_Add_Step(${OSG_PROJECT} osg_patch_displaysettings
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/OpenSceneGraph-3.6.5/DisplaySettings.cpp"
+            "<SOURCE_DIR>/src/osg/DisplaySettings.cpp"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${OSG_PROJECT} osg_patch_graphicswindowwin32
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/OpenSceneGraph-3.6.5/GraphicsWindowWin32.cpp"
+            "<SOURCE_DIR>/src/osgViewer/GraphicsWindowWin32.cpp"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 endif()
 
 if(OPTION_GLM)
