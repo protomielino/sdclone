@@ -531,6 +531,7 @@ if(OPTION_OSG)
                                         -DBUILD_OSG_DEPRECATED_SERIALIZERS=OFF
                                         -DBUILD_OSG_APPLICATIONS=OFF
                                         -DBUILD_OSG_PLUGINS_BY_DEFAULT=OFF
+                                        -DOPENTHREADS_ATOMIC_USE_MUTEX=ON
                                         -DBUILD_OSG_PLUGIN_OSG=ON
                                         -DBUILD_OSG_PLUGIN_AC=ON
                                         -DBUILD_OSG_PLUGIN_CURL=ON
