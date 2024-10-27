@@ -1,6 +1,6 @@
 ; vorbis.def
 ; 
-LIBRARY
+LIBRARY libvorbis.dll
 EXPORTS
 _floor_P
 _mapping_P

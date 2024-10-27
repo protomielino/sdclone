@@ -369,6 +369,27 @@ if(OPTION_VORBIS)
       URL_HASH ${VORBIS_HASH}
       CMAKE_ARGS ${VORBIS_ARGS}
       DEPENDS ${OGG_PROJECT})
+
+   ExternalProject_Add_Step(${VORBIS_PROJECT} vorbis_patch_def
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/vorbis/vorbis.def"
+           "<SOURCE_DIR>/win32/vorbis.def"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${VORBIS_PROJECT} vorbis_patch_enc_def
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/vorbis/vorbisenc.def"
+           "<SOURCE_DIR>/win32/vorbisenc.def"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${VORBIS_PROJECT} vorbis_patch_file_def
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/vorbis/vorbisfile.def"
+           "<SOURCE_DIR>/win32/vorbisfile.def"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 else()
    set(VORBIS_PROJECT )
 endif()

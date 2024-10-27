@@ -1,6 +1,6 @@
 ; vorbisenc.def
 ;
-LIBRARY
+LIBRARY libvorbisenc.dll
 
 EXPORTS
 vorbis_encode_init
