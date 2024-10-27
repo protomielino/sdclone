@@ -16,6 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#define SDL_MAIN_HANDLED
+
 #include <portability.h>
 
 #include <string>
