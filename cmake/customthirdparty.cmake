@@ -182,6 +182,14 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-9;jpeg-8" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
+	# CMake might already define FindFreetype.cmake, but it is not required
+	# since freetype should already install freetype-config.cmake inside the
+	# 3rdParty directory.
+	find_package(freetype CONFIG REQUIRED)
+	get_target_property(freetype_lib freetype LOCATION)
+	_FIND_3RDPARTY_DLL("${freetype_lib}" "freetype" ";lib" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
 	get_property(CURL_LIBRARY TARGET CURL::libcurl PROPERTY LOCATION)
 	_FIND_3RDPARTY_DLL("${CURL_LIBRARY}" "curl" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
