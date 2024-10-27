@@ -30,7 +30,7 @@ ADD_ENET_LIBRARY(csnetworking)
 ADD_SDL2_LIBRARY(csnetworking)
 
 IF(WIN32)
-	TARGET_LINK_LIBRARIES(csnetworking Winmm ws2_32)
+	TARGET_LINK_LIBRARIES(csnetworking winmm ws2_32)
 ENDIF(WIN32)
 
 IF(MSVC)

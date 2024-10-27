@@ -30,7 +30,7 @@ ADD_ENET_LIBRARY(networking)
 ADD_SDL2_LIBRARY(networking)
 
 IF(WIN32)
-	TARGET_LINK_LIBRARIES(networking Winmm ws2_32)
+	TARGET_LINK_LIBRARIES(networking winmm ws2_32)
 ENDIF(WIN32)
 
 IF(MSVC)
