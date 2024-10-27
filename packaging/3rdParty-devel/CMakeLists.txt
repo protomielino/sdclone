@@ -581,8 +581,7 @@ if(OPTION_CJSON)
    ExternalProject_Add(${CJSON_PROJECT}
       URL ${CJSON_URL}
       URL_HASH ${CJSON_HASH}
-      CMAKE_ARGS ${CJSON_ARGS}
-      DEPENDS ${MINIZIP_PROJECT})
+      CMAKE_ARGS ${CJSON_ARGS})
 else()
    set(CJSON_PROJECT )
 endif()
