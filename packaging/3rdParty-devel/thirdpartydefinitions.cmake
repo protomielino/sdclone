@@ -210,7 +210,7 @@ set(SQLITE3_HASH SHA256=712a7d09d2a22652fb06a49af516e051979a3984adb067da86760e60
 # GLM
 set(GLM_VERSION 1.0.1)
 set(GLM_PROJECT glm-${GLM_VERSION})
-set(GLM_FILE ${GLM_PROJECT},tar.gz)
+set(GLM_FILE ${GLM_VERSION}.tar.gz)
 set(GLM_URL https://github.com/g-truc/glm/archive/refs/tags/${GLM_VERSION}.tar.gz)
 set(GLM_HASH SHA256=9f3174561fd26904b23f0db5e560971cbf9b3cbda0b280f04d5c379d03bf234c)
 
