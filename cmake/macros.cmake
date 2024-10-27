@@ -250,8 +250,6 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 
   ELSEIF(NOT ${TARGET_TYPE} STREQUAL "STATIC")
 
-    MESSAGE(FATAL "Unsupported library type ${TARGET_TYPE} for ${TARGET_NAME}")
-
   ENDIF()
 
   # Change target location (for running in build-tree without installing).
