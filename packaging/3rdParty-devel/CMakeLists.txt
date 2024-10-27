@@ -178,15 +178,6 @@ if(OPTION_ZLIB)
       URL_HASH ${ZLIB_HASH}
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       PATCH_COMMAND ${CMAKE_COMMAND} -E remove -f <SOURCE_DIR>/zconf.h)
-   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_dll
-      COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll
-      DEPENDEES install)
-   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
-      COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/lib/zlib${SUPER_BUILD_POSTFIX}.lib
-      DEPENDEES sd_zlib_remove_dll)
-   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
-      COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib
-      DEPENDEES sd_zlib_remove_lib)
 else()
    set(ZLIB_PROJECT )
 endif()
