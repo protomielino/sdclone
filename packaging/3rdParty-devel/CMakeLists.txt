@@ -156,14 +156,49 @@ else()
    set(SUPER_BUILD_POSTFIX "")
 endif()
 
-# OpenGL extensions (Windows only??)
-message(STATUS "OpenGL extensions (Windows only??)")
-if(WIN32 AND OPTION_OPENGL_HEADERS)
+# OpenGL extensions
+find_package(OpenGL)
+
+if(NOT TARGET OpenGL::GL)
+   message(STATUS "Copying in-tree OpenGL headers")
    ExternalProject_Add(OpenGL-headers
       URL ${CMAKE_CURRENT_SOURCE_DIR}/patches/openglheaders.zip
       URL_HASH SHA256=344debe6e65629d70020b6da056255de56c7d4fe48194336ea2cb896fc1b545b
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
-endif(WIN32 AND OPTION_OPENGL_HEADERS)
+else()
+   if(TARGET OpenGL::GL)
+      add_library(OpenGL-headers ALIAS OpenGL::GL)
+
+      if(MINGW AND NOT OPENGL_INCLUDE_DIR)
+         get_filename_component(MINGW_BINDIR "${CMAKE_CXX_COMPILER}" PATH)
+         get_filename_component(MINGW_BINDIR "${MINGW_BINDIR}/../" REALPATH)
+
+         if(CMAKE_CROSSCOMPILING)
+            find_path(OPENGL_INCLUDE_DIR GL/gl.h
+               REQUIRED
+               NO_CMAKE_SYSTEM_PATH
+               NO_DEFAULT_PATH
+               NO_CMAKE_PATH
+               NO_CMAKE_INSTALL_PREFIX
+               HINTS
+                  "${MINGW_BINDIR}/include"
+                  "${MINGW_BINDIR}/*/include"
+            )
+         else()
+            find_path(OPENGL_INCLUDE_DIR GL/gl.h
+               REQUIRED
+               HINTS
+                  "${MINGW_BINDIR}/include"
+                  "${MINGW_BINDIR}/*/include"
+            )
+         endif()
+
+         # FindOpenGL.cmake seems not to set this property under
+         # some circumstances.
+         target_include_directories(OpenGL::GL INTERFACE ${OPENGL_INCLUDE_DIR})
+      endif()
+   endif()
+endif()
 
 if(OPTION_ZLIB)
    ExternalProject_Add(${ZLIB_PROJECT}
