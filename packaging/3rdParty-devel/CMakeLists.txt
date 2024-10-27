@@ -79,6 +79,7 @@ endif()
 
 list(APPEND EXTERNALS_CMAKE_ARGS "-D CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 list(APPEND EXTERNALS_CMAKE_ARGS "-D CMAKE_FIND_ROOT_PATH=${EXTERNALS_INSTALL_DIR}")
+list(APPEND EXTERNALS_CMAKE_ARGS "-D BUILD_SHARED_LIBS=ON")
 
 if(WIN32)
    set(_max_ext_path "64")
@@ -346,7 +347,7 @@ else()
 endif()
 
 if(OPTION_OGG)
-   set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off)
+   set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=off -DINSTALL_DOCS=off)
    ExternalProject_Add(${OGG_PROJECT}
       URL ${OGG_URL}
       URL_HASH ${OGG_HASH}
@@ -356,7 +357,7 @@ else()
 endif()
 
 if(OPTION_VORBIS)
-   set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on)
+   set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS})
    ExternalProject_Add(${VORBIS_PROJECT}
       URL ${VORBIS_URL}
       URL_HASH ${VORBIS_HASH}
@@ -452,8 +453,7 @@ if(OPTION_FREETYPE)
       # Set FREETYPE_LEGACY_PROJECT to empty string, because we will use FREETYPE_PROJECT,
       # OpenScenegraph DEPENDS on freetype, so only one can be defined
       set(FREETYPE_LEGACY_PROJECT )
-      set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
-                                                -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
+      set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                                 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
                                                 -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
                                                 -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
@@ -472,8 +472,7 @@ if(OPTION_FREETYPE)
       if(CMAKE_GENERATOR MATCHES "Visual Studio")
          message(WARNING "freetype versions newer than 2.10.4 need Visual Studio 2013 or newer")
       endif()
-      set(FREETYPE_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
-                                                       -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
+      set(FREETYPE_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                                        -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
                                                        -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
                                                        -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
