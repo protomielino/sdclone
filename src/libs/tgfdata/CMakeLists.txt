@@ -37,6 +37,8 @@ ENDIF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
 
 ADD_SDLIB_LIBRARY(tgfdata portability txml tgf) # txml ignored if OPTION_3RDPARTY_EXPAT
 
+target_include_directories(tgfdata PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 ADD_PLIB_LIBRARY(tgfdata sg ul)
 
 IF(WIN32)

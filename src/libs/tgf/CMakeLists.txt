@@ -35,6 +35,8 @@ ENDIF(WIN32)
 # Note: Other sources needed for having them available in IDEs.
 SD_ADD_LIBRARY(tgf SHARED ${TGF_HEADERS} ${TGF_SOURCES} ${TGF_OTHER_SOURCES})
 
+target_include_directories(tgf PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(tgf PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 

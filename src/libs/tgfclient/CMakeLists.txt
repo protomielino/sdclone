@@ -53,6 +53,8 @@ ENDIF(MSVC)
 # Note: Other sources needed for having them available in IDEs.
 SD_ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
 
+target_include_directories(tgfclient PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
@@ -64,7 +66,7 @@ ADD_SDLIB_LIBRARY(tgfclient portability tgf)
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)
 IF(OPTION_WEBSERVER)
-	ADD_CURL_LIBRARY(tgfclient)
+    target_link_libraries(tgfclient CURL::libcurl)
 ENDIF(OPTION_WEBSERVER)
 
 IF(OPENGL_FOUND)
