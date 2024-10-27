@@ -193,6 +193,9 @@ public:
 
   void sync () ;
   void stop () ;
+#ifdef UL_WIN32
+  void done () ;
+#endif
 } ;
 
 

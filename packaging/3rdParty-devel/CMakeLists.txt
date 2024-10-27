@@ -255,6 +255,27 @@ if(OPTION_PLIB)
                     "<SOURCE_DIR>/CMakeLists.txt"
             DEPENDEES update # do after update
             DEPENDERS patch)  # do before patch
+
+         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_sl
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+               "${CMAKE_SOURCE_DIR}/patches/plib/sl.h"
+               "<SOURCE_DIR>/src/sl/sl.h"
+            DEPENDEES update # do after update
+            DEPENDERS patch)  # do before patch
+
+         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_sldsp
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+               "${CMAKE_SOURCE_DIR}/patches/plib/slDSP.cxx"
+               "<SOURCE_DIR>/src/sl/slDSP.cxx"
+            DEPENDEES update # do after update
+            DEPENDERS patch)  # do before patch
+
+         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_ssgparser
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+               "${CMAKE_SOURCE_DIR}/patches/plib/ssgParser.cxx"
+               "<SOURCE_DIR>/src/ssg/ssgParser.cxx"
+            DEPENDEES update # do after update
+            DEPENDERS patch)  # do before patch
       else()
          # this archive corresponds to revision 2173
          ExternalProject_Add(${PLIB_HEAD_PROJECT}

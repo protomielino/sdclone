@@ -170,7 +170,10 @@ static	void	wperror(MMRESULT num)
    ulSetError ( UL_WARNING, "SlDSP: %s (%d)", buffer, num );
 }
 
-
+void slDSP::done ()
+{
+   counter--;
+}
 
 void CALLBACK waveOutProc( HWAVEOUT hwo, UINT uMsg,	
       DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 )
@@ -185,7 +188,7 @@ void CALLBACK waveOutProc( HWAVEOUT hwo, UINT uMsg,
       break;
 
    case    WOM_DONE:
-      pDsp->counter--;
+      pDsp->done ();
       break;
    }
 }
@@ -237,8 +240,8 @@ void slDSP::open ( const char *device, int _rate, int _stereo, int _bps )
    // Now the hwaveouthandle "should" be valid 
 
    if ( ( result = waveOutOpen( & hWaveOut, WAVE_MAPPER, 
-         (WAVEFORMATEX *)& Format, (DWORD)waveOutProc, 
-         (DWORD)this, CALLBACK_FUNCTION )) != MMSYSERR_NOERROR )
+         (WAVEFORMATEX *)& Format, (DWORD_PTR)waveOutProc,
+         (DWORD_PTR)this, CALLBACK_FUNCTION )) != MMSYSERR_NOERROR )
    {
       wperror( result);
 

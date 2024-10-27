@@ -36,6 +36,7 @@
 
 #include "ssgLocal.h"
 #include "ssgParser.h"
+#include <cstdint>
 
 
 static _ssgParserSpec default_spec =
@@ -263,7 +264,7 @@ void _ssgParser::expectNextToken( const char* name )
 // This is copied to a new buffer, so that I have the space to add the 0.
 void _ssgParser::addOneCharToken ( char *ptr ) 
 {
-	assert( (long)onechartokenbuf_ptr- (long)onechartokenbuf < 4096 ) ; // Buffer overflow
+	assert( (ptrdiff_t)onechartokenbuf_ptr- (ptrdiff_t)onechartokenbuf < 4096 ) ; // Buffer overflow
 	
 	onechartokenbuf_ptr [ 0 ] = *ptr;
 	onechartokenbuf_ptr [ 1 ] = 0;
