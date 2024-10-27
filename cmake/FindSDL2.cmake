@@ -61,13 +61,6 @@ IF(NOT APPLE)
 FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
-# MinGW needs an additional library, mwindows
-# It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -lmwindows
-# (Actually on second look, I think it only needs one of the m* libraries.)
-IF(MINGW)
-SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
-ENDIF(MINGW)
-
 IF(SDL2_LIBRARY_TEMP)
 # For SDL2main
 IF(NOT SDL2_BUILDING_LIBRARY)
@@ -92,11 +85,6 @@ ENDIF(APPLE)
 IF(NOT APPLE)
 SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
 ENDIF(NOT APPLE)
-
-# For MinGW library
-IF(MINGW)
-SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
-ENDIF(MINGW)
 
 # Set the final string here so the GUI reflects the final state.
 SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
@@ -168,13 +156,6 @@ IF(NOT APPLE)
 FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
-# MinGW needs an additional library, mwindows
-# It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -lmwindows
-# (Actually on second look, I think it only needs one of the m* libraries.)
-IF(MINGW)
-SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
-ENDIF(MINGW)
-
 IF(SDL2_LIBRARY_TEMP)
 # For SDL2main
 IF(NOT SDL2_BUILDING_LIBRARY)
@@ -199,11 +180,6 @@ ENDIF(APPLE)
 IF(NOT APPLE)
 SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
 ENDIF(NOT APPLE)
-
-# For MinGW library
-IF(MINGW)
-SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
-ENDIF(MINGW)
 
 # Set the final string here so the GUI reflects the final state.
 SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
@@ -275,13 +251,6 @@ IF(NOT APPLE)
 FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
-# MinGW needs an additional library, mwindows
-# It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -lmwindows
-# (Actually on second look, I think it only needs one of the m* libraries.)
-IF(MINGW)
-SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
-ENDIF(MINGW)
-
 IF(SDL2_LIBRARY_TEMP)
 # For SDL2main
 IF(NOT SDL2_BUILDING_LIBRARY)
@@ -306,11 +275,6 @@ ENDIF(APPLE)
 IF(NOT APPLE)
 SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
 ENDIF(NOT APPLE)
-
-# For MinGW library
-IF(MINGW)
-SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
-ENDIF(MINGW)
 
 # Set the final string here so the GUI reflects the final state.
 SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
