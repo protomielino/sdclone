@@ -204,10 +204,6 @@ MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
 
   SET_PROPERTY(GLOBAL APPEND PROPERTY SD_EXE_LIST "${SD_BINDIR}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
 
-  # Make the "settings_versions" target depend on this target,
-  # in order settings_versions is built after them.
-  ADD_DEPENDENCIES(settings_versions ${TARGET_NAME})
-
 ENDMACRO(SD_ADD_EXECUTABLE TARGET_NAME)
 
 
@@ -284,10 +280,6 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
     ENDIF(UNIX OR MINGW)
 
   ENDIF()
-
-  # Make the "settings_versions" target depend on this target,
-  # in order settings_versions is built after them.
-  ADD_DEPENDENCIES(settings_versions ${TARGET_NAME})
 
 ENDMACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 

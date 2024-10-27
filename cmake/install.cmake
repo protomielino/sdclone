@@ -50,6 +50,8 @@ MACRO(SD_SETUP_SETTINGS_VERSION)
   #       the unique version.xml file.
   ADD_CUSTOM_TARGET(settings_versions ALL)
 
+  ADD_DEPENDENCIES(settings_versions xmlversion)
+
   # Initialize the list of xmlversion args.
   DEFINE_PROPERTY(TARGET PROPERTY XMLVERSION_ARGS
                   BRIEF_DOCS "List of xmlversion args"
@@ -62,11 +64,6 @@ ENDMACRO(SD_SETUP_SETTINGS_VERSION)
 #       because of ADD_CUSTOM_COMMAND(TARGET limitations (will simply be ignored if not same dir
 #       as when the ADD_CUSTOM_TARGET was called).
 MACRO(SD_UPDATE_SETTINGS_VERSION)
-
-	# Determine the full path-name of xmlversion.exe
-    SET(_XMLVER_EXE "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_EXECUTABLE_PREFIX}xmlversion${CMAKE_EXECUTABLE_SUFFIX}")
-
-    #MESSAGE(STATUS "_XMLVER_EXE=${_XMLVER_EXE}")
 
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
     # we nearly always have to copy 3rd party dependency and compiler run-time DLLs next to it.
@@ -144,8 +141,6 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
     # Update version.xml from the collected user settings files (see SD_INSTALL_FILES).
     GET_PROPERTY(_XMLVER_ARGS TARGET settings_versions PROPERTY XMLVERSION_ARGS)
     #MESSAGE(STATUS "SD_UPDATE_SETTINGS_VERSION : XMLVERSION_ARGS=${_XMLVER_ARGS}")
-    GET_FILENAME_COMPONENT(_XMLVER_DIR ${_XMLVER_EXE} PATH)
-    GET_FILENAME_COMPONENT(_XMLVER_NAME ${_XMLVER_EXE} NAME)
 
     SET(_SRC_FILE)
     FOREACH(_ARG ${_XMLVER_ARGS})
@@ -158,12 +153,17 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
       ELSE()
 
         SET(_USER_DIR ${_ARG})
+        SET(_XMLVER_NAME "${CMAKE_BINARY_DIR}/bin/xmlversion")
+
+        IF(NOT CMAKE_CROSSCOMPILING)
+          SET(_XMLVER_NAME "${_XMLVER_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+        ENDIF()
 
         # Register file for run-time install/update at game startup, thanks to xmlversion
         # (filesetup.cpp services will do the job at game startup).
         ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
-                           WORKING_DIRECTORY "${_XMLVER_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                           WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+                           COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_NAME}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
                            COMMAND "${_XMLVER_NAME}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
                            VERBATIM)
 
