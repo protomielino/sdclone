@@ -2,6 +2,7 @@
 
 cmake_minimum_required(VERSION 3.1)
 project(rhash)
+include(rhash-tohex.cmake)
 
 file(READ "version.h" versionfile)
 string(REGEX MATCH "#define VERSION \"([0-9]*)\.([0-9]*)\.([0-9]*)\"" _ ${versionfile})
@@ -9,6 +10,11 @@ set(RHASH_VERSION_MAJOR ${CMAKE_MATCH_1})
 set(RHASH_VERSION_MINOR ${CMAKE_MATCH_2})
 set(RHASH_VERSION_PATCH ${CMAKE_MATCH_3})
 set(RHASH_VERSION "${RHASH_VERSION_MAJOR}.${RHASH_VERSION_MINOR}.${RHASH_VERSION_PATCH}")
+rhash_tohex(${RHASH_VERSION_MAJOR} RHASH_XVERSION_MAJOR)
+rhash_tohex(${RHASH_VERSION_MINOR} RHASH_XVERSION_MINOR)
+rhash_tohex(${RHASH_VERSION_PATCH} RHASH_XVERSION_PATCH)
+# The last two zeros are equivalent to "printf %02x 0".
+set(RHASH_XVERSION "0x${RHASH_XVERSION_MAJOR}${RHASH_XVERSION_MINOR}${RHASH_XVERSION_PATCH}00")
 
 option(USE_GETTEXT "Enable gettext (localization) support")
 
@@ -46,6 +52,7 @@ add_subdirectory("librhash")
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(${CMAKE_PROJECT_NAME} librhash)
+target_compile_definitions(librhash PRIVATE RHASH_XVERSION=${RHASH_XVERSION})
 
 if (USE_GETTEXT)
     find_package(Intl REQUIRED)
