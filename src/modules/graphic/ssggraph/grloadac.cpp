@@ -1288,7 +1288,7 @@ void myssgFlatten(ssgEntity *obj)
  if ( obj->isAKindOf ( ssgTypeBranch() ) )
   {
     ssgBranch *br = (ssgBranch *) obj ;
-#ifdef WIN32
+#ifdef _WIN32
     if (!strnicmp(br->getKid(0)->getName(), "tkmn",4))
 #else
     if (!strncasecmp(br->getKid(0)->getName(), "tkmn",4))

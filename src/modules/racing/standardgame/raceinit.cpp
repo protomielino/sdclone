@@ -20,7 +20,7 @@
     @author <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
 */
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif

@@ -26,7 +26,7 @@
 
 #include "tgf.hpp"
 
-#ifdef WIN32
+#ifdef _WIN32
 /* Prevent inclusion of winsock.h in windows.h */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -52,7 +52,7 @@ static std::string lastDLErrorString()
 {
 	std::string strError;
 
-#ifdef WIN32
+#ifdef _WIN32
 
     // Retrieve the system error message for the last-error code
     LPVOID lpMsgBuf;

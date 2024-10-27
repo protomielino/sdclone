@@ -27,7 +27,7 @@
 #include <tgfdata.h>
 #include <tgf.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif

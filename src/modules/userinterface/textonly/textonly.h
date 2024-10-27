@@ -27,7 +27,7 @@
 #include <tgf.hpp>
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef TEXTONLY_DLL
 #  define TEXTONLY_API __declspec(dllexport)
 # else

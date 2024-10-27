@@ -29,13 +29,13 @@
 #endif
 #include <cmath>
 #include <cfloat>
-#ifndef WIN32
+#ifndef _WIN32
 // std::isnan should be available as of C++11 (201103L) but some compiler
 // vendors set this even though support is incomplete
 #if __cplusplus>=201402L // compiler claims to be C++14 compliant
 #define isnan std::isnan
 #endif
-#endif // WIN32
+#endif // _WIN32
 
 #include "accc.h"
 
@@ -2487,7 +2487,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
     }
 
     fclose(stripeout);
-#ifdef WIN32
+#ifdef _WIN32
     sprintf(command, "stripe.exe %s >shudup", filename);
     system(command);
     sprintf(command, "erase shudup");

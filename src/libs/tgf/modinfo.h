@@ -84,7 +84,7 @@ typedef struct ModInfoNC {
 /** Shared library handle type */
 typedef void* tSOHandle;
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 /* Prevent inclusion of winsock.h in windows.h */
 #define WIN32_LEAN_AND_MEAN

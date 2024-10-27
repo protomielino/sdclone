@@ -7,7 +7,7 @@
 #define _XML_H_
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef TXML_DLL
 #  define TXML_API __declspec(dllexport)
 # else

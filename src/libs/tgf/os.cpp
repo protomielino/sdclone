@@ -22,7 +22,7 @@
 
 #include "tgf.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "windowsspec.h"
 #else
 #include "linuxspec.h"
@@ -41,7 +41,7 @@ void
 gfOsInit(void)
 {
 	// Initialise OS-specific functions
-#ifdef WIN32
+#ifdef _WIN32
     WindowsSpecInit();
 #else
     LinuxSpecInit();

@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef TXML_DLL
 #  define XMLPARSEAPI __declspec(dllexport)
 # else

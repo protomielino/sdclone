@@ -34,7 +34,7 @@ struct Situation;
 
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef LEGACYMENU_DLL
 #  define LEGACYMENU_API __declspec(dllexport)
 # else

@@ -29,7 +29,7 @@
 
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef SIMUV4_DLL
 #  define SIMUV4_API __declspec(dllexport)
 # else

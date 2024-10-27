@@ -39,7 +39,7 @@ static double RtTicksPerSec = 1000.0;			// Ticks per second
 // Init Timer
 bool RtInitTimer()
 {
-#ifdef WIN32
+#ifdef _WIN32
   ULONGLONG TicksPerSec;
   if (!QueryPerformanceFrequency((LARGE_INTEGER*)&TicksPerSec))
   {
@@ -67,7 +67,7 @@ double RtTimerFrequency()
 // Get timestamp [msec]
 double RtTimeStamp()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	ULONGLONG TickCount;
 	DWORD_PTR oldmask = ::SetThreadAffinityMask(::GetCurrentThread(), 0);
 	QueryPerformanceCounter((LARGE_INTEGER*)&TickCount);

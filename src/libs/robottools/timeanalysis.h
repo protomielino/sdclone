@@ -30,7 +30,7 @@
 
 #include <portability.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <ctime>
 #else
 #include <sys/time.h>

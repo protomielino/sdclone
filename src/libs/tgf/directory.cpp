@@ -109,7 +109,7 @@ bool GfDirExists(const char* pszName)
 
 	struct stat st;
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (pszName[strlen(pszName)-1] == '/' || pszName[strlen(pszName)-1] == '\\')
 	{
 		// Windows stat() does not supports traling (anti-)slashes ... no comment please.
@@ -141,7 +141,7 @@ int GfDirCreate(const char *path)
 	strncpy(buf, path, nPathBufSize - 1);
 	buf[nPathBufSize - 1] = '\0';
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	// Translate path.
 	static const char cPathSeparator = '\\';
@@ -150,7 +150,7 @@ int GfDirCreate(const char *path)
 		if (buf[i] == '/')
 			buf[i] = cPathSeparator;
 
-#else // WIN32
+#else // _WIN32
 
 // mkdir with u+rwx access grants by default
 #ifdef mkdir
@@ -160,7 +160,7 @@ int GfDirCreate(const char *path)
 
 	static const char cPathSeparator = '/';
 
-#endif // WIN32
+#endif // _WIN32
 
 	// Try to create the requested folder.
 	int err = mkdir(buf);

@@ -27,23 +27,19 @@
 #define RESULTEXT ".xml"
 
 // Windows -----------------------------------------------------------------
-#ifdef WIN32
-
-#ifndef _WIN32
-#error Hey ! Where is _WIN32 ??
-#endif
+#ifdef _WIN32
 
 // File name extensions
 #define DLLEXT	".dll"
 #define DLLEXTLEN 4
 
 // Linux -------------------------------------------------------------------
-#else // WIN32
+#else // _WIN32
 
 // File name extensions
 #define DLLEXT	 ".so"
 #define DLLEXTLEN 3
 
-#endif // WIN32
+#endif // _WIN32
 
 #endif /* __OSSPEC__H__ */

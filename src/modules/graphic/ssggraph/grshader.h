@@ -23,7 +23,7 @@
 #include <plib/ssg.h>
 #include "grmain.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 extern PFNGLVERTEXATTRIB1DARBPROC glVertexAttrib1dARB;
 extern PFNGLVERTEXATTRIB1DVARBPROC glVertexAttrib1dvARB;
 extern PFNGLVERTEXATTRIB1FARBPROC glVertexAttrib1fARB;
@@ -127,7 +127,7 @@ extern PFNGLDELETEPROGRAMSNVPROC glDeleteProgramsNV;
 extern PFNGLGENPROGRAMSNVPROC glGenProgramsNV;
 extern PFNGLLOADPROGRAMNVPROC glLoadProgramNV;
 extern PFNGLPROGRAMPARAMETER4FVNVPROC glProgramParameter4fvNV;
-#endif //WIN32
+#endif //_WIN32
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>

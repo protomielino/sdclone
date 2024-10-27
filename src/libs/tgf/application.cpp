@@ -27,7 +27,7 @@
 #include <limits>
 #include <iostream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
@@ -251,7 +251,7 @@ void GfApplication::restart()
     std::list<std::string>::const_iterator itArg;
     for (itArg = _lstArgs.begin(); itArg != _lstArgs.end(); ++itArg)
     {
-#ifdef WIN32
+#ifdef _WIN32
         // execvp will not automatically surround args with spaces inside with double quotes !
         if (itArg->find(' ') != std::string::npos)
         {

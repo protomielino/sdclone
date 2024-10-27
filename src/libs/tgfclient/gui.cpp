@@ -47,7 +47,7 @@
 #include "guimenusfx.h"
 #include <SDL_mixer.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 PFNGLUSEPROGRAMOBJECTARBPROC glUseProgram = NULL;
 PFNGLACTIVETEXTUREARBPROC   glActiveTexture ;
 #endif
@@ -133,7 +133,7 @@ gfuiInit(void)
 	gfuiInitWebStats();
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
     glActiveTexture = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTexture");
 #endif
@@ -1239,12 +1239,12 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 	SDL_VERSION(&wmInfo.version);
 	if (SDL_GetWindowWMInfo(GfuiWindow, &wmInfo)) {
 
-#ifdef WIN32
+#ifdef _WIN32
 		SetWindowPos(wmInfo.info.win.window, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 #else
 		// TODO.
 		GfLogWarning("GfuiInitWindowPositionAndSize not yet implemented under non-Windows OSes\n");
-#endif // WIN32
+#endif // _WIN32
 	}
 	else{
 		GfLogWarning("SDL_GetWindowWMInfo() failed: SDL_GetError() returns: %s\n", SDL_GetError());

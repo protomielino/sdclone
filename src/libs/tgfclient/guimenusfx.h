@@ -21,7 +21,7 @@
 
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef TGFCLIENT_DLL
 #  define TGFCLIENT_API __declspec(dllexport)
 # else

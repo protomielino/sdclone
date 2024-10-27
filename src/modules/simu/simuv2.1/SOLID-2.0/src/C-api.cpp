@@ -60,7 +60,7 @@ typedef vector<Complex *> ComplexList;
 typedef map<DtObjectRef, Object *> ObjectList;
 typedef set<Encounter> ProxList;
 
-#if defined( WIN32) || (__APPLE__)
+#if defined( _WIN32) || (__APPLE__)
 #define uint unsigned int
 #endif
 

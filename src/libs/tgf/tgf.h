@@ -31,7 +31,7 @@
 #include "osspec.h"
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef tgf_EXPORTS
 #  define TGF_API __declspec(dllexport)
 # else
@@ -215,7 +215,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 
 // <esppat>
 //#define TGF_ALLOC_DEBUG 1
-//#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+//#if (defined(_WIN32) && defined(TGF_ALLOC_DEBUG))
 // </esppat>
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
@@ -229,7 +229,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 //#define __DEBUG_MEMORYMANAGER__
 #if defined(__DEBUG_MEMORYMANAGER__)
 // Use new Memory Manager ...
-    #if defined(WIN32)
+    #if defined(_WIN32)
     // Windows ...
         #if defined(__MINGW32__)
         // MinGW ...
@@ -251,7 +251,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 //============================================================================*
 // Definitions of the replacements for the new Memory Manager
 //----------------------------------------------------------------------------*
-#if defined(WIN32)
+#if defined(_WIN32)
 // Windows ...
     #if defined(__MINGW32__)
     // MinGW ...

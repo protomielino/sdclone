@@ -24,7 +24,7 @@ web                  : speed-dreams.sourceforge.net
 //#endif
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef csnetworking_EXPORTS
 #  define NETWORKING_API __declspec(dllexport)
 # else

@@ -82,7 +82,7 @@ void GfuiEventLoop::injectKeyboardEvent(int code, int modifier, int state,
 	}
 	else
 	{
-#ifndef WIN32
+#ifndef _WIN32
 		// Hard-coded Alt+Enter shortcut, to enable the user to quit/re-enter
 		// the full-screen mode ; as in SDL's full screen mode, events never reach
 		// the Window Manager, we need this trick for the user to enjoy

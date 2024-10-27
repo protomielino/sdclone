@@ -18,13 +18,13 @@
 
 #include <portability.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 
 #include <cstdio>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <getopt.h>
 #endif
 
@@ -46,12 +46,12 @@ void usage(void)
 }
 void init_args(int argc, char **argv)
 {
-#ifdef WIN32
+#ifdef _WIN32
     int i;
 #else
     int	c;
 #endif
-#ifndef WIN32
+#ifndef _WIN32
     while (1) {
 	int option_index = 0;
 	static struct option long_options[] = {

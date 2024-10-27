@@ -30,7 +30,7 @@ class ssgLoaderOptions;
 
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef SSGGRAPH_DLL
 #  define SSGGRAPH_API __declspec(dllexport)
 # else

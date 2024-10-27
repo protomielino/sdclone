@@ -18,7 +18,7 @@
 
 #include <portability.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
@@ -43,7 +43,7 @@
 #include "grbackground.h"
 
  // TODO: Move this to glfeatures.
-#ifdef WIN32
+#ifdef _WIN32
 PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
 PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
 PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
@@ -102,7 +102,7 @@ static void setupOpenGLFeatures(void)
         // Use the selected number of texture units.
         grMaxTextureUnits = GfglFeatures::self().getSelected(GfglFeatures::MultiTexturingUnits);
 
-#ifdef WIN32
+#ifdef _WIN32
         // Retrieve the addresses of multi-texturing functions under Windows
         // They are not declared in gl.h or any other header ;
         // you can only get them through a call to wglGetProcAddress at run-time.

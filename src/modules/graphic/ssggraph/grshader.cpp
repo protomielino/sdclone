@@ -27,7 +27,7 @@ copyright            : (C) 2015 by Xavier Bertaux
 
 #include "grshader.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/gl.h>
 #include <GL/glext.h>
 PFNGLVERTEXATTRIB1DARBPROC glVertexAttrib1dARB = NULL;
@@ -692,7 +692,7 @@ void cgrShader::Init(void)
 
 	if( VP_supported || FP_supported )
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		/* All ARB_fragment_program entry points are shared with ARB_vertex_program. */
 		glVertexAttrib1dARB  = (PFNGLVERTEXATTRIB1DARBPROC)wglGetProcAddress("glVertexAttrib1dARB");
 		glVertexAttrib1dvARB = (PFNGLVERTEXATTRIB1DVARBPROC)wglGetProcAddress("glVertexAttrib1dvARB");

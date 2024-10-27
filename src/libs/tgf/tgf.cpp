@@ -17,7 +17,7 @@
 
 #include <portability.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <shlobj.h>
 #include <io.h>
 #endif
@@ -386,7 +386,7 @@ void GfPoolMove(tMemoryPool* oldpool, tMemoryPool* newpool)
  *********************************/
 
 // <esppat>
-#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+#if (defined(_WIN32) && defined(TGF_ALLOC_DEBUG))
 
 #include <crtdbg.h>
 #include <cassert>
@@ -482,7 +482,7 @@ char * _tgf_win_strdup(const char * str)
 
 	return s;
 }
-#endif // (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+#endif // (defined(_WIN32) && defined(TGF_ALLOC_DEBUG))
 // </esppat>
 
 
@@ -702,12 +702,12 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 // In-place convert internal file or dir path to an OS compatible path
 char* GfPathMakeOSCompatible(char* path)
 {
-#ifdef WIN32
+#ifdef _WIN32
   size_t i;
   for (i = 0; i < strlen(path); i++)
 	if (path[i] == '/')
 	  path[i] = '\\';
-#endif //WIN32
+#endif //_WIN32
   return path;
 }
 
@@ -715,7 +715,7 @@ char* GfPathMakeOSCompatible(char* path)
 bool GfPathIsAbsolute(const char *pszPath)
 {
 	return pszPath != 0 && strlen(pszPath) > 0
-#ifdef WIN32
+#ifdef _WIN32
 		   && (pszPath[0] == '/'  // Leading '/'
 			   || pszPath[0] == '\\' // Leading '\'
 			   || (strlen(pszPath) > 2 && pszPath[1] == ':'
@@ -728,7 +728,7 @@ bool GfPathIsAbsolute(const char *pszPath)
 // Normalize a directory path in-place : \ to / conversion + mandatory unique trailing /.
 char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// Replace '\' by '/'
 	size_t i;
 	for (i = 0; i < strlen(pszPath); i++)
@@ -751,7 +751,7 @@ char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 // Normalize a file path in-place.
 char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen)
 {
-#ifndef WIN32
+#ifndef _WIN32
     char * buf = realpath(pszPath, NULL);
     if (buf)
     {
@@ -790,7 +790,7 @@ static char* makeRunTimeDirPath(const char* srcPath)
 	if (strlen(srcPath) > 0 && srcPath[0] == '~'
 		&& (strlen(srcPath) == 1 || (srcPath[1] == '/' || srcPath[1] == '\\')))
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		LPITEMIDLIST pidl;
 		if (!SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
 			|| !SHGetPathFromIDList(pidl, tgtPath))
@@ -856,7 +856,7 @@ const char* GfGetInstallDir(void)
 	return gfInstallDir;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static const char* pszPathSeparator = "\\";
 static const char* pszPATHSeparator = ";";
 #else
@@ -873,7 +873,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	char pszPath[1024];
 	strcpy(pszPath, pszExecutablePath);
 	char* pLastPathSep = strrchr(pszPath, '/');
-#ifdef WIN32
+#ifdef _WIN32
 	if (!pLastPathSep)
 		pLastPathSep = strrchr(pszPath, '\\');
 #endif
@@ -903,7 +903,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 			strcpy(pszPath, pszCandPath);
 			strcat(pszPath, pszPathSeparator);
 			strcat(pszPath, pszExecutablePath);
-#ifdef WIN32
+#ifdef _WIN32
 			if (strstr(pszPath, ".exe") != pszPath + strlen(pszPath) - 4)
 				strcat(pszPath, ".exe");
 #endif

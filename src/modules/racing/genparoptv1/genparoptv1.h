@@ -32,7 +32,7 @@
 #include <tgfclient.h>
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef GENPAROPTV1_DLL
 #  define GENPAROPTV1_API __declspec(dllexport)
 # else

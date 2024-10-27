@@ -65,7 +65,7 @@ ctrlCheck(tCar *car)
     tClutch		*clutch = &(trans->clutch);
 
     /* sanity check */
-#ifndef WIN32
+#ifndef _WIN32
     if (isnan(car->ctrl->accelCmd) || isinf(car->ctrl->accelCmd)) car->ctrl->accelCmd = 0;
     if (isnan(car->ctrl->brakeCmd) || isinf(car->ctrl->brakeCmd)) car->ctrl->brakeCmd = 0;
     if (isnan(car->ctrl->clutchCmd) || isinf(car->ctrl->clutchCmd)) car->ctrl->clutchCmd = 0;

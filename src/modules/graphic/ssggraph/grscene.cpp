@@ -21,7 +21,7 @@
 #include <ctime>
 #include <string>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif

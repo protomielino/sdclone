@@ -29,7 +29,7 @@
 #include <tgf.hpp>
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef STANDARDGAME_DLL
 #  define STANDARDGAME_API __declspec(dllexport)
 # else

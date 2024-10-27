@@ -42,7 +42,7 @@
 #define	mysecure		   //	Use	_fopen_s
 #define	myhypot	_hypot	   // Use _hypot	instead	of hypot
 #define	myfopen	_fopen_s   // Use _fopen_s instead of fopen
-#ifdef WIN32
+#ifdef _WIN32
 #include <direct.h>
 #endif
 #else					 // but in a poor	world without walls	and	fences,	...
@@ -60,12 +60,12 @@
 // ... VC++	2005 or	newer
 
 // VC++	6.0	...
-#if	defined(WIN32) && !defined(snprintf_s)
+#if	defined(_WIN32) && !defined(snprintf_s)
 #undef snprintf
 #define	snprintf _snprintf
 #endif
 */
-#if	defined(WIN32) && !defined(fopen_s)
+#if	defined(_WIN32) && !defined(fopen_s)
 #undef mysecure
 #endif
 // ... VC++	6.0

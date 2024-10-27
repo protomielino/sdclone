@@ -30,7 +30,7 @@
 
 #include "portability.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 #else

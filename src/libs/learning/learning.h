@@ -24,7 +24,7 @@
 #define _LEARNING_H_
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef LEARNING_DLL
 #  define LEARNING_API __declspec(dllexport)
 # else

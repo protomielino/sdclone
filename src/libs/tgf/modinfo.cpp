@@ -25,14 +25,14 @@
 #include <cstring>
 #include <climits>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <dlfcn.h>
 #endif
 
 #include "tgf.h"
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #define dlsym   GetProcAddress
 #define dlerror GetLastError
 #endif

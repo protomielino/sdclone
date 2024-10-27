@@ -17,7 +17,7 @@
 #include "learn_debug.h"
 #include "policy.h"
 #include "MathFunctions.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <float.h>
 #else
 // std::isnan should be available as of C++11 (201103L) but some compiler
@@ -25,7 +25,7 @@
 #if __cplusplus>=201402L // compiler claims to be C++14 compliant
 #define isnan std::isnan
 #endif
-#endif // WIN32
+#endif // _WIN32
 
 #undef POLICY_LOG
 

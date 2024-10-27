@@ -24,7 +24,7 @@
 #define __TGFDATA__H__
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef TGFDATA_DLL
 #  define TGFDATA_API __declspec(dllexport)
 # else

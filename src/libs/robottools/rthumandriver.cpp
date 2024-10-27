@@ -676,7 +676,7 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
     memset(keyInfo, 0, sizeof(keyInfo));
     memset(lastReadKeyState, 0, sizeof(lastReadKeyState));
 
-#ifndef WIN32
+#ifndef _WIN32
 #ifdef TELEMETRY
     if (s->_raceType == RM_TYPE_PRACTICE) {
         RtTelemInit(-10, 10);
@@ -1785,7 +1785,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     }//if speedLimiter
 
 
-#ifndef WIN32
+#ifndef _WIN32
 #ifdef TELEMETRY
     if ((car->_laps > 1) && (car->_laps < 5)) {
         if (HCtx[idx]->lap == 1) {

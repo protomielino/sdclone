@@ -27,7 +27,7 @@
 #include <cerrno>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 
@@ -45,7 +45,7 @@ char* GfFileGetDirName(const char* pszFileName)
 	char* pszDirName = strdup(pszFileName);
 
 	// Replace '\\' by '/' under Windows
-#ifdef WIN32
+#ifdef _WIN32
 	for (int i = 0; pszDirName[i]; i++)
 		if (pszDirName[i] == '\\')
 			pszDirName[i] = '/';
@@ -59,7 +59,7 @@ char* GfFileGetDirName(const char* pszFileName)
 	{
 		// But keep the '/' if it is the first one of an absolute path-name.
 		if (lastSlash != pszDirName)
-#ifdef WIN32
+#ifdef _WIN32
 			if (*(lastSlash-1) != ':')
 #endif
 				*lastSlash = '\0';
@@ -109,7 +109,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	strncpy(buf, pszTgtName, sizeof(buf) - 1);
 	buf[sizeof(buf) - 1] = '\0';
 
-#ifdef WIN32
+#ifdef _WIN32
 	for (size_t i = 0; i < maxBufSize && buf[i] != '\0'; i++)
 		if (buf[i] == '\\')
 			buf[i] = '/';

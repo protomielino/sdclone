@@ -35,11 +35,11 @@
 
 #include <map>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windowsx.h>
 #else
 #include <sys/param.h>
-#endif // WIN32
+#endif // _WIN32
 
 #include "tgf.hpp"
 
@@ -503,7 +503,7 @@ void GfLogger::fatal(const char *pszFmt, ...)
 	}
 #endif // TRACE_OUT
 
-#ifdef WIN32
+#ifdef _WIN32
 	MessageBox(NULL, "Please contact the maintenance team\n"
 			   "and notify them about the error messages in the console",
 			   TEXT("Fatal error"), MB_OK|MB_ICONERROR|MB_SETFOREGROUND);

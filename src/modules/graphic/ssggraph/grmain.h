@@ -23,7 +23,7 @@
 
 #include <plib/ssg.h>	//ssgContect
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
@@ -32,7 +32,7 @@
 #include "grcam.h"
 #include <raceman.h>	//tSituation
 
-#ifdef WIN32
+#ifdef _WIN32
 // Multi-texturing functions : Under Windows, not present in gl.h or any other ;
 // you can only get them through a call to wglGetProcAddress at run-time.
 extern PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2fARB ;

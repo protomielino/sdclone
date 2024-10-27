@@ -25,7 +25,7 @@
 
 #include <sstream>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 
@@ -33,11 +33,11 @@
 #define _GNU_SOURCE
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <getopt.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif

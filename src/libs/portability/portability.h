@@ -61,7 +61,7 @@
 #endif
 
 // DLL exported symbols declarator for Windows.
-#ifdef WIN32
+#ifdef _WIN32
 # ifdef portability_EXPORTS
 #  define PORTABILITY_API __declspec(dllexport)
 # else

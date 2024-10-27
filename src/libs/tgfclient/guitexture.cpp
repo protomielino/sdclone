@@ -25,7 +25,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <direct.h>
 #define XMD_H
 #endif

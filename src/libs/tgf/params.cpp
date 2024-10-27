@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <float.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #endif
 
@@ -4761,7 +4761,7 @@ GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *m
  */
 
 // mkdir with u+rwx access rights by default
-#ifndef WIN32
+#ifndef _WIN32
 # ifdef mkdir
 #  undef mkdir
 # endif

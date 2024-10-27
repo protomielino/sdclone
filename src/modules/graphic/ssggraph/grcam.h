@@ -23,7 +23,7 @@
 #include <car.h>		//tCarElt
 #include <raceman.h>	//tSituation
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <float.h>
 #endif
 

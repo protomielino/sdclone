@@ -44,7 +44,7 @@ GfuiFontClass *gfuiFont[GFUI_FONT_NB];
 const char *keySize[4] = { "size big", "size large", "size medium", "size small" };
 
 
-#if !defined(WIN32) && !defined(__HAIKU__)
+#if !defined(_WIN32) && !defined(__HAIKU__)
 #if BYTE_ORDER == BIG_ENDIAN
 void swap32(unsigned int *p, unsigned int size)
 {
@@ -157,7 +157,7 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 		GfLogWarning( "Not all bytes are successfully read" );
 	//GfLogDebug("Font(%s) : texW=%d, texH=%d\n", FileName, font->TexWidth, font->TexHeight);
 
-#if !defined(WIN32) && !defined(__HAIKU__)
+#if !defined(_WIN32) && !defined(__HAIKU__)
 #if BYTE_ORDER == BIG_ENDIAN
 	swap32((unsigned int *) font, 24);
 #endif
@@ -179,7 +179,7 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	if( readSize <= 0 )
 		GfLogWarning( "Not all bytes are successfully read" );
 
-#if !defined(WIN32) && !defined(__HAIKU__)
+#if !defined(_WIN32) && !defined(__HAIKU__)
 #if BYTE_ORDER == BIG_ENDIAN
 	swap32((unsigned int *)font->Char, sizeof(GLFONTCHAR) * Num);
 #endif
