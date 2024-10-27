@@ -105,7 +105,7 @@ ENDIF(NOT OPTION_USE_MACPORTS)
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
   FIND_LIBRARY(PLIB_SSGAUX_LIBRARY
-	NAMES plibssgaux ssgaux
+	NAMES plibssgaux ssgaux ssgAux
 	HINTS ENV PLIB_DIR
 	PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
 	PATHS /usr /usr/local)
