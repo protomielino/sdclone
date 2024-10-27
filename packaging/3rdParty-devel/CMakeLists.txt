@@ -71,12 +71,6 @@ if(CMAKE_SYSTEM_VERSION)
    list(APPEND EXTERNALS_CMAKE_ARGS "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
 endif()
 
-# CMake's built-in FindCURL.cmake module doesn't set CURL_INCLUDE_DIR and CURL_LIBRARIES
-# if it finds CURLConfig.cmake it just returns after setting CURL_FOUND and CURL_DIR
-if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
-   list(APPEND EXTERNALS_CMAKE_ARGS -DCURL_NO_CURL_CMAKE=ON)
-endif()
-
 list(APPEND EXTERNALS_CMAKE_ARGS "-D CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 list(APPEND EXTERNALS_CMAKE_ARGS "-D CMAKE_FIND_ROOT_PATH=${EXTERNALS_INSTALL_DIR}")
 list(APPEND EXTERNALS_CMAKE_ARGS "-D BUILD_SHARED_LIBS=ON")
@@ -548,6 +542,13 @@ if(OPTION_OSG)
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_SOURCE_DIR}/patches/OpenSceneGraph-3.6.5/GraphicsWindowWin32.cpp"
             "<SOURCE_DIR>/src/osgViewer/GraphicsWindowWin32.cpp"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+      ExternalProject_Add_Step(${OSG_PROJECT} osg_patch_curl_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/OpenSceneGraph-3.6.5/CMakeLists.txt"
+            "<SOURCE_DIR>/src/osgPlugins/curl/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
 endif()
