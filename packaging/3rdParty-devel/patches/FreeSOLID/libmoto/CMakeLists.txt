@@ -33,4 +33,11 @@ add_library(moto
   MT_Vector4.cpp
   MT_Vector4.h
   MT_Vector4.inl
-)  
+)
+
+install(
+    TARGETS moto
+    ARCHIVE DESTINATION lib${LIB_POSTFIX}
+    LIBRARY DESTINATION lib${LIB_POSTFIX}
+    RUNTIME DESTINATION bin
+)

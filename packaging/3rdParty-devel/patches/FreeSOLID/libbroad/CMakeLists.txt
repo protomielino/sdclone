@@ -9,3 +9,10 @@ add_library(broad
   BP_Scene.cpp
   BP_Scene.h
 )
+
+install(
+    TARGETS broad
+    ARCHIVE DESTINATION lib${LIB_POSTFIX}
+    LIBRARY DESTINATION lib${LIB_POSTFIX}
+    RUNTIME DESTINATION bin
+)

@@ -335,6 +335,20 @@ if(OPTION_FREESOLID)
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_broad_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/FreeSOLID/libbroad/CMakeLists.txt"
+              "<SOURCE_DIR>/libbroad/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+
+   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_moto_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/FreeSOLID/libmoto/CMakeLists.txt"
+              "<SOURCE_DIR>/libmoto/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 endif()
 
 if(OPTION_ENET)
