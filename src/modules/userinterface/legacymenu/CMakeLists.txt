@@ -130,7 +130,15 @@ SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 
 find_package(rhash REQUIRED)
 
-ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB} rhash)
+ADD_SDLIB_LIBRARY(legacymenu
+    portability
+    tgf
+    tgfclient
+    tgfdata
+    ${NETWORKING_LIB}
+    minizip::minizip
+    rhash::rhash
+)
 
 target_compile_features(legacymenu PRIVATE cxx_std_11)
 set_target_properties(legacymenu PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)

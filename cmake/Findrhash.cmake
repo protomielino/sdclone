@@ -31,9 +31,8 @@ find_package_handle_standard_args(rhash
 if(rhash_FOUND)
     if(NOT TARGET rhash::rhash)
         add_library(rhash::rhash INTERFACE IMPORTED)
-        target_include_directories(rhash::rhash
-            INTERFACE "${rhash_INCLUDE_DIRS}")
         set_target_properties(rhash::rhash PROPERTIES
-            IMPORTED_LOCATION "${rhash_LIBRARIES}")
+            INTERFACE_INCLUDE_DIRECTORIES "${rhash_INCLUDE_DIRS}"
+            INTERFACE_LINK_LIBRARIES "${rhash_LIBRARIES}")
     endif()
 endif()

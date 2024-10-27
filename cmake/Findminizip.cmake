@@ -46,9 +46,8 @@ find_package_handle_standard_args(minizip
 if(minizip_FOUND)
     if(NOT TARGET minizip::minizip)
         add_library(minizip::minizip INTERFACE IMPORTED)
-        target_include_directories(minizip::minizip
-            INTERFACE "${minizip_INCLUDE_DIRS}")
         set_target_properties(minizip::minizip PROPERTIES
-            IMPORTED_LOCATION "${minizip_LIBRARIES}")
+            INTERFACE_INCLUDE_DIRECTORIES "${minizip_INCLUDE_DIRS}"
+            INTERFACE_LINK_LIBRARIES "${minizip_LIBRARIES}")
     endif()
 endif()
