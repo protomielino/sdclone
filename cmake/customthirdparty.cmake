@@ -230,9 +230,57 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 
 	ELSEIF(MINGW)
 
-		# Works with MinGW 4.4 and 4.7.
+		# Works with MinGW 14.2.0.
 		GET_FILENAME_COMPONENT(_MINGW_BINDIR "${CMAKE_CXX_COMPILER}" PATH)
-		SET(_COMPILER_DLL_PATHNAMES "${_MINGW_BINDIR}/libstdc++-6.dll;${_MINGW_BINDIR}/libgcc_s_dw2-1.dll")
+		GET_FILENAME_COMPONENT(_MINGW_BINDIR "${_MINGW_BINDIR}/../" REALPATH)
+		FIND_FILE(libstdcxx_path "libstdc++-6.dll"
+			HINTS
+				"${_MINGW_BINDIR}/bin"
+				"${_MINGW_BINDIR}/lib"
+				"${_MINGW_BINDIR}/*/bin"
+				"${_MINGW_BINDIR}/*/lib"
+			NO_CMAKE_FIND_ROOT_PATH
+			NO_DEFAULT_PATH)
+		FIND_FILE(libgcc_path
+			NAMES
+				"libgcc_s_seh-1.dll"
+				"libgcc_s_dw2-1.dll"
+				"libgcc_s_sjlj-1.dll"
+			HINTS
+				"${_MINGW_BINDIR}/bin"
+				"${_MINGW_BINDIR}/lib"
+				"${_MINGW_BINDIR}/*/bin"
+				"${_MINGW_BINDIR}/*/lib"
+			NO_CMAKE_FIND_ROOT_PATH
+			NO_DEFAULT_PATH)
+		FIND_FILE(libssp_path "libssp-0.dll"
+			HINTS
+				"${_MINGW_BINDIR}/bin"
+				"${_MINGW_BINDIR}/lib"
+				"${_MINGW_BINDIR}/*/bin"
+				"${_MINGW_BINDIR}/*/lib"
+			NO_CMAKE_FIND_ROOT_PATH
+			NO_DEFAULT_PATH)
+
+		IF(libstdcxx_path STREQUAL "libstdcxx_path-NOTFOUND")
+			MESSAGE(FATAL_ERROR "Could not find libstdc++")
+		ENDIF()
+
+		IF(libgcc_path STREQUAL "libgcc_path-NOTFOUND")
+			MESSAGE(FATAL_ERROR "Could not find libgcc")
+		ENDIF()
+
+		IF(libssp_path STREQUAL "libssp_path-NOTFOUND")
+			MESSAGE(STATUS "Could not find libssp. speed-dreams-2 might be unable to run.")
+		ELSE()
+			SET(_COMPILER_DLL_PATHNAMES "${libssp_path}")
+		ENDIF()
+
+		SET(_COMPILER_DLL_PATHNAMES
+			${_COMPILER_DLL_PATHNAMES}
+			"${libstdcxx_path}"
+			"${libgcc_path}"
+			)
 
 	ENDIF(MSVC)
 
