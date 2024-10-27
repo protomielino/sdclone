@@ -72,7 +72,6 @@ set(HEADER_FILES    "aich.h"
                     "whirlpool.h")
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}")
 
 if(USE_OPENSSL)
     find_package(OpenSSL REQUIRED)
