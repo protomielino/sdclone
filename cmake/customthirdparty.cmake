@@ -269,6 +269,14 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 				"${_MINGW_BINDIR}/*/lib"
 			NO_CMAKE_FIND_ROOT_PATH
 			NO_DEFAULT_PATH)
+		FIND_FILE(libwinpthread_path "libwinpthread-1.dll"
+			HINTS
+				"${_MINGW_BINDIR}/bin"
+				"${_MINGW_BINDIR}/lib"
+				"${_MINGW_BINDIR}/*/bin"
+				"${_MINGW_BINDIR}/*/lib"
+			NO_CMAKE_FIND_ROOT_PATH
+			NO_DEFAULT_PATH)
 
 		IF(libstdcxx_path STREQUAL "libstdcxx_path-NOTFOUND")
 			MESSAGE(FATAL_ERROR "Could not find libstdc++")
@@ -282,6 +290,12 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 			MESSAGE(STATUS "Could not find libssp. speed-dreams-2 might be unable to run.")
 		ELSE()
 			SET(_COMPILER_DLL_PATHNAMES "${libssp_path}")
+		ENDIF()
+
+		IF(libwinpthread_path STREQUAL "libwinpthread_path-NOTFOUND")
+			MESSAGE(STATUS "Could not find libwinpthread. win32 thread model assumed.")
+		ELSE()
+			SET(_COMPILER_DLL_PATHNAMES "${libwinpthread_path}")
 		ENDIF()
 
 		SET(_COMPILER_DLL_PATHNAMES

@@ -122,6 +122,10 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
       LIST(APPEND _DLLS_TO_INSTALL "${libssp_path}")
     ENDIF()
 
+    IF(NOT libwinpthread_path STREQUAL "libwinpthread_path-NOTFOUND")
+      LIST(APPEND _DLLS_TO_INSTALL "${libwinpthread_path}")
+    ENDIF()
+
       ENDIF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
       # Copy the dependency DLLs found above.
