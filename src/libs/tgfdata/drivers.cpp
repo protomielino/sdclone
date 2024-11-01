@@ -22,12 +22,34 @@
 #include <map>
 #include <sstream>
 #include <algorithm>
+#include <cerrno>
+#include <cstdlib>
+#include <cstdio>
+#include <vector>
 
 #include <robot.h>
 
 #include "cars.h"
 #include "drivers.h"
 
+static const struct rattr
+{
+    const char *key;
+    enum GfXMLDriver::attr::type type;
+} drvattrs[] =
+{
+    {ROB_ATTR_NAME, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_SNAME, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_CODE, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_NATION, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_TEAM, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_AUTHOR, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_CAR, GfXMLDriver::attr::type::string},
+    {ROB_ATTR_RACENUM, GfXMLDriver::attr::type::num},
+    {ROB_ATTR_RED, GfXMLDriver::attr::type::num},
+    {ROB_ATTR_GREEN, GfXMLDriver::attr::type::num},
+    {ROB_ATTR_BLUE, GfXMLDriver::attr::type::num}
+};
 
 // Private data for GfDrivers
 class GfDrivers::Private
@@ -86,8 +108,438 @@ void GfDrivers::clear()
     _pPrivate->vecDrivers.clear();
 }
 
-void GfDrivers::reload()
+int GfDrivers::drvdir(std::string &dir) const
 {
+    const char *data = GfLocalDir();
+
+    if (!data)
+    {
+        GfLogError("GfDataDir failed\n");
+        return -1;
+    }
+
+    dir = data;
+    dir += "drivers/";
+    return 0;
+}
+
+int GfDrivers::iter(const std::string &dir, GfDrivers::action a, void *args,
+    enum FList::type type) const
+{
+    tFList *l = GfDirGetList(dir.c_str());
+    const tFList *f = l;
+
+    if (!l)
+        return 0;
+
+    do
+    {
+        const char *name = f->name;
+        std::string fname = dir + f->name;
+
+        if (!strcmp(name, ".")
+            || !strcmp(name, "..")
+            || (type != FList::unknown
+                && f->type != type))
+            continue;
+        else if (f->type == FList::dir)
+            fname += '/';
+
+        if ((this->*a)(fname, args))
+        {
+            GfLogError("%s: failed\n", fname.c_str());
+            continue;
+        }
+    } while ((f = f->next) != l);
+
+    GfDirFreeList(l, nullptr, true, true);
+    return 0;
+}
+
+int GfDrivers::basename(const std::string &path, std::string &out) const
+{
+    const char *p = path.c_str();
+    std::string::size_type end = path.rfind('/');
+
+    if (end == std::string::npos)
+    {
+        GfLogError("%s: failed to extract ending '/'\n", p);
+        return -1;
+    }
+
+    std::string::size_type start = path.rfind('/', end - 1);
+
+    if (start == std::string::npos)
+    {
+        GfLogError("%s: failed to extract start '/'\n", p);
+        return -1;
+    }
+
+    start++;
+    out = path.substr(start, end - start);
+    return 0;
+}
+
+int GfDrivers::parent(const std::string &path, std::string &out) const
+{
+    const char *p = path.c_str();
+    std::string::size_type end = path.rfind('/');
+
+    if (end == std::string::npos)
+    {
+        GfLogError("%s: failed to extract ending '/'\n", p);
+        return -1;
+    }
+
+    std::string::size_type start = path.rfind('/', end - 1);
+
+    if (start == std::string::npos)
+    {
+        GfLogError("%s: failed to extract start '/'\n", p);
+        return -1;
+    }
+
+    out = path.substr(0, start + 1);
+    return 0;
+}
+
+bool GfDrivers::isindex(const std::string &name) const
+{
+    char *end;
+
+    errno = 0;
+    ::strtoul(name.c_str(), &end, 10);
+    return !errno && !*end;
+}
+
+int GfDrivers::extract_driver(const std::string &dir, void *args) const
+{
+    std::string name, parent;
+
+    if (basename(dir, name))
+    {
+        GfLogError("%s: failed to extract basename\n", dir.c_str());
+        return -1;
+    }
+    else if (!isindex(name))
+        return 0;
+
+    int ret = -1;
+    std::string path = dir + "driver.xml", tmpdir;
+    const char *p = path.c_str();
+    void *h = GfParmReadFile(p, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+    GfXMLDrivers *drivers = static_cast<GfXMLDrivers *>(args);
+    GfXMLDriver d(drivers->size());
+
+    if (!h)
+    {
+        GfLogError("GfDrivers::extract_driver: GfParmReadFile %s failed\n", p);
+        goto end;
+    }
+    else if (d.read(h))
+    {
+        GfLogError("Failed to read %s\n", p);
+        goto end;
+    }
+    else if (GfDrivers::rename(dir, d.tmpdir))
+        goto end;
+
+    drivers->push_back(d);
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+int GfDrivers::extract(const std::string &dir, void *args) const
+{
+    const char *d = dir.c_str();
+    std::string name;
+    GfXMLDrivers drivers;
+
+    if (basename(dir, name))
+    {
+        GfLogError("%s: Could not extract basename\n", d);
+        return -1;
+    }
+    else if (human(name))
+        /* Human drivers do not define any subdirectories. */
+        return 0;
+    else if (iter(dir, &GfDrivers::extract_driver, &drivers))
+    {
+        GfLogError("%s: failed to extract driver parameters\n", d);
+        return -1;
+    }
+
+    GfXMLDriversMap *map = static_cast<GfXMLDriversMap *>(args);
+
+    (*map)[dir] = drivers;
+    return 0;
+}
+
+int GfXMLDriver::read(void *h)
+{
+    for (size_t i = 0; i < sizeof drvattrs / sizeof *drvattrs; i++)
+    {
+        static const char path[] = "driver";
+        const struct rattr &a = drvattrs[i];
+
+        switch (a.type)
+        {
+            case attr::type::string:
+            {
+                const char *key = a.key;
+                const char *val = GfParmGetStr(h, path, key, nullptr);
+
+                if (!val)
+                {
+                    GfLogError("Failed to extract parameter: %s\n", key);
+                    return -1;
+                }
+
+                map[key] = attr(val);
+                break;
+            }
+
+            case attr::type::num:
+            {
+                const char *key = a.key;
+                tdble val = GfParmGetNum(h, path, key, nullptr, 0);
+
+                map[key] = attr(val);
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
+
+static int randname(std::string &name)
+{
+    static const size_t len = 32;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        unsigned char b;
+
+        if (portability::rand(&b, sizeof b))
+        {
+            GfLogError("%s: portability::rand failed\n", __func__);
+            return -1;
+        }
+
+        char hex[sizeof "00"];
+        int n = snprintf(hex, sizeof hex, "%02hhx", b);
+
+        if (n < 0 || n >= static_cast<int>(sizeof hex))
+        {
+            GfLogError("snprintf(3) failed with %d\n", n);
+            return -1;
+        }
+
+        name += hex;
+    }
+
+    return 0;
+}
+
+int GfDrivers::rename(const std::string &dir, std::string &tmpdir) const
+{
+    const char *old = dir.c_str();
+
+    if (GfDrivers::parent(dir, tmpdir))
+    {
+        GfLogError("%s: Failed to determine parent directory\n", old);
+        return -1;
+    }
+    else if (randname(tmpdir))
+    {
+        GfLogError("Failed to generate random directory name\n");
+        return -1;
+    }
+
+    tmpdir += '/';
+
+    const char *newd = tmpdir.c_str();
+
+    if (::rename(old, newd))
+    {
+        GfLogError("Failed to rename %s to %s: %s\n",
+            old, newd, strerror(errno));
+        return -1;
+    }
+
+    return 0;
+}
+
+int GfDrivers::dump(const GfXMLDriver &d, void *h, const std::string &path) const
+{
+    for (size_t i = 0; i < sizeof drvattrs / sizeof *drvattrs; i++)
+    {
+        const char *p = path.c_str();
+        const struct rattr &a = drvattrs[i];
+
+        switch (a.type)
+        {
+            case GfXMLDriver::attr::type::string:
+            {
+                const std::string &val = d.map.at(a.key).s;
+
+                if (GfParmSetStr(h, p, a.key, val.c_str()))
+                {
+                    GfLogError("Failed to set parameter: %s\n", a.key);
+                    return -1;
+                }
+            }
+                break;
+
+            case GfXMLDriver::attr::type::num:
+            {
+                tdble val = d.map.at(a.key).num;
+
+                if (GfParmSetNum(h, p, a.key, nullptr, val))
+                {
+                    GfLogError("Failed to set parameter: %s\n", a.key);
+                    return -1;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+bool GfDrivers::human(const std::string &name) const
+{
+    return name == "human" || name == "networkhuman";
+}
+
+int GfDrivers::dump(const std::string &dir, void *args) const
+{
+    int ret = -1;
+    const GfXMLDriversMap *map = static_cast<const GfXMLDriversMap *>(args);
+    std::string name, params;
+    void *h = nullptr;
+    const char *p;
+
+    if (basename(dir, name))
+    {
+        GfLogError("%s: failed to get basename\n", dir.c_str());
+        goto end;
+    }
+    else if (human(name))
+        /* Human drivers do not define any entries. */
+        return 0;
+
+    params = dir + name + PARAMEXT;
+    p = params.c_str();
+
+    if (!(h = GfParmReadFile(p, GFPARM_RMODE_NOREREAD | GFPARM_RMODE_CREAT)))
+    {
+        GfLogError("GfDrivers::dump: GfParmReadFile %s failed\n", p);
+        goto end;
+    }
+
+    for (const auto &d : map->at(dir))
+    {
+        std::string path = ROB_SECT_ROBOTS "/" ROB_LIST_INDEX "/";
+
+        path += std::to_string(d.index);
+
+        if (dump(d, h, path))
+        {
+            GfLogError("Failed to dump driver\n");
+            goto end;
+        }
+    }
+
+    if (GfParmWriteFile(nullptr, h, name.c_str()))
+    {
+        GfLogError("GfParmWriteFile %s failed\n", p);
+        goto end;
+    }
+
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+int GfDrivers::sort(const std::string &dir, void *args) const
+{
+    std::string name;
+
+    if (basename(dir, name))
+    {
+        GfLogError("%s: failed to extract basename\n", dir.c_str());
+        return -1;
+    }
+    else if (human(name))
+        /* Human drivers do not define any entries. */
+        return 0;
+
+    const GfXMLDriversMap *map = static_cast<const GfXMLDriversMap *>(args);
+
+    for (const auto &d: map->at(dir))
+    {
+        std::string newdir = dir + std::to_string(d.index) + '/';
+        const char *old = d.tmpdir.c_str(), *newd = newdir.c_str();
+
+        if (::rename(old, newd))
+        {
+            GfLogError("Failed to rename %s to %s: %s\n", old, newd,
+                strerror(errno));
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int GfDrivers::regen() const
+{
+    std::string dir;
+    GfXMLDriversMap map;
+
+    if (drvdir(dir))
+    {
+        GfLogError("Failed to get drivers directory\n");
+        return -1;
+    }
+    else if (iter(dir, &GfDrivers::extract, &map))
+    {
+        GfLogError("Failed to extract driver data\n");
+        return -1;
+    }
+    else if (iter(dir, &GfDrivers::dump, &map))
+    {
+        GfLogError("Failed to dump driver data\n");
+        return -1;
+    }
+    else if (iter(dir, &GfDrivers::sort, &map))
+    {
+        GfLogError("Failed to sort driver data\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int GfDrivers::reload()
+{
+    if (regen())
+    {
+        GfLogError("Failed to regenerate drivers list\n");
+        return -1;
+    }
+
     // Clear all.
     clear();
 
@@ -100,7 +552,7 @@ void GfDrivers::reload()
     if (nDriverModules <= 0 || !lstDriverModules)
     {
         GfLogFatal("Could not load any driver module from %s", strDriversDirName.c_str());
-        return;
+        return -1;
     }
 
     // For each module found, load drivers information.
@@ -207,6 +659,190 @@ void GfDrivers::reload()
 
     // Trace what we got.
     print();
+    return 0;
+}
+
+int GfDrivers::robots(std::vector<std::string> &out) const
+{
+    int ret = -1;
+    std::string dir;
+    tModList *mods = nullptr;
+    const tModList *mod;
+    const char *lib = GfLibDir(), *dirp;
+
+    if (!lib)
+    {
+        GfLogError("GfLibDir failed\n");
+        goto end;
+    }
+
+    dir = lib;
+    dir += "drivers/";
+    dirp = dir.c_str();
+
+    if (GfModInfoDir(CAR_IDENT, dirp, 1, &mods) < 0)
+    {
+        GfLogError("GfModInfoDir %s failed\n", dirp);
+        goto end;
+    }
+
+    mod = mods;
+
+    do
+    {
+        std::string name = mod->sopath;
+        std::string::size_type ext = name.rfind('.'), sep = name.rfind('/');
+
+        if (ext == std::string::npos || sep == std::string::npos)
+        {
+            GfLogError("Invalid sopath: %s\n", mod->sopath);
+            goto end;
+        }
+
+        sep++;
+        name = name.substr(sep, ext - sep);
+        out.push_back(name);
+    } while ((mod = mod->next) != mods);
+
+    ret = 0;
+
+end:
+    GfModFreeInfoList(&mods);
+    return ret;
+}
+
+int GfDrivers::gen(const std::vector<std::string> &robots,
+    const std::string &category, unsigned n) const
+{
+    for (unsigned i = 0; i < n; i++)
+    {
+        unsigned index;
+
+again:
+        if (portability::rand(&index, sizeof index))
+        {
+            GfLogError("Failed to calculate random index\n");
+            return -1;
+        }
+
+        index %= robots.size();
+
+        const std::string &driver = robots.at(index);
+        const char *d = driver.c_str();
+
+        if (human(driver))
+            goto again;
+        else if (gen(driver, category))
+        {
+            GfLogError("Failed to generate driver: %s\n", d);
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+struct ensure_min
+{
+    const std::vector<std::string> &robots;
+    bool reload;
+};
+
+int GfDrivers::ensure_min(const std::string &path, void *args) const
+{
+    int ret = -1;
+    static const unsigned min = 5;
+    const char *p = path.c_str(), *category;
+    std::vector<GfDriver *> drivers;
+    struct ensure_min *emin = static_cast<struct ensure_min *>(args);
+    std::string::size_type ext = path.rfind('.');
+    void *h = nullptr;
+
+    if (ext == std::string::npos
+        || path.substr(ext) != PARAMEXT)
+    {
+        ret = 0;
+        goto end;
+    }
+    else if (!(h = GfParmReadFile(p, GFPARM_RMODE_STD)))
+    {
+        GfLogError("GfDrivers::ensure_min: GfParmReadFile %s failed\n", p);
+        goto end;
+    }
+    else if (!(category = GfParmGetStr(h, SECT_CAR, RM_ATTR_CATEGORY, nullptr)))
+    {
+        GfLogError("%s: failed to get category name\n", p);
+        goto end;
+    }
+    else if (GfCars::self()->getCarsInCategory(category).empty())
+    {
+        GfLogInfo("Skipping category without any cars: %s\n", category);
+        ret = 0;
+        goto end;
+    }
+
+    drivers = getDriversWithTypeAndCategory("", category);
+
+    if (drivers.size() < min)
+    {
+        unsigned needed = min - drivers.size();
+
+        GfLogInfo("Will generate %u drivers for category %s\n",
+            needed, category);
+
+        if (gen(emin->robots, category, needed))
+        {
+            GfLogError("Failed to generate %u driver(s) for category=%s\n",
+                needed, category);
+            goto end;
+        }
+
+        emin->reload = true;
+    }
+
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+int GfDrivers::ensure_min()
+{
+    std::string dir;
+    const char *data = GfDataDir(), *dirp;
+    std::vector<std::string> r;
+    struct ensure_min args = {r};
+
+    if (robots(r))
+    {
+        GfLogError("Failed to extract robots list\n");
+        return -1;
+    }
+    else if (!data)
+    {
+        GfLogError("GfDataDir failed\n");
+        return -1;
+    }
+
+    dir = data;
+    dir += "cars/categories/";
+    dirp = dir.c_str();
+
+    if (iter(dirp, &GfDrivers::ensure_min, &args, FList::file))
+    {
+        GfLogError("Failed to ensure category minimum on %s", dirp);
+        return -1;
+    }
+    else if (args.reload && GfDrivers::reload())
+    {
+        GfLogError("Failed to reload drivers\n");
+        return -1;
+    }
+
+    return 0;
 }
 
 GfDrivers::GfDrivers()
@@ -214,6 +850,7 @@ GfDrivers::GfDrivers()
     _pPrivate = new GfDrivers::Private;
 
     reload();
+    ensure_min();
 }
 
 unsigned GfDrivers::getCount() const
@@ -235,6 +872,16 @@ GfDriver* GfDrivers::getDriver(const std::string& strModName, int nItfIndex) con
         return itDriver->second;
 
     return 0;
+}
+
+GfDriver *GfDrivers::getDriverWithName(const std::string& strName, const char *mod) const
+{
+    for (const auto d : _pPrivate->vecDrivers)
+        if (d->getName() == strName)
+            if (!mod || !*mod || d->getModuleName() == mod)
+                return d;
+
+    return nullptr;
 }
 
 std::vector<GfDriver*> GfDrivers::getDriversWithTypeAndCategory(const std::string& strType,
@@ -849,4 +1496,348 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
     }
 
     return vecPossSkins;
+}
+
+int GfDrivers::genident(struct GfDrivers::identity &ident) const
+{
+    size_t index;
+
+    if (portability::rand(&index, sizeof index))
+    {
+        GfLogError("Failed to get random identity index\n");
+        return -1;
+    }
+
+    index %= n_teams;
+
+    ident.team = teams[index];
+
+    if (portability::rand(&index, sizeof index))
+    {
+        GfLogError("Failed to get random identity index\n");
+        return -1;
+    }
+
+    index %= n_names;
+
+    const struct names &n = names[index];
+
+    ident.nationality = n.nation;
+
+    if (portability::rand(&index, sizeof index))
+    {
+        GfLogError("Failed to get random identity index\n");
+        return -1;
+    }
+
+    index %= n.n_names;
+    ident.name = n.names[index];
+    ident.short_name = n.names[index][0];
+    ident.short_name += ".";
+
+    if (portability::rand(&index, sizeof index))
+    {
+        GfLogError("Failed to get random identity index\n");
+        return -1;
+    }
+
+    const char *surname = n.surnames[index %= n.n_surnames];
+    std::string code_name = std::string(surname).substr(0, 3);
+
+    for (auto &c: code_name)
+        c = ::toupper(c);
+
+    ident.name += " ";
+    ident.short_name += " ";
+    ident.code_name = code_name;
+    ident.name += surname;
+    ident.short_name += surname;
+    return 0;
+}
+
+int GfDrivers::pickcar(const std::string &category, std::string &car) const
+{
+    std::vector<GfCar*> cars = GfCars::self()->getCarsInCategory(category);
+    unsigned index;
+
+    if (cars.empty())
+    {
+        GfLogError("No cars on category %s\n", category.c_str());
+        return -1;
+    }
+    else if (portability::rand(&index, sizeof index))
+    {
+        GfLogError("Failed to get random car index\n");
+        return -1;
+    }
+
+    index %= cars.size();
+    car = cars.at(index)->getId();
+    return 0;
+}
+
+int GfDrivers::genparams(const std::string &driver, const std::string &category,
+    const std::string &car, const std::string &dir) const
+{
+    int ret = -1;
+    const char *catId = category.c_str();
+    std::string params = dir + "driver" PARAMEXT, selcar = car;
+    const char *p = params.c_str();
+    void *h = GfParmReadFile(p, GFPARM_RMODE_NOREREAD | GFPARM_RMODE_CREAT);
+    struct identity ident;
+
+    if (!h)
+    {
+        GfLogError("GfDrivers::genparams: GfParmReadFile %s failed\n", p);
+        goto end;
+    }
+
+    if (car.empty() && pickcar(category, selcar))
+    {
+        GfLogError("Failed to pick random car from category: %s\n", catId);
+        goto end;
+    }
+
+    if (genident(ident))
+    {
+        GfLogError("Failed to generate driver identitity\n");
+        return -1;
+    }
+
+    GfParmSetStr(h, "driver", "name", ident.name.c_str());
+    GfParmSetStr(h, "driver", "short name", ident.short_name.c_str());
+    GfParmSetStr(h, "driver", "code name", ident.code_name.c_str());
+    GfParmSetStr(h, "driver", "desc", "Bot generated");
+    GfParmSetStr(h, "driver", "team", ident.team.c_str());
+    GfParmSetStr(h, "driver", "author", "Automatically generated");
+    GfParmSetStr(h, "driver", "car name", selcar.c_str());
+    GfParmSetStr(h, "driver", "race number", "1");
+    GfParmSetStr(h, "driver", "red", "1.0");
+    GfParmSetStr(h, "driver", "green", "1.0");
+    GfParmSetStr(h, "driver", "blue", "1.0");
+    GfParmSetStr(h, "driver", "nation", ident.nationality.c_str());
+
+    if (GfParmWriteFile(nullptr, h, driver.c_str()))
+    {
+        GfLogError("GfParmWriteFile %s failed\n", p);
+        goto end;
+    }
+
+    GfLogInfo("Generated driver %s with robot %s for category %s\n",
+        ident.name.c_str(), driver.c_str(), category.c_str());
+
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+bool GfDrivers::supports_aggression(const std::string &driver) const
+{
+    return driver == "usr" || driver == "shadow";
+}
+
+int GfDrivers::genskill(const std::string &driver, const std::string &dir) const
+{
+    int ret = -1;
+    std::string params = dir + "skill" PARAMEXT, car;
+    const char *p = params.c_str();
+    void *h = GfParmReadFile(p, GFPARM_RMODE_NOREREAD | GFPARM_RMODE_CREAT);
+    unsigned value;
+    float valuef;
+
+    if (portability::rand(&value, sizeof value))
+    {
+        GfLogError("Failed to generate random skill value\n");
+        goto end;
+    }
+
+    value %= 11;
+    valuef = value / 10.0f;
+
+    if (GfParmSetNum(h, "skill", "level", nullptr, valuef))
+    {
+        GfLogError("Failed to set skill value\n");
+        goto end;
+    }
+    else if (supports_aggression(driver))
+    {
+        if (portability::rand(&value, sizeof value))
+        {
+            GfLogError("Failed to generate random skill value\n");
+            goto end;
+        }
+
+        // Values range from -3.0 to 1.5. However, for shadow it is not
+        // recommended to exceed 0.1 to avoid accidents.
+        value %= 32;
+        valuef = value / 10.0f - 3.0f;
+
+        if (GfParmSetNum(h, "skill", "aggression", nullptr, valuef))
+        {
+            GfLogError("Failed to set agression value\n");
+            goto end;
+        }
+    }
+
+    if (GfParmWriteFile(nullptr, h, "Skill"))
+    {
+        GfLogError("GfParmWriteFile %s failed\n", p);
+        goto end;
+    }
+
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+int GfDrivers::gen(const std::string &driver, const std::string &category,
+    const std::string &car) const
+{
+    const char *dir = GfLocalDir();
+
+    if (!dir)
+    {
+        GfLogError("GfLocalDir failed\n");
+        return -1;
+    }
+
+    std::string drvdir = dir;
+
+    drvdir += "drivers/" + driver + "/";
+
+    const char *d = drvdir.c_str();
+
+    if (GfDirCreate(d) != GF_DIR_CREATED)
+    {
+        GfLogError("Failed to created directory: %s\n", d);
+        return -1;
+    }
+
+    unsigned index = 0;
+
+    while (GfDirExists((drvdir + std::to_string(index)).c_str()))
+        index++;
+
+    drvdir += std::to_string(index) + "/";
+
+    if (GfDirCreate(d) != GF_DIR_CREATED)
+    {
+        GfLogError("Failed to created directory: %s\n", d);
+        return -1;
+    }
+    else if (genparams(driver, category, car, drvdir))
+    {
+        GfLogError("Failed to generate driver parameters\n");
+        return -1;
+    }
+    else if (genskill(driver, drvdir))
+    {
+        GfLogError("Failed to generate driver skill\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int GfDrivers::getDriverIdx(void *h, const char *path, const char *mod) const
+{
+    const char *name = GfParmGetStr(h, path, RM_ATTR_DRIVERNAME, NULL);
+
+    if (!name)
+    {
+        GfLogError("Attribute \"" RM_ATTR_DRIVERNAME "\" missing\n");
+        return -1;
+    }
+
+    const GfDriver *driver = getDriverWithName(name, mod);
+
+    if (!driver)
+    {
+        GfLogError("Driver not found: %s\n", name);
+        return -1;
+    }
+
+    return driver->getInterfaceIndex();
+}
+
+int GfDrivers::getDriverIdx(const std::string &mod, const std::string &name) const
+{
+    int ret = -1, n;
+    std::string path = "drivers/" + mod + "/" + mod + PARAMEXT;
+    const char *p = path.c_str(), *pname = name.c_str(), *pmod = mod.c_str();
+    static const char *prefix = ROB_SECT_ROBOTS "/" ROB_LIST_INDEX;
+    void *h = GfParmReadFileLocal(p, GFPARM_RMODE_STD);
+
+    if (!h)
+    {
+        GfLogError("GfParmReadFileLocal %s failed\n", p);
+        goto end;
+    }
+    else if (!(n = GfParmGetEltNb(h, prefix)))
+    {
+        GfLogError("GfParmGetEltNb %s failed\n", p);
+        goto end;
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        std::string s = std::string(prefix) + "/" + std::to_string(i);
+        const char *value = GfParmGetStr(h, s.c_str(), ROB_ATTR_NAME, nullptr);
+
+        if (!value)
+            GfLogError("Missing driver name, module=%s, index=%d\n",
+                pmod, i);
+        else if (name == value)
+        {
+            ret = i;
+            goto end;
+        }
+    }
+
+    GfLogError("No driver found: %s, module=%s\n", pname, pmod);
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
+int GfDrivers::del(const std::string &mod, const std::string &driver) const
+{
+    const char *dir = GfLocalDir();
+
+    if (!dir)
+    {
+        GfLogError("GfLocalDir failed\n");
+        return -1;
+    }
+
+    int index = getDriverIdx(mod, driver);
+
+    if (index < 0)
+    {
+        GfLogError("GfDrivers::del: failed to get driver index\n");
+        return -1;
+    }
+
+    std::string path = dir;
+
+    path += "drivers/" + mod + "/" + std::to_string(index);
+
+    if (portability::rmdir_r(path.c_str()))
+    {
+        GfLogError("Failed to remove directory: %s\n", path.c_str());
+        return -1;
+    }
+
+    return 0;
 }

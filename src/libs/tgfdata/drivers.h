@@ -26,7 +26,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <variant>
 
+#include "tgf.h"
 #include "tgfdata.h"
 
 class GfCar;
@@ -116,6 +119,28 @@ protected:
 	int _nFeatures; // Bit mask built with RM_FEATURE_*
 };
 
+class GfXMLDriver
+{
+public:
+	GfXMLDriver(unsigned index) : index(index) {}
+	int read(void *h);
+
+	struct attr
+	{
+		attr() {}
+		attr(const char *s): type(type::string), s(s) {}
+		attr(tdble d): type(type::num), num(d) {}
+
+		enum class type {num, string} type;
+		std::string s;
+		tdble num;
+	};
+
+	unsigned index;
+	std::string tmpdir;
+	std::map<std::string, attr> map;
+};
+
 class TGFDATA_API GfDrivers
 {
 public:
@@ -125,18 +150,28 @@ public:
 	static void shutdown();
 
 	// Reload drivers data from files.
-	void reload();
+	int reload();
 
 	unsigned getCount() const;
  	const std::vector<std::string>& getTypes() const;
 
  	GfDriver* getDriver(const std::string& strModName, int nItfIndex) const;
-	GfDriver* getDriverWithName(const std::string& strName) const;
+	GfDriver* getDriverWithName(const std::string& strName, const char *mod = nullptr) const;
+ 	int getDriverIdx(void *h, const char *path, const char *mod) const;
+	int getDriverIdx(const std::string &mod, const std::string &name) const;
 
  	std::vector<GfDriver*> getDriversWithTypeAndCategory(const std::string& strType = "",
 														 const std::string& strCarCatId = "") const;
 
  	void print() const;
+	int gen(const std::string &driver, const std::string &category,
+		const std::string &car = "") const;
+	int gen(const std::vector<std::string> &robots,
+		const std::string &category, unsigned n) const;
+	int robots(std::vector<std::string> &out) const;
+	int ensure_min();
+	int ensure_min(const std::string &path, void *args) const;
+	int del(const std::string &mod, const std::string &driver) const;
 
 protected:
 
@@ -144,8 +179,40 @@ protected:
 	GfDrivers();
 	~GfDrivers();
 
+	typedef int (GfDrivers::*action)(const std::string &dir, void *args) const;
+	int extract(const std::string &dir, void *args) const;
+	int extract_driver(const std::string &dir, void *args) const;
+	int rename(const std::string &dir, std::string &tmpdir) const;
+	int drvdir(std::string &dir) const;
+	int iter(const std::string &dir, action a, void *args,
+		enum FList::type type = FList::type::dir) const;
+
 	// Clear all data.
 	void clear();
+
+	struct identity
+	{
+		std::string name, short_name, code_name, nationality, team;
+	};
+
+	typedef std::vector<GfXMLDriver> GfXMLDrivers;
+	typedef std::map<std::string, GfXMLDrivers> GfXMLDriversMap;
+	int regen() const;
+	int basename(const std::string &path, std::string &out) const;
+	int parent(const std::string &path, std::string &out) const;
+	int gendir(const std::string &dir) const;
+	int read(void *h, GfXMLDriver &drv) const;
+	int dump(const std::string &dir, void *args) const;
+	int dump(const GfXMLDriver &d, void *h, const std::string &path) const;
+	int sort(const std::string &dir, void *args) const;
+	bool isindex(const std::string &dir) const;
+	bool human(const std::string &name) const;
+	int genparams(const std::string &driver, const std::string &category,
+		const std::string &car, const std::string &dir) const;
+	int genident(struct identity &ident) const;
+	int genskill(const std::string &driver, const std::string &dir) const;
+	bool supports_aggression(const std::string &driver) const;
+	int pickcar(const std::string &category, std::string &car) const;
 
 protected:
 
@@ -155,6 +222,18 @@ protected:
 	// Its private data.
 	class Private;
 	Private* _pPrivate;
+
+	static const char *const teams[];
+	static const size_t n_teams;
+
+	static const struct names
+	{
+		const char *nation, *const *names, *const *surnames;
+		size_t n_names, n_surnames;
+	} names[];
+
+	static const size_t n_names;
+	enum nationality {JA, EN, DE, CRO, IT, FR};
 };
 
 #endif /* __TGFDRIVERS_H__ */
