@@ -72,18 +72,10 @@ SET(ROBOT_SOURCES
     src/unitvec3d.h
 )
 
-# Official-only simplix instances.
-SET(ROBOT_CLONES simplix_36GP simplix_67GP simplix_sc simplix_srw simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5)
-
-IF(NOT OPTION_OFFICIAL_ONLY)
-   SET(ROBOT_CLONES ${ROBOT_CLONES} simplix_ref simplix_stock simplix_lp1)
-ENDIF(NOT OPTION_OFFICIAL_ONLY)
-
 # The ubiquitous robot module and its clones.
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
              INTERFACE ${ROBOT_INTERFACE}
-             SOURCES ${ROBOT_SOURCES}
-             CLONENAMES ${ROBOT_CLONES})
+             SOURCES ${ROBOT_SOURCES})
 
 
 # For data associated to the ubiquitous robot module and its clones,

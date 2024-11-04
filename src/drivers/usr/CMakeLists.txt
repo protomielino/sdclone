@@ -59,17 +59,9 @@ SET(ROBOT_SOURCES
     src/Vec3.h
     src/Vec3d.h)
 
-# Official-only USR instances.
-SET(ROBOT_CLONES usr_36GP usr_67GP usr_ls1 usr_ls2 usr_mpa1 usr_mpa11 usr_mpa12 usr_rs usr_sc usr_trb1)
-
-IF(NOT OPTION_OFFICIAL_ONLY)
-   SET(ROBOT_CLONES ${ROBOT_CLONES} usr_mp10 usr_srw usr_lp1)
-ENDIF(NOT OPTION_OFFICIAL_ONLY)
-
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
               INTERFACE ${ROBOT_INTERFACE}
-              SOURCES ${ROBOT_SOURCES}
-              CLONENAMES ${ROBOT_CLONES})
+              SOURCES ${ROBOT_SOURCES})
 
 # For data associated to the ubiquirous USR robot module and its clones,
 # see data/drivers/usr*/CMakeLists.txt

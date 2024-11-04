@@ -79,7 +79,6 @@ ENDMACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
 #                 See GENERATE_ROBOT_DEF_FILE macro.
 #                 If not specified, defaults to "LEGACY_MIN" ; not used if MODULE used
 #  SOURCES    : List of files to use as build sources if any ; not needed if MODULE used
-#  CLONENAMES : The names of the clones to generate
 #  VERSION    : The VERSION of the libraries to produce (robot and its clones) (def: $VERSION).
 #  SOVERSION  : The SOVERSION of the libraries to produce (in the ldconfig meaning) (def: 0.0.0).
 #               WARNING: Not taken into account for the moment : might not work with GCC 4.5 or +.
@@ -87,8 +86,7 @@ ENDMACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
 # Example:
 #    ROBOT_MODULE(NAME simplix VERSION 3.0.5 SOVERSION 0.0.0
 #                 INTERFACE LEGACY WELCOME simplix_trb1 simplix_ls1 simplix_36GP
-#                 SOURCES simplix.cpp ...
-#                 CLONENAMES simplix_trb1 simplix_ls1 simplix_36GP)
+#                 SOURCES simplix.cpp ...)
 MACRO(ROBOT_MODULE)
 
   SET(RBM_SYNTAX "NAME,1,1,RBM_HAS_NAME,RBM_NAME")
@@ -96,7 +94,6 @@ MACRO(ROBOT_MODULE)
   SET(RBM_SYNTAX ${RBM_SYNTAX} "SOVERSION,0,1,RBM_HAS_SOVERSION,RBM_SOVERSION")
   SET(RBM_SYNTAX ${RBM_SYNTAX} "INTERFACE,0,-1,RBM_HAS_INTERFACE,RBM_INTERFACE")
   SET(RBM_SYNTAX ${RBM_SYNTAX} "SOURCES,0,-1,RBM_HAS_SOURCES,RBM_SOURCES")
-  SET(RBM_SYNTAX ${RBM_SYNTAX} "CLONENAMES,0,-1,RBM_HAS_CLONENAMES,RBM_CLONENAMES")
 
   SPLIT_ARGN(${RBM_SYNTAX} ARGUMENTS ${ARGN})
 
@@ -169,46 +166,6 @@ MACRO(ROBOT_MODULE)
 
   # Install target robot module shared library
   SD_INSTALL_FILES(LIB drivers/${RBM_NAME} TARGETS ${RBM_NAME})
-
-  # Install clone robot modules shared libraries (use ldconfig version naming scheme under Linux)
-  IF(RBM_HAS_CLONENAMES AND RBM_CLONENAMES)
-
-    GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    IF(NOT RUNTIME_OUTPUT_DIRECTORY)
-      GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LIBRARY_OUTPUT_DIRECTORY)
-    ENDIF()
-    SET(MODLOC "${MODLOC}/${RBM_NAME}${CMAKE_SHARED_MODULE_SUFFIX}")
-
-    FOREACH(CLONENAME ${RBM_CLONENAMES})
-
-      SET(CLONE_MODDIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${CLONENAME}")
-      SET(CLONE_MODLOC "${CLONE_MODDIR}/${CLONENAME}${CMAKE_SHARED_MODULE_SUFFIX}")
-      SET_PROPERTY(GLOBAL APPEND PROPERTY SD_ROBOT_LIST "${CLONENAME}")
-      IF(FALSE) #IF(UNIX)
-        # Might not work with GCC 4.5 or + (see above)
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_MODULE_SUFFIX} into ${CLONE_MODLOC}.${RBM_VERSION}"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory "${CLONE_MODDIR}"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
-                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME}
-                         FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
-      ELSE()
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E echo "Creating directory ${CLONE_MODDIR}"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory "${CLONE_MODDIR}"
-                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_MODULE_SUFFIX}=${MODLOC} into ${CLONE_MODLOC}"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME}
-                         FILES ${CLONE_MODLOC})
-      ENDIF()
-
-    ENDFOREACH(CLONENAME ${RBM_CLONENAMES})
-
-  ENDIF()
-
 ENDMACRO(ROBOT_MODULE)
 
 # Robot data installation
