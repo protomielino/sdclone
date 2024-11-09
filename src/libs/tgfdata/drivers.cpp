@@ -129,6 +129,8 @@ void GfDrivers::reload()
             continue;
         }
 
+        _pPrivate->vecTypes.push_back(strModName);
+
         // For each driver (= interface) "in" the module
         for (int nItfInd = 0; nItfInd < pCurModule->modInfoSize; nItfInd++)
         {
@@ -171,9 +173,7 @@ void GfDrivers::reload()
                 const std::pair<std::string, int> driverKey(pDriver->getModuleName(),
                                                             pDriver->getInterfaceIndex());
                 _pPrivate->mapDriversByKey[driverKey] = pDriver;
-                if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(),
-                              pDriver->getType()) == _pPrivate->vecTypes.end())
-                    _pPrivate->vecTypes.push_back(pDriver->getType());
+
                 if (std::find(_pPrivate->vecCarCategoryIds.begin(), _pPrivate->vecCarCategoryIds.end(),
                               pDriver->getCar()->getCategoryId()) == _pPrivate->vecCarCategoryIds.end())
                     _pPrivate->vecCarCategoryIds.push_back(pDriver->getCar()->getCategoryId());
