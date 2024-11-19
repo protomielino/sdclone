@@ -9,10 +9,12 @@
  */
 
 #include "asset.h"
+#include <drivers.h>
 #include <tgf.h>
 #include <cjson/cJSON.h>
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -75,10 +77,61 @@ std::string Asset::path() const
             return "cars/models/";
 
         case Asset::driver:
-            return "drivers/";
+            // In the case of drivers, category means "driver type".
+            return "drivers/" + category + "/";
 
         case Asset::track:
             return "tracks/" + category + "/";
+    }
+
+    return "";
+}
+
+std::string Asset::basedir() const
+{
+    switch (type)
+    {
+        case Asset::car:
+        case Asset::track:
+            return GfDataDir();
+
+        case Asset::driver:
+            return GfLocalDir();
+    }
+
+    return "";
+}
+
+std::string Asset::dstdir() const
+{
+    switch (type)
+    {
+        case Asset::car:
+        case Asset::track:
+            return path() + directory;
+
+        case Asset::driver:
+        {
+            int idx = 0;
+            // In the case of drivers, category means "driver type".
+            std::vector<GfDriver *> drivers =
+                GfDrivers::self()->getDriversWithTypeAndCategory(category);
+
+            for (const GfDriver *d : drivers)
+            {
+                int drvidx = d->getInterfaceIndex();
+
+                if (d->getName() == name)
+                {
+                    idx = drvidx;
+                    break;
+                }
+                else if (drvidx >= idx)
+                    idx = drvidx + 1;
+            }
+
+            return path() + std::to_string(idx) + "/";
+        }
     }
 
     return "";
@@ -172,4 +225,89 @@ bool Asset::operator==(const Asset &other) const
         thumbnail == other.thumbnail &&
         directory == other.directory &&
         size == other.size;
+}
+
+int Asset::needs_update(bool &out) const
+{
+    switch (type)
+    {
+        case Asset::type::car:
+        case Asset::type::track:
+        {
+            std::string path = basedir() + this->path() + directory
+                + "/.revision";
+
+            return needs_update(path, out);
+        }
+
+        case Asset::type::driver:
+            return needs_update_drv(out);
+    }
+
+    return -1;
+}
+
+int Asset::needs_update(const std::string &path, bool &out) const
+{
+    std::ifstream f(path, std::ios::binary);
+
+    if (!f.is_open())
+        return -1;
+
+    char v[sizeof "18446744073709551615"];
+
+    f.getline(v, sizeof v);
+
+    if (f.fail())
+    {
+        GfLogError("Error while reading revision\n");
+        return -1;
+    }
+
+    unsigned long long rev;
+
+    try
+    {
+        size_t pos;
+
+        rev = std::stoull(v, &pos);
+
+        if (pos != strlen(v))
+        {
+            GfLogError("Invalid number: %s\n", v);
+            return -1;
+        }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        GfLogError("caught std::invalid_argument with %s\n", v);
+        return -1;
+    }
+    catch (const std::out_of_range &e)
+    {
+        GfLogError("caught std::out_of_range with %s\n", v);
+        return -1;
+    }
+
+    out = revision > rev;
+    return 0;
+}
+
+int Asset::needs_update_drv(bool &out) const
+{
+    // In the case of drivers, category means "driver type".
+    std::vector<GfDriver *> drivers =
+        GfDrivers::self()->getDriversWithTypeAndCategory(category);
+
+    for (const GfDriver *d : drivers)
+        if (d->getName() == name)
+        {
+            int idx = d->getInterfaceIndex();
+            std::string path = basedir() + this->path() + std::to_string(idx)
+                + "/.revision";
+
+            return needs_update(path, out);
+        }
+
+    return -1;
 }

@@ -571,14 +571,6 @@ int DownloadsMenu::extract(const entry *e, const std::string &src,
     std::string &error) const
 {
     const Asset &a = e->a;
-    const char *data = GfDataDir();
-
-    if (!data)
-    {
-        GfLogError("GfDataDir failed\n");
-        return -1;
-    }
-
     std::string name;
 
     if (randname(name))
@@ -588,9 +580,9 @@ int DownloadsMenu::extract(const entry *e, const std::string &src,
         return -1;
     }
 
-    std::string tmp = data + name + "/";
+    std::string base = a.basedir(), tmp = base + name + "/";
     unzip u(src, tmp, a.directory);
-    std::string dst = data + a.path() + a.directory,
+    std::string dst = base + a.dstdir(),
         tmpd = tmp + a.directory;
     int ret = -1;
 
@@ -697,61 +689,6 @@ int DownloadsMenu::asset_fetched(CURLcode result, CURL *h, const sink *s,
     return ret;
 }
 
-static int needs_update(const Asset &a, bool &out)
-{
-    const char *data = GfDataDir();
-
-    if (!data)
-    {
-        GfLogError("GfDataDir failed\n");
-        return -1;
-    }
-
-    std::string path = data + a.path() + a.directory + "/.revision";
-    std::ifstream f(path, std::ios::binary);
-
-    if (!f.is_open())
-        return -1;
-
-    char v[sizeof "18446744073709551615"];
-
-    f.getline(v, sizeof v);
-
-    if (f.fail())
-    {
-        GfLogError("Error while reading revision\n");
-        return -1;
-    }
-
-    unsigned long long rev;
-
-    try
-    {
-        size_t pos;
-
-        rev = std::stoull(v, &pos);
-
-        if (pos != strlen(v))
-        {
-            GfLogError("Invalid number: %s\n", v);
-            return -1;
-        }
-    }
-    catch (const std::invalid_argument &e)
-    {
-        GfLogError("caught std::invalid_argument with %s\n", v);
-        return -1;
-    }
-    catch (const std::out_of_range &e)
-    {
-        GfLogError("caught std::out_of_range with %s\n", v);
-        return -1;
-    }
-
-    out = a.revision > rev;
-    return 0;
-}
-
 int DownloadsMenu::thumbnail_fetched(CURLcode result, CURL *h, const sink *s,
     std::string &error)
 {
@@ -762,7 +699,7 @@ int DownloadsMenu::thumbnail_fetched(CURLcode result, CURL *h, const sink *s,
         {
             bool update;
 
-            if (needs_update(e->a, update))
+            if (e->a.needs_update(update))
                 e->state = entry::download;
             else if (update)
                 e->state = entry::update;
