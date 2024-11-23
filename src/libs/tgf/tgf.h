@@ -350,6 +350,7 @@ typedef struct FList
     char		*name;		/**< File name */
     char		*dispName;	/**< Name to display on screen */
     void		*userData;	/**< User data */
+    enum {unknown, file, dir} type; /**< Entry type. */
 } tFList;
 
 TGF_API bool GfDirExists(const char* pszName);

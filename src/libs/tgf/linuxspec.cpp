@@ -18,15 +18,18 @@
 
 // Note: This code is intended to be compiled ONLY under Linuxes / BSDs / Mac OS X.
 
+#include <cerrno>
 #include <cstdlib>
 #include <cstddef>
 #include <cstdarg>
+#include <cstring>
 #include <climits>
 #include <cstring>
 #include <cerrno>
 #include <string>
 #include <sstream>
 
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <dlfcn.h>
@@ -477,8 +480,26 @@ linuxDirGetList(const char *dir)
 		/* some files in it */
 		while ((ep = readdir(dp)) != 0) {
 			if ((strcmp(ep->d_name, ".") != 0) && (strcmp(ep->d_name, "..") != 0)) {
+				std::string path;
+				const char *pathc;
+				struct stat sb;
+
 				curf = (tFList*)calloc(1, sizeof(tFList));
 				curf->name = strdup(ep->d_name);
+
+				path = dir;
+				path += "/";
+				path += curf->name;
+				pathc = path.c_str();
+
+				if (stat(pathc, &sb)) {
+					GfLogError("stat(2) %s: %s\n", pathc, strerror(errno));
+				} else if (S_ISDIR(sb.st_mode)) {
+					curf->type = FList::dir;
+				} else if (S_ISREG(sb.st_mode)) {
+					curf->type = FList::file;
+				}
+
 				if (flist == (tFList*)NULL) {
 					curf->next = curf;
 					curf->prev = curf;

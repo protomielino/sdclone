@@ -433,6 +433,11 @@ windowsDirGetList(const char *dir)
 			if ( strcmp(FData.name, ".") != 0 && strcmp(FData.name, "..") != 0 ) {
 				curf = (tFList*)calloc(1, sizeof(tFList));
 				curf->name = strdup(FData.name);
+				if (FData.attrib & _A_NORMAL) {
+					curf->type = FList::file;
+				} else if (FData.attrib & _A_SUBDIR) {
+					curf->type = FList::dir;
+				}
 				if (flist == (tFList*)NULL) {
 					curf->next = curf;
 					curf->prev = curf;
