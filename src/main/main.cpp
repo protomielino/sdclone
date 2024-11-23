@@ -159,6 +159,24 @@ main(int argc, char *argv[])
     if (!pApp->parseOptions())
 		return 1;
 
+	const char *local = GfLocalDir();
+
+	if (!local)
+	{
+		GfLogError("GfLocalDir failed\n");
+		return 1;
+	}
+
+	std::string tmp = local;
+
+	tmp += "/tmp/";
+
+	if (portability::rmdir_r(tmp.c_str()))
+	{
+		GfLogError("Failed to remove directory: %s\n", tmp.c_str());
+		return 1;
+	}
+
 	// Some more checks about command line options.
 	std::string strRaceToStart;
 	if (bTextOnly && (!pApp->hasOption("startrace", strRaceToStart) || strRaceToStart.empty()))
