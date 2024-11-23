@@ -19,7 +19,7 @@ public:
     virtual int append(const void *buf, size_t n);
     virtual ~sink() = default;
     size_t size() const;
-    void flush();
+    virtual void flush();
     bool cleanup;
 
 protected:
