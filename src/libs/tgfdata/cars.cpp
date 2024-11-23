@@ -96,9 +96,9 @@ GfCars::GfCars()
 		if (pFolder->name[0] == '.')
 			continue;
 
-		// Ignore "CMakeLists.txt"
-		if (strcmp(pFolder->name, "CMakeLists.txt") == 0)
+		if (pFolder->type != FList::dir) {
 			continue;
+		}
 
 		// Open the XML file of the car.
 		const char* pszCarId = pFolder->name;
