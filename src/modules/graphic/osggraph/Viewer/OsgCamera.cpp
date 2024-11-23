@@ -4,6 +4,7 @@
     created              : Tue Feb 26 12:24:02 CEST 2013
     copyright            : (C) 2013 by Gaëtan André
     email                : gaetan.andre@gmail.com
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -609,7 +610,7 @@ public:
 
         center[0] = car->_pos_X - dist * cos(A + PI * car->_glance) + dist * cos(A + PI * car->_glance - offset);
         center[1] = car->_pos_Y - dist * sin(A + PI * car->_glance) + dist * sin(A + PI * car->_glance - offset);
-        center[2] = car->_pos_Z;
+        center[2] = car->_pos_Z + 1.0;
 
         speed[0] = car->pub.DynGCg.vel.x;
         speed[1] = car->pub.DynGCg.vel.y;
@@ -2620,3 +2621,4 @@ void SDCameras::loadSpanValues()
 }
 
 } // namespace osggraph
+
