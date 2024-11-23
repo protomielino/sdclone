@@ -78,14 +78,7 @@ std::string Asset::path() const
             return "drivers/";
 
         case Asset::track:
-        {
-            std::string ret = "tracks/";
-
-            ret += category;
-            ret += "/";
-
-            return ret;
-        }
+            return "tracks/" + category + "/";
     }
 
     return "";
