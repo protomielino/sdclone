@@ -151,7 +151,7 @@ int unzip::once() const
         return -1;
     }
 
-    size_t n = name.find(exp);
+    std::string::size_type n = name.find(exp);
 
     if (n == std::string::npos || n != 0)
     {
@@ -160,21 +160,26 @@ int unzip::once() const
     }
 
     std::string abspath = dst + name;
+    std::string::size_type slash = abspath.rfind('/');
+    std::string dir = abspath.substr(0, slash);
+    auto last = name.rbegin();
 
-    if (*name.rbegin() != '/')
+    if (slash == std::string::npos)
     {
-        if (extract(abspath))
-        {
+        GfLogInfo("%s: ignoring entry %s\n", src.c_str(), name.c_str());
+        return 0;
+    }
+    else if (GfDirCreate(dir.c_str()) != GF_DIR_CREATED)
+    {
+        GfLogError("%s: failed to create directory %s\n", dir.c_str(),
+            name.c_str());
+        return -1;
+    }
+    else if (*last != '/' && extract(abspath))
+    {
             GfLogError("%s: failed to extract %s\n", src.c_str(),
                 name.c_str());
             return -1;
-        }
-    }
-    else if (GfDirCreate(abspath.c_str()) != GF_DIR_CREATED)
-    {
-        GfLogError("%s: failed to create directory %s\n", abspath.c_str(),
-            name.c_str());
-        return -1;
     }
 
     return 0;
