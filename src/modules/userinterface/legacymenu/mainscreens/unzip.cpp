@@ -74,6 +74,11 @@ int unzip::extract(const std::string &path) const
             src.c_str(), path.c_str(), error);
         return -1;
     }
+    else if (!out.is_open())
+    {
+        GfLogError("Failed to open %s for writing\n", path.c_str());
+        return -1;
+    }
 
     for (;;)
     {
@@ -89,7 +94,15 @@ int unzip::extract(const std::string &path) const
             goto end;
         }
 
-        out.write(buf, n);
+        try
+        {
+            out.write(buf, n);
+        }
+        catch (const std::ios_base::failure &failure)
+        {
+            GfLogError("Failed to write %d bytes\n", n);
+            return -1;
+        }
     }
 
     ret = 0;
