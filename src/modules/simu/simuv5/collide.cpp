@@ -4,6 +4,7 @@
     created              : Sun Mar 19 00:06:19 CET 2000
     copyright            : (C) 2000-2005 by Eric Espie, Bernhard Wymann
     email                : torcs@free.fr
+    version              : $Id: collide.cpp 4609 2012-03-25 12:43:29Z wdbee $
 
  ***************************************************************************/
 
@@ -121,6 +122,8 @@ void SimCarCollideXYScene(tCar *car)
     tTrackBarrier *curBarrier;
     tdble dmg;
 
+	tWheel *wheel;
+
     if (car->carElt->_state & RM_CAR_STATE_NO_SIMU)
     {
         return;
@@ -134,6 +137,13 @@ void SimCarCollideXYScene(tCar *car)
         RtTrackGlobal2Local(seg, corner->pos.ax, corner->pos.ay, &trkpos, TR_LPOS_TRACK);
         seg = trkpos.seg;
         tdble toSide;
+		wheel = &(car->wheel[i]);
+
+		static tdble WHEEL_ROT_DAMAGE = 0.001f;
+		static tdble WHEEL_BENT_DAMAGE = 0.01f;
+		static tdble WHEEL_DAMAGE_LIMIT = 1.0f;
+		static tdble SUSP_DAMAGE_CONST = 1.0f;
+		static tdble SUSP_DAMAGE = 0.1f;
 
         if (trkpos.toRight < 0.0)
         {
@@ -209,6 +219,12 @@ void SimCarCollideXYScene(tCar *car)
 
         dotProd *= curBarrier->surface->kRebound;
 
+		// Damage suspension on impact
+		//SimSuspDamage(&wheel->susp, dotProd + SUSP_DAMAGE_CONST * SimDeltaTime);
+
+		SimWheelDamage(wheel, dotProd + WHEEL_ROT_DAMAGE * SimDeltaTime);
+		SimWheelUpdateRide(car, i);
+
         // If the car moves toward the barrier, rebound.
         if (dotProd < 0.0f)
         {
@@ -219,7 +235,7 @@ void SimCarCollideXYScene(tCar *car)
             car->collpos.y = corner->pos.ay;
             car->DynGCg.vel.x -= nx * dotProd;
             car->DynGCg.vel.y -= ny * dotProd;
-
+    
             //detect collision
             sgVec3 force = { 0, 0, 0 };
 
@@ -241,6 +257,8 @@ void SimCarCollideXYScene(tCar *car)
                 collision_state->force[j] = (float)(0.0001*force[j]);
             }
         }
+
+		
     }
 }
 
@@ -419,7 +437,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
             car[i]->VelColl.az = car[i]->DynGCg.vel.az + js * rpsign[i] * rpn[i] * car[i]->Iinv.z * ROT_K;
         }
 
-        static float VELMAX = 3.0f;
+        static float VELMAX = 2.0f;
         if (fabs(car[i]->VelColl.az) > VELMAX)
         {
             car[i]->VelColl.az = (tdble)(SIGN(car[i]->VelColl.az) * VELMAX);
@@ -568,7 +586,7 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
         car->VelColl.az = car->DynGCg.vel.az + j * rp * rpsign * car->Iinv.z * ROT_K;
     }
 
-    static float VELMAX = 3.0f;
+    static float VELMAX = 2.0f;
     if (fabs(car->VelColl.az) > VELMAX)
     {
         car->VelColl.az = (float) (SIGN(car->VelColl.az) * VELMAX);

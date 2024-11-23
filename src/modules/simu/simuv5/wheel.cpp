@@ -4,6 +4,7 @@
     created              : Sun Mar 19 00:09:06 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
+    version              : $Id: wheel.cpp 4983 2012-10-07 13:53:17Z pouillot $
 
  ***************************************************************************/
 
@@ -49,7 +50,7 @@ void SimWheelConfig(tCar *car, int index)
     setupCamber->changed = true;
     setupCamber->stepsize = (tdble) DEG2RAD(0.1);
 
-    setupPressure->desired_value = setupPressure->min = setupPressure->max = 275600;
+    setupPressure->desired_value = setupPressure->min = setupPressure->max = 138000;
     GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_PRESSURE, (char*)NULL, &(setupPressure->desired_value), &(setupPressure->min), &(setupPressure->max));
     setupPressure->changed = true;
     setupPressure->stepsize = 10000;
@@ -69,85 +70,112 @@ void SimWheelConfig(tCar *car, int index)
     wheel->treadThinkness	= GfParmGetNum(hdle, WheelSect[index], PRM_TREADTHICKNESS, (char*)NULL, 0.005f);		// default 5 [mm]
     tdble rimmass = GfParmGetNum(hdle, WheelSect[index], PRM_RIMMASS, (char*)NULL, 7.0f);							// default 7 [kg]
     wheel->hysteresisFactor = GfParmGetNum(hdle, WheelSect[index], PRM_HYSTERESIS, (char*)NULL, 1.0f);				// default 1.0 [-]
+	wheel->coolingFactor = GfParmGetNum(hdle, WheelSect[index], PRM_TIRECOOLING, (char*)NULL, 0.0f);				// default 0.0 [-] maintain compatibility with older cars
+	wheel->latHeatFactor = GfParmGetNum(hdle, WheelSect[index], PRM_LATMUHEATING, (char*)NULL, 0.0f);				// default 0.0 [-] 
+	wheel->longHeatFactor = GfParmGetNum(hdle, WheelSect[index], PRM_LONGMUHEATING, (char*)NULL, 0.0f);				// default 0.0 [-] 
+	wheel->tireSpeedCoolFactor = GfParmGetNum(hdle, WheelSect[index], PRM_TIRESPDCOOLING, (char*)NULL, 0.0f);		// default 0.0 [-] but recommend 0.5-1.25 for most cars
+	wheel->tireTreadDrainFactor = GfParmGetNum(hdle, WheelSect[index], PRM_TREADDRAINSPD, (char*)NULL, 0.0);		// default 0
     wheel->wearFactor = GfParmGetNum(hdle, WheelSect[index], PRM_WEAR, (char*)NULL, 1.0f);
 
-    if (car->features & FEAT_COMPOUNDS)
-    {
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
-        wheel->hysteresisFactorC[1] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[1] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+	if (car->features & FEAT_COMPOUNDS)
+	{
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
+		wheel->hysteresisFactorC[1] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+		wheel->coolingFactorC[1] = GfParmGetNum(hdle, path, PRM_TIRECOOLING, (char*)NULL, wheel->coolingFactor);
+		wheel->latHeatFactorC[1] = GfParmGetNum(hdle, path, PRM_LATMUHEATING, (char*)NULL, wheel->latHeatFactor);
+		wheel->longHeatFactorC[1] = GfParmGetNum(hdle, path, PRM_LONGMUHEATING, (char*)NULL, wheel->longHeatFactor);
+		wheel->tireSpeedCoolFactorC[1] = GfParmGetNum(hdle, path, PRM_TIRESPDCOOLING, (char*)NULL, wheel->tireSpeedCoolFactor);
+		wheel->tireTreadDrainFactorC[1] = GfParmGetNum(hdle, path, PRM_TREADDRAINSPD, (char*)NULL, wheel->tireTreadDrainFactor);
+		wheel->wearFactorC[1] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
-        wheel->hysteresisFactorC[2] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[2] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
+		wheel->hysteresisFactorC[2] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+		wheel->coolingFactorC[2] = GfParmGetNum(hdle, path, PRM_TIRECOOLING, (char*)NULL, wheel->coolingFactor);
+		wheel->latHeatFactorC[2] = GfParmGetNum(hdle, path, PRM_LATMUHEATING, (char*)NULL, wheel->latHeatFactor);
+		wheel->longHeatFactorC[2] = GfParmGetNum(hdle, path, PRM_LONGMUHEATING, (char*)NULL, wheel->longHeatFactor);
+		wheel->tireSpeedCoolFactorC[2] = GfParmGetNum(hdle, path, PRM_TIRESPDCOOLING, (char*)NULL, wheel->tireSpeedCoolFactor);
+		wheel->tireTreadDrainFactorC[2] = GfParmGetNum(hdle, path, PRM_TREADDRAINSPD, (char*)NULL, wheel->tireTreadDrainFactor);
+		wheel->wearFactorC[2] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
-        wheel->hysteresisFactorC[3] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[3] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
+		wheel->hysteresisFactorC[3] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+		wheel->coolingFactorC[3] = GfParmGetNum(hdle, path, PRM_TIRECOOLING, (char*)NULL, wheel->coolingFactor);
+		wheel->latHeatFactorC[3] = GfParmGetNum(hdle, path, PRM_LATMUHEATING, (char*)NULL, wheel->latHeatFactor);
+		wheel->longHeatFactorC[3] = GfParmGetNum(hdle, path, PRM_LONGMUHEATING, (char*)NULL, wheel->longHeatFactor);
+		wheel->tireSpeedCoolFactorC[3] = GfParmGetNum(hdle, path, PRM_TIRESPDCOOLING, (char*)NULL, wheel->tireSpeedCoolFactor);
+		wheel->tireTreadDrainFactorC[3] = GfParmGetNum(hdle, path, PRM_TREADDRAINSPD, (char*)NULL, wheel->tireTreadDrainFactor);
+		wheel->wearFactorC[3] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
-        wheel->hysteresisFactorC[4] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[4] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
+		wheel->hysteresisFactorC[4] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+		wheel->coolingFactorC[4] = GfParmGetNum(hdle, path, PRM_TIRECOOLING, (char*)NULL, wheel->coolingFactor);
+		wheel->latHeatFactorC[4] = GfParmGetNum(hdle, path, PRM_LATMUHEATING, (char*)NULL, wheel->latHeatFactor);
+		wheel->longHeatFactorC[4] = GfParmGetNum(hdle, path, PRM_LONGMUHEATING, (char*)NULL, wheel->longHeatFactor);
+		wheel->tireSpeedCoolFactorC[4] = GfParmGetNum(hdle, path, PRM_TIRESPDCOOLING, (char*)NULL, wheel->tireSpeedCoolFactor);
+		wheel->tireTreadDrainFactorC[4] = GfParmGetNum(hdle, path, PRM_TREADDRAINSPD, (char*)NULL, 1.5f);
+		wheel->wearFactorC[4] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
-        wheel->hysteresisFactorC[5] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
-        wheel->wearFactorC[5] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+		wheel->hysteresisFactorC[5] = GfParmGetNum(hdle, path, PRM_HYSTERESIS, (char*)NULL, wheel->hysteresisFactor);
+		wheel->coolingFactorC[5] = GfParmGetNum(hdle, path, PRM_TIRECOOLING, (char*)NULL, wheel->coolingFactor);
+		wheel->latHeatFactorC[5] = GfParmGetNum(hdle, path, PRM_LATMUHEATING, (char*)NULL, wheel->latHeatFactor);
+		wheel->longHeatFactorC[5] = GfParmGetNum(hdle, path, PRM_LONGMUHEATING, (char*)NULL, wheel->longHeatFactor);
+		wheel->tireSpeedCoolFactorC[5] = GfParmGetNum(hdle, path, PRM_TIRESPDCOOLING, (char*)NULL, wheel->tireSpeedCoolFactor);
+		wheel->tireTreadDrainFactorC[5] = GfParmGetNum(hdle, path, PRM_TREADDRAINSPD, (char*)NULL, 3.0f);
+		wheel->wearFactorC[5] = GfParmGetNum(hdle, path, PRM_WEAR, (char*)NULL, wheel->wearFactor);
 
-        if (SimRain < 1)
-        {
-            wheel->hysteresisFactorC[4] *= 1.5;
-            wheel->hysteresisFactorC[5] *= 2.0;
-            wheel->wearFactorC[4] *= 3.5;
-            wheel->wearFactorC[5] *= 4.5;
-            GfLogInfo("# Simu wear factor compound with no rain wet = %.4f - extreme wet = %.4f\n",
-                                  wheel->wearFactorC[4], wheel->wearFactorC[5]);
-        }
-    }
+		/*if (SimRain < 1)
+		{
+			wheel->hysteresisFactorC[4] *= 1.5;
+			wheel->hysteresisFactorC[5] *= 2.0;
+			wheel->wearFactorC[4] *= 3.5;
+			wheel->wearFactorC[5] *= 3.5;
+			GfLogInfo("# Simu wear factor compound with no rain wet = %.4f - extreme wet = %.4f\n",
+								  wheel->wearFactorC[4], wheel->wearFactorC[5]);
+		}*/
+	}
 
     rimdiam               = GfParmGetNum(hdle, WheelSect[index], PRM_RIMDIAM, (char*)NULL, 0.33f);
     tirewidth             = GfParmGetNum(hdle, WheelSect[index], PRM_TIREWIDTH, (char*)NULL, 0.145f);
     tireheight            = GfParmGetNum(hdle, WheelSect[index], PRM_TIREHEIGHT, (char*)NULL, -1.0f);
     tireratio             = GfParmGetNum(hdle, WheelSect[index], PRM_TIRERATIO, (char*)NULL, 0.75f);
     wheel->mu             = GfParmGetNum(hdle, WheelSect[index], PRM_MU, (char*)NULL, 1.0f);
+	wheel->muWet = GfParmGetNum(hdle, WheelSect[index], PRM_MUWET, (char*)NULL, 1.0f);
 
-    if ((car->features & FEAT_COMPOUNDS) && car->options->compounds)
-    {
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
-        wheel->muC[1] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-        GfLogInfo("Mu in simuV5 soft = %.3f\n", wheel->muC[1]);
+	if (car->features & FEAT_COMPOUNDS && car->options->compounds)
+	{
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_SOFT);
+		wheel->muC[1] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[1] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[1]);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
-        wheel->muC[2] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-        GfLogInfo("Mu in simuV5 medium = %.3f\n", wheel->muC[1]);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_MEDIUM);
+		wheel->muC[2] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[2] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[2]);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
-        wheel->muC[3] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-        GfLogInfo("Mu in simuV5 hard = %.3f\n", wheel->muC[1]);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_HARD);
+		wheel->muC[3] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[3] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[3]);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
-        wheel->muC[4] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-        GfLogInfo("Mu in simuV5 wet = %.3f\n", wheel->muC[1]);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_WET);
+		wheel->muC[4] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[4] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[4] * 1.05);
 
-        sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
-        wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
-        GfLogInfo("# Simu MU compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
-                  wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]);
+		sprintf(path, "%s/%s/%s", WheelSect[index], SECT_COMPOUNDS, SECT_EXTREM_WET);
+		wheel->muC[5] = GfParmGetNum(hdle, path, PRM_MU, (char*)NULL, wheel->mu);
+		wheel->muWetC[5] = GfParmGetNum(hdle, path, PRM_MUWET, (char*)NULL, wheel->muC[5] * 1.05);
+		GfLogInfo("# Simu MU compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
+			wheel->muC[1], wheel->muC[2], wheel->muC[3], wheel->muC[4], wheel->muC[5]);
+		GfLogInfo("# Simu MU WET compound soft = %.3f - medium = %.3f - hard = %.3f - wet = %.3f - extreme wet = %.3f\n",
+			wheel->muWetC[1], wheel->muWetC[2], wheel->muWetC[3], wheel->muWetC[4], wheel->muWetC[5]);
 
-        if(SimRain < 1)
-        {
-            wheel->muC[4] -= 0.2;
-            wheel->muC[5] -= 0.3;
-            GfLogInfo("# Simu MU compound with no rain wet = %.3f - extreme wet = %.3f\n",
-                      wheel->muC[4], wheel->muC[5]);
-        }
-
-        if(SimRain > 0)
-        {
-            wheel->muC[1] = 1.0;
-            wheel->muC[2] = 1.0;
-            wheel->muC[3] -= 0.2;
-        }
-    }
+		/*if(SimRain < 1)
+		{
+			wheel->muC[4] -= 0.2;
+			wheel->muC[5] -= 0.3;
+			GfLogInfo("# Simu MU compound with no rain wet = %.3f - extreme wet = %.3f\n",
+					  wheel->muC[4], wheel->muC[5]);
+		}*/
+	}
 
     wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
     //BUG: the next line should go after SimBrakeConfig to have an effect
@@ -159,6 +187,8 @@ void SimWheelConfig(tCar *car, int index)
     wheel->lfMax          = GfParmGetNum(hdle, WheelSect[index], PRM_LOADFMAX, (char*)NULL, 1.6f);
     wheel->lfMin          = GfParmGetNum(hdle, WheelSect[index], PRM_LOADFMIN, (char*)NULL, 0.8f);
     wheel->AlignTqFactor  = GfParmGetNum(hdle, WheelSect[index], PRM_ALIGNTQFACTOR, (char*)NULL, 0.6f);
+	wheel->LatMuFactor    = GfParmGetNum(hdle, WheelSect[index], PRM_LATMUFACTOR, (char*)NULL, 1.0f);
+	wheel->LongMuFactor   = GfParmGetNum(hdle, WheelSect[index], PRM_LONGMUFACTOR, (char*)NULL, 1.0f);
     wheel->mass           = GfParmGetNum(hdle, WheelSect[index], PRM_MASS, (char*)NULL, 20.0f);
 
     wheel->lfMin = MIN(0.9f, wheel->lfMin);
@@ -173,7 +203,7 @@ void SimWheelConfig(tCar *car, int index)
     wheel->pressure = MIN(setupPressure->max, MAX(setupPressure->min, setupPressure->desired_value));
     wheel->currentPressure	= wheel->pressure; //MIN(setupPressure->max, MAX(setupPressure->min, setupPressure->desired_value));
 
-    if (car->features & FEAT_COMPOUNDS && car->options->compounds)
+    if (car->features & FEAT_COMPOUNDS && car->options->tyre_temperature)
     {
         wheel->tireSet = MIN(setupCompound->max, MAX(setupCompound->min, setupCompound->desired_value));
         wheel->mu = wheel->muC[wheel->tireSet];
@@ -290,8 +320,18 @@ void SimWheelConfig(tCar *car, int index)
     carElt->_tyreCompound(index) = wheel->tireSet;
 
     wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
-    wheel->mfB = Ca / wheel->mfC;
     wheel->mfE = EFactor;
+	
+	// increase stiffness factor when temperature and pressure increases
+	// but only if temperature feature is enabled.
+	if (car->features & FEAT_TIRETEMPDEG)
+	{
+		wheel->mfB = ((Ca*0.50) + (wheel->currentPressure * 0.0001)) / wheel->mfC;
+	}
+	else
+	{
+		wheel->mfB = Ca / wheel->mfC;
+	}
 
     wheel->lfK = log((1.0f - wheel->lfMin) / (wheel->lfMax - wheel->lfMin));
 
@@ -400,9 +440,15 @@ void SimWheelReConfig(tCar *car, int index)
         setupCompound->value = wheel->tireSet;
         setupCompound->changed = false;
         wheel->mu = wheel->muC[wheel->tireSet];
-        wheel->Tinit = wheel->TinitC[wheel->tireSet];
-        wheel->Topt = wheel->ToptC[wheel->tireSet];
-        wheel->hysteresisFactor = wheel->hysteresisFactorC[wheel->tireSet];
+		wheel->muWet = wheel->muWetC[wheel->tireSet];
+		wheel->Tinit = wheel->TinitC[wheel->tireSet];
+		wheel->Topt = wheel->ToptC[wheel->tireSet];
+		wheel->hysteresisFactor = wheel->hysteresisFactorC[wheel->tireSet];
+		wheel->coolingFactor = wheel->coolingFactorC[wheel->tireSet];
+		wheel->latHeatFactor = wheel->latHeatFactorC[wheel->tireSet];
+		wheel->longHeatFactor = wheel->longHeatFactorC[wheel->tireSet];
+		wheel->tireSpeedCoolFactor = wheel->tireSpeedCoolFactorC[wheel->tireSet];
+		wheel->tireTreadDrainFactor = wheel->tireTreadDrainFactorC[wheel->tireSet];
         wheel->wearFactor = wheel->wearFactorC[wheel->tireSet];
         GfLogInfo("# SimuV4 tire compound changed mu = %.3f - hysteresis = %.2f - wear factor = %.7f\n", wheel->mu, wheel->hysteresisFactor,
                   wheel->wearFactor);
@@ -412,6 +458,34 @@ void SimWheelReConfig(tCar *car, int index)
     SimSuspReConfig(car, &(wheel->susp), index, wheel->weight0, x0);
     GfLogInfo("SimuV4 MU = %.3f - Topt = %.2f - Tinit = %.2f - wear = %.2f\n",
               wheel->mu, wheel->Topt - 273.15, wheel->Tinit - 273.15, wheel->wearFactor);
+}
+
+void SimWheelDamage(tWheel* wheel, tdble dmg)
+{
+	// total wheel damage
+	tdble wheelDamage = 0.0;
+	double impactDamage = 0;
+
+	impactDamage = (dmg * 0.025 * SimDeltaTime);
+
+	if (wheelDamage < 1.0)
+	{
+		wheelDamage += impactDamage;
+		//wheel->bent_damage_x -= impactDamage;
+		//wheel->bent_damage_z -= impactDamage;
+		wheel->rotational_damage_x -= wheelDamage;
+		wheel->rotational_damage_z -= impactDamage;
+	}
+	else
+	{
+		wheelDamage = 1.0;
+	}
+	//printf ("Bent: %f -> %f\n", exp(dmg), impactDamage);
+}
+
+double GetWheelDamage(tWheel* wheel)
+{
+	return wheel->rotational_damage_x;
 }
 
 void SimWheelUpdateRide(tCar *car, int index)
@@ -450,8 +524,19 @@ void SimWheelUpdateRide(tCar *car, int index)
 
     if (car->options->alignment_damage && wheel->rotational_damage_x > 0.0)
     {
-        wheel->relPos.ax += wheel->rotational_damage_x * sin(wheel->relPos.ay + wheel->bent_damage_x);
-        wheel->relPos.az += wheel->rotational_damage_z * cos(wheel->relPos.ay + wheel->bent_damage_z);
+		/*if (index % 2)
+		{
+			wheel->staticPos.az = sin(wheel->staticPos.az - GetWheelDamage(wheel));
+		}
+		else
+		{
+			wheel->staticPos.az = sin(wheel->staticPos.az - GetWheelDamage(wheel));
+		}
+
+		if (wheel->rotational_damage_x >= 1.0)
+		{
+			wheel->rotational_damage_x = 1.0;
+		}*/
     }
 
     // verify the suspension travel, beware, wheel->susp.x will be scaled by SimSuspCheckIn
@@ -646,10 +731,22 @@ void SimWheelUpdateForce(tCar *car, int index)
 
     //temperature and degradation
     if (car->options->tyre_temperature)
-    {
-        tireCond = wheel->currentGripFactor;
-        mu *= tireCond;
-    }
+	{
+		tireCond = wheel->currentGripFactor;
+		mu *= tireCond;
+	}
+	/*else
+	{
+		tireCond = 1;
+		mu *= tireCond;
+	}*/
+
+	// wet weather mu modifier
+	// using SimRain is incorrect for surface wetness, so this should be changed
+	if (car->features & FEAT_COMPOUNDS)
+	{
+		mu += ((SimRain / 3)*(wheel->muWet - wheel->mu));
+	}
 
     F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * (1.0f + 0.05f * sin((-wheel->staticPos.ax + camberDelta) * 18.0f));	/* coeff */
 
@@ -674,8 +771,9 @@ void SimWheelUpdateForce(tCar *car, int index)
     if (s > 0.000001f)
     {
         // wheel axis based
-        Ft -= F * sx / s;
-        Fn -= F * sy / s;
+		// MuFactor modifies grip based on axis - sx for longitudinal, sy for lateral
+		Ft -= F * (sx * wheel->LongMuFactor) / s;
+		Fn -= F * (sy * wheel->LatMuFactor) / s;
     }
     else
     {
@@ -869,26 +967,100 @@ void SimWheelUpdateTire(tCar *car, int index)
 
     tdble normalForce = wheel->forces.z;
     tdble slip = wheel->tireSlip;
+	tdble lateralForce = fabs(wheel->forces.y);
+	tdble longForce = fabs(wheel->forces.x);
+	tdble absForce2 = fabs(normalForce * 0.5);
+	//tdble slipRatio = wheel->spinVel * wheel->radius;
+	tdble latMod = 0;
+	tdble longMod = 0;
+	tdble minOptTemp = wheel->Topt - 20;
+	tdble wheelSpeed = fabs(wheel->spinVel * wheel->radius);
+	tdble deltaTemperature = wheel->Ttire - Tair;
+	tdble drainRate;
+	tdble drainCooling;
+	double gripLoss50 = 0.99;
+	double gripLoss75 = 0.95;
+	double gripLoss100 = 0.80;
+	bool isPunctured = false;
 
-    tdble wheelSpeed = fabs(wheel->spinVel * wheel->radius);
-    tdble deltaTemperature = wheel->Ttire - Tair;
+	// Tire Tread Drain Factor is a very simple/abstract approximation of a tire's ability
+	// to drain water from the tire as it passes through a wet surface.
+	if (SimRain > 0)
+	{
+		drainRate = wheel->tireTreadDrainFactor / SimRain;
+		drainCooling = SimRain / (wheel->tireTreadDrainFactor + 1);
+	}
+	else
+	{
+		drainRate = 1;
+		drainCooling = 0;
+	}
+
+	// Normalize slip. Not realistic, but prevents extreme spiking when high wheelspin occurs
+	// when trying to recover from bumpy surfaces such as gravel traps.
+	if (slip >= 1)
+	{
+		slip = 1;
+	}
+	else
+	{
+		slip = slip;
+	}
+
+	if (normalForce >= wheel->opLoad * 2)
+	{
+		normalForce = wheel->opLoad * 2;
+	}
+	else
+	{
+		normalForce = normalForce;
+	}
 
     // Calculate factor for energy which is turned into heat, according papers this seems to be pretty constant
     // for a specific construction and constant slip (empiric value with model validation, called hysteresis).
     // A value of 0.1 is available in papers, so for 10% slip I head for 0.1, where 0.05 come from rolling and
     // the other 0.05 from slip. Additionaly the hysteresis goes down with wear.
     tdble elasticity = (wheel->pressure - SimAirPressure)/(wheel->currentPressure - SimAirPressure);
-    tdble hysteresis = (0.05f * (sqrt(1.0f - wheel->currentWear)) * elasticity + 0.5f * slip) * wheel->hysteresisFactor;
+    tdble hysteresis = (0.05f * (sqrt(1.0f - (wheel->currentWear * 0.25))) * elasticity + 0.5f * (slip * 2)) * wheel->hysteresisFactor;
 
     // Calculate energy input for the tire
     tdble energyGain = normalForce * wheelSpeed * SimDeltaTime * hysteresis;
 
+	// Normalize lateral and longitudinal forces if they peak too far past the operating threshold.
+	// This is done to (slightly) even out tire heating so huge differences in tire pressure are not necessary
+	// for cars with a lot of weight on one axle or the other.
+	if (lateralForce >= wheel->opLoad * 2)
+	{
+		lateralForce = wheel->opLoad * 2;
+	}
+	else
+	{
+		lateralForce = lateralForce;
+	}
+
+	if (longForce >= wheel->opLoad * 2)
+	{
+		longForce = wheel->opLoad * 2;
+	}
+	else
+	{
+		longForce = longForce;
+	}
+
+	// Modifiers for energy input from lateral and longitudinal forces.
+	latMod = ((lateralForce * absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
+	longMod = ((longForce * absForce2) * wheel->longHeatFactor) * SimDeltaTime * 0.0004;
+
+	tdble energyMod = (latMod + longMod);
+
+	tdble lockMod = 0;
+
     // Calculate energy loss of the tire (convection, convection model approximation from papers,
     // 5.9f + airspeed*3.7f [W/(meter*meter*Kelvin)]). Because the model is linear it is reasonable to apply
     // it to the whole tire at once (no subdivision in elements).
-    tdble energyLoss = (5.9f + wheelSpeed * 3.7f) * deltaTemperature * wheel->tireConvectionSurface * SimDeltaTime;
+	tdble energyLoss = (5.9f + wheelSpeed * 3.7f) * deltaTemperature * wheel->tireConvectionSurface * SimDeltaTime * (1 + (wheel->tireSpeedCoolFactor * 1.5) + (drainCooling * 4));
 
-    tdble deltaEnergy = energyGain - energyLoss;
+	tdble deltaEnergy = (lockMod + energyMod + energyGain) - energyLoss;
 
     // Calculate heat capacity. Basically the heat capacity of the gas in the tire accounts for a "normal" TORCS tire
     // around 2 percent of the whole tire heat capacity, so one could neglect this. I put it into the model because it:
@@ -916,13 +1088,23 @@ void SimWheelUpdateTire(tCar *car, int index)
     // Energy transfer into the tire
     wheel->Ttire += deltaEnergy / heatCapacity;
 
+	// Base cooling from lack of force
+	// static cooling, slowly cool tire down with low loads
+	wheel->Ttire -= ((wheel->coolingFactor) * (fabs(wheel->Ttire - Tair) * SimDeltaTime));
+
     if (wheel->Ttire > 473.15f)
         wheel->Ttire = 473.15f;
 
-    wheel->currentPressure = wheel->Ttire / wheel->Tinit * wheel->pressure;
+	// Effect of temperature on live tire pressure.
+	// Note that we compare the live temperature and the current ambient temperature together.
+	// This is because some series/car types use tire warmers, which would make the initial
+	// tire temperature much closer to optimal.
+	// According to tire data from a leading GT tire manufacturer, tire pressure goes up by ~0.7 PSI for every 10 F (~5.56 C).
+    // wheel->currentPressure = ((wheel->Ttire + ((Tair - 273.15) * 1.50)) * wheel->pressure) / Tair;
+	wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
 
     // Wear
-    double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * normalForce
+    double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * (energyMod + normalForce)
             * wheel->wearFactor * 0.00000000000009;
 
     wheel->currentWear += deltaWear;
@@ -930,7 +1112,9 @@ void SimWheelUpdateTire(tCar *car, int index)
         wheel->currentWear = 1.0f;
 
     // Graining
-    tdble grainTemperature = (wheel->Topt - wheel->Tinit) * 3.0f / 4.0f + wheel->Tinit;
+	// Note that we use the TRACK temp and not the initial tire temp
+	// if the initial tire temp is higher (tire warmers, for example)
+	tdble grainTemperature = (wheel->Topt - Tair) * 3.0f / 4.0f + Tair;
     tdble deltaGraining = (grainTemperature - wheel->Ttire) * deltaWear;
     if (deltaGraining > 0.0f)
     {
@@ -947,15 +1131,70 @@ void SimWheelUpdateTire(tCar *car, int index)
         wheel->currentGraining = 0.0f;
     }
 
+	// Temperature window. 
+	tdble di;
 
-    tdble di = (wheel->Ttire - wheel->Topt)/(wheel->Topt - wheel->Tinit);
-    wheel->currentGripFactor =  ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f) * (1.0f - wheel->currentGraining / 10.0f);
+	// Ratio modifier for when temp is under minimal optimal
+	// operating temp (f.e. below 70 C for a 90 deg optimal)
+	tdble diRatio;
+	diRatio = (wheel->Ttire - Tair) / (Tair - minOptTemp) * 0.125;
 
-    if(wheel->Ttire >= 473.15)
-    {
-        wheel->currentGripFactor = 0.0;
-        wheel->currentPressure = 0.0;
-    }
+	// Racing tires typically have a roughly 10-20C window
+	// where they achieve most of their optimal grip.
+	// When within this "ideal window", grip changes are less extreme.
+	if (wheel->Ttire < (wheel->Topt - 20))
+	{
+		di = ((wheel->Ttire - minOptTemp) / (minOptTemp - Tair)) + diRatio;
+	}
+	else if (wheel->Ttire <= wheel->Topt)
+	{
+		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - minOptTemp) * 0.125;
+	}
+	else
+	{
+		di = (wheel->Ttire - wheel->Topt) / (wheel->Topt - Tair);
+	}
+
+	wheel->currentGripFactor = ((1.0f - (MIN((di*di), 1.0f))) / 4.0f + 3.0f / 4.0f) * (1.0f - wheel->currentGraining / 10.0f);
+
+	// Tire grip drop-off from wear
+	if (isPunctured == false)
+	{
+		if (wheel->currentWear < 0.25)
+		{
+			wheel->currentGripFactor *= 1;
+		}
+		else if ((wheel->currentWear >= 0.25) && (wheel->currentWear < 0.5))
+		{
+			wheel->currentGripFactor *= 1 - (((wheel->currentWear - 0.25) / 0.5) * (1 - gripLoss50));
+		}
+		else if ((wheel->currentWear >= 0.5) && (wheel->currentWear < 0.75))
+		{
+			wheel->currentGripFactor *= gripLoss50 - (((wheel->currentWear - 0.5) / 0.25) * (1 - gripLoss75));
+		}
+		else
+		{
+			wheel->currentGripFactor *= gripLoss75 - (((wheel->currentWear - 0.75) / 0.25) * (1 - gripLoss100));
+		}
+	}
+
+	// Simulate tire punctures. Drop the grip to a low % 
+	// because metal-on-ground (ie. rim on road) contact 
+	// still generates some traction, just not a lot.
+	if (wheel->currentWear >= 1.0 || (wheel->Ttire >= 473.15))
+	{
+		if (isPunctured == false)
+		{
+			wheel->relPos.z += (wheel->radius)*(-0.25);
+		}
+		wheel->currentGripFactor = 0.25;
+		wheel->currentPressure = 0.0;
+		isPunctured = true;
+	}
+	else
+	{
+		isPunctured = false;
+	}
 
     car->carElt->_tyreCondition(index) = wheel->currentGripFactor;
     car->carElt->_tyreT_in(index) = wheel->Ttire;

@@ -4,6 +4,7 @@
     created              : Sun Mar 19 00:07:42 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
+    version              : $Id: sim.h 3568 2011-05-15 15:55:24Z pouillot $
 
  ***************************************************************************/
 
@@ -63,12 +64,12 @@ extern void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, t
 
 extern void SimWheelConfig(tCar *car, int index);
 extern void SimWheelReConfig(tCar *car, int index);
+extern void SimWheelDamage(tWheel* wheel, tdble dmg);
 extern void SimWheelUpdateRide(tCar *car, int index);
 extern void SimWheelUpdateForce(tCar *car, int index);
 extern void SimWheelUpdateTire(tCar *car, int index);
 extern void SimWheelUpdateRotation(tCar *car);
 extern void SimUpdateFreeWheels(tCar *car, int axlenb);
-
 
 extern void SimSteerConfig(tCar *car);
 extern void SimSteerReConfig(tCar *car);

@@ -4,6 +4,7 @@
     created              : Sun Mar 19 00:09:18 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
+    version              : $Id: wheel.h 3087 2010-11-03 23:42:34Z kakukri $
 
  ***************************************************************************/
 
@@ -65,6 +66,8 @@ typedef struct
     tdble  	radius;
     tdble  	mu;
     tdble   muC[6];     /* mu for compounds */
+	tdble  	muWet;		/* mu in wet weather */
+	tdble   muWetC[6];  /* wet weather mu for compounds */
     tdble  	I;       	/* I = inertial moment of the wheel */
     tdble  	curI;       /* Current inertia for the wheel (including transmission) */
     tdble	mfC;		/* Magic Formula C coeff */
@@ -75,6 +78,8 @@ typedef struct
     tdble	lfK;		/* Load factor */
     tdble	opLoad;		/* Operating load */
     tdble   AlignTqFactor; /* aligning torque factor */
+	tdble   LatMuFactor; /* lateral mu factor */
+	tdble   LongMuFactor; /* longitudinal mu factor */
     tdble	mass;		/* total wheel mass (incl. brake) (unsprung mass) */
     tdble	camber;		/* camber, negative toward exterior on both sides */
     tdble	pressure;	/* tire pressure */
@@ -95,6 +100,16 @@ typedef struct
     tdble initialTemperature;		// Initial temperature of the tire (initial pressure, p0/T0=constant)
     tdble hysteresisFactor;			// Factor to adjust the hysteresis (model fitting), usually close to 1.0.
     tdble hysteresisFactorC[6];     // Factor to adjust the hysteresis for compounds
+	tdble coolingFactor;			// Factor to adjust the cooling rate
+	tdble coolingFactorC[6];		// Factor to adjust the cooling rate for compounds 
+	tdble latHeatFactor;			// Factor to adjust lateral friction heating
+	tdble latHeatFactorC[6];		// Factor to adjust lateral friction heating for compounds 
+	tdble longHeatFactor;			// Factor to adjust longtudinal friction heating
+	tdble longHeatFactorC[6];		// Factor to adjust longtudinal friction heating for compounds 
+	tdble tireSpeedCoolFactor;		// Factor to adjust air speed cooling constant. Should be close to 1.0 for most cars.
+	tdble tireSpeedCoolFactorC[6];	// Factor to adjust air speed cooling constant per compound.
+	tdble tireTreadDrainFactor;		// Factor to adjust effective drain speed
+	tdble tireTreadDrainFactorC[6];		// Factor to adjust effective drain speed per compound
     tdble wearFactor;				// Factor to adjust the wear (model fitting), usually close to 1.0.
     tdble wearFactorC[6];               // Factor to adjust the wear for compounds
 
