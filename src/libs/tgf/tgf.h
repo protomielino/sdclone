@@ -404,6 +404,7 @@ TGF_API char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen);
 #define GFPARM_RMODE_REREAD	0x02	/**< reread the parameters from file and release the previous ones */
 #define GFPARM_RMODE_CREAT	0x04	/**< Create the file if doesn't exist */
 #define GFPARM_RMODE_PRIVATE	0x08
+#define GFPARM_RMODE_NOREREAD	0x10
 
 /* parameter file read */
 TGF_API void *GfParmReadFileLocal(const char *file, int mode, bool neededFile = true);

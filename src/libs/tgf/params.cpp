@@ -1294,7 +1294,8 @@ GfParmReadFile (const char *file, int mode, bool neededFile, bool trace)
             fprintf(stderr,"GfParmReadFile: conf header creation failed\n");
         goto bailout;
     }
-    mode |= GFPARM_RMODE_REREAD;
+    if (!(mode & GFPARM_RMODE_NOREREAD))
+        mode |= GFPARM_RMODE_REREAD;
     }
 
     /* Handle creation */
