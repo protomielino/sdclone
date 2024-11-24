@@ -59,7 +59,7 @@ int portability::rmdir_r(const char *path)
     op.lpszProgressTitle = "";
     op.pFrom = dir;
 
-    if ((res = SHFileOperation(&op)))
+    if ((res = SHFileOperation(&op)) && res != ERROR_FILE_NOT_FOUND)
     {
         fprintf(stderr, "%s: SHFileOperation failed with %#x\n", __func__, res);
         goto end;
