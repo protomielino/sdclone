@@ -71,8 +71,6 @@ public:
     const std::string& getResultsDir() const;
     bool hasResultsFiles() const;
 
-    bool hasSubFiles() const;
-
     //! Save data to params (in-memory, no file written to disk).
     void store();
 
@@ -96,8 +94,6 @@ protected:
 
     std::vector<std::string> _vecAcceptedDriverTypes;
     std::vector<std::string> _vecAcceptedCarCategoryIds;
-
-    mutable bool _bHasSubFiles; // True if multiple configuration files are used (ex: Career mode).
 
     // Saved configs and results files dirs.
     mutable std::string _strSavedConfigsDir;

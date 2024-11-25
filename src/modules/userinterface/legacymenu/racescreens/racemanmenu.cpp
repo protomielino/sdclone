@@ -343,8 +343,7 @@ rmOnRaceDataChanged()
 		const GfDriver* pComp = vecCompetitors[nCompIndex];
 		ossText.str("");
 		ossText << pComp->getName();
-		if (!pRaceMan->hasSubFiles()) // Don't show car name if Career mode (N/A here).
-			ossText << " (" << pComp->getCar()->getName() << ')';
+		ossText << " (" << pComp->getCar()->getName() << ')';
 		VecCompetitorsInfo.push_back(ossText.str());
 	}
 	for (int nCompIndex = 0; nCompIndex < (int)vecCompetitors.size(); nCompIndex++)

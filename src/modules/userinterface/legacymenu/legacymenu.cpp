@@ -232,14 +232,8 @@ void LegacyMenu::activateLoadingScreen()
     tRmInfo* pReInfo = _piRaceEngine->inData();
 
     char pszTitle[128];
-    if (_piRaceEngine->race()->getManager()->hasSubFiles())
-	{
-        const char* pszGroup = GfParmGetStr(pReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
-        snprintf(pszTitle, sizeof (pszTitle), "%s - %s", pReInfo->_reName, pszGroup);
-    }
-	else
-        snprintf(pszTitle, sizeof (pszTitle), "%s", pReInfo->_reName);
 
+    snprintf(pszTitle, sizeof (pszTitle), "%s", pReInfo->_reName);
 	::RmLoadingScreenStart(pszTitle, "data/img/splash-raceload.jpg");
 }
 

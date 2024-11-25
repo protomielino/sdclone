@@ -3,13 +3,13 @@ INCLUDE(../../../../cmake/macros.cmake)
 #PROJECT(standardgame)
 
 SET(_SOURCES standardgame.cpp
-             racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
+             raceupdate.cpp racenetwork.cpp racecars.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp
              racestate.cpp racesituation.cpp racemessage.cpp
              raceutil.cpp racewebmetar.cpp)
 SET(_HEADERS standardgame.h
-             racecareer.h raceupdate.h racenetwork.h racecars.h
+             raceupdate.h racenetwork.h racecars.h
              raceinit.h racemain.h
              racetrack.h raceresults.h racesimusimu.h
              racestate.h racesituation.h racemessage.h

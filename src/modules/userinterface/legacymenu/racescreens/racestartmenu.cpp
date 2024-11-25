@@ -114,13 +114,8 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 
     // Create variable title label.
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
-	if (LmRaceEngine().race()->getManager()->hasSubFiles())
-	{
-		const char* pszGroup = GfParmGetStr(info->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
-		snprintf(buf, sizeof(buf), "%s - %s", info->_reName, pszGroup);
-	}
-	else
-		snprintf(buf, sizeof(buf), "%s", info->_reName);
+
+    snprintf(buf, sizeof(buf), "%s", info->_reName);
     GfuiLabelSetText(rmScrHdle, titleId, buf);
 
     // Create background image if any.

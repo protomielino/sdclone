@@ -314,34 +314,7 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 // This methos is const because we want it to be called by const methods. No other way.
 void GfRaceManager::load() const
 {
-    // Determine the race manager file from which to load the events info.
-    // 1) Simple case : the race manager has no subfiles, use the normal file.
-    // 2) Career case : the events are defined in "sub-championships" files.
-    //    WARNING: Very partial support for the moment : we only care about the 1st event
-    //             ('cause it is quite complicated, with intermixed events between
-    //              the other "sub-championships", each defined in a career_<sub-champ>.xmls).
-    //             This is not an issue as long as this class is not used in the race engine
-    //             or the event management purpose (most of it is in racecareer.cpp for now).
     void* hparmHandle = _hparmHandle;
-    const char* pszHasSubFiles =
-        GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO);
-    _bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) == 0;
-    if (_bHasSubFiles)
-    {
-        const char* psz1stSubFileName =
-            GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_FIRSTSUBFILE, 0);
-        if (psz1stSubFileName)
-        {
-            std::ostringstream ossSubFilePath;
-            ossSubFilePath << "config/raceman/" << psz1stSubFileName;
-            hparmHandle = GfParmReadFileLocal(ossSubFilePath.str(), GFPARM_RMODE_STD);
-        }
-        if (!psz1stSubFileName || !hparmHandle)
-        {
-            _bHasSubFiles = false;
-            hparmHandle = _hparmHandle;
-        }
-    }
 
 // 	GfLogDebug("GfRaceManager::reset(%s): %s %s\n",
 // 			   _strName.c_str(), _hparmHandle == hparmHandle ? "file" : "sub-file",
@@ -440,26 +413,22 @@ void GfRaceManager::store()
     // Note: No need to save constant properties (never changed).
 
     // Info about each event in the schedule.
-    // WARNING: Not supported for Career mode (TODO ?).
-    if (!_bHasSubFiles)
-    {
-        // a) clear the event list.
-        GfParmListClean(_hparmHandle, RM_SECT_TRACKS);
+    // a) clear the event list.
+    GfParmListClean(_hparmHandle, RM_SECT_TRACKS);
 
-        // b) re-create it from the current event list state (may have changed since loaded).
-        std::ostringstream ossSectionPath;
-        for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
-        {
+    // b) re-create it from the current event list state (may have changed since loaded).
+    std::ostringstream ossSectionPath;
+    for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
+    {
 // 			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
 // 					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
-            ossSectionPath.str("");
-            ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
-            GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
-                         _vecEventTrackIds[nEventInd].c_str());
-            GfTrack* pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nEventInd]);
-            GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY,
-                         pTrack->getCategoryId().c_str());
-        }
+        ossSectionPath.str("");
+        ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
+        GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
+                        _vecEventTrackIds[nEventInd].c_str());
+        GfTrack* pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nEventInd]);
+        GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY,
+                        pTrack->getCategoryId().c_str());
     }
 
     // Now we are consistent with the race managers params (in memory).
@@ -689,11 +658,6 @@ bool GfRaceManager::hasResultsFiles() const
 
     // Answer.
     return bAnswer;
-}
-
-bool GfRaceManager::hasSubFiles() const
-{
-    return _bHasSubFiles;
 }
 
 bool GfRaceManager::isDirty() const

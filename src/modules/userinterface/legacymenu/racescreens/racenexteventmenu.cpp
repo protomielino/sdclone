@@ -79,13 +79,8 @@ RmNextEventMenu(void)
 	// Create variable title label from race params.
 	int titleId = GfuiMenuCreateLabelControl(rmScrHandle, menuXMLDescHdle, "TitleLabel");
 	char pszTitle[128];
-	if (LmRaceEngine().race()->getManager()->hasSubFiles())
-	{
-		const char* pszGroup = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
-		snprintf(pszTitle, sizeof(pszTitle), "%s - %s", reInfo->_reName, pszGroup);
-	}
-	else
-		snprintf(pszTitle, sizeof(pszTitle), "%s", reInfo->_reName);
+
+	snprintf(pszTitle, sizeof(pszTitle), "%s", reInfo->_reName);
 	GfuiLabelSetText(rmScrHandle, titleId, pszTitle);
 
 	// Calculate which race of the series this is
