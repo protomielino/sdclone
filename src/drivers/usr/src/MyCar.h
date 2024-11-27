@@ -22,7 +22,6 @@
 #include <car.h>
 
 #include "filter.h"
-#include "MyParam.h"
 #include "MyTrack.h"
 #include "PathType.h"
 #include "pidcontroller.h"
@@ -35,8 +34,9 @@ public:
   MyCar();
 
   void   init(tCarElt* car, MyTrack* track);
-  void   readPrivateSection(const MyParam& param);
-  void   readVarSpecs(const MyParam& param);
+  void   setDefaults();
+  void   readPrivateSection(void *handle);
+  void   readVarSpecs(void *handle);
   void   readConstSpecs(void* CarHandle);
   double calcFuel(double dist) const;
   void   update(double dt);

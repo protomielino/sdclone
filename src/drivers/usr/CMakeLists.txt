@@ -25,8 +25,6 @@ SET(ROBOT_SOURCES
     src/MuFactorsSect.h
     src/MyCar.cpp
     src/MyCar.h
-    src/MyParam.cpp
-    src/MyParam.h
     src/MyTrack.cpp
     src/MyTrack.h
     src/MyTrackSeg.h

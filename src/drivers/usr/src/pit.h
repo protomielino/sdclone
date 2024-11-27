@@ -86,11 +86,11 @@ private:
     double mAvgFuelPerLap;
     bool   mTireChange;
     double mTiresChangeTime;
-	double mTireWearDanger;
+    double mTireWearDanger;
     int    mPitDamage;
     double mPitGripFactor;
     int    mRain;
-	tdble  tracktemp;
+    tdble  tracktemp;
 
     const int mMaxDamage;
     const int mMaxDamageDist;

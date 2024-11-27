@@ -21,7 +21,6 @@
 
 #include "driver.h"
 
-#include "MyParam.h"
 #include "Utils.h"
 
 #include <sstream>
@@ -51,7 +50,7 @@ Driver::Driver(int index) :
     mGarage(false),
     mFrontCollMargin(6.0),
     mOvtMargin(2.0),
-	driver_consistency(0.2)
+    driver_consistency(0.2)
 
 {
     // Names assigned in constructor for VS 2013 compatibility
@@ -77,6 +76,71 @@ void Driver::TeamInfo(tCarElt* car, tSituation* situation)
     RtTeamManagerDump();
 }
 
+void *Driver::GetHandle(const std::string &dir, const std::string &track, unsigned weather) const
+{
+    std::string wstr = std::to_string(weather),
+        trdata = dir + track + PARAMEXT,
+        wtrdata = dir + track + "-" + wstr + PARAMEXT,
+        defdata = dir + "default" + PARAMEXT,
+        wdefdata = dir + "default" + "-" + wstr + PARAMEXT;
+    void *handle;
+
+    if (weather
+        && (handle = GfParmReadFile(wtrdata.c_str(), GFPARM_RMODE_STD)))
+        return handle;
+    else if (weather
+        && (handle = GfParmReadFile(wdefdata.c_str(), GFPARM_RMODE_STD)))
+        return handle;
+    else if ((handle = GfParmReadFile(trdata.c_str(), GFPARM_RMODE_STD)))
+        return handle;
+    else if ((handle = GfParmReadFile(defdata.c_str(), GFPARM_RMODE_STD)))
+        return handle;
+
+    return nullptr;
+}
+
+void Driver::SetDefaults()
+{
+    mTestPath = PATH_O;
+    mDataLogOn = 0;
+    mPitDamage = 5000;
+    mPitEntryMargin = 100.0;
+    mPitEntrySpeed = 50.0;
+    mPitExitSpeed = 50.0;
+    mPitTest = 0;
+    mSegLen = 4.0;
+    mClothFactor = 1.013;
+    mVMaxK = 0.00183;
+    mVMaxKFactor = 0.9;
+    driver_consistMod = 0.0f;
+    modMult = 1;
+    mMaxFuel = 63.0;
+    mPitTireDanger = 35.0;
+    mPitGripFactor = 1.0;
+}
+
+void Driver::ReadPrivate(void *handle)
+{
+    mTestPath = static_cast<PathType>(GfParmGetNum(handle, "private",  "test line", nullptr, mTestPath));
+    mDataLogOn = GfParmGetNum(handle, "private", "data log on", nullptr, mDataLogOn);
+    mPitDamage = GfParmGetNum(handle, "private", "pitdamage", nullptr, mPitDamage);
+    mPitGripFactor = GfParmGetNum(handle, "private", "pitgripfactor", nullptr, mPitGripFactor);
+    mPitEntryMargin = GfParmGetNum(handle, "private", "pitentrymargin", nullptr, mPitEntryMargin);
+    mPitEntrySpeed = GfParmGetNum(handle, "private", "pitentryspeed", nullptr, mPitEntrySpeed);
+    mPitExitSpeed = GfParmGetNum(handle, "private", "pitexitspeed", nullptr, mPitExitSpeed);
+    mPitTest = GfParmGetNum(handle, "private", "pittest", nullptr, mPitTest);
+    mSegLen = GfParmGetNum(handle, "private", "seglen", nullptr, mSegLen);
+    mClothFactor = GfParmGetNum(handle, "private", "clothoidfactor", nullptr, mClothFactor);
+    mVMaxK = GfParmGetNum(handle, "private", "vmaxk", nullptr, mVMaxK);
+    mVMaxKFactor = GfParmGetNum(handle, "private", "vmaxkfactor", nullptr, mVMaxKFactor);
+    mMaxFuel = GfParmGetNum(handle, "private", "max fuel", nullptr, mMaxFuel);
+    mPitTireDanger = GfParmGetNum(handle, "private", "Pit Tire Wear Threshold", nullptr, mPitTireDanger);
+
+    // Track and car-specific Aggression multiplier,
+    // to make certain car classes overtake more aggressively
+    driver_aggromult = GfParmGetNum(handle, "private", "Aggression Mult", nullptr, driver_aggromult);
+}
+
 void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSituation* situation)
 {
     LogUSR.debug(".......... %s Driver initrack .........\n", mDriverName);
@@ -93,6 +157,8 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     std::string tName;
     std::string cName;
     std::string rName;
+    void *handle;
+
     strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) - 1);
     *strrchr(trackname, '.') = '\0';
     LogUSR.info( " # USR trackName: '%s'\n", trackname );
@@ -103,7 +169,6 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     // Setup for this robot
     //void *newParmHandle;
-    *carParmHandle = NULL;
     //newParmHandle = NULL;
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
@@ -120,52 +185,21 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     Meteorology(track);
 
-    std::string mData(std::string(GetDataDir()) + "drivers/" + rName + "/");
+    std::string mData(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
     mDataDir = mData;
 
-    // Assign to carParmHandle my parameters file handle, it will later be merged with carHandle by TORCS
-    MyParam param(carParmHandle, mDataDir, Track->internalname, weathercode);
-    LogUSR.info(" # Driver %s call param \n", mDriverName);
+    handle = GetHandle(mData, Track->internalname, weathercode);
 
-    // Read the parameters
-    mTestPath = (PathType)((int)param.getNum("private", "test line")); // (int) for VS 2013 compatibility
-    //mMsgOn = (int)param.getNum("private", "message on"); // (int) for VS 2013 compatibility
-    mDataLogOn = (int)param.getNum("private", "data log on");
-    mPitDamage = (int)param.getNum("private", "pitdamage");
-    mPitGripFactor = param.getNum("private", "pitgripfactor");
-    mPitEntryMargin = param.getNum("private", "pitentrymargin");
-    mPitEntrySpeed = param.getNum("private", "pitentryspeed");
-    mPitExitSpeed = param.getNum("private", "pitexitspeed");
-    mPitTest = (int)param.getNum("private", "pittest");
-    mSegLen = param.getNum("private", "seglen");
-    mClothFactor = param.getNum("private", "clothoidfactor");
-    mVMaxK = param.getNum("private", "vmaxk");
-    mVMaxKFactor = param.getNum("private", "vmaxkfactor");
-	driver_aggromult = param.getNum("private", "Aggression Mult");
-	mPitTireDanger = (int)param.getNum("private", "Pit Tire Wear Threshold");
+    mCar.setDefaults();
+    SetDefaults();
 
-	// Track and car-specific Aggression multiplier,
-	// to make certain car classes overtake more aggressively
-	if (driver_aggromult == NULL)
-	{
-		driver_aggromult = 0.0;
-	}
+    if (handle)
+    {
+        ReadPrivate(handle);
+        mCar.readPrivateSection(handle);
+        mCar.readVarSpecs(handle);
+    }
 
-	//get "angry" with increasing time
-	double anger_limit;
-	anger_limit = 0;
-
-	driver_consistMod = 0.0f;
-	modMult = 1;
-
-    if (mVMaxK == 0.0)
-        mVMaxK = 0.0018;
-
-    if (mVMaxKFactor == 0.0)
-        mVMaxKFactor = 0.9;
-
-    mCar.readPrivateSection(param);
-    mCar.readVarSpecs(param);
     mCar.readConstSpecs(carHandle);
 
     // Init my track
@@ -184,12 +218,12 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     double startfuel = mCar.calcFuel(distance);
     LogUSR.info("Start fuel : %.3f\n", startfuel);
-    double initFuel = param.getNum("private", "max fuel");
 
-    if (initFuel > 1.0)
-        startfuel = MIN(startfuel, initFuel);
+    if (mMaxFuel > 1.0)
+        startfuel = MIN(startfuel, mMaxFuel);
 
-    param.setNum(SECT_CAR, PRM_FUEL, startfuel);
+    if (handle)
+        GfParmSetNum(handle, SECT_CAR, PRM_FUEL, nullptr, startfuel);
 
     bool compound = mCar.HASCPD;
 
@@ -199,61 +233,67 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
         if (temp < 15.0 && situation->_totLaps * (double)track->length < 57800.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
+            if (handle)
+                GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 1);
+
             mCar.setTireMu(1);
             LogUSR.info("STRATEGY 15C SPRINT: Compounds choice SOFT !!!\n");
         }
         else if (temp < 15.0 && situation->_totLaps * (double)track->length < 171000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            if (handle)
+                GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
+
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY 15C GP: Compounds choice MEDIUM !!!\n");
         }
         else if (temp < 15.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY 15C LONG: Compounds choice MEDIUM !!!\n");
         }
         else if (temp < 25.0 && situation->_totLaps * (double)track->length < 25000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 1);
             mCar.setTireMu(1);
             LogUSR.info("STRATEGY 25C HOTLAP: Compounds choice SOFT !!!\n");
         }
         else if (temp < 25.0 && situation->_totLaps * (double)track->length < 57800.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY 25C SPRINT: Compounds choice MEDIUM !!!\n");
         }
         else if (temp < 25.0 && situation->_totLaps * (double)track->length < 171000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY 25C GP: Compounds choice MEDIUM !!!\n");
         }
         else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 25000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY HOT HOTLAP: Compounds choice MEDIUM !!!\n");
         }
         else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 57800.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 2);
             mCar.setTireMu(2);
             LogUSR.info("STRATEGY HOT SPRINT: Compounds choice MEDIUM !!!\n");
         }
         else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 171000.0)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
+            GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 3);
             mCar.setTireMu(3);
             LogUSR.info("STRATEGY HOT GP: Compounds choice HARD !!!\n");
         }
         else
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
+            if (handle)
+                GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 3);
+
             mCar.setTireMu(3);
             LogUSR.info("NO STRATEGY: Compounds choice HARD !!!\n");
         }
@@ -262,13 +302,17 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
         if (mRain > 0 && mRain < 3)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 4);
+            if (handle)
+                GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 4);
+
             mCar.setTireMu(4);
             LogUSR.info("Compounds choice WET !!!\n");
         }
         else if (mRain > 2)
         {
-            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 5);
+            if (handle)
+                GfParmSetNum(handle, SECT_TIRESET, PRM_COMPOUNDS_SET, nullptr, 5);
+
             mCar.setTireMu(5);
             LogUSR.info("Compounds choice EXTREM WET !!!\n");
         }
@@ -303,18 +347,20 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     {
         SkillDriver = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-		driver_consistency = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_CONSI, (char *)NULL, 0.0);
+        driver_consistency = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_CONSI, (char *)NULL, 0.0);
         GfParmReleaseHandle(skillHandle);
         LogUSR.info( "# driver skill: %.2f - driver aggression: %.3f\n", SkillDriver, driver_aggression);
         SkillDriver = MAX(0.95, 1.0 - 0.05 * SkillDriver);
         //driver_aggression /= driver_aggression;
         driver_aggression = MIN(1.0, MAX(0.7, 0.99 + driver_aggression));
-		driver_consistency = MAX(0.0, driver_consistency);
+        driver_consistency = MAX(0.0, driver_consistency);
 
         LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver aggression: %.3f - driver consistency: %.3f\n", SkillGlobal, SkillDriver, driver_aggression, driver_consistency);
     }
     else
         LogUSR.info("Couldn't load : %s\n", buffer);
+
+    *carParmHandle = handle;
 }
 
 void Driver::NewRace(tCarElt* car, tSituation* situation)
@@ -393,7 +439,7 @@ void Driver::Drive()
     updateDrivingFast();
     updateLetPass();
     updateOnCollision();
-	updateConsistMod();
+    updateConsistMod();
     calcStateAndPath();
     calcOffsetAndYaw();
     calcMaxspeed();
@@ -511,25 +557,25 @@ void Driver::calcOffsetAndYaw()
             mLRTargetStep -=  stepdiff;
         }
     }
-	else if (mDrvPath == PATH_M && (m[OVERTAKE] || m[LET_PASS] || mDrvState == STATE_PITLANE || mPit.pitstop() || mTestPath != PATH_O))
-	{
-		if (mLRTargetPortion < -0.49 && mLRTargetStep <= -stepdiff)
-		{
-			mLRTargetStep += stepdiff;
-		}
-		else  if (mLRTargetPortion >= -0.49 && mLRTargetStep >= stepdiff)
-		{
-			mLRTargetStep -= stepdiff;
-		}
-		else if (mLRTargetPortion > 0.49 && mLRTargetStep >= stepdiff)
-		{
-			mLRTargetStep -= stepdiff;
-		}
-		else  if (mLRTargetPortion <= 0.49 && mLRTargetStep <= -stepdiff)
-		{
-			mLRTargetStep += stepdiff;
-		}
-	}
+    else if (mDrvPath == PATH_M && (m[OVERTAKE] || m[LET_PASS] || mDrvState == STATE_PITLANE || mPit.pitstop() || mTestPath != PATH_O))
+    {
+        if (mLRTargetPortion < -0.49 && mLRTargetStep <= -stepdiff)
+        {
+            mLRTargetStep += stepdiff;
+        }
+        else  if (mLRTargetPortion >= -0.49 && mLRTargetStep >= stepdiff)
+        {
+            mLRTargetStep -= stepdiff;
+        }
+        else if (mLRTargetPortion > 0.49 && mLRTargetStep >= stepdiff)
+        {
+            mLRTargetStep -= stepdiff;
+        }
+        else  if (mLRTargetPortion <= 0.49 && mLRTargetStep <= -stepdiff)
+        {
+            mLRTargetStep += stepdiff;
+        }
+    }
     else if (mDrvPath != PATH_O && fabs(mLRTargetPortion) > maxStepLR)
     {
         double sign = copysign(1.0, pathOffs(PATH_O));
@@ -545,12 +591,12 @@ void Driver::calcOffsetAndYaw()
     mLRTargetPortion += mLRTargetStep;
     mLRTargetPortion = Utils::clip(mLRTargetPortion, -1.0, 1.0);
 
-	if (mDrvPath == PATH_M)
-	{
+    if (mDrvPath == PATH_M)
+    {
         mPathOffs = pathOffs(PATH_M) + mLRTargetPortion * (pathOffs(PATH_L) - pathOffs(PATH_R));
         mPathYaw = Utils::normPiPi(mPathState[PATH_M].yaw() + mLRTargetPortion * Utils::normPiPi(mPathState[PATH_L].yaw() - mPathState[PATH_R].yaw()));
         mPathCurvature = mPathState[PATH_M].curvature() + mLRTargetPortion * (mPathState[PATH_L].curvature() - mPathState[PATH_R].curvature());
-	}
+    }
     else if (mLRTargetPortion > 0.0)
     {
         mPathOffs = pathOffs(PATH_O) + mLRTargetPortion * (pathOffs(PATH_L) - pathOffs(PATH_O));
@@ -781,7 +827,7 @@ double Driver::brakeDist(PathType path, double speed, double allowedspeed)
         if (v2 <= allowedspeed)
         {
             totaldist += seglen * (v1 - allowedspeed) / (v1 - v2);
-			totaldist *= 1 + (getConsistMod() * 0.1);
+            totaldist *= 1 + (getConsistMod() * 0.1);
 
             return 1.1 * totaldist;
         }
@@ -1268,7 +1314,7 @@ bool Driver::overtakeOpponent()
             && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 2.0)))
     {
         if ((mOpps.oppNear()->backMarker() && (dist <= (20.0 + driver_aggression))) ||
-			(((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())))
+            (((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())))
              || (m[OVERTAKE] && dist < mFrontCollMargin + 8.0 && mCar.v() > mOpps.oppNear()->v() - 4.0 - (driver_aggression))
              || (mOpps.oppNear()->v() < 20.0 && dist < mFrontCollMargin + 20.0))
                 && (!(!m[OVERTAKE] && m[DRIVING_FAST])))
@@ -1283,8 +1329,8 @@ bool Driver::overtakeOpponent()
         m[OVERTAKE] = false;
     }
     // If aside always overtake
-    if (((mOpps.oppNear()->backMarker()) && (dist <= ( 10.0 + (mCar.v() * 0.1 )) + driver_aggression)) 
-		|| dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -4.0 - (driver_aggression)
+    if (((mOpps.oppNear()->backMarker()) && (dist <= ( 10.0 + (mCar.v() * 0.1 )) + driver_aggression))
+        || dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -4.0 - (driver_aggression)
             && (fabs(mOpps.oppNear()->sideDist()) < 4.0 + driver_aggression || mDrvPath != PATH_O))
     {
         m[OVERTAKE] = true;
@@ -1313,20 +1359,20 @@ void Driver::updateOvertakePath()
 
     // Normal overtaking
     if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 1.0 - (driver_aggression * 0.1))
-            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 2.5 - (driver_aggression)) 
-			|| ((mOpps.oppNear()->backMarker()) && (mOpps.oppNear()->dist() > (4.0 + driver_aggression))))
+            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 2.5 - (driver_aggression))
+            || ((mOpps.oppNear()->backMarker()) && (mOpps.oppNear()->dist() > (4.0 + driver_aggression))))
     {
-		// Check if opponent is a lapped car.
-		// Shift lanes if lapped car is on the left
-		if ((mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
-		{
+        // Check if opponent is a lapped car.
+        // Shift lanes if lapped car is on the left
+        if ((mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
+        {
             mOvertakePath = PATH_R;
-		}
-		else if (!(mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
+        }
+        else if (!(mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
         {
             mOvertakePath = PATH_L;
         }
-		// If not a lapped car, overtake normally.
+        // If not a lapped car, overtake normally.
         if ((mOpps.oppNear()->leftOfMe()))
         {
             if (!(rightfree || leftfree))
@@ -1337,10 +1383,10 @@ void Driver::updateOvertakePath()
             {
                 mOvertakePath = PATH_R;
             }
-			else
-			{
-				mOvertakePath = PATH_L;
-			}
+            else
+            {
+                mOvertakePath = PATH_L;
+            }
         }
         else
         {
@@ -1352,19 +1398,19 @@ void Driver::updateOvertakePath()
             {
                 mOvertakePath = PATH_L;
             }
-			else
-			{
-				mOvertakePath = PATH_R;
-			}
+            else
+            {
+                mOvertakePath = PATH_R;
+            }
         }
     }
     else
     {
-		if (!(rightfree && leftfree))
-		{
+        if (!(rightfree && leftfree))
+        {
             mOvertakePath = PATH_M;
-		}
-		
+        }
+
         // Always stay on your side if opponent aside
         if (mOpps.oppNear()->leftOfMe())
         {
@@ -1648,19 +1694,19 @@ double Driver::frontCollFactor(Opponent* opp)
 
 void Driver::calcMaxspeed()
 {
-	switch (mDrvState)
+    switch (mDrvState)
     {
     case STATE_RACE:
     {
         if (mDrvPath != PATH_O)
         {
             mMaxspeed = pathSpeed(PATH_R) + 0.5 * (mLRTargetPortion + 1.0) * (pathSpeed(PATH_L) - pathSpeed(PATH_R));
-			mMaxspeed *= 1 + (((driver_aggression) * driver_aggromult)) - (getConsistMod() * 0.1);
+            mMaxspeed *= 1 + (((driver_aggression) * driver_aggromult)) - (getConsistMod() * 0.1);
         }
         else
         {
             mMaxspeed = pathSpeed(mDrvPath);
-			mMaxspeed *= 1 - (getConsistMod() * 0.1);
+            mMaxspeed *= 1 - (getConsistMod() * 0.1);
         }
 
         // Special cases
@@ -1761,26 +1807,26 @@ double Driver::controlSpeed(double accelerator, double maxspeed)
 
 void Driver::updateConsistMod()
 {
-	// Consistency modifier that has subtle random fluctuation.
-	double driver_consistModAdd = ((double)rand()/(RAND_MAX/driver_consistency) * 0.001) * modMult;
+    // Consistency modifier that has subtle random fluctuation.
+    double driver_consistModAdd = ((double)rand()/(RAND_MAX/driver_consistency) * 0.001) * modMult;
 
-	if (driver_consistMod > driver_consistency)
-	{
-		modMult = -1;
-	}
+    if (driver_consistMod > driver_consistency)
+    {
+        modMult = -1;
+    }
 
-	if (driver_consistMod < 0)
-	{
-		modMult = 1;
-	}
+    if (driver_consistMod < 0)
+    {
+        modMult = 1;
+    }
 
-	driver_consistMod += driver_consistModAdd;
-	// LogUSR.info(" # Consistency Mod = %.3f\n", driver_consistMod);
+    driver_consistMod += driver_consistModAdd;
+    // LogUSR.info(" # Consistency Mod = %.3f\n", driver_consistMod);
 }
 
 double Driver::getConsistMod()
 {
-	return driver_consistMod;
+    return driver_consistMod;
 }
 
 // Meteorology

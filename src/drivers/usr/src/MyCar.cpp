@@ -50,31 +50,41 @@ void MyCar::init(tCarElt* car, MyTrack* track)
     initBrakes();
 }
 
-void MyCar::readPrivateSection(const MyParam& param)
+void MyCar::setDefaults()
 {
-    LogUSR.info("Read private section ! \n");
-    mAbsSlip = param.getNum("private", "ABS slip");
-    mBrakeMuFactor = param.getNum("private", "brake mu factor");
-    mMuScaleLR = param.getNum("private", "LR mu scale");
-    mBumpSpeedFactor = param.getNum("private", "bump speed factor");
-    mFuelPerMeter = param.getNum("private", "fuel per meter");
-    mFuelWeightFactor = param.getNum("private", "fuel weight factor");
-    mTireWearPerMeter = param.getNum("private", "tire wear per meter");
-    mSideSlipTCL = param.getNum("private", "TCL side slip");
-    mSideSlipTCLQualy = param.getNum("private", "TCL side slip qualy");
-    mSideSlipTCLFactor = param.getNum("private", "TCL side slip factor");
-	mShiftUpPoint = param.getNum("private", "shift up point");
-
-    if (mTireWearPerMeter == 0.0)
-        mTireWearPerMeter = 1.0;
-
-    if (mSideSlipTCLFactor == 0.0)
-        mSideSlipTCLFactor = 0.2;
+    mAbsSlip = 14.0;
+    mSideSlipTCL = 25.0;
+    mSideSlipTCLQualy = 40.0;
+    mSideSlipTCLFactor = 0.2;
+    mBrakeMuFactor = 0.88;
+    mMuScaleLR = 0.86;
+    mBumpSpeedFactor = 1000.0;
+    mFuelPerMeter = 0.001;
+    mFuelWeightFactor = 1.0;
+    mTireWearPerMeter = 1.0;
+    mRearWingAngle = 17.0;
+    mShiftUpPoint = 0.98;
 }
 
-void MyCar::readVarSpecs(const MyParam& param)
+void MyCar::readPrivateSection(void *handle)
 {
-    mRearWingAngle = param.getNum(SECT_REARWING, PRM_WINGANGLE);
+    LogUSR.info("Read private section ! \n");
+    mAbsSlip = GfParmGetNum(handle, "private", "ABS slip", nullptr, mAbsSlip);
+    mBrakeMuFactor = GfParmGetNum(handle, "private", "brake mu factor", nullptr, mBrakeMuFactor);
+    mMuScaleLR = GfParmGetNum(handle, "private", "LR mu scale", nullptr, mMuScaleLR);
+    mBumpSpeedFactor = GfParmGetNum(handle, "private", "bump speed factor", nullptr, mBumpSpeedFactor);
+    mFuelPerMeter = GfParmGetNum(handle, "private", "fuel per meter", nullptr, mFuelPerMeter);
+    mFuelWeightFactor = GfParmGetNum(handle, "private", "fuel weight factor", nullptr, mFuelWeightFactor);
+    mTireWearPerMeter = GfParmGetNum(handle, "private", "tire wear per meter", nullptr, mTireWearPerMeter);
+    mSideSlipTCL = GfParmGetNum(handle, "private", "TCL side slip", nullptr, mSideSlipTCL);
+    mSideSlipTCLQualy = GfParmGetNum(handle, "private", "TCL side slip qualy", nullptr, mSideSlipTCLQualy);
+    mSideSlipTCLFactor = GfParmGetNum(handle, "private", "TCL side slip factor", nullptr, mSideSlipTCLFactor);
+    mShiftUpPoint = GfParmGetNum(handle, "private", "shift up point", nullptr, mShiftUpPoint);
+}
+
+void MyCar::readVarSpecs(void *handle)
+{
+    mRearWingAngle = GfParmGetNum(handle, SECT_REARWING, PRM_WINGANGLE, nullptr, mRearWingAngle);
 }
 
 void MyCar::readConstSpecs(void* CarHandle)
@@ -433,14 +443,10 @@ int MyCar::calcGear()
     int shifttime = 25;
     int MAX_GEAR = mCar->_gearNb - 1;
 
-	if (1 == mShiftUpPoint || mShiftUpPoint <= 0 || mShiftUpPoint == NULL)
-	{
-		mShiftUpPoint = 0.98;
-	}
-	else
-	{
-		SHIFT_DOWN_MARGIN = 130.0 / mShiftUpPoint;
-	}
+    if (mShiftUpPoint < 1.0  && mShiftUpPoint > 0.0)
+    {
+        SHIFT_DOWN_MARGIN = 130.0 / mShiftUpPoint;
+    }
 
     if (v() < 1.0)
     {

@@ -102,6 +102,9 @@ private:
     unsigned int GetWeather(const tTrack *t);
 
     bool    CheckPitSharing(tCarElt *car);
+    void    *GetHandle(const std::string &dir, const std::string &track, unsigned weather) const;
+    void    SetDefaults();
+    void    ReadPrivate(void *handle);
 
     // Name, dirs
     int INDEX;
@@ -145,6 +148,7 @@ private:
     double   mLRTargetStep;
     double   mVMaxK;
     double   mVMaxKFactor;
+    double   mMaxFuel;
 
     // Mu factors
     MuFactors mMuFactors;

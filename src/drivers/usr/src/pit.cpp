@@ -33,6 +33,8 @@ Pit::Pit() :
     mPit(NULL),
     mPitInfo(NULL),
     mTiresChangeTime(30.0),
+    mTireWearDanger(25.0),
+    tracktemp(0.0),
     mMaxDamage(7000.0),
     mMaxDamageDist(30000.0),
     mPreEntryMargin(100.0)
@@ -68,15 +70,11 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         mPitGripFactor = 0.80;
     }
 
-	if (tireweardanger && tireweardanger != NULL)
-	{
-		mTireWearDanger = tireweardanger;
-	}
-	else
-	{
-		mTireWearDanger = 25.0;
-	}
-	
+    if (tireweardanger > 0.1)
+    {
+        mTireWearDanger = tireweardanger;
+    }
+
     mRain = rain;
 
     mEntryMargin = pitentrymargin;
@@ -94,7 +92,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
     mLastPitFuel = 0.0;
     mLastFuel = 0.0;
     mPenalty = 0;
-	tracktemp = track->local.airtemperature;
+    tracktemp = track->local.airtemperature;
     // Get teammates car
 
     for (int i = 0; i < situation->_ncars; i++)
@@ -552,8 +550,8 @@ void Pit::pitCommand()
             {
                     int	remainingLaps = mCar->race.remainingLaps + 1;
 
-					tdble temp = tracktemp;
-					
+                    tdble temp = tracktemp;
+
                     if (temp <= 15.0 && remainingLaps <= 10  && mRain < 1)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
