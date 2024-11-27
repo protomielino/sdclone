@@ -126,7 +126,8 @@ private:
     double filterTCL_FWD();
     double filterTCL_RWD();
     double filterTCLSideSlip(double accel);
-    void readPrivateSection(PCarSettings *CarParmHandle);
+    void setPrivateDefaults();
+    void readPrivateSection(PCarSettings CarParmHandle);
     void readConstSpecs(PCarHandle CarHandle);
     void readVarSpecs(PCarSettings CarParmHandle);
     void initCa(PCarSettings CarParmHandle);

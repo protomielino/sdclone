@@ -152,8 +152,8 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         mTestLine = 0;
         mDriverMsgLevel = 0;
         mDriverMsgCarIndex = 0;
-        mFRONTCOLL_MARGIN = 4.0;
-        mSTARTCLUTCHRATE = 0.01;
+        mFRONTCOLL_MARGIN = 2.0;
+        mSTARTCLUTCHRATE = 0.013;
         mHASABS = false;
         mHASESP = false;
         mHASTCL = false;
@@ -169,8 +169,8 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         mTestLine = (int)GfParmGetNum(handle, "private", "test line", (char*)NULL, 0.0);
         mDriverMsgLevel = (int)GfParmGetNum(handle, "private", "driver message", (char*)NULL, 0.0);
         mDriverMsgCarIndex = (int)GfParmGetNum(handle, "private", "driver message car index", (char*)NULL, 0.0);
-        mFRONTCOLL_MARGIN = GfParmGetNum(handle, "private", "frontcollmargin", (char*)NULL, 4.0);
-        mSTARTCLUTCHRATE = GfParmGetNum(handle, "private", "startclutchrate", (char*)NULL, 0.01);
+        mFRONTCOLL_MARGIN = GfParmGetNum(handle, "private", "frontcollmargin", (char*)NULL, 2.0);
+        mSTARTCLUTCHRATE = GfParmGetNum(handle, "private", "startclutchrate", (char*)NULL, 0.013);
         GfParmReleaseHandle(handle);
     }
 
@@ -198,7 +198,27 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     }
 
-    readPrivateSection(CarParmHandle);
+    if (*CarParmHandle == NULL)
+    {
+        const char *category = GfParmGetStr(CarHandle, SECT_CAR, PRM_CATEGORY, NULL);
+
+        if (category)
+        {
+            std::string path = "drivers/";
+
+            path += MyBotName;
+            path += "/";
+            path += category;
+            path += PARAMEXT;
+            *CarParmHandle = GfParmReadFile(path.c_str(), GFPARM_RMODE_STD);
+        }
+    }
+
+    setPrivateDefaults();
+
+    if (*CarParmHandle != NULL)
+        readPrivateSection(*CarParmHandle);
+
     readConstSpecs(CarHandle);
 
     // Set initial fuel
@@ -230,7 +250,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     //load the driver skill level, range 0 - 1
 
     sprintf(buffer, "drivers/%s/%d/skill.xml", MyBotName, mCarIndex);
-    handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    handle = GfParmReadFileLocal(buffer, GFPARM_RMODE_STD);
     double driverskill = 0.0;
 
     if (handle != NULL)
@@ -1926,29 +1946,54 @@ void TDriver::readVarSpecs(PCarSettings CarParmHandle)
     mREARWINGANGLE = GfParmGetNum(CarParmHandle, SECT_REARWING, PRM_WINGANGLE, (char*)NULL, 0.0);
 }
 
-void TDriver::readPrivateSection(PCarSettings* CarParmHandle)
+void TDriver::setPrivateDefaults()
 {
-    mBRAKEFORCEFACTOR = GfParmGetNum(*CarParmHandle, "private", "brakeforcefactor", (char*)NULL, 1.0);
-    mBRAKEFORCEMIN = GfParmGetNum(*CarParmHandle, "private", "brakeforcemin", (char*)NULL, 0.0);
-    mMUSCALE = GfParmGetNum(*CarParmHandle, "private", "muscale", (char*)NULL, 0.9);
-    mBRAKESCALE = GfParmGetNum(*CarParmHandle, "private", "brakescale", (char*)NULL, 1.9);
-    mBUMPSPEEDFACTOR = GfParmGetNum(*CarParmHandle, "private", "bumpspeedfactor", (char*)NULL, 3.0);
-    mFUELPERMETER = GfParmGetNum(*CarParmHandle, "private", "fuelpermeter", (char*)NULL, 0.001f);
-    mWEARPERMETER = GfParmGetNum(*CarParmHandle, "private", "wearpermeter", (char*)NULL, 0.001f);
-    mFUELWEIGHTFACTOR = GfParmGetNum(*CarParmHandle, "private", "fuelweightfactor", (char*)NULL, 1.0);
-    mPITDAMAGE = (int)GfParmGetNum(*CarParmHandle, "private", "pitdamage", (char*)NULL, 5000);
-    mPITENTRYMARGIN = GfParmGetNum(*CarParmHandle, "private", "pitentrymargin", (char*)NULL, 200.0);
-    mPITENTRYSPEED = GfParmGetNum(*CarParmHandle, "private", "pitentryspeed", (char*)NULL, 25.0);
-    mPITEXITSPEED = GfParmGetNum(*CarParmHandle, "private", "pitexitspeed", (char*)NULL, 25.0);
-    mTARGETFACTOR = GfParmGetNum(*CarParmHandle, "private", "targetfactor", (char*)NULL, 0.3f);
-    mTARGETWALLDIST = GfParmGetNum(*CarParmHandle, "private", "targetwalldist", (char*)NULL, 0.0);
-    mTRACTIONCONTROL = GfParmGetNum(*CarParmHandle, "private", "tractioncontrol", (char*)NULL, 1.0) != 0;
-    mMAXLEFT = GfParmGetNum(*CarParmHandle, "private", "maxleft", (char*)NULL, 10.0);
-    mMAXRIGHT = GfParmGetNum(*CarParmHandle, "private", "maxright", (char*)NULL, 10.0);
-    mMARGININSIDE = GfParmGetNum(*CarParmHandle, "private", "margininside", (char*)NULL, 1.0);
-    mMARGINOUTSIDE = GfParmGetNum(*CarParmHandle, "private", "marginoutside", (char*)NULL, 1.5);
-    mCLOTHFACTOR = GfParmGetNum(*CarParmHandle, "private", "clothoidfactor", (char*)NULL, 1.005f);
-    mSEGLEN = GfParmGetNum(*CarParmHandle, "private", "seglen", (char*)NULL, 3.0);
+    mBRAKEFORCEFACTOR = 1.0;
+    mBRAKEFORCEMIN = 0.25;
+    mMUSCALE = 0.9;
+    mBRAKESCALE = 1.9;
+    mBUMPSPEEDFACTOR = 3.0;
+    mFUELPERMETER = 0.001f;
+    mWEARPERMETER = 0.001f;
+    mFUELWEIGHTFACTOR = 1.0;
+    mPITDAMAGE = 5000;
+    mPITENTRYMARGIN = 200.0;
+    mPITENTRYSPEED = 25.0;
+    mPITEXITSPEED = 25.0;
+    mTARGETFACTOR = 0.3f;
+    mTARGETWALLDIST = 0.0;
+    mTRACTIONCONTROL = true;
+    mMAXLEFT = 10.0;
+    mMAXRIGHT = 10.0;
+    mMARGININSIDE = 1.0;
+    mMARGINOUTSIDE = 1.5;
+    mCLOTHFACTOR = 1.005f;
+    mSEGLEN = 3.0;
+}
+
+void TDriver::readPrivateSection(PCarSettings CarParmHandle)
+{
+    mBRAKEFORCEFACTOR = GfParmGetNum(CarParmHandle, "private", "brakeforcefactor", (char*)NULL, mBRAKEFORCEFACTOR);
+    mBRAKEFORCEMIN = GfParmGetNum(CarParmHandle, "private", "brakeforcemin", (char*)NULL, mBRAKEFORCEMIN);
+    mMUSCALE = GfParmGetNum(CarParmHandle, "private", "muscale", (char*)NULL, mMUSCALE);
+    mBRAKESCALE = GfParmGetNum(CarParmHandle, "private", "brakescale", (char*)NULL, mBRAKESCALE);
+    mBUMPSPEEDFACTOR = GfParmGetNum(CarParmHandle, "private", "bumpspeedfactor", (char*)NULL, mBUMPSPEEDFACTOR);
+    mFUELPERMETER = GfParmGetNum(CarParmHandle, "private", "fuelpermeter", (char*)NULL, mFUELPERMETER);
+    mWEARPERMETER = GfParmGetNum(CarParmHandle, "private", "wearpermeter", (char*)NULL, mWEARPERMETER);
+    mFUELWEIGHTFACTOR = GfParmGetNum(CarParmHandle, "private", "fuelweightfactor", (char*)NULL, mFUELWEIGHTFACTOR);
+    mPITDAMAGE = (int)GfParmGetNum(CarParmHandle, "private", "pitdamage", (char*)NULL, mPITDAMAGE);
+    mPITENTRYMARGIN = GfParmGetNum(CarParmHandle, "private", "pitentrymargin", (char*)NULL, mPITENTRYMARGIN);
+    mPITENTRYSPEED = GfParmGetNum(CarParmHandle, "private", "pitentryspeed", (char*)NULL, mPITENTRYSPEED);
+    mPITEXITSPEED = GfParmGetNum(CarParmHandle, "private", "pitexitspeed", (char*)NULL, mPITEXITSPEED);
+    mTARGETFACTOR = GfParmGetNum(CarParmHandle, "private", "targetfactor", (char*)NULL, mTARGETFACTOR);
+    mTARGETWALLDIST = GfParmGetNum(CarParmHandle, "private", "targetwalldist", (char*)NULL, mTARGETWALLDIST);
+    mTRACTIONCONTROL = GfParmGetNum(CarParmHandle, "private", "tractioncontrol", (char*)NULL, (tdble)mTRACTIONCONTROL);
+    mMAXLEFT = GfParmGetNum(CarParmHandle, "private", "maxleft", (char*)NULL, mMAXLEFT);
+    mMAXRIGHT = GfParmGetNum(CarParmHandle, "private", "maxright", (char*)NULL, mMAXRIGHT);
+    mMARGININSIDE = GfParmGetNum(CarParmHandle, "private", "margininside", (char*)NULL, mMARGININSIDE);
+    mMARGINOUTSIDE = GfParmGetNum(CarParmHandle, "private", "marginoutside", (char*)NULL, mMARGINOUTSIDE);
+    mCLOTHFACTOR = GfParmGetNum(CarParmHandle, "private", "clothoidfactor", (char*)NULL, mCLOTHFACTOR);
+    mSEGLEN = GfParmGetNum(CarParmHandle, "private", "seglen", (char*)NULL, mSEGLEN);
 }
 
 void TDriver::printSetup()
