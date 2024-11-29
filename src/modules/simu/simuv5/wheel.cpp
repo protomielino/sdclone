@@ -968,8 +968,8 @@ void SimWheelUpdateTire(tCar *car, int index)
 
     tdble normalForce = wheel->forces.z;
     tdble slip = wheel->tireSlip;
-	tdble lateralForce = (wheel->forces.y);
-	tdble longForce = (wheel->forces.x);
+	tdble lateralForce = fabs(wheel->forces.y);
+	tdble longForce = fabs(wheel->forces.x);
 	tdble absForce2 = fabs(normalForce * 0.5);
 	//tdble slipRatio = wheel->spinVel * wheel->radius;
 	tdble latMod = 0;
