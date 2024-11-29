@@ -165,8 +165,9 @@ SimCarConfig(tCar *car)
     {
         car->fuel = car->tank;
     }
-
     car->fuel_prev = car->fuel;
+	
+    car->fuelMass        = GfParmGetNum(hdle, SECT_CAR, PRM_FUELMASS, (char*)NULL, 1.0);
 
     setupFuel->desired_value = setupFuel->min = setupFuel->max = 80.0;
     GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, &(setupFuel->desired_value), &(setupFuel->min), &(setupFuel->max));
@@ -619,7 +620,7 @@ SimCarUpdateForces(tCar *car)
     car->preDynGC = car->DynGCg;
 
     /* total mass */
-    m = car->mass + car->fuel;
+    m = car->mass + (car->fuel * car->fuelMass);
     minv = (tdble) (1.0 / m);
     w = -m * G;
 
@@ -950,7 +951,7 @@ SimTelemetryOut(tCar *car)
     else if (car->ctrl->telemetryMode == 2)
     {
         // Mass from total and mass from wheels
-        float MassTotal = car->mass + car->fuel;
+        float MassTotal = car->mass + (car->fuel * car->fuelMass);
         float mass = car->wheel[FRNT_RGT].weight0 + car->wheel[FRNT_LFT].weight0 + car->wheel[REAR_RGT].weight0 + car->wheel[REAR_LFT].weight0;
         float massfactor = (mass + car->fuel*G) / mass;
         float MassTotal2 = massfactor/G * (car->wheel[0].weight0 + car->wheel[1].weight0 + car->wheel[2].weight0 + car->wheel[3].weight0);

@@ -203,7 +203,7 @@ void SimWheelConfig(tCar *car, int index)
     wheel->pressure = MIN(setupPressure->max, MAX(setupPressure->min, setupPressure->desired_value));
     wheel->currentPressure	= wheel->pressure; //MIN(setupPressure->max, MAX(setupPressure->min, setupPressure->desired_value));
 
-    if (car->features & FEAT_COMPOUNDS && car->options->tyre_temperature)
+    if (car->features & FEAT_COMPOUNDS && car->options->compounds)
     {
         wheel->tireSet = MIN(setupCompound->max, MAX(setupCompound->min, setupCompound->desired_value));
         wheel->mu = wheel->muC[wheel->tireSet];
@@ -326,7 +326,9 @@ void SimWheelConfig(tCar *car, int index)
 	// but only if temperature feature is enabled.
 	if (car->features & FEAT_TIRETEMPDEG)
 	{
-		wheel->mfB = ((Ca*0.50) + (wheel->currentPressure * 0.0001)) / wheel->mfC;
+		//wheel->mfB = ((Ca*0.50) + (wheel->currentPressure * 0.0001)) / wheel->mfC;
+		
+		wheel->mfB = Ca / wheel->mfC;
 	}
 	else
 	{
@@ -967,8 +969,8 @@ void SimWheelUpdateTire(tCar *car, int index)
 
     tdble normalForce = wheel->forces.z;
     tdble slip = wheel->tireSlip;
-	tdble lateralForce = fabs(wheel->forces.y);
-	tdble longForce = fabs(wheel->forces.x);
+	tdble lateralForce = (wheel->forces.y);
+	tdble longForce = (wheel->forces.x);
 	tdble absForce2 = fabs(normalForce * 0.5);
 	//tdble slipRatio = wheel->spinVel * wheel->radius;
 	tdble latMod = 0;
@@ -1002,18 +1004,13 @@ void SimWheelUpdateTire(tCar *car, int index)
 	{
 		slip = 1;
 	}
+	else if (slip <= -1)
+	{
+		slip = -1;
+	}
 	else
 	{
 		slip = slip;
-	}
-
-	if (normalForce >= wheel->opLoad * 2)
-	{
-		normalForce = wheel->opLoad * 2;
-	}
-	else
-	{
-		normalForce = normalForce;
 	}
 
     // Calculate factor for energy which is turned into heat, according papers this seems to be pretty constant
@@ -1025,27 +1022,6 @@ void SimWheelUpdateTire(tCar *car, int index)
 
     // Calculate energy input for the tire
     tdble energyGain = normalForce * wheelSpeed * SimDeltaTime * hysteresis;
-
-	// Normalize lateral and longitudinal forces if they peak too far past the operating threshold.
-	// This is done to (slightly) even out tire heating so huge differences in tire pressure are not necessary
-	// for cars with a lot of weight on one axle or the other.
-	if (lateralForce >= wheel->opLoad * 2)
-	{
-		lateralForce = wheel->opLoad * 2;
-	}
-	else
-	{
-		lateralForce = lateralForce;
-	}
-
-	if (longForce >= wheel->opLoad * 2)
-	{
-		longForce = wheel->opLoad * 2;
-	}
-	else
-	{
-		longForce = longForce;
-	}
 
 	// Modifiers for energy input from lateral and longitudinal forces.
 	latMod = ((lateralForce * absForce2) * wheel->latHeatFactor) * SimDeltaTime * 0.0004;
@@ -1100,8 +1076,8 @@ void SimWheelUpdateTire(tCar *car, int index)
 	// This is because some series/car types use tire warmers, which would make the initial
 	// tire temperature much closer to optimal.
 	// According to tire data from a leading GT tire manufacturer, tire pressure goes up by ~0.7 PSI for every 10 F (~5.56 C).
-    // wheel->currentPressure = ((wheel->Ttire + ((Tair - 273.15) * 1.50)) * wheel->pressure) / Tair;
-	wheel->currentPressure = wheel->Ttire / Tair * wheel->pressure;
+    //wheel->currentPressure = ((wheel->Ttire + ((Tair - 273.15) * 1.50)) * wheel->pressure) / Tair;
+	wheel->currentPressure = wheel->Ttire / wheel->Tinit * wheel->pressure;
 
     // Wear
     double deltaWear = (wheel->currentPressure - SimAirPressure) * slip * wheelSpeed * SimDeltaTime * (energyMod + normalForce)
@@ -1112,9 +1088,7 @@ void SimWheelUpdateTire(tCar *car, int index)
         wheel->currentWear = 1.0f;
 
     // Graining
-	// Note that we use the TRACK temp and not the initial tire temp
-	// if the initial tire temp is higher (tire warmers, for example)
-	tdble grainTemperature = (wheel->Topt - Tair) * 3.0f / 4.0f + Tair;
+	tdble grainTemperature = (wheel->Topt - wheel->Ttire) * 3.0f / 4.0f + wheel->Ttire;
     tdble deltaGraining = (grainTemperature - wheel->Ttire) * deltaWear;
     if (deltaGraining > 0.0f)
     {

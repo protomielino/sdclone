@@ -61,6 +61,7 @@ typedef struct
 
     /* dynamic */
     tdble	fuel;		/* current fuel load */
+    tdble	fuelMass;		/* current fuel mass */
     tdble	fuel_consumption; /* average fuel consumption */
     tdble	fuel_prev;	/* average fuel consumption */
     tdble	fuel_time;	/* average fuel consumption */
