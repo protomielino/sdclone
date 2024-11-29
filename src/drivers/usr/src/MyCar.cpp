@@ -487,7 +487,7 @@ double MyCar::calcClutch()
             mClutch = 0.3;
         }
 
-        if (mCar->_enginerpm / mCar->_enginerpmRedLine > 0.7)
+        if (mCar->_enginerpm / mCar->_enginerpmRedLine > 0.2)
         {
             mClutch -= 0.04;
         }
@@ -503,7 +503,7 @@ double MyCar::calcClutch()
     }
     else if (gear() == 1)
     {
-        if (mCar->_enginerpm / mCar->_enginerpmRedLine > 0.7)
+        if (mCar->_enginerpm / mCar->_enginerpmRedLine > 0.2)
         {
             mClutch -= 0.04;
         }
@@ -520,7 +520,7 @@ double MyCar::calcClutch()
     else if (gear() == 0)
     {
         // For a good start
-        mClutch = 0.7;
+        mClutch = 0.2;
     }
     else if (gear() == -1)
     {
