@@ -732,6 +732,7 @@ typedef struct CarElt
 #define PRM_GCHEIGHT		"GC height"
 #define PRM_TANK			"fuel tank"
 #define PRM_FUEL			"initial fuel"
+#define PRM_FUELMASS		"fuel mass mult"
 #define PRM_CENTR			"mass repartition coefficient"
 #define PRM_ROLLROTINERTIA		"roll rotational inertia"
 #define PRM_PITCHROTINERTIA		"pitch rotational inertia"
