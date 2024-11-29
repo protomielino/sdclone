@@ -171,11 +171,7 @@ main(int argc, char *argv[])
 
 	tmp += "/tmp/";
 
-	if (portability::rmdir_r(tmp.c_str()))
-	{
-		GfLogError("Failed to remove directory: %s\n", tmp.c_str());
-		return 1;
-	}
+	portability::rmdir_r(tmp.c_str());
 
 	// Some more checks about command line options.
 	std::string strRaceToStart;
