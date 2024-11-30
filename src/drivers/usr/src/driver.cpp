@@ -47,11 +47,10 @@ Driver::Driver(int index) :
     INDEX(index),
     mRain(0),
     driver_aggression(1.0),
+    driver_consistency(0.2),
     mGarage(false),
     mFrontCollMargin(6.0),
-    mOvtMargin(2.0),
-    driver_consistency(0.2)
-
+    mOvtMargin(2.0)
 {
     // Names assigned in constructor for VS 2013 compatibility
     mFlagNames.push_back("STATE_CHANGE");
