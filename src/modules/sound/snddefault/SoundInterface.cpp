@@ -33,6 +33,7 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	curb_ride_sound =NULL;
 	dirt_ride_sound = NULL;
 	dirt_skid_sound = NULL;
+	snow_ride_sound = NULL;
 	metal_skid_sound=NULL;
 	axle_sound=NULL;
 	turbo_sound=NULL;
@@ -66,7 +67,11 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	dirt_skid.schar = NULL;
 	dirt_skid.snd = NULL;
 	dirt_skid.max_vol = 0.0f;
-	dirt_skid.id = 0;
+	dirt_skid.id = 0;	
+	snow.schar = NULL;
+	snow.snd = NULL;
+	snow.max_vol = 0.0f;
+	snow.id = 0;
 	metal_skid.schar=NULL;
 	metal_skid.snd=NULL;
 	metal_skid.max_vol=0.0f;
@@ -83,7 +88,7 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	axle.snd=NULL;
 	axle.max_vol=0.0f;
 	axle.id=0;
-
+	
 	n_engine_sounds = n_channels - 12;
 
 	static const int MAX_N_ENGINE_SOUNDS = 8;
@@ -93,7 +98,7 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	} else if (n_engine_sounds > MAX_N_ENGINE_SOUNDS) {
 		n_engine_sounds = MAX_N_ENGINE_SOUNDS;
 	}
-
+	
 	global_gain = 1.0f;
 	silent = false;
 }
@@ -150,7 +155,13 @@ void SoundInterface::setSkidSound (const char* sound_name)
 		Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
 		skid_sound[i] = sound;
 	}
-
+}
+void SoundInterface::setScrubSound(const char* sound_name)
+{
+	for (int i = 0; i < 4; i++) {
+		Sound* sound = addSample(sound_name, ACTIVE_VOLUME | ACTIVE_PITCH, true);
+		scrub_sound[i] = sound;
+	}
 }
 void SoundInterface::setRoadRideSound (const char* sound_name)
 {
@@ -176,6 +187,11 @@ void SoundInterface::setDirtSkidSound(const char* sound_name)
 {
 	Sound* sound = addSample(sound_name, ACTIVE_VOLUME | ACTIVE_PITCH, true);
 	dirt_skid_sound = sound;
+}
+void SoundInterface::setSnowRideSound(const char * sound_name)
+{
+	Sound* sound = addSample(sound_name, ACTIVE_VOLUME | ACTIVE_PITCH, true);
+	snow_ride_sound = sound;
 }
 void SoundInterface::setMetalSkidSound (const char* sound_name)
 {
@@ -229,24 +245,24 @@ void SoundInterface::setGearChangeSound (const char* sound_name)
 }
 
 float SoundInterface::getGlobalGain() const
-{
-	return silent ? 0 : global_gain;
+{ 
+	return silent ? 0 : global_gain; 
 }
 
-void SoundInterface::setGlobalGain(float g)
+void SoundInterface::setGlobalGain(float g) 
 {
 	if (g < 0)
 		g = 0.0f;
 	else if (g > 1.0f)
 		g = 1.0f;
-
+	
 	global_gain = g;
 
 	GfLogInfo("Sound global gain set to %.2f\n", global_gain);
 }
 
 float SoundInterface::getVolume() const
-{
+{ 
 	return getGlobalGain();
 }
 
@@ -258,6 +274,6 @@ void SoundInterface::setVolume(float g)
 void SoundInterface::mute(bool bOn)
 {
 	silent = bOn;
-
+	
 	GfLogInfo("Sound %s\n", silent ? "paused" : "restored");
 }

@@ -45,6 +45,8 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     dirt_skid.f = 0.0f;
     dirt.a = 0.0f;
     dirt.f = 0.0f;
+	snow.a = 0.0f;
+	snow.f = 0.0f;
     road.a = 0.0f;
     road.f = 0.0f;
     skid_metal.a = 0.0f;
@@ -70,7 +72,7 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     setCarPosition(zeroes);
     setCarSpeed(zeroes);
     setListenerPosition(zeroes);
-
+    
     attenuation = 0.0f;
     base_frequency = 0.0f;
 }
@@ -197,7 +199,7 @@ void CarSoundData::calculateEngineSound (tCarElt* car)
             turbo_target = 0.1f + 0.9f * smooth_accel;
             turbo_target_vol = 0.1f * smooth_accel;
         }
-
+                
         turbo.a += 0.1f * (turbo_target_vol - turbo.a) * (0.1f + smooth_accel);
         float turbo_target_pitch = turbo_target * car->_enginerpm / 600.0f;
         turbo.f += turbo_ilag * (turbo_target_pitch - turbo.f) * (smooth_accel);
@@ -217,13 +219,13 @@ void CarSoundData::calculateEngineSound (tCarElt* car)
         + (1.0f-smooth_accel)*0.25f*rev_cor2;
 
     // TODO: filter for exhaust and car body resonance?
-
+                
 }
 
 
 /// Calculate the frequency and amplitude of a looped backfiring sound.
 void CarSoundData::calculateBackfireSound (tCarElt* car)
-{
+{               
     if (car->_state & RM_CAR_STATE_NO_SIMU) {
         engine_backfire.a = 0.0f;
         engine_backfire.f = 1.0f;
@@ -248,12 +250,19 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
     dirt.f = 1.0f;
     road.a = 0.0;
     road.f = 0.0f;
+	road_scrub.a = 0.0;
+	road_scrub.f = 0.0f;
+	snow.a = 0.0;
+	snow.f = 0.0f;
+	
     float car_speed2 = car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y;
     bool flag = false;
     int i;
     for (i = 0; i<4; i++) {
         wheel[i].skid.a = 0.0f;
         wheel[i].skid.f = 1.0f;
+		wheel[i].scrub.a = 0.0f;
+		wheel[i].scrub.f = 1.0f;
     }
     if (car->_state & RM_CAR_STATE_NO_SIMU) {
         return;
@@ -266,7 +275,7 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
         }
     }
     if (car->_state & RM_CAR_STATE_NO_SIMU
-        ||
+        || 
         (((car->_speed_x*car->_speed_x + car->_speed_y*car->_speed_y) < 0.1f)
         && (flag == false))) {
         return;
@@ -307,13 +316,13 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
             &&((strcmp(s, TRK_VAL_GRASS)==0)
                ||(strcmp(s, TRK_VAL_SAND)==0)
                ||(strcmp(s, TRK_VAL_DIRT)==0)
-	       ||(strcmp(s, TRK_VAL_SNOW)==0)
+			   ||(strcmp(s, TRK_VAL_SNOW) == 0)
+			   || (strstr(s, "snow"))
                ||(strstr(s, "sand"))
                ||(strstr(s, "dirt"))
                ||(strstr(s, "grass"))
                ||(strstr(s, "gravel"))
                ||(strstr(s, "mud"))
-	       ||(strstr(s, "snow"))
                )) {
             out_of_road = true;
         }
@@ -328,6 +337,8 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
         wheel[i].skid.a = 0.0f;
         wheel[i].skid.f = 1.0f;
 
+		wheel[i].scrub.a = 0.0f;
+		wheel[i].scrub.f = 1.0f;
         if (out_of_road==false) {
             float tmppitch = tmpvol*(0.75f+0.25f*roughnessFreq);
             float wind_noise = 1.0f;
@@ -345,16 +356,21 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
                   road.f = tmppitch;
                }
             }
-
-            if (car->_skid[i] > 0.05f) {
+			
+			// This is not a smart way to implement tire scrubbing.
+			if (car->_skid[i] > 0.05f) {
                 //skvol[i] = (float)car->_skid[i];
                 //skpitch[i] = 0.7+0.3*roughnessFreq;
                 wheel[i].skid.a = (float)car->_skid[i]-0.05f;
+				wheel[i].scrub.a = MAX(0.0f, MIN((0.5f - wheel[i].skid.a), wheel[i].skid.a)) * 4;
                 float wsa = tanh((car->_wheelSlipAccel(i)+10.0f)*0.01f);
                 wheel[i].skid.f = (0.3f - 0.3f*wsa + 0.3f*roughnessFreq)/(1.0f+0.5f*tanh(car->_reaction[i]*0.0001f));
+				wheel[i].scrub.f = wheel[i].skid.f;
             } else {
                 wheel[i].skid.a = 0.0f;
                 wheel[i].skid.f = 1.0f;
+				wheel[i].scrub.a = 0.0f;
+				wheel[i].scrub.f = 1.0f;
             }
             //printf ("%d %f %f\n", i, wheel[i].skid.a, wheel[i].skid.f);
         } else {
@@ -376,7 +392,21 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
                     dirt_skid.f = 1.0f;
                 }
                 //printf("wheel %d roughness %f dirt vol %f dirt_skid vol %f\n", i, roughness, dirt.a, dirt_skid.a);
-            } else {
+            } 
+			else if ((s)
+				&&
+				((strstr(s, "snow"))
+					)) {
+				if (snow.a < tmpvol) {
+					snow.a = tmpvol;
+					snow.f = tmppitch;
+				}
+				if (dirt_skid.a < car->_skid[i]) {
+					dirt_skid.a = (float)car->_skid[i];
+					dirt_skid.f = 1.0f;
+				}
+			}
+			else {
                 if (grass.a < tmpvol) {
                     grass.a = tmpvol;
                     grass.f = tmppitch;
@@ -388,6 +418,7 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
                 */
                 //printf("wheel %d roughness %f grass vol %f \n", i, roughness, grass.a);
             }
+
         }
 
     }
@@ -396,19 +427,19 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
         tdble az = car->_yaw;
         tdble Sinz = sin(az);
         tdble Cosz = cos(az);
-
+                
         tdble x = car->priv.wheel[i].relPos.x;
         tdble y = car->priv.wheel[i].relPos.y;
-
+                
         tdble dx = x * Cosz - y * Sinz;
         tdble dy = x * Sinz + y * Cosz;
-
+                
         tdble dux = -car->_yaw_rate * y;
         tdble duy = car->_yaw_rate * x;
-
+                
         dux = dux * Cosz - duy * Sinz;
         duy = dux * Sinz + duy * Cosz;
-
+                
         wheel[i].u[0] = car->pub.DynGCg.vel.x + dux;
         wheel[i].u[1] = car->pub.DynGCg.vel.y + duy;
         wheel[i].u[2] = car->pub.DynGCg.vel.z;
@@ -439,7 +470,7 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
     if (car->_state & RM_CAR_STATE_NO_SIMU) {
         return;
     }
-
+        
     const int collision = car->priv.collision;
     if (collision) {
         if (collision & SEM_COLLISION) {

@@ -27,7 +27,7 @@
 
 const int OpenalSoundInterface::OSI_MIN_DYNAMIC_SOURCES = 4;
 
-int sortSndPriority(const void* a, const void* b)
+int sortSndPriority(const void* a, const void* b) 
 {
 	SoundPri* A = (SoundPri*) a;
 	SoundPri* B = (SoundPri*) b;
@@ -56,7 +56,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 		GfLogError("OpenAL: Could not open device (alcOpenDevice failed)\n");
 		throw ("Could not open device");
 	}
-
+	
 	// Last zero is termination of the array, I think the current official beat SDK ignores that.
 	// ALCint attr[] = { ALC_MONO_SOURCES, 1024, ALC_STEREO_SOURCES, 0, 0};
 	cc = alcCreateContext( dev, NULL);
@@ -139,7 +139,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 	GfLogInfo("  Version: %s\n", alGetString(AL_VERSION));
 	GfLogInfo("  Available sources: %d%s\n", OSI_MAX_SOURCES, (sources >= MAX_SOURCES) ? " or more" : "");
 	GfLogInfo("  Available buffers: %d%s\n", OSI_MAX_BUFFERS, (buffers >= MAX_SOURCES) ? " or more" : "");
-
+	
 	alDistanceModel ( AL_INVERSE_DISTANCE );
 	error = alGetError();
 	if (error != AL_NO_ERROR) {
@@ -162,14 +162,15 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 	if (error != AL_NO_ERROR) {
 		GfLogError("OpenAL : Error %d from alListenerfv\n", error);
 	}
-
+	
 	engpri = NULL;
-
+	
 	// initialise mappings
 	grass.schar = &CarSoundData::grass;
 	curb.schar = &CarSoundData::curb;
 	dirt.schar = &CarSoundData::dirt;
 	dirt_skid.schar = &CarSoundData::dirt_skid;
+	snow.schar = &CarSoundData::snow;
 	road.schar = &CarSoundData::road;
 	metal_skid.schar = &CarSoundData::drag_collision;
 	backfire_loop.schar = &CarSoundData::engine_backfire;
@@ -213,7 +214,7 @@ Sound* OpenalSoundInterface::addSample (const char* filename, unsigned int flags
 	sound_list.push_back(sound);
 	return sound;
 }
-
+	
 void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec3 p_obs, sgVec3 u_obs, sgVec3 c_obs, sgVec3 a_obs)
 {
 	if(silent){
@@ -226,7 +227,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 #endif
 	ALfloat listener_orientation[6];
     static const ALfloat zeros[] = {0.0f, 0.0f, 0.0f};
-
+	
 	for (int i = 0; i<3; i++) {
 		listener_pos[i] = p_obs[i];
 #ifdef USE_OPENAL_DOPPLER
@@ -235,11 +236,11 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		listener_orientation[i] = c_obs[i];
 		listener_orientation[i+3] = a_obs[i];
 	}
-
+	
 	alListenerfv(AL_POSITION, listener_pos );
 #ifdef USE_OPENAL_DOPPLER
 	alListenerfv(AL_VELOCITY, listener_speed );
-#else
+#else 
     alListenerfv(AL_VELOCITY, zeros);
 #endif
 	alListenerfv(AL_ORIENTATION, listener_orientation );
@@ -289,7 +290,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 			engine->stop();
 		}
 	}
-
+	
 	float max_skid_vol[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	int max_skid_id[4] = {0,0,0,0};
 	for (int id = 0; id<n_cars; id++) {
@@ -323,6 +324,40 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		}
 	}
 
+	float max_scrub_vol[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	int max_scrub_id[4] = { 0,0,0,0 };
+	for (int id = 0; id < n_cars; id++) {
+		CarSoundData* sound_data = car_sound_data[id];
+		for (int j = 0; j < 4; j++) {
+			float skvol = sound_data->attenuation*sound_data->wheel[j].scrub.a;
+			if (skvol > max_scrub_vol[j]) {
+				max_scrub_vol[j] = skvol;
+				max_scrub_id[j] = id;
+			}
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int id = max_scrub_id[i];
+		WheelSoundData* sound_data = car_sound_data[id]->wheel;
+		scrub_sound[i]->setSource(sound_data[i].p, sound_data[i].u);
+		scrub_sound[i]->setVolume(sound_data[i].scrub.a);
+#ifdef USE_OPENAL_DOPPLER
+		/// \note Why MIN() here?
+		scrub_sound[i]->setPitch(MIN(sound_data[i].scrub.f, 1.0f));
+#else
+		float mod_f = car_src[id].f;
+		scrub_sound[i]->setPitch(sound_data[i].scrub.f * mod_f);
+#endif
+		scrub_sound[i]->update();
+		if (sound_data[i].scrub.a > VOLUME_CUTOFF) {
+			scrub_sound[i]->start();
+		}
+		else {
+			scrub_sound[i]->stop();
+		}
+	}
+
 	// other looping sounds
 	road.snd = road_ride_sound;
 	sortSingleQueue (car_sound_data, &road, n_cars);
@@ -343,6 +378,10 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	dirt_skid.snd = dirt_skid_sound;
 	sortSingleQueue(car_sound_data, &dirt_skid, n_cars);
 	setMaxSoundCar(car_sound_data, &dirt_skid);
+
+	snow.snd = snow_ride_sound;
+	sortSingleQueue(car_sound_data, &snow, n_cars);
+	setMaxSoundCar(car_sound_data, &snow);
 
 	metal_skid.snd = metal_skid_sound;
 	sortSingleQueue (car_sound_data, &metal_skid, n_cars);

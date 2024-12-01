@@ -67,12 +67,14 @@ class SoundInterface {
 	int n_engine_sounds; ///< number of simultaneous engines
 	int curCrashSnd; ///< holds current crash sound used - the sound cycles
 	Sound* skid_sound[4]; ///< set of skid sounds, one per tyre
+	Sound* scrub_sound[4]; ///< set of scrubbing sounds, one per tyre
 	Sound* road_ride_sound; ///< rolling on normal road
 	Sound* grass_ride_sound; ///< rolling on grass
 	Sound* curb_ride_sound; ///< riding on curb
 	Sound* dirt_ride_sound; ///< rolling on dirt/gravel
 	Sound* dirt_skid_sound; ///< skidding on dirt/gravel
-	Sound* metal_skid_sound; ///< metal skidding on metal
+	Sound* snow_ride_sound; ///< rolling on snow/ice
+	Sound* metal_skid_sound; ///< metal skidding on metal 
 	Sound* axle_sound; ///< axle/gear spinning sound
 	Sound* turbo_sound; ///< turbo spinning sound
 	Sound* backfire_loop_sound; ///< exhaust backfire sound
@@ -86,20 +88,21 @@ class SoundInterface {
 	SoundPri* engpri; ///< the engine priority, used for sorting
 
 	/// The following are mappings for sound prioritisation
-	QueueSoundMap road;
-	QueueSoundMap grass;
+	QueueSoundMap road; 
+	QueueSoundMap grass; 
 	QueueSoundMap curb;
 	QueueSoundMap dirt;
+	QueueSoundMap snow;
 	QueueSoundMap dirt_skid;
 	QueueSoundMap metal_skid;
 	QueueSoundMap backfire_loop;
 	QueueSoundMap turbo;
 	QueueSoundMap axle;
 
-	/// Current global gain [0, 1] and mute flag.
+	/// Current global gain [0, 1] and mute flag. 
 	float global_gain;
 	bool silent;
-
+	
 	/** Find the max amplitude sound in car_sound_data and put it in smap  */
 	void sortSingleQueue (CarSoundData** car_sound_data, QueueSoundMap* smap, int n_cars);
 
@@ -107,7 +110,7 @@ class SoundInterface {
 	    car_sound_data and call apprioriate methods for smap->snd in order
 	    to play the sound.*/
 	void setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
-
+	
  public:
 	/// Make a new sound interface
 	SoundInterface(float sampling_rate, int n_channels);
@@ -127,12 +130,14 @@ class SoundInterface {
 	virtual void initSharedSourcePool();
 
 	void setSkidSound (const char* sound_name);
+	void setScrubSound(const char * sound_name);
 	void setRoadRideSound (const char* sound_name);
 	void setGrassRideSound (const char* sound_name);
 	//void setGrassSkidSound (const char* sound_name);
 	void setCurbRideSound(const char* sound_name);
 	void setDirtRideSound(const char* sound_name);
 	void setDirtSkidSound(const char* sound_name);
+	void setSnowRideSound(const char* sound_name);
 	void setMetalSkidSound (const char* sound_name);
 	void setAxleSound (const char* sound_name);
 	void setTurboSound (const char* sound_name);
@@ -145,7 +150,7 @@ class SoundInterface {
 
 	/// Update sound for a given observer.
 	virtual void update(CarSoundData** car_sound_data,
-						int n_cars, sndVec3 p_obs, sndVec3 u_obs,
+						int n_cars, sndVec3 p_obs, sndVec3 u_obs, 
 						sndVec3 c_obs = NULL, sndVec3 a_obs = NULL) = 0;
 
 	virtual float getGlobalGain() const;

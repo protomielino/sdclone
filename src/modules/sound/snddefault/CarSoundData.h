@@ -23,13 +23,14 @@ typedef struct WheelSoundData_
 	sgVec3 p; ///< position
 	sgVec3 u; ///< speed
 	QSoundChar skid;
+	QSoundChar scrub;
 } WheelSoundData;
 
 /// Manages the source sound of each individual car.
 class CarSoundData
 {
 protected:
-
+	
 	sgVec3 listener_position;
 	sgVec3 position;
 	sgVec3 speed;
@@ -43,7 +44,7 @@ protected:
 	void calculateCollisionSound (tCarElt* car);
 
 public:
-
+	
 	SoundPri eng_pri;
 	WheelSoundData wheel[4];
 	float attenuation; ///< global distance attenuation
@@ -62,7 +63,9 @@ public:
 	QSoundChar grass;
 	QSoundChar dirt_skid;
 	QSoundChar dirt;
+	QSoundChar snow;
 	QSoundChar road;
+	QSoundChar road_scrub;
 	QSoundChar skid_metal;
 	int prev_gear;
 
@@ -72,7 +75,7 @@ public:
 	bool crash;
 
 public:
-
+	
 	CarSoundData (int id, SoundInterface* sound_interface);
 	void setEngineSound (Sound* engine_sound, float rpm_scale);
 	void setTurboParameters (bool turbo_on, float turbo_rpm, float turbo_lag);
