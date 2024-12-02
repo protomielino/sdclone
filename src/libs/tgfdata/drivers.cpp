@@ -104,7 +104,7 @@ void GfDrivers::reload()
     }
 
     // For each module found, load drivers information.
-    tModList *pCurModule = lstDriverModules;
+    const tModList *pCurModule = lstDriverModules;
     do
     {
         pCurModule = pCurModule->next;
