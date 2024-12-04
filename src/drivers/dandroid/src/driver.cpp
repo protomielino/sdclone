@@ -141,7 +141,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     mCarType = GfParmGetStr(handle, buffer, (char*)ROB_ATTR_CAR, "no good");
 
     // Parameters that are the same for all tracks
-    handle = NULL;
+    GfParmReleaseHandle(handle);
     sprintf(buffer, "drivers/%s/%s/_all_tracks.xml", MyBotName, mCarType.c_str());
     handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
@@ -171,6 +171,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         mDriverMsgCarIndex = (int)GfParmGetNum(handle, "private", "driver message car index", (char*)NULL, 0.0);
         mFRONTCOLL_MARGIN = GfParmGetNum(handle, "private", "frontcollmargin", (char*)NULL, 4.0);
         mSTARTCLUTCHRATE = GfParmGetNum(handle, "private", "startclutchrate", (char*)NULL, 0.01);
+        GfParmReleaseHandle(handle);
     }
 
     // Parameters that are track specific
@@ -222,11 +223,12 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     {
         // Skill levels: 0 pro, 3 semi-pro, 7 amateur, 10 rookie
         globalskill = GfParmGetNum(handle, "skill", "level", (char*)NULL, 0.0);
+        GfParmReleaseHandle(handle);
     }
 
     mSkillGlobal = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
     //load the driver skill level, range 0 - 1
-    handle = NULL;
+
     sprintf(buffer, "drivers/%s/%d/skill.xml", MyBotName, mCarIndex);
     handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     double driverskill = 0.0;
@@ -234,6 +236,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     if (handle != NULL)
     {
         driverskill = GfParmGetNum(handle, "skill", "level", (char*)NULL, 0.0);
+        GfParmReleaseHandle(handle);
     }
 
     mSkillDriver = MAX(0.95, 1.0 - 0.05 * driverskill);

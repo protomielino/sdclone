@@ -1169,6 +1169,7 @@ void TDriver::GetSkillingParameters
             }
         }
 
+        GfParmReleaseHandle(SkillHandle);
 
         // Get individual	skilling
         snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
@@ -1184,9 +1185,8 @@ void TDriver::GetSkillingParameters
 
             oDriverAggression = GfParmGetNum(SkillHandle, "skill", "aggression",	(char *)NULL, 0.0);
             LogSimplix.debug("#oDriverAggression: %g\n",	oDriverAggression);
+            GfParmReleaseHandle(SkillHandle);
         }
-
-        GfParmReleaseHandle(SkillHandle);
     }
     else
     {

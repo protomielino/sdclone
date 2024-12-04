@@ -330,6 +330,7 @@ void	Driver::InitTrack(
     if (skillHandle)
     {
         globalskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+        GfParmReleaseHandle(skillHandle);
     }
 
     globalskill = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
@@ -349,6 +350,7 @@ void	Driver::InitTrack(
         double Rand2 = (double) (getRandom() / 65536.0) / 100;
         driverskill = MAX(0.95, 1.0 - 0.05 * (driverskill - Rand2));
         LogSHADOW.info(" # Global skill = %.2f - driver skill: %.8f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
+        GfParmReleaseHandle(skillHandle);
     }
 
     //
