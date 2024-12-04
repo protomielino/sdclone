@@ -604,7 +604,7 @@ void TDriver::AdjustCarCharacteristic(PCarHandle Handle)
         sprintf(buf, "%s/%s/%d", TDriver::SECT_PRIV, PRV_CAR_CHARACTER, I+1);
         Y[I] = GfParmGetNum(Handle, buf, PRV_PERFORMANCE,	(char*)	NULL, 1.0);
     }
-    CarCharacteristic.Init(ControlPoints, X, Y, S);
+    CarCharacteristic = TCubicSpline(ControlPoints, X, Y, S);
 
     snprintf(buf, BUFLEN, "%sCharacteristic-%s.txt",
              GetLocalDir(), oDriverName.c_str());

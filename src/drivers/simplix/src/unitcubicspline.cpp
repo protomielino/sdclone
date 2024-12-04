@@ -49,9 +49,6 @@
 //--------------------------------------------------------------------------*
 TCubicSpline::TCubicSpline()
 {
-  oCount = 0;
-  oSegs	= NULL;
-  oCubics =	NULL;
 }
 //==========================================================================*
 
@@ -61,48 +58,15 @@ TCubicSpline::TCubicSpline()
 TCubicSpline::TCubicSpline
   (int Count, const	double*	X, const double* Y,	const double* S)
 {
-  oCount = Count;
-  oSegs	= new double[oCount];
-  oCubics =	new	TCubic[oCount -	1];
+  oSegs.reserve(Count);
+  oCubics.reserve(Count - 1);
 
-  for (int I = 0; I	< oCount; I++)
+  for (int I = 0; I	< Count; I++)
   {
- 	oSegs[I] = X[I];
-	if	(I + 1 < oCount)
-	oCubics[I].Set( X[I], Y[I], S[I], X[I+1], Y[I+1], S[I+1]);
+	oSegs.push_back(X[I]);
+	if	(I + 1 < Count)
+	oCubics.push_back(TCubic(X[I], Y[I], S[I], X[I+1], Y[I+1], S[I+1]));
   }
-}
-//==========================================================================*
-
-//==========================================================================*
-// Initialization
-//--------------------------------------------------------------------------*
-void TCubicSpline::Init
-  (int Count, const	double*	X, const double* Y,	const double* S)
-{
-  delete []	oSegs;
-  delete []	oCubics;
-
-  oCount = Count;
-  oSegs	= new double[oCount];
-  oCubics =	new	TCubic[oCount -	1];
-
-  for (int I = 0; I	< oCount; I++)
-  {
- 	oSegs[I] = X[I];
-	if	(I + 1 < oCount)
-	oCubics[I].Set( X[I], Y[I], S[I], X[I+1], Y[I+1], S[I+1]);
-  }
-}
-//==========================================================================*
-
-//==========================================================================*
-// Destructor
-//--------------------------------------------------------------------------*
-TCubicSpline::~TCubicSpline()
-{
-  delete []	oSegs;
-  delete []	oCubics;
 }
 //==========================================================================*
 
@@ -131,7 +95,7 @@ double TCubicSpline::CalcGradient(double X)	const
 //--------------------------------------------------------------------------*
 bool TCubicSpline::IsValidX(double X) const
 {
-  return X >= oSegs[0] && X	<= oSegs[oCount	- 1];
+  return X >= oSegs[0] && X	< oSegs.size();
 }
 //==========================================================================*
 
@@ -142,7 +106,7 @@ int	TCubicSpline::FindSeg(double X)	const
 {
   // binary	chop search	for	interval.
   int Lo = 0;
-  int Hi = oCount;
+  int Hi = oSegs.size();
 
   while	(Lo	+ 1	< Hi)
   {

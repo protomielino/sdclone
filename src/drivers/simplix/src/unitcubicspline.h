@@ -36,6 +36,7 @@
 #define	_UNITCUBICSPLINE_H_
 
 #include "unitcubic.h"
+#include <vector>
 
 //==========================================================================*
 // Deklaration der Klasse TCubicSpline
@@ -47,10 +48,6 @@ class TCubicSpline
 	TCubicSpline								  // Constructor
 	  (int	Count, const double* X,
 	  const double* Y,	const double* S);
-	~TCubicSpline();
-
-	void Init(int Count, const	double*	X,
-		const	double*	Y, const double* S);
 
 	double	CalcOffset(double X) const;			  // Get offset
 	double	CalcGradient(double	X) const;		  //	Get	gradient
@@ -61,9 +58,8 @@ class TCubicSpline
 	int	FindSeg(double	X) const;				  // Find seg to x
 
   private:
-	int	oCount;								  // Nbr of	segemnts
-	double*	oSegs;								  //	Segments
-	TCubic*	oCubics;							  // Cubics
+	std::vector<double>	oSegs;				  //	Segments
+	std::vector<TCubic>	oCubics;			  // Cubics
 };
 //==========================================================================*
 #endif // _UNITCUBICSPLINE_H_

@@ -72,57 +72,9 @@
 // Default constructor
 //--------------------------------------------------------------------------*
 TLane::TLane(TDriver &driver):
-  oPathPoints(NULL),
   oTrack(NULL),
   driver(driver)
 {
-}
-//==========================================================================*
-
-//==========================================================================*
-// Destructor
-//--------------------------------------------------------------------------*
-TLane::~TLane()
-{
-  delete []	oPathPoints;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Set operator	(Sets lane)
-//--------------------------------------------------------------------------*
-TLane& TLane::operator=	(const TLane& Lane)
-{
-  SetLane(Lane);
-  return *this;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Set lane
-//--------------------------------------------------------------------------*
-void TLane::SetLane(const TLane& Lane)
-{
-  oTrack = Lane.oTrack;
-  oFixCarParam = Lane.oFixCarParam;
-  oCarParam	= Lane.oCarParam;
-
-  const	int	Count =	oTrack->Count();
-
-  delete []	oPathPoints;
-  oPathPoints =	new	TPathPt[Count];
-
-  for (int i = 0; i < Count; ++i)
-    oPathPoints[i] = Lane.oPathPoints[i];
-  //memcpy(oPathPoints, Lane.oPathPoints,	Count *	sizeof(*oPathPoints));
-
-  for (int I = 0; I	< TA_N;	I++)
-  {
-    TA_X[I] = Lane.TA_X[I];
-    TA_Y[I] = Lane.TA_Y[I];
-    TA_S[I] = Lane.TA_S[I];
-  }
-  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);
 }
 //==========================================================================*
 
@@ -215,98 +167,41 @@ void TLane::Initialise
   const	TCarParam& CarParam,
   double MaxLeft, double MaxRight)
 {
-  delete []	oPathPoints;
+  oPathPoints.clear();
   oTrack = Track;
-  oPathPoints =	new	TPathPt[Track->Count()];
   oCarParam	= CarParam;							 // Copy car params
   oFixCarParam = FixCarParam;					 // Copy car params
-
-  // To	avoid uninitialized	alignment bytes	within the allocated memory	for
-  // linux compilers not doing this	initialization without our explizit
-  // request we	should fill	it with	zeros. Otherwise we	would get valgrind
-  // warnings writing the data to file using only one memory block per
-  // path point.
-  //memset(oPathPoints, 0, Track->Count()	* sizeof(*oPathPoints));
-  for (int i = 0; i < static_cast<int>(Track->Count()); ++i)
-    oPathPoints[i].Sec = nullptr;
+  oPathPoints.reserve(Track->Count());
 
   if (MaxLeft <	999.0)
   {
     for (int I	= 0; I < Track->Count(); I++)
     {
       const TSection& Sec = (*oTrack)[I];
-      oPathPoints[I].Sec =	&Sec;
-      oPathPoints[I].Center = Sec.Center;
-      oPathPoints[I].Crv =	0;
-      oPathPoints[I].CrvZ	= 0;
-      oPathPoints[I].Offset = 0.0;
-      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-      oPathPoints[I].MaxSpeed	= 10;
-      oPathPoints[I].Speed	= 10;
-      oPathPoints[I].AccSpd = 10;
-      oPathPoints[I].FlyHeight	= 0;
-//		 oPathPoints[I].BufL	= 0;
-//		 oPathPoints[I].BufR	= 0;
-      oPathPoints[I].NextCrv =	0.0;
-      oPathPoints[I].WToL = (float) MaxLeft;
-         oPathPoints[I].WToR = (float) Sec.WidthToRight;
-      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-      oPathPoints[I].Fix =	false;
+
+      oPathPoints.push_back(TPathPt(Sec, MaxLeft, Sec.WidthToRight));
     }
-    oPathPoints[0].WToL = oPathPoints[1].WToL;
-    oPathPoints[0].WToR = oPathPoints[1].WToR;
+    oPathPoints[0].WToL = oPathPoints.at(1).WToL;
+    oPathPoints[0].WToR = oPathPoints.at(1).WToR;
   }
   else if (MaxRight	< 999.0)
   {
     for (int I	= 0; I < Track->Count(); I++)
     {
       const TSection& Sec = (*oTrack)[I];
-      oPathPoints[I].Sec =	&Sec;
-      oPathPoints[I].Center	= Sec.Center;
-      oPathPoints[I].Crv =	0;
-      oPathPoints[I].CrvZ = 0;
-      oPathPoints[I].Offset = 0.0;
-      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-      oPathPoints[I].MaxSpeed = 10;
-      oPathPoints[I].Speed	= 10;
-      oPathPoints[I].AccSpd	= 10;
-      oPathPoints[I].FlyHeight	= 0;
-//		 oPathPoints[I].BufL = 0;
-//		 oPathPoints[I].BufR = 0;
-      oPathPoints[I].NextCrv =	0.0;
-      oPathPoints[I].WToL = (float) Sec.WidthToLeft;
-      oPathPoints[I].WToR = (float) MaxRight;
-      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-      oPathPoints[I].Fix =	false;
+
+      oPathPoints.push_back(TPathPt(Sec, Sec.WidthToLeft, MaxRight));
     }
-    oPathPoints[0].WToL = oPathPoints[1].WToL;
-    oPathPoints[0].WToR = oPathPoints[1].WToR;
+    oPathPoints[0].WToL = oPathPoints.at(1).WToL;
+    oPathPoints[0].WToR = oPathPoints.at(1).WToR;
   }
   else
   {
     for (int I	= 0; I < Track->Count(); I++)
     {
       const TSection& Sec = (*oTrack)[I];
-      oPathPoints[I].Sec =	&Sec;
-      oPathPoints[I].Center = Sec.Center;
-      oPathPoints[I].Crv =	0;
-      oPathPoints[I].CrvZ = 0;
-      oPathPoints[I].Offset = 0.0;
-      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-      oPathPoints[I].MaxSpeed	= 10;
-      oPathPoints[I].Speed	= 10;
-      oPathPoints[I].AccSpd = 10;
-      oPathPoints[I].FlyHeight	= 0;
-//		 oPathPoints[I].BufL	= 0;
-//		 oPathPoints[I].BufR	= 0;
-      oPathPoints[I].NextCrv =	0.0;
-      oPathPoints[I].WToL = (float) Sec.WidthToLeft;
-      oPathPoints[I].WToR = (float) Sec.WidthToRight;
-      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-      oPathPoints[I].Fix =	false;
+
+      oPathPoints.push_back(TPathPt(Sec, Sec.WidthToLeft, Sec.WidthToRight));
     }
     oPathPoints[0].WToL = oPathPoints[1].WToL;
     oPathPoints[0].WToR = oPathPoints[1].WToR;
@@ -351,7 +246,7 @@ void TLane::Initialise
   TA_S[0] =	0.0;
   TA_S[9] =	0.0;
 
-  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);
+  oTurnScale = TCubicSpline(TA_N,TA_X,TA_Y,TA_S);
 }
 //==========================================================================*
 
@@ -360,8 +255,14 @@ void TLane::Initialise
 //--------------------------------------------------------------------------*
 const TLane::TPathPt& TLane::PathPoints(int	Index) const
 {
-  return oPathPoints[Index];
+  return oPathPoints.at(Index);
 }
+
+const std::vector<TLane::TPathPt> &TLane::PathPoints() const
+{
+  return oPathPoints;
+}
+
 //==========================================================================*
 
 //==========================================================================*

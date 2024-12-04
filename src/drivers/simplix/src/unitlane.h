@@ -60,6 +60,7 @@
 #include "unitcarparam.h"
 #include "unitfixcarparam.h"
 #include "unitcubicspline.h"
+#include <vector>
 
 //==========================================================================*
 // Class TLane
@@ -69,10 +70,35 @@ class TLane
   public:
 	struct	TPathPt
 	{
-		// Part 1: These data	will be	stored and reused from others as well
+		TPathPt(const TSection &sec, float left, float right) :
+			DistFromStart(sec.DistFromStart),
+			ToRight(sec.ToRight),
+			Offset(0),
+			Center(sec.Center),
+			Point(CalcPt()),
+			Crv(0),
+			CrvZ(0),
+			NextCrv(0),
+			WToL(left),
+			WToR(right),
+			WPitToL(sec.PitWidthToLeft),
+			WPitToR(sec.PitWidthToRight),
+			Fix(false),
+			MaxSpeed(10),
+			AccSpd(10),
+			Speed(10),
+			FlyHeight(0)
+		{}
+
+		TPathPt(const TSection &sec) :
+			TPathPt(sec, 0, 0)
+		{}
+
+		float DistFromStart;
+		TVec3d ToRight;
+		float	Offset;							   //	Offset from	centre point
 		TVec3d Center;						   //	Lane specific center
 		TVec3d Point;							   //	Actual point (same as CalcPt())
-		float	Offset;							   //	Offset from	centre point
 		float	Crv;	 							 // Curvature in xy
 		float	CrvZ;								 // Curvature in z	direction... e.g. bumps
 		float	NextCrv;						   //	Cuvature comming next
@@ -81,23 +107,17 @@ class TLane
 		float	WPitToL;						   //	Lane specfic width to left
 		float	WPitToR;						   //	Lane specfic width to right
 		bool Fix;
-
-		// Part 2: These data	could be stored, but is	recalculated from others
-		// (So we	don't have to store	it)
 		double MaxSpeed;						   // Max speed	through	this point
 		double AccSpd;						   //	Speed through this point, with modelled	accel
 		double Speed;							   //	Speed through this point (braking only)
 		double FlyHeight;						   // Predicted height	of car above track (flying)
 
-		// Part 3: These data	may	not	be used	from others	(pointers)
-		const	TSection*	Sec;					 // Track seg that contains this	Seg
-
-		double Dist()	const {return Sec->DistFromStart;}
+		double Dist()	const {return DistFromStart;}
 		double WtoL()	const {return WToL;}
 		double WtoR()	const {return WToR;}
 		const	TVec3d&	Pt() const {return Center;}
-		const	TVec3d&	Norm() const {return Sec->ToRight;}
-		TVec3d CalcPt() const	{return	Center + Sec->ToRight *	Offset;}
+		const	TVec3d&	Norm() const {return ToRight;}
+		TVec3d CalcPt() const	{return	Center + ToRight *	Offset;}
 	};
 
   public:
@@ -106,19 +126,15 @@ class TLane
 	double	TA_Y[TA_N];							  // Y-coordinates
 	double	TA_S[TA_N];							  // Directions
 
-	TPathPt* oPathPoints;						  // Points	in this	lane
+	std::vector<TPathPt> oPathPoints;			  // Points	in this	lane
 
 	TLane(TDriver &driver);
-	virtual ~TLane();
-
-	virtual TLane&	operator= (const TLane&	Lane);
 
 	virtual bool ContainsPos
 	  (double TrackPos) const;
 	virtual bool GetLanePoint
 	  (double TrackPos, TLanePoint& LanePoint)	const;
 
-	void SetLane(const	TLane& Lane);
 	void Initialise
 	  (TTrackDescription* pTrack,
 	  const TFixCarParam& FixCarParam,
@@ -128,6 +144,7 @@ class TLane
 	void SmmothLane();
 
 	const TPathPt&	PathPoints(int Index) const;
+	const std::vector<TLane::TPathPt> &PathPoints() const;
 
 	void Dump();
 	void SmoothSpeeds();

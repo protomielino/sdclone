@@ -356,7 +356,7 @@ void TPitLane::MakePath
 	bool FirstPit = false;							// Reset flag
     TCarParam CarParam;
     CarParam = Param.oCarParam3;			            // Copy parameters
-	TLane::SetLane(*BasePath);						//	Copy Pathpoints
+	*static_cast<TLane *>(this) = *static_cast<const TLane *>(BasePath);
 	const tTrackPitInfo* PitInfo =					// Get pit infos
 			&oTrack->Track()->pits;
 
