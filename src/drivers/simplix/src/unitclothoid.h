@@ -61,6 +61,9 @@
 #include "unitlane.h"
 #include "unittrack.h"
 
+#include <string>
+#include <cjson/cJSON.h>
+
 //==========================================================================*
 // Class TClothoidLane
 //--------------------------------------------------------------------------*
@@ -119,7 +122,7 @@ class TClothoidLane : public TLane
 
     bool SaveToFile(const char* Filename);       // Save to file
     void ClearRacingline(const char* TrackLoad);
-    void SavePointsToFile(const char* TrackLoad);
+    bool SavePointsToFile(const char* TrackLoad) const;
     bool LoadPointsFromFile(const char* TrackLoad);
 
   private:
@@ -169,7 +172,11 @@ class TClothoidLane : public TLane
 	   double UglyCrvZ/*,
 	   bool Smooth*/);
 	int GetWeather() const;
-
+	int DumpFile(const char *path, std::string &out) const;
+	int ParseVec3d(const cJSON *c, const char *key, TVec3d &out) const;
+	int ReadPoint(const cJSON *p, TPathPt &out) const;
+	int StorePoint(const TPathPt &p, cJSON *array) const;
+	int WriteVec3d(cJSON *c, const char *key, const TVec3d &out) const;
 };
 //==========================================================================*
 #endif // _UNITCLOTHOID_H_

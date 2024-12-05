@@ -75,6 +75,7 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
              INTERFACE ${ROBOT_INTERFACE}
              SOURCES ${ROBOT_SOURCES})
 
-
+find_package(cJSON REQUIRED)
+target_link_libraries(${ROBOT_NAME} ${CJSON_LIBRARY})
 # For data associated to the ubiquitous robot module and its clones,
 # see data/drivers/simplix*/CMakeLists.txt

@@ -66,6 +66,14 @@
 #include "unitparam.h"
 #include "unitsysfoo.h"
 
+#include <cerrno>
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
+#include <fstream>
+#include <string>
+#include <cjson/cJSON.h>
+
 //==========================================================================*
 // Default constructor
 //--------------------------------------------------------------------------*
@@ -698,129 +706,381 @@ int TClothoidLane::GetWeather() const
 };
 //==========================================================================*
 
+int TClothoidLane::DumpFile(const char *path, std::string &out) const
+{
+  std::ifstream f(path, std::ios::binary);
+
+  if (!f.is_open())
+    return -1;
+
+  out = std::string(std::istreambuf_iterator<char>(f), {});
+  return 0;
+}
+
+int TClothoidLane::ParseVec3d(const cJSON *c, const char *key, TVec3d &out) const
+{
+  struct field
+  {
+    const char *key;
+    double &value;
+  } fields[] =
+  {
+    {"x", out.x},
+    {"y", out.y},
+    {"z", out.z}
+  };
+
+  const cJSON *ck = cJSON_GetObjectItem(c, key);
+
+  if (!ck)
+  {
+    LogSimplix.error("Failed to get key \"%s\"\n", key);
+    return -1;
+  }
+
+  for (size_t i = 0; i < sizeof fields / sizeof *fields; i++)
+  {
+    const struct field &f = fields[i];
+    const cJSON *cf = cJSON_GetObjectItem(ck, f.key);
+
+    if (!cf)
+    {
+      LogSimplix.error("Failed to get key \"%s\"\n", f.key);
+      return -1;
+    }
+    else if (!cJSON_IsNumber(cf))
+    {
+      LogSimplix.error("Key \"%s\" not a number\n", f.key);
+      return -1;
+    }
+
+    f.value = cJSON_GetNumberValue(cf);
+  }
+
+  return 0;
+}
+
+int TClothoidLane::ReadPoint(const cJSON *p, TPathPt &out) const
+{
+  struct field
+  {
+    const char *key;
+    float &value;
+  } fields[] =
+  {
+    {"Offset", out.Offset},
+    {"Crv", out.Crv},
+    {"CrvZ", out.CrvZ},
+    {"NextCrv", out.NextCrv},
+    {"WToL", out.WToL},
+    {"WToR", out.WToR},
+    {"WPitToL", out.WPitToL},
+    {"WPitToR", out.WPitToR},
+    {"MaxSpeed", out.MaxSpeed},
+    {"AccSpd", out.AccSpd},
+    {"Speed", out.Speed},
+    {"FlyHeight", out.FlyHeight}
+  };
+
+  for (size_t i = 0; i < sizeof fields / sizeof *fields; i++)
+  {
+    const field &f = fields[i];
+    const cJSON *it = cJSON_GetObjectItem(p, f.key);
+
+    if (!it)
+    {
+      LogSimplix.error("Failed to find key \"%s\"\n", f.key);
+      return -1;
+    }
+    else if (!cJSON_IsNumber(it))
+    {
+      LogSimplix.error("Key \"%s\" not a number\n", f.key);
+      return -1;
+    }
+
+    f.value = cJSON_GetNumberValue(it);
+  }
+
+  if (ParseVec3d(p, "Center", out.Center))
+  {
+    LogSimplix.error("Failed to parse \"Center\"\n");
+    return -1;
+  }
+  else if (ParseVec3d(p, "Point", out.Point))
+  {
+    LogSimplix.error("Failed to parse \"Point\"\n");
+    return -1;
+  }
+
+  const cJSON *fix = cJSON_GetObjectItem(p, "Fix");
+
+  if (!fix)
+  {
+    LogSimplix.error("Failed to find key \"Fix\"\n");
+    return -1;
+  }
+  else if (!cJSON_IsNumber(fix))
+  {
+    LogSimplix.error("Key \"Fix\" not a number\n");
+    return -1;
+  }
+
+  out.Fix = cJSON_GetNumberValue(fix);
+  return 0;
+}
+
 //==========================================================================*
 // Save path points
 //--------------------------------------------------------------------------*
 bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 {
-  FILE* F = fopen(TrackLoad, "rb");
-  size_t readSize;
-  if (F == 0)
-    return false;
+  bool ret = false;
+  cJSON *c = nullptr;
+  const cJSON *cweather, *points;
+  int weather;
+  std::string s;
+  std::vector<TPathPt> vec;
 
-  int K;
-  readSize = fread(&K,sizeof(int),1,F);
-  if( readSize < 1 )
+  if (DumpFile(TrackLoad, s))
+    goto end;
+  else if (!(c = cJSON_Parse(s.c_str())))
   {
-    fclose(F);
-    return false;
+    LogSimplix.error("Failed to parse %s\n", TrackLoad);
+    goto end;
   }
-  if (K > 0)
+  else if (!(cweather = cJSON_GetObjectItem(c, "weather")))
   {
-    fclose(F);
-    return false;
-  }
-
-  int Version;
-  readSize = fread(&Version,sizeof(int),1,F);
-  if(readSize < 1)
-  {
-    fclose(F);
-    return false;
-  }
-  if (Version < RL_VERSION)
-  {
-    fclose(F);
-    return false;
+    LogSimplix.error("%s: failed to find \"weather\"\n", TrackLoad);
+    goto end;
   }
 
-  int Weather;
-  readSize = fread(&Weather,sizeof(int),1,F);
-  if(readSize < 1)
+  weather = cJSON_GetNumberValue(cweather);
+
+  if (weather != GetWeather())
   {
-    fclose(F);
-    return false;
+    LogSimplix.error("%s: expected weather %d, got %d\n", TrackLoad,
+      GetWeather(), weather);
+    goto end;
   }
-  if (Weather != GetWeather())
+  else if (!(points = cJSON_GetObjectItem(c, "points")))
   {
-    fclose(F);
-    return false;
+    LogSimplix.error("%s: failed to find \"points\"\n", TrackLoad);
+    goto end;
+  }
+  else if (!cJSON_IsArray(points))
+  {
+    LogSimplix.error("%s: \"points\" not an array\n", TrackLoad);
+    goto end;
   }
 
-  void* Start = &(oPathPoints[0]);
-  void* End = &(oPathPoints[0].MaxSpeed);
-  int UsedLen = ((char *) End) - ((char *) Start);
+  for (int i = 0; i < cJSON_GetArraySize(points); i++)
+  {
+    const cJSON *p = cJSON_GetArrayItem(points, i);
+    TPathPt pt((*oTrack)[i]);
 
-  int N;
-  readSize = fread(&N,sizeof(int),1,F);
-  if(readSize < 1)
-  {
-    fclose(F);
-    return false;
-  }
-  for (int I = 0; I < N; I++)
-  {
-    readSize = fread(&(oPathPoints[I]),UsedLen,1,F);
-    if(readSize < 1)
+    if (ReadPoint(p, pt))
     {
-      fclose(F);
-      return false;
+      LogSimplix.error("%s: failed to read point %d\n", TrackLoad, i);
+      goto end;
     }
-    const TSection& Sec = (*oTrack)[I];
-    oPathPoints[I].Sec = &Sec;
-  }
-  fclose(F);
 
-  return true;
+    vec.push_back(pt);
+  }
+
+  oPathPoints = vec;
+  ret = true;
+
+end:
+
+  if (c)
+    cJSON_Delete(c);
+
+  return ret;
 }
 //==========================================================================*
+
+int TClothoidLane::WriteVec3d
+  (cJSON *c, const char *key, const TVec3d &out) const
+{
+  struct field
+  {
+    const char *key;
+    const double &value;
+  } fields[] =
+  {
+    {"x", out.x},
+    {"y", out.y},
+    {"z", out.z}
+  };
+
+  cJSON *o = cJSON_CreateObject();
+
+  if (!o)
+  {
+    LogSimplix.error("cJSON_CreateObject failed\n");
+    goto failure;
+  }
+
+  for (size_t i = 0; i < sizeof fields / sizeof *fields; i++)
+  {
+    const struct field &f = fields[i];
+
+    if (!cJSON_AddNumberToObject(o, f.key, f.value))
+    {
+      LogSimplix.error("Failed to set key \"%s\"\n", f.key);
+      goto failure;
+    }
+  }
+
+  if (!cJSON_AddItemToObject(c, key, o))
+  {
+    LogSimplix.error("cJSON_AddItemToObject failed\n");
+    goto failure;
+  }
+
+  return 0;
+
+failure:
+
+  if (o)
+    cJSON_Delete(o);
+
+  return -1;
+}
+
+int TClothoidLane::StorePoint(const TPathPt &p, cJSON *array) const
+{
+  struct field
+  {
+    const char *key;
+    const float &value;
+  } fields[] =
+  {
+    {"Offset", p.Offset},
+    {"Crv", p.Crv},
+    {"CrvZ", p.CrvZ},
+    {"NextCrv", p.NextCrv},
+    {"WToL", p.WToL},
+    {"WToR", p.WToR},
+    {"WPitToL", p.WPitToL},
+    {"WPitToR", p.WPitToR},
+    {"MaxSpeed", p.MaxSpeed},
+    {"AccSpd", p.AccSpd},
+    {"Speed", p.Speed},
+    {"FlyHeight", p.FlyHeight}
+  };
+
+  cJSON *it = cJSON_CreateObject();
+
+  if (!it)
+  {
+    LogSimplix.error("cJSON_CreateObject failed\n");
+    goto failure;
+  }
+
+  for (size_t i = 0; i < sizeof fields / sizeof *fields; i++)
+  {
+    const struct field &f = fields[i];
+
+    if (!cJSON_AddNumberToObject(it, f.key, f.value))
+    {
+      LogSimplix.error("Failed to store \"%s\"\n", f.key);
+      goto failure;
+    }
+  }
+
+  if (!cJSON_AddNumberToObject(it, "Fix", p.Fix))
+  {
+    LogSimplix.error("Failed to store \"Fix\"\n");
+    goto failure;
+  }
+  else if (!cJSON_AddItemToArray(array, it))
+  {
+    LogSimplix.error("Failed to add point to array\n");
+    goto failure;
+  }
+  else if (WriteVec3d(it, "Center", p.Center))
+  {
+    LogSimplix.error("Failed to add Center\n");
+    goto failure;
+  }
+  else if (WriteVec3d(it, "Point", p.Point))
+  {
+    LogSimplix.error("Failed to add Point\n");
+    goto failure;
+  }
+
+  return 0;
+
+failure:
+
+  if (it)
+    cJSON_Delete(it);
+
+  return -1;
+}
 
 //==========================================================================*
 // Save path points
 //--------------------------------------------------------------------------*
-void TClothoidLane::SavePointsToFile(const char* TrackLoad)
+bool TClothoidLane::SavePointsToFile(const char* TrackLoad) const
 {
-  FILE* F = fopen(TrackLoad, "wb");
-  bool error = false;
-  size_t writeSize;
-  if (F == 0)
-    return;
+  bool ret = false;
+  cJSON *c = nullptr, *array = nullptr;
+  char *print = nullptr;
+  std::ofstream f(TrackLoad, std::ios::binary);
 
-  int K = 0;
-  writeSize = fwrite(&K,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-  int Version = RL_VERSION;
-  writeSize = fwrite(&Version,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  int Weather = GetWeather();
-  writeSize = fwrite(&Weather,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  int N = oTrack->Count();
-  writeSize = fwrite(&N,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  LogSimplix.debug("\n\n\nsizeof(TPathPt): %zu\n\n\n",sizeof(TPathPt));
-  void* Start = &(oPathPoints[0]);
-  void* End = &(oPathPoints[0].MaxSpeed);
-  int UsedLen = ((char *) End) - ((char *) Start);
-  LogSimplix.debug("\n\n\nUsedLen (TPathPt Part 1): %d\n\n\n",UsedLen);
-  for (int I = 0; I < N; I++)
+  if (!f.is_open())
   {
-    writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
-    if( writeSize < 1)
-      error = true;
+    LogSimplix.error("Could not load %s for writing\n", TrackLoad);
+    goto end;
   }
-  if (error)
+  else if (!(c = cJSON_CreateObject()))
   {
-      LogSimplix.debug("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
+    LogSimplix.error("cJSON_CreateObject failed\n");
+    goto end;
   }
-  fclose(F);
+  else if (!cJSON_AddNumberToObject(c, "weather", GetWeather()))
+  {
+    LogSimplix.error("Failed to store \"weather\"\n");
+    goto end;
+  }
+  else if (!(array = cJSON_AddArrayToObject(c, "points")))
+  {
+    LogSimplix.error("Failed to array \"points\"\n");
+    goto end;
+  }
+
+  for (const auto &p : oPathPoints)
+    if (StorePoint(p, array))
+    {
+      LogSimplix.error("Failed to store point\n");
+      goto end;
+    }
+
+  if (!(print = cJSON_Print(c)))
+  {
+    LogSimplix.error("Failed to print JSON point data\n");
+    goto end;
+  }
+
+  f.write(print, ::strlen(print));
+
+  if (!f.good())
+  {
+    LogSimplix.error("Failed to write JSON point data\n");
+    goto end;
+  }
+
+  ret = true;
+
+end:
+
+  if (c)
+    cJSON_Delete(c);
+
+  cJSON_free(print);
+  return ret;
 }
 //==========================================================================*
 
@@ -829,35 +1089,8 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
 //--------------------------------------------------------------------------*
 void TClothoidLane::ClearRacingline(const char* TrackLoad)
 {
-  FILE* F = fopen(TrackLoad, "wb");
-  bool error = false;
-  size_t writeSize;
-  if (F == 0)
-    return;
-
-  int K = 0;
-  writeSize = fwrite(&K,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-  int Version = 0; // Mark it as old
-  writeSize = fwrite(&Version,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  int Weather = GetWeather();
-  writeSize = fwrite(&Weather,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  int N = oTrack->Count();
-  writeSize = fwrite(&N,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
-
-  if (error)
-    LogSimplix.debug("TClothoidLane::ClearRacingline(%s) : Some error occurred\n", TrackLoad);
-
-  fclose(F);
+  if (::remove(TrackLoad))
+    LogSimplix.error("Failed to remove %s: %s\n", TrackLoad, strerror(errno));
 }
 //==========================================================================*
 

@@ -107,10 +107,10 @@ class TLane
 		float	WPitToL;						   //	Lane specfic width to left
 		float	WPitToR;						   //	Lane specfic width to right
 		bool Fix;
-		double MaxSpeed;						   // Max speed	through	this point
-		double AccSpd;						   //	Speed through this point, with modelled	accel
-		double Speed;							   //	Speed through this point (braking only)
-		double FlyHeight;						   // Predicted height	of car above track (flying)
+		float MaxSpeed;						   // Max speed	through	this point
+		float AccSpd;						   //	Speed through this point, with modelled	accel
+		float Speed;							   //	Speed through this point (braking only)
+		float FlyHeight;						   // Predicted height	of car above track (flying)
 
 		double Dist()	const {return DistFromStart;}
 		double WtoL()	const {return WToL;}
