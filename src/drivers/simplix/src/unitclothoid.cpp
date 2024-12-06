@@ -690,10 +690,10 @@ bool TClothoidLane::SaveToFile(const char* Filename)
 //==========================================================================*
 // Called for every track change or new race.
 //--------------------------------------------------------------------------*
-int TClothoidLane::GetWeather()
+int TClothoidLane::GetWeather() const
 {
   const TSection& Sec = (*oTrack)[0];
-  tTrackSeg* Seg = Sec.Seg;
+  const tTrackSeg* Seg = Sec.Seg;
   return (int) (100000 * Seg->surface->kFriction);
 };
 //==========================================================================*

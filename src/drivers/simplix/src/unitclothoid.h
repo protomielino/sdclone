@@ -168,7 +168,7 @@ class TClothoidLane : public TLane
 	   double BumpMod,
 	   double UglyCrvZ/*,
 	   bool Smooth*/);
-	int GetWeather();
+	int GetWeather() const;
 
 };
 //==========================================================================*
