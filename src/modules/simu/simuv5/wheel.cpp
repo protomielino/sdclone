@@ -997,6 +997,15 @@ void SimWheelUpdateTire(tCar *car, int index)
 		drainCooling = 0;
 	}
 
+    if (normalForce > wheel->opLoad)
+    {
+        normalForce -= (wheel->pressure / 5894.6) * fabs(wheel->camber * M_PI * 360.0);
+    }
+    else
+    {
+        normalForce += (wheel->pressure / 3894.6) * fabs(wheel->camber * M_PI * 360.0);
+    }
+
 	// Normalize slip. Not realistic, but prevents extreme spiking when high wheelspin occurs
 	// when trying to recover from bumpy surfaces such as gravel traps.
 	if (slip >= 1)
@@ -1154,12 +1163,13 @@ void SimWheelUpdateTire(tCar *car, int index)
 	// Simulate tire punctures. Drop the grip to a low % 
 	// because metal-on-ground (ie. rim on road) contact 
 	// still generates some traction, just not a lot.
-	if (wheel->currentWear >= 1.0 || (wheel->Ttire >= 473.15))
+	if (wheel->currentWear >= 1.0 || (wheel->Ttire >= 473.14))
 	{
 		if (isPunctured == false)
 		{
 			wheel->relPos.z += (wheel->radius)*(-0.25);
 		}
+        wheel->currentWear = 1.0;
 		wheel->currentGripFactor = 0.25;
 		wheel->currentPressure = 0.0;
 		isPunctured = true;
