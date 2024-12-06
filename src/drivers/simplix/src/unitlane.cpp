@@ -71,9 +71,9 @@
 //==========================================================================*
 // Default constructor
 //--------------------------------------------------------------------------*
-TLane::TLane(TDriver &driver):
+TLane::TLane(const TDriver &driver):
   oTrack(NULL),
-  driver(driver)
+  UseBrakeLimit(driver.UseBrakeLimit)
 {
 }
 //==========================================================================*
@@ -351,7 +351,7 @@ void TLane::CalcMaxSpeeds
          TrackRollAngle,
          TrackTiltAngle);
 
-    if	(driver.UseBrakeLimit)
+    if	(UseBrakeLimit)
     {
 
       //double	TrackTurnangle1	= CalcTrackTurnangle(P,	(P + 30) % N);

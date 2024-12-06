@@ -128,7 +128,7 @@ class TLane
 
 	std::vector<TPathPt> oPathPoints;			  // Points	in this	lane
 
-	TLane(TDriver &driver);
+	TLane(const TDriver &driver);
 
 	virtual bool ContainsPos
 	  (double TrackPos) const;
@@ -188,7 +188,7 @@ class TLane
 	TFixCarParam oFixCarParam;					  // Copy of car params
 	TCarParam oCarParam;						  //	Copy of	car	params
 	TCubicSpline oTurnScale;					  // Scale of	turns
-	TDriver &driver;
+	bool UseBrakeLimit;
 };
 //==========================================================================*
 #endif // _UNITLANE_H_
