@@ -117,10 +117,10 @@ bool TSimpleStrategy::IsPitFree()
     bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
     if	(IsFree)
         LogSimplix.debug("#%s	pit	is free	(%d)\n",
-                         oDriver->GetDriverName(),oDriver->TeamIndex());
+                         oDriver->GetDriverName().c_str(),oDriver->TeamIndex());
     else
         LogSimplix.debug("#%s	pit	is locked (%d)\n",
-                         oDriver->GetDriverName(),oDriver->TeamIndex());
+                         oDriver->GetDriverName().c_str(),oDriver->TeamIndex());
     return	IsFree;
 }
 //==========================================================================*
@@ -150,7 +150,7 @@ bool TSimpleStrategy::NeedPitStop()
         if	(MIN(TdF,TdR) <	1.5	* oDegradationPerLap) // tyres become critical
         {
             LogSimplix.warning("Tyre condition D:	%.1f%% F: %.1f%% R:	%.1f%% (%s)\n",
-                               oDegradationPerLap,TdF,TdR,oDriver->GetDriverName());
+                               oDegradationPerLap,TdF,TdR,oDriver->GetDriverName().c_str());
 
             if ((TdF	< 1.1 *	oDegradationPerLap)
                     || (TdR <	1.1	* oDegradationPerLap))
@@ -537,7 +537,7 @@ void TSimpleStrategy::CheckPitState(float /*PitScaleBrake*/)
                     && ((Major >	NEEDED_MAJOR_VERSION)
                         ||	((Major	= NEEDED_MAJOR_VERSION)	&& (Minor >= NEEDED_MINOR_VERSION))))
             {
-                LogSimplix.debug("#Pitting issues %s\n",oDriver->GetDriverName());
+                LogSimplix.debug("#Pitting issues %s\n",oDriver->GetDriverName().c_str());
                 LogSimplix.debug("#StillToGo	: %.2f m\n",TeamDriver->StillToGo);
                 LogSimplix.debug("#MoreOffset: %.2f m\n",TeamDriver->MoreOffset);
                 LogSimplix.debug("#TooFastBy	: %.2f m/s\n",TeamDriver->TooFastBy);
