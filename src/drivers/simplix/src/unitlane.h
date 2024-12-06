@@ -172,7 +172,6 @@ class TLane
 	TCarParam oCarParam;						  //	Copy of	car	params
 	TCubicSpline oTurnScale;					  // Scale of	turns
 	TDriver &driver;
-	int Dummy;
 };
 //==========================================================================*
 #endif // _UNITLANE_H_
