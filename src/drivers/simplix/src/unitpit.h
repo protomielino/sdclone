@@ -84,7 +84,7 @@ class TPitLane : public	TClothoidLane
 	TPitLane(TDriver &driver);
 	void Init(PtCarElt	Car);					  // Initialize oCar
 	void MakePath								  // Build pitlane
-	  (char* Filename,
+	  (const char* Filename,
 	  TAbstractStrategy* Strategy,
 	  TClothoidLane* BasePath,
 	  const TParam& Param,

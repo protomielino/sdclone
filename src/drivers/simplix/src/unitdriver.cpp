@@ -104,16 +104,6 @@ static const char *WingSect[2] =
 // R: Avoid	to right
 //--------------------------------------------------------------------------*
 #define	BUFLEN 256
-static char	PathToWriteToBuffer[BUFLEN];		 // for path we write	to
-static char	PathFilenameBuffer[BUFLEN];			 // for path and filename
-static char	TrackNameBuffer[BUFLEN];			 // for track name
-static char	TrackLoadQualifyBuffer[BUFLEN];		 // for track filename	Q
-static char	TrackLoadBuffer[BUFLEN];			 // for track filename F
-static char	TrackLoadLeftBuffer[BUFLEN];		 // for track	filename L
-static char	TrackLoadRightBuffer[BUFLEN];		 // for track filename R
-static char	PitLoadBuffer[BUFLEN];				 // for pit track	filename F
-static char	PitLoadLeftBuffer[BUFLEN];			 // for pit track filename	L
-static char	PitLoadRightBuffer[BUFLEN];			 // for pit track	filename R
 //==========================================================================*
 
 //==========================================================================*
@@ -123,6 +113,8 @@ static char	PitLoadRightBuffer[BUFLEN];			 // for pit track	filename R
 #define	RANDOM_A	1664525
 #define	RANDOM_C	1013904223
 //==========================================================================*
+
+#define LINESEXT ".json"
 
 //==========================================================================*
 // Skilling: Initialize	Randomness
@@ -1173,7 +1165,7 @@ void TDriver::AdjustSkilling(PCarHandle	Handle)
 // Get skilling	parameters
 //--------------------------------------------------------------------------*
 void TDriver::GetSkillingParameters
-(const char* BaseParamPath,	const char*	PathFilename)
+()
 {
     //	Global skilling	from Andrew	Sumner ...
     //	Check if skilling is enabled
@@ -1182,11 +1174,12 @@ void TDriver::GetSkillingParameters
     //	Do not skill if	optimisation is	working
     if	(!oGeneticOpti)
     {
-        snprintf(PathFilenameBuffer, BUFLEN,			 // In	default.xml
-                 "%s/default.xml", BaseParamPath);			  // of the robot
-        LogSimplix.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
+        std::string path = TDriver::ROBOT_DIR;
+
+        path += "/default" PARAMEXT;
+
         void*	SkillHandle	= GfParmReadFile
-                (PathFilename, GFPARM_RMODE_REREAD);
+                (path.c_str(), GFPARM_RMODE_REREAD);
         if (SkillHandle)
         {
             SkillEnabled	= (int)	MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
@@ -1195,9 +1188,8 @@ void TDriver::GetSkillingParameters
             oTeamEnabled	=
                     GfParmGetNum(SkillHandle,"team","enable",0,(float)	oTeamEnabled) != 0;
             LogSimplix.debug("#oTeamEnabled %d\n",oTeamEnabled);
+            GfParmReleaseHandle(SkillHandle);
         }
-
-        GfParmReleaseHandle(SkillHandle);
     }
 
     if	(SkillEnabled >	0)							//	If skilling	is enabled
@@ -1207,11 +1199,8 @@ void TDriver::GetSkillingParameters
 
         void*	SkillHandle	= NULL;
 
-        snprintf(PathFilenameBuffer, BUFLEN,
-                 "%sconfig/raceman/extra/skill.xml",GetLocalDir());
-        LogSimplix.debug("#skill.xml:	%s\n", PathFilename);
         SkillHandle =	GfParmReadFile
-                (PathFilename, GFPARM_RMODE_REREAD);
+                ("config/raceman/extra/skill" PARAMEXT, GFPARM_RMODE_REREAD);
 
         if (SkillHandle)
         {
@@ -1219,13 +1208,12 @@ void TDriver::GetSkillingParameters
                                                          "skill",	"level", (char *) NULL,	10.0)));
             oSkillGlobal	= MAX(0.7, 1.0 - 0.5 * oSkillGlobal	/ 10.0);
             LogSimplix.debug("#LocalDir:	SkillGlobal: %g\n",	oSkillGlobal);
+            GfParmReleaseHandle(SkillHandle);
         }
         else
         {
-            snprintf(PathFilenameBuffer,	BUFLEN,
-                     "%sconfig/raceman/extra/skill.xml",GetDataDir());
-            LogSimplix.debug("#skill.xml: %s\n",	PathFilename);
-            SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+            SkillHandle = GfParmReadFile("config/raceman/extra/skill" PARAMEXT,
+                GFPARM_RMODE_REREAD);
 
             if (SkillHandle)
             {
@@ -1233,16 +1221,16 @@ void TDriver::GetSkillingParameters
                                                              "skill", "level", (char	*) NULL, 10.0)));
                 oSkillGlobal = MAX(0.7,	1.0	- 0.5 *	oSkillGlobal / 10.0);
                 LogSimplix.debug("#DataDir:	SkillGlobal: %g\n",	oSkillGlobal);
+                GfParmReleaseHandle(SkillHandle);
             }
         }
 
-        GfParmReleaseHandle(SkillHandle);
+        std::string path = TDriver::ROBOT_DIR;
+
+        path += "/" + std::to_string(oIndex) + "/skill" PARAMEXT;
 
         // Get individual	skilling
-        snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
-                 BaseParamPath,oIndex);
-        LogSimplix.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
-        SkillHandle =	GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        SkillHandle =	GfParmReadFileLocal(path.c_str(), GFPARM_RMODE_REREAD);
 
         if (SkillHandle)
         {
@@ -1269,44 +1257,41 @@ void TDriver::GetSkillingParameters
 //--------------------------------------------------------------------------*
 void TDriver::SetPathAndFilenameForRacinglines()
 {
-    const char* PathToWriteTo = GetLocalDir();
+    dstDir = GetLocalDir();
+    dstDir += "drivers/simplix_common/racinglines/";
+    dstDir += MyBotName;
+    dstDir += "/" + oCarType;
+    oPathToWriteTo	= dstDir.c_str();
 
-    snprintf(PathToWriteToBuffer, sizeof(TrackLoadBuffer),
-             "%sdrivers/simplix_common/racinglines/%s/%s",
-             PathToWriteTo, MyBotName, oCarType.c_str());
-    oPathToWriteTo	= PathToWriteToBuffer;
     if	(GfDirCreate(oPathToWriteTo) ==	GF_DIR_CREATION_FAILED)
     {
-        LogSimplix.debug("#Unable	to create path for racinglines:	>%s<",oPathToWriteTo);
-    };
+        LogSimplix.debug("#Unable to create path for racinglines: >%s<", oPathToWriteTo);
+        return;
+    }
 
-    snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%d-%s.trk",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oTrackLoad	= TrackLoadBuffer;					// Set pointer to buffer
+    std::string prefix = dstDir + "/" + std::to_string(oWeatherCode) + "-"
+        + oTrackName + "-";
 
-    snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),
-             "%s/%d-%s.trq",oPathToWriteTo,oWeatherCode,oTrackName);
-    oTrackLoadQualify = TrackLoadQualifyBuffer;	//	Set	pointer	to buffer
+    trackLoad = prefix + "trk" LINESEXT;
+    oTrackLoad = trackLoad.c_str();
 
-    snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/%d-%s.trl",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oTrackLoadLeft	= TrackLoadLeftBuffer;			//	Set	pointer	to buffer
+    trackLoadQualify = prefix + "trq" LINESEXT;
+    oTrackLoadQualify = trackLoadQualify.c_str();
 
-    snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/%d-%s.trr",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oTrackLoadRight = TrackLoadRightBuffer;		// Set pointer to	buffer
+    trackLoadLeft = prefix + "trl" LINESEXT;
+    oTrackLoadLeft = trackLoadLeft.c_str();
 
-    snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/%d-%s.tpk",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oPitLoad[0] = PitLoadBuffer;					// Set pointer to	buffer
+    trackLoadRight = prefix + "trr" LINESEXT;
+    oTrackLoadRight = trackLoadRight.c_str();
 
-    snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/%d-%s.tpl",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oPitLoad[1] = PitLoadLeftBuffer;				//	Set	pointer	to buffer
+    pitLoad[0] = prefix + "tpk" LINESEXT;
+    oPitLoad[0] = pitLoad[0].c_str();
 
-    snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/%d-%s.tpr",
-             oPathToWriteTo,oWeatherCode,oTrackName);
-    oPitLoad[2] = PitLoadRightBuffer;				// Set pointer to	buffer
+    pitLoad[1] = prefix + "tpl" LINESEXT;
+    oPitLoad[1] = pitLoad[1].c_str();
+
+    pitLoad[2] = prefix + "tpr" LINESEXT;
+    oPitLoad[2] = pitLoad[2].c_str();
 };
 //==========================================================================*
 
@@ -1335,31 +1320,36 @@ void TDriver::InitTrack
 
     //	Initialize the base	param path
     const char* BaseParamPath = TDriver::ROBOT_DIR;
-    const char* PathFilename =	PathFilenameBuffer;
 
     oWeatherCode =	GetWeather();
 
-    //	Get	the	name of	the	track
-    strncpy(TrackNameBuffer,						// Copy name	of track file
-            strrchr(oTrack->filename, '/') +	1,			//	from path and filename
-            BUFLEN -	1);					   // regarding	length of buf.
-    TrackNameBuffer[BUFLEN	- 1] = '\0';
-    *strrchr(TrackNameBuffer, '.')	= '\0';			// Truncate at point
-    oTrackName	= TrackNameBuffer;					// Set pointer to buffer
-    if	(strcmp(oTrackName,"monandgo") == 0)		// The force will	be with
-    {												// you even at monandgo!
-        oCloseYourEyes = true;
-        Param.Pit.oLatOffset = 0.5;
-        Param.Pit.oLongOffset	= 0.0;
-        Param.Pit.oLaneEntryOffset = 4.0;
-        Param.Pit.oLaneExitOffset	= 7.0;
-    }
+    const char *name = strrchr(oTrack->filename, '/'),
+        *dot = strrchr(oTrack->filename, '.');
+
+    if (!name++)
+        LogSimplix.error("Could not determine track name: %s", oTrack->filename);
+    else if (!dot)
+        LogSimplix.error("Could not find '.' in track name: %s", oTrack->filename);
     else
     {
-        Param.Pit.oLatOffset = 0.0;
-        Param.Pit.oLongOffset	= 0.0;
-        Param.Pit.oLaneEntryOffset = 3.0;
-        Param.Pit.oLaneExitOffset	= 5.0;
+        trackName = std::string(name, dot - name);
+        oTrackName = trackName.c_str();
+
+        if	(strcmp(oTrackName,"monandgo") == 0)		// The force will	be with
+        {												// you even at monandgo!
+            oCloseYourEyes = true;
+            Param.Pit.oLatOffset = 0.5;
+            Param.Pit.oLongOffset	= 0.0;
+            Param.Pit.oLaneEntryOffset = 4.0;
+            Param.Pit.oLaneExitOffset	= 7.0;
+        }
+        else
+        {
+            Param.Pit.oLatOffset = 0.0;
+            Param.Pit.oLongOffset	= 0.0;
+            Param.Pit.oLaneEntryOffset = 3.0;
+            Param.Pit.oLaneExitOffset	= 5.0;
+        }
     }
 
     //	Read/merge car parms
@@ -1513,7 +1503,7 @@ void TDriver::InitTrack
     oGeneticOpti =
             GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) >	0;
 
-    GetSkillingParameters(BaseParamPath,PathFilename);
+    GetSkillingParameters();
 
     char tempbuf [1024];
     sprintf(tempbuf,"%s/DEBUG1.xml",GetLocalDir());

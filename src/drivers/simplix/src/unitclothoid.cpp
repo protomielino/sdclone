@@ -179,7 +179,7 @@ void TClothoidLane::MakeSmoothPath(
 // Load a smooth lane
 //--------------------------------------------------------------------------*
 bool TClothoidLane::LoadSmoothPath(
-  char* TrackLoad,
+  const char* TrackLoad,
   TTrackDescription* Track,
   TParam& Param,
   const TOptions& Opts)

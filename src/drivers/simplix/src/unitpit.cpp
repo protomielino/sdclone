@@ -333,7 +333,7 @@ void TPitLane::SmoothPitPath
 // Make	Path with pitlane
 //--------------------------------------------------------------------------*
 void TPitLane::MakePath
-(char* Filename,
+(const char* Filename,
  TAbstractStrategy*	Strategy,
  TClothoidLane*	BasePath,
  const TParam& Param, int Index)

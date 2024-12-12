@@ -110,7 +110,7 @@ class TClothoidLane : public TLane
 	   const TOptions& Opts);
 
 	bool LoadSmoothPath
-	  (char* TrackLoad,
+	  (const char* TrackLoad,
 	   TTrackDescription* pTrack,
 	   TParam& Param,
 	   const TOptions& Opts);

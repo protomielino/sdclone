@@ -336,13 +336,15 @@ private:
     double	oTclAccelLast;						  // Historie
     double	oTclAccelFactor;					  // TCL acceleration scaling
 */
-    char*   oTrackName;							  // Name of track	to drive on
-    char*   oTrackLoad;							  // Name of track	to drive on
-    char*   oTrackLoadQualify;					  // Name	of track to	drive on
-    char*   oTrackLoadLeft;						  // Name of track to drive	on
-    char*   oTrackLoadRight;						  // Name of track	to drive on
-    char*   oPitLoad[3];							  // Name	of track to	drive on
-    char*   oPathToWriteTo;						  // Path we can write to
+    const char*   oTrackName;							  // Name of track	to drive on
+    const char*   oTrackLoad;							  // Name of track	to drive on
+    const char*   oTrackLoadQualify;					  // Name	of track to	drive on
+    const char*   oTrackLoadLeft;						  // Name of track to drive	on
+    const char*   oTrackLoadRight;						  // Name of track	to drive on
+    const char*   oPitLoad[3];							  // Name	of track to	drive on
+    const char*   oPathToWriteTo;						  // Path we can write to
+    std::string trackName, trackLoad, trackLoadQualify,
+      trackLoadLeft, trackLoadRight, pitLoad[3], dstDir;
     PTrack	oTrack;								  //	TORCS data fpr track
     double	oTolerance;							  // Tolerable offset	difference
     TLanePoint	oLanePoint;						  // Information to Point
@@ -482,7 +484,7 @@ private:
     void AdjustDriving(PCarHandle Handle, double ScaleBrake, double ScaleMu);
     void AdjustPitting(PCarHandle Handle);
     void AdjustSkilling(PCarHandle	Handle);
-    void GetSkillingParameters(const char*	BaseParamPath, const char* PathFilename);
+    void GetSkillingParameters();
     void SetPathAndFilenameForRacinglines();
     void Meteorology();
     int GetWeather();
