@@ -124,14 +124,6 @@ void GfDrivers::reload()
 
         if (!hparmRobot)
         {
-            // Do not waste log with drivers that do not exists or do not have to exist!
-            if (strModName.compare(0, 8, "dandroid") == 0)
-                continue;
-            else if (strModName.compare(0, 3, "usr") == 0)
-                continue;
-            else if (strModName.compare(0, 6, "replay") == 0)
-                continue;
-
             GfLogError("No usable '%s' driver (%s.xml not found or not readable)\n",
                        strModName.c_str(), strModName.c_str());
             continue;
