@@ -2,7 +2,8 @@
                   driverselect.cpp -- drivers interactive selection
                              -------------------
     created              : Mon Aug 16 20:40:44 CEST 1999
-    copyright            : (C) 1999 by Eric Espie, 2009 Jean-Philippe Meuret
+    copyright            : (C) 1999 by Eric Espie, 2009 Jean-Philippe Meuret,
+						   2024 Xavier Del Campo Romero
     email                : torcs@free.fr
 
 ***************************************************************************/
@@ -24,6 +25,8 @@
 
 
 #include <algorithm>
+#include <cerrno>
+#include <cstdlib>
 
 #include <tgfclient.h>
 #include <track.h>
@@ -51,6 +54,7 @@ static tRmDriverSelect* MenuData;
 
 // GUI control Ids.
 static int		CompetitorsScrollListId, CandidatesScrollListId;
+static int		CandidateCarId;
 static int		SelectButtonId, DeselectButtonId;
 static int		RemoveAllButtonId, SelectRandomButtonId, ShuffleButtonId;
 static int		MoveUpButtonId, MoveDownButtonId;
@@ -65,8 +69,11 @@ static int		FocusedDriverLabelId;
 static int		CurrentDriverTypeLabelId;
 static int		CurrentDriverCarLabelId;
 static int		CurrentDriverCarCategoryLabelId;
+static int		NumberofDriversToGenId;
 
 static int      NextButtonId;
+static int      GenerateButtonId;
+static int      DeleteButtonId;
 static int      ChangeCarButtonId;
 
 // The car selection menu.
@@ -83,6 +90,11 @@ static const char* AnyDriverType = "--- All driver types ---";
 static std::vector<std::string> VecDriverTypes;
 static size_t CurDriverTypeIndex = 0;
 
+// Car models
+static const char* AnyCarModel = "--- All car models ---";
+static std::vector<std::string> VecCarModels;
+static size_t CurCarModelIdx = 0;
+
 // Skin names, targets and associated preview files for the currently selected driver.
 static std::vector<GfDriverSkin> VecCurDriverPossSkins;
 static size_t CurSkinIndex = 0;
@@ -93,7 +105,8 @@ GfDriver* PCurrentDriver;
 
 // Local functions.
 static void rmdsFilterCandidatesScrollList(const std::string& strCarCatId,
-										   const std::string& strType);
+										   const std::string& strType,
+										   const std::string& strCarModel);
 static void rmdsClickOnDriver(void * /* dummy */);
 
 
@@ -167,11 +180,83 @@ rmdsReloadCompetitorsScrollList()
 			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
+static bool
+rmdsCanGenerateDriverType()
+{
+	const std::string &driver = VecDriverTypes[CurDriverTypeIndex];
+	static const char *exc[] =
+	{
+		"human", "networkhuman", AnyDriverType
+	};
+
+	for (size_t i = 0; i < sizeof exc / sizeof *exc; i++)
+		if (driver == exc[i])
+			return false;
+
+	return true;
+}
+
+static void
+rmdsUpdateGenerate()
+{
+	bool driver_enable = rmdsCanGenerateDriverType(),
+		car_enable = VecCarCategoryNames[CurCarCategoryIndex] != AnyCarCategory;
+	int enable = driver_enable && car_enable ? GFUI_ENABLE : GFUI_DISABLE;
+
+	GfuiEnable(ScrHandle, GenerateButtonId, enable);
+}
+
+static void
+rmdsRefreshCarModels()
+{
+	const std::string &sel = VecCarCategoryIds[CurCarCategoryIndex],
+		&catId = sel == AnyCarCategory ? "" : sel;
+	std::vector<GfCar *> cars = GfCars::self()->getCarsInCategory(catId);
+
+	VecCarModels.clear();
+	VecCarModels.push_back(AnyCarModel);
+	GfuiComboboxClear(ScrHandle, CandidateCarId);
+	GfuiComboboxAddText(ScrHandle, CandidateCarId, AnyCarModel);
+
+	for (const GfCar *c : cars) {
+		VecCarModels.push_back(c->getId());
+		GfuiComboboxAddText(ScrHandle, CandidateCarId, c->getName().c_str());
+	}
+
+	GfuiComboboxSetSelectedIndex(ScrHandle, CandidateCarId, CurCarModelIdx);
+}
+
 // Screen activation call-back.
 static void
 rmdsActivate(void * /* not used */)
 {
 	GfLogTrace("Entering Driver Select menu\n");
+
+	// Fill-in the competitors scroll-list.
+	rmdsReloadCompetitorsScrollList();
+
+	// Initialize the currently highlighted competitor (and scroll the list if needed to show him)
+	// (the 1st human driver, or else of the 1st driver).
+	PCurrentDriver = 0;
+	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
+	std::vector<GfDriver*>::iterator itComp;
+	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); ++itComp)
+	{
+		if ((*itComp)->isHuman())
+		{
+			PCurrentDriver = *itComp;
+			break;
+		}
+	}
+	if (!PCurrentDriver && !vecCompetitors.empty())
+	{
+		itComp = vecCompetitors.begin();
+		PCurrentDriver = *itComp;
+	}
+
+	if (PCurrentDriver)
+		GfuiScrollListShowElement(ScrHandle, CompetitorsScrollListId,
+								  itComp - vecCompetitors.begin());
 
 	// Update GUI : current driver info, car preview.
 	rmdsHighlightDriver(PCurrentDriver);
@@ -198,11 +283,26 @@ rmdsActivate(void * /* not used */)
 	else
 		CurCarCategoryIndex = itCarCat - VecCarCategoryIds.begin();
 
+	// Initialize the car model filter criteria :
+	// use the one of the current driver if any, or else "any category" if possible,
+	// or else the first available model.
+	const std::string strCarModelId =
+		PCurrentDriver ? PCurrentDriver->getCar()->getName() : AnyCarModel;
+	const std::vector<std::string>::const_iterator itCarModel =
+		std::find(VecCarModels.begin(), VecCarModels.end(), strCarModelId);
+	if (itCarModel == VecCarModels.end())
+		CurCarModelIdx = 0;
+	else
+		CurCarModelIdx = itCarModel - VecCarModels.begin();
+
 	// Update GUI (candidate list, filter criteria).
+	rmdsRefreshCarModels();
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
     rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
-								   VecDriverTypes[CurDriverTypeIndex]);
+								   VecDriverTypes[CurDriverTypeIndex],
+								   VecCarModels[CurCarModelIdx]);
+	rmdsUpdateGenerate();
 }
 
 static void
@@ -234,10 +334,15 @@ rmdsChangeCarCategory(int dir)
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
 
     rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
-								   VecDriverTypes[CurDriverTypeIndex]);
+								   VecDriverTypes[CurDriverTypeIndex],
+								   VecCarModels[CurCarModelIdx]);
 
 	if (rmdsIsAnyCompetitorHighlighted())
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
+
+	rmdsUpdateGenerate();
+	CurCarModelIdx = 0;
+	rmdsRefreshCarModels();
 }
 
 static void
@@ -261,10 +366,15 @@ rmdsChangeDriverType(int dir)
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
 
     rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
-								   VecDriverTypes[CurDriverTypeIndex]);
+								   VecDriverTypes[CurDriverTypeIndex],
+								   VecCarModels[CurCarModelIdx]);
 
 	if (rmdsIsAnyCompetitorHighlighted())
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
+
+	rmdsUpdateGenerate();
+	CurCarModelIdx = 0;
+	rmdsRefreshCarModels();
 }
 
 static void
@@ -409,17 +519,21 @@ rmdsClickOnDriver(void * /* dummy */)
 		// A driver from the Competitors scroll-list.
 		GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, DeselectButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, DeleteButtonId, GFUI_DISABLE);
 		if (!MenuData->pRace->getManager()->hasSubFiles()) // Career disables car choice
 			GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
 		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
 	}
     else if (GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver))
 	{
+		int enable = pDriver->isHuman() ? GFUI_DISABLE : GFUI_ENABLE;
+
 		// A driver from the Candidates scroll-list.
 		GfuiEnable(ScrHandle, SelectButtonId,
 				   MenuData->pRace->acceptsMoreCompetitors() ? GFUI_ENABLE : GFUI_DISABLE);
 		GfuiEnable(ScrHandle, DeselectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, DeleteButtonId, enable);
 		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
 	}
     else
@@ -428,6 +542,7 @@ rmdsClickOnDriver(void * /* dummy */)
 		GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, DeselectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, DeleteButtonId, GFUI_DISABLE);
 		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_INVISIBLE);
 		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 	}
@@ -692,6 +807,21 @@ rmdsShuffleCompetitors(void * /* dummy */ )
 }
 
 static void
+rmdsChangeCarModel(tComboBoxInfo *info)
+{
+	CurCarModelIdx = info->nPos;
+
+	const std::string &catId = VecCarCategoryIds[CurCarCategoryIndex],
+		&driver = VecDriverTypes[CurDriverTypeIndex],
+		&model = VecCarModels[CurCarModelIdx];
+
+	rmdsFilterCandidatesScrollList(catId, driver, model);
+	// Re-highlight the previously highlighted driver if any
+	// (in case it was in the competitors list).
+	rmdsHighlightDriver(PCurrentDriver);
+}
+
+static void
 rmdsAddKeys(void)
 {
     // Add standard keyboard shortcuts.
@@ -705,6 +835,120 @@ rmdsAddKeys(void)
 #ifdef FOCUS
     GfuiAddKey(ScrHandle, 'f', "Set Focus", NULL, rmdsSetFocus, NULL);
 #endif
+}
+
+static void
+rmdsRefreshLists()
+{
+	// rmdsActivate() would reassign the indexes.
+	size_t drv_i = CurDriverTypeIndex, cat_i = CurCarCategoryIndex,
+		model_i = CurCarModelIdx;
+
+	GfuiScrollListClear(ScrHandle, CandidatesScrollListId);
+	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
+	MenuData->pRace->removeAllCompetitors();
+	rmdsRemoveAllCompetitors(nullptr);
+	MenuData->pRace->load(MenuData->pRace->getManager(), true);
+	rmdsActivate(nullptr);
+	CurDriverTypeIndex = drv_i;
+	CurCarCategoryIndex = cat_i;
+	CurCarModelIdx = model_i;
+
+	const std::string &category = VecCarCategoryNames[CurCarCategoryIndex],
+		&catId = VecCarCategoryIds[CurCarCategoryIndex],
+		&driver = VecDriverTypes[CurDriverTypeIndex],
+		&model = VecCarModels[CurCarModelIdx];
+
+	GfuiLabelSetText(ScrHandle, DriverTypeEditId, driver.c_str());
+	GfuiLabelSetText(ScrHandle, CarCategoryEditId, category.c_str());
+	rmdsRefreshCarModels();
+    rmdsFilterCandidatesScrollList(catId, driver, model);
+	rmdsReloadCompetitorsScrollList();
+	rmdsUpdateGenerate();
+}
+
+static void
+rmdsGenerate(void *)
+{
+	const std::string &catId = VecCarCategoryIds[CurCarCategoryIndex],
+		&driver = VecDriverTypes[CurDriverTypeIndex],
+		&model = VecCarModels[CurCarModelIdx],
+		&selcar = model == AnyCarModel ? "" : model;
+	GfDrivers *drivers = GfDrivers::self();
+
+	MenuData->pRace->store();
+
+	const char *numstr = GfuiComboboxGetText(ScrHandle, NumberofDriversToGenId);
+
+	if (!numstr)
+	{
+		GfLogError("Failed to extract number of drivers to generate\n");
+		return;
+	}
+
+	unsigned long num;
+	char *end;
+
+	errno = 0;
+	num = ::strtoul(numstr, &end, 10);
+
+	if (errno || *end)
+	{
+		GfLogError("Invalid number of drivers to generate: %s\n", numstr);
+		return;
+	}
+
+	for (unsigned long i = 0; i < num; i++)
+		if (drivers->gen(driver, catId, selcar))
+		{
+			GfLogError("Failed to generate driver %lu with driver type "
+				"\"%s\" and category \"%s\"\n", i, driver.c_str(),
+				catId.c_str());
+			return;
+		}
+
+	if (drivers->reload())
+	{
+		GfLogError("Failed to reload drivers\n");
+		return;
+	}
+
+	rmdsRefreshLists();
+}
+
+static void
+rmdsDelete(void *)
+{
+	void *dv;
+
+	if (!GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, &dv))
+		return;
+
+	const GfDriver *d = static_cast<GfDriver *>(dv);
+	const std::string &name = d->getName();
+	GfDrivers *drivers = GfDrivers::self();
+
+	MenuData->pRace->store();
+
+	if (drivers->del(d->getModuleName(), name))
+		GfLogError("Failed to delete driver: %s\n", name.c_str());
+	else if (drivers->reload())
+		GfLogError("Failed to reload drivers\n");
+
+	rmdsRefreshLists();
+}
+
+static void
+rmdsSetupNumDriverGen(int id)
+{
+	GfuiComboboxClear(ScrHandle, id);
+
+	for (int i = 1; i <= 10; i++) {
+		char s[sizeof "00"];
+
+		snprintf(s, sizeof s, "%d", i);
+		GfuiComboboxAddText(ScrHandle, id, s);
+	}
 }
 
 /** Interactive Drivers list selection
@@ -760,6 +1004,14 @@ RmDriversSelect(void *vs)
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
     ShuffleButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
+
+	CandidateCarId =
+		GfuiMenuCreateComboboxControl(ScrHandle, menuDescHdle, "cartypecb", 0, rmdsChangeCarModel);
+
+	NumberofDriversToGenId =
+		GfuiMenuCreateComboboxControl(ScrHandle, menuDescHdle, "numdrivergen", 0, NULL);
+
+	rmdsSetupNumDriverGen(NumberofDriversToGenId);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
     SkinLeftButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", NULL, rmdsChangeSkinLeft);
@@ -834,6 +1086,10 @@ RmDriversSelect(void *vs)
     // Next, Back and Change Car buttons
     NextButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "nextmenubutton", NULL, rmdsNextMenu);
+	GenerateButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "generatebutton", NULL, rmdsGenerate);
+	DeleteButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "deletebutton", NULL, rmdsDelete);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "backbutton",
 								MenuData->prevScreen, rmdsPreviousMenu);
     ChangeCarButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
@@ -846,39 +1102,14 @@ RmDriversSelect(void *vs)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     rmdsAddKeys();
 
-	// Fill-in the competitors scroll-list.
-	rmdsReloadCompetitorsScrollList();
-
-	// Initialize the currently highlighted competitor (and scroll the list if needed to show him)
-	// (the 1st human driver, or else of the 1st driver).
-	PCurrentDriver = 0;
-	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
-	std::vector<GfDriver*>::iterator itComp;
-	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); ++itComp)
-	{
-		if ((*itComp)->isHuman())
-		{
-			PCurrentDriver = *itComp;
-			break;
-		}
-	}
-	if (!PCurrentDriver && !vecCompetitors.empty())
-	{
-		itComp = vecCompetitors.begin();
-		PCurrentDriver = *itComp;
-	}
-
-	if (PCurrentDriver)
-		GfuiScrollListShowElement(ScrHandle, CompetitorsScrollListId,
-								  itComp - vecCompetitors.begin());
-
 	// Display the menu.
     GfuiScreenActivate(ScrHandle);
 }
 
 
 static void
-rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string& strType)
+rmdsFilterCandidatesScrollList(const std::string& strCarCatId,
+	const std::string& strType, const std::string& strCarModel)
 {
 	// Empty the candidates scroll-list
     GfuiScrollListClear(ScrHandle, CandidatesScrollListId);
@@ -917,6 +1148,8 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 		if (std::find(vecCompetitors.begin(), vecCompetitors.end(), *itCandidate)
 			== vecCompetitors.end()
 			&& MenuData->pRace->acceptsDriverType((*itCandidate)->getType())
+			&& (strCarModel == AnyCarModel
+				|| (*itCandidate)->getCar()->getId() == strCarModel)
 			&& ((*itCandidate)->isHuman()
 				|| MenuData->pRace->acceptsCarCategory((*itCandidate)->getCar()->getCategoryId())))
 			GfuiScrollListInsertElement(ScrHandle, CandidatesScrollListId,
