@@ -498,6 +498,8 @@ linuxDirGetList(const char *dir)
 					curf->type = FList::dir;
 				} else if (S_ISREG(sb.st_mode)) {
 					curf->type = FList::file;
+				} else {
+					curf->type = FList::unknown;
 				}
 
 				if (flist == (tFList*)NULL) {
