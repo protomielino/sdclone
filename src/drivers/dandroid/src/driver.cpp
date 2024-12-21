@@ -136,7 +136,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     // Discover the car type used
     void* handle = NULL;
     sprintf(buffer, "drivers/%s/%s.xml", MyBotName, MyBotName);
-    handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    handle = GfParmReadFileLocal(buffer, GFPARM_RMODE_STD);
     sprintf(buffer, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, mCarIndex);
     mCarType = GfParmGetStr(handle, buffer, (char*)ROB_ATTR_CAR, "no good");
 
