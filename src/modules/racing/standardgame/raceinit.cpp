@@ -62,6 +62,7 @@
 #include <race.h>
 
 #include "standardgame.h"
+#include "drivers.h"
 #include "racewebmetar.h"
 #include "racesituation.h"
 #include "racemain.h"
@@ -851,7 +852,14 @@ ReInitCars(void)
         /* Get the name of the module (= shared library) of the robot */
         snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
         robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
-        robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
+        robotIdx = GfDrivers::self()->getDriverIdx(ReInfo->params, path, robotModuleName);
+
+        if (robotIdx < 0)
+        {
+            GfLogError("ReInitCars: could not find driver %d, robot: %s\n",
+                i, robotModuleName);
+            return -1;
+        }
 
 #if 0 // SDW
         if (replayReplay)

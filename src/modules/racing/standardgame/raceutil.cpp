@@ -24,6 +24,7 @@
 #include <tgf.h>
 #include <portability.h>
 #include <robot.h>
+#include <drivers.h>
 
 #include "raceutil.h"
 
@@ -80,7 +81,15 @@ int RmGetFeaturesList( void* param )
 		/* Open robot */
 		snprintf( path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, xx );
 		cardllname = GfParmGetStr( param, path, RM_ATTR_MODULE, "" );
-		caridx = (int)GfParmGetNum( param, path, RM_ATTR_IDX, NULL, 0 );
+		GfLogInfo("GfParmGetFileName=%s\n", GfParmGetFileName(param));
+		caridx = GfDrivers::self()->getDriverIdx(param, path, cardllname);
+
+		if (caridx < 0)
+		{
+			GfLogError("RmGetFeaturesList: failed to get driver index %d\n", xx);
+			return -1;
+		}
+
 		snprintf( buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname );
 		robhdle = GfParmReadFile( buf, GFPARM_RMODE_STD );
 

@@ -388,7 +388,6 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
     bool bReversedGrid;
     std::string strDrvSec;
     const char* pszModulePropName;
-    const char* pszItfIndexPropName;
     if (strGridType != RM_VAL_DRV_LIST_ORDER)
     {
         // Params to read the starting grid from.
@@ -404,7 +403,6 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
 
         // Module and interface index property names.
         pszModulePropName = RE_ATTR_MODULE;
-        pszItfIndexPropName = RE_ATTR_IDX;
     }
 
     else
@@ -420,7 +418,6 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
 
         // Module and interface index property names.
         pszModulePropName = RM_ATTR_MODULE;
-        pszItfIndexPropName = RM_ATTR_IDX;
     }
 
     // Finally load the competitors in the specified starting grid order.
@@ -441,10 +438,19 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
         // Get driver infos from the the starting grid.
         ossDrvSecPath.str("");
         ossDrvSecPath << strDrvSec << '/' << nCompIndex;
+
+        std::string pathstr = ossDrvSecPath.str();
+        const char *path = pathstr.c_str();
         const char* pszModName =
-            GfParmGetStr(hparmStartGrid, ossDrvSecPath.str().c_str(), pszModulePropName, "");
+            GfParmGetStr(hparmStartGrid, path, pszModulePropName, "");
         const int nItfIndex =
-            (int)GfParmGetNum(hparmStartGrid, ossDrvSecPath.str().c_str(), pszItfIndexPropName, NULL, 0);
+            GfDrivers::self()->getDriverIdx(hparmStartGrid, path, pszModName);
+
+        if (nItfIndex < 0)
+        {
+            GfLogWarning("Could not find driver index\n");
+            continue;
+        }
 
 //  		GfLogDebug("Competitor #%d : %s#%d\n", nCompIndex, pszModName, nItfIndex);
 
@@ -538,8 +544,22 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
     // Load focused competitor data from the raceman params.
     _pPrivate->strFocusedModuleName =
         GfParmGetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-    _pPrivate->nFocusedItfIndex =
-        (int)GfParmGetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
+
+    const char *driver =
+        GfParmGetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDNAME, NULL);
+
+    if (driver)
+    {
+        const GfDriver *d = GfDrivers::self()->getDriverWithName(driver);
+
+        if (!d)
+        {
+            GfLogWarning("Focused driver does not exist: %s\n", driver);
+            return;
+        }
+
+        _pPrivate->nFocusedItfIndex = d->getInterfaceIndex();
+    }
 }
 
 void GfRace::store()
@@ -650,8 +670,8 @@ void GfRace::store()
                        << '/' << (unsigned)(itComp - _pPrivate->vecCompetitors.begin() + 1);
         const std::string strDrvSec(ossDrvSecPath.str());
 
-        GfParmSetNum(hparmRaceMan, strDrvSec.c_str(), RM_ATTR_IDX, (char*)NULL,
-                     (tdble)(*itComp)->getInterfaceIndex());
+        GfParmSetStr(hparmRaceMan, strDrvSec.c_str(), RM_ATTR_DRIVERNAME,
+            (*itComp)->getName().c_str());
         GfParmSetStr(hparmRaceMan, strDrvSec.c_str(), RM_ATTR_MODULE,
                      (*itComp)->getModuleName().c_str());
 
@@ -700,8 +720,22 @@ void GfRace::store()
     // Save focused competitor data to the raceman params.
     GfParmSetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSED,
                  _pPrivate->strFocusedModuleName.c_str());
-    GfParmSetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL,
-                 (tdble)_pPrivate->nFocusedItfIndex);
+
+    const char *driver =
+        GfParmGetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDNAME, NULL);
+
+    if (driver)
+    {
+        const GfDriver *d = GfDrivers::self()->getDriverWithName(driver);
+
+        if (!d)
+        {
+            GfLogWarning("Focused driver does not exist: %s\n", driver);
+            return;
+        }
+
+        _pPrivate->nFocusedItfIndex = d->getInterfaceIndex();
+    }
 
     // Now we are consistent with the race params (in memory).
     _pPrivate->bIsDirty = false;

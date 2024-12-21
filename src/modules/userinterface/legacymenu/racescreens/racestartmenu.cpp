@@ -152,8 +152,14 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
             // Find starting driver's name
             snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i + 1);
             const char* modName = GfParmGetStr(info->params, path, RM_ATTR_MODULE, "");
-            const int robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
             const int extended = (int)GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
+            const int robotIdx = GfDrivers::self()->getDriverIdx(info->params, path, modName);
+
+            if (robotIdx < 0)
+            {
+                GfLogWarning("Failed to find driver index\n");
+                continue;
+            }
 
             void* robhdle = 0;
 			snprintf(path, sizeof(path), "%sdrivers/%s/%s.xml", GfLocalDir(), modName, modName);
