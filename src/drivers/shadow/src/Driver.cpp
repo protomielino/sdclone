@@ -342,7 +342,7 @@ void	Driver::InitTrack(
     // float driver_skill = 0.0f;
     snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
     LogSHADOW.debug("Path skill driver: %s\n", buf);
-    skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    skillHandle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
 
     if (skillHandle)
     {
