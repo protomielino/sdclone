@@ -82,6 +82,7 @@ public:
 
 public:
     Driver(int index);
+    Driver(const Driver &d);
     ~Driver();
 
     void	SetShared( Shared* pShared );

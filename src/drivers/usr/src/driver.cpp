@@ -120,7 +120,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     Meteorology(track);
 
-    std::string mData(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
+    std::string mData(std::string(GetDataDir()) + "drivers/" + rName + "/");
     mDataDir = mData;
 
     // Assign to carParmHandle my parameters file handle, it will later be merged with carHandle by TORCS
@@ -295,7 +295,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     //load the driver skill level, range 0 - 1
     SkillDriver = 0.0f;
-    snprintf(buffer, sizeof(buffer), "%sdrivers/%s/%d/skill.xml", GetDataDir(), mDriverName, INDEX);
+    snprintf(buffer, sizeof(buffer), "%sdrivers/%s/%d/skill.xml", GetLocalDir(), mDriverName, INDEX);
     LogUSR.info("Path skill driver: %s\n", buffer);
     skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 

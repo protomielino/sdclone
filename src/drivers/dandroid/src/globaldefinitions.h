@@ -37,7 +37,6 @@
 //==========================================================================*
 // Global constants, to be changed for different wdbee-bots
 //--------------------------------------------------------------------------*
-static const int MAX_NBBOTS = 100;                    // Max nbr of drivers per robot
 const int cMAX_OPP = 120;                     // Max nbr of drivers per race
 const int RTYPE_FRAMEWORK = 100;              // Robot type
 const float HALFFRICTION = (float) sqrt(0.5); // 1=Sqrt(2*HALFFRICTION**2)

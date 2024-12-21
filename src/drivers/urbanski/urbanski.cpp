@@ -22,8 +22,13 @@
 
 #include "driver.h"
 
-static const int DRIVERS = 2;
-static Driver driver[DRIVERS];
+struct ident
+{
+	std::string name, desc;
+};
+
+static std::vector<Driver> driver;
+static std::vector<ident> idents;
 
 static void initTrack(int index, tTrack *track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newrace(int index, tCarElt *car, tSituation *s);
@@ -33,14 +38,18 @@ static void shutdown(int index);
 static int  InitFuncPt(int index, void *pt);
 
 extern "C" int moduleInitialize(tModInfo *modInfo) {
-	memset(modInfo, 0, DRIVERS*sizeof(tModInfo));
+	driver.clear();
+	memset(modInfo, 0, idents.size() * sizeof(tModInfo));
 
-	for (int i = 0; i < DRIVERS; i++, modInfo++) {
-		modInfo->name    = "urbanski";		/* name of the module (short) */
-		modInfo->desc    = "";	/* description of the module (can be long) */
+	for (size_t i = 0; i < idents.size(); i++, modInfo++) {
+		const ident &id = idents.at(i);
+
+		modInfo->name    = id.name.c_str();		/* name of the module (short) */
+		modInfo->desc    = id.desc.c_str();	/* description of the module (can be long) */
 		modInfo->fctInit = InitFuncPt;		/* init function */
 		modInfo->gfId    = ROB_IDENT;		/* supported framework version */
 		modInfo->index   = i;
+		driver.push_back(Driver());
 	}
 
 	GfOut("Initialized urbanski\n");
@@ -48,8 +57,50 @@ extern "C" int moduleInitialize(tModInfo *modInfo) {
 }
 
 extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut) {
-	welcomeOut->maxNbItf = DRIVERS;
-	return 0;
+	int ret = -1;
+	static const char path[] = "drivers/urbanski/urbanski.xml";
+	void *h = GfParmReadFileLocal(path, GFPARM_RMODE_STD);
+	int n;
+
+	if (!h)
+	{
+		ret = 0;
+		goto end;
+	}
+
+	n = GfParmGetEltNb(h, ROB_SECT_ROBOTS "/" ROB_LIST_INDEX);
+	idents.clear();
+
+	for (int i = 0; i < n; i++)
+	{
+		std::string section = ROB_SECT_ROBOTS "/" ROB_LIST_INDEX "/";
+		const char *s;
+
+		section += std::to_string(i);
+		s = section.c_str();
+
+		const char *name = GfParmGetStr(h, s, ROB_ATTR_NAME, nullptr);
+
+		if (!name)
+		{
+			GfLogError("%s: GfParmGetStr %s failed\n", path, s);
+			goto end;
+		}
+
+		const char *desc = GfParmGetStr(h, s, ROB_ATTR_DESC, "");
+		ident id = {name, desc};
+
+		idents.push_back(id);
+	}
+
+	ret = 0;
+
+end:
+	if (h)
+		GfParmReleaseHandle(h);
+
+	welcomeOut->maxNbItf = idents.size();
+	return ret;
 }
 
 extern "C" int moduleTerminate() {
@@ -83,7 +134,6 @@ static int InitFuncPt(int index, void *pt) {
 	itf->rbEndRace  = endrace;	 /* End of the current race */
 	itf->rbShutdown = shutdown;	 /* Called before the module is unloaded */
 	itf->index      = index; 	 /* Index used if multiple interfaces */
-	driver[index] = Driver();
 	return 0;
 }
 

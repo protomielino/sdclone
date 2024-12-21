@@ -330,7 +330,8 @@ bool Opponent::fastBehind()
 
 
 
-Opponents::Opponents()
+Opponents::Opponents() :
+  opponent(nullptr)
 {
 }
 
