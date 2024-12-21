@@ -42,6 +42,8 @@ CarModel::CarModel()
     COMPOUNDS(0),
     MASS(0),
     FUEL(0),
+    FUELPERMETER(0),
+    FUELTANK(0),
     DAMAGE(0),
     WIDTH(2),
     TYRE_MU(0),
