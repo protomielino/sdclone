@@ -32,30 +32,6 @@
 
 #include <vector>
 
-struct Blah
-{
-    static int ccount;
-    static int dcount;
-    int dummy;
-    int* pDummy;
-//	std::vector<int> vect;
-    Blah() : dummy(123456789), pDummy(new int[1024])//, vect(2, 5)
-    {
-        pDummy[0] = 1234;
-        ccount++;
-    }
-    ~Blah()
-    {
-        pDummy[0] = 4321;
-        delete [] pDummy;
-        dcount++;
-    }
-
-private:
-    Blah( const Blah& blah );
-    Blah& operator=( const Blah& blah );
-};
-
 class ClothoidPath : public Path
 {
 public:
@@ -121,7 +97,6 @@ public:
 
 private:
     PathOptions	m_options;
-    Blah				m_blah;
 //	std::vector<double> m_factors;  // cached factors
 };
 
