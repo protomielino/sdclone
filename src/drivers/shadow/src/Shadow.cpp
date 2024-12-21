@@ -114,7 +114,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
     setRobotName(welcomeIn->name);
 
     // Filehandle for robot's xml-file
-    void *pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
+    void *pRobotSettings = GfParmReadFileLocal(pathBuffer, GFPARM_RMODE_STD);
 
     PLogSHADOW = GfLogger::instance("SHADOW");
 
@@ -213,7 +213,7 @@ extern "C" int shadow(tModInfo *modInfo)
     nameBuffer = "shadow";
 
     // Filehandle for robot's xml-file
-    void *pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
+    void *pRobotSettings = GfParmReadFileLocal(pathBuffer, GFPARM_RMODE_STD);
 
     if (pRobotSettings)                  // Let's look what we have to provide here
     {
