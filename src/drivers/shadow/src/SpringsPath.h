@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "Path.h"
+#include "ClothoidPath.h"
 #include "PathOptions.h"
 #include "MyTrack.h"
 
@@ -59,8 +60,7 @@ public:
     SpringsPath();
     virtual ~SpringsPath();
 
-    virtual SpringsPath&	operator=( const Path& other );
-    SpringsPath&			operator=( const SpringsPath& other );
+    SpringsPath&	operator=( const ClothoidPath& other );
 
     const PathOptions&	GetOptions() const;
 

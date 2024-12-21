@@ -82,6 +82,21 @@ LearnedGraph::~LearnedGraph()
     delete [] m_pData;
 }
 
+LearnedGraph::LearnedGraph(const LearnedGraph &other)
+{
+    m_nAxes = other.m_nAxes;
+    m_pAxis = new Axis[m_nAxes];
+    m_beta = other.m_beta;
+
+    for (int i = 0; i < m_nAxes; i++)
+        m_pAxis[i] = other.m_pAxis[i];
+
+    m_pData = new double[m_pAxis->m_steps + 1];
+
+    for( int i = 0; i <= m_pAxis->m_steps; i++ )
+        m_pData[i] = other.m_pData[i];
+}
+
 int		LearnedGraph::GetNAxes() const
 {
     return m_nAxes;

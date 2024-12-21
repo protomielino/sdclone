@@ -77,8 +77,6 @@ public:
     void	Clear();
     int		Size() const { return m_pts.size(); }
 
-    virtual Path&	operator=( const Path& path );
-
 public:
     virtual bool	ContainsPos( double trackPos ) const;
     virtual bool	GetPtInfo( double trackPos, PtInfo& pi ) const;

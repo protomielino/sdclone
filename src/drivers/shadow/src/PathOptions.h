@@ -40,19 +40,6 @@ struct PathOptions
 
     PathOptions( int bm, double limit = 1.5, double mult = 100, double ml = 999, double mr = 999, double af = 0 )
     :	bumpMod(bm), safetyLimit(limit), safetyMultiplier(mult), quadSmoothIters(0), maxL(ml), maxR(mr), apexFactor(af), factors(1, 1.005) {}
-
-    PathOptions&	operator=( const PathOptions& other )
-    {
-        bumpMod				= other.bumpMod;
-        safetyLimit			= other.safetyLimit;
-        safetyMultiplier	= other.safetyMultiplier;
-        quadSmoothIters		= other.quadSmoothIters;
-        maxL				= other.maxL;
-        maxR				= other.maxR;
-        apexFactor			= other.apexFactor;
-        factors				= other.factors;
-        return *this;
-    }
 };
 
 #endif // _PATHOPTIONS_H_

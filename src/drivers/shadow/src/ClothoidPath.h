@@ -62,9 +62,6 @@ private:
 public:
     virtual ~ClothoidPath();
 
-    virtual ClothoidPath&	operator=( const Path& other ) override;
-    virtual ClothoidPath&	operator=( const ClothoidPath& other );
-
     const PathOptions&	GetOptions() const;
 
     void	MakeSmoothPath( const MyTrack* pTrack, const CarModel& cm,

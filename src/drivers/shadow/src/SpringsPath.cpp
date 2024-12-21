@@ -46,21 +46,10 @@ SpringsPath::~SpringsPath()
 {
 }
 
-SpringsPath&	SpringsPath::operator=( const Path& path )
+SpringsPath&	SpringsPath::operator=( const ClothoidPath& other )
 {
-    const SpringsPath* pSpringsPath = dynamic_cast<const SpringsPath*>(&path);
-    if( pSpringsPath )
-        return SpringsPath::operator=( *pSpringsPath );
-
-    Path::operator=(path);
-    m_options = PathOptions();
-    return *this;
-}
-
-SpringsPath&	SpringsPath::operator=( const SpringsPath& path )
-{
-    Path::operator=(path);
-    m_options = path.m_options;
+    Path::operator=(other);
+    m_options = other.GetOptions();
     return *this;
 }
 

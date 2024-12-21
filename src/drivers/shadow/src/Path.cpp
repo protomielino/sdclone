@@ -55,18 +55,6 @@ void	Path::Clear()
     m_estimatedTime = 0;
 }
 
-Path&	Path::operator=( const Path& path )
-{
-    NSEG = path.NSEG;
-    m_pTrack = path.m_pTrack;
-    m_pts = path.m_pts;
-    m_estimatedTime = path.m_estimatedTime;
-    m_maxL = path.m_maxL;
-    m_maxR = path.m_maxR;
-
-    return *this;
-}
-
 bool	Path::ContainsPos( double trackPos ) const
 {
     return true;

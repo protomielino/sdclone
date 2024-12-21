@@ -47,26 +47,6 @@ ClothoidPath::~ClothoidPath()
 {
 }
 
-ClothoidPath&	ClothoidPath::operator=( const Path& path )
-{
-    const ClothoidPath* pClothoidPath = dynamic_cast<const ClothoidPath*>(&path);
-    if( pClothoidPath )
-        return ClothoidPath::operator=( *pClothoidPath );
-
-    Path::operator=(path);
-    m_options = PathOptions();
-    CalcCachedFactors();
-    return *this;
-}
-
-ClothoidPath&	ClothoidPath::operator=( const ClothoidPath& path )
-{
-    Path::operator=(path);
-    m_options = path.m_options;
-    CalcCachedFactors();
-    return *this;
-}
-
 const PathOptions&	ClothoidPath::GetOptions() const
 {
     return m_options;

@@ -26,6 +26,7 @@ class LearnedGraph
 {
 public:
     LearnedGraph();
+    LearnedGraph(const LearnedGraph &other);
     LearnedGraph( int nAxes, const double* minX, const double* maxX,
                     const int* xSteps, double initialValue  );
     LearnedGraph( double minX, double maxX, int xSteps, double initialY );

@@ -35,9 +35,6 @@ public:
 	PitPath();
 	virtual ~PitPath();
 
-	PitPath&			operator=( const PitPath& other );
-	virtual PitPath&	operator=( const Path& other );
-
 	void	MakePath( const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
 					  int pitType, double entryOffset = 0, double exitOffset = 0 );
 

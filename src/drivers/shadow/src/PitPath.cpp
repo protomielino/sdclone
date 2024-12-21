@@ -40,40 +40,6 @@ PitPath::~PitPath()
 {
 }
 
-PitPath& PitPath::operator=( const PitPath& other )
-{
-    Path::operator=( other );
-
-    m_pitEntryPos	= other.m_pitEntryPos;
-    m_pitExitPos	= other.m_pitExitPos;
-    m_pitStartPos	= other.m_pitStartPos;
-    m_pitEndPos		= other.m_pitEndPos;
-    m_stopIdx		= other.m_stopIdx;
-    m_stopPos		= other.m_stopPos;
-
-    return *this;
-}
-
-PitPath& PitPath::operator=( const Path& other )
-{
-    const PitPath* pPitPath = dynamic_cast<const PitPath*>(&other);
-    if( pPitPath )
-    {
-        return PitPath::operator=(*pPitPath);
-    }
-    else
-    {
-        Path::operator=(other);
-        m_pitEntryPos	= 0;
-        m_pitExitPos	= 0;
-        m_pitStartPos	= 0;
-        m_pitEndPos		= 0;
-        m_stopIdx		= 0;
-        m_stopPos		= 0;
-        return *this;
-    }
-}
-
 void	PitPath::MakePath(
     const tTrackOwnPit*	pPit,
     Path*			pBasePath,
@@ -82,7 +48,7 @@ void	PitPath::MakePath(
     double			entryOffset,
     double			exitOffset )
 {
-    operator=( *pBasePath );
+    Path::operator=( *pBasePath );
 
     if( pPit == NULL )
         return;
