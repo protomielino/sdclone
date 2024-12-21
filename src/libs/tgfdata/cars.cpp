@@ -32,6 +32,7 @@
 class GfCars::Private
 {
 public:
+	~Private();
 
 	// One GfCar structure for each car (order = sorted directory one).
 	std::vector<GfCar*> vecCars;
@@ -46,6 +47,12 @@ public:
 	std::vector<std::string> vecCatNames;
 };
 
+GfCars::Private::~Private()
+{
+	std::vector<GfCar*>::const_iterator itCar;
+	for (itCar = vecCars.begin(); itCar != vecCars.end(); ++itCar)
+		delete *itCar;
+}
 
 GfCars* GfCars::_pSelf = 0;
 
@@ -65,12 +72,14 @@ void GfCars::shutdown()
 
 GfCars::~GfCars()
 {
-	std::vector<GfCar*>::const_iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
-		delete *itCar;
-
 	delete _pPrivate;
 	_pPrivate = 0;
+}
+
+void GfCars::reload()
+{
+	shutdown();
+	_pSelf = new GfCars;
 }
 
 GfCars::GfCars()

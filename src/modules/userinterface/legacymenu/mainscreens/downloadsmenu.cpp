@@ -11,6 +11,8 @@
 #include <tgfclient.h>
 #include <tgf.hpp>
 #include <portability.h>
+#include <cars.h>
+#include <drivers.h>
 #include "assets.h"
 #include "downloadsmenu.h"
 #include "downloadservers.h"
@@ -1105,6 +1107,8 @@ DownloadsMenu::~DownloadsMenu()
     }
 
     curl_multi_cleanup(multi);
+    GfCars::reload();
+    GfDrivers::self()->reload();
     GfuiScreenRelease(hscr);
     GfuiScreenActivate(prev);
 }

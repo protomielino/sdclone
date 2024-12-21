@@ -107,6 +107,7 @@ public:
 	// Accessor to the unique instance of the singleton.
 	static GfCars* self();
 	static void shutdown();
+	static void reload();
 
 	const std::vector<std::string>& getCategoryIds() const;
 	const std::vector<std::string>& getCategoryNames() const;
