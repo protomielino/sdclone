@@ -63,7 +63,6 @@
 
 #include "unitglobal.h"
 #include "unitcommon.h"
-#include "unitcommondata.h"
 
 #include "unitcharacteristic.h"
 #include "unitcollision.h"
@@ -85,7 +84,8 @@
 class TDriver
 {
   public:
-    TDriver(void *params, int Index);						  // Constructor
+    TDriver(const std::string &name, const std::string &car,
+      const std::string &category, int Index);
     ~TDriver();								  // Destructor
 
     //	TORCS-Interface:
@@ -156,11 +156,7 @@ class TDriver
     void BrakingForceController();				  //	PID	controller
     void LearnBraking(double Pos);				   // Learn braking parameters
 
-    void SetBotName							  //	Set	name of	bot
-      (void* RobotSettings, const char* Value);
-    inline	void	SetCommonData					  //	Set	pointer	to common data
-      (TCommonData* CommonData);
-    inline	const char* GetBotName();
+    inline	const std::string &GetDriverName() const;
     inline	float CurrSpeed();
     inline	int	TeamIndex();
 
@@ -207,12 +203,11 @@ private:
     double	CalcSkill(double TargetSpeed);
     bool CheckPitSharing();
     bool SaveToFile();
-    int getRobotType(void *h, unsigned index) const;
+    int getRobotType(const std::string &h) const;
     void setCategoryParams();
 
 
 private:
-    TCommonData* oCommonData;					  //	Pointer	to common data
     TTrackDescription oTrackDesc;				  // Track description
     std::vector<TClothoidLane> oRacingLine;		  // Racinglines
 
@@ -269,9 +264,7 @@ private:
     bool oAlone;								  // No opponent near
     double	oAngle;								  //	Actual Angle
     double	oAngleSpeed;						  // Angle of	speed
-    const char* oBotName;							  //	Name of	driver
-    const char* oTeamName;						  // Name of team
-    int oRaceNumber;							  // Race number
+    const std::string oDriverName;
     bool oWingControl;							 // Enable wing control
     double	oWingAngleFront;					  // Front	wing angle of attack
     double	oWingAngleRear;						  // Rear wing	angle of attack
@@ -295,7 +288,7 @@ private:
     double	oInitialBrakeCoeff;
     PtCarElt oCar;								  //	TORCS data for own car
     float oSteerAngle;							  // Angle to	steer
-    char* oCarType;							  //	Type name of own car
+    const std::string oCarType;							  //	Type name of own car
     double	oClutchMax;
     double	oClutchDelta;
     double	oClutchRange;
@@ -308,7 +301,6 @@ private:
     double	oShiftUp[MAX_GEARS];				  // Shift by setup
     double	oEarlyShiftFactor;					  //	Early shifting
     int oShiftCounter;							  // Shift timer
-    int oExtended;								  //	Information	if this	robot is extended (oExtended = 1) or not (oExtended	= 0).
     int oLastGear;								  //	Last gear
     int oLastUsedGear;							  // Last	used gear
     bool oLetPass;								  //	Let	opoonent pass
@@ -402,7 +394,7 @@ private:
     unsigned int oRandomSeed;					  //	seed of	generator
 
   public:
-    int oIndex;								  // index of own driver
+    const int oIndex;								  // index of own driver
     int oTestPitStop;							  // Test pit stop
     bool oShowPlot;
 
@@ -481,7 +473,6 @@ private:
 
     static bool FirstPropagation;
 
-    void ScaleSide(float FactorMu,	float FactorBrake);
     void SideBorderOuter(float	Factor);
     void SideBorderInner(float	Factor);
 
@@ -539,8 +530,8 @@ private:
 //==========================================================================*
 // Get name	of robot
 //--------------------------------------------------------------------------*
-const char* TDriver::GetBotName()
-  {return oBotName;};
+const std::string &TDriver::GetDriverName() const
+  {return oDriverName;};
 //==========================================================================*
 
 //==========================================================================*
@@ -548,14 +539,6 @@ const char* TDriver::GetBotName()
 //--------------------------------------------------------------------------*
 int	TDriver::TeamIndex()
   {return oTeamIndex;};
-//==========================================================================*
-
-//==========================================================================*
-// Set pointer to common data
-//--------------------------------------------------------------------------*
-void TDriver::SetCommonData
-  (TCommonData*	CommonData)
-  {oCommonData = CommonData;};
 //==========================================================================*
 
 //==========================================================================*

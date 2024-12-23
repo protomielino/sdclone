@@ -57,9 +57,6 @@
 // Version 2 oder nach eigener Wahl	eine spätere Version.
 //--------------------------------------------------------------------------*
 // THIS	VERSION	WAS	MODIFIED TO	BE USED	WITH SD	CAREER MODE
-// This	results	in some	issues while using it with windows!
-// Known bugs:
-// Heap	corruption -> do not use delete	for	oCarType, use free (oCarType)
 //
 //--------------------------------------------------------------------------*
 
@@ -295,8 +292,8 @@ void TDriver::setCategoryParams()
 //==========================================================================*
 // Constructor
 //--------------------------------------------------------------------------*
-TDriver::TDriver(void *params, int Index):
-    oCommonData(NULL),
+TDriver::TDriver(const std::string &name, const std::string &car,
+    const std::string &category, int Index):
     //	TrackDesc
     //	Racingline
     //	oCarParams
@@ -343,9 +340,7 @@ TDriver::TDriver(void *params, int Index):
     oAlone(true),
     oAngle(0),
     oAngleSpeed(0),
-    oBotName(NULL),
-    oTeamName(NULL),
-    oRaceNumber(0),
+    oDriverName(name),
     oWingControl(false),
     oWingAngleFront(0),
     oWingAngleRear(0),
@@ -367,7 +362,7 @@ TDriver::TDriver(void *params, int Index):
     oInitialBrakeCoeff(0.5f),
     oCar(NULL),
     oSteerAngle(0.0f),
-    oCarType(NULL),
+    oCarType(car),
     oClutchMax(0.5),
     oClutchDelta(0.009),
     oClutchRange(0.82),
@@ -383,7 +378,6 @@ TDriver::TDriver(void *params, int Index):
     */
     oEarlyShiftFactor(1.0),
     oShiftCounter(0),
-    oExtended(0),
     oLastGear(0),
     oLetPass(false),
     oLookAhead(5.0),
@@ -466,7 +460,7 @@ TDriver::TDriver(void *params, int Index):
     oDecelAdjustTarget(1.0),
     oDecelAdjustPerc(1.0),
     oRandomSeed(0),
-    oIndex(0),
+    oIndex(Index),
     oTestPitStop(0),
     oShowPlot(false),
     //LengthMargin
@@ -493,8 +487,8 @@ TDriver::TDriver(void *params, int Index):
     oDeltaAccel(0.05f),
     oDeltaAccelRain(0.025f),
     oUseAccelOut(false),
-    oSideScaleMu(0.97f),
-    oSideScaleBrake(0.97f),
+    oSideScaleMu(0.95f),
+    oSideScaleBrake(0.95f),
     oSideBorderOuter(0.2f),
     oSideBorderInner(0.2f),
     oXXX(1.0),
@@ -509,7 +503,7 @@ TDriver::TDriver(void *params, int Index):
     oFirstJump(true),
     oStartSteerFactor(0.0),
     oCarHasTYC(false),
-    RobotType(getRobotType(params, Index)),
+    RobotType(getRobotType(category)),
     AdvancedParameters(false),
     UseOldSkilling(false),
     UseSCSkilling(false),
@@ -524,13 +518,14 @@ TDriver::TDriver(void *params, int Index):
     BrakeLimitBase(0.025f),
     SpeedLimitScale(25),
     SpeedLimitBase(0.025f),
-    Learning(false)
+    Learning(false),
+    CalcSkillingFoo(&TDriver::CalcSkilling_simplix),
+    CalcFrictionFoo(&TDriver::CalcFriction_simplix_Identity),
+    CalcCrvFoo(&TDriver::CalcCrv_simplix_Identity),
+    CalcHairpinFoo(&TDriver::CalcHairpin_simplix_Identity)
 {
     LogSimplix.debug("\n#TDriver::TDriver() >>>\n\n");
     int I;
-    oIndex	= Index;								// Save	own	index
-    oExtended =									//	Determine if it
-            ( Index < 0 || Index	>= NBBOTS )	? 1	: 0;  //   is extended or not
 
     //	Motion survey
     oSysFooStuckX = new TSysFoo(1,128);			// Ringbuffer for X
@@ -579,9 +574,6 @@ TDriver::~TDriver()
     LogSimplix.debug("\n#TDriver::~TDriver() >>>\n\n");
     delete	[] oOpponents;
 
-    if	(oCarType != NULL)
-        free(oCarType);
-
     if	(oStrategy != NULL)
         delete oStrategy;
     if	(oSysFooStuckX != NULL)
@@ -591,61 +583,6 @@ TDriver::~TDriver()
 
     LogSimplix.debug("\n#<<< TDriver::~TDriver()\n\n");
 }
-//==========================================================================*
-
-//==========================================================================*
-// Set name	of robot (and other	appendant features)
-//--------------------------------------------------------------------------*
-void TDriver::SetBotName(void* RobotSettings, const char*	Value)
-{
-    //	At this	point TORCS	gives us no	information
-    //	about the name of the driver, the team and
-    //	our	own	car	type!
-    //	Because	we want	it to set the name as defined
-    //	in the teams xml file and to load depending
-    //	setup files	we have	to find	it out:
-
-    //	Needed for Career mode?
-    if	(oCarType)
-        free (oCarType);
-    oCarType =	NULL;
-
-    char SectionBuffer[256];					  // Buffer
-    char indexstr[32];
-
-    snprintf(SectionBuffer,BUFLEN,				  //	Build name of
-             "%s/%s/%d"								 // section from
-             ,ROB_SECT_ROBOTS,ROB_LIST_INDEX,oIndex); //	Index of own driver
-    char* Section = SectionBuffer;
-
-    //	Modified to	avoid memory leaks
-    //	Speed dreams has a trick to	find out the oCarType
-    RtGetCarindexString(oIndex, "simplix",	(char) oExtended, indexstr,	32);
-    if( oExtended )
-        oCarType = strdup( indexstr );
-    else // avoid empty car type
-        oCarType = strdup(GfParmGetStr			 // Get pointer to
-                          (RobotSettings							 // car type
-                           , Section								  // defined in corresponding
-                           , ROB_ATTR_CAR, DEFAULTCARTYPE));		  // section, default car type
-
-    oBotName =	Value;							  // Get pointer to drv. name
-
-    oTeamName = GfParmGetStr					  // Get pointer to
-            (RobotSettings							  // drivers team name
-             , Section								   // defined in corresponding
-             , ROB_ATTR_TEAM, (char *) oCarType);	   // section,	default	car	type
-
-    oRaceNumber = (int) GfParmGetNum			  // Get pointer to
-            (RobotSettings							  // race number
-             , Section, ROB_ATTR_RACENUM				   // defined in	corresponding
-             , (char	*) NULL, (tdble) oIndex	+ 1);	   //	section, index as default
-
-    LogSimplix.debug("#Bot	name	: %s\n",oBotName);
-    LogSimplix.debug("#Team name	: %s\n",oTeamName);
-    LogSimplix.debug("#Car	type	: %s\n",oCarType);
-    LogSimplix.debug("#Race number	: %d\n",oRaceNumber);
-};
 //==========================================================================*
 
 //==========================================================================*
@@ -670,7 +607,7 @@ void TDriver::AdjustCarCharacteristic(PCarHandle Handle)
     CarCharacteristic.Init(ControlPoints, X, Y, S);
 
     snprintf(buf, BUFLEN, "%sCharacteristic-%s.txt",
-             GetLocalDir(),oBotName);
+             GetLocalDir(), oDriverName.c_str());
 
     SaveCharacteristicToFile(buf);
 };
@@ -1334,9 +1271,9 @@ void TDriver::SetPathAndFilenameForRacinglines()
 {
     const char* PathToWriteTo = GetLocalDir();
 
-    snprintf(PathToWriteToBuffer,sizeof(TrackLoadBuffer),
+    snprintf(PathToWriteToBuffer, sizeof(TrackLoadBuffer),
              "%sdrivers/simplix_common/racinglines/%s/%s",
-             PathToWriteTo,MyBotName,oCarType);
+             PathToWriteTo, MyBotName, oCarType.c_str());
     oPathToWriteTo	= PathToWriteToBuffer;
     if	(GfDirCreate(oPathToWriteTo) ==	GF_DIR_CREATION_FAILED)
     {
@@ -1476,7 +1413,7 @@ void TDriver::InitTrack
 
     //	Default	params for car type	(e.g. .../ROBOT_DIR/sc-petrol/default.xml)
     snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
-             BaseParamPath,oCarType);
+             BaseParamPath, oCarType.c_str());
     if	(GfFileExists(Buf))
     {
         LogSimplix.info("#Default	params for car type: %s\n",	Buf);
@@ -1515,7 +1452,7 @@ void TDriver::InitTrack
 
     //	Override params	for	car	type with params of	track
     snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
-             BaseParamPath,oCarType,oTrackName);
+             BaseParamPath, oCarType.c_str(), oTrackName);
     if	(GfFileExists(Buf))
     {
         LogSimplix.info("#Override params	for	car	type with params of	track: %s\n", Buf);
@@ -1528,7 +1465,7 @@ void TDriver::InitTrack
 
     //	Override params	for	car	type with params of	track and weather
     snprintf(Buf,sizeof(Buf),"%s/%s/%s-%d.xml",
-             BaseParamPath,oCarType,oTrackName,oWeatherCode);
+             BaseParamPath, oCarType.c_str(),oTrackName, oWeatherCode);
     if	(GfFileExists(Buf))
     {
         LogSimplix.info("#Override params	for	car	type with params of	track and weather: %s\n", Buf);
@@ -1541,7 +1478,7 @@ void TDriver::InitTrack
 
     //	Override params	for	car	type on	track with params of specific race type
     snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
-             BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
+             BaseParamPath, oCarType.c_str(), oTrackName, RaceType[oSituation->_raceType]);
     if	(GfFileExists(Buf))
     {
         LogSimplix.info("#Override params	for	car	type on	track with params of specific race type: %s\n",	Buf);
@@ -2108,10 +2045,6 @@ void TDriver::FindRacinglines()
     Param.Update();								// update car parameters
 
     LogSimplix.debug("# ... set track ...\n");
-    if(oCommonData->Track != oTrackDesc.Track())	// New track?
-    {
-        oCommonData->Track = oTrackDesc.Track();	   // Save pointer
-    }
 
     LogSimplix.debug("# ... load smooth path ...\n");
     if	(oSituation->_raceType == RM_TYPE_PRACTICE)
@@ -4682,17 +4615,6 @@ double TDriver::CalcSkill(double TargetSpeed)
     }
     return	TargetSpeed;
 }
-//==========================================================================*
-
-//==========================================================================*
-// Set scaling factor for avoiding racinglines
-//--------------------------------------------------------------------------*
-void TDriver::ScaleSide(float FactorMu,	float FactorBrake)
-{
-    oSideScaleMu =	FactorMu;
-    oSideScaleBrake = FactorBrake;
-}
-//==========================================================================*
 
 //==========================================================================*
 // Set additional border to	outer side

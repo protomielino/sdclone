@@ -61,36 +61,6 @@ TCarParam::TCarParam():
 }
 //==========================================================================*
 
-//==========================================================================*
-// Destructor
-//--------------------------------------------------------------------------*
-TCarParam::~TCarParam()
-{
-}
-//===========================================================================
-
-//==========================================================================*
-// Zuweisung
-//--------------------------------------------------------------------------*
-TCarParam& TCarParam::operator= (const TCarParam& CarParam)
-{
-  oScaleMu = CarParam.oScaleMu;
-  oScaleMinMu = CarParam.oScaleMinMu;
-  oScaleBrake = CarParam.oScaleBrake;
-  oScaleBrakePit = CarParam.oScaleBrakePit;
-  oScaleBump = CarParam.oScaleBump;
-  oScaleBumpOuter = CarParam.oScaleBumpOuter;
-  oScaleBumpLeft = CarParam.oScaleBumpLeft;
-  oScaleBumpRight = CarParam.oScaleBumpRight;
-  oLimitSideUse = CarParam.oLimitSideUse;
-  oLimitSideWidth = CarParam.oLimitSideWidth;
-  oUglyCrvZ = CarParam.oUglyCrvZ;
-  oBrakeForce = CarParam.oBrakeForce;
-
-  return *this;
-}
-//===========================================================================
-
 //--------------------------------------------------------------------------*
 // end of file unitcarparam.cpp
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*

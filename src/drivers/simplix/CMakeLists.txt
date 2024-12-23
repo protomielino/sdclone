@@ -23,8 +23,6 @@ SET(ROBOT_SOURCES
     src/unitcollision.cpp
     src/unitcollision.h
     src/unitcommon.cpp
-    src/unitcommondata.cpp
-    src/unitcommondata.h
     src/unitcommon.h
     src/unitcubic.cpp
     src/unitcubic.h
