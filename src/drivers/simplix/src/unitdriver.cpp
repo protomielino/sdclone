@@ -563,6 +563,10 @@ TDriver::TDriver(void *params, int Index):
     TDriver::LengthMargin = LENGTH_MARGIN;			// Initialize	safty margin
     enableCarNeedsSinLong = false;
 
+    for (int i = 0; i < gNBR_RL; i++)
+        oRacingLine.push_back(TClothoidLane(*this));
+
+    setCategoryParams();
     LogSimplix.debug("\n#<<< TDriver::TDriver()\n\n");
 }
 //==========================================================================*

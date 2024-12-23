@@ -143,7 +143,10 @@ TPit::TPit(TDriver *Driver)
 		LogSimplix.debug("\n\n\n SIMPLIX:	NO PIT \n\n\n");
 
 	for (int I	= 0; I < gNBR_RL; I++)
+	{
+		oPitLane.push_back(TPitLane(*Driver));
 		oPitLane[I].Init(Driver->Car());
+	}
 }
 //==========================================================================*
 
@@ -295,6 +298,11 @@ void TPitLane::Init(PtCarElt Car)
 	oPitStopOffset	= 0.0;
 }
 //==========================================================================*
+
+TPitLane::TPitLane(TDriver &driver):
+	TClothoidLane(driver)
+{
+}
 
 //==========================================================================*
 // Smooth Path with	pitlane

@@ -47,12 +47,13 @@
 #define	_PIT_H_
 
 #include "unitglobal.h"
-#include "unitcommon.h"
-#include "unitdriver.h"
-#include "unittrack.h"
 #include "unitclothoid.h"
+#include "unitcommon.h"
+#include "unittrack.h"
 #include "unitparam.h"
 #include "unitstrategy.h"
+
+#include <vector>
 
 //==========================================================================*
 // Klasse TPitLane
@@ -80,6 +81,7 @@ class TPitLane : public	TClothoidLane
 	double	ToSplinePos(double TrackPos) const;	  //
 
   public:
+	TPitLane(TDriver &driver);
 	void Init(PtCarElt	Car);					  // Initialize oCar
 	void MakePath								  // Build pitlane
 	  (char* Filename,
@@ -109,7 +111,7 @@ class TPit
   public:
 	PTrack	oTrack;								  //	TORCS track	data
 	PCarElt oCar;								  // TORCS car data
-	TPitLane oPitLane[gNBR_RL];				  // Pitlanes
+	std::vector<TPitLane> oPitLane;				  // Pitlanes
 	tTrackOwnPit *oMyPit;						  // Pointer to	my pit.
 	tTrackPitInfo *oPitInfo;					   //	General	pit	info.
 

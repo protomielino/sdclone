@@ -77,6 +77,7 @@
 #include "unitsysfoo.h"
 
 #include "teammanager.h"
+#include <vector>
 
 //==========================================================================*
 // Deklaration der Klasse TDriver
@@ -213,7 +214,7 @@ private:
 private:
     TCommonData* oCommonData;					  //	Pointer	to common data
     TTrackDescription oTrackDesc;				  // Track description
-    TClothoidLane oRacingLine[gNBR_RL];		  // Racinglines
+    std::vector<TClothoidLane> oRacingLine;		  // Racinglines
 
     TCarParam*	oCarParams[3];					  //	Array of pointers to parameter sets
     tWing oWing[2];

@@ -61,6 +61,7 @@
 #include "unitcommon.h"
 
 #include "unitclothoid.h"
+#include "unitdriver.h"
 #include "unitlinreg.h"
 #include "unitparam.h"
 #include "unitsysfoo.h"
@@ -68,7 +69,8 @@
 //==========================================================================*
 // Default constructor
 //--------------------------------------------------------------------------*
-TClothoidLane::TClothoidLane()
+TClothoidLane::TClothoidLane(TDriver &driver):
+  TLane(driver)
 {
 }
 //==========================================================================*

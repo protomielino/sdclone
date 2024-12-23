@@ -98,7 +98,7 @@ class TClothoidLane : public TLane
     double oBaseFactor;
 
   public:
-	TClothoidLane();
+	TClothoidLane(TDriver &driver);
 	virtual ~TClothoidLane();
 
 	void MakeSmoothPath
