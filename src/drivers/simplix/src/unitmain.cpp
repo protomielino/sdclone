@@ -109,6 +109,8 @@
 #include "unitcommon.h"
 
 #include "unitdriver.h"
+#include <string>
+#include <vector>
 
 //==========================================================================*
 // Prototypes of routines(functions/procedures), provided
@@ -150,37 +152,18 @@ static void	Shutdown
 //==========================================================================*
 // Speed Dreams-Interface
 //--------------------------------------------------------------------------*
-static const int MAXNBBOTS = MAX_NBBOTS;		 // Number of	drivers/robots
 static const int BUFSIZE = 256;
 
-// Default driver names
-static char	const* defaultBotName[MAXNBBOTS] = {
-    "driver 1",  "driver 2",  "driver 3",	"driver 4",	"driver 5",
-    "driver 6",  "driver 7",  "driver 8",	"driver 9",	"driver 10",
-    "driver 11", "driver 12", "driver 13",	"driver	14", "driver 15",
-    "driver 16", "driver 17", "driver 18",	"driver	19", "driver 20"
+struct Ident
+{
+    std::string name, desc;
 };
 
-// Default driver descriptions
-static char	const* defaultBotDesc[MAXNBBOTS] = {
-    "driver 1",  "driver 2",  "driver 3",	"driver 4",	"driver 5",
-    "driver 6",  "driver 7",  "driver 8",	"driver 9",	"driver 10",
-    "driver 11", "driver 12", "driver 13",	"driver	14", "driver 15",
-    "driver 16", "driver 17", "driver 18",	"driver	19", "driver 20"
-};
-
-// Max length of a drivers name
-static const int DRIVERLEN = 32;
-// Max length of a drivers description
-static const int DESCRPLEN = 256;
 // Pointer to buffer for driver's names	defined	in robot's xml-file
-static char	*DriverNames;
 // Pointer to buffer for driver's descriptions defined in robot's xml-file
-static char	*DriverDescs;
+std::vector<Ident> idents;
 
 // Number of drivers defined in	robot's	xml-file
-static int NBBOTS =	0;							 // Still unknown
-// Robot's name
 static char	BufName[BUFSIZE];					 // Buffer for robot's name
 static const char* RobName = BufName;			 //	Pointer	to robot's name
 // Robot's relative	dir
@@ -195,13 +178,6 @@ static char	BufPathDir[BUFSIZE];				 //	Robot's	dir
 static char	BufPathXML[BUFSIZE];				 //	Robot's	xml-filename
 static const char* RobPathXML =	BufPathXML;		 // Pointer to	xml-filename
 
-// Save	start index	offset from	robot's	xml	file
-static int IndexOffset = 0;
-
-// Marker for undefined	drivers	to be able to comment out drivers
-// in the robot's xml-file between others, not only	at the end of the list
-char undefined[] = "undefined";
-
 // The "Simplix" logger	instance
 GfLogger* PLogSimplix =	0;
 //==========================================================================*
@@ -210,12 +186,24 @@ GfLogger* PLogSimplix =	0;
 //	Robot of	this modul
 //	Roboter des Moduls
 //--------------------------------------------------------------------------*
-static TCommonData gCommonData;
-static int cRobotType;
 
-typedef	struct stInstanceInfo
+struct tInstanceInfo
 {
-    TDriver *cRobot;
+    tInstanceInfo(const std::string &name, const std::string &car,
+        const std::string &category, int index) :
+        cRobot(TDriver(name, car, category, index)),
+        cTicks(0),
+        cMinTicks(FLT_MAX),
+        cMaxTicks(0),
+        cTickCount(0),
+        cLongSteps(0),
+        cCriticalSteps(0),
+        cUnusedCount(0)
+    {}
+
+    // TClothoidPath contains a pointer to the TDriver,
+    // so tInstanceInfo cannot be copied around.
+    TDriver cRobot;
     double	cTicks;
     double	cMinTicks;
     double	cMaxTicks;
@@ -223,15 +211,38 @@ typedef	struct stInstanceInfo
     int cLongSteps;
     int cCriticalSteps;
     int cUnusedCount;
-} tInstanceInfo;
+};
 
-//#undef ROB_SECT_ARBITRARY
-#ifdef ROB_SECT_ARBITRARY
-static tInstanceInfo *cInstances;
-static int cInstancesCount;
-#else //ROB_SECT_ARBITRARY
-static tInstanceInfo cInstances[MAXNBBOTS];
-#endif //ROB_SECT_ARBITRARY
+class Drivers
+{
+public:
+    ~Drivers()
+    {
+        clear();
+    }
+
+    void push_back(tInstanceInfo *d)
+    {
+        v.push_back(d);
+    }
+
+    void clear()
+    {
+        for (auto d : v)
+            delete d;
+
+        v.clear();
+    }
+
+    tInstanceInfo *operator[](int index)
+    {
+        return v[index];
+    }
+
+    std::vector<tInstanceInfo *> v;
+};
+
+static class Drivers drivers;
 
 //==========================================================================*
 
@@ -275,183 +286,45 @@ void* GetFileHandle(const char*	RobotName)
 //==========================================================================*
 
 //==========================================================================*
-// Set parameters
-//--------------------------------------------------------------------------*
-void SetParameters(int N, char const* DefaultCarType)
-{
-  NBBOTS = N;
-  TDriver::NBBOTS =	N;									  //	Used nbr of	cars
-  TDriver::MyBotName = BufName;							  // Name	of this	bot
-  TDriver::ROBOT_DIR = BufPathDir;						  // Path to dll
-  TDriver::SECT_PRIV = "simplix	private";				  // Private section
-  TDriver::DEFAULTCARTYPE  = DefaultCarType;			  //	Default	car	type
-  TDriver::Learning	= true;
-};
-//==========================================================================*
 
-//==========================================================================*
-// Schismatic entry	point for simplix
-//--------------------------------------------------------------------------*
-void SetUpSimplix()
+static int loadIdentities(void *handle)
 {
-    cRobotType	= RTYPE_SIMPLIX;
-    SetParameters(NBBOTS, "car1-trb1");
-    TDriver::AdvancedParameters = true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseWingControl = true;
-    TDriver::UseRacinglineParameters =	true;
-};
+    static const char section[] = ROB_SECT_ROBOTS "/" ROB_LIST_INDEX;
 
-//==========================================================================*
-//==========================================================================*
-// Schismatic entry	point for simplix_trb1
-//--------------------------------------------------------------------------*
-void SetUpSimplix_trb1()
-{
-    cRobotType	= RTYPE_SIMPLIX_TRB1;
-    SetParameters(NBBOTS, "car1-trb1");
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseRacinglineParameters =	true;
-};
-//==========================================================================*
+    idents.clear();
 
-//==========================================================================*
-// Schismatic entry	point for simplix_sc
-//--------------------------------------------------------------------------*
-void SetUpSimplix_sc()
-{
-    cRobotType	= RTYPE_SIMPLIX_SC;
-    SetParameters(NBBOTS, "sc996");
-    TDriver::UseSCSkilling	= true;					// Use supercar	skilling
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseRacinglineParameters =	true;
-};
-//==========================================================================*
+    for (int i = 0; i < GfParmGetEltNb(handle, section); i++)
+    {
+        std::string index = ROB_SECT_ROBOTS;
 
-//==========================================================================*
-// Schismatic entry	point for simplix_srw
-//--------------------------------------------------------------------------*
-void SetUpSimplix_srw()
-{
-    cRobotType	= RTYPE_SIMPLIX_SRW;
-    TDriver::RobotType	= cRobotType;
-    SetParameters(NBBOTS, "srw-sector-p4");
-    TDriver::AdvancedParameters = true;
-    TDriver::UseSCSkilling	= true;			 // Use supercar skilling
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseWingControl = true;
-    TDriver::UseRacinglineParameters =	true;
-};
-//==========================================================================*
+        index += "/";
+        index += ROB_LIST_INDEX;
+        index += "/";
+        index += std::to_string(i);
 
-//==========================================================================*
-// Schismatic entry	point for simplix_36GP
-//--------------------------------------------------------------------------*
-void SetUpSimplix_36GP()
-{
-    cRobotType	= RTYPE_SIMPLIX_36GP;
-    SetParameters(NBBOTS, "36GP-alfa12c");
-    TDriver::AdvancedParameters = true;
-    //TDriver::UseBrakeLimit =	true;
-    TDriver::UseSCSkilling	= true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-};
-//==========================================================================*
+        const char *cidx = index.c_str();
+        const char *name = GfParmGetStr(handle, cidx,
+            ROB_ATTR_NAME, nullptr);
 
-//==========================================================================*
-// Schismatic entry	point for simplix_36GP
-//--------------------------------------------------------------------------*
-void SetUpSimplix_67GP()
-{
-    cRobotType	= RTYPE_SIMPLIX_67GP;
-    SetParameters(NBBOTS, "67GP-cavallo-123");
-    TDriver::AdvancedParameters = true;
-    //TDriver::UseBrakeLimit =	true;
-    TDriver::UseSCSkilling	= true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-};
-//==========================================================================*
-// Schismatic entry	point for simplix_ls1
-//--------------------------------------------------------------------------*
-void SetUpSimplix_ls1()
-{
-    cRobotType	= RTYPE_SIMPLIX_LS1;
-    SetParameters(NBBOTS, "ls1-archer-r9");
-    TDriver::AdvancedParameters = true;
-    //TDriver::UseBrakeLimit =	true;
-    TDriver::UseBrakeLimit	= true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseRacinglineParameters =	true;
-};
-//==========================================================================*
+        if (!name)
+        {
+            LogSimplix.error("#GfParmGetStr %s:%s/%s failed\n",
+                RobPathXMLRel, cidx, ROB_ATTR_NAME);
+            idents.clear();
+            return -1;
+        }
 
-//==========================================================================*
-// Schismatic entry	point for simplix_ls2
-//--------------------------------------------------------------------------*
-void SetUpSimplix_ls2()
-{
-    cRobotType	= RTYPE_SIMPLIX_LS2;
-    SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
-    TDriver::AdvancedParameters = true;
-    TDriver::UseBrakeLimit	= true;
-    TDriver::UseRacinglineParameters =	true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-};
-//==========================================================================*
+        const char *desc = GfParmGetStr(handle, cidx,
+            ROB_ATTR_DESC, "no description");
 
-//==========================================================================*
-// Schismatic entry	point for simplix_MP5
-//--------------------------------------------------------------------------*
-void SetUpSimplix_mp5()
-{
-    cRobotType	= RTYPE_SIMPLIX_MP5;
-    SetParameters(NBBOTS, "mp5");
-    TDriver::AdvancedParameters = true;
-    TDriver::UseBrakeLimit	= true;
-    //TDriver::UseSCSkilling =	true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-};
+        Ident id = {name, desc};
 
-//==========================================================================*
+        idents.push_back(id);
+        LogSimplix.debug("#Driver %d: %s (%s)\n", i, name, desc);
+    }
 
-//==========================================================================*
-// Schismatic entry	point for simplix_lp1
-//--------------------------------------------------------------------------*
-void SetUpSimplix_lp1()
-{
-    cRobotType	= RTYPE_SIMPLIX_LP1;
-    SetParameters(NBBOTS, "lp1-vieringe-vr8");
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry	point for simplix_ref
-//--------------------------------------------------------------------------*
-void SetUpSimplix_ref()
-{
-    cRobotType	= RTYPE_SIMPLIX_REF;
-    SetParameters(NBBOTS, "ref-sector-p4");
-    TDriver::UseRacinglineParameters =	true;
-    TDriver::UseWingControl = true;
-};
-
-//==========================================================================*
-// Schismatic entry	point for simplix_mpa12
-//--------------------------------------------------------------------------*
-void SetUpSimplix_stock()
-{
-    cRobotType	= RTYPE_SIMPLIX_STOCK;
-    SetParameters(NBBOTS, "stock-deckard-72montecristo");
-    TDriver::AdvancedParameters = true;
-    TDriver::UseBrakeLimit	= false;
-    TDriver::UseMPA1Skilling =	true;
-    TDriver::SkillingFactor = 0.1f;		 // Skilling factor for career-mode
-    TDriver::UseRacinglineParameters =	true;
-};
-//==========================================================================*
-
-//==========================================================================*
+    return 0;
+}
 
 //==========================================================================*
 // Handle module entry for Speed Dreams	Interface V1.00	(new fixed name	scheme)
@@ -459,130 +332,37 @@ void SetUpSimplix_stock()
 int	moduleWelcomeV1_00
   (const tModWelcomeIn*	welcomeIn, tModWelcomeOut* welcomeOut)
 {
+    void *RobotSettings = GetFileHandle(welcomeIn->name);
+
+    idents.clear();
+
     PLogSimplix = GfLogger::instance("Simplix");
     LogSimplix.debug("\n#Interface	Version: %d.%d\n",
         welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 
-    //	Get	filehandle for robot's xml-file
-    void* RobotSettings = GetFileHandle(welcomeIn->name);
-    //	Let's look what	we have	to provide here
-    if	(RobotSettings)
+    if (!RobotSettings)
     {
-        LogSimplix.debug("#Robot name		 :	%s\n",RobName);
-        LogSimplix.debug("#Robot directory : %s\n",RobPathDirRel);
-        LogSimplix.debug("#Robot XML-file	 : %s\n",RobPathXMLRel);
+        LogSimplix.error("#Robot XML-Path not found: (%s) or (%s) %s\n\n",
+            GetLocalDir(), GetDataDir(), RobPathXMLRel);
+        goto end;
+    }
 
-        char Buffer[BUFSIZE];
-        char *Section	= Buffer;
+    LogSimplix.debug("#Robot name: %s\n", RobName);
+    LogSimplix.debug("#Robot directory: %s\n", RobPathDirRel);
+    LogSimplix.debug("#Robot XML-file: %s\n", RobPathXMLRel);
 
-        // To	get	the	number of drivers defined in the
-        // robot team	definition file	we have	to count
-        // the number	of sections	within Robots/index!
-        snprintf(Buffer, BUFSIZE,	"%s/%s",
-            ROB_SECT_ROBOTS,	ROB_LIST_INDEX);
-        NBBOTS = GfParmGetEltNb(RobotSettings,Buffer);
-        LogSimplix.debug("#Nbr of	drivers	 : %d\n",NBBOTS);
+    if (loadIdentities(RobotSettings))
+    {
+        LogSimplix.error("#Failed to load identities\n");
+        goto end;
+    }
 
-        DriverNames =	(char *) calloc(NBBOTS,DRIVERLEN);
-        DriverDescs =	(char *) calloc(NBBOTS,DESCRPLEN);
-
-        // Setup a path to the first driver section
-        // assuming that it starts with the index	0
-        snprintf(Buffer, BUFSIZE,	"%s/%s/%d",
-            ROB_SECT_ROBOTS,	ROB_LIST_INDEX,	0);
-
-        // Try to	get	first driver from index	0
-        const	char *DriverName = GfParmGetStr( RobotSettings,
-            Section,	(char *) ROB_ATTR_NAME,	undefined);
-
-        // Check wether index	0 is used as start index
-        if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
-        {
-            // Teams	xml	file uses index	0, 1, ..., N - 1
-            IndexOffset = 0;
-        }
-        else
-        {
-            // Teams	xml	file uses index	1, 2, ..., N
-            IndexOffset = 1;
-        }
-
-        // Loop over all possible	drivers, clear all buffers,
-        // save defined driver names and desc.
-        int I	= 0;
-        int N	= 0;
-        int M	= 0;
-//		for	(I = 0;	I <	MAXNBBOTS; I++)
-        while	(N < NBBOTS)
-        {
-            snprintf(Section, BUFSIZE, "%s/%s/%d",
-                ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
-            DriverName = GfParmGetStr( RobotSettings, Section,
-                (char *) ROB_ATTR_NAME,undefined);
-
-            if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
-            {   // This driver is defined in	robot's	xml-file
-                strncpy(&DriverNames[I*DRIVERLEN], DriverName, DRIVERLEN-1);
-                const char *DriverDesc = GfParmGetStr(RobotSettings, Section,
-                    (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
-                strncpy(&DriverDescs[I*DESCRPLEN], DriverDesc, DESCRPLEN-1);
-                LogSimplix.debug("#Driver %d: %s (%s)\n",I,DriverName,DriverDesc);
-                N++;
-            }
-            else
-            {
-                // There is	an index skipped in	the	robots team	definition file
-                // Therefore we	have to	get	additional memory to store the data
-                M++;
-                DriverNames	= (char	*) realloc(DriverNames,(NBBOTS+M)*DRIVERLEN);
-                memset(&DriverNames[I*DRIVERLEN], 0, DRIVERLEN);
-                DriverDescs	= (char	*) realloc(DriverDescs,(NBBOTS+M)*DESCRPLEN);
-                memset(&DriverDescs[I*DESCRPLEN], 0, DESCRPLEN);
-                LogSimplix.debug("#Driver %d: %s (%s)\n",I,&DriverNames[I*DRIVERLEN],&DriverDescs[I*DESCRPLEN]);
-            }
-
-            I++;
-        }
+end:
+    if (RobotSettings)
         GfParmReleaseHandle(RobotSettings);
-    }
-    else
-    {
-        // Handle	error here
-        LogSimplix.debug("#Robot XML-Path	not	found: (%s)	or (%s)	%s\n\n",
-            GetLocalDir(),GetDataDir(),RobPathXMLRel);
 
-        NBBOTS = 0;
-        // But this is not considered	a real failure of moduleWelcome	!
-    }
-
-    //	Handle additional settings for wellknown identities
-    if	(strncmp(RobName,"simplix_trb1",strlen("simplix_trb1"))	== 0)
-        SetUpSimplix_trb1();
-    else if (strncmp(RobName,"simplix_sc",strlen("simplix_sc")) ==	0)
-        SetUpSimplix_sc();
-    else if (strncmp(RobName,"simplix_srw",strlen("simplix_srw")) == 0)
-        SetUpSimplix_srw();
-    else if (strncmp(RobName,"simplix_36GP",strlen("simplix_36GP")) ==	0)
-        SetUpSimplix_36GP();
-    else if (strncmp(RobName,"simplix_67GP",strlen("simplix_67GP")) ==	0)
-        SetUpSimplix_67GP();
-    else if (strncmp(RobName,"simplix_ls1",strlen("simplix_ls1")) == 0)
-        SetUpSimplix_ls1();
-    else if (strncmp(RobName,"simplix_ls2",strlen("simplix_ls2")) == 0)
-        SetUpSimplix_ls2();
-    else if (strncmp(RobName,"simplix_mp5",strlen("simplix_mp5")) == 0)
-        SetUpSimplix_mp5();
-    else if (strncmp(RobName,"simplix_lp1", strlen("simplix_lp1"))	== 0)
-        SetUpSimplix_lp1();
-    else if (strncmp(RobName,"simplix_ref", strlen("simplix_ref"))	== 0)
-        SetUpSimplix_ref();
-    else
-        SetUpSimplix();
-
-    //	Set	max	nb of interfaces to	return.
-    welcomeOut->maxNbItf =	NBBOTS;
-
-    return	0;
+    welcomeOut->maxNbItf = idents.size();
+    return 0;
 }
 //==========================================================================*
 
@@ -610,6 +390,57 @@ extern "C" int moduleWelcome
 }
 //==========================================================================*
 
+static int getCar(void *handle, int index, std::string &out)
+{
+    const char *car;
+    std::string section = ROB_SECT_ROBOTS "/" ROB_LIST_INDEX "/";
+
+    section += std::to_string(index);
+
+    if (!(car = GfParmGetStr(handle, section.c_str(), ROB_ATTR_CAR, nullptr)))
+    {
+        LogSimplix.error("Missing attribute for driver %u: " ROB_ATTR_CAR, index);
+        return -1;
+    }
+
+    out = car;
+    return 0;
+}
+
+static int getCategory(const std::string &car, std::string &out)
+{
+    int ret = -1;
+    std::string path = "cars/models/";
+    const char *category, *cpath;
+    void *h;
+
+    path += car;
+    path += "/";
+    path += car;
+    path += PARAMEXT;
+    cpath = path.c_str();
+
+    if (!(h = GfParmReadFile(cpath, GFPARM_RMODE_STD)))
+    {
+        LogSimplix.error("Failed to open %s\n", cpath);
+        goto end;
+    }
+    else if (!(category = GfParmGetStr(h, "Car", ROB_ATTR_CATEGORY, nullptr)))
+    {
+        LogSimplix.error("%s: failed to get car category\n", cpath);
+        goto end;
+    }
+
+    out = category;
+    ret = 0;
+
+end:
+    if (h)
+        GfParmReleaseHandle(h);
+
+    return ret;
+}
+
 //==========================================================================*
 // Module entry	point (new fixed name scheme).
 // Tells TORCS,	who	we are,	how	we want	to be called and
@@ -619,45 +450,59 @@ extern "C" int moduleWelcome
 //--------------------------------------------------------------------------*
 extern "C" int moduleInitialize(tModInfo *ModInfo)
 {
-  LogSimplix.debug("\n#Initialize from %s ...\n",RobPathXML);
-  LogSimplix.debug("#NBBOTS: %d	(of	%d)\n",NBBOTS,MAXNBBOTS);
+    int ret = -1;
+    void *handle = GetFileHandle("simplix");
 
-#ifdef ROB_SECT_ARBITRARY
-  // Clear all structures.
-  memset(ModInfo, 0, (NBBOTS+1)*sizeof(tModInfo));
+    LogSimplix.debug("\n#Initialize from %s ...\n",RobPathXML);
+    drivers.clear();
 
-  int I;
-  for (I = 0; I	< TDriver::NBBOTS; I++)
-  {
-    ModInfo[I].name = &DriverNames[I*DRIVERLEN]; // Tell customisable name
-    ModInfo[I].desc = &DriverDescs[I*DESCRPLEN]; // Tell customisable desc.
-    ModInfo[I].fctInit	= InitFuncPt;			  // Common	used functions
-    ModInfo[I].gfId = ROB_IDENT;				  // Robot	identity
-    ModInfo[I].index =	I+IndexOffset;			  // Drivers index
-  }
-  ModInfo[NBBOTS].name = RobName;
-  ModInfo[NBBOTS].desc = RobName;
-  ModInfo[NBBOTS].fctInit =	InitFuncPt;
-  ModInfo[NBBOTS].gfId = ROB_IDENT;
-  ModInfo[NBBOTS].index	= NBBOTS+IndexOffset;
-#else //ROB_SECT_ARBITRARY
-  // Clear all structures.
-  memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
+    if (!handle)
+    {
+        LogSimplix.warning("Failed to get file handle\n");
+        ret = 0;
+        goto end;
+    }
 
-  int I;
-  for (I = 0; I	< TDriver::NBBOTS; I++)
-  {
-    ModInfo[I].name = &DriverNames[I*DRIVERLEN]; // Tell customisable name
-    ModInfo[I].desc = &DriverDescs[I*DESCRPLEN]; // Tell customisable desc.
-    ModInfo[I].fctInit	= InitFuncPt;			  // Common	used functions
-    ModInfo[I].gfId = ROB_IDENT;				  // Robot	identity
-    ModInfo[I].index =	I+IndexOffset;			  // Drivers index
-  }
-#endif //ROB_SECT_ARBITRARY
+    for (size_t i = 0; i < idents.size(); i++)
+    {
+        std::string car, category;
 
-  LogSimplix.debug("# ... Initialized\n\n");
+        if (getCar(handle, i, car))
+        {
+            LogSimplix.error("Failed to get car name for driver %u\n",
+                static_cast<unsigned>(i));
+            goto end;
+        }
+        else if (getCategory(car, category))
+        {
+            LogSimplix.error("Failed to get category for driver %u\n",
+                static_cast<unsigned>(i));
+            goto end;
+        }
 
-  return 0;
+        const Ident &id = idents.at(i);
+        const std::string &name = id.name;
+
+        ModInfo[i].name = id.name.c_str();
+        ModInfo[i].desc = id.desc.c_str();
+        ModInfo[i].fctInit	= InitFuncPt;
+        ModInfo[i].gfId = ROB_IDENT;
+        ModInfo[i].index =	i;
+
+        drivers.push_back(new tInstanceInfo(name, car, category, i));
+    }
+
+    LogSimplix.debug("# ... Initialized\n\n");
+    ret = 0;
+
+end:
+    if (ret)
+        drivers.clear();
+
+    if (handle)
+        GfParmReleaseHandle(handle);
+
+    return ret;
 }
 //==========================================================================*
 
@@ -667,14 +512,6 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
 extern "C" int moduleTerminate()
 {
     LogSimplix.debug("#Terminated %s\n\n",RobName);
-
-  if (DriverNames)
-    free(DriverNames);
-  DriverNames =	NULL;
-
-  if (DriverDescs)
-    free(DriverDescs);
-  DriverDescs =	NULL;
 
   return 0;
 }
@@ -686,31 +523,11 @@ extern "C" int moduleTerminate()
 int	simplixEntryPoint(tModInfo *ModInfo, void *RobotSettings)
 {
     LogSimplix.debug("\n#Torcs	backward compatibility scheme used\n");
-    NBBOTS	= MIN(10,NBBOTS);
 
-    memset(ModInfo, 0,	NBBOTS*sizeof(tModInfo));
-    DriverNames = (char *)	calloc(10,DRIVERLEN);
-    DriverDescs = (char *)	calloc(10,DESCRPLEN);
-    memset(DriverNames, 0,	10*DRIVERLEN);
-    memset(DriverDescs, 0,	10*DESCRPLEN);
-
-    char SectionBuf[BUFSIZE];
-    char *Section = SectionBuf;
-
-    snprintf( SectionBuf, BUFSIZE,	"%s/%s/%d",
-        ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
-
-    int I;
-    for (I	= 0; I < NBBOTS; I++)
+    if (loadIdentities(RobotSettings))
     {
-      snprintf( SectionBuf, BUFSIZE, "%s/%s/%d",
-          ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
-      const char *DriverName =	GfParmGetStr( RobotSettings,
-          Section, (char *) ROB_ATTR_NAME, defaultBotName[I]);
-      strncpy(&DriverNames[I*DRIVERLEN], DriverName, DRIVERLEN-1);
-      const char *DriverDesc =	GfParmGetStr( RobotSettings,
-          Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
-      strncpy(&DriverDescs[I*DESCRPLEN], DriverDesc, DESCRPLEN-1);
+        LogSimplix.error("#Failed to load identities\n");
+        return -1;
     }
 
     GfParmReleaseHandle(RobotSettings);
@@ -759,168 +576,6 @@ static int InitFuncPt(int Index, void *Pt)
   Itf->rbShutdown =	Shutdown;
   Itf->index	  = Index;						  // Store	index
 
-#ifdef ROB_SECT_ARBITRARY
-  int xx;
-  tInstanceInfo	*copy;
-
-  //Make sure enough data is allocated
-  if (cInstancesCount <= Index-IndexOffset)	{
-    copy =	new	tInstanceInfo[Index-IndexOffset+1];
-    for (xx = 0; xx < cInstancesCount;	++xx)
-      copy[xx]	= cInstances[xx];
-    for (xx = cInstancesCount;	xx < Index-IndexOffset+1; ++xx)
-      copy[xx].cRobot = NULL;
-    if	(cInstancesCount > 0)
-      delete []cInstances;
-    cInstances	= copy;
-    cInstancesCount = Index-IndexOffset+1;
-  }
-#endif
-
-  void*	RobotSettings =								// Open robot team definition
-      GetFileHandle(TDriver::MyBotName);
-
-  cInstances[Index-IndexOffset].cRobot =			// Create a driver
-      new TDriver(Index-IndexOffset);
-  cInstances[Index-IndexOffset].cRobot->SetBotName	// Store	customized name
-      (RobotSettings,								// from Robot's xml-file and
-      &DriverNames[(Index-IndexOffset)*DRIVERLEN]);	//	not	from drivers xml-file!
-
-  if (cRobotType ==	RTYPE_SIMPLIX)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_TRB1)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_TRB1\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_SC)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_SC\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.10f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_SRW)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_SRW\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.30f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderInner(0.00f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_36GP)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_36GP\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_36GP;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.5f);
-    //cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
-    //cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_67GP)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_67GP\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.5f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_LS1)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_LS1\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS1;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-    cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_LS2)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_LS2\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS2;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LS2;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_MP5)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_MP5\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_LP1)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_LP1\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LP1;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_REF)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_REF\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
-//	  cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-  else if (cRobotType == RTYPE_SIMPLIX_STOCK)
-  {
-    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_STOCK\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
-//	  cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-//	  cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo =	&TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo =	&TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-  }
-
-  GfParmReleaseHandle(RobotSettings);
-
   return 0;
 }
 //==========================================================================*
@@ -932,10 +587,7 @@ static int InitFuncPt(int Index, void *Pt)
 static void	InitTrack(int Index,
   tTrack* Track,void *CarHandle,void **CarParmHandle, tSituation *S)
 {
-  // Init common used data
-  cInstances[Index-IndexOffset].cRobot->SetCommonData
-      (&gCommonData,cRobotType);
-  cInstances[Index-IndexOffset].cRobot->InitTrack
+  drivers[Index]->cRobot.InitTrack
       (Track,CarHandle,CarParmHandle, S);
 }
 //==========================================================================*
@@ -947,17 +599,10 @@ static void	InitTrack(int Index,
 static void	NewRace(int	Index, tCarElt*	Car, tSituation	*S)
 {
   RtInitTimer(); //	Check existance	of Performance Counter Hardware
+  tInstanceInfo *d = drivers[Index];
 
-  cInstances[Index-IndexOffset].cTicks = 0.0;				//	Initialize counters
-  cInstances[Index-IndexOffset].cMinTicks =	FLT_MAX;		// and time data
-  cInstances[Index-IndexOffset].cMaxTicks =	0.0;
-  cInstances[Index-IndexOffset].cTickCount = 0;
-  cInstances[Index-IndexOffset].cLongSteps = 0;
-  cInstances[Index-IndexOffset].cCriticalSteps = 0;
-  cInstances[Index-IndexOffset].cUnusedCount = 0;
-
-  cInstances[Index-IndexOffset].cRobot->NewRace(Car, S);
-  cInstances[Index-IndexOffset].cRobot->CurrSimTime	= -10.0;
+  d->cRobot.NewRace(Car, S);
+  d->cRobot.CurrSimTime	= -10.0;
 }
 //==========================================================================*
 
@@ -975,42 +620,45 @@ static void	NewRace(int	Index, tCarElt*	Car, tSituation	*S)
 //--------------------------------------------------------------------------*
 static void	Drive(int Index, tCarElt* Car, tSituation *S)
 {
+  tInstanceInfo *d = drivers[Index];
+  TDriver &robot = d->cRobot;
+
   //LogSimplix.debug("#>>> TDriver::Drive\n");
-  if (cInstances[Index-IndexOffset].cRobot->CurrSimTime	< S->currentTime)
-//	if (cInstances[Index-IndexOffset].cRobot->CurrSimTime + 0.03	< S->currentTime)
+  if (robot.CurrSimTime	< S->currentTime)
+//	if (robot.CurrSimTime + 0.03	< S->currentTime)
   {
     //LogSimplix.debug("#Drive\n");
     double	StartTimeStamp = RtTimeStamp();
 
-    cInstances[Index-IndexOffset].cRobot->CurrSimTime =	 // Update	current	time
+    robot.CurrSimTime =	 // Update	current	time
         S->currentTime;
-    cInstances[Index-IndexOffset].cRobot->Update(Car,S);	 // Update info about	opp.
-    if	(cInstances[Index-IndexOffset].cRobot->IsStuck())	 // Check	if we are stuck
-      cInstances[Index-IndexOffset].cRobot->Unstuck();		 //   Unstuck
+    robot.Update(Car,S);	 // Update info about	opp.
+    if	(robot.IsStuck())	 // Check	if we are stuck
+      robot.Unstuck();		 //   Unstuck
     else										  //	or
-      cInstances[Index-IndexOffset].cRobot->Drive();		 //	 Drive
+      robot.Drive();		 //	 Drive
 
     double	Duration = RtDuration(StartTimeStamp);
 
-    if	(cInstances[Index-IndexOffset].cTickCount >	0)		 //	Collect	used time
+    if	(d->cTickCount >	0)		 //	Collect	used time
     {
       if (Duration	> 1.0)
-        cInstances[Index-IndexOffset].cLongSteps++;
+        d->cLongSteps++;
       if (Duration	> 2.0)
-        cInstances[Index-IndexOffset].cCriticalSteps++;
-      if (cInstances[Index-IndexOffset].cMinTicks > Duration)
-        cInstances[Index-IndexOffset].cMinTicks =	Duration;
-      if (cInstances[Index-IndexOffset].cMaxTicks < Duration)
-        cInstances[Index-IndexOffset].cMaxTicks =	Duration;
+        d->cCriticalSteps++;
+      if (d->cMinTicks > Duration)
+        d->cMinTicks =	Duration;
+      if (d->cMaxTicks < Duration)
+        d->cMaxTicks =	Duration;
     }
-    cInstances[Index-IndexOffset].cTickCount++;
-    cInstances[Index-IndexOffset].cTicks += Duration;
+    d->cTickCount++;
+    d->cTicks += Duration;
   }
   else
   {
     //LogSimplix.debug("#DriveLast\n");
-    cInstances[Index-IndexOffset].cUnusedCount++;
-    cInstances[Index-IndexOffset].cRobot->DriveLast();		 // Use last drive	commands
+    d->cUnusedCount++;
+    robot.DriveLast();		 // Use last drive	commands
   }
   //LogSimplix.debug("#<<< TDriver::Drive\n");
 }
@@ -1025,7 +673,7 @@ static int PitCmd(int Index, tCarElt* Car, tSituation *S)
   // Dummy:	use	parameters
   if ((Index < 0) || (Car == NULL) || (S ==	NULL))
     LogSimplix.debug("PitCmd\n");
-  return cInstances[Index-IndexOffset].cRobot->PitCmd();
+  return drivers[Index]->cRobot.PitCmd();
 }
 //==========================================================================*
 
@@ -1040,7 +688,7 @@ static void	EndRace(int	Index, tCarElt *Car, tSituation	*S)
       Index = 0;
 
   LogSimplix.debug("EndRace\n");
-  cInstances[Index-IndexOffset].cRobot->EndRace();
+  drivers[Index]->cRobot.EndRace();
 }
 //==========================================================================*
 
@@ -1050,56 +698,20 @@ static void	EndRace(int	Index, tCarElt *Car, tSituation	*S)
 //--------------------------------------------------------------------------*
 static void	Shutdown(int Index)
 {
-#ifdef ROB_SECT_ARBITRARY
-  int count;
-  int xx;
-  tInstanceInfo	*copy;
-#endif //ROB_SECT_ARBITRARY
+  tInstanceInfo *d = drivers[Index];
 
   LogSimplix.debug("\n\n#Clock\n");
-  LogSimplix.debug("#Total Time	used: %g sec\n",cInstances[Index-IndexOffset].cTicks/1000.0);
-  LogSimplix.debug("#Min   Time	used: %g msec\n",cInstances[Index-IndexOffset].cMinTicks);
-  LogSimplix.debug("#Max   Time	used: %g msec\n",cInstances[Index-IndexOffset].cMaxTicks);
-  LogSimplix.debug("#Mean  Time	used: %g msec\n",cInstances[Index-IndexOffset].cTicks/cInstances[Index-IndexOffset].cTickCount);
-  LogSimplix.debug("#Long Time Steps: %d\n",cInstances[Index-IndexOffset].cLongSteps);
-  LogSimplix.debug("#Critical Steps	: %d\n",cInstances[Index-IndexOffset].cCriticalSteps);
-  LogSimplix.debug("#Unused	Steps	:	%d\n",cInstances[Index-IndexOffset].cUnusedCount);
+  LogSimplix.debug("#Total Time	used: %g sec\n",d->cTicks/1000.0);
+  LogSimplix.debug("#Min   Time	used: %g msec\n",d->cMinTicks);
+  LogSimplix.debug("#Max   Time	used: %g msec\n",d->cMaxTicks);
+  LogSimplix.debug("#Mean  Time	used: %g msec\n",d->cTicks/d->cTickCount);
+  LogSimplix.debug("#Long Time Steps: %d\n",d->cLongSteps);
+  LogSimplix.debug("#Critical Steps	: %d\n",d->cCriticalSteps);
+  LogSimplix.debug("#Unused	Steps	:	%d\n",d->cUnusedCount);
   LogSimplix.debug("\n");
   LogSimplix.debug("\n");
 
-  cInstances[Index-IndexOffset].cRobot->Shutdown();
-  delete cInstances[Index-IndexOffset].cRobot;
-  cInstances[Index-IndexOffset].cRobot = NULL;
-
-#ifdef ROB_SECT_ARBITRARY
-  //Check if this was the highest index
-  if (cInstancesCount == Index-IndexOffset+1)
-  {
-    //Now make	the	cInstances array smaller
-    //Count the number	of robots which	are	still in the array
-    count = 0;
-    for (xx = 0; xx < Index-IndexOffset+1;	++xx)
-    {
-      if (cInstances[xx].cRobot)
-        count	= xx+1;
-    }
-
-    if	(count>0)
-    {
-      //We	have robots	left: make a new array
-      copy	= new tInstanceInfo[count];
-      for (xx = 0;	xx < count;	++xx)
-        copy[xx] = cInstances[xx];
-    }
-    else
-    {
-      copy	= NULL;
-    }
-    delete	[]cInstances;
-    cInstances	= copy;
-    cInstancesCount = count;
-  }
-#endif //ROB_SECT_ARBITRARY
+  d->cRobot.Shutdown();
 }
 //==========================================================================*
 
@@ -1110,9 +722,8 @@ extern "C" int simplix(tModInfo	*ModInfo)
 {
   void *RobotSettings =	GetFileHandle("simplix");
   if (!RobotSettings)
-      return -1;
+      return 0;
 
-  SetParameters(1, "car1-trb1");
   return simplixEntryPoint(ModInfo,RobotSettings);
 }
 //==========================================================================*

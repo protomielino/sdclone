@@ -55,6 +55,7 @@
 #ifndef	_UNITLANE_H_
 #define	_UNITLANE_H_
 
+#include "unitglobal.h"
 #include "unittrack.h"
 #include "unitcarparam.h"
 #include "unitfixcarparam.h"
@@ -107,7 +108,7 @@ class TLane
 
 	TPathPt* oPathPoints;						  // Points	in this	lane
 
-	TLane();
+	TLane(TDriver &driver);
 	virtual ~TLane();
 
 	virtual TLane&	operator= (const TLane&	Lane);
@@ -170,6 +171,7 @@ class TLane
 	TFixCarParam oFixCarParam;					  // Copy of car params
 	TCarParam oCarParam;						  //	Copy of	car	params
 	TCubicSpline oTurnScale;					  // Scale of	turns
+	TDriver &driver;
 	int Dummy;
 };
 //==========================================================================*

@@ -84,31 +84,14 @@
 //==========================================================================*
 // Statics
 //--------------------------------------------------------------------------*
-int	TDriver::NBBOTS	= MAX_NBBOTS;				   // Nbr of drivers/robots
 const char*	TDriver::MyBotName = "simplix";		   // Name	of this	bot
 const char*	TDriver::ROBOT_DIR = "drivers/simplix";// Sub path to dll
 const char*	TDriver::SECT_PRIV = "simplix private";// Private section
 const char*	TDriver::DEFAULTCARTYPE	 = "car1-trb1";// Default car type
-int	  TDriver::RobotType = 0;
-bool  TDriver::AdvancedParameters =	false;		   // Advanced parameters
-bool  TDriver::UseOldSkilling =	false;			   // Use old skilling
-bool  TDriver::UseSCSkilling = false;			   // Use supercar skilling
-bool  TDriver::UseMPA1Skilling = false;			   //	Use	mpa1 car skilling
-float TDriver::SkillingFactor =	0.1f;			   // Skilling factor for career-mode
-bool  TDriver::UseBrakeLimit = false;			   // Use brake	limit
-bool  TDriver::UseGPBrakeLimit = false;			   //	Use	brake limit	GP36
-bool  TDriver::UseRacinglineParameters = false;	   // Use racingline parameters
-bool  TDriver::UseWingControl =	false;			   // Use wing	control	parameters
-float TDriver::BrakeLimit =	-6;					   // Brake	limit
-float TDriver::BrakeLimitBase =	0.025f;			   //	Brake limit	base
-float TDriver::BrakeLimitScale = 25;			   // Brake limit scale
-float TDriver::SpeedLimitBase =	0.025f;			   //	Speed limit	base
-float TDriver::SpeedLimitScale = 25;			   // Speed limit scale
-bool  TDriver::FirstPropagation	= true;			   //	Initialize
-bool  TDriver::Learning	= false;				   // Initialize
 
 double TDriver::LengthMargin;					   //	safety margin long.
 bool TDriver::Qualification;					   // Global flag
+bool TDriver::FirstPropagation = true;
 static const char *WheelSect[4]	=				   // TORCS defined sections
 {SECT_FRNTRGTWHEEL,	SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 static const char *WingSect[2] =
@@ -181,11 +164,138 @@ void TDriver::InterpolatePointInfo
 }
 //==========================================================================*
 
+int TDriver::getRobotType(const std::string &category) const
+{
+    static const struct cat
+    {
+        const char *category;
+        int type;
+    } cats[] =
+    {
+        {"TRB1", RTYPE_SIMPLIX_TRB1},
+        {"SC", RTYPE_SIMPLIX_SC},
+        {"36GP", RTYPE_SIMPLIX_36GP},
+        {"LS1", RTYPE_SIMPLIX_LS1},
+        {"LS2", RTYPE_SIMPLIX_LS2},
+        {"MP5", RTYPE_SIMPLIX_MP5},
+        {"LP1", RTYPE_SIMPLIX_LP1},
+        {"REF", RTYPE_SIMPLIX_REF},
+        {"SRW", RTYPE_SIMPLIX_SRW},
+        {"STOCK", RTYPE_SIMPLIX_STOCK},
+        {"67GP", RTYPE_SIMPLIX_67GP},
+    };
+
+    for (size_t i = 0; i < sizeof cats / sizeof *cats; i++)
+    {
+        const struct cat &c = cats[i];
+
+        if (category == c.category)
+            return c.type;
+    }
+
+    return RTYPE_SIMPLIX;
+}
+
+void TDriver::setCategoryParams()
+{
+    switch (RobotType)
+    {
+        case RTYPE_SIMPLIX_TRB1:
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            UseRacinglineParameters =	true;
+            SideBorderOuter(0.20f);
+            break;
+
+        case RTYPE_SIMPLIX_SC:
+            UseSCSkilling	= true;					// Use supercar	skilling
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            UseRacinglineParameters =	true;
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+            SideBorderOuter(0.10f);
+            break;
+
+        case RTYPE_SIMPLIX_SRW:
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+            AdvancedParameters = true;
+            UseSCSkilling	= true;			 // Use supercar skilling
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            UseWingControl = true;
+            UseRacinglineParameters =	true;
+            SideBorderOuter(0.30f);
+            SideBorderInner(0.00f);
+            break;
+
+        case RTYPE_SIMPLIX_36GP:
+        case RTYPE_SIMPLIX_67GP:
+            AdvancedParameters = true;
+            UseSCSkilling	= true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            SideBorderOuter(0.5f);
+            break;
+
+        case RTYPE_SIMPLIX_LS1:
+            AdvancedParameters = true;
+            UseBrakeLimit	= true;
+            UseRacinglineParameters =	true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS1;
+            UseFilterAccel();
+            break;
+
+        case RTYPE_SIMPLIX_LS2:
+            AdvancedParameters = true;
+            UseBrakeLimit	= true;
+            UseRacinglineParameters =	true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS2;
+            CalcFrictionFoo = &TDriver::CalcFriction_simplix_LS2;
+            SideBorderOuter(0.20f);
+            break;
+
+        case RTYPE_SIMPLIX_MP5:
+            AdvancedParameters = true;
+            UseBrakeLimit	= true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            SideBorderOuter(0.20f);
+            break;
+
+        case RTYPE_SIMPLIX_LP1:
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            CalcFrictionFoo = &TDriver::CalcFriction_simplix_LP1;
+            SideBorderOuter(0.20f);
+            break;
+
+        case RTYPE_SIMPLIX_REF:
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+            UseRacinglineParameters =	true;
+            UseWingControl = true;
+            SideBorderOuter(0.20f);
+            break;
+
+        case RTYPE_SIMPLIX_STOCK:
+            CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+            AdvancedParameters = true;
+            UseBrakeLimit	= false;
+            UseMPA1Skilling =	true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            UseRacinglineParameters =	true;
+            SideBorderOuter(0.20f);
+            break;
+
+        default:
+            AdvancedParameters = true;
+            SkillingFactor = 0.1f;		 // Skilling factor for career-mode
+            UseWingControl = true;
+            UseRacinglineParameters =	true;
+            SideBorderOuter(0.20f);
+            break;
+    }
+}
+
 //==========================================================================*
 // Constructor
 //--------------------------------------------------------------------------*
-TDriver::TDriver(int Index):
-    oRobotTyp(0),
+TDriver::TDriver(void *params, int Index):
     oCommonData(NULL),
     //	TrackDesc
     //	Racingline
@@ -398,7 +508,23 @@ TDriver::TDriver(int Index):
     oJumpOffset(0.0),
     oFirstJump(true),
     oStartSteerFactor(0.0),
-    oCarHasTYC(false)
+    oCarHasTYC(false),
+    RobotType(getRobotType(params, Index)),
+    AdvancedParameters(false),
+    UseOldSkilling(false),
+    UseSCSkilling(false),
+    UseMPA1Skilling(false),
+    SkillingFactor(0.1f),
+    UseBrakeLimit(false),
+    UseGPBrakeLimit(false),
+    UseRacinglineParameters(false),
+    UseWingControl(false),
+    BrakeLimit(6),
+    BrakeLimitScale(25),
+    BrakeLimitBase(0.025f),
+    SpeedLimitScale(25),
+    SpeedLimitBase(0.025f),
+    Learning(false)
 {
     LogSimplix.debug("\n#TDriver::TDriver() >>>\n\n");
     int I;
@@ -466,7 +592,7 @@ TDriver::~TDriver()
 //==========================================================================*
 // Set name	of robot (and other	appendant features)
 //--------------------------------------------------------------------------*
-void TDriver::SetBotName(void* RobotSettings, char*	Value)
+void TDriver::SetBotName(void* RobotSettings, const char*	Value)
 {
     //	At this	point TORCS	gives us no	information
     //	about the name of the driver, the team and
@@ -580,12 +706,12 @@ bool TDriver::SaveCharacteristicToFile(const char* Filename)
 //--------------------------------------------------------------------------*
 void TDriver::AdjustBrakes(PCarHandle Handle)
 {
-    if	((TDriver::UseBrakeLimit) || (TDriver::UseGPBrakeLimit))
+    if	((UseBrakeLimit) || (UseGPBrakeLimit))
     {
-        TDriver::BrakeLimit =
+        BrakeLimit =
                 GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT,0,
-                             (float)	TDriver::BrakeLimit);
-        LogSimplix.debug("#BrakeLimit	%g\n",TDriver::BrakeLimit);
+                             (float)	BrakeLimit);
+        LogSimplix.debug("#BrakeLimit	%g\n",BrakeLimit);
         TDriver::BrakeLimitBase =
                 GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT_BASE,0,
                              (float)	TDriver::BrakeLimitBase);
@@ -2956,7 +3082,7 @@ void TDriver::InitAdaptiveShiftLevels()
     for (I	= 0; I < MAX_GEARS;	I++)
     {
         oShift[I]	= 1000.0;
-        if (TDriver::UseGPBrakeLimit)
+        if (UseBrakeLimit)
             oGearEff[I] = 0.95;
         else
             oGearEff[I] = 0.95;
@@ -3025,7 +3151,7 @@ void TDriver::InitAdaptiveShiftLevels()
 
     int J;
     for (J	= 0; J < CarGearNbr; J++)
-        if (TDriver::UseGPBrakeLimit)
+        if (UseBrakeLimit)
             oShift[J] = oRevsLimiter	* 0.90;	//0.87;
         else
             oShift[J] = oRevsLimiter	* 0.974;
@@ -4779,7 +4905,7 @@ double TDriver::CalcHairpin_simplix_Identity(double	Speed, double AbsCrv)
 double TDriver::CalcHairpin_simplix(double Speed, double AbsCrv)
 {
 
-    if	(TDriver::UseGPBrakeLimit)
+    if	(UseBrakeLimit)
     {
         if (fabs(AbsCrv) > 1/15.0)
             Speed *=	0.20;							  // Filter	hairpins
@@ -4804,7 +4930,7 @@ double TDriver::CalcHairpin_simplix(double Speed, double AbsCrv)
 
     if	(AbsCrv	< 1/10.0)
     {
-        if (TDriver::UseGPBrakeLimit)
+        if (UseBrakeLimit)
         {
             if (Speed < 6.0)
                 Speed =	6.0;
@@ -4817,7 +4943,7 @@ double TDriver::CalcHairpin_simplix(double Speed, double AbsCrv)
     }
     else
     {
-        if (TDriver::UseGPBrakeLimit)
+        if (UseBrakeLimit)
         {
             if (Speed < 3.0)
                 Speed =	3.0;

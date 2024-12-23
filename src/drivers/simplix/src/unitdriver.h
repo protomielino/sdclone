@@ -84,7 +84,7 @@
 class TDriver
 {
   public:
-    TDriver(int Index);						  // Constructor
+    TDriver(void *params, int Index);						  // Constructor
     ~TDriver();								  // Destructor
 
     //	TORCS-Interface:
@@ -156,10 +156,10 @@ class TDriver
     void LearnBraking(double Pos);				   // Learn braking parameters
 
     void SetBotName							  //	Set	name of	bot
-      (void* RobotSettings, char* Value);
+      (void* RobotSettings, const char* Value);
     inline	void	SetCommonData					  //	Set	pointer	to common data
-      (TCommonData* CommonData, int RobotTyp);
-    inline	char* GetBotName();
+      (TCommonData* CommonData);
+    inline	const char* GetBotName();
     inline	float CurrSpeed();
     inline	int	TeamIndex();
 
@@ -206,10 +206,11 @@ private:
     double	CalcSkill(double TargetSpeed);
     bool CheckPitSharing();
     bool SaveToFile();
+    int getRobotType(void *h, unsigned index) const;
+    void setCategoryParams();
 
 
 private:
-    int oRobotTyp;
     TCommonData* oCommonData;					  //	Pointer	to common data
     TTrackDescription oTrackDesc;				  // Track description
     TClothoidLane oRacingLine[gNBR_RL];		  // Racinglines
@@ -267,7 +268,7 @@ private:
     bool oAlone;								  // No opponent near
     double	oAngle;								  //	Actual Angle
     double	oAngleSpeed;						  // Angle of	speed
-    char* oBotName;							  //	Name of	driver
+    const char* oBotName;							  //	Name of	driver
     const char* oTeamName;						  // Name of team
     int oRaceNumber;							  // Race number
     bool oWingControl;							 // Enable wing control
@@ -454,30 +455,30 @@ private:
     double	Y[ControlPoints];
     double	S[ControlPoints];
 
-    static	int	NBBOTS;							  // Nbr of cars
     double	CurrSimTime;						  // Current simulation time
     static	const char*	MyBotName;						// Name	of this	bot
     static	const char*	ROBOT_DIR;						// Sub path	to dll
     static	const char*	SECT_PRIV;						// Private section
     static	const char*	DEFAULTCARTYPE;					// Default car type
 
-    static	int	RobotType;
-    static	bool AdvancedParameters;
-    static	bool UseOldSkilling;
-    static	bool UseSCSkilling;
-    static	bool UseMPA1Skilling;
-    static	float SkillingFactor;
-    static	bool UseBrakeLimit;
-    static	bool UseGPBrakeLimit;
-    static	bool UseRacinglineParameters;
-    static	bool UseWingControl;
-    static	float BrakeLimit;
-    static	float BrakeLimitScale;
-    static	float BrakeLimitBase;
-    static	float SpeedLimitScale;
-    static	float SpeedLimitBase;
-    static	bool FirstPropagation;
-    static	bool Learning;
+    int	RobotType;
+    bool AdvancedParameters;
+    bool UseOldSkilling;
+    bool UseSCSkilling;
+    bool UseMPA1Skilling;
+    float SkillingFactor;
+    bool UseBrakeLimit;
+    bool UseGPBrakeLimit;
+    bool UseRacinglineParameters;
+    bool UseWingControl;
+    float BrakeLimit;
+    float BrakeLimitScale;
+    float BrakeLimitBase;
+    float SpeedLimitScale;
+    float SpeedLimitBase;
+    bool Learning;
+
+    static bool FirstPropagation;
 
     void ScaleSide(float FactorMu,	float FactorBrake);
     void SideBorderOuter(float	Factor);
@@ -537,7 +538,7 @@ private:
 //==========================================================================*
 // Get name	of robot
 //--------------------------------------------------------------------------*
-char* TDriver::GetBotName()
+const char* TDriver::GetBotName()
   {return oBotName;};
 //==========================================================================*
 
@@ -552,8 +553,8 @@ int	TDriver::TeamIndex()
 // Set pointer to common data
 //--------------------------------------------------------------------------*
 void TDriver::SetCommonData
-  (TCommonData*	CommonData,	int	RobotTyp)
-  {oCommonData = CommonData; oRobotTyp = RobotTyp;};
+  (TCommonData*	CommonData)
+  {oCommonData = CommonData;};
 //==========================================================================*
 
 //==========================================================================*

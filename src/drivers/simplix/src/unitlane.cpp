@@ -449,7 +449,7 @@ void TLane::CalcMaxSpeeds
          TrackRollAngle,
          TrackTiltAngle);
 
-    if	(TDriver::UseGPBrakeLimit)
+    if	(driver.UseBrakeLimit)
     {
 
       //double	TrackTurnangle1	= CalcTrackTurnangle(P,	(P + 30) % N);

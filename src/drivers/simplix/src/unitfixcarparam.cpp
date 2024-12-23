@@ -249,11 +249,11 @@ double TFixCarParam::CalcBraking
 	Acc = CarParam.oScaleBrake	* Ftanroad
 	  / (oTmpCarParam->oMass *	( 3	+ oTmpCarParam->oSkill)	/ 4);
 
-	if	(TDriver::UseBrakeLimit)
+	if	(oDriver->UseBrakeLimit)
 	{
 	  double Radius = 1.0 / fabs(Crv);
 	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) /	100.0));
-	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+	  Acc = MAX(Acc,oDriver->BrakeLimit * factor);
 	}
 
 	double	Inner =	MAX(0, V * V - 2 * Acc * Dist);
@@ -364,7 +364,7 @@ double	TFixCarParam::CalcBrakingPit
 	{
 	  double Radius = 1.0 / fabs(Crv);
 	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) /	100.0));
-	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+	  Acc = MAX(Acc,oDriver->BrakeLimit * factor);
 	}
 
 	double	Inner =	MAX(0, V * V - 2 * Acc * Dist);
