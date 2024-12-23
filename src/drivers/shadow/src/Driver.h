@@ -85,8 +85,6 @@ public:
     Driver(const Driver &d);
     ~Driver();
 
-    void	SetShared( Shared* pShared );
-
     void	InitTrack( int index, tTrack* track, void* carHandle,
                         void** carParmHandle, tSituation* s);
     void	NewRace( int index, tCarElt* car, tSituation* s );
@@ -347,9 +345,8 @@ private:
     };
 
 private:
-
+    static Shared			m_pShared;
     int             INDEX;
-    Shared*			m_pShared;
     SpringsPath		m_path[N_PATHS];
     PitPath			m_pitPath[N_PATHS][2];
     Strategy		m_Strategy;

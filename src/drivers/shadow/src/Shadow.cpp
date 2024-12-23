@@ -44,8 +44,6 @@ class Driver;
 // The "SHADOW" logger instance
 GfLogger* PLogSHADOW = 0;
 
-static Shared       s_shared;
-
 // TORCS interface
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newRace(int index, tCarElt* car, tSituation *s);
@@ -261,7 +259,6 @@ static int InitFuncPt(int index, void *pt)
 static void initTrack(int index, tTrack* track, void *carHandle,
                       void **carParmHandle, tSituation *s)
 {
-    driver[index]->SetShared( &s_shared );
     driver[index]->InitTrack(index, track, carHandle, carParmHandle, s);
 }
 

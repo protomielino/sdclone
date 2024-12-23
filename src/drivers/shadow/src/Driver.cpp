@@ -37,6 +37,8 @@
 
 using namespace std;
 
+Shared Driver::m_pShared;
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -248,11 +250,6 @@ static double	SafeParmGetNum( void *handle, const char *path, const char *key, c
         return deflt;
 
     return GfParmGetNum(handle, path, key, unit, deflt);
-}
-
-void	Driver::SetShared( Shared* pShared )
-{
-    m_pShared = pShared;
 }
 
 // Called for every track change or new race.
@@ -713,15 +710,15 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         m_cm[p].TYRE_MU_R	= m_cm[PATH_NORMAL].TYRE_MU_R;
     }
 
-    if( m_pShared->m_path[PATH_NORMAL].GetOptions().factors != m_priv[PATH_NORMAL].FACTORS ||
-            m_pShared->m_path[PATH_LEFT].GetOptions().factors   != m_priv[PATH_LEFT].FACTORS ||
-            m_pShared->m_path[PATH_RIGHT].GetOptions().factors  != m_priv[PATH_RIGHT].FACTORS ||
-            m_pShared->m_pTrack != m_track.GetTrack() )
+    if( m_pShared.m_path[PATH_NORMAL].GetOptions().factors != m_priv[PATH_NORMAL].FACTORS ||
+            m_pShared.m_path[PATH_LEFT].GetOptions().factors   != m_priv[PATH_LEFT].FACTORS ||
+            m_pShared.m_path[PATH_RIGHT].GetOptions().factors  != m_priv[PATH_RIGHT].FACTORS ||
+            m_pShared.m_pTrack != m_track.GetTrack() )
     {
-        if( m_pShared->m_pTrack != m_track.GetTrack() )
+        if( m_pShared.m_pTrack != m_track.GetTrack() )
         {
-            m_pShared->m_pTrack = m_track.GetTrack();
-            m_pShared->m_teamInfo.Empty();
+            m_pShared.m_pTrack = m_track.GetTrack();
+            m_pShared.m_teamInfo.Empty();
         }
 
         LogSHADOW.debug( "Generating smooth paths...\n" );
@@ -735,8 +732,8 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
         options.quadSmoothIters = m_priv[PATH_NORMAL].QUAD_SMOOTH_ITERS;
 
-        m_pShared->m_path[PATH_NORMAL].MakeSmoothPath( &m_track, m_cm[PATH_NORMAL], options);
-        LogSHADOW.debug("m_pShared->m_path passed !\n");
+        m_pShared.m_path[PATH_NORMAL].MakeSmoothPath( &m_track, m_cm[PATH_NORMAL], options);
+        LogSHADOW.debug("m_pShared.m_path passed !\n");
 
         const double car_margin = m_track.GetWidth() / 2 - 4;
 
@@ -749,7 +746,7 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
         options.quadSmoothIters = m_priv[PATH_LEFT].QUAD_SMOOTH_ITERS;
 
-        m_pShared->m_path[PATH_LEFT].MakeSmoothPath( &m_track, m_cm[PATH_LEFT], options);
+        m_pShared.m_path[PATH_LEFT].MakeSmoothPath( &m_track, m_cm[PATH_LEFT], options);
 
         options = PathOptions(m_priv[PATH_RIGHT].BUMP_MOD,
                               m_priv[PATH_RIGHT].SAFETY_LIMIT,
@@ -760,10 +757,10 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
         options.quadSmoothIters = m_priv[PATH_RIGHT].QUAD_SMOOTH_ITERS;
 
-        m_pShared->m_path[PATH_RIGHT].MakeSmoothPath( &m_track, m_cm[PATH_RIGHT], options);
+        m_pShared.m_path[PATH_RIGHT].MakeSmoothPath( &m_track, m_cm[PATH_RIGHT], options);
     }
 
-    m_path[PATH_NORMAL] = m_pShared->m_path[PATH_NORMAL];
+    m_path[PATH_NORMAL] = m_pShared.m_path[PATH_NORMAL];
 
     {
         char	buf[1024];
@@ -784,11 +781,11 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     m_path[PATH_NORMAL].PropagateBraking(m_cm[PATH_NORMAL] );
 #endif
 
-    m_path[PATH_LEFT] = m_pShared->m_path[PATH_LEFT];
+    m_path[PATH_LEFT] = m_pShared.m_path[PATH_LEFT];
     m_path[PATH_LEFT].CalcMaxSpeeds( m_cm[PATH_LEFT] );
     m_path[PATH_LEFT].PropagateBraking( m_cm[PATH_LEFT] );
 
-    m_path[PATH_RIGHT] = m_pShared->m_path[PATH_RIGHT];
+    m_path[PATH_RIGHT] = m_pShared.m_path[PATH_RIGHT];
     m_path[PATH_RIGHT].CalcMaxSpeeds( m_cm[PATH_RIGHT] );
     m_path[PATH_RIGHT].PropagateBraking( m_cm[PATH_RIGHT] );
 
@@ -866,7 +863,7 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     pItem->pOther = 0;
     pItem->pCar = pCar;
 
-    m_pShared->m_teamInfo.Add( pCar->index, pItem );
+    m_pShared.m_teamInfo.Add( pCar->index, pItem );
 }
 
 bool	Driver::Pitting( int path, double pos ) const
@@ -2980,13 +2977,13 @@ void	Driver::Drive( int, tCarElt* car, tSituation* s )
     if( doStuckThing )
         m_stuckThing.execute( m_track, s, car, mySit );
 
-    m_Strategy.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
+    m_Strategy.Process( car, m_pShared.m_teamInfo.GetAt(car->index) );
 }
 
 // Pitstop callback.
 int		Driver::PitCmd( int index, tCarElt* car, tSituation* s )
 {
-    m_Strategy.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
+    m_Strategy.Process( car, m_pShared.m_teamInfo.GetAt(car->index) );
     if (m_cm[PATH_NORMAL].HASCOMPOUNDS)
     {
         int compounds = m_Strategy.GetCompounds();
@@ -3027,7 +3024,7 @@ void	Driver::AvoidOtherCars(
         bool*				close,
         bool*				lapper )
 {
-    m_pShared->m_teamInfo.GetAt(car->index)->damage = car->_dammage;
+    m_pShared.m_teamInfo.GetAt(car->index)->damage = car->_dammage;
 
     // double	trackLen = m_track.GetLength();
     // double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
@@ -3052,14 +3049,14 @@ void	Driver::AvoidOtherCars(
         PtInfo	oppPi;
         const tCarElt* oCar = m_opp[i].GetCar();
         GetPosInfo( oCar->race.distFromStartLine, oppPi );
-        m_opp[i].UpdateSit( car, s, &m_pShared->m_teamInfo, myDirX, myDirY,	oppPi );
+        m_opp[i].UpdateSit( car, s, &m_pShared.m_teamInfo, myDirX, myDirY,	oppPi );
     }
 
     const Opponent::Sit&	mySit = m_opp[m_myOppIdx].GetInfo().sit;
 
     for( int i = 0; i < m_nCars; i++ )
     {
-        m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this,
+        m_opp[i].ProcessMyCar( s, &m_pShared.m_teamInfo, car, mySit, *this,
                                m_maxAccel.CalcY(car->_speed_x), i, m_priv[PATH_NORMAL].OPPONENT_SPEED,
                                m_priv[PATH_NORMAL].RACETIME_LIMIT);
     }
