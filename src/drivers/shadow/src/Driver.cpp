@@ -2739,10 +2739,10 @@ void	Driver::Drive( int, tCarElt* car, tSituation* s )
         if( (thisPt - m_lastPts[0]).len() > 0.1 &&
                 car->ctrl.accelCmd == 1.0 )
         {
-            double	x[2];
-            x[0] = Utils::CalcCurvature(m_lastPts[0], m_lastPts[HIST / 2], thisPt);
-            x[0] = fabs(x[0]);
-            x[1] = m_lastSpd;
+            std::vector<double> x;
+
+            x.push_back(fabs(Utils::CalcCurvature(m_lastPts[0], m_lastPts[HIST / 2], thisPt)));
+            x.push_back(m_lastSpd);
             m_steerGraph.Learn( x, fabs(m_lastAng) );
         }
 

@@ -17,16 +17,14 @@
 
 #include "LearnedGraph.h"
 #include <math.h>
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 LearnedGraph::LearnedGraph()
-:	m_nAxes(0),
-    m_pAxis(0),
-    m_beta(0.5),
-    m_pData(0)
+:	m_beta(0.5)
 {
 }
 
@@ -37,128 +35,85 @@ LearnedGraph::LearnedGraph(
     const int*		steps,
     double			initialValue )
 :
-    m_nAxes(nAxes),
-    m_pAxis(0),
-    m_beta(0.5),
-    m_pData(0)
+    LearnedGraph()
 {
-    m_pAxis = new Axis[nAxes];
+    m_pAxis.reserve(nAxes);
     int	itemSize = 1;
     for( int i = nAxes - 1; i >= 0; i-- )
     {
-        m_pAxis[i].m_min = min[i];
-        m_pAxis[i].m_span = max[i] - min[i];
-        m_pAxis[i].m_steps = steps[i];
-        m_pAxis[i].m_itemSize = itemSize;
+        Axis axis;
+
+        axis.m_min = min[i];
+        axis.m_span = max[i] - min[i];
+        axis.m_steps = steps[i];
+        axis.m_itemSize = itemSize;
+        m_pAxis.push_back(axis);
 
         itemSize *= steps[i] + 1;
     }
 
-    m_pData = new double[itemSize];
-    {for( int i = 0; i < itemSize; i++ )
-        m_pData[i] = initialValue;
-    }
+    m_pData.reserve(itemSize);
+    for( int i = 0; i < itemSize; i++ )
+        m_pData.push_back(initialValue);
 }
 
 LearnedGraph::LearnedGraph( double minX, double maxX, int xSteps, double initialY )
-:	m_nAxes(1),
-    m_pAxis(0),
-    m_beta(0.5),
-    m_pData(0)
+:	LearnedGraph()
 {
-    m_pAxis = new Axis[1];
-    m_pAxis->m_min = minX;
-    m_pAxis->m_span = maxX - minX;
-    m_pAxis->m_steps = xSteps;
-    m_pAxis->m_itemSize = 1;
+    Axis axis;
 
-    m_pData = new double[xSteps + 1];
+    axis.m_min = minX;
+    axis.m_span = maxX - minX;
+    axis.m_steps = xSteps;
+    axis.m_itemSize = 1;
+    m_pAxis.push_back(axis);
+
+    m_pData.reserve(xSteps + 1);
     for( int i = 0; i <= xSteps; i++ )
-        m_pData[i] = initialY;
+        m_pData.push_back(initialY);
 }
 
-LearnedGraph::~LearnedGraph()
+LearnedGraph::axis_size		LearnedGraph::GetNAxes() const
 {
-    delete [] m_pData;
-}
-
-LearnedGraph::LearnedGraph(const LearnedGraph &other)
-{
-    m_nAxes = other.m_nAxes;
-    m_pAxis = new Axis[m_nAxes];
-    m_beta = other.m_beta;
-
-    for (int i = 0; i < m_nAxes; i++)
-        m_pAxis[i] = other.m_pAxis[i];
-
-    m_pData = new double[m_pAxis->m_steps + 1];
-
-    for( int i = 0; i <= m_pAxis->m_steps; i++ )
-        m_pData[i] = other.m_pData[i];
-}
-
-int		LearnedGraph::GetNAxes() const
-{
-    return m_nAxes;
-}
-
-int		LearnedGraph::GetAxisSize( int axis ) const
-{
-    if( axis < 0 || axis >= m_nAxes )
-        return 0;
-
-    return m_pAxis[axis].m_steps + 1;
+    return m_pAxis.size();
 }
 
 void	LearnedGraph::Learn( double x, double value )
 {
-    // ASSERT( m_nAxes == 1 );
-/*	Idx*	idx = MakeIdx(&x);
+    std::vector<double> coord;
 
-    double	oldValue = m_pData[idx->i] * (1 - idx->t) +
-                       m_pData[idx->j] * idx->t;
-
-    double	delta = m_beta * (value - oldValue);
-
-    m_pData[idx->i] += delta * (1 - idx->t);
-    m_pData[idx->j] += delta * idx->t;
-
-    delete [] idx;*/
-    Learn( &x, value );
+    coord.push_back(x);
+    Learn( coord, value );
 }
 
-void	LearnedGraph::Learn( const double* coord, double value )
+void	LearnedGraph::Learn( const std::vector<double> &coord, double value )
 {
-    Idx*	idx = MakeIdx(coord);
+    std::vector<Idx> idx;
+    MakeIdx(coord, idx);
 
     double	oldValue = CalcValue(0, 0, idx);
     double	delta = m_beta * (value - oldValue);
     LearnValue( 0, 0, idx, delta );
-
-    delete [] idx;
 }
 
 double	LearnedGraph::CalcY( double x ) const
 {
-/*	double	t = m_steps * (x - m_minX) / m_spanX;	// 0 <= t <= m_steps
-    if( t < 0 )
-        t = 0;
-    else if( t > m_steps )
-        t = m_steps;
-
-    int	idx0 = (int)floor(t);
-    int	idx1 = idx0 < m_steps ? idx0 + 1 : m_steps;
-
-    t = t - idx0;	// 0 <= t <= 1
-    return m_pData[idx0] * (1 - t) + m_pData[idx1] * t;*/
-    return CalcValue(&x);
+    return CalcValue(x);
 }
 
-double	LearnedGraph::CalcValue( const double* coord ) const
+double	LearnedGraph::CalcValue( double coord ) const
 {
-    Idx*	idx = MakeIdx(coord);
+    std::vector<Idx> idx;
+
+    idx.push_back(MakeIdx(m_pAxis[0], coord));
+    return CalcValue(0, 0, idx);
+}
+
+double	LearnedGraph::CalcValue( const std::vector<double> &coord ) const
+{
+    std::vector<Idx> idx;
+    MakeIdx(coord, idx);
     double	value = CalcValue(0, 0, idx);
-    delete [] idx;
     return value;
 }
 
@@ -167,22 +122,14 @@ double	LearnedGraph::GetY( int index ) const
     return m_pData[index];
 }
 
-double	LearnedGraph::GetValue( const int* index ) const
-{
-    int	idx = 0;
-    for( int i = 0; i < m_nAxes; i++ )
-        idx += m_pAxis[i].m_itemSize * index[i];
-    return m_pData[idx];
-}
-
 void	LearnedGraph::SetBeta( double beta )
 {
     m_beta = beta;
 }
 
-double	LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
+double	LearnedGraph::CalcValue( axis_size dim, int offs, const std::vector<Idx> &idx ) const
 {
-    if( dim < m_nAxes )
+    if( dim < m_pAxis.size() )
     {
         int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
         int		offs_j = offs + m_pAxis[dim].m_itemSize * idx[dim].j;
@@ -196,9 +143,9 @@ double	LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
         return m_pData[offs];
 }
 
-void	LearnedGraph::LearnValue( int dim, int offs, const Idx* idx, double delta )
+void	LearnedGraph::LearnValue( axis_size dim, int offs, const std::vector<Idx> &idx, double delta )
 {
-    if( dim < m_nAxes )
+    if( dim < m_pAxis.size() )
     {
         int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
         int		offs_j = offs + m_pAxis[dim].m_itemSize * idx[dim].j;
@@ -210,24 +157,28 @@ void	LearnedGraph::LearnValue( int dim, int offs, const Idx* idx, double delta )
         m_pData[offs] += delta;
 }
 
-LearnedGraph::Idx*	LearnedGraph::MakeIdx( const double* coord ) const
+LearnedGraph::Idx    LearnedGraph::MakeIdx( const Axis &src, double coord ) const
 {
-    Idx*	idx = new Idx[m_nAxes];
+    Idx idx;
 
-    for( int i = 0; i < m_nAxes; i++ )
-    {
-        // 0 <= t <= m_steps
-        idx[i].t = m_pAxis[i].m_steps * (coord[i] - m_pAxis[i].m_min) /
-                            m_pAxis[i].m_span;
-        if( idx[i].t < 0 )
-            idx[i].t = 0;
-        else if( idx[i].t > m_pAxis[i].m_steps )
-            idx[i].t = m_pAxis[i].m_steps;
+    // 0 <= t <= m_steps
+    idx.t = src.m_steps * (coord - src.m_min) / src.m_span;
+    if( idx.t < 0 )
+        idx.t = 0;
+    else if( idx.t > src.m_steps )
+        idx.t = src.m_steps;
 
-        idx[i].i = (int)floor(idx[i].t);
-        idx[i].j = idx[i].i < m_pAxis[i].m_steps ? idx[i].i + 1 : m_pAxis[i].m_steps;
-        idx[i].t = idx[i].t - idx[i].i;	// 0 <= t <= 1
-    }
+    idx.i = floor(idx.t);
+    idx.j = idx.i < src.m_steps ? idx.i + 1 : src.m_steps;
+    idx.t = idx.t - idx.i;	// 0 <= t <= 1
 
     return idx;
+}
+
+void	LearnedGraph::MakeIdx( const std::vector<double> &coord, std::vector<Idx> &idx ) const
+{
+    idx.reserve(m_pAxis.size());
+
+    for( axis_size i = 0; i < m_pAxis.size(); i++ )
+        idx.push_back(MakeIdx(m_pAxis[i], coord[i]));
 }

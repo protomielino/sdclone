@@ -18,6 +18,8 @@
 #ifndef _LEARNEDGRAPH_H_
 #define _LEARNEDGRAPH_H_
 
+#include <vector>
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -26,23 +28,20 @@ class LearnedGraph
 {
 public:
     LearnedGraph();
-    LearnedGraph(const LearnedGraph &other);
     LearnedGraph( int nAxes, const double* minX, const double* maxX,
                     const int* xSteps, double initialValue  );
     LearnedGraph( double minX, double maxX, int xSteps, double initialY );
-    ~LearnedGraph();
+    typedef std::vector<struct Axis>::size_type axis_size;
 
-    int		GetNAxes() const;
-    int		GetAxisSize( int axis ) const;
+    axis_size		GetNAxes() const;
 
     void	Learn( double x, double value );
-    void	Learn( const double* coord, double value );
+    void	Learn( const std::vector<double> &coord, double value );
 
     double	CalcY( double x ) const;
-    double	CalcValue( const double* coord ) const;
+    double	CalcValue( const std::vector<double> &coord ) const;
 
     double	GetY( int index ) const;
-    double	GetValue( const int* index ) const;
 
     void	SetBeta( double beta );
 
@@ -63,18 +62,16 @@ private:
     };
 
 private:
-    double	CalcValue( int dim, int offs, const Idx* idx ) const;
-    void	LearnValue( int dim, int offs, const Idx* idx, double delta );
-    Idx*	MakeIdx( const double* coord ) const;
+    double	CalcValue( axis_size dim, int offs, const std::vector<Idx> &idx ) const;
+    double	CalcValue( double coord ) const;
+    void	LearnValue( axis_size dim, int offs, const std::vector<Idx> &idx, double delta );
+    void	MakeIdx( const std::vector<double> &coord, std::vector<Idx> &out ) const;
+    Idx    MakeIdx( const Axis &src, double coord ) const;
 
 private:
-    int		m_nAxes;
-    Axis*	m_pAxis;
-//	int		m_steps;
-//	double	m_minX;
-//	double	m_spanX;
     double	m_beta;
-    double*	m_pData;
+    std::vector<Axis>	m_pAxis;
+    std::vector<double>	m_pData;
 };
 
 #endif // _LEARNEDGRAPH_H_
