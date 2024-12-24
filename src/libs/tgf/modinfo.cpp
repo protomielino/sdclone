@@ -210,10 +210,10 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 		}
     }
 
-    /* 2) If not present, default number of interfaces (backward compatibility) */
+    /* 2) If not present, assume no interfaces */
     else
     {
-        (*mod)->modInfoSize = GfModInfoDefaultMaxItf;
+        (*mod)->modInfoSize = 0;
     }
 
     /* Get module initialization function if welcome succeeded :

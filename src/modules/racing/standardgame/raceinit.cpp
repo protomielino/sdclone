@@ -488,7 +488,7 @@ initPits(void)
  *
  * @param carindex The index whichs will be used as car->index for the car.
  * @param listindex The listindex in RM_SECT_DRIVERS_RACING
- * @param modindex The index of the mod; must be MAX_MOD_ITF if normal_carname is FALSE.
+ * @param modindex The index of the mod
  * @param robotIdx The index of the robot.
  * @param normal_carname If this member is TRUE, the car is treated as an ordinary car;
  *                       if this member is FALSE, then the car used is the one given

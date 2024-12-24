@@ -185,7 +185,8 @@ Driver::Driver(int index) :	INDEX(index),
       _deltaCounter(0),
       _prevDelta(0),
       _lastSpd0(0),
-      m_garage(false)
+      m_garage(false),
+      last_srslip(0)
 {
     for( int i = 0; i < 50; i++ )
     {
@@ -2500,7 +2501,7 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
     lastPos = car->pub.DynGC.pos.x;
 }
 
-void	Driver::Drive( int index, tCarElt* car, tSituation* s )
+void	Driver::Drive( int, tCarElt* car, tSituation* s )
 {
     if (strcmp(m_trackName, "garage") == 0)
     {
@@ -2683,7 +2684,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 
     bool	close = false;
     bool	lapper = false;
-    AvoidOtherCars( index, car, s, pi.k, &avoidTargetSpd, &avoidTargetAcc, &close, &lapper );
+    AvoidOtherCars( car, s, pi.k, &avoidTargetSpd, &avoidTargetAcc, &close, &lapper );
 #if 0   // dead code
     bool	slowing = false;
 #endif
@@ -2719,15 +2720,13 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         }
         else
         {
-            static double last_srslip[MAX_MOD_ITF] = {0};
-
             const double slip_limit  = m_priv[PATH_NORMAL].REAR_LAT_SLIP_LIMIT;
             const double slip_factor = m_priv[PATH_NORMAL].REAR_LAT_SLIP_FACTOR;
             const double slip_dscale = m_priv[PATH_NORMAL].REAR_LAT_SLIP_DSCALE;
 
             double srslip = SGN(yrslip) * rslip;
-            double delta_srslip = srslip - last_srslip[index];
-            last_srslip[index] = srslip;
+            double delta_srslip = srslip - last_srslip;
+            last_srslip = srslip;
             steer += atan(delta_srslip) * slip_dscale;// 0.1;
 
             if( rslip > slip_limit && fabs(yrslip) > slip_limit * 0.5 )
@@ -3020,7 +3019,6 @@ void	Driver::Shutdown( int index )
 }
 
 void	Driver::AvoidOtherCars(
-        int					index,
         const tCarElt*		car,
         const tSituation*	s,
         double				k,

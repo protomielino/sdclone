@@ -152,7 +152,7 @@ private:
 
 private:
     void	ProcessOtherCars( int index, tCarElt* car, double spd, tSituation* s );
-    void	AvoidOtherCars( int index, const tCarElt* car, const tSituation* s, double k,
+    void	AvoidOtherCars( const tCarElt* car, const tSituation* s, double k,
                             double* carTargetSpd, double* carTargetAcc, bool* inTraffic,
                             bool* lapper );
 
@@ -515,6 +515,7 @@ private:
     double			_prevDelta;
     double			_lastSpd0;
     bool            m_garage;
+    double          last_srslip;
 };
 
 #endif // _DRIVER_H_

@@ -24,13 +24,6 @@
 #ifndef __MODINFO__H__
 #define __MODINFO__H__
 
-/** Maximum number of interfaces in one "legacy" module
-    (no limit for "Unlimited Number of Interfaces" modules)
-    @see	ModList
- */
-#define MAX_MOD_ITF 20
-#define GfModInfoDefaultMaxItf MAX_MOD_ITF
-
 /* Name of the module function where run-time informations are exchanged (new scheme)
    This function is called before moduleInitialize if present */
 #define GfModInfoWelcomeFuncName "moduleWelcome"
