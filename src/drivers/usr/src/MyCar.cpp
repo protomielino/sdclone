@@ -63,6 +63,7 @@ void MyCar::readPrivateSection(const MyParam& param)
     mSideSlipTCL = param.getNum("private", "TCL side slip");
     mSideSlipTCLQualy = param.getNum("private", "TCL side slip qualy");
     mSideSlipTCLFactor = param.getNum("private", "TCL side slip factor");
+	mShiftUpPoint = param.getNum("private", "shift up point");
 
     if (mTireWearPerMeter == 0.0)
         mTireWearPerMeter = 1.0;
@@ -427,10 +428,19 @@ double MyCar::bumpSpeed(double curv_z) const
 
 int MyCar::calcGear()
 {
-    double SHIFT_UP = 0.98;           // [-] (% of rpmredline)
+    double SHIFT_UP = mShiftUpPoint;           // [-] (% of rpmredline)
     double SHIFT_DOWN_MARGIN = 130.0; // [rad/s] down from rpmredline
     int shifttime = 25;
     int MAX_GEAR = mCar->_gearNb - 1;
+
+	if (1 == mShiftUpPoint || mShiftUpPoint <= 0 || mShiftUpPoint == NULL)
+	{
+		mShiftUpPoint = 0.98;
+	}
+	else
+	{
+		SHIFT_DOWN_MARGIN = 130.0 / mShiftUpPoint;
+	}
 
     if (v() < 1.0)
     {

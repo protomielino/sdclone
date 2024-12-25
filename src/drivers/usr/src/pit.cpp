@@ -17,6 +17,7 @@
 
 #include "pit.h"
 #include "Utils.h"
+#include "MyTrack.h"
 
 #include <iostream>
 
@@ -38,7 +39,7 @@ Pit::Pit() :
 {
 }
 
-void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin, int rain)
+void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin, int rain, double tireweardanger)
 {
     // Get tires change time
     //void* handle = NULL;
@@ -67,6 +68,15 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         mPitGripFactor = 0.80;
     }
 
+	if (tireweardanger && tireweardanger != NULL)
+	{
+		mTireWearDanger = tireweardanger;
+	}
+	else
+	{
+		mTireWearDanger = 25.0;
+	}
+	
     mRain = rain;
 
     mEntryMargin = pitentrymargin;
@@ -84,6 +94,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
     mLastPitFuel = 0.0;
     mLastFuel = 0.0;
     mPenalty = 0;
+	tracktemp = track->local.airtemperature;
     // Get teammates car
 
     for (int i = 0; i < situation->_ncars; i++)
@@ -317,7 +328,7 @@ void Pit::update()
 
     if(mMyCar->HASTYC)
     {
-        pittyres = (mMyCar->tires()->TyreTreadDepth() < 15.00 && remaininglaps  > 5.0);
+        pittyres = (mMyCar->tires()->TyreTreadDepth() < mTireWearDanger && remaininglaps  > 5.0);
         LogUSR.debug(" # Tyre depth = %.2f Pit Tyres change = %i\n", mMyCar->tires()->TyreTreadDepth(), pittyres);
     }
     else
@@ -478,7 +489,7 @@ double Pit::calcRefuel()
     double tiresdist = mMyCar->tires()->distLeft() - 1000.0;
     double stintdist = stintfuel * (mTrack->length / mAvgFuelPerLap);
 
-    if (tiresdist < stintdist || (mMyCar->tires()->TyreTreadDepth() > 25.0 - ((double)mCar->_remainingLaps / 10)))
+    if (tiresdist < stintdist || (mMyCar->tires()->TyreTreadDepth() > (mTireWearDanger * 2) - ((double)mCar->_remainingLaps / 10)))
     {
         mTireChange = false;
     }
@@ -541,17 +552,55 @@ void Pit::pitCommand()
             {
                     int	remainingLaps = mCar->race.remainingLaps + 1;
 
-                    if (remainingLaps <= 10  && mRain < 1)
+					tdble temp = tracktemp;
+					
+                    if (temp <= 15.0 && remainingLaps <= 10  && mRain < 1)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
                         mMyCar->setTireMu(1);
-                        LogUSR.info("Change Tire SOFT !\n");
+                        LogUSR.info("STRATEGY 15C: Change Tire SOFT !\n");
                     }
-                    else if (remainingLaps <= 25 && mRain < 1)
+                    else if (temp <= 15.0 && remainingLaps <= 25 && mRain < 1)
                     {
                         mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
                         mMyCar->setTireMu(2);
-                        LogUSR.info("Change Tire MEDIUM !\n");
+                        LogUSR.info("STRATEGY 15C: Change Tire MEDIUM !\n");
+                    }
+                    else if (temp <= 15.0 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        mMyCar->setTireMu(2);
+                        LogUSR.info("STRATEGY 15C: Change Tire MEDIUM !\n");
+                    }
+                    else if (temp <= 25.0 && remainingLaps <= 10 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::SOFT;
+                        mMyCar->setTireMu(1);
+                        LogUSR.info("STRATEGY 25C: Change Tire SOFT !\n");
+                    }
+                    else if (temp <= 25.0 && remainingLaps <= 25 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        mMyCar->setTireMu(2);
+                        LogUSR.info("STRATEGY 25C: Change Tire MEDIUM !\n");
+                    }
+                    else if (temp <= 25.0 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        mMyCar->setTireMu(2);
+                        LogUSR.info("STRATEGY 25C: Change Tire MEDIUM !\n");
+                    }
+                    else if (temp > 25.0 && remainingLaps <= 10 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::MEDIUM;
+                        mMyCar->setTireMu(2);
+                        LogUSR.info("STRATEGY HOT: Change Tire MEDIUM !\n");
+                    }
+                    else if (temp > 25.0 && remainingLaps <= 30 && mRain < 1)
+                    {
+                        mCar->pitcmd.tiresetChange = tCarPitCmd::HARD;
+                        mMyCar->setTireMu(3);
+                        LogUSR.info("STRATEGY HOT: Change Tire HARD !\n");
                     }
                     else if(mRain < 2 && mCar->priv.localTemperature > 28.0 )
                     {

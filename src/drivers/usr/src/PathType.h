@@ -23,8 +23,8 @@
 
 #include <portability.h>
 
-enum PathType{ PATH_O, PATH_L, PATH_R };
+enum PathType{ PATH_O, PATH_L, PATH_R, PATH_M };
 
-static std::string PathNames[] = { "PATH_O", "PATH_L", "PATH_R" };
+static std::string PathNames[] = { "PATH_O", "PATH_L", "PATH_R", "PATH_M" };
 
 #endif // _PATHTYPE_H_

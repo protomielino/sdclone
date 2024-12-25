@@ -198,6 +198,7 @@ private:
     double mSegLen;
     double mClothFactor;
     int    mPitTest;
+	double mPitTireDanger;
 
     bool   rain;
     double rainintensity;

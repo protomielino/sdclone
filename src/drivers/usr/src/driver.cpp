@@ -142,6 +142,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     mVMaxK = param.getNum("private", "vmaxk");
     mVMaxKFactor = param.getNum("private", "vmaxkfactor");
 	driver_aggromult = param.getNum("private", "Aggression Mult");
+	mPitTireDanger = (int)param.getNum("private", "Pit Tire Wear Threshold");
 
 	// Track and car-specific Aggression multiplier,
 	// to make certain car classes overtake more aggressively
@@ -196,23 +197,65 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     {
         tdble temp = track->local.airtemperature;
 
-        if (temp < 13.0 || situation->_totLaps * (double)track->length < 57800.0)
+        if (temp < 15.0 && situation->_totLaps * (double)track->length < 57800.0)
         {
             param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
             mCar.setTireMu(1);
-            LogUSR.info("Compounds choice SOFT !!!\n");
+            LogUSR.info("STRATEGY 15C SPRINT: Compounds choice SOFT !!!\n");
         }
-        else if (temp < 25.0 || situation->_totLaps * (double)track->length < 171000.0)
+        else if (temp < 15.0 && situation->_totLaps * (double)track->length < 171000.0)
         {
             param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
             mCar.setTireMu(2);
-            LogUSR.info("Compounds choice MEDIUM !!!\n");
+            LogUSR.info("STRATEGY 15C GP: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp < 15.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            mCar.setTireMu(2);
+            LogUSR.info("STRATEGY 15C LONG: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp < 25.0 && situation->_totLaps * (double)track->length < 25000.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 1);
+            mCar.setTireMu(1);
+            LogUSR.info("STRATEGY 25C HOTLAP: Compounds choice SOFT !!!\n");
+        }
+        else if (temp < 25.0 && situation->_totLaps * (double)track->length < 57800.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            mCar.setTireMu(2);
+            LogUSR.info("STRATEGY 25C SPRINT: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp < 25.0 && situation->_totLaps * (double)track->length < 171000.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            mCar.setTireMu(2);
+            LogUSR.info("STRATEGY 25C GP: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 25000.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            mCar.setTireMu(2);
+            LogUSR.info("STRATEGY HOT HOTLAP: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 57800.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 2);
+            mCar.setTireMu(2);
+            LogUSR.info("STRATEGY HOT SPRINT: Compounds choice MEDIUM !!!\n");
+        }
+        else if (temp >= 25.0 && situation->_totLaps * (double)track->length < 171000.0)
+        {
+            param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
+            mCar.setTireMu(3);
+            LogUSR.info("STRATEGY HOT GP: Compounds choice HARD !!!\n");
         }
         else
         {
             param.setNum(SECT_TIRESET, PRM_COMPOUNDS_SET, 3);
             mCar.setTireMu(3);
-            LogUSR.info("Compounds choice HARD !!!\n");
+            LogUSR.info("NO STRATEGY: Compounds choice HARD !!!\n");
         }
 
         mRain = track->local.rain;
@@ -284,7 +327,7 @@ void Driver::NewRace(tCarElt* car, tSituation* situation)
 
     TeamInfo(car, mSituation);
     mCar.init(car, &mTrack);
-    mPit.init(mTrack.torcsTrack(), situation, &mCar, mPitDamage, mPitGripFactor, mPitEntryMargin, mRain);
+    mPit.init(mTrack.torcsTrack(), situation, &mCar, mPitDamage, mPitGripFactor, mPitEntryMargin, mRain, mPitTireDanger);
 
     // Create paths
     mPath.clear();
@@ -444,7 +487,7 @@ void Driver::calcOffsetAndYaw()
 {
     // Set LR target portion
     double maxStepLR = 0.01;
-    double stepdiff = 0.002;
+    double stepdiff = 0.0002;
 
     if (mDrvPath == PATH_L && (m[OVERTAKE] || m[LET_PASS] || mDrvState == STATE_PITLANE || mPit.pitstop() || mTestPath != PATH_O))
     {
@@ -468,6 +511,25 @@ void Driver::calcOffsetAndYaw()
             mLRTargetStep -=  stepdiff;
         }
     }
+	else if (mDrvPath == PATH_M && (m[OVERTAKE] || m[LET_PASS] || mDrvState == STATE_PITLANE || mPit.pitstop() || mTestPath != PATH_O))
+	{
+		if (mLRTargetPortion < -0.49 && mLRTargetStep <= -stepdiff)
+		{
+			mLRTargetStep += stepdiff;
+		}
+		else  if (mLRTargetPortion >= -0.49 && mLRTargetStep >= stepdiff)
+		{
+			mLRTargetStep -= stepdiff;
+		}
+		else if (mLRTargetPortion > 0.49 && mLRTargetStep >= stepdiff)
+		{
+			mLRTargetStep -= stepdiff;
+		}
+		else  if (mLRTargetPortion <= 0.49 && mLRTargetStep <= -stepdiff)
+		{
+			mLRTargetStep += stepdiff;
+		}
+	}
     else if (mDrvPath != PATH_O && fabs(mLRTargetPortion) > maxStepLR)
     {
         double sign = copysign(1.0, pathOffs(PATH_O));
@@ -483,7 +545,13 @@ void Driver::calcOffsetAndYaw()
     mLRTargetPortion += mLRTargetStep;
     mLRTargetPortion = Utils::clip(mLRTargetPortion, -1.0, 1.0);
 
-    if (mLRTargetPortion > 0.0)
+	if (mDrvPath == PATH_M)
+	{
+        mPathOffs = pathOffs(PATH_M) + mLRTargetPortion * (pathOffs(PATH_L) - pathOffs(PATH_R));
+        mPathYaw = Utils::normPiPi(mPathState[PATH_M].yaw() + mLRTargetPortion * Utils::normPiPi(mPathState[PATH_L].yaw() - mPathState[PATH_R].yaw()));
+        mPathCurvature = mPathState[PATH_M].curvature() + mLRTargetPortion * (mPathState[PATH_L].curvature() - mPathState[PATH_R].curvature());
+	}
+    else if (mLRTargetPortion > 0.0)
     {
         mPathOffs = pathOffs(PATH_O) + mLRTargetPortion * (pathOffs(PATH_L) - pathOffs(PATH_O));
         mPathYaw = Utils::normPiPi(mPathState[PATH_O].yaw() + mLRTargetPortion * Utils::normPiPi(mPathState[PATH_L].yaw() - mPathState[PATH_O].yaw()));
@@ -819,11 +887,11 @@ double Driver::getAccel(double maxspeed)
 
     if (m[LET_PASS])
     {
-        accel *= 0.5 + (driver_aggression * 0.25);
+        accel *= 0.95;
     }
     else if (mOpps.mateFrontAside())
     {
-        accel *= 0.7 + (driver_aggression * 0.25);
+        accel *= 0.75;
     }
 
     // LR tire friction unbalanced (grass on border)
@@ -1196,10 +1264,11 @@ bool Driver::overtakeOpponent()
     // Normal overtake
     double maxdist = std::min(50.0, mFrontCollMargin + 5.0 + mCar.v());
     double dist = mOpps.oppNear()->dist();
-    if (dist < maxdist && dist > mOvtMargin / 2.0
+    if (((mOpps.oppNear()->backMarker())) || dist < maxdist && dist > mOvtMargin / 2.0
             && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 2.0)))
     {
-        if ((((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())))
+        if ((mOpps.oppNear()->backMarker() && (dist <= (20.0 + driver_aggression))) ||
+			(((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())))
              || (m[OVERTAKE] && dist < mFrontCollMargin + 8.0 && mCar.v() > mOpps.oppNear()->v() - 4.0 - (driver_aggression))
              || (mOpps.oppNear()->v() < 20.0 && dist < mFrontCollMargin + 20.0))
                 && (!(!m[OVERTAKE] && m[DRIVING_FAST])))
@@ -1214,14 +1283,15 @@ bool Driver::overtakeOpponent()
         m[OVERTAKE] = false;
     }
     // If aside always overtake
-    if (dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -4.0 - (driver_aggression)
+    if (((mOpps.oppNear()->backMarker()) && (dist <= ( 10.0 + (mCar.v() * 0.1 )) + driver_aggression)) 
+		|| dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -4.0 - (driver_aggression)
             && (fabs(mOpps.oppNear()->sideDist()) < 4.0 + driver_aggression || mDrvPath != PATH_O))
     {
         m[OVERTAKE] = true;
     }
 
     // If in front and on raceline stay there
-    if (dist < -5.0 && mDrvPath == PATH_O)
+    if (dist < (-5.0 + driver_aggression) && mDrvPath == PATH_O)
     {
         m[OVERTAKE] = false;
     }
@@ -1235,18 +1305,29 @@ void Driver::updateOvertakePath()
     {
         return;
     }
-
-    // Normal overtaking
-    if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 1.0 - (driver_aggression * 0.1))
-            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 2.5 - (driver_aggression)))
-    {
         // Stay on your side when there is enough space
         double righttomiddle = mPath[PATH_R].toMiddle(mOpps.oppNear()->fromStart());
         double lefttomiddle = mPath[PATH_L].toMiddle(mOpps.oppNear()->fromStart());
-        bool rightfree = fabs(righttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 + driver_aggression * 2;
-        bool leftfree = fabs(lefttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 + driver_aggression * 2;
+        bool rightfree = fabs(righttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 - driver_aggression * 2;
+        bool leftfree = fabs(lefttomiddle - mOpps.oppNear()->toMiddle()) > 4.0 - driver_aggression * 2;
 
-        if (mOpps.oppNear()->leftOfMe())
+    // Normal overtaking
+    if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 1.0 - (driver_aggression * 0.1))
+            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 2.5 - (driver_aggression)) 
+			|| ((mOpps.oppNear()->backMarker()) && (mOpps.oppNear()->dist() > (4.0 + driver_aggression))))
+    {
+		// Check if opponent is a lapped car.
+		// Shift lanes if lapped car is on the left
+		if ((mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
+		{
+            mOvertakePath = PATH_R;
+		}
+		else if (!(mOpps.oppNear()->leftOfMe()) && (mOpps.oppNear()->toMiddle() > 1.0) && (mOpps.oppNear()->backMarker()))
+        {
+            mOvertakePath = PATH_L;
+        }
+		// If not a lapped car, overtake normally.
+        if ((mOpps.oppNear()->leftOfMe()))
         {
             if (!(rightfree || leftfree))
             {
@@ -1256,10 +1337,10 @@ void Driver::updateOvertakePath()
             {
                 mOvertakePath = PATH_R;
             }
-            else
-            {
-                mOvertakePath = PATH_L;
-            }
+			else
+			{
+				mOvertakePath = PATH_L;
+			}
         }
         else
         {
@@ -1271,14 +1352,19 @@ void Driver::updateOvertakePath()
             {
                 mOvertakePath = PATH_L;
             }
-            else
-            {
-                mOvertakePath = PATH_R;
-            }
+			else
+			{
+				mOvertakePath = PATH_R;
+			}
         }
     }
     else
     {
+		if (!(rightfree && leftfree))
+		{
+            mOvertakePath = PATH_M;
+		}
+		
         // Always stay on your side if opponent aside
         if (mOpps.oppNear()->leftOfMe())
         {

@@ -266,6 +266,11 @@ double Path::constrainOffset(double t, PathSeg* l)
     {
         maxL = 0.2;
     }
+    else if (mPathType == PATH_M)
+    {
+        maxL = 2.5;
+        maxR = 2.5;
+    }
 
     return Utils::clip(t, -maxL, maxR);
 }

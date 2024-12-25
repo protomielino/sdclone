@@ -111,6 +111,7 @@ private:
   double mFrontAxleOffset;
   int mGearDirection;
   int mShiftTimer;
+  double mShiftUpPoint;
   int mPrevGear;
   double mClutch;
   double mAbsFactor;
