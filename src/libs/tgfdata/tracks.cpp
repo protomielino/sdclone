@@ -69,6 +69,12 @@ void GfTracks::shutdown()
 	_pSelf = 0;
 }
 
+void GfTracks::reload()
+{
+	shutdown();
+	_pSelf = new GfTracks;
+}
+
 GfTracks::~GfTracks()
 {
 	std::vector<GfTrack*>::const_iterator itTrack;

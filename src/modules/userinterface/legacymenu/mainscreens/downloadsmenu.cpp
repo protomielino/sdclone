@@ -12,6 +12,7 @@
 #include <tgf.hpp>
 #include <portability.h>
 #include <cars.h>
+#include <tracks.h>
 #include <drivers.h>
 #include "assets.h"
 #include "downloadsmenu.h"
@@ -632,7 +633,10 @@ end:
 int DownloadsMenu::save(entry *e, const std::string &path,
     std::string &error) const
 {
+    const Asset &a = e->a;
+
     if (check_hash(e, path, error)
+        || GfDirCreate(a.path().c_str()) != GF_DIR_CREATED
         || extract(e, path, error))
         goto failure;
     else
@@ -1045,6 +1049,7 @@ DownloadsMenu::~DownloadsMenu()
 
     curl_multi_cleanup(multi);
     GfCars::reload();
+    GfTracks::reload();
     GfDrivers::self()->reload();
     GfuiScreenRelease(hscr);
     GfuiScreenActivate(prev);
