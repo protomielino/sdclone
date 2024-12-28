@@ -62,6 +62,12 @@ void GfRaceManagers::shutdown()
     _pSelf = 0;
 }
 
+void GfRaceManagers::reload()
+{
+    shutdown();
+    _pSelf = new GfRaceManagers;
+}
+
 GfRaceManagers::~GfRaceManagers()
 {
     std::vector<GfRaceManager*>::const_iterator itRaceMan;

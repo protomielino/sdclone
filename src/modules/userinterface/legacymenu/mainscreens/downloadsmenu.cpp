@@ -13,6 +13,7 @@
 #include <portability.h>
 #include <cars.h>
 #include <tracks.h>
+#include <racemanagers.h>
 #include <drivers.h>
 #include "assets.h"
 #include "downloadsmenu.h"
@@ -1050,6 +1051,7 @@ DownloadsMenu::~DownloadsMenu()
     curl_multi_cleanup(multi);
     GfCars::reload();
     GfTracks::reload();
+    GfRaceManagers::reload();
     GfDrivers::self()->reload();
     GfuiScreenRelease(hscr);
     GfuiScreenActivate(prev);

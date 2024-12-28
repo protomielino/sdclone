@@ -112,6 +112,7 @@ public:
     // Accessor to the unique instance of the singleton.
     static GfRaceManagers* self();
     static void shutdown();
+    static void reload();
 
     const std::vector<std::string>& getTypes() const;
 
