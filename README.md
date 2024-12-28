@@ -30,6 +30,22 @@ cmake -B build
 cmake --build build/ # Optionally, add -j8 or any other number for faster builds
 ```
 
+This assumes the
+[`speed-dreams-data`](https://forge.a-lec.org/speed-dreams/speed-dreams-data/)
+package is already installed on a well-known location. If not, use the
+[`CMAKE_PREFIX_PATH`](https://cmake.org/cmake/help/latest/variable/CMAKE_PREFIX_PATH.html)
+variable to indicate CMake where to locate an **installed** version of the
+`speed-dreams-data` package:
+
+```
+cmake -B build -DCMAKE_PREFIX_PATH=<path-to-speed-dreams-data>
+```
+
+And then build the project as usual.
+
+> If the `speed-dreams-data` package is not found, the game should still be
+> able to build, but it would not be able to run.
+
 ### Dependencies
 
 #### Debian/Ubuntu

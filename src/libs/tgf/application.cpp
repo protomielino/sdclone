@@ -447,18 +447,6 @@ bool GfApplication::parseOptions()
     if (strDataDir.empty())
         strDataDir = GfSetDataDir(SD_DATADIR);
 
-    // If the data dir. is not a run-time usable one, may be it's because we are running
-    // without installing : try and use the _source_ data dir (it _is_ run-time usable).
-    std::string strDataDirProof(strDataDir);
-    // A run-time usable data dir has a "config/logging.xml" file inside.
-    strDataDirProof += LOGGING_CFG;
-    if (!strDataDir.empty() && !GfFileExists(strDataDirProof.c_str()))
-    {
-        GfLogTrace("Data dir. '%s' not run-time usable, trying source data dir.\n",
-                   strDataDir.c_str());
-        strDataDir = GfSetDataDir(SD_DATADIR_SRC);
-    }
-
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (strLocalDir.empty() || strLibDir.empty() || strBinDir.empty() || strDataDir.empty())
     {

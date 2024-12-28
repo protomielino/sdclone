@@ -454,29 +454,6 @@ MACRO(SD_INSTALL_DIRECTORIES)
 
 ENDMACRO(SD_INSTALL_DIRECTORIES)
 
-# Macro to install CMake config files for SD if in-source build.
-IF(IN_SOURCETREE)
-  MACRO(INSTALL_SD_CMAKE)
-    INSTALL(CODE
-        "SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
-         IF(CUR_DESTDIR MATCHES \"[^/]\")
-           STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
-         ELSE(CUR_DESTDIR MATCHES \"[^/]\")
-           SET(CUR_DESTDIR_CORR \"\")
-           ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
-         FILE(MAKE_DIRECTORY \"\${CUR_DESTDIR_CORR}${SD_DATADIR_ABS}/cmake\")
-         FILE(WRITE \"\${CUR_DESTDIR_CORR}${SD_DATADIR_ABS}/cmake/speed-dreams.cmake\"
-            \"SET(SD_DATADIR_ABS \\\"${SD_DATADIR_ABS}\\\")
-              SET(SD_LOCALDIR \\\"${SD_LOCALDIR}\\\")
-            SET(SD_LIBDIR_ABS \\\"${SD_LIBDIR_ABS}\\\")
-            SET(SD_BINDIR_ABS \\\"${SD_BINDIR_ABS}\\\")
-            SET(SD_INCLUDEDIR_ABS \\\"${SD_INCLUDEDIR_ABS}\\\")
-               SET(IN_SOURCETREE FALSE)\\n\\n\")
-         FILE(READ \"${SOURCE_DIR}/cmake/macros.cmake\" SD_MACRO_CONTENT)
-         FILE(APPEND \"\${CUR_DESTDIR_CORR}${SD_DATADIR_ABS}/cmake/speed-dreams.cmake\" \${SD_MACRO_CONTENT})")
-  ENDMACRO(INSTALL_SD_CMAKE)
-ENDIF(IN_SOURCETREE)
-
 MACRO(SD_INSTALL_CAR CARNAME)
 
   SET(SDIC_FILES ${ARGN})

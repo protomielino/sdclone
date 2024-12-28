@@ -28,6 +28,20 @@ IF(APPLE)
    SET(CMAKE_CXX_STANDARD_REQUIRED True)
 ENDIF(APPLE)
 
+set(data_version 2.4.0)
+find_package(speed-dreams-data ${data_version})
+
+if(NOT SD_DATADIR)
+   message(WARNING "Data directory not found or incompatible with version "
+      "${data_version}. Speed Dreams should still "
+      "be able to build, but it might not run successfully. "
+      "If speed-dreams-data has been installed to a non-standard location, "
+      "please add -DCMAKE_PREFIX_PATH=<data-dir> to the command line to "
+      "find it.")
+else()
+   message(STATUS "Data directory: ${SD_DATADIR}")
+endif()
+
 IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0.2")
    # Speed Dreams project
    PROJECT(speed-dreams-2 VERSION 2.4.0)
