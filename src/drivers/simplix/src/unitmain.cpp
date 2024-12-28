@@ -465,7 +465,7 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
 
     for (size_t i = 0; i < idents.size(); i++)
     {
-        std::string car, category;
+        std::string car, category = "";
 
         if (getCar(handle, i, car))
         {
@@ -474,11 +474,8 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
             goto end;
         }
         else if (getCategory(car, category))
-        {
-            LogSimplix.error("Failed to get category for driver %u\n",
+            LogSimplix.warning("Failed to get category for driver %u\n",
                 static_cast<unsigned>(i));
-            goto end;
-        }
 
         const Ident &id = idents.at(i);
         const std::string &name = id.name;
