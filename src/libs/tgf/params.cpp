@@ -2343,7 +2343,7 @@ GfParmGetMajorVersion (void *handle)
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
         GfLogError ("GfParmGetMajorVersion: bad handle (%p)\n", parmHandle);
-        return 0;
+        return -1;
     }
 
     return parmHandle->conf->major;
@@ -2361,7 +2361,7 @@ GfParmGetMinorVersion (void *handle)
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
         GfLogError ("GfParmGetMinorVersion: bad handle (%p)\n", parmHandle);
-        return 0;
+        return -1;
     }
 
     return parmHandle->conf->minor;
