@@ -193,13 +193,6 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in.cmake
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygenconfig.in.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
-
-# Fictive = no-output target, for having source files available in IDEs.
-SET(_SOURCES CHANGES.txt COPYING.txt INSTALL.txt README.txt)
-
-# Install top tree data files
-SD_INSTALL_FILES(DATA "/"  FILES ${_SOURCES})
-
 # Setup empty GLOBAL lists for robots and modules
 SET_PROPERTY(GLOBAL PROPERTY SD_MODULE_LIST "")
 SET_PROPERTY(GLOBAL PROPERTY SD_CAR_LIST "")
