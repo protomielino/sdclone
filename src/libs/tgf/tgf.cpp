@@ -840,7 +840,7 @@ static char* makeRunTimeDirPath(const char* srcPath)
 		strcpy(tgtPath, srcPath);
 
 	// Fix \ and add a trailing / is needed.
-	if (tgtPath)
+	if (tgtPath && strlen(tgtPath))
 		GfPathNormalizeDir(tgtPath, bufSize - 1);
 
 	if (!tgtPath)
