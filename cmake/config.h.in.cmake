@@ -178,7 +178,14 @@
 #endif
 
 /* Run-time directories */
-#define SD_DATADIR "${SD_DATADIR}/"
+#cmakedefine SD_HAS_DATADIR
+
+#if defined(SD_HAS_DATADIR)
+#  define SD_DATADIR "${SD_DATADIR}/"
+#else
+#  define SD_DATADIR ""
+#endif
+
 #define SD_LIBDIR "${SD_LIBDIR}/"
 #define SD_BINDIR "${SD_BINDIR}/"
 #define SD_LOCALDIR "${SD_LOCALDIR}/"

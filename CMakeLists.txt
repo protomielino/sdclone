@@ -40,6 +40,7 @@ if(NOT SD_DATADIR)
       "find it.")
 else()
    message(STATUS "Data directory: ${SD_DATADIR}")
+   set(SD_HAS_DATADIR true)
 endif()
 
 IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0.2")
