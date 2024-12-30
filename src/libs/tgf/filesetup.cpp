@@ -16,229 +16,150 @@
  ***************************************************************************/
 
 /** @file
-    		Versioned settings XML files installation at run-time
+            Versioned settings XML files installation at run-time
     @author	Mart Kelder
     @ingroup	tgf
 */
 
 #include "portability.h"
-
-#include <cstdio>
-#include <cerrno>
 #include <sys/stat.h>
-
 #include "tgf.h"
+#include <fstream>
+#include <string>
 
-
-static bool gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )
+struct version
 {
-	bool status;
+    int major, minor;
+};
 
-	// Copy the source file to its target place.
-	if( !( status = GfFileCopy( dataLocation, localLocation ) ) )
-		return status;
+static int getversion(void *h, struct version &v)
+{
+    if ((v.major = GfParmGetMajorVersion(h)) < 0)
+    {
+        GfLogError("GfParmGetMajorVersion failed\n");
+        return -1;
+    }
+    else if ((v.minor = GfParmGetMinorVersion(h)) < 0)
+    {
+        GfLogError("GfParmGetMinorVersion failed\n");
+        return -1;
+    }
 
-	// Update local version.xml file.
-	if( localHandle )
-	{
-		if( count < 0 )
-		{
-			GfParmSetCurStr( localHandle, "versions", "Data location", dataLocation );
-			GfParmSetCurStr( localHandle, "versions", "Local location", localLocation );
-			GfParmSetCurNum( localHandle, "versions", "Major version", NULL, (tdble)major );
-			GfParmSetCurNum( localHandle, "versions", "Minor version", NULL, (tdble)minor );
-		}
-		else
-		{
-			char buf[32];
-			snprintf( buf, 30, "versions/%d", count );
-			GfParmSetStr( localHandle, buf, "Data location", dataLocation );
-			GfParmSetStr( localHandle, buf, "Local location", localLocation );
-			GfParmSetNum( localHandle, buf, "Major version", NULL, (tdble)major );
-			GfParmSetNum( localHandle, buf, "Minor version", NULL, (tdble)minor );
-		}
-	}
-
-	return status;
+    return 0;
 }
 
-void GfFileSetup()
+static bool needs_update(const struct version &src, const struct version &dst)
 {
-	void *dataVersionHandle;
-	void *localVersionHandle;
-	char *filename;
-	size_t filenameLength;
-	char *dataLocation;
-	char *localLocation;
-	char *absLocalLocation;
-	char *absDataLocation;
-	bool *isIndexUsed;
-	int isIndexUsedLen;
-	int index;
-	bool anyLocalChange, fileFound;
-	int major;
-	int minor;
-	struct stat st;
-	const char* pszVersionFileName = "version.xml";
+    return src.major > dst.major || src.minor > dst.minor;
+}
 
-	// Try and open version.xml from GfDataDir() .
-	filenameLength = strlen(GfDataDir()) + strlen(pszVersionFileName) + 2;
-	filename = (char*)malloc( sizeof(char) * filenameLength );
-	sprintf( filename, "%s%s", GfDataDir(), pszVersionFileName );
-	dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
+static int update(const std::string &file)
+{
+    const char *datadir = GfDataDir(), *localdir = GfLocalDir();
 
-	// If it failed, let's try GfBinDir() (in case running from build tree, not installed one).
-	if( !dataVersionHandle )
-	{
-		free( filename );
-		filenameLength = strlen(GfBinDir()) + strlen(pszVersionFileName) + 2;
-		filename = (char*)malloc( sizeof(char) * filenameLength );
-		sprintf( filename, "%s%s", GfBinDir(), pszVersionFileName );
-		dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
-	}
+    if (!datadir)
+    {
+        GfLogError("GfDataDir failed\n");
+        return -1;
+    }
+    else if (!localdir)
+    {
+        GfLogError("GfLocalDir failed\n");
+        return -1;
+    }
 
-	// Exit if version.xml not found.
-	if( !dataVersionHandle )
-	{
-		GfLogWarning("No readable reference %s found ; will not check / update user settings",
-					 pszVersionFileName);
-		free( filename );
-		return;
-	}
+    std::ifstream src(std::string(datadir) + file, std::ios::binary);
+    std::ofstream dst(std::string(localdir) + file, std::ios::binary);
 
-	// Exit if nothing inside.
-	if( GfParmListSeekFirst( dataVersionHandle, "versions" ) != 0 )
-	{
-		GfLogWarning("%s contains no user settings version info ; will not check / update user settings",
-					 filename);
-		free( filename );
-		GfParmReleaseHandle( dataVersionHandle );
-		return;
-	}
+    dst << src.rdbuf();
+    return 0;
+}
 
-	// Create LocalDir (user settings root) if not already done.
-	GfDirCreate( GfLocalDir() );
+static int process(const std::string &file)
+{
+    int ret = -1;
+    const char *path = file.c_str();
+    void *src = GfParmReadFile(path, GFPARM_RMODE_STD),
+        *dst = GfParmReadFileLocal(path, GFPARM_RMODE_STD);
+    struct version srcv, dstv;
 
-	// Open local (user settings) version.xml (create it if not there).
-	if( filenameLength < strlen(GfLocalDir()) + 12 )
-	{
-		free( filename );
-		filenameLength = strlen(GfLocalDir()) + strlen(pszVersionFileName) + 2;
-		filename = (char*)malloc( sizeof(char) * filenameLength );
-	}
+    if (!src)
+    {
+        GfLogError("GfParmReadFile failed: %s\n", path);
+        goto end;
+    }
+    else if (!dst)
+    {
+        GfLogInfo("%s not found on user settings, forcing update\n", path);
 
-	sprintf( filename, "%s%s", GfLocalDir(), pszVersionFileName );
-	anyLocalChange = !GfFileExists(filename);
-	localVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_CREAT );
+        if (update(file))
+        {
+            GfLogError("Failed to update file: %s\n", path);
+            goto end;
+        }
+    }
+    else if (getversion(src, srcv))
+    {
+        GfLogError("Failed to extract source version: %s\n", path);
+        goto end;
+    }
+    else if (getversion(dst, dstv))
+    {
+        GfLogError("Failed to extract user version: %s\n", path);
+        goto end;
+    }
+    else if (needs_update(srcv, dstv) )
+    {
+        if (update(path))
+        {
+            GfLogError("Failed to update file: %s\n", path);
+            goto end;
+        }
 
-	// Exit if open/creation failed.
-	if( !localVersionHandle )
-	{
-		GfLogWarning("%s not found / readable ; will not check / update user settings",
-					 filename);
-		free( filename );
-		GfParmReleaseHandle( dataVersionHandle );
-		return;
-	}
+        GfLogInfo("Updated %s from %d.%d to %d.%d\n", path,
+            dstv.major, dstv.minor, srcv.major, srcv.minor);
+    }
 
-	// Setup the index of the XML files referenced in the local version.xml.
-	isIndexUsedLen = GfParmGetEltNb( localVersionHandle, "versions" )
-		             + GfParmGetEltNb( dataVersionHandle, "versions" ) + 2;
-	isIndexUsed = (bool*)malloc( sizeof(bool) * isIndexUsedLen );
-	for( index = 0; index < isIndexUsedLen; index++ )
-		isIndexUsed[index] = false;
-	if( GfParmListSeekFirst( localVersionHandle, "versions" ) == 0 )
-	{
-		do
-		{
-			index = atoi( GfParmListGetCurEltName( localVersionHandle, "versions" ) );
-			if( 0 <= index && index < isIndexUsedLen )
-				isIndexUsed[index] = true;
-		} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );
-	}
+    ret = 0;
 
-	// For each file referenced in the installation version.xml
-	do
-	{
-		fileFound = false;
+end:
 
-		// Get its installation path (data), user settings path (local),
-		// and new major and minor version numbers
-		dataLocation = strdup( GfParmGetCurStr( dataVersionHandle, "versions", "Data location", "" ) );
-		localLocation = strdup( GfParmGetCurStr( dataVersionHandle, "versions", "Local location", "" ) );
-		major = (int)GfParmGetCurNum( dataVersionHandle, "versions", "Major version", NULL, 0 );
-		minor = (int)GfParmGetCurNum( dataVersionHandle, "versions", "Minor version", NULL, 0 );
+    if (src)
+        GfParmReleaseHandle(src);
 
-		absLocalLocation = (char*)malloc( sizeof(char)*(strlen(GfLocalDir())+strlen(localLocation)+3) );
-		sprintf( absLocalLocation, "%s%s", GfLocalDir(), localLocation );
+    if (dst)
+        GfParmReleaseHandle(dst);
 
-		absDataLocation = (char*)malloc( sizeof(char)*(strlen(GfDataDir())+strlen(dataLocation)+3) );
-		sprintf( absDataLocation, "%s%s", GfDataDir(), dataLocation );
+    return ret;
+}
 
-		GfLogTrace("Checking %s : user settings version ", localLocation);
+int GfFileSetup()
+{
+    const char *datadir = GfDataDir();
 
-		// Search for its old major and minor version numbers in the user settings.
-		if( GfParmListSeekFirst( localVersionHandle, "versions" ) == 0 )
-		{
-			do
-			{
-				if( strcmp( absLocalLocation, GfParmGetCurStr( localVersionHandle, "versions", "Local location", "" ) ) == 0 )
-				{
-					fileFound = true;
-					const int locMinor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Minor version", NULL, 0 );
-					const int locMajor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Major version", NULL, 0 );
+    if (!datadir)
+    {
+        GfLogError("GfDataDir failed\n");
+        return -1;
+    }
 
-					GfLogTrace("%d.%d is ", locMajor, locMinor);
+    std::string path = std::string(datadir) + "user-files";
+    std::ifstream f(path, std::ios::binary);
 
-					if( locMajor != major || locMinor < minor)
-					{
-						GfLogTrace("obsolete (installed one is %d.%d) => updating ...\n",
-								   major, minor);
-						if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 ) )
-							anyLocalChange = true;
-					}
-					else
-					{
-					    GfLogTrace("up-to-date");
-						if (stat(absLocalLocation, &st))
-						{
-							GfLogTrace(", but not there => installing ...\n");
-							if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 ) )
-								anyLocalChange = true;
-						}
-						else
-							GfLogTrace(".\n");
-					}
+    if (!f.is_open())
+    {
+        GfLogError("Failed to open %s\n", path.c_str());
+        return -1;
+    }
 
-					break;
-				}
-			} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );
-		}
+    std::string line;
 
-		if( !fileFound)
-		{
-			index = 0;
-			while( isIndexUsed[index] )
-				++index;
-			GfLogTrace("not found => installing ...\n");
-			if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, index ) )
-				anyLocalChange = true;
-			isIndexUsed[index] = true;
-		}
+    while (std::getline(f, line))
+        if (!line.empty() && process(line))
+        {
+            GfLogError("Failed to process line: %s\n", line.c_str());
+            return -1;
+        }
 
-		free( dataLocation );
-		free( localLocation );
-		free( absDataLocation );
-		free( absLocalLocation );
-
-	} while( GfParmListSeekNext( dataVersionHandle, "versions" ) == 0 );
-
-	// Write the user settings version.xml if changed.
-	if (anyLocalChange)
-		GfParmWriteFile( NULL, localVersionHandle, "versions" );
-
-	GfParmReleaseHandle( localVersionHandle );
-	GfParmReleaseHandle( dataVersionHandle );
-	free( isIndexUsed );
-	free( filename );
+    return 0;
 }

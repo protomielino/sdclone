@@ -786,7 +786,7 @@ TGF_API const char* GfSetBinDir(const char* pszPath);
 /************************************************
  * User settings files run-time update/install. *
  ************************************************/
-TGF_API void GfFileSetup();
+TGF_API int GfFileSetup();
 
 
 /***************************

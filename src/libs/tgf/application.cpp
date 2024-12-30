@@ -171,7 +171,8 @@ const std::string& GfApplication::version() const
 
 void GfApplication::updateUserSettings()
 {
-    GfFileSetup();
+    if (GfFileSetup())
+        GfLogError("GfFileSetup failed\n");
 
     // Complete logging system initialisation
     // 1) Reparse the relevant options if present.

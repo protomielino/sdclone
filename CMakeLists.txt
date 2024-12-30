@@ -199,9 +199,6 @@ SET(_SOURCES CHANGES.txt COPYING.txt INSTALL.txt README.txt)
 # Install top tree data files
 SD_INSTALL_FILES(DATA "/"  FILES ${_SOURCES})
 
-# Initialize user settings file management (before any of them is collected).
-SD_SETUP_SETTINGS_VERSION()
-
 # Setup empty GLOBAL lists for robots and modules
 SET_PROPERTY(GLOBAL PROPERTY SD_MODULE_LIST "")
 SET_PROPERTY(GLOBAL PROPERTY SD_CAR_LIST "")
@@ -212,10 +209,6 @@ SET_PROPERTY(GLOBAL PROPERTY SD_EXE_LIST "")
 
 # Sub-dirs to build ...
 ADD_SUBDIRECTORY(src)
-
-# After the user settings files have been collected,
-# Update (and then install) version.xml from their respective version.
-SD_UPDATE_SETTINGS_VERSION()
 
 IF(MSVC)
    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/faq/faq.html DESTINATION ./doc)
