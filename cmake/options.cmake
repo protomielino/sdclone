@@ -128,8 +128,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
        SET(OPTION_OSGGRAPH false CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
     ENDIF(OPTION_USE_MACPORTS)
 
-    SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
-
     # Custom 3rdParty location for some Windows builds (standard CMake Find<package> macros
     # can't find it, so we needed another solution : see FindCustom3rdParty.cmake).
     IF(MSVC)

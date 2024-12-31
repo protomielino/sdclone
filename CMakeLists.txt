@@ -53,102 +53,18 @@ CHECK_HEADERS_H()
 CHECK_FUNCTIONS()
 CHECK_LIBRARIES()
 
-# Determine version
-SET(NEXT_LESSER_VERSION 0) # The next lesser version
-MATH(EXPR NEXT_MINOR "${PROJECT_VERSION_MINOR} + 1")
-SET(NEXT_MAJOR_MINOR_VERSION "${PROJECT_VERSION_MAJOR}.${NEXT_MINOR}") # Next major.minor version
-#MESSAGE(STATUS "NEXT_MAJOR_MINOR_VERSION ${NEXT_MAJOR_MINOR_VERSION}")
+execute_process(
+   COMMAND git describe --tags --dirty
+   RESULT_VARIABLE result
+   OUTPUT_VARIABLE VERSION
+   OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# Uncomment if you don't want automatic SVN version detection
-# (poor performances under Windows, don't work with git-svn, ...)
-# SET(OPTION_AUTOVERSION Off)
+if(NOT result EQUAL 0)
+   set(VERSION "undefined-version")
+endif()
 
-IF(NOT OPTION_AUTOVERSION)
-
-	SET(VERSION "${NEXT_MAJOR_MINOR_VERSION}-dev")
-	SET(VERSION_LONG "${VERSION}")
-
-	MESSAGE(STATUS "Version '${VERSION_LONG}' (not auto-detected from SVN source tree)")
-
-ELSE(NOT OPTION_AUTOVERSION)
-
-	# Use SVN HeadURL property on this CMakeLists.txt file in order to automatically get the current version
-	SET(HEAD_URL "$HeadURL: svn+ssh://xavi92@svn.code.sf.net/p/speed-dreams/code/trunk/CMakeLists.txt $")
-
-	# Define regular expressions
-	SET(REGEX_TAG        "^\\$HeadURL:.*speed-dreams/code/tags/([^/\\$ ]*).*\\$$")
-	SET(REGEX_BUG_BRANCH "^\\$HeadURL:.*speed-dreams/code/branches/([0-9]+\\.[0-9]+)(\\.[xX])?/.*\\$$")
-	SET(REGEX_TRUNK      "^\\$HeadURL:.*speed-dreams/code/trunk/.*\\$$")
-	SET(REGEX_BRANCH     "^\\$HeadURL:.*speed-dreams/code/branches/([^/\\$ ]*).*\\$$")
-
-	# Check regular expressions
-	STRING(REGEX MATCH "${REGEX_TAG}"        VERSION_IS_TAG "${HEAD_URL}")
-	STRING(REGEX MATCH "${REGEX_BUG_BRANCH}" VERSION_IS_BUG_BRANCH "${HEAD_URL}")
-	STRING(REGEX MATCH "${REGEX_TRUNK}"      VERSION_IS_TRUNK "${HEAD_URL}")
-	STRING(REGEX MATCH "${REGEX_BRANCH}"     VERSION_IS_BRANCH "${HEAD_URL}")
-
-	# See if we need to look at the current SVN revision
-	SET(NEED_SVN_REV TRUE)
-	IF(VERSION_IS_TAG)
-		STRING(REGEX REPLACE "${REGEX_TAG}" "\\1" VERSION "${HEAD_URL}")
-	ELSEIF(VERSION_IS_BUG_BRANCH)
-		STRING(REGEX REPLACE "${REGEX_BUG_BRANCH}" "\\1" TMP_VERSION "${HEAD_URL}")
-		SET(VERSION "${TMP_VERSION}.${NEXT_LESSER_VERSION}-dev")
-	ELSEIF(VERSION_IS_TRUNK)
-		SET(VERSION "${NEXT_MAJOR_MINOR_VERSION}-trunk")
-	ELSEIF(VERSION_IS_BRANCH)
-		STRING(REGEX REPLACE "${REGEX_BRANCH}" "\\1" VERSION "${HEAD_URL}")
-	ELSE(VERSION_IS_TAG)
-		MESSAGE("Warning: Could not determine version name from HeadURL ${HEAD_URL}")
-		SET(VERSION "${NEXT_MAJOR_MINOR_VERSION}-dev")
-		SET(NEED_SVN_REV FALSE)
-	ENDIF(VERSION_IS_TAG)
-
-	# Try to get current SVN revision
-	IF(NEED_SVN_REV)
-		SET(SVN_FIND_REV_FAILED FALSE)
-		FIND_PROGRAM(SVNVERSION_EXEC svnversion PATHS /usr/local/bin /usr/bin)
-		MARK_AS_ADVANCED(SVNVERSION_EXEC)
-		IF(NOT SVNVERSION_EXEC)
-			SET(SVN_FIND_REV_FAILED TRUE)
-		ENDIF(NOT SVNVERSION_EXEC)
-		IF(NOT SVN_FIND_REV_FAILED)
-			MESSAGE(STATUS "Looking for current subversion revision (may be long) ...")
-			EXECUTE_PROCESS(COMMAND ${SVNVERSION_EXEC} ${CMAKE_CURRENT_SOURCE_DIR} --no-newline
-							RESULT_VARIABLE SVNVERSION_RESULT
-							OUTPUT_VARIABLE SVN_REV_LONG)
-			IF(NOT ${SVNVERSION_RESULT} EQUAL 0)
-				SET(SVN_FIND_REV_FAILED TRUE)
-			ENDIF(NOT ${SVNVERSION_RESULT} EQUAL 0)
-		ENDIF(NOT SVN_FIND_REV_FAILED)
-		IF(NOT SVN_FIND_REV_FAILED)
-			IF("${SVN_REV_LONG}" MATCHES ":")
-				STRING(REGEX REPLACE "^[^:]*:(.*)$" "\\1" SVN_REV "${SVN_REV_LONG}")
-			ELSE("${SVN_REV_LONG}" MATCHES ":")
-				SET(SVN_REV "${SVN_REV_LONG}")
-			ENDIF("${SVN_REV_LONG}" MATCHES ":")
-			IF(NOT SVN_REV)
-				SET(SVN_FIND_REV_FAILED TRUE)
-			ENDIF(NOT SVN_REV)
-		ENDIF(NOT SVN_FIND_REV_FAILED)
-		SET(VERSION_LONG "${VERSION}")
-		IF(NOT SVN_FIND_REV_FAILED)
-			STRING(TOLOWER ${SVN_REV} SVN_REV)
-			SET(VERSION_LONG "${VERSION_LONG}-r${SVN_REV}")
-		ENDIF(NOT SVN_FIND_REV_FAILED)
-	ELSE(NEED_SVN_REV)
-		SET(VERSION_LONG "${VERSION}")
-	ENDIF(NEED_SVN_REV)
-
-	MESSAGE(STATUS "Version '${VERSION_LONG}'")
-
-ENDIF(NOT OPTION_AUTOVERSION)
-
-# SVN_REV is used by packagers, so set it to something
-# in case it couldn't be retrieved or OPTION_AUTOVERSION is FALSE
-IF(NOT SVN_REV)
-	SET(SVN_REV "XXXX")
-ENDIF(NOT SVN_REV)
+set(VERSION_LONG ${VERSION})
 
 # PROJECT_VERSION_METADATA is used by NSIS packagers
 # its what comes after the '-' sign (if anything)
@@ -248,8 +164,8 @@ IF(OPTION_PORTABLE_PACKAGING)
       find_file(7ZIP_WIN 7z.sfx PATH_SUFFIXES 7-Zip)
 
       set(SD_EXE_NAME "speed-dreams-2.exe")
-      SET(PORTABLE_PACKAGE_FILE_NAME "speed-dreams-2-r${SVN_REV}-portable-setup" CACHE STRING "Name for portable package file")
-      SET(PORTABLE_BATCH_FILE_NAME "speed-dreams-2-r${SVN_REV}-portable.bat" CACHE STRING "Name for portable batch file")
+      SET(PORTABLE_PACKAGE_FILE_NAME "speed-dreams-2-${VERSION_LONG}-portable-setup" CACHE STRING "Name for portable package file")
+      SET(PORTABLE_BATCH_FILE_NAME "speed-dreams-2-${VERSION_LONG}-portable.bat" CACHE STRING "Name for portable batch file")
 
             CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/portable/sd-portable.bat.in"
                   "${CMAKE_BINARY_DIR}/${PORTABLE_BATCH_FILE_NAME}" @ONLY)

@@ -130,10 +130,6 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #cmakedefine TIME_WITH_SYS_TIME 1
 
-/* Version numbers for package */
-#ifndef VERSION
-#define VERSION "${VERSION}"
-#endif //VERSION
 
 #ifndef VERSION_LONG
 #define VERSION_LONG "${VERSION_LONG}"
