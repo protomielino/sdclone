@@ -178,8 +178,10 @@
 
 #if defined(SD_HAS_DATADIR)
 #  define SD_DATADIR "${SD_DATADIR}/"
+#  define SD_DATADIR_ABS "${SD_DATADIR_ABS}/"
 #else
 #  define SD_DATADIR ""
+#  define SD_DATADIR_ABS ""
 #endif
 
 #define SD_LIBDIR "${SD_LIBDIR}/"

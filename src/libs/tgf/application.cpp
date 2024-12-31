@@ -447,6 +447,8 @@ bool GfApplication::parseOptions()
         strBinDir = GfSetBinDir(SD_BINDIR);
     if (strDataDir.empty())
         strDataDir = GfSetDataDir(SD_DATADIR);
+    if (strDataDir.empty() || !GfDirExists(strDataDir.c_str()))
+        strDataDir = GfSetDataDir(SD_DATADIR_ABS);
 
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (strLocalDir.empty() || strLibDir.empty() || strBinDir.empty() || strDataDir.empty())
@@ -459,6 +461,11 @@ bool GfApplication::parseOptions()
         GfLogError("Could not start %s :"
                    " at least 1 of local/data/lib/bin dir is empty\n\n", _strName.c_str());
 
+        return false;
+    }
+    else if (!GfDirExists(strDataDir.c_str()))
+    {
+        GfLogTrace("Data directory does not exist: %s\n", strDataDir.c_str());
         return false;
     }
 

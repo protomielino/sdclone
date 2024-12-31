@@ -39,7 +39,7 @@ if(NOT SD_DATADIR)
       "please add -DCMAKE_PREFIX_PATH=<data-dir> to the command line to "
       "find it.")
 else()
-   message(STATUS "Data directory: ${SD_DATADIR}")
+   message(STATUS "Data directory: ${SD_DATADIR_ABS}")
    set(SD_HAS_DATADIR true)
 endif()
 
