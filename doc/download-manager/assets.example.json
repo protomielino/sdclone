@@ -70,17 +70,17 @@
     ],
     "drivers": [
         {
-            "name": "dandroid 36gp",
-            "category": "36gp",
+            "name": "Ren Suzuki",
+            "category": "dandroid",
             "author": "?",
             "license": "Free Art License",
-            "url": "http://localhost:8000/dandroid_36GP.zip",
-            "hash": "8484a548efbcf8c081a14c76f9a12ba7e7220909146452fdde223f9f8f951372",
+            "url": "http://localhost:8000/ren-suzuki.zip",
+            "hash": "458128211a8f7215060b54b8ebf953ed8692181aed69a47c9280f20730f67665",
             "hashtype": "sha256",
-            "size": "22333413",
-            "thumbnail": "http://localhost:8000/dandroid_36GP.png",
-            "directory": "dandroid_36GP",
-            "revision": "0"
+            "size": "668",
+            "thumbnail": "http://localhost:8000/logo.png",
+            "directory": "ren-suzuki",
+            "revision": "3"
         }
     ]
 }

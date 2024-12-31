@@ -105,6 +105,8 @@ Where:
         - `karting`
         - `road`
         - `speedway`
+    - For drivers, it must be one of the available robots, such as
+      `simplix` or `usr`.
 - `author`: defines the author(s) for an asset. Speed Dreams shall not
 perform any specific actions based on the value of this string.
 - `license`: defines the license covering the asset. Speed Dreams shall not
@@ -129,13 +131,23 @@ the download manager. The URL must point to an image file with an extension
 known to the `GfTexReadImageFromFile` function. The URL does not have to point
 to the same web server hosting the asset database.
 - `directory`: defines the directory where the asset shall be stored.
-    - Cars are stored into `data/cars/models/<directory>`.
-    - Tracks are stored into `data/tracks/<category>/<directory>`.
-    - Drivers are stored into `data/drivers/<directory>`.
+`datadir` depends on how Speed Dreams is configured during build and
+installation and matches the value returned by the `GfDataDir` function,
+whereas the `localdir` directory is calculated at run-time by Speed Dreams
+and matches the value returned by the `GfLocalDir` function.
+    - Cars are stored into `<datadir>/cars/models/<directory>`.
+    - Tracks are stored into `<datadir>/tracks/<category>/<directory>`.
+    - Drivers are stored into `<localdir>/drivers/<category>/<index>`.
+    Since Speed Dreams refers to drivers by their indexes, once extracted
+    it will rename `directory` to the next integer `index` available in the
+    directory.
 - `revision`: an integer that defines the revision of an asset. This value is
 used as a basic mechanism to inform users about updates. The download manager
 shall write the currently downloaded revision into a file called `.revision`
 inside the asset directory.
+
+> **TODO:** future releases will also store cars and tracks into `localdir`
+> instead of `datadir`.
 
 ## Asset file structure
 
