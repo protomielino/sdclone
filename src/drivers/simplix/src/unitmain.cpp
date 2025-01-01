@@ -341,11 +341,7 @@ int	moduleWelcomeV1_00
         welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 
     if (!RobotSettings)
-    {
-        LogSimplix.error("#Robot XML-Path not found: (%s) or (%s) %s\n\n",
-            GetLocalDir(), GetDataDir(), RobPathXMLRel);
         goto end;
-    }
 
     LogSimplix.debug("#Robot name: %s\n", RobName);
     LogSimplix.debug("#Robot directory: %s\n", RobPathDirRel);
