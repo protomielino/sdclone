@@ -377,7 +377,11 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
     }
 #endif
     /* Create OpenGL context */
-    GLContext = SDL_GL_CreateContext(GfuiWindow);
+    if (!(GLContext = SDL_GL_CreateContext(GfuiWindow)))
+    {
+        GfLogError("SDL_GL_CreateContext failed: %s\n", SDL_GetError());
+        return nullptr;
+    }
 
     // If specified, try best possible settings.
     PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
