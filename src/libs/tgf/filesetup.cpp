@@ -55,24 +55,51 @@ static bool needs_update(const struct version &src, const struct version &dst)
 
 static int update(const std::string &file)
 {
-    const char *datadir = GfDataDir(), *localdir = GfLocalDir();
+    int ret = -1;
+    char *dstdir = nullptr;
+    std::string srcpath = std::string(GfDataDir()) + file,
+        dstpath = std::string(GfLocalDir()) + file;
+    const char *sp = srcpath.c_str(), *dp = dstpath.c_str();
+    std::ifstream src(srcpath, std::ios::binary);
+    std::ofstream dst;
 
-    if (!datadir)
+    if (!src.is_open())
     {
-        GfLogError("GfDataDir failed\n");
-        return -1;
+        GfLogError("Failed to open file for reading: %s\n", sp);
+        goto end;
     }
-    else if (!localdir)
+    else if (!(dstdir = GfFileGetDirName(dp)))
     {
-        GfLogError("GfLocalDir failed\n");
-        return -1;
+        GfLogError("GfFileGetDirName %s failed\n", dp);
+        goto end;
+    }
+    else if (GfDirCreate(dstdir) != GF_DIR_CREATED)
+    {
+        GfLogError("Failed to created directory: %s\n", dstdir);
+        goto end;
     }
 
-    std::ifstream src(std::string(datadir) + file, std::ios::binary);
-    std::ofstream dst(std::string(localdir) + file, std::ios::binary);
+    dst.open(dstpath, std::ios::binary);
+
+    if (!dst.is_open())
+    {
+        GfLogError("Failed to open file for writing: %s\n", dp);
+        goto end;
+    }
 
     dst << src.rdbuf();
-    return 0;
+
+    if (!dst.good())
+    {
+        GfLogError("Failed to write from %s to %s\n", sp, dp);
+        goto end;
+    }
+
+    ret = 0;
+
+end:
+    free(dstdir);
+    return ret;
 }
 
 static int process(const std::string &file)
