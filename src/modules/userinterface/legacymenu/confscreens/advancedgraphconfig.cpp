@@ -204,7 +204,7 @@ onChangeShadersLeft(void *)
 static void
 onChangeShadersRight(void *)
 {
-    onChangeShaders(-1);
+    onChangeShaders(1);
 }
 
 static void
