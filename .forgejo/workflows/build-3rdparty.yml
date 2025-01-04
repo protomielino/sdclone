@@ -1,0 +1,34 @@
+on:
+  pull_request:
+    paths:
+      - '/packaging/3rdParty-devel/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: docker
+    container:
+      image: forge.a-lec.org/speed-dreams/debian-i686-w64-mingw32:stable
+    steps:
+      - name: Clone repository
+        run: |
+          git clone -q \
+            -b ${{ env.GITHUB_HEAD_REF }} \
+            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
+            /src
+      - name: Configure third-party libraries
+        run: cmake -B build -DCMAKE_TOOLCHAIN_FILE=i686-w64-mingw32.cmake
+        working-directory: /src/packaging/3rdParty-devel
+      - name: Build third-party libraries
+        run: cmake --build build -j$(nproc --all)
+        working-directory: /src/packaging/3rdParty-devel
+      - name: Archive third-party libraries
+        run: tar -czf 3rdparty-${{ env.GITHUB_SHA }}.tar.gz 3rdParty/
+        working-directory: /src/packaging/3rdParty-devel/build
+      - name: Upload third-party libraries
+        run: upload-artifact 3rdparty-${{ env.GITHUB_SHA }}.tar.gz
+        working-directory: /src/packaging/3rdParty-devel/build
+        env:
+          URL: ${{ vars.STORE_URL }}
+          USERNAME: ${{ secrets.STORE_USERNAME }}
+          PASSWORD: ${{ secrets.STORE_PASSWORD }}
