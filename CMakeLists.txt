@@ -1,6 +1,9 @@
 #CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)
 
+# Speed Dreams project
+PROJECT(speed-dreams-2 VERSION 2.4.0)
+
 MESSAGE(STATUS CMAKE_VERSION = "${CMAKE_VERSION}")
 
 IF(POLICY CMP0003)
@@ -28,23 +31,31 @@ IF(APPLE)
    SET(CMAKE_CXX_STANDARD_REQUIRED True)
 ENDIF(APPLE)
 
+option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data if not found")
+
 set(data_version 2.4.0)
 find_package(speed-dreams-data ${data_version})
 
 if(NOT SD_DATADIR)
-   message(WARNING "Data directory not found or incompatible with version "
-      "${data_version}. Speed Dreams should still "
-      "be able to build, but it might not run successfully. "
-      "If speed-dreams-data has been installed to a non-standard location, "
-      "please add -DCMAKE_PREFIX_PATH=<data-dir> to the command line to "
-      "find it.")
+   if(SD_ASSUME_DATADIR)
+      include(GNUInstallDirs)
+
+      set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+      set(SD_DATADIR_ABS ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+      message(STATUS "Data directory: ${SD_DATADIR_ABS} (assumed)")
+      set(SD_HAS_DATADIR true)
+   else()
+      message(WARNING "Data directory not found or incompatible with version "
+         "${data_version}. Speed Dreams should still "
+         "be able to build, but it might not run successfully. "
+         "If speed-dreams-data has been installed to a non-standard location, "
+         "please add -DCMAKE_PREFIX_PATH=<data-dir> to the command line to "
+         "find it.")
+   endif()
 else()
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
    set(SD_HAS_DATADIR true)
 endif()
-
-# Speed Dreams project
-PROJECT(speed-dreams-2 VERSION 2.4.0)
 
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
