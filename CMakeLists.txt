@@ -1,6 +1,9 @@
 #CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)
 
+# Speed Dreams project
+PROJECT(speed-dreams-2 VERSION 2.4.0)
+
 MESSAGE(STATUS CMAKE_VERSION = "${CMAKE_VERSION}")
 
 IF(POLICY CMP0003)
@@ -42,9 +45,6 @@ else()
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
    set(SD_HAS_DATADIR true)
 endif()
-
-# Speed Dreams project
-PROJECT(speed-dreams-2 VERSION 2.4.0)
 
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
