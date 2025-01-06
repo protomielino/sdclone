@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)
 
 # Speed Dreams project
-PROJECT(speed-dreams-2 VERSION 2.4.0)
+PROJECT(speed-dreams-2 VERSION 2.3.0)
 
 MESSAGE(STATUS CMAKE_VERSION = "${CMAKE_VERSION}")
 
@@ -33,7 +33,7 @@ ENDIF(APPLE)
 
 option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data if not found")
 
-set(data_version 2.4.0)
+set(data_version 2.3.0)
 find_package(speed-dreams-data ${data_version})
 
 if(NOT SD_DATADIR)
