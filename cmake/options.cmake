@@ -86,12 +86,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_PARAM_OPTIMIZER false CACHE BOOL "Build with Parameter Optimizer for Robot development")
 
-    SET(OPTION_PACKAGING true CACHE BOOL "Enable Packaging for distribution")
-
-    SET(OPTION_ALL_IN_ONE_PACKAGING false CACHE BOOL "Enable CPack's monolithic PACKAGE")
-
-    SET(OPTION_PORTABLE_PACKAGING false CACHE BOOL "Enable creation of Portable App as a self-extracting zip")
-
     SET(OPTION_TRACKEDITOR true CACHE BOOL "Build the TrackEditor (Requires Java)")
 
     IF(APPLE)
