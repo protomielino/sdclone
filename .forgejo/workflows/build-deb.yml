@@ -1,16 +1,16 @@
 on: [pull_request]
 jobs:
-    build:
-        runs-on: docker
-        container:
-            image: forge.a-lec.org/speed-dreams/debian-sd:stable
-        steps:
-            - run: |
-                git clone \
-                    -b ${{ env.GITHUB_HEAD_REF }} \
-                    --depth 1 \
-                    ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
-                    src
-                cd src/
-                cmake -B build -DSD_ASSUME_DATADIR=1
-                cmake --build build -j$(nproc --all)
+  build:
+    runs-on: docker
+    container:
+      image: forge.a-lec.org/speed-dreams/debian-sd:stable
+    steps:
+      - run: |
+        git clone \
+          -b ${{ env.GITHUB_HEAD_REF }} \
+          --depth 1 \
+          ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
+          src
+        cd src/
+        cmake -B build -DSD_ASSUME_DATADIR=1
+        cmake --build build -j$(nproc --all)
