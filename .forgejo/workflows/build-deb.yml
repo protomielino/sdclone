@@ -17,3 +17,6 @@ jobs:
       - name: Build project
         run: cmake --build build -j$(nproc --all)
         working-directory: /src
+      - name: Build Debian package
+        run: cpack -G DEB
+        working-directory: /src/build
