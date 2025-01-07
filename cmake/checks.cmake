@@ -184,7 +184,7 @@ MACRO(CHECK_LIBRARIES)
 	ENDIF(ENET_FOUND)
 
 	# OpenGL
-	Find_Package(OpenGL)
+	Find_Package(OpenGL 2.1.0)
 
 	IF(OPENGL_FOUND)
 		SET(HAVE_LIBGL 1)
