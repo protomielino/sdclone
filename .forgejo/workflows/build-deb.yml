@@ -20,3 +20,10 @@ jobs:
       - name: Build Debian package
         run: cpack -G DEB
         working-directory: /src/build
+      - name: Upload Debian package
+        run: upload-artifact *.deb
+        working-directory: /src/build
+        env:
+          URL: ${{ vars.STORE_URL }}
+          USERNAME: ${{ secrets.STORE_USERNAME }}
+          PASSWORD: ${{ secrets.STORE_PASSWORD }}
