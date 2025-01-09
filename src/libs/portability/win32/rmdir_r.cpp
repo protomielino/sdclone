@@ -13,10 +13,12 @@
 
 #include <windows.h>
 #include <winerror.h>
+#include <shlwapi.h>
 #include <shellapi.h>
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 
@@ -45,10 +47,15 @@ failure:
 int portability::rmdir_r(const char *path)
 {
     int ret = -1, res;
-    char *dir = getdir(path);
     SHFILEOPSTRUCT op = {0};
+    char *dir = nullptr;
 
-    if (!dir)
+    if (!PathFileExistsA(path))
+    {
+        ret = 0;
+        goto end;
+    }
+    else if (!(dir = getdir(path)))
     {
         fprintf(stderr, "%s: getdir failed\n", __func__);
         goto end;
