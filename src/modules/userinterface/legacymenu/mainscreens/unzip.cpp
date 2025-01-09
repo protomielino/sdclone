@@ -87,7 +87,7 @@ int unzip::extract(const std::string &path) const
 
         if (!n)
             break;
-        if (n < 0)
+        else if (n < 0)
         {
             GfLogError("%s: unzReadCurrentFile %s failed with %d\n",
                 src.c_str(), path.c_str(), n);
