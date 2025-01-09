@@ -65,7 +65,7 @@ end:
 
 int unzip::extract(const std::string &path) const
 {
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     int ret = -1, error = unzOpenCurrentFile(f);
 
     if (error)
