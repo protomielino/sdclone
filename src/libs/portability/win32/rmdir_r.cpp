@@ -68,8 +68,15 @@ int portability::rmdir_r(const char *path)
 
     if ((res = SHFileOperation(&op)))
     {
-        fprintf(stderr, "%s: SHFileOperation failed with %#x\n", __func__, res);
-        goto end;
+        fprintf(stderr, "%s: SHFileOperation %s failed with %#x, "
+            "trying with RemoveDirectory\n", __func__, path, res);
+
+        if (!RemoveDirectory(path))
+        {
+            fprintf(stderr, "%s: RemoveDirectory %s failed with %#jx\n",
+                __func__, path, static_cast<intmax_t>(GetLastError()));
+            goto end;
+        }
     }
     else if (op.fAnyOperationsAborted)
     {
