@@ -65,7 +65,7 @@ end:
 
 int unzip::extract(const std::string &path) const
 {
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     int ret = -1, error = unzOpenCurrentFile(f);
 
     if (error)
@@ -87,7 +87,7 @@ int unzip::extract(const std::string &path) const
 
         if (!n)
             break;
-        if (n < 0)
+        else if (n < 0)
         {
             GfLogError("%s: unzReadCurrentFile %s failed with %d\n",
                 src.c_str(), path.c_str(), n);

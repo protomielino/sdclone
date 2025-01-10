@@ -25,6 +25,10 @@ ENDIF(WIN32)
 # Note: Headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(portability SHARED ${PORTABILITY_SOURCES} ${PORTABILITY_HEADERS})
 
+IF(WIN32)
+	TARGET_LINK_LIBRARIES(portability shlwapi)
+ENDIF()
+
 target_include_directories(portability PUBLIC
 	${CMAKE_BINARY_DIR}
 	${CMAKE_CURRENT_LIST_DIR}
