@@ -9,6 +9,12 @@ IF(MSVC)
 	SET(_SOURCES ${_SOURCES} main.rc resource.h ../../data/data/icons/icon.ico)
 ENDIF(MSVC)
 
+IF(SD_HAS_DATADIR AND NOT SD_ASSUME_DATADIR)
+	configure_file(${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}.rc.in.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
+	SET(_SOURCES ${_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc)
+ENDIF()
+
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(tgf tgfclient tgfdata math portability)
 
