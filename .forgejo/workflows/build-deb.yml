@@ -9,7 +9,6 @@ jobs:
         run: |
           git clone -q \
             -b ${{ env.GITHUB_HEAD_REF }} \
-            --depth 1 \
             ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
             /src
       - name: Configure project
