@@ -1,8 +1,10 @@
 #CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12 FATAL_ERROR)
 
 # Speed Dreams project
-PROJECT(speed-dreams-2 VERSION 2.3.0)
+PROJECT(speed-dreams-2 VERSION 2.3.0
+   HOMEPAGE_URL "https://www.speed-dreams.net/"
+)
 
 MESSAGE(STATUS CMAKE_VERSION = "${CMAKE_VERSION}")
 
@@ -77,16 +79,16 @@ endif()
 
 set(VERSION_LONG ${VERSION})
 
-# PROJECT_VERSION_METADATA is used by NSIS packagers
+# CMAKE_PROJECT_VERSION_TWEAK is used by NSIS packagers
 # its what comes after the '-' sign (if anything)
-# ie: in tag '2.2.2-rc1' PROJECT_VERSION_METADATA should be '-rc1'
+# ie: in tag '2.2.2-rc1' CMAKE_PROJECT_VERSION_TWEAK should be '-rc1'
 STRING(FIND "${VERSION}" "-" _METADATA_INDEX)
 IF(NOT ${_METADATA_INDEX} EQUAL -1)
-   STRING(SUBSTRING ${VERSION} ${_METADATA_INDEX} -1 PROJECT_VERSION_METADATA)
-ELSE(NOT ${_METADATA_INDEX} EQUAL -1)
-   SET(PROJECT_VERSION_METADATA )
-ENDIF(NOT ${_METADATA_INDEX} EQUAL -1)
-#MESSAGE(STATUS "PROJECT_VERSION_METADATA ${PROJECT_VERSION_METADATA}")
+   STRING(SUBSTRING ${VERSION} ${_METADATA_INDEX} -1 CMAKE_PROJECT_VERSION_TWEAK)
+ELSE()
+   SET(CMAKE_PROJECT_VERSION_TWEAK)
+ENDIF()
+#MESSAGE(STATUS "CMAKE_PROJECT_VERSION_TWEAK ${CMAKE_PROJECT_VERSION_TWEAK}")
 
 # Generate config.h
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in.cmake
@@ -142,68 +144,5 @@ IF(OPTION_CHECK_CONTENTS)
    INCLUDE(cmake/prerelease.cmake)
 ENDIF(OPTION_CHECK_CONTENTS)
 
-IF(OPTION_PACKAGING OR OPTION_ALL_IN_ONE_PACKAGING)
-   INCLUDE(cmake/packagemaker.cmake)
-ENDIF(OPTION_PACKAGING OR OPTION_ALL_IN_ONE_PACKAGING)
-IF(OPTION_PACKAGING)
-   IF(MSVC)
-      INCLUDE(cmake/packagemaker-nsis.cmake)
-   ENDIF(MSVC)
-   IF(APPLE)
-      INCLUDE(cmake/packagemaker-dmg.cmake)
-   ENDIF(APPLE)
-ENDIF(OPTION_PACKAGING)
-
-IF(OPTION_ALL_IN_ONE_PACKAGING)
-   IF(MSVC AND ${CMAKE_VERSION} VERSION_LESS "3.17")
-      MESSAGE(SEND_ERROR "OPTION_ALL_IN_ONE_PACKAGING requires CMake 3.17 or greater on Windows")
-   ENDIF(MSVC AND ${CMAKE_VERSION} VERSION_LESS "3.17")
-   INCLUDE(CPack)
-ENDIF(OPTION_ALL_IN_ONE_PACKAGING)
-
-IF(OPTION_PORTABLE_PACKAGING)
-   IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
-         #[[
-         This section adds a batch file for running speed-dreams-2.exe with a local settings directory.
-         This is similar to how 'Portable Apps' work.
-         It also adds projects to build a self-extracting 7-zip file (if 7-zip is installed)
-      ]]
-   ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
-   IF(WIN32)
-
-      find_program(7ZIP_EXE 7z.exe PATH_SUFFIXES 7-Zip)
-      find_file(7ZIP_WIN 7z.sfx PATH_SUFFIXES 7-Zip)
-
-      set(SD_EXE_NAME "speed-dreams-2.exe")
-      SET(PORTABLE_PACKAGE_FILE_NAME "speed-dreams-2-${VERSION_LONG}-portable-setup" CACHE STRING "Name for portable package file")
-      SET(PORTABLE_BATCH_FILE_NAME "speed-dreams-2-${VERSION_LONG}-portable.bat" CACHE STRING "Name for portable batch file")
-
-            CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/portable/sd-portable.bat.in"
-                  "${CMAKE_BINARY_DIR}/${PORTABLE_BATCH_FILE_NAME}" @ONLY)
-
-      INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/${PORTABLE_BATCH_FILE_NAME}" DESTINATION .)
-
-      # NOTE this WILL pick up changes and additions!
-      # just re-build INSTALL no need to rerun CMake configure!
-      INSTALL(DIRECTORY packaging/portable/settings DESTINATION . )
-
-      if(7ZIP_EXE AND 7ZIP_WIN)
-
-         ADD_CUSTOM_TARGET(PORTABLE_INSTALL)
-         ADD_CUSTOM_TARGET(PORTABLE_PACKAGE DEPENDS PORTABLE_INSTALL)
-
-         ADD_CUSTOM_COMMAND(TARGET PORTABLE_INSTALL
-                     COMMAND "${CMAKE_COMMAND}" --build . --target INSTALL --config $<CONFIG>
-                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                     COMMENT "Building INSTALL...")
-
-         ADD_CUSTOM_COMMAND(TARGET PORTABLE_PACKAGE
-                        COMMAND ${7ZIP_EXE} a -sfx7z.sfx ${CMAKE_BINARY_DIR}/${PORTABLE_PACKAGE_FILE_NAME} *
-                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}
-                        COMMENT "Building portable package...")
-
-      else(7ZIP_EXE AND 7ZIP_WIN)
-            message(STATUS "Could not find 7-ZIP. Portable build disabled.")
-      endif(7ZIP_EXE AND 7ZIP_WIN)
-   ENDIF(WIN32)
-ENDIF(OPTION_PORTABLE_PACKAGING)
+INCLUDE(cpack/common.cmake)
+INCLUDE(CPack)

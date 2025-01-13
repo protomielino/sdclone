@@ -1,0 +1,37 @@
+on: [pull_request]
+jobs:
+  build:
+    runs-on: docker
+    container:
+      image: forge.a-lec.org/speed-dreams/debian-i686-w64-mingw32:stable
+    steps:
+      - name: Download third-party libraries
+        run: curl -so 3rdparty.tar.gz ${{ vars.THIRDPARTY_URL }}
+      - name: Untar third-party libraries
+        run: tar -xf 3rdparty.tar.gz
+      - name: Clone repository
+        run: |
+          git clone -q \
+            -b ${{ env.GITHUB_HEAD_REF }} \
+            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
+            src
+      - name: Configure project
+        run: |
+          cmake -B build \
+            -DSD_ASSUME_DATADIR=1 \
+            -DCMAKE_FIND_ROOT_PATH=${{ env.GITHUB_WORKSPACE }}/3rdParty \
+            -DCMAKE_TOOLCHAIN_FILE=packaging/3rdParty-devel/i686-w64-mingw32.cmake
+        working-directory: src
+      - name: Build project
+        run: cmake --build build -j$(nproc --all)
+        working-directory: src
+      - name: Build installer
+        run: cpack -G NSIS
+        working-directory: src/build
+      - name: Upload installer
+        run: upload-artifact *.exe
+        working-directory: src/build
+        env:
+          URL: ${{ vars.STORE_URL }}
+          USERNAME: ${{ secrets.STORE_USERNAME }}
+          PASSWORD: ${{ secrets.STORE_PASSWORD }}

@@ -1,0 +1,29 @@
+on: [pull_request]
+jobs:
+  build:
+    runs-on: docker
+    container:
+      image: forge.a-lec.org/speed-dreams/debian-sd:stable
+    steps:
+      - name: Clone repository
+        run: |
+          git clone -q \
+            -b ${{ env.GITHUB_HEAD_REF }} \
+            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
+            /src
+      - name: Configure project
+        working-directory: /src
+        run: cmake -B build -DSD_ASSUME_DATADIR=1
+      - name: Build project
+        run: cmake --build build -j$(nproc --all)
+        working-directory: /src
+      - name: Build Debian package
+        run: cpack -G DEB
+        working-directory: /src/build
+      - name: Upload Debian package
+        run: upload-artifact *.deb
+        working-directory: /src/build
+        env:
+          URL: ${{ vars.STORE_URL }}
+          USERNAME: ${{ secrets.STORE_USERNAME }}
+          PASSWORD: ${{ secrets.STORE_PASSWORD }}

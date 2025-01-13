@@ -67,9 +67,4 @@ MESSAGE(STATUS "TODO - fix up the dependencies. Try to not run the install multi
                         COMMAND "${CMAKE_COMMAND}" -P packagefulldmg.cmake
                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                         COMMENT "Building full package...")
-
-
-
-ELSE((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
-      MESSAGE(WARNING "Custom DMG creation requires *.app")
 ENDIF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
