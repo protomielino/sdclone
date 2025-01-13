@@ -33,30 +33,43 @@ IF(APPLE)
    SET(CMAKE_CXX_STANDARD_REQUIRED True)
 ENDIF(APPLE)
 
-option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data if not found")
+option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data")
+include(GNUInstallDirs)
 
-set(data_version 2.3.0)
-find_package(speed-dreams-data ${data_version})
-
-if(NOT SD_DATADIR)
-   if(SD_ASSUME_DATADIR)
-      include(GNUInstallDirs)
-
-      set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
-      set(SD_DATADIR_ABS ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
-      message(STATUS "Data directory: ${SD_DATADIR_ABS} (assumed)")
-      set(SD_HAS_DATADIR true)
-   else()
-      message(WARNING "Data directory not found or incompatible with version "
-         "${data_version}. Speed Dreams should still "
-         "be able to build, but it might not run successfully. "
-         "If speed-dreams-data has been installed to a non-standard location, "
-         "please add -DCMAKE_PREFIX_PATH=<data-dir> to the command line to "
-         "find it.")
-   endif()
+if(SD_ASSUME_DATADIR)
+   set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+   set(SD_DATADIR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+   set(SD_DATADIR_ABS ${SD_DATADIR_INSTALL_PREFIX})
+   message(STATUS "Data directory: ${SD_DATADIR_ABS} (assumed)")
+elseif(EXISTS speed-dreams-data/CMakeLists.txt)
+   add_subdirectory(speed-dreams-data)
+   set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+   set(SD_DATADIR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
+   set(SD_DATADIR_ABS ${CMAKE_CURRENT_SOURCE_DIR}/speed-dreams-data/data)
+   message(STATUS "Data directory: ${SD_DATADIR_ABS} (in-tree)")
 else()
+   set(data_version 2.3.0)
+   find_package(speed-dreams-data ${data_version} QUIET)
+
+   if(NOT SD_DATADIR)
+      message(FATAL_ERROR
+         "Data directory not found or incompatible with version "
+         "${data_version}. Please perform one of the following actions:\n"
+         "- Update the data git submodule to do an in-tree build with the "
+         " command below, and then configure the project again:\n"
+         "git submodule update --init --recursive\n"
+         "- If speed-dreams-data has been installed to a non-standard "
+         "location, configure the project with "
+         "-DCMAKE_PREFIX_PATH=<data-dir>.\n"
+         "- Configure the project with -DSD_ASSUME_DATADIR=1 to assume "
+         "speed-dreams-data was installed into a standard location. "
+         "Speed Dreams should then still be able to build, but it might "
+         "not run successfully. This option is usually only recommended "
+         "for CI/CD and packagers."
+      )
+   endif()
+
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
-   set(SD_HAS_DATADIR true)
 endif()
 
 INCLUDE(cmake/macros.cmake)

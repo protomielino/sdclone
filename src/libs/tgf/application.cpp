@@ -449,6 +449,8 @@ bool GfApplication::parseOptions()
         strDataDir = GfSetDataDir(SD_DATADIR);
     if (strDataDir.empty() || !GfDirExists(strDataDir.c_str()))
         strDataDir = GfSetDataDir(SD_DATADIR_ABS);
+    if (strDataDir.empty() || !GfDirExists(strDataDir.c_str()))
+        strDataDir = GfSetDataDir(SD_DATADIR_INSTALL_PREFIX);
 
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (strLocalDir.empty() || strLibDir.empty() || strBinDir.empty() || strDataDir.empty())

@@ -8,7 +8,7 @@
 
 set(CPACK_NSIS_INSTALLED_ICON_NAME ${PROJECT_NAME})
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN ${PROJECT_NAME})
-set(CPACK_NSIS_DISPLAY_NAME "Speed Dreams ${CPACK_PACKAGE_VERSION} (engine and tools)")
+set(CPACK_NSIS_DISPLAY_NAME "Speed Dreams ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_URL_INFO_ABOUT "${CMAKE_PROJECT_HOMEPAGE_URL}")
 set(CPACK_NSIS_HELP_LINK "https://forge.a-lec.org/speed-dreams/")
 set(CPACK_PACKAGE_EXECUTABLES
@@ -23,7 +23,7 @@ set(CPACK_NSIS_MENU_LINKS
    "https://forge.a-lec.org/speed-dreams/" "Project source repositories"
    "/doc/userman/how_to_drive.html" "User manual")
 
-if(SD_HAS_DATADIR AND NOT SD_ASSUME_DATADIR)
+if(NOT SD_ASSUME_DATADIR)
    set(CPACK_NSIS_MUI_ICON "${SD_DATADIR_ABS}/data/icons/icon.ico")
    set(CPACK_NSIS_MUI_UNIICON "${SD_DATADIR_ABS}/data/icons/icon.ico")
    set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "${SD_DATADIR_ABS}/data/img/header-vert.bmp")

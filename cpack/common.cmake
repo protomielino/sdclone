@@ -27,7 +27,7 @@ computer-controlled driver implementations, flexible race configuration
 master server to compare your best lap times against other players."
 )
 
-if(SD_HAS_DATADIR AND NOT SD_ASSUME_DATADIR)
+if(NOT SD_ASSUME_DATADIR)
     set(CPACK_PACKAGE_ICON "${SD_DATADIR_ABS}/data/img/header.bmp")
 endif()
 
