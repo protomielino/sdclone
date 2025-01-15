@@ -1,12 +1,14 @@
 # Speed Dreams
 
+![Speed Dreams logo](./doc/readme/sd-logo.png)
+
 Speed Dreams is a free and open source motorsport simulator. Originally
 a fork of the [TORCS](https://torcs.sourceforge.net/) project,
 it has evolved into a higher level of maturity, featuring realistic physics
 with tens of high-quality cars and tracks to choose from.
 
 > **This repository contains the engine source code,**
-> **and the base assets [as a submodule](/data/).**
+> **and the base assets [as a submodule](/speed-dreams-data/).**
 > **End users are expected to download the pre-built packages listed below.**
 >
 > The assets repository is located on
@@ -24,8 +26,8 @@ Speed Dreams binaries are available for the following platforms:
 ## Building from source
 
 In-tree builds (i.e., including both code and data on the same build)
-are recommended for simplicity. To achieve this, update the [`data/`](/data/)
-submodule with:
+are recommended for simplicity. To achieve this, update the
+[`speed-dreams-data/`](/speed-dreams-data/) submodule with:
 
 ```
 git submodule update --init --recursive
