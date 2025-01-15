@@ -1,5 +1,7 @@
 # Speed Dreams
 
+![Speed Dreams logo](./doc/readme/sd-logo.png)
+
 Speed Dreams is a free and open source motorsport simulator. Originally
 a fork of the [TORCS](https://torcs.sourceforge.net/) project,
 it has evolved into a higher level of maturity, featuring realistic physics
