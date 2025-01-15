@@ -9,16 +9,16 @@ jobs:
         run: curl -so 3rdparty.tar.gz ${{ vars.THIRDPARTY_URL }}
       - name: Untar third-party libraries
         run: tar -xf 3rdparty.tar.gz
-      - name: Clone repository
+      - name: Clone repository recursively
         run: |
           git clone -q \
+            --recursive \
             -b ${{ env.GITHUB_HEAD_REF }} \
             ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
             src
       - name: Configure project
         run: |
           cmake -B build \
-            -DSD_ASSUME_DATADIR=1 \
             -DCMAKE_FIND_ROOT_PATH=${{ env.GITHUB_WORKSPACE }}/3rdParty \
             -DCMAKE_TOOLCHAIN_FILE=packaging/3rdParty-devel/i686-w64-mingw32.cmake
         working-directory: src
