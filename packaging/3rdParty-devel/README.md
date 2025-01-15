@@ -13,10 +13,10 @@ pinnings against third-party dependencies. A build consists of:
 2. Building the dependencies.
 3. Installing them to the `3rdParty/` directory, inside the build directory.
 **This is the directory referred to by the top-level**
-**[`CMakeLists.txt`](/CMakeLists.txt)**
+**[`CMakeLists.txt`](../../CMakeLists.txt)**
 **when performing Windows builds, via either `CMAKE_PREFIX_PATH` or**
 **`CMAKE_FIND_ROOT_PATH`**. Read
-[the relevant section from the top-level `README.md`](/README.md#windows)
+[the relevant section from the top-level `README.md`](../../README.md#windows)
 for further reference.
 
 ## Requirements
@@ -94,4 +94,4 @@ cmake --build build/ # Optionally, add -j8 or any other number for faster builds
 The build will probably take a long time, as it builds tens of third-party
 libraries fetched from multiple sources. Once finished, a directory called
 `3rdParty/` should be available inside the build directory, ready to be
-consumed by [the top-level `CMakeLists.txt`](/CMakeLists.txt).
+consumed by [the top-level `CMakeLists.txt`](../../CMakeLists.txt).
