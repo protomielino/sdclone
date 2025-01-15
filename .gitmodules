@@ -1,0 +1,3 @@
+[submodule "data"]
+	path = speed-dreams-data
+	url = https://forge.a-lec.org/speed-dreams/speed-dreams-data.git
