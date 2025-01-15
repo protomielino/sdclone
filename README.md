@@ -8,7 +8,7 @@ it has evolved into a higher level of maturity, featuring realistic physics
 with tens of high-quality cars and tracks to choose from.
 
 > **This repository contains the engine source code,**
-> **and the base assets [as a submodule](/speed-dreams-data/).**
+> **and the base assets [as a submodule](./speed-dreams-data/).**
 > **End users are expected to download the pre-built packages listed below.**
 >
 > The assets repository is located on
@@ -27,7 +27,7 @@ Speed Dreams binaries are available for the following platforms:
 
 In-tree builds (i.e., including both code and data on the same build)
 are recommended for simplicity. To achieve this, update the
-[`speed-dreams-data/`](/speed-dreams-data/) submodule with:
+[`speed-dreams-data/`](./speed-dreams-data/) submodule with:
 
 ```
 git submodule update --init --recursive
@@ -77,13 +77,13 @@ cmake -B build
 
 On Windows, dependencies cannot be fetched from a package manager as in
 conventional Linux distributions. To solve this, Speed Dreams defines
-[a separate build system for third-party dependencies](/packaging/3rdParty-devel/).
+[a separate build system for third-party dependencies](./packaging/3rdParty-devel/).
 This would build all dependencies from source, so they can be later found
 by CMake.
 
 > **Both methods described below will require the path to the pre-built**
 > **dependencies**.
-> Please read [the instructions](/packaging/3rdParty-devel/README.md)
+> Please read [the instructions](./packaging/3rdParty-devel/README.md)
 > for further reference.
 
 #### Native builds
@@ -112,9 +112,9 @@ system like GNU/Linux. The
 [`w64-mingw32`](https://git.code.sf.net/p/mingw-w64/mingw-w64)
 toolchain can be used for the cross-compilation, with dedicated
 toolchain files for
-[`i686-w64-mingw32`](/packaging/3rdParty-devel/i686-w64-mingw32.cmake)
+[`i686-w64-mingw32`](./packaging/3rdParty-devel/i686-w64-mingw32.cmake)
 and
-[`x86_64-w64-mingw32`](/packaging/3rdParty-devel/x86_64-w64-mingw32.cmake),
+[`x86_64-w64-mingw32`](./packaging/3rdParty-devel/x86_64-w64-mingw32.cmake),
 referred to by the
 [`CMAKE_TOOLCHAIN_FILE`](https://cmake.org/cmake/help/latest/variable/CMAKE_TOOLCHAIN_FILE.html)
 variable. Third-party dependencies are then referred to by the
