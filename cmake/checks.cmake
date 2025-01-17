@@ -1,7 +1,3 @@
-IF(NOT DEFINED SOURCE_DIR)
-	MESSAGE(ERROR ": Please first include macro's")
-ENDIF(NOT DEFINED SOURCE_DIR)
-
 INCLUDE(CheckIncludeFiles)
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)

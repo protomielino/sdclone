@@ -36,12 +36,6 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   ENDIF()
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-# Determine the source folder if ???
-IF(NOT SOURCE_DIR AND IN_SOURCETREE)
-  SET(SOURCE_DIR ${CMAKE_SOURCE_DIR})
-  MARK_AS_ADVANCED(SOURCE_DIR)
-ENDIF(NOT SOURCE_DIR AND IN_SOURCETREE)
-
 # The path of the folder of the current CMakeLists.txt
 GET_FILENAME_COMPONENT(CURRENT_LIST_FILE_PATH ${CMAKE_CURRENT_LIST_FILE} PATH)
 
@@ -279,7 +273,7 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
     IF(MSVC)
 
-      SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.bat")
+      SET(TGT_SCRIPT "${CMAKE_SOURCE_DIR}/clobber.bat")
       FILE(WRITE  "${TGT_SCRIPT}" "@echo off\n")
       FILE(APPEND "${TGT_SCRIPT}" "rem CMake-generated script for in-source build tree total cleanup\n")
       FILE(APPEND "${TGT_SCRIPT}" "rem (remove any build-system-generated file (+ .bak, *~, ... etc), \n")
@@ -337,7 +331,7 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
     ELSE(MSVC)
 
-      SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.sh")
+      SET(TGT_SCRIPT "${CMAKE_SOURCE_DIR}/clobber.sh")
       FILE(WRITE  "${TGT_SCRIPT}" "#!/bin/sh\n")
       FILE(APPEND "${TGT_SCRIPT}" "# CMake-generated script for in-source build tree total cleanup\n")
       FILE(APPEND "${TGT_SCRIPT}" "# (remove any build-system-generated file (+ .bak, *~, ... etc), \n")

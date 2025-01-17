@@ -50,8 +50,8 @@ ENDMACRO(_GET_TARGET_REAL_PATHNAME TGT_NAME VAR_PATHNAME)
 #     Installs bt.so in ${prefix}/${SD_LIBDIR}/drivers/bt
 #  SD_INSTALL_FILES(BIN TARGETS speed-dreams)
 #     Installs the speed-dreams target in ${prefix}/${SD_BINDIR}
-#  SD_INSTALL_FILES(MAN man6 PREFIX ${SOURCE_DIR}/doc/man FILES sd2-menuview.6)
-#     Installs ${SOURCE_DIR}/doc/man/sd2-menuview.6 in ${prefix}/${SD_MANDIR}/man6
+#  SD_INSTALL_FILES(MAN man6 PREFIX ${CMAKE_SOURCE_DIR}/doc/man FILES sd2-menuview.6)
+#     Installs ${CMAKE_SOURCE_DIR}/doc/man/sd2-menuview.6 in ${prefix}/${SD_MANDIR}/man6
 MACRO(SD_INSTALL_FILES)
 
   SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "LIB,1,1,IS_LIB,LIB_PATH")

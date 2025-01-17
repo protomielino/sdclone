@@ -65,7 +65,7 @@ MACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
   # Generate the .def file
   SET(ROBOT_NAME "${ROBOTNAME}")
   IF(IN_SOURCETREE)
-    CONFIGURE_FILE(${SOURCE_DIR}/cmake/robot.def.in.cmake ${DEF_FILE})
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/robot.def.in.cmake ${DEF_FILE})
   ELSE(IN_SOURCETREE)
     CONFIGURE_FILE(${SD_DATADIR}/cmake/robot.def.in.cmake ${DEF_FILE})
   ENDIF(IN_SOURCETREE)
