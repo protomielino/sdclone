@@ -34,6 +34,7 @@ IF(APPLE)
 ENDIF(APPLE)
 
 option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data")
+set(data_version 2.3.0)
 include(GNUInstallDirs)
 
 if(SD_ASSUME_DATADIR)
@@ -48,7 +49,6 @@ elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/speed-dreams-data/CMakeLists.txt)
    set(SD_DATADIR_ABS ${CMAKE_CURRENT_SOURCE_DIR}/speed-dreams-data/data)
    message(STATUS "Data directory: ${SD_DATADIR_ABS} (in-tree)")
 else()
-   set(data_version 2.3.0)
    find_package(speed-dreams-data ${data_version} QUIET)
 
    if(NOT SD_DATADIR)
