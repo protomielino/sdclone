@@ -37,6 +37,8 @@ option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data")
 set(data_version 2.3.0)
 include(GNUInstallDirs)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
+
 if(SD_ASSUME_DATADIR)
    set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
    set(SD_DATADIR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
