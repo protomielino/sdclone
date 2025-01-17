@@ -144,13 +144,6 @@ IF(MSVC)
    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/userman/images/ DESTINATION ./doc/images/)
 ENDIF(MSVC)
 
-
-# Useful for using an installation of SD as a robot development framework without building it.
-# Only do for an in source tree build as INSTALL_SD_CMAKE() doesn't seem to use CMAKE_INSTALL_PREFIX
-IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   INSTALL_SD_CMAKE()
-ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
 
