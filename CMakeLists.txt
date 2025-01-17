@@ -75,6 +75,11 @@ endif()
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
 
+set(CMAKE_INSTALL_RPATH
+   ${CMAKE_INSTALL_RPATH}
+   ${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib
+)
+
 CHECK_HEADERS_H()
 CHECK_FUNCTIONS()
 CHECK_LIBRARIES()
