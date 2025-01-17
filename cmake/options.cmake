@@ -22,27 +22,6 @@ INCLUDE(CMakeDependentOption)
 
 MACRO(ADD_SD_COMPILE_OPTIONS)
 
-  # This has to be done more than once, because HAVE_CONFIG_H may change.
-  IF(HAVE_CONFIG_H)
-
-    ADD_DEFINITIONS(-DHAVE_CONFIG_H)
-
-    IF(IN_SOURCETREE)
-      SET(INCLUDE_CANDIDATE ${CMAKE_SOURCE_DIR})
-    ELSE(IN_SOURCETREE)
-      SET(INCLUDE_CANDIDATE "")
-    ENDIF(IN_SOURCETREE)
-    FIND_PATH(CONFIGH_INCLUDE_DIR config.h ${INCLUDE_CANDIDATE} /usr/include /usr/local/include NO_DEFAULT_PATH)
-    FIND_PATH(CONFIGH_INCLUDE_DIR config.h ${INCLUDE_CANDIDATE} /usr/include /usr/local/include)
-    MARK_AS_ADVANCED(CONFIGH_INCLUDE_DIR)
-    IF(CONFIGH_INCLUDE_DIR)
-      INCLUDE_DIRECTORIES(${CONFIGH_INCLUDE_DIR})
-    ELSE(CONFIGH_INCLUDE_DIR)
-      MESSAGE(FATAL_ERROR "Cannot find config.h header file")
-    ENDIF(CONFIGH_INCLUDE_DIR)
-
-  ENDIF(HAVE_CONFIG_H)
-
   # Build options (do it only once).
   IF(NOT _ALREADY_DONE)
 
