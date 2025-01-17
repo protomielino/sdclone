@@ -74,6 +74,12 @@ else()
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
 endif()
 
+if(CMAKE_CXX_COMPILER_ID)
+   set(SD_BUILD_INFO_COMPILER_NAME ${CMAKE_CXX_COMPILER_ID})
+else()
+   set(SD_BUILD_INFO_COMPILER_NAME "Unknown")
+endif()
+
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
 
