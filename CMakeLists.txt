@@ -153,11 +153,6 @@ ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
 
-# Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
-IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-	SD_GENERATE_CLOBBER_SCRIPT()
-ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-
 # Add an unistall target.
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
                "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" IMMEDIATE @ONLY)
