@@ -36,12 +36,9 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   ENDIF()
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-# The path of the folder of the current CMakeLists.txt
-GET_FILENAME_COMPONENT(CURRENT_LIST_FILE_PATH ${CMAKE_CURRENT_LIST_FILE} PATH)
-
 # Macros arg list parsing tools.
 IF(NOT _ALREADY_DONE)
-  INCLUDE(${CURRENT_LIST_FILE_PATH}/splitargn.cmake)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/splitargn.cmake)
 ENDIF(NOT _ALREADY_DONE)
 
 # Include dir for config.h
@@ -134,23 +131,23 @@ ENDIF(UNIX)
 STRING(REGEX REPLACE "^(.*[^/])/*$" "\\1" SD_LOCALDIR_TMP ${SD_LOCALDIR})
 SET(SD_LOCALDIR ${SD_LOCALDIR_TMP})
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CURRENT_LIST_FILE_PATH})
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 SET(CMAKE_INSTALL_RPATH "${SD_LIBDIR_ABS}/lib")
 
 # Configuration options macros.
-INCLUDE(${CURRENT_LIST_FILE_PATH}/options.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/options.cmake)
 
 # Robots-related macros.
-INCLUDE(${CURRENT_LIST_FILE_PATH}/robot.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/robot.cmake)
 
 # Robots-related macros.
-INCLUDE(${CURRENT_LIST_FILE_PATH}/install.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/install.cmake)
 
 # Internal dependencies macros (includes and libs).
-INCLUDE(${CURRENT_LIST_FILE_PATH}/internaldeps.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/internaldeps.cmake)
 
 # 3rd party dependencies macros (includes and libs).
-INCLUDE(${CURRENT_LIST_FILE_PATH}/thirdpartydeps.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/thirdpartydeps.cmake)
 
 # Use as a replacement of native ADD_DIRECTORY if the target folder may be optional
 # (if it is actually not there, and OPTION_CHECK_CONTENTS is Off,
