@@ -43,8 +43,7 @@ SDScenery::SDScenery(void) :
     m_background(NULL),
     m_pit(NULL),
     m_tracklights(NULL),
-    _scenery(NULL),
-    SDTrack(NULL)
+    _scenery(NULL)
 {
     _max_visibility = 0;
     _nb_cloudlayer = 0;
@@ -62,15 +61,12 @@ SDScenery::~SDScenery(void)
     delete	m_background;
     delete  m_pit;
     delete  m_tracklights;
-    delete SDTrack;
 
     if(_scenery != NULL)
     {
         _scenery->removeChildren(0, _scenery->getNumChildren());
         _scenery = NULL;
     }
-
-    SDTrack = NULL;
 }
 
 void SDScenery::LoadScene(tTrack *track)
@@ -85,7 +81,6 @@ void SDScenery::LoadScene(tTrack *track)
     m_pit = new SDPit;
     m_tracklights = new SDTrackLights;
     _scenery = new osg::Group;
-    SDTrack = track;
 
     // Load graphics options.
     LoadGraphicsOptions();
@@ -96,15 +91,15 @@ void SDScenery::LoadScene(tTrack *track)
     }//if grHandle
 
     /* Determine the world limits */
-    grWrldX = (int)(SDTrack->max.x - SDTrack->min.x + 1);
-    grWrldY = (int)(SDTrack->max.y - SDTrack->min.y + 1);
-    grWrldZ = (int)(SDTrack->max.z - SDTrack->min.z + 1);
+    grWrldX = (int)(track->max.x - track->min.x + 1);
+    grWrldY = (int)(track->max.y - track->min.y + 1);
+    grWrldZ = (int)(track->max.z - track->min.z + 1);
     grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
-    if (strcmp(SDTrack->category, "speedway") == 0)
+    if (strcmp(track->category, "speedway") == 0)
     {
         _speedWay = true;
-        if (strcmp(SDTrack->subcategory, "long") == 0)
+        if (strcmp(track->subcategory, "long") == 0)
             _speedWayLong = true;
         else
             _speedWayLong = false;
@@ -222,8 +217,6 @@ void SDScenery::ShutdownScene(void)
     //delete loader;
     _scenery->removeChildren(0, _scenery->getNumChildren());
     _scenery = NULL;
-
-    SDTrack = NULL;
 }
 
 bool SDScenery::LoadTrack(std::string& strTrack)
