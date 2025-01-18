@@ -502,8 +502,11 @@ grLoadBackground()
 
     GfLogDebug("Loading background ...\n");
 
-    snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
-             grTrack->category, grTrack->internalname);
+    std::string trackpath = grTrackPath();
+    const char *track = trackpath.c_str();
+
+    snprintf(buf, sizeof(buf), "%s%s;%s;data/img;data/textures;.",
+            GfLocalDir(), track, track);
     grSetFilePath(buf);
     grGammaValue = 1.8;
     grMipMap = 0;
@@ -894,11 +897,13 @@ void grLoadBackgroundSky(void)
     char buf2[256];
     const char		*bgsky;
     ssgEntity		*desc2;
+    std::string trackpath = grTrackPath();
+    const char *track = trackpath.c_str();
 
     bgsky = "background-sky.ac";
-    snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
+    snprintf(buf2, sizeof(buf2), "%s%s;%s;data/textures;.", GfLocalDir(), track, track);
     ssgTexturePath(buf2);
-    snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects", grTrack->category, grTrack->internalname);
+    snprintf(buf2, sizeof(buf2), "%s%s;%s;data/objects", GfLocalDir(), track, track);
     ssgModelPath(buf2);
 
     desc2 = grssgLoadAC3D(bgsky, NULL);

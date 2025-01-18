@@ -27,6 +27,7 @@
 #include <track.h>	//tTrack
 #include <raceman.h> // tSituation
 #include "grmultitexstate.h"
+#include <string>
 
 namespace ssggraph {
 
@@ -67,6 +68,7 @@ extern void grShutdownScene(void);
 extern void grCustomizePits(void);
 extern void grLoadPitsIndicator(tdble x,tdble y, tdble z, char *buf, int Pitind);
 extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
+std::string grTrackPath();
 
 //TODO: Question: What is this??? kilo
 //      Possible answer: Some try to lower GPU load by filtering the scene ? JP

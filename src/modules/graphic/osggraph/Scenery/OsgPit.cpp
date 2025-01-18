@@ -422,10 +422,16 @@ void SDPit::build(const tTrack *track)
             // load pit indicator
             if (bHasPitIndicator)
             {
-                loader.AddSearchPath(std::string("tracks/") + track->category + "/" + track->internalname);
-                loader.AddSearchPath("data/objects");
-                loader.AddSearchPath("data/textures");
-                loader.AddSearchPath("data/img");
+                std::string localdir = GfLocalDir(), datadir = GfDataDir();
+                loader.AddSearchPath(localdir + "tracks/" + track->category + "/" + track->internalname);
+                loader.AddSearchPath(localdir + "data/objects");
+                loader.AddSearchPath(localdir + "data/textures");
+                loader.AddSearchPath(localdir + "data/img");
+
+                loader.AddSearchPath(datadir + "tracks/" + track->category + "/" + track->internalname);
+                loader.AddSearchPath(datadir + "data/objects");
+                loader.AddSearchPath(datadir + "data/textures");
+                loader.AddSearchPath(datadir + "data/img");
 
                 std::string filename = pits->pitindicator == 1
                                      ? "pit_indicator.ac"

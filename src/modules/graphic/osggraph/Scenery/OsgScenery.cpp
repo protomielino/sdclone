@@ -69,7 +69,7 @@ SDScenery::~SDScenery(void)
     }
 }
 
-void SDScenery::LoadScene(const tTrack *track)
+int SDScenery::LoadScene(const tTrack *track)
 {
     void		*hndl = grTrackHandle;
     const char	*acname;
@@ -118,44 +118,37 @@ void SDScenery::LoadScene(const tTrack *track)
         GfLogError("No specified track 3D model file\n");
     }
 
-    std::string PathTmp = GfDataDir();
-
     _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
     if (_bgsky)
     {
-        std::string strPath = PathTmp;
-        snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
-        strPath += buf;
-        m_background->build(grWrldX, grWrldY, grWrldZ, strPath);
+        snprintf(buf, 256, "tracks/%s/%s/", track->category, track->internalname);
+        m_background->build(grWrldX, grWrldY, grWrldZ, buf);
         GfLogDebug("Background loaded\n");
     }
 
-    std::string strPath = GfDataDir();
-    snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
+    snprintf(buf, 256, "tracks/%s/%s/", track->category, track->internalname);
 
     std::string ext = osgDB::getFileExtension(acname);
 
     if (ext == "acc")
     {
         GfLogDebug("Load 3D Model Scene ACC\n");
-        strPath+=buf;
-        _strTexturePath = strPath;
-        strPath+=acname;
-
-        LoadTrack(strPath);
+        if (!LoadTrack(buf, acname))
+        {
+            GfLogError("LoadTrack %s%s failed\n", buf, acname);
+            return -1;
+        }
     }
     else
     {
-        strPath+=buf;
-
-        std::string strTPath = GfDataDir();
+        std::string localdir = GfLocalDir(), datadir = GfDataDir();
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
-        pathList.push_back(strPath);
-        GfLogDebug("Track Path : %s\n", pathList.back().c_str());
-        pathList.push_back(strTPath+"data/objects/");
-        GfLogDebug("Texture Path : %s\n", pathList.back().c_str());
-        pathList.push_back(strTPath+"data/textures/");
-        GfLogDebug("Texture Path : %s\n", pathList.back().c_str());
+        pathList.push_back(localdir + buf);
+        pathList.push_back(localdir + "data/objects/");
+        pathList.push_back(localdir + "data/textures/");
+        pathList.push_back(datadir + buf);
+        pathList.push_back(datadir + "data/objects/");
+        pathList.push_back(datadir + "data/textures/");
         osgDB::Registry::instance()->setDataFilePathList(pathList);
         osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
 
@@ -184,6 +177,7 @@ void SDScenery::LoadScene(const tTrack *track)
 
     osgDB::Registry::instance()->setDataFilePathList( osgDB::FilePathList() );
     osgDB::Registry::instance()->clearObjectCache();
+    return 0;
 }
 
 void SDScenery::LoadSkyOptions()
@@ -219,22 +213,19 @@ void SDScenery::ShutdownScene(void)
     _scenery = NULL;
 }
 
-bool SDScenery::LoadTrack(std::string& strTrack)
+bool SDScenery::LoadTrack(const std::string &dir, const std::string &file)
 {
-    std::string name;
-    GfLogDebug("Track Path : %s\n", strTrack.c_str());
+    std::string localdir = GfLocalDir();
     osgLoader loader;
-    GfLogDebug("Texture Path : %s\n", _strTexturePath.c_str());
-    loader.AddSearchPath(_strTexturePath);
+    loader.AddSearchPath(dir);
+    loader.AddSearchPath(localdir + "data/textures/");
+    loader.AddSearchPath("data/textures/");
 
-    std::string strTPath = GfDataDir();
-    strTPath += "data/textures/";
-    GfLogDebug("Texture Path : %s\n", strTPath.c_str());
-    loader.AddSearchPath(strTPath);
+    std::string path = dir + file;
+    osg::Node *pTrack;
 
-    osg::Node *pTrack = loader.Load3dFile(strTrack, false, "", name);
-
-    if (pTrack)
+    if ((pTrack = loader.Load3dFile(GfLocalDir() + path))
+        || (pTrack = loader.Load3dFile(path)))
     {
         pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
         _scenery->addChild(pTrack);

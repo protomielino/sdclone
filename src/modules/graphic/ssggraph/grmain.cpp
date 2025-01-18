@@ -952,7 +952,12 @@ initTrack(tTrack *track)
     grssgSetCurrentOptions(&options);
 
     // Now, do the real track loading job.
-    grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    grTrackHandle = GfParmReadFileBoth(track->filename, GFPARM_RMODE_STD);
+    if (!grTrackHandle) {
+        GfLogError("GfParmReadFileBoth %s failed\n", track->filename);
+        return -1;
+    }
+
     if (grNbActiveScreens > 0)
         return grLoadScene(track);
 

@@ -530,7 +530,11 @@ int initTrack(tTrack *track)
     // TODO: Find a solution to init the graphics first independent of objects.
 
     // Now, do the real track loading job.
-    grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    grTrackHandle = GfParmReadFileBoth(track->filename, GFPARM_RMODE_STD);
+    if (!grTrackHandle) {
+        GfLogError("GfParmReadFileBoth %s failed\n", track->filename);
+        return -1;
+    }
 
     //Options = new SDOptions;
 
@@ -538,7 +542,9 @@ int initTrack(tTrack *track)
     render = new SDRender;
     //cam = new SDCamera;
 
-    scenery->LoadScene(track);
+    if (scenery->LoadScene(track))
+        return -1;
+
     render->Init(track);
 
     Clouds = track->local.clouds;

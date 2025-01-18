@@ -44,13 +44,16 @@ void SDBackground::build(int X, int Y, int Z, const std::string& TrackPath)
 {
     osgDB::Registry::instance()->clearObjectCache();
 
-    std::string LocalPath = GfDataDir();
+    std::string DataPath = GfDataDir(), LocalPath = GfLocalDir();
 
     osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
 
-    pathList.push_front(LocalPath+"data/objects/");
-    pathList.push_front(LocalPath+"data/textures/");
-    pathList.push_front(TrackPath);
+    pathList.push_front(DataPath + "data/objects/");
+    pathList.push_front(DataPath + "data/textures/");
+    pathList.push_front(DataPath + TrackPath);
+    pathList.push_front(LocalPath + "data/objects/");
+    pathList.push_front(LocalPath + "data/textures/");
+    pathList.push_front(LocalPath + TrackPath);
     osgDB::Registry::instance()->setDataFilePathList(pathList);
 
     //osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
