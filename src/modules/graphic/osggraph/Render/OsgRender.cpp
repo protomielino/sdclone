@@ -133,22 +133,9 @@ SDRender::~SDRender(void)
         m_Root->removeChildren(0, m_Root->getNumChildren());
         stateSet->getTextureAttributeList().clear();
         stateSet->getTextureModeList().clear();
-
-        m_CarRoot = NULL;
-        m_CarLightsRoot = NULL;
-        m_ShadowRoot = NULL;
-        m_ShadowSlot = NULL;
-        m_NonShadowRoot = NULL;
-        m_Scene = NULL;
-        m_Root = NULL;
-        m_Fog = NULL;
     }
 
-    if (thesky)
-    {
-        delete thesky;
-        thesky = NULL;
-    }
+    delete thesky;
 
     SDTrack = NULL;
 }
