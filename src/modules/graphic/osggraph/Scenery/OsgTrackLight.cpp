@@ -285,7 +285,7 @@ SDTrackLights::~SDTrackLights(void)
     if (internal) delete internal;
 }
 
-void SDTrackLights::build(tTrack *track)
+void SDTrackLights::build(const tTrack *track)
 {
     if (internal) delete internal;
 

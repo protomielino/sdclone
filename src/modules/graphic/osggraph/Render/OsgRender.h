@@ -98,22 +98,22 @@ private:
 
     SDSky *thesky;
     SDScenery *scenery;
-    tTrack *SDTrack;
+    const tTrack *track;
 
 public:
     SDRender(void);
     ~SDRender(void);
 
-    void Init(tTrack *track);
+    void Init(const tTrack *track);
     osg::ref_ptr< osg::StateSet> setFogState();
     osg::Vec4f getSceneColor(void);
     void UpdateTime(tSituation *s);
-    void UpdateLight(void);
+    void UpdateLight(const tTrack *track);
     void addCars(osg::Node* cars, osg::Node* carLights);
     void UpdateFogColor(double angle);
     void UpdateSky(double currentTime, double accelTime, double X, double Y);
     void ShadowedScene(void);
-    void weather(void);
+    void weather(const tTrack *track);
 
     inline SDSky * getSky() { return thesky; }
     inline int getShader() const { return carsShader; }

@@ -35,11 +35,11 @@ SDPit::~SDPit(void)
 {
 }
 
-void SDPit::build(tTrack *track)
+void SDPit::build(const tTrack *track)
 {
     GfLogDebug("Build pits ... \n");
 
-    tTrackPitInfo *pits = &track->pits;
+    const tTrackPitInfo *pits = &track->pits;
 
     if (pits->pitindicator > 0)
         GfLogTrace("Pit Indicator ... YES ...\n");
@@ -56,7 +56,7 @@ void SDPit::build(tTrack *track)
         GfLogTrace("Creating track side pit buildings (%d slots) ...\n", pits->nMaxPits);
         for (int i = 0; i < pits->nMaxPits; i++)
         {
-            tTrackOwnPit *act_pit = &pits->driversPits[i];
+            const tTrackOwnPit *act_pit = &pits->driversPits[i];
 
             osgLoader loader;
 

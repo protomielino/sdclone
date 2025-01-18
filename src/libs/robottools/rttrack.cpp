@@ -67,7 +67,7 @@ tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart)
             - TR_TORIGHT the toRight field is used
             - TR_TOLEFT the toLeft field is used
 */
-void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag)
+void RtTrackLocal2Global(const tTrkLocPos *p, tdble *X, tdble *Y, int flag)
 {
     tdble r, a;
     tdble tr;

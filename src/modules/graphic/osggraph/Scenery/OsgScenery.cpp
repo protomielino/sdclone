@@ -69,7 +69,7 @@ SDScenery::~SDScenery(void)
     }
 }
 
-void SDScenery::LoadScene(tTrack *track)
+void SDScenery::LoadScene(const tTrack *track)
 {
     void		*hndl = grTrackHandle;
     const char	*acname;
