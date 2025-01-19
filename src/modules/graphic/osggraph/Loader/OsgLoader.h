@@ -16,6 +16,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef OSGLOADER_H
+#define OSGLOADER_H
+
 #include <osgDB/ReadFile>
 
 #include "ReaderWriterACC.h"
@@ -39,3 +42,5 @@ protected:
 };
 
 } // namespace osggraph
+
+#endif
