@@ -1233,7 +1233,21 @@ GfParmReadBuf (char *buffer)
     return NULL;
 }
 
+void *
+GfParmReadFileBoth(const char *file, int mode)
+{
+    void *ret = GfParmReadFileLocal(file, mode);
 
+    if (!ret)
+        return GfParmReadFile(file, mode);
+
+    return ret;
+}
+
+void *GfParmReadFileBoth(const std::string &file, int mode)
+{
+    return GfParmReadFileBoth(file.c_str(), mode);
+}
 
 void *
 GfParmReadFileLocal(const std::string &file, int mode, bool neededFile)

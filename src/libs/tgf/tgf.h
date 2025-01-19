@@ -409,6 +409,9 @@ TGF_API char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen);
 /* parameter file read */
 TGF_API void *GfParmReadFileLocal(const char *file, int mode, bool neededFile = true);
 TGF_API void *GfParmReadFileLocal(const std::string &file, int mode, bool neededFile = true);
+/* attempt GfParmReadFileLocal first, then GfParmReadFile */
+TGF_API void *GfParmReadFileBoth(const char *file, int mode);
+TGF_API void *GfParmReadFileBoth(const std::string &file, int mode);
 /* last optional parameter allows usage without logger be available */
 TGF_API void *GfParmReadFile(const char *file, int mode, bool neededFile = true, bool trace = true);
 TGF_API void *GfParmReadFile(const std::string &file, int mode, bool neededFile = true, bool trace = true);
