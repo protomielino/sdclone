@@ -50,6 +50,7 @@ public:
     void config_exit(const std::vector<std::string> &repos);
     void toggle();
     void pressed(thumbnail *t);
+    void on_delete(thumbnail *t);
     int progress(const pressedargs *p, float pt) const;
     void prev_page();
     void next_page();

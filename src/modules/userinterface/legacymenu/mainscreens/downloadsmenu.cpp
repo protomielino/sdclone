@@ -451,7 +451,7 @@ void DownloadsMenu::append(thumbnail *t, entry *e)
 void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
     unsigned &offset)
 {
-    bool enable = false, show = false;
+    bool enable = false, show_progress = false, show_delete = false;
     float progress = 0.0f;
     const char *s;
 
@@ -469,16 +469,18 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
         case entry::update:
             s = "Update";
             enable = true;
+            show_delete = true;
             break;
 
         case entry::fetching:
             s = "Downloading";
-            show = true;
+            show_progress = true;
             progress = e->progress;
             break;
 
         case entry::done:
             s = "Downloaded";
+            show_delete = true;
             break;
     }
 
@@ -488,7 +490,7 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
         return;
     }
 
-    t->set(s, enable, show, progress);
+    t->set(s, enable, show_progress, progress, show_delete);
     append(t, e);
     appended = true;
 }
@@ -929,6 +931,37 @@ static void pressed(thumbnail *t, void *arg)
     m->pressed(t);
 }
 
+void DownloadsMenu::on_delete(thumbnail *t)
+{
+    for (const auto &b : bargs)
+    {
+        if (b.first != t)
+            continue;
+
+        entry *e = b.second;
+        const Asset &a = e->a;
+        std::string pathstr = a.basedir() + a.dstdir();
+        const char *path = pathstr.c_str();
+
+        if (portability::rmdir_r(path))
+            GfLogError("rmdir_r %s failed\n", path);
+        else
+        {
+            e->state = entry::download;
+            update_ui();
+        }
+
+        break;
+    }
+}
+
+static void on_delete(thumbnail *t, void *arg)
+{
+    DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
+
+    m->on_delete(t);
+}
+
 void DownloadsMenu::prev_page()
 {
     if (!offset)
@@ -1015,7 +1048,8 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
         std::string id = "thumbnail";
 
         id += std::to_string(i);
-        thumbnails.push_back(new thumbnail(hscr, param, id, ::pressed, this));
+        thumbnails.push_back(new thumbnail(hscr, param, id, ::pressed,
+            ::on_delete, this));
     }
 
     GfParmReleaseHandle(param);
