@@ -21,7 +21,11 @@
 
 #include <camera.h>
 #include <graphic.h>
-#include <raceman.h>	//tSituation
+#include <track.h>
+#include <tgf.h>
+
+struct Situation;
+typedef struct Situation tSituation;
 
 namespace osggraph {
 

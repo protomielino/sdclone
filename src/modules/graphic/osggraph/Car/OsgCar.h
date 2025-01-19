@@ -19,16 +19,18 @@
 #ifndef _OSGCAR_H_
 #define _OSGCAR_H_
 
-#include <car.h>
-#include <raceman.h>
 #include <vector>
 
 #include <osg/TextureCubeMap>
 #include <osg/LOD>
 
+#include "OsgLoader.h"
 #include "OsgWheel.h"
 //#include "OsgBackFire.h"
 #include "OsgCarLight.h"
+
+struct CarElt;
+typedef struct CarElt tCarElt;
 
 namespace osggraph {
 

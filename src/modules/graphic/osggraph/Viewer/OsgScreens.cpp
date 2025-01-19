@@ -38,6 +38,7 @@
 #include "OsgMain.h"
 #include "OsgCar.h"
 #include "OsgHUD.h"
+#include <raceman.h>        //tSituation
 
 namespace osggraph {
 

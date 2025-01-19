@@ -45,6 +45,8 @@
 #include "OsgShader.h"
 #include "OsgReflectionMapping.h"
 #include "OsgNodeMask.h"
+#include <car.h>
+#include <raceman.h>
 
 namespace osggraph {
 

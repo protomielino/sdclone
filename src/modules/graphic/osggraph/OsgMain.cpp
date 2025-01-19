@@ -38,6 +38,8 @@
 #include "OsgHUD.h"
 #include "OsgParticles.h"
 
+#include <raceman.h>	//tSituation
+
 namespace osggraph {
 
 //extern	osg::Timer m_timer;
