@@ -128,6 +128,8 @@ protected:
 	GfTracks();
 	~GfTracks();
 
+	void list(const std::string &path);
+
 protected:
 
 	// The singleton itself.

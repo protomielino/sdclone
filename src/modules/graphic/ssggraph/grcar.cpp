@@ -670,7 +670,7 @@ grInitShadow(tCarElt *car)
 
     {
         GfLogInfo("Init shadow static SSG\n");
-        char		buf[512];
+        std::string paths;
         const char	*shdTexName;
         int			i;
         float		x;
@@ -683,11 +683,23 @@ grInitShadow(tCarElt *car)
         ssgNormalArray	*shd_nrm = new ssgNormalArray(1);
         ssgTexCoordArray	*shd_tex = new ssgTexCoordArray(GR_SHADOW_POINTS+1);
 
-        snprintf(buf, sizeof(buf), "cars/models/%s;", car->_carName);
-        if (strlen(car->_masterModel) > 0) // Add the master model path if we are using a template.
-            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "cars/models/%s;", car->_masterModel);
+        const char *dirs[] = {GfLocalDir(), GfDataDir()};
 
-        grSetFilePath(buf);
+        for (size_t i = 0; i < sizeof dirs / sizeof *dirs; i++)
+        {
+            const char *dir = dirs[i],
+                *models[] = {car->_carName, car->_masterModel};
+
+            for (size_t i = 0; i < sizeof models / sizeof *models; i++)
+            {
+                paths += dir;
+                paths += "cars/models/";
+                paths += models[i];
+                paths += ";";
+            }
+        }
+
+        grSetFilePath(paths.c_str());
 
         shdTexName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
 
@@ -1069,9 +1081,13 @@ grInitCar(tCarElt *car)
 
     lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
+    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%scars/models/%s;", GfLocalDir(), car->_carName);
     lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
     if (bMasterModel)
+    {
+        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%scars/models/%s;", GfLocalDir(), car->_masterModel);
         lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
+    }
 
     lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/objects;");
 

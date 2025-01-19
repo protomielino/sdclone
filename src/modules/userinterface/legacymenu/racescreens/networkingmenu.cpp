@@ -169,7 +169,7 @@ GetTrackName(const char *category, const char *trackName)
 	std::string name;
 
     sprintf(buf, "tracks/%s/%s/%s.%s", category, trackName, trackName, TRKEXT);
-    trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    trackHandle = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
 
     if (trackHandle) {
         name = GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName);
@@ -192,37 +192,41 @@ GetTrackName(const char *category, const char *trackName)
 static std::string
 GetTrackPreviewFileName(const char *pszCategory, const char *pszTrack)
 {
-	char buf[256];
+    static const char *extensions[] = {"jpg", "png"};
 
-	// Try JPEG first.
-    snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.jpg", pszCategory, pszTrack, pszTrack);
-    buf[255] = 0; /* snprinf manual is not clear about that ... */
+    for (size_t i = 0; i < sizeof extensions / sizeof *extensions; i++)
+    {
+        const char *ext = extensions[i];
+        std::string dirs[] = {GfLocalDir(), GfDataDir()};
 
-	// Then PNG if not found.
-	if (!GfFileExists(buf))
-	{
-		snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.png", pszCategory, pszTrack, pszTrack);
-		buf[255] = 0; /* snprinf manual is not clear about that ... */
-	}
+        for (size_t i = 0; i < sizeof dirs / sizeof *dirs; i++)
+        {
+            std::string path = dirs[i] + "tracks/" + pszCategory
+                + "/" + pszTrack + "/" + pszTrack + "." + ext;
 
-	// Then fallback.
-	if (!GfFileExists(buf))
-		strncpy(buf, "data/img/splash-networkrace.jpg", sizeof(buf));
+            if (GfFileExists(path.c_str()))
+                return path;
+        }
+    }
 
-	return std::string(buf);
+    return "data/img/splash-networkrace.jpg";
 }
 
 static std::string
 GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack)
 {
-	char buf[256];
+    std::string dirs[] = {GfLocalDir(), GfDataDir()};
 
-    snprintf(buf, sizeof(buf), "tracks/%s/%s/outline.png", pszCategory, pszTrack);
+    for (size_t i = 0; i < sizeof dirs / sizeof *dirs; i++)
+    {
+        std::string path = dirs[i] + "tracks/" + pszCategory + "/" + pszTrack
+            + "/outline.png";
 
-	if (!GfFileExists(buf))
-		strncpy(buf, "data/img/transparent.png", sizeof(buf));
+        if (GfFileExists(path.c_str()))
+            return path;
+    }
 
-	return std::string(buf);
+    return "data/img/transparent.png";
 }
 
 static void

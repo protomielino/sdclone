@@ -16,13 +16,14 @@ class thumbnail
 public:
     typedef void (*callback)(thumbnail *t, void *args);
     thumbnail(void *hscr, void *param, const std::string &id, callback cb,
-        void *args);
+        callback delete_cb, void *args);
     void pressed() const;
     void set(const std::string &path, const std::string &name,
         const std::string &category, const std::string &license,
         const std::string &author, const std::string &size) const;
     void set(const std::string &text = "", bool enable = false,
-        bool show = false, float progress = 0.0f) const;
+        bool show_progress = false, float progress = 0.0f,
+        bool show_delete = false) const;
     void clear() const;
     void progress(float p) const;
 
@@ -34,7 +35,10 @@ public:
 
 private:
     const cbargs args;
-    const int img, name, category, license, author, size, btn, progress_bar;
-    const callback cb;
+    const int img, name, category, license, author, size, btn, progress_bar,
+        deletebtn;
+    const callback cb, delete_cb;
     void *const hscr;
+
+    static void on_delete(void *args);
 };

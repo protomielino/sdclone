@@ -35,11 +35,11 @@ SDPit::~SDPit(void)
 {
 }
 
-void SDPit::build(tTrack *track)
+void SDPit::build(const tTrack *track)
 {
     GfLogDebug("Build pits ... \n");
 
-    tTrackPitInfo *pits = &track->pits;
+    const tTrackPitInfo *pits = &track->pits;
 
     if (pits->pitindicator > 0)
         GfLogTrace("Pit Indicator ... YES ...\n");
@@ -56,7 +56,7 @@ void SDPit::build(tTrack *track)
         GfLogTrace("Creating track side pit buildings (%d slots) ...\n", pits->nMaxPits);
         for (int i = 0; i < pits->nMaxPits; i++)
         {
-            tTrackOwnPit *act_pit = &pits->driversPits[i];
+            const tTrackOwnPit *act_pit = &pits->driversPits[i];
 
             osgLoader loader;
 
@@ -422,10 +422,16 @@ void SDPit::build(tTrack *track)
             // load pit indicator
             if (bHasPitIndicator)
             {
-                loader.AddSearchPath(std::string("tracks/") + track->category + "/" + track->internalname);
-                loader.AddSearchPath("data/objects");
-                loader.AddSearchPath("data/textures");
-                loader.AddSearchPath("data/img");
+                std::string localdir = GfLocalDir(), datadir = GfDataDir();
+                loader.AddSearchPath(localdir + "tracks/" + track->category + "/" + track->internalname);
+                loader.AddSearchPath(localdir + "data/objects");
+                loader.AddSearchPath(localdir + "data/textures");
+                loader.AddSearchPath(localdir + "data/img");
+
+                loader.AddSearchPath(datadir + "tracks/" + track->category + "/" + track->internalname);
+                loader.AddSearchPath(datadir + "data/objects");
+                loader.AddSearchPath(datadir + "data/textures");
+                loader.AddSearchPath(datadir + "data/img");
 
                 std::string filename = pits->pitindicator == 1
                                      ? "pit_indicator.ac"

@@ -89,7 +89,7 @@ SDRender::SDRender(void) :
     APlanetsData(NULL),
     thesky(NULL),
     scenery(NULL),
-    SDTrack(NULL)
+    track(NULL)
 {
     BaseSkyColor = osg::Vec3f( 0.31f, 0.43f, 0.69f );
     BaseFogColor = osg::Vec3f( 0.84f, 0.84f, 1.0f );
@@ -133,24 +133,9 @@ SDRender::~SDRender(void)
         m_Root->removeChildren(0, m_Root->getNumChildren());
         stateSet->getTextureAttributeList().clear();
         stateSet->getTextureModeList().clear();
-
-        m_CarRoot = NULL;
-        m_CarLightsRoot = NULL;
-        m_ShadowRoot = NULL;
-        m_ShadowSlot = NULL;
-        m_NonShadowRoot = NULL;
-        m_Scene = NULL;
-        m_Root = NULL;
-        m_Fog = NULL;
     }
 
-    if (thesky)
-    {
-        delete thesky;
-        thesky = NULL;
-    }
-
-    SDTrack = NULL;
+    delete thesky;
 }
 
 /**
@@ -159,10 +144,8 @@ SDRender::~SDRender(void)
  *
  * @return 0 if OK, -1 if something failed
  */
-void SDRender::Init(tTrack *track)
+void SDRender::Init(const tTrack *track)
 {
-    SDTrack = track;
-
     std::string datapath = GfDataDir();
     //datapath +="/";
     thesky = new SDSky;
@@ -292,8 +275,8 @@ void SDRender::Init(tTrack *track)
 
     GfLogDebug("  Planets : %d\n", NPlanets);
 
-    const int timeOfDay = (int)SDTrack->local.timeofday;
-    //SDRain = (unsigned int)SDTrack->local.rain;
+    const int timeOfDay = track->local.timeofday;
+    //SDRain = (unsigned int)track->local.rain;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
     GfLogDebug("  domeSizeRation : %f\n", domeSizeRatio);
@@ -302,7 +285,7 @@ void SDRender::Init(tTrack *track)
                   SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets,
                   APlanetsData, NStars, AStarsData );
     GfLogDebug("Build SKY\n");
-    GLfloat sunAscension = SDTrack->local.sunascension;
+    GLfloat sunAscension = track->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
     thesky->setSD( DEG2RAD(SDSunDeclination));
@@ -317,7 +300,7 @@ void SDRender::Init(tTrack *track)
     else
         SDMoonDeclination = (rand() % 270);
 
-    const float moonAscension = SDTrack->local.sunascension;
+    const float moonAscension = track->local.sunascension;
 
     thesky->setMD( DEG2RAD(SDMoonDeclination) );
     thesky->setMRA( DEG2RAD(moonAscension) );
@@ -332,7 +315,7 @@ void SDRender::Init(tTrack *track)
     //double r_WrldZ = SDScenery::getWorldZ();
     osg::Vec3d viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
 
-    weather();
+    weather(track);
     thesky->set_visibility( SDVisibility ); // Visibility in meters
 
     thesky->reposition( viewPos, 0, 0);
@@ -340,7 +323,7 @@ void SDRender::Init(tTrack *track)
     moon_angle = (float)thesky->getMA();
     thesky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle, NPlanets,
                     APlanetsData, NStars, AStarsData);
-    UpdateLight();
+    UpdateLight(track);
 
     osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
     m_Root = new osg::Group;
@@ -461,6 +444,7 @@ void SDRender::Init(tTrack *track)
     stateSet2->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet2->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     //stateSet2->setMode(GL_FOG, osg::StateAttribute::ON);
+    this->track = track;
 }//SDRender::Init
 
 void SDRender::ShadowedScene()
@@ -549,13 +533,13 @@ void SDRender::addCars(osg::Node* cars, osg::Node* carLights)
     optimizer.optimize(m_Root.get());
 }
 
-void SDRender::UpdateLight( void )
+void SDRender::UpdateLight(const tTrack *track)
 {
     sol_angle = (float)thesky->getSA();
     moon_angle = (float)thesky->getMA();
     sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
-    if (SDTrack->local.rain > 0)
+    if (track->local.rain > 0)
     {
         BaseFogColor = osg::Vec3f(0.42f, 0.44f, 0.50f);
         sky_brightness = (float)pow(sky_brightness, 0.5f);
@@ -713,11 +697,11 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
         if ( SDSkyDomeDistance )
         {
             // Ensure the sun and moon positions are reset
-            const int timeOfDay = (int)SDTrack->local.timeofday;
-            GLfloat sunAscension = SDTrack->local.sunascension;
+            const int timeOfDay = (int)track->local.timeofday;
+            GLfloat sunAscension = track->local.sunascension;
             SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
-            const float moonAscension = SDTrack->local.sunascension;
+            const float moonAscension = track->local.sunascension;
             //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
 
             thesky->setSD( DEG2RAD(SDSunDeclination));
@@ -772,7 +756,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
     }
 
     // 3) Update scene color and light
-    UpdateLight();
+    UpdateLight(track);
 
     sunLight->getLight()->setAmbient(SceneAmbiant);
     sunLight->getLight()->setDiffuse(SceneDiffuse);
@@ -798,7 +782,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
 
 }//grUpdateSky
 
-void SDRender::weather(void)
+void SDRender::weather(const tTrack *track)
 {
     std::string datapath = GfDataDir();
     double domeSizeRatio = SDSkyDomeDistance / 80000.0;
@@ -808,22 +792,22 @@ void SDRender::weather(void)
             (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
     GfLogDebug("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
-    GfLogDebug("Graphic cloud alt 1 = %.3f\n", SDTrack->local.cloud_altitude);
-    GfLogDebug("Graphic cloud alt 2 = %.3f\n", SDTrack->local.cloud_altitude2);
-    GfLogDebug("Graphic cloud alt 3 = %.3f\n", SDTrack->local.cloud_altitude3);
+    GfLogDebug("Graphic cloud alt 1 = %.3f\n", track->local.cloud_altitude);
+    GfLogDebug("Graphic cloud alt 2 = %.3f\n", track->local.cloud_altitude2);
+    GfLogDebug("Graphic cloud alt 3 = %.3f\n", track->local.cloud_altitude3);
 
-    cloudsTextureIndex = SDTrack->local.clouds;
-    cloudsTextureIndex2 = SDTrack->local.clouds2;
-    cloudsTextureIndex3 = SDTrack->local.clouds3;
+    cloudsTextureIndex = track->local.clouds;
+    cloudsTextureIndex2 = track->local.clouds2;
+    cloudsTextureIndex3 = track->local.clouds3;
 
-    switch (SDTrack->local.rain)
+    switch (track->local.rain)
     {
     case TR_RAIN_NONE:
-        SDVisibility = SDTrack->local.visibility;
+        SDVisibility = track->local.visibility;
         SDRain = 0;
         break;
     case TR_RAIN_LITTLE:
-        SDVisibility = SDTrack->local.visibility;
+        SDVisibility = track->local.visibility;
         SDRain = 1;
         break;
     case TR_RAIN_MEDIUM:
@@ -836,8 +820,8 @@ void SDRender::weather(void)
         break;
     default:
         GfLogDebug("Unsupported rain strength value %d (assuming none)",
-                     SDTrack->local.rain);
-        SDVisibility = SDTrack->local.visibility;
+                     track->local.rain);
+        SDVisibility = track->local.visibility;
         break;
     }//switch Rain
 
@@ -845,9 +829,9 @@ void SDRender::weather(void)
     {
         SDCloudLayer *layer = new SDCloudLayer(datapath);
         layer->setCoverage(layer->SD_CLOUD_OVERCAST);
-        layer->setSpeed(SDTrack->local.windspeed);
-        layer->setDirection(SDTrack->local.winddir);
-        layer->setElevation_m(SDTrack->local.cloud_altitude);
+        layer->setSpeed(track->local.windspeed);
+        layer->setDirection(track->local.winddir);
+        layer->setElevation_m(track->local.cloud_altitude);
         layer->setThickness_m(100  / domeSizeRatio);
         layer->setTransition_m(100 / domeSizeRatio);
         layer->setSpan_m(SDSkyDomeDistance);
@@ -888,9 +872,9 @@ void SDRender::weather(void)
             break;
         }
 
-        layer->setSpeed(SDTrack->local.windspeed);
-        layer->setDirection(SDTrack->local.winddir);
-        layer->setElevation_m(SDTrack->local.cloud_altitude);
+        layer->setSpeed(track->local.windspeed);
+        layer->setDirection(track->local.winddir);
+        layer->setElevation_m(track->local.cloud_altitude);
         layer->setThickness_m(100  / domeSizeRatio);
         layer->setTransition_m(100  / domeSizeRatio);
         layer->setSpan_m(SDSkyDomeDistance);
@@ -932,9 +916,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer2->setSpeed(SDTrack->local.windspeed / 2);
-            layer2->setDirection(SDTrack->local.winddir);
-            layer2->setElevation_m(SDTrack->local.cloud_altitude2);
+            layer2->setSpeed(track->local.windspeed / 2);
+            layer2->setDirection(track->local.winddir);
+            layer2->setElevation_m(track->local.cloud_altitude2);
             layer2->setThickness_m(100  / domeSizeRatio);
             layer2->setTransition_m(100  / domeSizeRatio);
             layer2->setSpan_m(SDSkyDomeDistance);
@@ -972,9 +956,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer->setSpeed(SDTrack->local.windspeed);
-            layer->setDirection(SDTrack->local.winddir);
-            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setSpeed(track->local.windspeed);
+            layer->setDirection(track->local.winddir);
+            layer->setElevation_m(track->local.cloud_altitude);
             layer->setThickness_m(100  / domeSizeRatio);
             layer->setTransition_m(100  / domeSizeRatio);
             layer->setSpan_m(SDSkyDomeDistance);
@@ -1015,9 +999,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer->setSpeed(SDTrack->local.windspeed);
-            layer->setDirection(SDTrack->local.winddir);
-            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setSpeed(track->local.windspeed);
+            layer->setDirection(track->local.winddir);
+            layer->setElevation_m(track->local.cloud_altitude);
             layer->setThickness_m(100  / domeSizeRatio);
             layer->setTransition_m(100  / domeSizeRatio);
             layer->setSpan_m(SDSkyDomeDistance);
@@ -1064,8 +1048,8 @@ void SDRender::weather(void)
                 }
 
                 layer3->setSpeed(0);
-                layer3->setDirection(SDTrack->local.winddir);
-                layer3->setElevation_m(SDTrack->local.cloud_altitude3);
+                layer3->setDirection(track->local.winddir);
+                layer3->setElevation_m(track->local.cloud_altitude3);
                 layer3->setThickness_m(100  / domeSizeRatio);
                 layer3->setTransition_m(100  / domeSizeRatio);
                 layer3->setSpan_m(SDSkyDomeDistance);
@@ -1103,9 +1087,9 @@ void SDRender::weather(void)
                     break;
                 }
 
-                layer2->setSpeed(SDTrack->local.windspeed / 2);
-                layer2->setDirection(SDTrack->local.winddir);
-                layer2->setElevation_m(SDTrack->local.cloud_altitude2);
+                layer2->setSpeed(track->local.windspeed / 2);
+                layer2->setDirection(track->local.winddir);
+                layer2->setElevation_m(track->local.cloud_altitude2);
                 layer2->setThickness_m(100  / domeSizeRatio);
                 layer2->setTransition_m(100  / domeSizeRatio);
                 layer2->setSpan_m(SDSkyDomeDistance);
@@ -1143,9 +1127,9 @@ void SDRender::weather(void)
                     break;
                 }
 
-                layer->setSpeed(SDTrack->local.windspeed);
-                layer->setDirection(SDTrack->local.winddir);
-                layer->setElevation_m(SDTrack->local.cloud_altitude);
+                layer->setSpeed(track->local.windspeed);
+                layer->setDirection(track->local.winddir);
+                layer->setElevation_m(track->local.cloud_altitude);
                 layer->setThickness_m(100  / domeSizeRatio);
                 layer->setTransition_m(100  / domeSizeRatio);
                 layer->setSpan_m(SDSkyDomeDistance);
@@ -1186,9 +1170,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer2->setSpeed(SDTrack->local.windspeed /2);
-            layer2->setDirection(SDTrack->local.winddir);
-            layer2->setElevation_m(SDTrack->local.cloud_altitude2);
+            layer2->setSpeed(track->local.windspeed /2);
+            layer2->setDirection(track->local.winddir);
+            layer2->setElevation_m(track->local.cloud_altitude2);
             layer2->setThickness_m(100  / domeSizeRatio);
             layer2->setTransition_m(100  / domeSizeRatio);
             layer2->setSpan_m(SDSkyDomeDistance);
@@ -1226,9 +1210,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer->setSpeed(SDTrack->local.windspeed);
-            layer->setDirection(SDTrack->local.winddir);
-            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setSpeed(track->local.windspeed);
+            layer->setDirection(track->local.winddir);
+            layer->setElevation_m(track->local.cloud_altitude);
             layer->setThickness_m(100  / domeSizeRatio);
             layer->setTransition_m(100  / domeSizeRatio);
             layer->setSpan_m(SDSkyDomeDistance);
@@ -1268,9 +1252,9 @@ void SDRender::weather(void)
                 break;
             }
 
-            layer->setSpeed(SDTrack->local.windspeed);
-            layer->setDirection(SDTrack->local.winddir);
-            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setSpeed(track->local.windspeed);
+            layer->setDirection(track->local.winddir);
+            layer->setElevation_m(track->local.cloud_altitude);
             layer->setThickness_m(100  / domeSizeRatio);
             layer->setTransition_m(100  / domeSizeRatio);
             layer->setSpan_m(SDSkyDomeDistance);

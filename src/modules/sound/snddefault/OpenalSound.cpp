@@ -47,7 +47,9 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 	SDL_AudioSpec wavspec;
 	Uint32 wavlen;
 	Uint8 *wavbuf;
-	if (!SDL_LoadWAV(filename, &wavspec, &wavbuf, &wavlen))
+	std::string localpath = std::string(GfLocalDir()) + filename;
+	if (!SDL_LoadWAV(localpath.c_str(), &wavspec, &wavbuf, &wavlen)
+		&& !SDL_LoadWAV(filename, &wavspec, &wavbuf, &wavlen))
 	{
 		if (alIsBuffer(buffer))
 			alDeleteBuffers(1, &buffer);

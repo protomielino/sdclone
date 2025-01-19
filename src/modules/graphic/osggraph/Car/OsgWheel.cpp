@@ -112,19 +112,24 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, bool comp
     const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
     std::string bSkinName;
-    std::string TmpPath = GfDataDir();
+    std::string TmpPath;
 
     if (bCustomSkin)
     {
+        std::string dataDir = GfDataDir(), localDir = GfLocalDir();
         snprintf(buf, MaxPathSize, "cars/models/%s/wheel3d-%s.png", car->_carName, car->_skinName);
-        bSkinName = TmpPath + buf;
-        bool exist = osgDB::fileExists(bSkinName);
-        GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
+        std::string dataSkin = TmpPath + buf,
+            localSkin = localDir + buf;
 
-        if (!exist)
-            bSkinName.clear();
-        else
+        if (osgDB::fileExists(localSkin))
         {
+            TmpPath = localDir;
+            snprintf(buf, MaxPathSize, "wheel3d-%s", car->_skinName);
+            bSkinName = buf;
+        }
+        else if (osgDB::fileExists(dataSkin))
+        {
+            TmpPath = dataDir;
             snprintf(buf, MaxPathSize, "wheel3d-%s", car->_skinName);
             bSkinName = buf;
         }

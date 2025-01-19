@@ -24,6 +24,12 @@
 #include <osg/Matrix>
 #include <osg/ValueObject>
 
+#include "OsgCamera.h"
+#include "OsgView.h"
+#include "OsgScenery.h"
+#include "OsgMain.h"
+#include "OsgNodeMask.h"
+
 #include <car.h>
 #include <raceman.h>
 #include <robottools.h>
@@ -31,12 +37,6 @@
 #include <tgf.h>
 #include <guiscreen.h>
 #include <graphic.h>
-
-#include "OsgCamera.h"
-#include "OsgView.h"
-#include "OsgScenery.h"
-#include "OsgMain.h"
-#include "OsgNodeMask.h"
 
 namespace osggraph {
 
@@ -2621,4 +2621,3 @@ void SDCameras::loadSpanValues()
 }
 
 } // namespace osggraph
-

@@ -86,7 +86,7 @@ ROBOTTOOLS_API tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart);
  * and a length in meters for straights.
  *
  */
-ROBOTTOOLS_API void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag);
+ROBOTTOOLS_API void RtTrackLocal2Global(const tTrkLocPos *p, tdble *X, tdble *Y, int flag);
 
 /*
  * Convert a Global (segment, X, Y) position into a Local one (segment, toRight, toStart)

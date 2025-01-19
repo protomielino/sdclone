@@ -18,12 +18,14 @@
 #ifndef _OSGSCREENS_H_
 #define _OSGSCREENS_H_
 
-#include <raceman.h>        //tSituation
 #include <vector>
 
 #include <osg/Group>
 
 #include "OsgView.h"
+
+struct Situation;
+typedef struct Situation tSituation;
 
 namespace osggraph {
 

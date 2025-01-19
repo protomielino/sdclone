@@ -410,9 +410,14 @@ rmdsChangeSkin(int dir)
 	strCurSkinDispName[0] = toupper(strCurSkinDispName[0]);
 	GfuiLabelSetText(ScrHandle, SkinEditId, strCurSkinDispName.c_str());
 
+	const std::string &filename = curSkin.getCarPreviewFileName();
+	std::string localname = std::string(GfLocalDir()) + filename;
+
 	// Load associated preview image (or "no preview" panel if none available).
-	if (GfFileExists(curSkin.getCarPreviewFileName().c_str()))
-		GfuiStaticImageSet(ScrHandle, CarImageId, curSkin.getCarPreviewFileName().c_str());
+	if (GfFileExists(localname.c_str()))
+		GfuiStaticImageSet(ScrHandle, CarImageId, localname.c_str());
+	else if (GfFileExists(filename.c_str()))
+		GfuiStaticImageSet(ScrHandle, CarImageId, filename.c_str());
 	else
 		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 

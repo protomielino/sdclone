@@ -86,34 +86,28 @@ GfTracks::~GfTracks()
 	_pPrivate = 0;
 }
 
-GfTracks::GfTracks()
+void GfTracks::list(const std::string &path)
 {
-	_pPrivate = new GfTracks::Private;
-
 	// Get the list of sub-dirs in the "tracks" folder (the track categories).
-	tFList* lstCatFolders = GfDirGetList("tracks");
+	tFList* lstCatFolders = GfDirGetList(path.c_str());
 	if (!lstCatFolders)
-	{
-		GfLogFatal("No track category available in the 'tracks' folder\n");
 		return;
-	}
 
-	tFList* pCatFolder = lstCatFolders;
+	const tFList* pCatFolder = lstCatFolders;
 	do
 	{
 		//GfLogDebug("GfTracks::GfTracks() : Examining category %s\n", pCatFolder->name);
 
 		// Ignore "." and ".." folders.
 		const char* pszCatId = pCatFolder->name;
-		if (pszCatId[0] == '.')
+		if (!strcmp(pszCatId, ".") || !strcmp(pszCatId, ".."))
 			continue;
 
-		// Ignore "CMakeLists.txt"
-		if (strcmp(pszCatId, "CMakeLists.txt") == 0)
+		if (pCatFolder->type != FList::dir)
 			continue;
 
 		// Get the list of sub-dirs in the "tracks" folder (the track categories).
-		std::string strDirName("tracks/");
+		std::string strDirName(path);
 		strDirName += pszCatId;
 		tFList* lstTrackFolders = GfDirGetList(strDirName.c_str());
 		if (!lstTrackFolders)
@@ -122,8 +116,13 @@ GfTracks::GfTracks()
 			continue;
 		}
 
-		// Add new category.
-		_pPrivate->vecCatIds.push_back(pszCatId);
+		const std::vector<std::string> &v = _pPrivate->vecCatIds;
+
+		if (std::find(v.cbegin(), v.cend(), pszCatId) == v.cend())
+		{
+			// Add new category.
+			_pPrivate->vecCatIds.push_back(pszCatId);
+		}
 
 		// Look at the tracks in this category.
 		tFList* pTrackFolder = lstTrackFolders;
@@ -143,7 +142,7 @@ GfTracks::GfTracks()
 				continue;
 
 			std::ostringstream ossFileName;
-			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
+			ossFileName << path << pszCatId << '/' << pszTrackId
 						<< '/' << pszTrackId << '.' << TRKEXT;
 			const std::string strTrackFileName(ossFileName.str());
 			if (!GfFileExists(strTrackFileName.c_str()))
@@ -155,13 +154,13 @@ GfTracks::GfTracks()
 
 			// Get 1st level track info (those which don't need to open any file).
 			ossFileName.str("");
-			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
+			ossFileName << path << pszCatId << '/' << pszTrackId
 						<< '/' << pszTrackId << ".jpg";
 			std::string strPreviewFileName(ossFileName.str());
 			if (!GfFileExists(strPreviewFileName.c_str()))
 			{
 				ossFileName.str("");
-				ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
+				ossFileName << path << pszCatId << '/' << pszTrackId
 							<< '/' << pszTrackId << ".png";
 				strPreviewFileName = ossFileName.str();
 			}
@@ -169,7 +168,7 @@ GfTracks::GfTracks()
 				strPreviewFileName = "data/img/splash-trackselect.jpg";
 
 			ossFileName.str("");
-			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId << '/' << "outline.png";
+			ossFileName << path << pszCatId << '/' << pszTrackId << '/' << "outline.png";
 			std::string strOutlineFileName(ossFileName.str());
 			if (!GfFileExists(strOutlineFileName.c_str()))
 				strOutlineFileName = "data/img/notrackoutline.png";
@@ -201,6 +200,14 @@ GfTracks::GfTracks()
 	print(false); // No verbose here, otherwise infinite recursion.
 }
 
+GfTracks::GfTracks()
+{
+	_pPrivate = new GfTracks::Private;
+
+	list(std::string(GfLocalDir()) + "tracks/");
+	list(std::string(GfDataDir()) + "tracks/");
+}
+
 ITrackLoader* GfTracks::getTrackLoader() const
 {
 	return _pPrivate->piTrackLoader;
@@ -226,7 +233,7 @@ const std::vector<std::string>& GfTracks::getCategoryNames() const
 		{
 			std::ostringstream ossFileName;
 			ossFileName << "data/tracks/" << *itCatId << '.' << TRKEXT;
-			void* hparmCat = GfParmReadFile(ossFileName.str(), GFPARM_RMODE_STD);
+			void* hparmCat = GfParmReadFileBoth(ossFileName.str(), GFPARM_RMODE_STD);
 			const char* pszCatName;
 			if (!hparmCat)
 			{
@@ -624,10 +631,13 @@ bool GfTrack::load() const
 	std::ostringstream ossFileName;
 	ossFileName << "tracks/" << _strCatId << '/' << _strId << '/'
 				<< (pTrack->graphic.model3d ? pTrack->graphic.model3d : "track.ac");
-    if (!GfFileExists(ossFileName.str().c_str()))
+	std::string path = ossFileName.str();
+
+    if (!GfFileExists((GfLocalDir() + path).c_str())
+		&& !GfFileExists((GfDataDir() + path).c_str()))
 	{
 		GfLogWarning("Unusable track %s : could not find 3D model %s\n",
-					 _strId.c_str(), ossFileName.str().c_str());
+					 _strId.c_str(), path.c_str());
         return false;
     }
 

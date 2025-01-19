@@ -30,6 +30,9 @@
 #include "OsgCar.h"
 #include "OsgNodeMask.h"
 
+#include <raceman.h>        	//tSituation
+#include <car.h>		//tCarElt
+
 namespace osggraph {
 
 static char buf[1024];

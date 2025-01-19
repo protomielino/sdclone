@@ -82,17 +82,12 @@ void GfCars::reload()
 	_pSelf = new GfCars;
 }
 
-GfCars::GfCars()
+void GfCars::list(const std::string &path)
 {
-	_pPrivate = new Private;
-
 	// Get the list of sub-dirs in the "cars" folder.
-	tFList* lstFolders = GfDirGetList("cars/models");
+	tFList* lstFolders = GfDirGetList(path.c_str());
 	if (!lstFolders)
-	{
-		GfLogFatal("No car available in the 'cars' folder\n");
 		return;
-	}
 
 	std::string strLastCatId("none");
 	std::string strCatName;
@@ -113,8 +108,10 @@ GfCars::GfCars()
 		const char* pszCarId = pFolder->name;
 
 		std::ostringstream ossCarFileName;
-		ossCarFileName << "cars/models/" << pszCarId << '/' << pszCarId << PARAMEXT;
+		ossCarFileName << path << '/' << pszCarId << '/' << pszCarId << PARAMEXT;
+		GfLogInfo("ossCarFileName=%s\n", ossCarFileName.str().c_str());
 		void* hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
+
 		if (!hparmCar)
 		{
 			GfLogError("Ignoring car %s (file %s not %s)\n",
@@ -166,6 +163,14 @@ GfCars::GfCars()
 
 	// Trace what we got.
 	print();
+}
+
+GfCars::GfCars()
+{
+	_pPrivate = new Private;
+
+	list(std::string(GfLocalDir()) + "cars/models");
+	list(std::string(GfDataDir()) + "cars/models");
 }
 
 const std::vector<std::string>& GfCars::getCategoryIds() const

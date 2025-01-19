@@ -89,17 +89,7 @@ std::string Asset::path() const
 
 std::string Asset::basedir() const
 {
-    switch (type)
-    {
-        case Asset::car:
-        case Asset::track:
-            return GfDataDir();
-
-        case Asset::driver:
-            return GfLocalDir();
-    }
-
-    return "";
+    return GfLocalDir();
 }
 
 std::string Asset::dstdir() const

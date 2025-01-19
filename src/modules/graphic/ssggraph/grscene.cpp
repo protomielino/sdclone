@@ -77,6 +77,16 @@ ssgBranch    *CarlightAnchor = NULL;
 ssgBranch    *TrackLightAnchor = NULL;
 ssgBranch    *ThePits = NULL;
 
+std::string
+grTrackPath()
+{
+    std::string trackpath = "tracks/";
+    trackpath += grTrack->category;
+    trackpath += "/";
+    trackpath += grTrack->internalname;
+
+    return trackpath;
+}
 
 // Must have (Question: What for ?)
 int preScene(ssgEntity *e)
@@ -227,9 +237,11 @@ grLoadScene(tTrack *track)
     if ( grSkyDomeDistance > 0 )
         grLoadBackgroundSky();
 
-    snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
+    std::string trackpath = grTrackPath();
+    const char *tr = trackpath.c_str();
+    snprintf(buf, sizeof(buf), "%s%s;%s;data/textures;data/img;.", GfLocalDir(), tr, tr);
     ssgTexturePath(buf);
-    snprintf(buf, sizeof(buf), "tracks/%s/%s", grTrack->category, grTrack->internalname);
+    snprintf(buf, sizeof(buf), "%s%s;%s", GfLocalDir(), tr, tr);
     ssgModelPath(buf);
 
     desc = grssgLoadAC3D(acname, NULL);

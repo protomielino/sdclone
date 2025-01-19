@@ -69,7 +69,7 @@ public:
     // Destructor
     ~SDPit(void);
 
-    void build(tTrack *track);
+    void build(const tTrack *track);
 
     osg::ref_ptr<osg::Group> getPit() const { return pit_root; }
 };
@@ -89,7 +89,7 @@ public:
     // Destructor
     ~SDTrackLights(void);
 
-    void build(tTrack *track);
+    void build(const tTrack *track);
     void update(double currentTime, double totTime, int raceType);
 
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
@@ -104,8 +104,6 @@ private:
 
     osg::ref_ptr<osg::Group> _scenery;
 
-    tTrack *SDTrack;
-
     int _max_visibility;
     int _nb_cloudlayer;
     int _DynamicSkyDome;
@@ -116,8 +114,6 @@ private:
     bool _speedWay;
     bool _speedWayLong;
 
-    std::string _strTexturePath;
-
     static double grWrldX;
     static double grWrldY;
     static double grWrldZ;
@@ -126,7 +122,7 @@ private:
     void LoadGraphicsOptions();
     void LoadSkyOptions();
     void CustomizePits(void);
-    bool LoadTrack(std::string& strTrack);
+    bool LoadTrack(const std::string &dir, const std::string &file);
 
 public:
     /* Constructor */
@@ -135,7 +131,7 @@ public:
     /* Destructor */
     ~SDScenery(void);
 
-    void LoadScene(tTrack *track);
+    int LoadScene(const tTrack *track);
     void ShutdownScene(void);
     void reposition(double X, double Y, double Z);
     void update_tracklights(double currentTime, double totTime, int raceType);

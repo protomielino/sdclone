@@ -1097,16 +1097,27 @@ xmlExternalEntityRefHandler (XML_Parser mainparser,
     fin[LINE_SZ - 1] = 0;
     } else {
     /* relative path */
-    strncpy (fin, conf->filename, sizeof (fin));
-    fin[LINE_SZ - 1] = 0;
-    s = strrchr (fin, '/');
-    if (s) {
-        s++;
+    const char *localdir = GfLocalDir();
+
+    if (!strncmp(conf->filename, localdir, strlen(localdir))) {
+	    /* skip local dir path so that objects are still looked
+         * up from GfDataDir. */
+        static const char prefix[] = "../";
+        while (!strncmp(systemId, prefix, strlen(prefix)))
+            systemId += strlen(prefix);
+        strncpy (fin, systemId, sizeof (fin));
     } else {
-        s = fin;
-    }
-    strncpy (s, systemId, sizeof (fin) - (s - fin));
-    fin[LINE_SZ - 1] = 0;
+        strncpy (fin, conf->filename, sizeof (fin));
+        fin[LINE_SZ - 1] = 0;
+        s = strrchr (fin, '/');
+        if (s) {
+            s++;
+        } else {
+            s = fin;
+        }
+        strncpy (s, systemId, sizeof (fin) - (s - fin));
+        fin[LINE_SZ - 1] = 0;
+        }
     }
 
     in = fopen (fin, "r");
@@ -1233,7 +1244,21 @@ GfParmReadBuf (char *buffer)
     return NULL;
 }
 
+void *
+GfParmReadFileBoth(const char *file, int mode)
+{
+    void *ret = GfParmReadFileLocal(file, mode);
 
+    if (!ret)
+        return GfParmReadFile(file, mode);
+
+    return ret;
+}
+
+void *GfParmReadFileBoth(const std::string &file, int mode)
+{
+    return GfParmReadFileBoth(file.c_str(), mode);
+}
 
 void *
 GfParmReadFileLocal(const std::string &file, int mode, bool neededFile)

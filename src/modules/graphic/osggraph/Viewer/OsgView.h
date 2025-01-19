@@ -19,12 +19,15 @@
 #define _OSGVIEWER_H_
 
 #include <camera.h>
-#include <raceman.h>        	//tSituation
-#include <car.h>		//tCarElt
 
 #include "OsgCamera.h"		//SDCameras
 
 #include <osg/FrontFace>
+
+struct Situation;
+struct CarElt;
+typedef struct CarElt tCarElt;
+typedef struct Situation tSituation;
 
 namespace osggraph {
 

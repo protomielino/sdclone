@@ -34,8 +34,16 @@ void thumbnail::progress(float p) const
     GfuiProgressbarSetValue(hscr, progress_bar, p);
 }
 
+void thumbnail::on_delete(void *args)
+{
+    const thumbnail::cbargs *a = static_cast<const thumbnail::cbargs *>(args);
+    const thumbnail *t = a->t;
+
+    t->delete_cb(t->args.t, t->args.args);
+}
+
 thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
-    callback cb, void *args) :
+    callback cb, callback delete_cb, void *args) :
     args(this, args),
     img(GfuiMenuCreateStaticImageControl(hscr, param,
         (id + std::string("img")).c_str())),
@@ -54,7 +62,11 @@ thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
         const_cast<thumbnail::cbargs *>(&this->args), ::pressed)),
     progress_bar(GfuiMenuCreateProgressbarControl(hscr, param,
         (id + std::string("progress")).c_str())),
+    deletebtn(GfuiMenuCreateImageButtonControl(hscr, param,
+        (id + std::string("delete")).c_str(),
+        const_cast<thumbnail::cbargs *>(&this->args), thumbnail::on_delete)),
     cb(cb),
+    delete_cb(delete_cb),
     hscr(hscr)
 {
     if (img < 0)
@@ -73,6 +85,8 @@ thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
         throw std::runtime_error("btn failed");
     else if (progress_bar < 0)
         throw std::runtime_error("progress failed");
+    else if (deletebtn < 0)
+        throw std::runtime_error("deletebtn failed");
 
     clear();
 }
@@ -89,12 +103,13 @@ void thumbnail::set(const std::string &path, const std::string &name,
     GfuiLabelSetText(hscr, this->size, size.c_str());
 }
 
-void thumbnail::set(const std::string &text, bool enable, bool show,
-    float p) const
+void thumbnail::set(const std::string &text, bool enable, bool show_progress,
+    float p, bool show_delete) const
 {
     GfuiEnable(hscr, btn, enable ? GFUI_ENABLE : GFUI_DISABLE);
-    GfuiVisibilitySet(hscr, progress_bar, show ? GFUI_VISIBLE : GFUI_INVISIBLE);
+    GfuiVisibilitySet(hscr, progress_bar, show_progress ? GFUI_VISIBLE : GFUI_INVISIBLE);
     GfuiButtonSetText(hscr, btn, text.c_str());
+    GfuiVisibilitySet(hscr, deletebtn, show_delete ? GFUI_VISIBLE : GFUI_INVISIBLE);
     progress(p);
 }
 

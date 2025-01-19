@@ -799,7 +799,7 @@ ReRaceRealStart(void)
     {
         snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml",
                  s->cars[i]->_carName, s->cars[i]->_carName);
-        carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+        carHdle = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
         snprintf(buf, sizeof(buf), "Loading %s driver (%s) ...",
                  s->cars[i]->_name, GfParmGetName(carHdle));
 

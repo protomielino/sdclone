@@ -19,16 +19,18 @@
 #ifndef _OSGCAR_H_
 #define _OSGCAR_H_
 
-#include <car.h>
-#include <raceman.h>
 #include <vector>
 
 #include <osg/TextureCubeMap>
 #include <osg/LOD>
 
+#include "OsgLoader.h"
 #include "OsgWheel.h"
 //#include "OsgBackFire.h"
 #include "OsgCarLight.h"
+
+struct CarElt;
+typedef struct CarElt tCarElt;
 
 namespace osggraph {
 
@@ -77,6 +79,10 @@ private :
 
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
     void loadCarLights();
+    int loadWing(void *handle, const char *path, const char *key,
+        osgLoader &loader, const std::string &bCarName,
+        const std::string &bSkinName, const char *name, bool value,
+        osg::ref_ptr<osg::Switch> &wing) const;
 
 public :
     SDCar(void);

@@ -416,7 +416,7 @@ static int getCategory(const std::string &car, std::string &out)
     path += PARAMEXT;
     cpath = path.c_str();
 
-    if (!(h = GfParmReadFile(cpath, GFPARM_RMODE_STD)))
+    if (!(h = GfParmReadFileBoth(cpath, GFPARM_RMODE_STD)))
     {
         LogSimplix.error("Failed to open %s\n", cpath);
         goto end;

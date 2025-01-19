@@ -20,8 +20,14 @@
 #define _OSGCAMERA_H_
 
 #include <osg/Vec3>
+#include <tgf.h>
 #include <vector>
 #include <camera.h>
+
+struct CarElt;
+struct Situation;
+typedef struct CarElt tCarElt;
+typedef struct Situation tSituation;
 
 namespace osggraph {
 

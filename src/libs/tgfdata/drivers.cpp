@@ -1456,6 +1456,10 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
     getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
     ossDirPath.str("");
+    ossDirPath << GfLocalDir() << "cars/models/" << strCarId;
+    getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
+
+    ossDirPath.str("");
     ossDirPath << "cars/models/" << strCarId;
     getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
