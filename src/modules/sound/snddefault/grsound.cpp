@@ -93,7 +93,6 @@ void grInitSound(tSituation* s, int ncars)
 		tCarElt	*car = s->cars[i];
 		const char* param;
 		char filename[512];
-		FILE *file = NULL;
 
 		// ENGINE PARAMS
 		tdble rpm_scale;
@@ -103,16 +102,11 @@ void grInitSound(tSituation* s, int ncars)
 			car->_carName,
 			(int)(sizeof(filename) - strlen(car->_carName) - strlen("cars/models//")),
 			param);
-		file = fopen(filename, "r");
-		if (!file)
+		if (!GfFileExists(filename))
 		{
  			sprintf(filename, "data/sound/%.*s",
 				(int)(sizeof(filename) - strlen(car->_carName) - strlen("data/sound/")),
 				param);
-		}
-		else
-		{
-			fclose(file);
 		}
 
 		car_sound_data[car->index] = new CarSoundData (car->index, sound_interface);
