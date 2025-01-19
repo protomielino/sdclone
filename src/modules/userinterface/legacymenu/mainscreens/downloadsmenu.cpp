@@ -635,9 +635,10 @@ int DownloadsMenu::save(entry *e, const std::string &path,
     std::string &error) const
 {
     const Asset &a = e->a;
+    std::string dir = a.basedir() + a.path();
 
     if (check_hash(e, path, error)
-        || GfDirCreate(a.path().c_str()) != GF_DIR_CREATED
+        || GfDirCreate(dir.c_str()) != GF_DIR_CREATED
         || extract(e, path, error))
         goto failure;
     else
