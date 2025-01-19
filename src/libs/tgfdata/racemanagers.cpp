@@ -124,13 +124,31 @@ GfRaceManagers::GfRaceManagers()
             continue;
         }
 
+        bool insert = false;
         // Create the race manager and load it from the params file.
         //GfLogDebug("GfRaceManagers::GfRaceManagers: creating '%s'\n", strRaceManId.c_str());
         GfRaceManager* pRaceMan = new GfRaceManager(strRaceManId, hparmRaceMan);
+        const std::vector<std::string>& catIds =
+            pRaceMan->getAcceptedCarCategoryIds();
 
-        // Update the GfRaceManagers singleton.
-        _pPrivate->vecRaceMans.push_back(pRaceMan);
-        _pPrivate->mapRaceMansById[strRaceManId] = pRaceMan;
+        for (const std::string &category : catIds)
+        {
+            std::vector<GfCar *> cars =
+                GfCars::self()->getCarsInCategory(category);
+
+            if (!cars.empty())
+            {
+                insert = true;
+                break;
+            }
+        }
+
+        if (insert)
+        {
+            // Update the GfRaceManagers singleton.
+            _pPrivate->vecRaceMans.push_back(pRaceMan);
+            _pPrivate->mapRaceMansById[strRaceManId] = pRaceMan;
+        }
     }
     while ((pFile = pFile->next) != lstFiles);
 
