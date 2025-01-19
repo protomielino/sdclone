@@ -34,21 +34,23 @@ IF(APPLE)
 ENDIF(APPLE)
 
 option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data")
+set(data_version 2.3.0)
 include(GNUInstallDirs)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 if(SD_ASSUME_DATADIR)
    set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
    set(SD_DATADIR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
    set(SD_DATADIR_ABS ${SD_DATADIR_INSTALL_PREFIX})
    message(STATUS "Data directory: ${SD_DATADIR_ABS} (assumed)")
-elseif(EXISTS speed-dreams-data/CMakeLists.txt)
+elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/speed-dreams-data/CMakeLists.txt)
    add_subdirectory(speed-dreams-data)
    set(SD_DATADIR ${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
    set(SD_DATADIR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}/games/speed-dreams-2)
    set(SD_DATADIR_ABS ${CMAKE_CURRENT_SOURCE_DIR}/speed-dreams-data/data)
    message(STATUS "Data directory: ${SD_DATADIR_ABS} (in-tree)")
 else()
-   set(data_version 2.3.0)
    find_package(speed-dreams-data ${data_version} QUIET)
 
    if(NOT SD_DATADIR)
@@ -72,8 +74,22 @@ else()
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
 endif()
 
+if(CMAKE_CXX_COMPILER_ID)
+   set(SD_BUILD_INFO_COMPILER_NAME ${CMAKE_CXX_COMPILER_ID})
+else()
+   set(SD_BUILD_INFO_COMPILER_NAME "Unknown")
+endif()
+
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
+
+set(CMAKE_INSTALL_RPATH
+   ${CMAKE_INSTALL_RPATH}
+   ${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib
+   /usr/${SD_LIBDIR}/lib
+)
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 CHECK_HEADERS_H()
 CHECK_FUNCTIONS()
@@ -128,30 +144,8 @@ IF(MSVC)
    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/userman/images/ DESTINATION ./doc/images/)
 ENDIF(MSVC)
 
-
-# Useful for using an installation of SD as a robot development framework without building it.
-# Only do for an in source tree build as INSTALL_SD_CMAKE() doesn't seem to use CMAKE_INSTALL_PREFIX
-IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   INSTALL_SD_CMAKE()
-ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
-
-# Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
-IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-	SD_GENERATE_CLOBBER_SCRIPT()
-ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-
-# Add an unistall target.
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
-               "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" IMMEDIATE @ONLY)
-IF(MSVC)
-	SET(_UNINST_TGT_NAME "UNINSTALL")
-ELSE(MSVC)
-	SET(_UNINST_TGT_NAME "uninstall")
-ENDIF(MSVC)
-ADD_CUSTOM_TARGET(${_UNINST_TGT_NAME} "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
 
 IF(OPTION_CHECK_CONTENTS)
    INCLUDE(cmake/prerelease.cmake)

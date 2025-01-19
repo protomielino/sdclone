@@ -159,19 +159,7 @@
 # define SD_BUILD_INFO_CONFIGURATION "${CMAKE_BUILD_TYPE}"
 #endif
 
-#if defined(_MSC_VER)
-# define SD_BUILD_INFO_COMPILER_NAME "MSC"
-#elif defined(__GNUC__)
-# if defined(__MINGW32__)
-#  define SD_BUILD_INFO_COMPILER_NAME "MinGW GCC"
-# elif defined(__INTEL_COMPILER)
-#  define SD_BUILD_INFO_COMPILER_NAME "Intel"
-# else
-#  define SD_BUILD_INFO_COMPILER_NAME "GCC"
-# endif
-#else
-# define SD_BUILD_INFO_COMPILER_NAME "Unknown"
-#endif
+#define SD_BUILD_INFO_COMPILER_NAME "${SD_BUILD_INFO_COMPILER_NAME}"
 
 /* Run-time directories */
 #define SD_DATADIR "${SD_DATADIR}/"
