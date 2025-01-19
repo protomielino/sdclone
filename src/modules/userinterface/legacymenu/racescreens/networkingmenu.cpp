@@ -22,7 +22,6 @@
    Should also allow choosing IP address, track, etc ...
 */
 
-#ifndef CLIENT_SERVER
 #include <cstdlib>
 #include <cstdio>
 #include <string>
@@ -1110,4 +1109,3 @@ GetHumanDriver(NetDriver &driver,int index)
 
 	return 1;
 }
-#endif // #ifndef CLIENT_SERVER

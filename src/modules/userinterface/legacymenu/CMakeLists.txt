@@ -55,7 +55,7 @@ SET(CONFSCREENS_HEADERS ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
 SET(RS racescreens)
 SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         #${RS}/raceweekendmenu.cpp
-                        ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
+                        ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp
                         ${RS}/raceconfigstate.cpp
                         ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
                         ${RS}/raceparamsmenu.cpp ${RS}/carsetupmenu.cpp
@@ -67,6 +67,8 @@ IF(OPTION_CLIENT_SERVER)
    SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/csnetworkingmenu.cpp
                                                   ${RS}/csnetclientsettings.cpp
                                                   ${RS}/csnetserversettings.cpp)
+ELSE()
+   SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/networkingmenu.cpp)
 ENDIF(OPTION_CLIENT_SERVER)
 
 SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h ${RS}/carsetupmenu.h) #${RS}/raceweekendscreens.h)
