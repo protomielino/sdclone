@@ -118,7 +118,7 @@ void grInitSound(tSituation* s, int ncars)
 		car_sound_data[car->index] = new CarSoundData (car->index, sound_interface);
 		Sound* engine_sound = sound_interface->addSample(filename, ACTIVE_VOLUME | ACTIVE_PITCH | ACTIVE_LP_FILTER, true, false);
 		car_sound_data[i]->setEngineSound (engine_sound, rpm_scale);
-	
+
 		// TURBO PARAMS
 		float default_turbo_rpm = 100.0f;//0.5f*car->_enginerpmMaxTq;
 		bool turbo_on;
@@ -131,12 +131,12 @@ void grInitSound(tSituation* s, int ncars)
 			}
 			turbo_on = false;
 		}
-	
+
 		float turbo_rpm = GfParmGetNum(handle, SECT_ENGINE, PRM_TURBO_RPM, NULL, default_turbo_rpm);
 		float turbo_lag = GfParmGetNum(handle, SECT_ENGINE, PRM_TURBO_LAG, NULL, 1.0f);
 		car_sound_data[i]->setTurboParameters (turbo_on, turbo_rpm, turbo_lag);
 	}
-	
+
 	sound_interface->setSkidSound("data/sound/skid_tyres.wav");
 	sound_interface->setScrubSound("data/sound/tire_scrub.wav");
 	sound_interface->setRoadRideSound("data/sound/road-ride.wav");
@@ -163,12 +163,12 @@ void grInitSound(tSituation* s, int ncars)
 	sound_interface->setNCars(ncars);
 	soundInitialized = 1;
 
-	// Must happen after all static non-shared have been allocated. 
+	// Must happen after all static non-shared have been allocated.
 	sound_interface->initSharedSourcePool();
 }
 
 
-void 
+void
 grShutdownSound()
 {
     GfLogInfo("Shutting down sound engine\n");
@@ -201,7 +201,7 @@ grRefreshSound(tSituation *s, Camera* camera)
 		return;
 	}
 
-	// TODO: Fix for a lot of cars. 
+	// TODO: Fix for a lot of cars.
 	// I guess in this implementation we can change the Update() call to have _ncars = 1?
 
 	// TODO: Just consider cars near the camera, doing computations just for them?
@@ -224,7 +224,7 @@ grRefreshSound(tSituation *s, Camera* camera)
 			car_sound_data[car->index]->update(car);
 		}
 
-		sound_interface->update (car_sound_data, s->_ncars, 
+		sound_interface->update (car_sound_data, s->_ncars,
 					 *p_camera, *u_camera, c_camera, *a_camera);
 	}
 
