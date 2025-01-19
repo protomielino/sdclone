@@ -79,6 +79,10 @@ private :
 
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
     void loadCarLights();
+    int loadWing(void *handle, const char *path, const char *key,
+        osgLoader &loader, const std::string &bCarName,
+        const std::string &bSkinName, const char *name, bool value,
+        osg::ref_ptr<osg::Switch> &wing) const;
 
 public :
     SDCar(void);

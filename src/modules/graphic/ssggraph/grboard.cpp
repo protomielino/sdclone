@@ -1671,6 +1671,10 @@ void grInitBoardCar(tCarElt *car)
 
     lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
+    lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%scars/models/%s;", GfLocalDir(), car->_carName);
+    if (bMasterModel)
+        lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "%scars/models/%s;", GfLocalDir(), car->_masterModel);
+
     lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
     if (bMasterModel)
         lg += snprintf(filePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);

@@ -405,7 +405,7 @@ void CarSetupMenu::loadSettings()
     std::ostringstream ossCarFileName;
     std::string strCarId = getCar()->getId();
     ossCarFileName << "cars/models/" << strCarId << '/' << strCarId << PARAMEXT;
-    void *hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
+    void *hparmCar = GfParmReadFileBoth(ossCarFileName.str(), GFPARM_RMODE_STD);
     if (!hparmCar)
     {
         GfLogError("Car %s (file %s not %s)\n",

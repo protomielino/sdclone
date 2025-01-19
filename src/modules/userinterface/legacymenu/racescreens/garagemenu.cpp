@@ -380,10 +380,14 @@ void RmGarageMenu::resetSkinComboBox(const std::string& strCarName,
 void RmGarageMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 {
 	const int nCarImageId = getDynamicControlId("PreviewImage");
+	const std::string &filename = selSkin.getCarPreviewFileName();
+	std::string local = std::string(GfLocalDir()) + filename;
 
 	// Load the preview image.
-	if (GfFileExists(selSkin.getCarPreviewFileName().c_str()))
-		GfuiStaticImageSet(getMenuHandle(), nCarImageId, selSkin.getCarPreviewFileName().c_str());
+	if (GfFileExists(local.c_str()))
+		GfuiStaticImageSet(getMenuHandle(), nCarImageId, local.c_str());
+	else if (GfFileExists(filename.c_str()))
+		GfuiStaticImageSet(getMenuHandle(), nCarImageId, filename.c_str());
 	else
 		GfuiStaticImageSet(getMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }

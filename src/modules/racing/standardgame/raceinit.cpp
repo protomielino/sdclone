@@ -660,8 +660,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         category specs and driver modifications (=> handle) */
             /* Read Car model specifications */
             snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, carname.c_str());
-            carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-
+            carhdle = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
         }
         else
         {
@@ -669,7 +668,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         category specs and driver modifications (=> handle) */
             /* Read Car model specifications */
             snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
-            carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+            carhdle = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
         }
 
         category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);

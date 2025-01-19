@@ -120,6 +120,7 @@ public:
 	std::vector<std::string> getCarIdsInCategory(const std::string& strCatId = "") const;
 	std::vector<std::string> getCarNamesInCategory(const std::string& strCatId = "") const;
 
+	void list(const std::string &path);
 	void print() const;
 
 protected:

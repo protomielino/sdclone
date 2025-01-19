@@ -102,7 +102,8 @@ void grInitSound(tSituation* s, int ncars)
 			car->_carName,
 			(int)(sizeof(filename) - strlen(car->_carName) - strlen("cars/models//")),
 			param);
-		if (!GfFileExists(filename))
+		std::string localname = std::string(GfLocalDir()) + filename;
+		if (!GfFileExists(localname.c_str()) && !GfFileExists(filename))
 		{
  			sprintf(filename, "data/sound/%.*s",
 				(int)(sizeof(filename) - strlen(car->_carName) - strlen("data/sound/")),

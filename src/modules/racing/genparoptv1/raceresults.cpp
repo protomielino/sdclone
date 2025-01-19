@@ -370,7 +370,7 @@ ReStoreRaceResults(const char *race)
                 GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 
                 snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
-                carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+                carparam = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
                 carName = GfParmGetName(carparam);
 
                 GfParmSetStr(results, path, RE_ATTR_CAR, carName);
@@ -407,7 +407,7 @@ ReStoreRaceResults(const char *race)
                     GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 
                     snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
-                    carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+                    carparam = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
                     carName = GfParmGetName(carparam);
 
                     GfParmSetStr(results, path, RE_ATTR_CAR, carName);
@@ -525,7 +525,7 @@ ReUpdateQualifCurRes(tCarElt *car)
         maxLines = ReUI().getResultsTableRowCount();
 
         snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
-        carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+        carparam = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
         carName = GfParmGetName(carparam);
 
         char pszTitle[128];
@@ -595,7 +595,7 @@ ReUpdateQualifCurRes(tCarElt *car)
         for (xx = 0; xx < nCars; ++xx) {
             car = ReInfo->s->cars[ xx ];
             snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
-            carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+            carparam = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
             carName = strdup(GfParmGetName(carparam));
             GfParmReleaseHandle(carparam);
 
@@ -657,7 +657,7 @@ ReUpdateRaceCurRes()
     for (xx = 0; xx < ncars; ++xx) {
         car = ReInfo->s->cars[ xx ];
         snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
-        carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+        carparam = GfParmReadFileBoth(buf, GFPARM_RMODE_STD);
         carName = strdup(GfParmGetName(carparam));
         GfParmReleaseHandle(carparam);
 
