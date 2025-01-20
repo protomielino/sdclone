@@ -144,6 +144,9 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, bool comp
     snprintf(buf, MaxPathSize, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
+
+    snprintf(buf, MaxPathSize, "%scars/models/%s/", GfLocalDir(), car->_carName);
+    loader.AddSearchPath(buf);
     GfLogDebug("Chemin Textures : %s\n", strTPath.c_str());
 
     snprintf(buf, MaxPathSize, "data/objects/");

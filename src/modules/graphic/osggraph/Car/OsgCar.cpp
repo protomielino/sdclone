@@ -237,9 +237,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     osgLoader loader;
 
-    std::string TmpPath = GfDataDir();
-    std::string strTPath;
-
     index = car->index;	/* current car's index */
     handle = car->_carHandle;
 
@@ -248,54 +245,43 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     GfLogInfo("[gr] Init(%d) car %s CustomSkin name\n", index, car->_skinName);
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/",
-             GfDataDir(), car->_modName, car->_driverIndex);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+             GfLocalDir(), car->_modName, car->_driverIndex);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%s/",
-             GfDataDir(), car->_modName, car->_carName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+             GfLocalDir(), car->_modName, car->_carName);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/",
-             GfDataDir(), car->_modName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+             GfLocalDir(), car->_modName);
+    loader.AddSearchPath(buf);
 
-    snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
-             car->_modName, car->_driverIndex, car->_carName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/%s/",
+             GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+    loader.AddSearchPath(buf);
 
-    snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/",
-             car->_modName, car->_driverIndex);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/",
+             GfLocalDir(), car->_modName, car->_driverIndex);
+    loader.AddSearchPath(buf);
 
-    snprintf(buf, nMaxTexPathSize, "drivers/%s/%s/",
-             car->_modName, car->_carName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%s/",
+             GfLocalDir(), car->_modName, car->_carName);
+    loader.AddSearchPath(buf);
 
-    snprintf(buf, nMaxTexPathSize, "drivers/%s/", car->_modName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/", GfLocalDir(), car->_modName);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "%scars/models/%s/", GfLocalDir(), car->_carName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "data/objects/");
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    loader.AddSearchPath(buf);
 
     snprintf(buf, nMaxTexPathSize, "data/textures/");
-    strTPath = TmpPath+buf;
-    loader.AddSearchPath(strTPath);
+    loader.AddSearchPath(buf);
 
     /* loading raw car level 0*/
     //  selIndex = 0; 	/* current selector index */
@@ -304,14 +290,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     snprintf(path, nMaxTexPathSize, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
     param = GfParmGetStr(handle, path, PRM_CAR, buf);
 
-    std::string strPath = GfDataDir();
-
     snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s", bMasterModel ? car->_masterModel : car->_carName, param);
 
     std::string carmodel = buf;
-
-    strPath+=buf;
-
     std::string name = car->_carName;
 
     osg::ref_ptr<osg::Group> gCar = new osg::Group;
@@ -323,7 +304,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     pWing->setName("WING");
 
     //strPath+=buf;
-    GfLogDebug("Chemin Textures : %s\n", strTPath.c_str());
 
     //osg::ref_ptr<osg::Node> Car = new osg::Node;
     if (bMasterModel)
@@ -341,11 +321,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     std::string localpath = std::string(GfLocalDir()) + carmodel;
     osg::ref_ptr<osg::Node> pCar;
     if ((pCar = loader.Load3dFile(localpath, true, bCarName, bSkinName))
-        || (pCar = loader.Load3dFile(strPath, true, bCarName, bSkinName)))
+        || (pCar = loader.Load3dFile(carmodel, true, bCarName, bSkinName)))
         GfLogDebug("Load Car ACC !\n");
     else
     {
-        GfLogError("Failed to load %s\n", strPath.c_str());
+        GfLogError("Failed to load %s\n", carmodel.c_str());
         pCar = new osg::Node;
     }
 
@@ -406,9 +386,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         this->DRMSelector2 = new osg::Switch;
         this->RearWingSelector = new osg::Switch;
         this->RearWingSelector->setName("WINGREAR");
-        std::string tmp = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-        tmp = tmp+buf;
 
         // Add the rearwings
         for (int i = 1; i < nranges; i++)
@@ -416,20 +394,19 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             snprintf(path, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_REARWING, i);
             param = GfParmGetStr(handle, path, PRM_REARWINGMODEL, "");
 
-            strPath = tmp+param;
-            std::string local = std::string(GfLocalDir()) + buf + param;
+            std::string path = std::string(buf) + param;
+            std::string local = GfLocalDir() + path;
             osg::ref_ptr<osg::Node> pWing1_branch;
             if ((pWing1_branch = loader.Load3dFile(local, true, bCarName, bSkinName))
-                || (pWing1_branch = loader.Load3dFile(strPath, true, bCarName, bSkinName)))
-                GfLogDebug("Loading Wing animate %i - %s !\n", i, strPath.c_str());
+                || (pWing1_branch = loader.Load3dFile(path, true, bCarName, bSkinName)))
+                GfLogDebug("Loading Wing animate %i - %s !\n", i, path.c_str());
             else
             {
-                GfLogError("failed to load Wing animate %i - %s !\n", i, strPath.c_str());
+                GfLogError("failed to load Wing animate %i - %s !\n", i, path.c_str());
                 pWing1_branch = new osg::Node;
             }
 
             this->DRMSelector2->addChild(pWing1_branch.get());
-            strPath.clear();
         }
 
         this->DRMSelector2->setSingleChildOn(0);
@@ -447,18 +424,16 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     if (param)
     {
         _cockpit = true;
-        std::string tmp = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-        tmp = tmp+buf;
 
-        strPath= tmp+param;
+        std::string local = std::string(GfLocalDir()) + buf;
 
-        if (!(pCockpit = loader.Load3dFile(GfLocalDir() + strPath, true, bCarName, bSkinName))
-            && !(pCockpit = loader.Load3dFile(strPath, true, bCarName, bSkinName)))
-            GfLogDebug("Cockpit loaded = %s !\n", strPath.c_str());
+        if ((pCockpit = loader.Load3dFile(local, true, bCarName, bSkinName))
+            || (pCockpit = loader.Load3dFile(buf, true, bCarName, bSkinName)))
+            GfLogDebug("Cockpit loaded = %s !\n", buf);
         else
         {
-            GfLogError("Failed to load %s\n", strPath.c_str());
+            GfLogError("Failed to load %s\n", buf);
             pCockpit = new osg::Node;
         }
     }
@@ -472,16 +447,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     if (param)
     {
         _steer = true;
-        std::string tmpPath = GfLocalDir();
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-        tmpPath = tmpPath+buf;
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s", car->_carName, param);
 
-        strPath = tmpPath + param;
-
+        std::string carname = buf;
         osg::ref_ptr<osg::Node> steerEntityLo;
-        if (!(steerEntityLo = loader.Load3dFile(GfLocalDir() + strPath, true, "", ""))
-            && !(steerEntityLo = loader.Load3dFile(strPath, true, "", "")))
-            GfLogError("Failed to load %s\n", strPath.c_str());
+        if (!(steerEntityLo = loader.Load3dFile(GfLocalDir() + carname, true, "", ""))
+            && !(steerEntityLo = loader.Load3dFile(carname, true, "", "")))
+            GfLogError("Failed to load %s\n", carname.c_str());
         else
         {
             this->nSteer = 1;
@@ -517,16 +489,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             if (param)
             {
-                tmpPath = GfDataDir();
-                snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-                tmpPath = tmpPath+buf;
-
-                strPath = tmpPath + param;
+                snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s", car->_carName, param);
                 osg::ref_ptr<osg::Node> steerEntityHi;
-                if (!(steerEntityHi = loader.Load3dFile(GfLocalDir() + strPath, true, "", ""))
-                    && !(steerEntityHi = loader.Load3dFile(strPath, true, "", "")))
+                std::string localpath = std::string(GfLocalDir()) + buf;
+                if (!(steerEntityHi = loader.Load3dFile(localpath, true, "", ""))
+                    && !(steerEntityHi = loader.Load3dFile(buf, true, "", "")))
                 {
-                    GfLogError("Failed to load: %s\n", strPath.c_str());
+                    GfLogError("Failed to load: %s\n", buf);
                     steerEntityHi = new osg::Node;
                 }
                 this->nSteer = 2;
@@ -571,9 +540,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         this->DRMSelector = new osg::Switch;
         this->carTransform->addChild(DriverSelector.get());
 
-        std::string tmp = GfLocalDir();
-        std::string driver_path;
-
         // add the drivers
         for (int i = 1; i < nranges; i++)
         {
@@ -590,9 +556,16 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             driverLoc->setMatrix(pos);
 
-            driver_path = tmp+param;
-            driverEntity = loader.Load3dFile(driver_path, true, bCarName, bSkinName);
+            snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s", car->_carName, param);
+            std::string driver_path = buf;
+
             GfLogInfo("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
+            if (!(driverEntity = loader.Load3dFile(GfLocalDir() + driver_path, true, bCarName, bSkinName))
+                && !(driverEntity = loader.Load3dFile(driver_path, true, bCarName, bSkinName)))
+            {
+                GfLogWarning("Failed to load animated driver %i - %s\n", i, buf);
+                continue;
+            }
 
             driverLoc->addChild(driverEntity.get());
             driverBody->addChild(driverLoc.get());
