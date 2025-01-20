@@ -2216,9 +2216,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         void *carparam;
         char *carName;
         temp << "cars/models/" << currCar->_carName << "/" << currCar->_carName << ".xml";
-        carparam = GfParmReadFileLocal(temp.str().c_str(), GFPARM_RMODE_STD);
-        if (!carparam)
-            carparam = GfParmReadFile(temp.str().c_str(), GFPARM_RMODE_STD);
+        carparam = GfParmReadFileBoth(temp.str().c_str(), GFPARM_RMODE_STD);
         carName = GfParmGetName(carparam);
         GfParmReleaseHandle(carparam);
 
