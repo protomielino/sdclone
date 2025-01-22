@@ -100,6 +100,7 @@ Where:
     - For cars, the value is only shown for informational purposes, but no
     actions are made based on its value.
     - For tracks, the following values are accepted:
+        - `circuit`
         - `development`
         - `dirt`
         - `gprix`
