@@ -192,10 +192,19 @@ int Asset::parse(const cJSON *c)
         GfLogError("check_dir directory failed\n");
         return -1;
     }
-    else if (type == Asset::track && check_dir(category))
+
+    switch (type)
     {
-        GfLogError("check_dir category failed\n");
-        return -1;
+        case Asset::car:
+            break;
+
+        case Asset::driver:
+        case Asset::track:
+            if (check_dir(category))
+            {
+                GfLogError("check_dir category failed\n");
+                return -1;
+            }
     }
 
     this->size = sizeull;

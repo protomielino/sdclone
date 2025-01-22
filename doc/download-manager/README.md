@@ -97,8 +97,10 @@ Where:
 
 - `name`: defines the human-readable name for an asset.
 - `category`: defines which category an asset belongs to.
-    - For cars, the value is ignored.
+    - For cars, the value is only shown for informational purposes, but no
+    actions are made based on its value.
     - For tracks, the following values are accepted:
+        - `circuit`
         - `development`
         - `dirt`
         - `gprix`
