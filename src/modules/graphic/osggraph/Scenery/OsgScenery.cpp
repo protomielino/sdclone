@@ -144,8 +144,6 @@ int SDScenery::LoadScene(const tTrack *track)
         std::string localdir = GfLocalDir(), datadir = GfDataDir();
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
         pathList.push_back(localdir + buf);
-        pathList.push_back(localdir + "data/objects/");
-        pathList.push_back(localdir + "data/textures/");
         pathList.push_back(datadir + buf);
         pathList.push_back(datadir + "data/objects/");
         pathList.push_back(datadir + "data/textures/");
@@ -217,8 +215,8 @@ bool SDScenery::LoadTrack(const std::string &dir, const std::string &file)
 {
     std::string localdir = GfLocalDir();
     osgLoader loader;
+    loader.AddSearchPath(localdir + dir);
     loader.AddSearchPath(dir);
-    loader.AddSearchPath(localdir + "data/textures/");
     loader.AddSearchPath("data/textures/");
 
     std::string path = dir + file;
