@@ -107,8 +107,7 @@ Where:
         - `karting`
         - `road`
         - `speedway`
-    - For drivers, it must be one of the available robots, such as
-      `simplix` or `usr`.
+    - For drivers, it should not match `human` or `networkhuman`.
 - `author`: defines the author(s) for an asset. Speed Dreams shall not
 perform any specific actions based on the value of this string.
 - `license`: defines the license covering the asset. Speed Dreams shall not
