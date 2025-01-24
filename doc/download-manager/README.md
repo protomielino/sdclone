@@ -38,7 +38,7 @@ In order for Speed Dreams to know which assets can be downloaded, a
 [JSON schema](./assets.schema.json) and
 [a practical example](./assets.example.json) are defined. A database can be
 verified with the
-[`check-cjsonschema`](https://pypi.org/project/check-jsonschema/) utility:
+[`check-jsonschema`](https://pypi.org/project/check-jsonschema/) utility:
 
 ```
 check-jsonschema --schemafile assets.schema.json <file>
