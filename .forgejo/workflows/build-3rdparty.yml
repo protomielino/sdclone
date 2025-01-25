@@ -12,8 +12,9 @@ jobs:
     steps:
       - name: Clone repository
         run: |
+          branch=$(jq -r '.ref | ltrimstr("refs/heads/")' ${{ env.GITHUB_EVENT_PATH }})
           git clone -q \
-            -b ${{ env.GITHUB_HEAD_REF }} \
+            -b $branch \
             ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
             /src
       - name: Configure third-party libraries
