@@ -188,7 +188,9 @@ Driver::Driver(int index) :	INDEX(index),
       _prevDelta(0),
       _lastSpd0(0),
       m_garage(false),
-      last_srslip(0)
+      last_srslip(0),
+      lastDynGcPos(0),
+      lastDynGcSpd(0)
 {
     for( int i = 0; i < 50; i++ )
     {
@@ -2473,8 +2475,6 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
         gearChangeCounter = 10;
     car->ctrl.gear = newGear;
 
-    static double lastPos = 0;
-    static double lastSpd = 0;
     //		  t    del-t  acc   brk   clut gr  rpm   pos    spd   cspd  acc   cacc rslpv  fslp  rslp freac rreac
     LogSHADOW.debug( "%1.3f,%7.5f,%5.3f,%5.3f,%5.3f,%d,%4.0f,%12.7f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f,%5.0f,%5.0f\n",
                      s->currentTime,
@@ -2486,16 +2486,16 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
                      car->priv.enginerpm * 60 / (2 * PI),
                      car->pub.DynGCg.pos.x,
                      car->pub.DynGCg.vel.x,
-                     (car->pub.DynGCg.pos.x - lastPos) / s->deltaTime,
+                     (car->pub.DynGCg.pos.x - lastDynGcPos) / s->deltaTime,
                      car->pub.DynGC.acc.x,
-                     (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,
+                     (car->pub.DynGC.vel.x - lastDynGcSpd) / s->deltaTime,
                      car->priv.wheel[2].slipAccel,
             (m_cm[PATH_NORMAL].wheel(0).slipX() + m_cm[PATH_NORMAL].wheel(1).slipX()) * 0.5,
             (m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5,
             car->priv.reaction[0] + car->priv.reaction[1],
             car->priv.reaction[2] + car->priv.reaction[3] );
-    lastSpd = car->pub.DynGC.vel.x;
-    lastPos = car->pub.DynGC.pos.x;
+    lastDynGcSpd = car->pub.DynGC.vel.x;
+    lastDynGcPos = car->pub.DynGC.pos.x;
 }
 
 void	Driver::Drive( int, tCarElt* car, tSituation* s )
@@ -2643,8 +2643,6 @@ void	Driver::Drive( int, tCarElt* car, tSituation* s )
     _lastSpd0 = spd0;
 
     {
-        static Vec2d prevPos;
-        static Vec2d lastPos;
         Vec2d currPos = Vec2d(car->pub.DynGCg.pos);
         Vec2d lastVel = (lastPos - prevPos) / s->deltaTime;
         Vec2d currVel = (currPos - lastPos) / s->deltaTime;

@@ -513,6 +513,10 @@ private:
     double			_lastSpd0;
     bool            m_garage;
     double          last_srslip;
+    Vec2d           prevPos;
+    Vec2d           lastPos;
+    double          lastDynGcPos;
+    double          lastDynGcSpd;
 };
 
 #endif // _DRIVER_H_
