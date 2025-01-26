@@ -1,6 +1,5 @@
 INCLUDE(../../../cmake/macros.cmake)
 
-ADD_SUBDIRECTORY(simuv2.1)
 ADD_SUBDIRECTORY(simuv4)
 ADD_SUBDIRECTORY(simuv4.1)
 ADD_SUBDIRECTORY(simuv5)

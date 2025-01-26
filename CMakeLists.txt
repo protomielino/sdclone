@@ -7,6 +7,7 @@ PROJECT(speed-dreams-2 VERSION 2.3.0
 )
 
 MESSAGE(STATUS CMAKE_VERSION = "${CMAKE_VERSION}")
+SET(BUILD_SHARED_LIBS ON)
 
 IF(POLICY CMP0003)
    CMAKE_POLICY(SET CMP0003 NEW)
@@ -72,6 +73,13 @@ else()
    endif()
 
    message(STATUS "Data directory: ${SD_DATADIR_ABS}")
+endif()
+
+find_package(SOLID 2.1.2)
+
+if(NOT SOLID_FOUND)
+   message(STATUS "SOLID not found. Using in-tree submodule.")
+   add_subdirectory(freesolid)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID)
