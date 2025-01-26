@@ -62,7 +62,7 @@ void MyCar::setDefaults()
     mFuelPerMeter = 0.001;
     mFuelWeightFactor = 1.0;
     mTireWearPerMeter = 1.0;
-    mRearWingAngle = 17.0;
+    mRearWingAngle = 17.0 * M_PI / 180.0; /* rad */
     mShiftUpPoint = 0.98;
 }
 
@@ -84,7 +84,7 @@ void MyCar::readPrivateSection(void *handle)
 
 void MyCar::readVarSpecs(void *handle)
 {
-    mRearWingAngle = GfParmGetNum(handle, SECT_REARWING, PRM_WINGANGLE, nullptr, mRearWingAngle);
+    mRearWingAngle = GfParmGetNum(handle, SECT_REARWING, PRM_WINGANGLE, "deg", mRearWingAngle);
 }
 
 void MyCar::readConstSpecs(void* CarHandle)
