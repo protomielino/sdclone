@@ -730,7 +730,7 @@ else()
 endif()
 
 # no-output target, for having some files available in IDEs.
-set(DOCSOURCES COPYING LICENSE readme.txt)
+set(DOCSOURCES COPYING LICENSE README.md)
 
 add_custom_target(rootdoc SOURCES ${DOCSOURCES})
 
