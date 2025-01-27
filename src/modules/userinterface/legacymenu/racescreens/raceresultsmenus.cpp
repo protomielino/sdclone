@@ -42,9 +42,9 @@ static void rmPracticeResults(void *prevHdle, tRmInfo *info, int start);
 static void rmRaceResults(void *prevHdle, tRmInfo *info, int start);
 static void rmQualifResults(void *prevHdle, tRmInfo *info, const char*pszTitle, int start);
 
-static const int DefaultSimuVersion = 1;
+static const int DefaultSimuVersion = 3;
 static const char *SimuVersionList[] =
-    {RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4, RM_VAL_MOD_SIMU_REPLAY};
+    {RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4, RM_VAL_MOD_SIMU_V4_1, RM_VAL_MOD_SIMU_V5, RM_VAL_MOD_SIMU_REPLAY};
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
 static int CurSimuVersion = DefaultSimuVersion;
 
@@ -77,7 +77,7 @@ rmReplayRace(void * /* dummy */)
         }
     }
 
-    GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[4]);
+    GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, RM_VAL_MOD_SIMU_REPLAY);
     GfParmWriteFile(NULL, paramHandle, "raceengine");
 
     LmRaceEngine().startNewRace();
