@@ -17,6 +17,9 @@ jobs:
             -b ${{ env.GITHUB_HEAD_REF }} \
             ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
             /src
+      - name: Update FreeSOLID submodule
+        run: git submodule update --init freesolid
+        working-directory: /src
       - name: Configure project
         working-directory: /src
         run: cmake -B build -DSD_ASSUME_DATADIR=1

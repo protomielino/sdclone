@@ -73,15 +73,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
       SET(OPTION_USE_MACPORTS true CACHE BOOL "Use the MacPorts dependencies")
     ENDIF(APPLE)
 
-    # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
-    # but not under Linux, where FreeSolid seems not to be available by default on most distros.
-    IF(WIN32)
-      SET(_OPTION_3RDPARTY_SOLID true)
-    ELSE(WIN32)
-      SET(_OPTION_3RDPARTY_SOLID false)
-    ENDIF(WIN32)
-    SET(OPTION_3RDPARTY_SOLID ${_OPTION_3RDPARTY_SOLID} CACHE BOOL "Use 3rd party SOLID library rather than simu-bundled one")
-
     IF(UNIX)
       SET(OPTION_XRANDR true CACHE BOOL "XrandR")
       SET(OPTION_GLEXTPROTOTYPES true CACHE BOOL "Enable prototypes in glext.h")
@@ -161,10 +152,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_3RDPARTY_SQLITE3)
       ADD_DEFINITIONS(-DTHIRD_PARTY_SQLITE3)
     ENDIF(OPTION_3RDPARTY_SQLITE3)
-
-    IF(OPTION_3RDPARTY_SOLID)
-      ADD_DEFINITIONS(-DTHIRD_PARTY_SOLID)
-    ENDIF(OPTION_3RDPARTY_SOLID)
 
     IF(OPTION_GLEXTPROTOTYPES)
       ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)

@@ -98,7 +98,6 @@ option(OPTION_OPENAL "Download and Build OpenAL" true)
 option(OPTION_PLIB "Download and Build PLIB" true)
 cmake_dependent_option(OPTION_PLIB_USE_HEAD "Download and Build PLIB from the latest revision" true "OPTION_PLIB" false)
 option(OPTION_JPEG "Download and Build libjpeg" true)
-option(OPTION_FREESOLID "Download and Build FreeSOLID" true)
 option(OPTION_ENET "Download and Build Enet" true)
 option(OPTION_OGG "Download and Build libogg" true)
 option(OPTION_VORBIS "Download and Build libvorbis" true)
@@ -127,7 +126,6 @@ if(OPTION_CACHED_ARCHIVES)
    set(PLIB_HEAD_URL "${CACHED_URL}/${PLIB_HEAD_FILE}")
    set(PLIB_URL "${CACHED_URL}/${PLIB_FILE}")
    set(JPEG_URL "${CACHED_URL}/${JPEG_FILE}")
-   set(FREESOLID_URL "${CACHED_URL}/${FREESOLID_FILE}")
    set(ENET_URL "${CACHED_URL}/${ENET_FILE}")
    set(OGG_URL "${CACHED_URL}/${OGG_FILE}")
    set(VORBIS_URL "${CACHED_URL}/${VORBIS_FILE}")
@@ -355,35 +353,6 @@ if(OPTION_JPEG)
       DEPENDERS patch)  # do before patch
 else()
    set(JPEG_PROJECT )
-endif()
-
-if(OPTION_FREESOLID)
-   set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX="")
-   ExternalProject_Add(${FREESOLID_PROJECT}
-      DOWNLOAD_NAME ${FREESOLID_FILE}
-      URL ${FREESOLID_URL}
-      URL_HASH ${FREESOLID_HASH}
-      CMAKE_ARGS ${FreeSOLID_ARGS})
-   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${FREESOLID_PROJECT}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
-
-   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_broad_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/FreeSOLID/libbroad/CMakeLists.txt"
-              "<SOURCE_DIR>/libbroad/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
-
-   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_moto_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/FreeSOLID/libmoto/CMakeLists.txt"
-              "<SOURCE_DIR>/libmoto/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
 endif()
 
 if(OPTION_ENET)
