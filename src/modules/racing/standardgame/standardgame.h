@@ -59,6 +59,7 @@ public:
 
 	virtual void initializeState(void *prevMenu);
 	virtual void updateState();
+	virtual void updateState(unsigned ms);
 	virtual void applyState(int state);
 
 	virtual void selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans = true);

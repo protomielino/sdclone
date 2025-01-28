@@ -169,9 +169,14 @@ void StandardGame::initializeState(void *prevMenu)
 	::ReStateInit(prevMenu);
 }
 
-void StandardGame::updateState(void)
+void StandardGame::updateState()
 {
 	::ReStateManage();
+}
+
+void StandardGame::updateState(unsigned ms)
+{
+	::ReStateManage(ms);
 }
 
 void StandardGame::applyState(int state)

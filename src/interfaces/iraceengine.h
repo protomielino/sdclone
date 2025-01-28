@@ -41,6 +41,7 @@ public:
 
 	virtual void initializeState(void *prevMenu) = 0;
 	virtual void updateState() = 0;
+	virtual void updateState(unsigned ms) = 0;
 	virtual void applyState(int state) = 0;
 
 	virtual void selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans = true) = 0;
