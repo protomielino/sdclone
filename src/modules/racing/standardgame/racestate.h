@@ -25,7 +25,7 @@
 #define _RACESTATE_H_
 
 extern void ReStateInit(void *prevMenu);
-extern void ReStateManage(void);
+extern void ReStateManage(unsigned ms = 0);
 extern void ReStateApply(int state);
 
 #endif /* _RACESTATE_H_ */

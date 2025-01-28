@@ -152,9 +152,9 @@ void RmProgressiveTimeModifier::terminate()
 
 /***************************************************************************/
 static void
-rmUpdateRaceEngine()
+rmUpdateRaceEngine(unsigned ms, void *)
 {
-    LmRaceEngine().updateState();
+    LmRaceEngine().updateState(ms);
 }
 
 /**************************************************************************
@@ -382,7 +382,7 @@ rmScreenActivate(void * /* dummy */)
 #endif
 
 	// Configure the event loop.
-	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine, nullptr);
     GfuiApp().eventLoop().setRedisplayCB(rmRedisplay);
 
 	// If not paused ...
@@ -696,7 +696,7 @@ RmScreenShutdown()
 static void
 rmActivateReUpdateStateHook(void * /* dummy */)
 {
-    rmUpdateRaceEngine();
+    rmUpdateRaceEngine(0, 0);
 }
 
 static void	*pvUpdateStateHookHandle = 0;
@@ -827,7 +827,7 @@ rmResScreenActivate(void * /* dummy */)
 	GfLogInfo("Entering Result menu ...\n");
 
 	// Configure the event loop.
-	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine, nullptr);
 	GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
 
 	// Resynchronize the race engine.

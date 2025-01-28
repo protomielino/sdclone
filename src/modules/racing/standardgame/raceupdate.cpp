@@ -51,7 +51,9 @@ public:
 	reMainUpdater(ReSituationUpdater* pSituUpdater);
 
 	//! The real updating funtion.
-	int operator()(void);
+	int update(unsigned ms);
+
+	void loop(unsigned ms);
 
 	//! Accessor to the output situation (read-only, as always overwritten).
 	const tRmInfo* data() const { return _pReInfo; };
@@ -74,7 +76,26 @@ reMainUpdater::reMainUpdater(ReSituationUpdater* pSituUpdater)
 {
 }
 
-int reMainUpdater::operator()(void)
+void reMainUpdater::loop(unsigned ms)
+{
+	double msd = ms;
+
+	do
+	{
+		double now = GfTimeClock();
+
+		_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
+
+		double elapsed = (GfTimeClock() - now) * 1000.0;
+
+		if (elapsed < msd)
+			msd -= elapsed;
+		else
+			msd = 0;
+	} while (static_cast<unsigned>(msd));
+}
+
+int reMainUpdater::update(unsigned ms)
 {
 	GfProfStartProfile("ReUpdate");
 
@@ -96,7 +117,7 @@ int reMainUpdater::operator()(void)
 	}
 	else // No other choice than RM_DISP_MODE_NONE
 	{
-		_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
+		loop(ms);
     }
 
 	ReNetworkCheckEndOfRace();
@@ -144,9 +165,9 @@ void ReOneStep(double dt)
 }
 #endif
 
-int ReUpdate(void)
+int ReUpdate(unsigned ms)
 {
-	return (*mainUpdater)();
+	return mainUpdater->update(ms);
 }
 
 void ReStop(void)

@@ -31,7 +31,7 @@ extern bool ReSetSchedulingSpecs(double fSimuRate, double fOutputRate = 0);
 
 extern void ReStart();
 extern void ReStop();
-extern int  ReUpdate();
+extern int  ReUpdate(unsigned ms);
 
 #ifdef SD_DEBUG
 extern void ReOneStep(double dt);

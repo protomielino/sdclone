@@ -43,7 +43,7 @@ ReStateInit(void *prevMenu)
 
 // State Automaton Management
 void
-ReStateManage(void)
+ReStateManage(unsigned ms)
 {
 	int mode = RM_SYNC | RM_NEXT_STEP;
 
@@ -108,7 +108,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_RACE:
-				mode = ReUpdate();
+				mode = ReUpdate(ms);
 				if (ReInfo->s->_raceState == RM_RACE_ENDED) {
 					// Race is finished
 					mode = ReRaceCooldown();
@@ -130,7 +130,7 @@ ReStateManage(void)
 					// Player is on victory lap or joy riding
 					// TODO rethink this transition
 					// this state will transition to RE_STATE_RACE_END when ReStopCooldown() is called by UI
-					mode = ReUpdate();
+					mode = ReUpdate(ms);
 				}
 				break;
 
@@ -216,5 +216,5 @@ ReStateApply(int pvState)
 {
 	ReInfo->_reState = pvState;
 
-	ReStateManage();
+	ReStateManage(0);
 }
