@@ -754,11 +754,6 @@ refresh(tSituation *s)
 
     TRACE_GL("refresh: start");
 
-    // Moved car collision damage propagation from grcar::grDrawCar.
-    // Because it has to be done only once per graphics update, whereas grDrawCar
-    // is called once for each car and for each screen.
-    grPropagateDamage(s);
-
     // Update sky if dynamic time enabled.
     grUpdateSky(s->currentTime, s->accelTime);
 
@@ -992,11 +987,5 @@ shutdownView(void)
         grScreens[i] = 0;
     }
 }
-
-//void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
-//{
-//	if (grCarInfo)
-//		grPropagateDamage (grCarInfo[index].carEntity, poc, force, count);
-//}
 
 } // namespace ssggraph

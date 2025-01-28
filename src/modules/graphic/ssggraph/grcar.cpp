@@ -754,61 +754,6 @@ grInitShadow(tCarElt *car)
 }
 
 void
-grPropagateDamage (ssgEntity* l, const sgVec3 &poc, const sgVec3 &force, int cnt)
-{
-    //showEntityType (l);
-    if (l->isAKindOf (ssgTypeBranch()))
-    {
-        ssgBranch* br = (ssgBranch*) l;
-
-        for (int i = 0 ; i < br -> getNumKids () ; i++ )
-        {
-            ssgEntity* ln = br->getKid (i);
-            grPropagateDamage(ln, poc, force, cnt+1);
-        }
-    }
-
-    if (l->isAKindOf (ssgTypeVtxTable()))
-    {
-        sgVec3* v;
-        int Nv;
-        ssgVtxTable* vt = (ssgVtxTable*) l;
-        Nv = vt->getNumVertices();
-        vt->getVertexList ((void**) &v);
-        tdble sigma = sgLengthVec3 (force);
-        tdble invSigma = 5.0;
-        //		if (sigma < 0.1)
-        //			invSigma = 10.0;
-        //		else
-        //			invSigma = 1.0/sigma;
-        for (int i=0; i<Nv; i++) {
-            tdble r =  sgDistanceSquaredVec3 (poc, v[i]);
-            tdble f = exp(-r*invSigma)*5.0;
-            v[i][0] += force[0]*f;
-            v[i][1] += force[1]*f;
-            // use sigma as a random number generator (!)
-            v[i][2] += (force[2]+0.02*sin(2.0*r + 10.0*sigma))*f;
-            //printf ("(%f %f %f)\n", v[i][0], v[i][1], v[i][2]);
-        }
-    }
-}
-
-void
-grPropagateDamage (tSituation *s)
-{
-    for (int i = 0; i < s->_ncars; i++)
-    {
-        tCarElt* car = s->cars[i];
-        tCollisionState* collision_state = &car->priv.collision_state;
-        if (collision_state->collision_count > 0)
-        {
-            grPropagateDamage(grCarInfo[car->index].carEntity,
-                    collision_state->pos, collision_state->force, 0);
-        }
-    }
-}
-
-void
 grPreInitCar(tCarElt *car)
 {
     strncpy(car->_masterModel,
