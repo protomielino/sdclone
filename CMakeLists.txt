@@ -152,6 +152,23 @@ IF(MSVC)
    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/userman/images/ DESTINATION ./doc/images/)
 ENDIF(MSVC)
 
+if(WIN32)
+   function(copy_dll target)
+      add_custom_target(${target}_copydll)
+      add_dependencies(${target}_copydll ${target})
+      add_dependencies(${PROJECT_NAME} ${target}_copydll)
+      add_custom_command(TARGET ${target}_copydll
+         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${target}> ${CMAKE_BINARY_DIR}/bin/
+         VERBATIM
+      )
+   endfunction()
+
+   copy_dll(solid)
+   copy_dll(broad)
+   copy_dll(moto)
+endif()
+
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
 
