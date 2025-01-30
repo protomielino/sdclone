@@ -24,10 +24,10 @@ jobs:
         run: cmake --build build -j$(nproc --all)
         working-directory: /src/packaging/3rdParty-devel
       - name: Archive third-party libraries
-        run: tar -czf 3rdparty-${{ env.GITHUB_SHA }}.tar.gz 3rdParty/
+        run: tar -czf 3rdparty-$(git describe --tags).tar.gz 3rdParty/
         working-directory: /src/packaging/3rdParty-devel/build
       - name: Upload third-party libraries
-        run: upload-artifact 3rdparty-${{ env.GITHUB_SHA }}.tar.gz
+        run: upload-artifact 3rdparty-$(git describe --tags).tar.gz
         working-directory: /src/packaging/3rdParty-devel/build
         env:
           URL: ${{ vars.STORE_URL }}
