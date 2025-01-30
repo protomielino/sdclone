@@ -122,23 +122,24 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 {
     // Save module name and loadDir, and determine module XML file pathname.
     setRobotName(welcomeIn->name);
-
-    // Filehandle for robot's xml-file
-    void *pRobotSettings = GfParmReadFileLocal(pathBuffer, GFPARM_RMODE_STD);
-
     PLogSHADOW = GfLogger::instance("SHADOW");
+
+    std::string dirstr = std::string(GfLocalDir()) + "drivers/shadow";
+    const char *dir = dirstr.c_str();
+
+    if (GfDirCreate(dir) != GF_DIR_CREATED)
+    {
+        PLogSHADOW->error("GfDirCreate %s failed\n", dir);
+        return -1;
+    }
+
+    int ret = 0;
+    // Filehandle for robot's xml-file
+    void *pRobotSettings = GfParmReadFileLocal(pathBuffer,
+        GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     if (pRobotSettings) // robot settings XML could be read
     {
-        char SectionBuffer[BUFSIZE];
-        snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
-
-        // Try to get first driver from index 0
-        string sDriverName = GfParmGetStrNC(pRobotSettings,
-            SectionBuffer,
-            ROB_ATTR_NAME,
-            const_cast<char*>(sUndefined));
-
         // Loop over all possible drivers, clear all buffers,
         // save defined driver names and descriptions.
         Drivers.clear();
@@ -147,9 +148,11 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 
         for (int i = 0; i < n; i++)
         {
+            char SectionBuffer[BUFSIZE];
+
             snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
 
-            sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
+            std::string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
                 ROB_ATTR_NAME, sUndefined);
 
             // This driver is defined in robot's xml-file
@@ -157,6 +160,12 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
                 ROB_ATTR_DESC, "");
             Drivers.push_back(make_pair(sDriverName, sDriverDesc));
         }  // for i
+
+        if (GfParmWriteFile(nullptr, pRobotSettings, "shadow"))
+        {
+            PLogSHADOW->error("GfParmWriteFile failed\n");
+            ret = -1;
+        }
 
         GfParmReleaseHandle(pRobotSettings);
     }
@@ -169,7 +178,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
     // Set max nb of interfaces to return.
     welcomeOut->maxNbItf = Drivers.size();
 
-    return 0;
+    return ret;
 }
 
 // Module entry point (new fixed name scheme).
@@ -210,12 +219,13 @@ extern "C" int shadow(tModInfo *modInfo)
     nameBuffer = "shadow";
 
     // Filehandle for robot's xml-file
-    void *pRobotSettings = GfParmReadFileLocal(pathBuffer, GFPARM_RMODE_STD);
+    void *pRobotSettings = GfParmReadFileLocal(pathBuffer,
+        GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     if (pRobotSettings)
     {  // Let's look what we have to provide here
         char SectionBuffer[BUFSIZE];
-        int n = GfParmGetEltNb(pRobotSettings, ROB_SECT_ROBOTS);
+        int ret = 0, n = GfParmGetEltNb(pRobotSettings, ROB_SECT_ROBOTS);
 
         for (int i = 0; i < n; i++)
         {
@@ -224,7 +234,14 @@ extern "C" int shadow(tModInfo *modInfo)
             std::string sDriverDesc = GfParmGetStr(pRobotSettings, SectionBuffer, ROB_ATTR_DESC, "");
             Drivers.push_back(make_pair(sDriverName, sDriverDesc));
         }
+
+        if (GfParmWriteFile(nullptr, pRobotSettings, "shadow"))
+            ret = -1;
+
         GfParmReleaseHandle(pRobotSettings);
+
+        if (ret)
+            return ret;
     }
 
     return moduleInitialize(modInfo);

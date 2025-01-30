@@ -263,13 +263,19 @@ void* GetFileHandle(const char*	RobotName)
     snprintf(BufPathXMLRel, BUFSIZE,			  // Robot's xml-filename
         "drivers/%s/%s.xml",RobotName,RobotName);// relative to installation
 
+    std::string dirstr = std::string(GfLocalDir()) + "drivers" + RobotName;
+    const char *dir = dirstr.c_str();
+
+    if (GfDirCreate(dir) != GF_DIR_CREATED)
+      return NULL;
+
     //	Test local installation	path
     snprintf(BufPathXML, BUFSIZE, "%s%s",
         GetLocalDir(), RobPathXMLRel);
     snprintf(BufPathDir, BUFSIZE, "%s%s",
         GetLocalDir(), RobPathDirRel);
     RobotSettings = GfParmReadFile
-        (RobPathXML, GFPARM_RMODE_STD	);
+        (RobPathXML, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     if	(!RobotSettings)
     {
@@ -281,6 +287,13 @@ void* GetFileHandle(const char*	RobotName)
       RobotSettings = GfParmReadFile
           (RobPathXML, GFPARM_RMODE_STD );
     }
+
+    if (GfParmWriteFile(nullptr, RobotSettings, "simplix"))
+    {
+      GfParmReleaseHandle(RobotSettings);
+      return NULL;
+    }
+
     return	RobotSettings;
 }
 //==========================================================================*
