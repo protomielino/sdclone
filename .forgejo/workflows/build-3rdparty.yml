@@ -14,12 +14,7 @@ jobs:
       image: forge.a-lec.org/speed-dreams/debian-i686-w64-mingw32:stable
     steps:
       - name: Clone repository
-        run: |
-          branch=$(jq -r '.ref | ltrimstr("refs/heads/")' ${{ env.GITHUB_EVENT_PATH }})
-          git clone -q \
-            -b $branch \
-            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
-            /src
+        run: forgejo-clone /src
       - name: Configure third-party libraries
         run: cmake -B build -DCMAKE_TOOLCHAIN_FILE=i686-w64-mingw32.cmake
         working-directory: /src/packaging/3rdParty-devel

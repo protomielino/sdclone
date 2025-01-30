@@ -17,12 +17,7 @@ jobs:
       - name: Untar third-party libraries
         run: tar -xf 3rdparty.tar.gz
       - name: Clone repository recursively
-        run: |
-          git clone -q \
-            --recursive \
-            -b ${{ env.GITHUB_HEAD_REF }} \
-            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
-            src
+        run: forgejo-clone -r src
       - name: Configure project
         run: |
           cmake -B build \

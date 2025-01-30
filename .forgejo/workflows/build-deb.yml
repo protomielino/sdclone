@@ -19,11 +19,7 @@ jobs:
       image: forge.a-lec.org/speed-dreams/${{ matrix.image }}
     steps:
       - name: Clone repository
-        run: |
-          git clone -q \
-            -b ${{ env.GITHUB_HEAD_REF }} \
-            ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git \
-            /src
+        run: forgejo-clone /src
       - name: Update FreeSOLID submodule
         run: git submodule update --init freesolid
         working-directory: /src
