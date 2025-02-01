@@ -25,7 +25,7 @@ jobs:
         working-directory: /src
       - name: Configure project
         working-directory: /src
-        run: cmake -B build -DSD_ASSUME_DATADIR=1
+        run: cmake -B build -DSD_ASSUME_DATADIR=1 -DCMAKE_INSTALL_PREFIX=/usr
       - name: Build project
         run: cmake --build build -j$(nproc --all)
         working-directory: /src
