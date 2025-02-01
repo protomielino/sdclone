@@ -31,7 +31,13 @@ jobs:
         run: cpack -G NSIS
         working-directory: src/build
       - name: Upload installer
-        run: upload-artifact *.exe
+        run: |
+          if [ $USERNAME ]
+          then
+            upload-artifact *.exe
+          else
+            echo "Skipping due to missing secrets" >&2
+          fi
         working-directory: src/build
         env:
           URL: ${{ vars.STORE_URL }}

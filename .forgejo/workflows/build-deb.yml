@@ -33,7 +33,13 @@ jobs:
         run: cpack -G DEB
         working-directory: /src/build
       - name: Upload Debian package
-        run: upload-artifact -d ${{ matrix.image }} *.deb
+        run: |
+          if [ $USERNAME ]
+          then
+            upload-artifact -d ${{ matrix.image }} *.deb
+          else
+            echo "Skipping due to missing secrets" >&2
+          fi
         working-directory: /src/build
         env:
           URL: ${{ vars.STORE_URL }}
