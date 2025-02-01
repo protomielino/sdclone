@@ -114,7 +114,7 @@ if(NOT result EQUAL 0)
    set(VERSION "undefined-version")
 endif()
 
-set(VERSION_LONG ${VERSION})
+set(VERSION_LONG ${VERSION} CACHE STRING "The version string displayed")
 
 # CMAKE_PROJECT_VERSION_TWEAK is used by NSIS packagers
 # its what comes after the '-' sign (if anything)
