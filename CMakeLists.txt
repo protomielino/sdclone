@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12 FATAL_ERROR)
 
 # Speed Dreams project
-PROJECT(speed-dreams-2 VERSION 2.3.0
+PROJECT(speed-dreams-2 VERSION 2.4.0
    HOMEPAGE_URL "https://www.speed-dreams.net/"
 )
 
@@ -35,7 +35,7 @@ IF(APPLE)
 ENDIF(APPLE)
 
 option(SD_ASSUME_DATADIR "Assume default directory for speed-dreams-data")
-set(data_version 2.3.0)
+set(data_version 2.4.0)
 include(GNUInstallDirs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
