@@ -45,7 +45,14 @@ IF(MINGW)
 ENDIF(MINGW)
 
 IF(UNIX)
-	SD_INSTALL_FILES(MAN man6 PREFIX ${CMAKE_SOURCE_DIR}/doc/man FILES ${_TARGET_NAME}.6)
+    SD_INSTALL_FILES(MAN man6 PREFIX ${CMAKE_SOURCE_DIR}/doc/man FILES ${_TARGET_NAME}.6)
+    # Install a launcher for desktop environments.
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/speed-dreams.desktop.in
+        ${PROJECT_BINARY_DIR}/speed-dreams.desktop @ONLY)
+    install(
+        FILES ${PROJECT_BINARY_DIR}/speed-dreams.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 ENDIF(UNIX)
 
 SD_INSTALL_FILES(BIN TARGETS ${_TARGET_NAME})
