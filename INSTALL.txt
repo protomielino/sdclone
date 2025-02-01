@@ -225,12 +225,6 @@ The Speed Dreams Team.
             Enable building against 3rd party Expat 2 library, rather than bundled txml (def: ON)
             Disable if "Expat 2 dev" is not available for your distro.
 
-        - OPTION_3RDPARTY_SOLID:BOOL :
-            Enable building against 3rd party Free Solid 2 library, rather than bundled one (def: OFF)
-            Note: This is not set by default, because Free Solid 2 dev is not yet available
-                  on most Linux distros (amongst the big ones only Fedora has it right now, in 2018, August)
-                  Ask the dev team for any hint about building it ...
-
         - OPTION_OSGGRAPH:BOOL :
             Enable building of the WIP new OpenSceneGraph-based graphics module 'osggraph' (def: ON)
             Note: This requires new 3rd party libs : OpenSceneGraph
