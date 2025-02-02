@@ -43,6 +43,14 @@ package, which must then be indicated when configuring the project:
 cmake -DCMAKE_PREFIX_PATH=<path-to-speed-dreams-data> # other args...
 ```
 
+Nonetheless, there is also the [`freesolid`](./freesolid/) submodule that might
+be required since that project has not been packaged by most distributions yet.
+In such case, update the submodule with:
+
+```
+git submodule update --init freesolid
+```
+
 > **The steps below will assume in-tree builds unless noted otherwise.**
 
 Once configured as described below, the project can be built with:
@@ -144,6 +152,12 @@ sudo apt install git cmake build-essential libopenscenegraph-dev libcurl4-gnutls
 ```
 
 > The version for the `openjdk-*` packages might change among distributions.
+
+#### Fedora
+
+```sh
+sudo dnf install SDL2_mixer SDL2_mixer-devel expat-devel OpenSceneGraph-devel plib-devel libcurl-devel openal-soft-devel enet-devel minizip-devel rhash-devel mesa-libGL-devel mesa-libGLU-devel
+```
 
 ## License
 
