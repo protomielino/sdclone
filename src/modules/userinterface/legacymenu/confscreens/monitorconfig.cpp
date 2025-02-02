@@ -25,6 +25,7 @@
 #include "legacymenu.h"
 #include "monitorconfig.h"
 #include "graphic.h"
+#include <cstring>
 
 
 // Some consts.
