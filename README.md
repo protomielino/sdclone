@@ -153,6 +153,12 @@ sudo apt install git cmake build-essential libopenscenegraph-dev libcurl4-gnutls
 
 > The version for the `openjdk-*` packages might change among distributions.
 
+#### Fedora
+
+```sh
+sudo dnf install SDL2_mixer SDL2_mixer-devel expat-devel OpenSceneGraph-devel plib-devel libcurl-devel openal-soft-devel enet-devel minizip-devel rhash-devel mesa-libGL-devel mesa-libGLU-devel
+```
+
 ## License
 
 By default, Speed Dreams code is licensed under the GPLv2-or-later license,
