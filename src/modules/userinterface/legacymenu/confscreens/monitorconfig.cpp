@@ -26,6 +26,7 @@
 #include "monitorconfig.h"
 #include "graphic.h"
 #include <cstring>
+#include <cstdio>
 
 
 // Some consts.
