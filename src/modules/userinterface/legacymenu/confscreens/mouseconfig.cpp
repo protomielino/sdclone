@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <math.h>
 
 #include <tgf.hpp>
 #include <tgfclient.h>

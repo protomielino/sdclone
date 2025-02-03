@@ -36,6 +36,7 @@
 
 #include <tgf.h>
 #include "cspack.h"
+#include <cstring>
 
 union float_uint32 {
     float floatval;
