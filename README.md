@@ -20,8 +20,14 @@ with tens of high-quality cars and tracks to choose from.
 
 Speed Dreams binaries are available for the following platforms:
 
-- Debian/Ubuntu (TODO)
-- Microsoft Windows (TODO)
+- Debian `bookworm`
+    - [`amd64` package](https://files.speed-dreams.net/public/72ad631c8524ef3abda1dbd6c83e548e)
+    - [`aarch64` package](https://files.speed-dreams.net/public/f4017ee12fbc4eab09d291334fc2a95c)
+    - [Base assets](https://files.speed-dreams.net/public/b61bbdbca2d5c17bb9150049117dbc77)
+- Ubuntu `jammy`
+    - [`amd64` package](https://files.speed-dreams.net/public/1875d6bdad6f9863f2d632e73e667d29)
+    - [Base assets](https://files.speed-dreams.net/public/b61bbdbca2d5c17bb9150049117dbc77)
+- [Microsoft Windows](https://files.speed-dreams.net/public/9fcd245c36b75ba2c18e9586d0899f88)
 
 ## Building from source
 
