@@ -35,7 +35,7 @@
 #include <stdexcept>
 
 static const size_t KB = 1024, MB = KB * KB;
-enum {THUMBNAILS = 4};
+enum {THUMBNAILS = 8};
 
 DownloadsMenu::transfer::transfer(CURL *h, done f, sink *s) :
     h(h),
