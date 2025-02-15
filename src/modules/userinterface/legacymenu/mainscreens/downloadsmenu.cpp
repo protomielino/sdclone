@@ -19,6 +19,7 @@
 #include "downloadsmenu.h"
 #include "downloadservers.h"
 #include "hash.h"
+#include "infomenu.h"
 #include "repomenu.h"
 #include "sha256.h"
 #include "unzip.h"
@@ -452,7 +453,7 @@ void DownloadsMenu::append(thumbnail *t, entry *e)
     }
 
     bargs.push_back(barg(t, e));
-    t->set(e->thumbnail, a.name, a.category, a.author, a.license, size);
+    t->set(e->thumbnail, a.name, size);
 }
 
 void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
@@ -460,7 +461,6 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
 {
     bool enable = false, show_progress = false, show_delete = false;
     float progress = 0.0f;
-    const char *s;
 
     switch (e->state)
     {
@@ -469,24 +469,20 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
             return;
 
         case entry::download:
-            s = "Download";
             enable = true;
             break;
 
         case entry::update:
-            s = "Update";
             enable = true;
             show_delete = true;
             break;
 
         case entry::fetching:
-            s = "Downloading";
             show_progress = true;
             progress = e->progress;
             break;
 
         case entry::done:
-            s = "Downloaded";
             show_delete = true;
             break;
     }
@@ -497,7 +493,7 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
         return;
     }
 
-    t->set(s, enable, show_progress, progress, show_delete);
+    t->set(enable, show_progress, progress, show_delete);
     append(t, e);
     appended = true;
 }
@@ -964,11 +960,30 @@ void DownloadsMenu::on_delete(thumbnail *t)
     }
 }
 
+void DownloadsMenu::on_info(thumbnail *t)
+{
+    for (const auto &b : bargs)
+    {
+        if (b.first != t)
+            continue;
+
+        new InfoMenu(hscr, ::recompute, this, b.second);
+        break;
+    }
+}
+
 static void on_delete(thumbnail *t, void *arg)
 {
     DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
 
     m->on_delete(t);
+}
+
+static void on_info(thumbnail *t, void *arg)
+{
+    DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
+
+    m->on_info(t);
 }
 
 void DownloadsMenu::prev_page()
@@ -1058,7 +1073,7 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
 
         id += std::to_string(i);
         thumbnails.push_back(new thumbnail(hscr, param, id, ::pressed,
-            ::on_delete, this));
+            ::on_delete, ::on_info, this));
     }
 
     GfParmReleaseHandle(param);
