@@ -402,7 +402,18 @@ static int get_size(size_t n, std::string &out)
     const char *suffix = suffixes[i];
 
     if (i)
-        out = std::to_string(sz);
+    {
+        char s[sizeof "18446744073709551615.0"];
+        int res = snprintf(s, sizeof s, "%.1f", sz);
+
+        if (res < 0 || (unsigned)res >= sizeof s)
+        {
+            GfLogError("Maximum size exceeded\n");
+            return -1;
+        }
+
+        out = s;
+    }
     else
         out = std::to_string(n);
 
