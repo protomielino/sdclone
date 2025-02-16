@@ -197,6 +197,7 @@ void DownloadsMenu::on_filter()
     while (offset && offset >= d)
         offset -= THUMBNAILS;
 
+    GfuiEnable(hscr, download_all, GFUI_DISABLE);
     update_ui();
 }
 
@@ -207,6 +208,9 @@ void DownloadsMenu::on_category()
     while (offset && offset >= d)
         offset -= THUMBNAILS;
 
+    bool all = !strcmp(GfuiComboboxGetText(hscr, category), "All categories");
+
+    GfuiEnable(hscr, download_all, all ? GFUI_DISABLE : GFUI_ENABLE);
     update_ui();
 }
 
@@ -1070,6 +1074,39 @@ void DownloadsMenu::next_page()
     update_ui();
 }
 
+void DownloadsMenu::on_download_all()
+{
+    for (const barg &b : bargs)
+    {
+        const entry *e = b.second;
+        bool download;
+
+        switch (e->state)
+        {
+            case entry::download:
+            case entry::update:
+                download = true;
+                break;
+
+            case entry::init:
+            case entry::fetching:
+            case entry::done:
+                download = false;
+                break;
+        }
+
+        if (download && visible(e->a))
+            pressed(b.first);
+    }
+}
+
+static void on_download_all(void *arg)
+{
+    DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
+
+    m->on_download_all();
+}
+
 static void prev_page(void *arg)
 {
     DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
@@ -1115,6 +1152,9 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((prev_arrow = GfuiMenuCreateButtonControl(hscr, param,
         "previous page arrow", this, ::prev_page)) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl prev failed");
+    else if ((download_all = GfuiMenuCreateButtonControl(hscr, param,
+        "download all", this, ::on_download_all)) < 0)
+        throw std::runtime_error("GfuiMenuCreateButtonControl download all failed");
     else if ((next_arrow = GfuiMenuCreateButtonControl(hscr, param,
         "next page arrow", this, ::next_page)) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl next failed");
@@ -1155,6 +1195,7 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     GfuiMenuDefaultKeysAdd(hscr);
     GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this, ::deinit,
         NULL);
+    GfuiEnable(hscr, download_all, GFUI_DISABLE);
     GfuiScreenActivate(hscr);
     // This must be done after GfuiScreenActivate because this function
     // overwrites the recompute callback to a null pointer.

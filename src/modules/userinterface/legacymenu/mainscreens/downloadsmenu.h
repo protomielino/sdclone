@@ -56,6 +56,7 @@ public:
     int progress(const pressedargs *p, float pt) const;
     void prev_page();
     void next_page();
+    void on_download_all();
 
 private:
     struct transfer
@@ -95,7 +96,8 @@ private:
     std::vector<thumbnail *> thumbnails;
     std::vector<barg> bargs;
     std::list<pressedargs> pargs;
-    int error_label, prev_arrow, next_arrow, filter, category, cur_page, npages;
+    int error_label, prev_arrow, next_arrow, filter, category, cur_page, npages,
+        download_all;
     unsigned offset;
 };
 
