@@ -95,7 +95,7 @@ private:
     std::vector<thumbnail *> thumbnails;
     std::vector<barg> bargs;
     std::list<pressedargs> pargs;
-    int error_label, prev_arrow, next_arrow, filter, category;
+    int error_label, prev_arrow, next_arrow, filter, category, cur_page, npages;
     unsigned offset;
 };
 

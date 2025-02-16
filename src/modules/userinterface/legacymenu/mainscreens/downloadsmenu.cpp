@@ -581,6 +581,13 @@ void DownloadsMenu::update_ui()
                 t++;
         }
     }
+
+    char s[sizeof "18446744073709551615"];
+
+    snprintf(s, sizeof s, "%d", (this->offset / THUMBNAILS) + 1);
+    GfuiLabelSetText(hscr, cur_page, s);
+    snprintf(s, sizeof s, "%d", (visible_entries() / THUMBNAILS) + 1);
+    GfuiLabelSetText(hscr, npages, s);
 }
 
 static std::unique_ptr<hash> alloc_hash(const std::string &type)
@@ -1117,6 +1124,10 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((category = GfuiMenuCreateComboboxControl(hscr, param, "category",
         this, ::on_category)) < 0)
         throw std::runtime_error("GfuiMenuCreateComboboxControl category failed");
+    else if ((cur_page = GfuiMenuCreateLabelControl(hscr, param, "current page")) < 0)
+        throw std::runtime_error("GfuiMenuCreateLabelControl cur_page failed");
+    else if ((npages = GfuiMenuCreateLabelControl(hscr, param, "total pages")) < 0)
+        throw std::runtime_error("GfuiMenuCreateLabelControl npages failed");
 
     const char *filters[] =
     {
