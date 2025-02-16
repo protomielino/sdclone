@@ -26,6 +26,7 @@
 #include "writebuf.h"
 #include "writefile.h"
 #include <curl/curl.h>
+#include <algorithm>
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
@@ -64,9 +65,14 @@ static void deinit(void *args)
     delete static_cast<DownloadsMenu *>(args);
 }
 
-static void toggle(tCheckBoxInfo *info)
+static void on_filter(tComboBoxInfo *info)
 {
-    static_cast<DownloadsMenu *>(info->userData)->toggle();
+    static_cast<DownloadsMenu *>(info->userData)->on_filter();
+}
+
+static void on_category(tComboBoxInfo *info)
+{
+    static_cast<DownloadsMenu *>(info->userData)->on_category();
 }
 
 static int randname(std::string &name)
@@ -157,7 +163,44 @@ unsigned DownloadsMenu::visible_entries() const
     return ret;
 }
 
-void DownloadsMenu::toggle()
+void DownloadsMenu::on_filter()
+{
+    GfuiComboboxClear(hscr, category);
+
+    if (strcmp(GfuiComboboxGetText(hscr, filter), "All types"))
+    {
+        std::vector<std::string> categories;
+
+        GfuiComboboxAddText(hscr, category, "All categories");
+
+        for (const entry *e : entries)
+        {
+            const Asset &a = e->a;
+            const std::string &c = a.category;
+
+            if (visible(a)
+                && std::find(categories.cbegin(), categories.cend(), c)
+                    == categories.end())
+                categories.push_back(c);
+        }
+
+        for (const auto &c : categories)
+            GfuiComboboxAddText(hscr, category, c.c_str());
+
+        GfuiEnable(hscr, category, GFUI_ENABLE);
+    }
+    else
+        GfuiEnable(hscr, category, GFUI_DISABLE);
+
+    unsigned d = visible_entries();
+
+    while (offset && offset >= d)
+        offset -= THUMBNAILS;
+
+    update_ui();
+}
+
+void DownloadsMenu::on_category()
 {
     unsigned d = visible_entries();
 
@@ -425,17 +468,31 @@ static int get_size(size_t n, std::string &out)
 
 bool DownloadsMenu::visible(const Asset &a) const
 {
+    const char *s = GfuiComboboxGetText(hscr, filter),
+        *cat = GfuiComboboxGetText(hscr, category);
+
+    if (!strcmp(s, "All types"))
+        return true;
+
+    bool matched = false;
+
     switch (a.type)
     {
         case Asset::car:
-            return GfuiCheckboxIsChecked(hscr, cars_cb);
+            matched = !strcmp(s, "Cars");
+            break;
 
         case Asset::track:
-            return GfuiCheckboxIsChecked(hscr, tracks_cb);
+            matched = !strcmp(s, "Tracks");
+            break;
 
         case Asset::driver:
-            return GfuiCheckboxIsChecked(hscr, drivers_cb);
+            matched = !strcmp(s, "Drivers");
+            break;
     }
+
+    if (matched)
+        return cat == a.category || !strcmp(cat, "All categories");
 
     return false;
 }
@@ -1042,18 +1099,6 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((error_label =
         GfuiMenuCreateLabelControl(hscr, param, "error")) < 0)
         throw std::runtime_error("GfuiMenuCreateLabelControl error failed");
-    else if ((cars_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "carscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl cars failed");
-    else if ((tracks_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "trackscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl tracks failed");
-    else if ((drivers_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "driverscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl drivers failed");
     else if (GfuiMenuCreateButtonControl(hscr, param, "back", this,
         ::deinit) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl back failed");
@@ -1066,6 +1111,25 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((next_arrow = GfuiMenuCreateButtonControl(hscr, param,
         "next page arrow", this, ::next_page)) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl next failed");
+    else if ((filter = GfuiMenuCreateComboboxControl(hscr, param, "filter",
+        this, ::on_filter)) < 0)
+        throw std::runtime_error("GfuiMenuCreateComboboxControl filter failed");
+    else if ((category = GfuiMenuCreateComboboxControl(hscr, param, "category",
+        this, ::on_category)) < 0)
+        throw std::runtime_error("GfuiMenuCreateComboboxControl category failed");
+
+    const char *filters[] =
+    {
+        "All types",
+        "Cars",
+        "Tracks",
+        "Drivers"
+    };
+
+    for (size_t i = 0; i < sizeof filters / sizeof *filters; i++)
+        GfuiComboboxAddText(hscr, filter, filters[i]);
+
+    GfuiEnable(hscr, category, GFUI_DISABLE);
 
     for (int i = 0; i < THUMBNAILS; i++)
     {
