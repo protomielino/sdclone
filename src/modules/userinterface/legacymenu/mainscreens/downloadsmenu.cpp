@@ -823,6 +823,7 @@ int DownloadsMenu::assets_fetched(CURLcode result, CURL *h, const sink *s,
 
         GfLogError("%s\n", e);
         error = e;
+        delete a;
         return -1;
     }
     else if (fetch_thumbnails(a->get()))
@@ -831,6 +832,7 @@ int DownloadsMenu::assets_fetched(CURLcode result, CURL *h, const sink *s,
 
         GfLogError("%s\n", e);
         error = e;
+        delete a;
         return -1;
     }
 
