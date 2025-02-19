@@ -57,6 +57,8 @@ public:
     void prev_page();
     void next_page();
     void on_download_all();
+    bool pending() const;
+    void confirm_exit();
 
 private:
     struct transfer

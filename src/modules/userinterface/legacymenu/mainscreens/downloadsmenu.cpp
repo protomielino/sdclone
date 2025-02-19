@@ -16,6 +16,7 @@
 #include <racemanagers.h>
 #include <drivers.h>
 #include "assets.h"
+#include "confirmmenu.h"
 #include "downloadsmenu.h"
 #include "downloadservers.h"
 #include "hash.h"
@@ -63,6 +64,11 @@ static void config_exit(const std::vector<std::string> &repos, void *args)
 static void deinit(void *args)
 {
     delete static_cast<DownloadsMenu *>(args);
+}
+
+static void confirm_exit(void *args)
+{
+    static_cast<DownloadsMenu *>(args)->confirm_exit();
 }
 
 static void on_filter(tComboBoxInfo *info)
@@ -132,6 +138,23 @@ static int tmppath(std::string &path)
 
     path = tmpdir + r;
     return 0;
+}
+
+bool DownloadsMenu::pending() const
+{
+    for (const entry *e : entries)
+        if (e->state == entry::fetching)
+            return true;
+
+    return false;
+}
+
+void DownloadsMenu::confirm_exit()
+{
+    if (pending())
+        new ConfirmMenu(hscr, ::recompute, ::deinit, this);
+    else
+        delete this;
 }
 
 void DownloadsMenu::config()
@@ -1144,7 +1167,7 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
         GfuiMenuCreateLabelControl(hscr, param, "error")) < 0)
         throw std::runtime_error("GfuiMenuCreateLabelControl error failed");
     else if (GfuiMenuCreateButtonControl(hscr, param, "back", this,
-        ::deinit) < 0)
+        ::confirm_exit) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl back failed");
     else if (GfuiMenuCreateButtonControl(hscr, param, "config", this,
         ::config) < 0)
@@ -1193,8 +1216,8 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
 
     GfParmReleaseHandle(param);
     GfuiMenuDefaultKeysAdd(hscr);
-    GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this, ::deinit,
-        NULL);
+    GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this,
+        ::confirm_exit, NULL);
     GfuiEnable(hscr, download_all, GFUI_DISABLE);
     GfuiScreenActivate(hscr);
     // This must be done after GfuiScreenActivate because this function
