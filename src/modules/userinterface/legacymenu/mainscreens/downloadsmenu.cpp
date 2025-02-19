@@ -129,15 +129,11 @@ static int tmppath(std::string &path)
 
 void DownloadsMenu::config()
 {
-    new RepoMenu(hscr, ::config_exit, this);
+    new RepoMenu(hscr, ::recompute, ::config_exit, this);
 }
 
 void DownloadsMenu::config_exit(const std::vector<std::string> &repos)
 {
-    // This must be done after GfuiScreenActivate because this function
-    // overwrites the recompute callback to a null pointer.
-    GfuiApp().eventLoop().setRecomputeCB(::recompute, this);
-
     for (auto a : assets)
         delete a;
 

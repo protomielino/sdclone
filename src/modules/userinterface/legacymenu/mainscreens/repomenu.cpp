@@ -117,14 +117,17 @@ RepoMenu::~RepoMenu()
 
     GfuiScreenRelease(hscr);
     GfuiScreenActivate(prev);
+    GfuiApp().eventLoop().setRecomputeCB(recompute, args);
     cb(repos, args);
 }
 
 RepoMenu::RepoMenu(void *prevMenu,
+    void (*recompute)(unsigned ms, void *args),
     void (*cb)(const std::vector<std::string> &, void *), void *args) :
     hscr(GfuiScreenCreate()),
     prev(prevMenu),
     args(args),
+    recompute(recompute),
     cb(cb)
 {
     if (!hscr)
@@ -159,6 +162,7 @@ RepoMenu::RepoMenu(void *prevMenu,
     GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this, ::deinit,
         NULL);
     GfuiScreenActivate(hscr);
+    GfuiApp().eventLoop().setRecomputeCB(recompute, args);
 
     if (downloadservers_get(repos))
         throw std::runtime_error("downloadservers_get failed");

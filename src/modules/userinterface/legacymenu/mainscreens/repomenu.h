@@ -18,6 +18,7 @@ class RepoMenu
 {
 public:
     RepoMenu(void *prevMenu,
+        void (*recompute)(unsigned ms, void *args),
         void (*cb)(const std::vector<std::string > &, void *), void *args);
     ~RepoMenu();
     void add();
@@ -25,6 +26,7 @@ public:
 
 private:
     void *const hscr, *const prev, *const args;
+    void (*const recompute)(unsigned ms, void *args);
     void (*const cb)(const std::vector<std::string> &, void *);
     std::vector<std::string> repos;
     std::vector<char *> elements;
