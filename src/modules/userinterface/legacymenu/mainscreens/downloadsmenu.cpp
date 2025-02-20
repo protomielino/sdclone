@@ -1,6 +1,6 @@
 /*
  * Speed Dreams, a free and open source motorsport simulator.
- * Copyright (C) 2024 Xavier Del Campo Romero
+ * Copyright (C) 2024-2025 Xavier Del Campo Romero
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,18 @@
 #include <racemanagers.h>
 #include <drivers.h>
 #include "assets.h"
+#include "confirmmenu.h"
 #include "downloadsmenu.h"
 #include "downloadservers.h"
 #include "hash.h"
+#include "infomenu.h"
 #include "repomenu.h"
 #include "sha256.h"
 #include "unzip.h"
 #include "writebuf.h"
 #include "writefile.h"
 #include <curl/curl.h>
+#include <algorithm>
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
@@ -34,7 +37,7 @@
 #include <stdexcept>
 
 static const size_t KB = 1024, MB = KB * KB;
-enum {THUMBNAILS = 4};
+enum {THUMBNAILS = 8};
 
 DownloadsMenu::transfer::transfer(CURL *h, done f, sink *s) :
     h(h),
@@ -63,9 +66,19 @@ static void deinit(void *args)
     delete static_cast<DownloadsMenu *>(args);
 }
 
-static void toggle(tCheckBoxInfo *info)
+static void confirm_exit(void *args)
 {
-    static_cast<DownloadsMenu *>(info->userData)->toggle();
+    static_cast<DownloadsMenu *>(args)->confirm_exit();
+}
+
+static void on_filter(tComboBoxInfo *info)
+{
+    static_cast<DownloadsMenu *>(info->userData)->on_filter();
+}
+
+static void on_category(tComboBoxInfo *info)
+{
+    static_cast<DownloadsMenu *>(info->userData)->on_category();
 }
 
 static int randname(std::string &name)
@@ -127,17 +140,30 @@ static int tmppath(std::string &path)
     return 0;
 }
 
+bool DownloadsMenu::pending() const
+{
+    for (const entry *e : entries)
+        if (e->state == entry::fetching)
+            return true;
+
+    return false;
+}
+
+void DownloadsMenu::confirm_exit()
+{
+    if (pending())
+        new ConfirmMenu(hscr, ::recompute, ::deinit, this);
+    else
+        delete this;
+}
+
 void DownloadsMenu::config()
 {
-    new RepoMenu(hscr, ::config_exit, this);
+    new RepoMenu(hscr, ::recompute, ::config_exit, this);
 }
 
 void DownloadsMenu::config_exit(const std::vector<std::string> &repos)
 {
-    // This must be done after GfuiScreenActivate because this function
-    // overwrites the recompute callback to a null pointer.
-    GfuiApp().eventLoop().setRecomputeCB(::recompute, this);
-
     for (auto a : assets)
         delete a;
 
@@ -160,13 +186,54 @@ unsigned DownloadsMenu::visible_entries() const
     return ret;
 }
 
-void DownloadsMenu::toggle()
+void DownloadsMenu::on_filter()
+{
+    GfuiComboboxClear(hscr, category);
+
+    if (strcmp(GfuiComboboxGetText(hscr, filter), "All types"))
+    {
+        std::vector<std::string> categories;
+
+        GfuiComboboxAddText(hscr, category, "All categories");
+
+        for (const entry *e : entries)
+        {
+            const Asset &a = e->a;
+            const std::string &c = a.category;
+
+            if (visible(a)
+                && std::find(categories.cbegin(), categories.cend(), c)
+                    == categories.end())
+                categories.push_back(c);
+        }
+
+        for (const auto &c : categories)
+            GfuiComboboxAddText(hscr, category, c.c_str());
+
+        GfuiEnable(hscr, category, GFUI_ENABLE);
+    }
+    else
+        GfuiEnable(hscr, category, GFUI_DISABLE);
+
+    unsigned d = visible_entries();
+
+    while (offset && offset >= d)
+        offset -= THUMBNAILS;
+
+    GfuiEnable(hscr, download_all, GFUI_DISABLE);
+    update_ui();
+}
+
+void DownloadsMenu::on_category()
 {
     unsigned d = visible_entries();
 
     while (offset && offset >= d)
         offset -= THUMBNAILS;
 
+    bool all = !strcmp(GfuiComboboxGetText(hscr, category), "All categories");
+
+    GfuiEnable(hscr, download_all, all ? GFUI_DISABLE : GFUI_ENABLE);
     update_ui();
 }
 
@@ -406,7 +473,18 @@ static int get_size(size_t n, std::string &out)
     const char *suffix = suffixes[i];
 
     if (i)
-        out = std::to_string(sz);
+    {
+        char s[sizeof "18446744073709551615.0"];
+        int res = snprintf(s, sizeof s, "%.1f", sz);
+
+        if (res < 0 || (unsigned)res >= sizeof s)
+        {
+            GfLogError("Maximum size exceeded\n");
+            return -1;
+        }
+
+        out = s;
+    }
     else
         out = std::to_string(n);
 
@@ -417,17 +495,31 @@ static int get_size(size_t n, std::string &out)
 
 bool DownloadsMenu::visible(const Asset &a) const
 {
+    const char *s = GfuiComboboxGetText(hscr, filter),
+        *cat = GfuiComboboxGetText(hscr, category);
+
+    if (!strcmp(s, "All types"))
+        return true;
+
+    bool matched = false;
+
     switch (a.type)
     {
         case Asset::car:
-            return GfuiCheckboxIsChecked(hscr, cars_cb);
+            matched = !strcmp(s, "Cars");
+            break;
 
         case Asset::track:
-            return GfuiCheckboxIsChecked(hscr, tracks_cb);
+            matched = !strcmp(s, "Tracks");
+            break;
 
         case Asset::driver:
-            return GfuiCheckboxIsChecked(hscr, drivers_cb);
+            matched = !strcmp(s, "Drivers");
+            break;
     }
+
+    if (matched)
+        return cat == a.category || !strcmp(cat, "All categories");
 
     return false;
 }
@@ -445,7 +537,7 @@ void DownloadsMenu::append(thumbnail *t, entry *e)
     }
 
     bargs.push_back(barg(t, e));
-    t->set(e->thumbnail, a.name, a.category, a.author, a.license, size);
+    t->set(e->thumbnail, a.name, size);
 }
 
 void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
@@ -453,7 +545,6 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
 {
     bool enable = false, show_progress = false, show_delete = false;
     float progress = 0.0f;
-    const char *s;
 
     switch (e->state)
     {
@@ -462,24 +553,20 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
             return;
 
         case entry::download:
-            s = "Download";
             enable = true;
             break;
 
         case entry::update:
-            s = "Update";
             enable = true;
             show_delete = true;
             break;
 
         case entry::fetching:
-            s = "Downloading";
             show_progress = true;
             progress = e->progress;
             break;
 
         case entry::done:
-            s = "Downloaded";
             show_delete = true;
             break;
     }
@@ -490,7 +577,7 @@ void DownloadsMenu::process(thumbnail *t, entry *e, bool &appended,
         return;
     }
 
-    t->set(s, enable, show_progress, progress, show_delete);
+    t->set(enable, show_progress, progress, show_delete);
     append(t, e);
     appended = true;
 }
@@ -521,6 +608,13 @@ void DownloadsMenu::update_ui()
                 t++;
         }
     }
+
+    char s[sizeof "18446744073709551615"];
+
+    snprintf(s, sizeof s, "%d", (this->offset / THUMBNAILS) + 1);
+    GfuiLabelSetText(hscr, cur_page, s);
+    snprintf(s, sizeof s, "%d", (visible_entries() / THUMBNAILS) + 1);
+    GfuiLabelSetText(hscr, npages, s);
 }
 
 static std::unique_ptr<hash> alloc_hash(const std::string &type)
@@ -823,6 +917,7 @@ int DownloadsMenu::assets_fetched(CURLcode result, CURL *h, const sink *s,
 
         GfLogError("%s\n", e);
         error = e;
+        delete a;
         return -1;
     }
     else if (fetch_thumbnails(a->get()))
@@ -831,6 +926,7 @@ int DownloadsMenu::assets_fetched(CURLcode result, CURL *h, const sink *s,
 
         GfLogError("%s\n", e);
         error = e;
+        delete a;
         return -1;
     }
 
@@ -840,7 +936,7 @@ int DownloadsMenu::assets_fetched(CURLcode result, CURL *h, const sink *s,
 
 int DownloadsMenu::fetch_assets()
 {
-    const size_t max = 16 * KB;
+    const size_t max = 2 * MB;
     std::vector<std::string> urls;
 
     if (downloadservers_get(urls))
@@ -955,11 +1051,30 @@ void DownloadsMenu::on_delete(thumbnail *t)
     }
 }
 
+void DownloadsMenu::on_info(thumbnail *t)
+{
+    for (const auto &b : bargs)
+    {
+        if (b.first != t)
+            continue;
+
+        new InfoMenu(hscr, ::recompute, this, b.second);
+        break;
+    }
+}
+
 static void on_delete(thumbnail *t, void *arg)
 {
     DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
 
     m->on_delete(t);
+}
+
+static void on_info(thumbnail *t, void *arg)
+{
+    DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
+
+    m->on_info(t);
 }
 
 void DownloadsMenu::prev_page()
@@ -980,6 +1095,39 @@ void DownloadsMenu::next_page()
 
     offset += THUMBNAILS;
     update_ui();
+}
+
+void DownloadsMenu::on_download_all()
+{
+    for (const barg &b : bargs)
+    {
+        const entry *e = b.second;
+        bool download;
+
+        switch (e->state)
+        {
+            case entry::download:
+            case entry::update:
+                download = true;
+                break;
+
+            case entry::init:
+            case entry::fetching:
+            case entry::done:
+                download = false;
+                break;
+        }
+
+        if (download && visible(e->a))
+            pressed(b.first);
+    }
+}
+
+static void on_download_all(void *arg)
+{
+    DownloadsMenu *m = static_cast<DownloadsMenu *>(arg);
+
+    m->on_download_all();
 }
 
 static void prev_page(void *arg)
@@ -1018,20 +1166,8 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((error_label =
         GfuiMenuCreateLabelControl(hscr, param, "error")) < 0)
         throw std::runtime_error("GfuiMenuCreateLabelControl error failed");
-    else if ((cars_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "carscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl cars failed");
-    else if ((tracks_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "trackscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl tracks failed");
-    else if ((drivers_cb =
-        GfuiMenuCreateCheckboxControl(hscr, param, "driverscheckbox",
-            this, ::toggle)) < 0)
-        throw std::runtime_error("GfuiMenuCreateCheckboxControl drivers failed");
     else if (GfuiMenuCreateButtonControl(hscr, param, "back", this,
-        ::deinit) < 0)
+        ::confirm_exit) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl back failed");
     else if (GfuiMenuCreateButtonControl(hscr, param, "config", this,
         ::config) < 0)
@@ -1039,9 +1175,35 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
     else if ((prev_arrow = GfuiMenuCreateButtonControl(hscr, param,
         "previous page arrow", this, ::prev_page)) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl prev failed");
+    else if ((download_all = GfuiMenuCreateButtonControl(hscr, param,
+        "download all", this, ::on_download_all)) < 0)
+        throw std::runtime_error("GfuiMenuCreateButtonControl download all failed");
     else if ((next_arrow = GfuiMenuCreateButtonControl(hscr, param,
         "next page arrow", this, ::next_page)) < 0)
         throw std::runtime_error("GfuiMenuCreateButtonControl next failed");
+    else if ((filter = GfuiMenuCreateComboboxControl(hscr, param, "filter",
+        this, ::on_filter)) < 0)
+        throw std::runtime_error("GfuiMenuCreateComboboxControl filter failed");
+    else if ((category = GfuiMenuCreateComboboxControl(hscr, param, "category",
+        this, ::on_category)) < 0)
+        throw std::runtime_error("GfuiMenuCreateComboboxControl category failed");
+    else if ((cur_page = GfuiMenuCreateLabelControl(hscr, param, "current page")) < 0)
+        throw std::runtime_error("GfuiMenuCreateLabelControl cur_page failed");
+    else if ((npages = GfuiMenuCreateLabelControl(hscr, param, "total pages")) < 0)
+        throw std::runtime_error("GfuiMenuCreateLabelControl npages failed");
+
+    const char *filters[] =
+    {
+        "All types",
+        "Cars",
+        "Tracks",
+        "Drivers"
+    };
+
+    for (size_t i = 0; i < sizeof filters / sizeof *filters; i++)
+        GfuiComboboxAddText(hscr, filter, filters[i]);
+
+    GfuiEnable(hscr, category, GFUI_DISABLE);
 
     for (int i = 0; i < THUMBNAILS; i++)
     {
@@ -1049,13 +1211,14 @@ DownloadsMenu::DownloadsMenu(void *prevMenu) :
 
         id += std::to_string(i);
         thumbnails.push_back(new thumbnail(hscr, param, id, ::pressed,
-            ::on_delete, this));
+            ::on_delete, ::on_info, this));
     }
 
     GfParmReleaseHandle(param);
     GfuiMenuDefaultKeysAdd(hscr);
-    GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this, ::deinit,
-        NULL);
+    GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this,
+        ::confirm_exit, NULL);
+    GfuiEnable(hscr, download_all, GFUI_DISABLE);
     GfuiScreenActivate(hscr);
     // This must be done after GfuiScreenActivate because this function
     // overwrites the recompute callback to a null pointer.

@@ -1,6 +1,6 @@
 /*
  * Speed Dreams, a free and open source motorsport simulator.
- * Copyright (C) 2024 Xavier Del Campo Romero
+ * Copyright (C) 2024-2025 Xavier Del Campo Romero
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ void thumbnail::pressed() const
 {
     GfuiEnable(hscr, btn, GFUI_DISABLE);
     GfuiVisibilitySet(hscr, progress_bar, GFUI_VISIBLE);
-    GfuiButtonSetText(hscr, btn, "Downloading");
     cb(args.t, args.args);
 }
 
@@ -42,19 +41,21 @@ void thumbnail::on_delete(void *args)
     t->delete_cb(t->args.t, t->args.args);
 }
 
+void thumbnail::on_info(void *args)
+{
+    const thumbnail::cbargs *a = static_cast<const thumbnail::cbargs *>(args);
+    const thumbnail *t = a->t;
+
+    t->info_cb(t->args.t, t->args.args);
+}
+
 thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
-    callback cb, callback delete_cb, void *args) :
+    callback cb, callback delete_cb, callback info_cb, void *args) :
     args(this, args),
     img(GfuiMenuCreateStaticImageControl(hscr, param,
         (id + std::string("img")).c_str())),
     name(GfuiMenuCreateLabelControl(hscr, param,
         (id + std::string("name")).c_str())),
-    category(GfuiMenuCreateLabelControl(hscr, param,
-        (id + std::string("category")).c_str())),
-    license(GfuiMenuCreateLabelControl(hscr, param,
-        (id + std::string("license")).c_str())),
-    author(GfuiMenuCreateLabelControl(hscr, param,
-        (id + std::string("author")).c_str())),
     size(GfuiMenuCreateLabelControl(hscr, param,
         (id + std::string("size")).c_str())),
     btn(GfuiMenuCreateButtonControl(hscr, param,
@@ -65,20 +66,18 @@ thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
     deletebtn(GfuiMenuCreateImageButtonControl(hscr, param,
         (id + std::string("delete")).c_str(),
         const_cast<thumbnail::cbargs *>(&this->args), thumbnail::on_delete)),
+    info(GfuiMenuCreateImageButtonControl(hscr, param,
+        (id + std::string("info")).c_str(),
+        const_cast<thumbnail::cbargs *>(&this->args), thumbnail::on_info)),
     cb(cb),
     delete_cb(delete_cb),
+    info_cb(info_cb),
     hscr(hscr)
 {
     if (img < 0)
         throw std::runtime_error("img failed");
     else if (name < 0)
         throw std::runtime_error("name failed");
-    else if (category < 0)
-        throw std::runtime_error("category failed");
-    else if (license < 0)
-        throw std::runtime_error("license failed");
-    else if (author < 0)
-        throw std::runtime_error("author failed");
     else if (size < 0)
         throw std::runtime_error("size failed");
     else if (btn < 0)
@@ -87,28 +86,26 @@ thumbnail::thumbnail(void *hscr, void *param, const std::string &id,
         throw std::runtime_error("progress failed");
     else if (deletebtn < 0)
         throw std::runtime_error("deletebtn failed");
+    else if (info < 0)
+        throw std::runtime_error("info failed");
 
     clear();
 }
 
 void thumbnail::set(const std::string &path, const std::string &name,
-    const std::string &category, const std::string &license,
-    const std::string &author, const std::string &size) const
+    const std::string &size) const
 {
     GfuiStaticImageSet(hscr, img, path.c_str());
     GfuiLabelSetText(hscr, this->name, name.c_str());
-    GfuiLabelSetText(hscr, this->category, category.c_str());
-    GfuiLabelSetText(hscr, this->author, author.c_str());
-    GfuiLabelSetText(hscr, this->license, license.c_str());
     GfuiLabelSetText(hscr, this->size, size.c_str());
+    GfuiEnable(hscr, info, GFUI_ENABLE);
 }
 
-void thumbnail::set(const std::string &text, bool enable, bool show_progress,
+void thumbnail::set(bool enable, bool show_progress,
     float p, bool show_delete) const
 {
     GfuiEnable(hscr, btn, enable ? GFUI_ENABLE : GFUI_DISABLE);
     GfuiVisibilitySet(hscr, progress_bar, show_progress ? GFUI_VISIBLE : GFUI_INVISIBLE);
-    GfuiButtonSetText(hscr, btn, text.c_str());
     GfuiVisibilitySet(hscr, deletebtn, show_delete ? GFUI_VISIBLE : GFUI_INVISIBLE);
     progress(p);
 }
@@ -117,9 +114,7 @@ void thumbnail::clear() const
 {
     GfuiStaticImageSet(hscr, img, "data/img/notready.png");
     GfuiLabelSetText(hscr, name, "");
-    GfuiLabelSetText(hscr, category, "");
-    GfuiLabelSetText(hscr, author, "");
-    GfuiLabelSetText(hscr, license, "");
     GfuiLabelSetText(hscr, size, "");
+    GfuiEnable(hscr, info, GFUI_DISABLE);
     set();
 }

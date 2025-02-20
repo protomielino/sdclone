@@ -5,9 +5,11 @@ SET(MAINSCREENS_SOURCES ${MS}/splash.cpp ${MS}/mainmenu.cpp
                         ${MS}/optionsmenu.cpp ${MS}/creditsmenu.cpp ${MS}/exitmenu.cpp
                         ${MS}/asset.cpp
                         ${MS}/assets.cpp
+                        ${MS}/confirmmenu.cpp
                         ${MS}/downloadservers.cpp
                         ${MS}/downloadsmenu.cpp
                         ${MS}/entry.cpp
+                        ${MS}/infomenu.cpp
                         ${MS}/repomenu.cpp
                         ${MS}/sha256.cpp
                         ${MS}/sink.cpp
@@ -19,9 +21,11 @@ SET(MAINSCREENS_HEADERS ${MS}/splash.h ${MS}/mainmenu.h
                         ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h
                         ${MS}/asset.h
                         ${MS}/assets.h
+                        ${MS}/confirmmenu.h
                         ${MS}/downloadservers.h
                         ${MS}/downloadsmenu.h
                         ${MS}/entry.h
+                        ${MS}/infomenu.h
                         ${MS}/repomenu.h
                         ${MS}/sha256.h
                         ${MS}/sink.h

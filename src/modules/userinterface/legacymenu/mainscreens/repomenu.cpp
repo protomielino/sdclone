@@ -1,3 +1,13 @@
+/*
+ * Speed Dreams, a free and open source motorsport simulator.
+ * Copyright (C) 2024-2025 Xavier Del Campo Romero
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
 #include "repomenu.h"
 #include "downloadservers.h"
 #include <tgfclient.h>
@@ -107,14 +117,17 @@ RepoMenu::~RepoMenu()
 
     GfuiScreenRelease(hscr);
     GfuiScreenActivate(prev);
+    GfuiApp().eventLoop().setRecomputeCB(recompute, args);
     cb(repos, args);
 }
 
 RepoMenu::RepoMenu(void *prevMenu,
+    void (*recompute)(unsigned ms, void *args),
     void (*cb)(const std::vector<std::string> &, void *), void *args) :
     hscr(GfuiScreenCreate()),
     prev(prevMenu),
     args(args),
+    recompute(recompute),
     cb(cb)
 {
     if (!hscr)
@@ -149,6 +162,7 @@ RepoMenu::RepoMenu(void *prevMenu,
     GfuiAddKey(hscr, GFUIK_ESCAPE, "Back to previous menu", this, ::deinit,
         NULL);
     GfuiScreenActivate(hscr);
+    GfuiApp().eventLoop().setRecomputeCB(recompute, args);
 
     if (downloadservers_get(repos))
         throw std::runtime_error("downloadservers_get failed");

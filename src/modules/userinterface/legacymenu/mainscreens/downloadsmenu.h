@@ -48,12 +48,17 @@ public:
     void recompute(unsigned ms);
     void config();
     void config_exit(const std::vector<std::string> &repos);
-    void toggle();
+    void on_filter();
+    void on_category();
     void pressed(thumbnail *t);
     void on_delete(thumbnail *t);
+    void on_info(thumbnail *t);
     int progress(const pressedargs *p, float pt) const;
     void prev_page();
     void next_page();
+    void on_download_all();
+    bool pending() const;
+    void confirm_exit();
 
 private:
     struct transfer
@@ -93,7 +98,8 @@ private:
     std::vector<thumbnail *> thumbnails;
     std::vector<barg> bargs;
     std::list<pressedargs> pargs;
-    int error_label, cars_cb, tracks_cb, drivers_cb, prev_arrow, next_arrow;
+    int error_label, prev_arrow, next_arrow, filter, category, cur_page, npages,
+        download_all;
     unsigned offset;
 };
 
