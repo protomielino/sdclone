@@ -341,7 +341,7 @@ int Application::generate()
 
     // Get the output file radix.
     if (TrackACFilePath.empty())
-        snprintf(buf2, sizeof(buf2), "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
+        snprintf(buf2, sizeof(buf2), "tracks/%s/%s/%s", Track->category, Track->internalname, Track->internalname);
     else
         snprintf(buf2, sizeof(buf2), "%s/%s", TrackACFilePath.c_str(), Track->internalname);
 
