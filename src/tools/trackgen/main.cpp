@@ -269,6 +269,18 @@ bool Application::parseOptions()
 
 int Application::generate()
 {
+    int ret = EXIT_FAILURE;
+    void *CfgHandle = nullptr, *TrackHandle = nullptr;
+    tTrack *Track = nullptr;
+    std::string useObjectMaterials;
+    ITrackLoader* PiTrackLoader = nullptr;
+    char trackdef[1024];
+    char buf2[1024];
+    std::string OutputFileName, OutTrackName, OutMeshName, TiledFile;
+    Ac3d allAc3d;
+    const char *extName;
+    bool all = false;
+
     ssgAddTextureFormat(".rgb", ssgLoadSGI);
     ssgAddTextureFormat(".rgba", ssgLoadSGI);
     ssgAddTextureFormat(".int", ssgLoadSGI);
@@ -278,7 +290,7 @@ int Application::generate()
     ssgAddTextureFormat(".jpg", loadJpegTexture);
 
     // Get the trackgen paramaters.
-    void *CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     // Load and initialize the track loader module.
     GfLogInfo("Loading Track Loader ...\n");
@@ -287,40 +299,35 @@ int Application::generate()
     GfModule *pmodTrkLoader = GfModule::load(ossModLibName.str());
     if (!pmodTrkLoader) {
         GfLogError("Cannot find %s\n", ossModLibName.str().c_str());
-        GfParmReleaseHandle(CfgHandle);
-        return EXIT_FAILURE;
+        goto end;
     }
 
     // Check that it implements ITrackLoader.
-    ITrackLoader* PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
+    PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
     if (!PiTrackLoader) {
         GfLogError("Cannot find ITrackLoader interface\n");
-        GfParmReleaseHandle(CfgHandle);
-        return EXIT_FAILURE;
+        goto end;
     }
 
     // This is the track definition.
-    char	trackdef[1024];
     if (TrackXMLFilePath.empty())
-        snprintf(trackdef, sizeof(trackdef), "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
+        snprintf(trackdef, sizeof(trackdef), "tracks/%s/%s/%s.xml", TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
     else
         snprintf(trackdef, sizeof(trackdef), "%s/%s.xml", TrackXMLFilePath.c_str(), TrackName.c_str());
 
-    void *TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
+    TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
         GfLogError("Cannot find %s\n", trackdef);
-        GfParmReleaseHandle(CfgHandle);
-        return EXIT_FAILURE;
+        goto end;
     }
 
     // Build the track structure with graphic extensions.
-    tTrack *Track = PiTrackLoader->load(trackdef, true);
+    Track = PiTrackLoader->load(trackdef, true);
 
     if (JustCalculate) {
         CalculateTrack(Track, TrackHandle, Bump, Raceline, Bridge, Acc);
-        GfParmReleaseHandle(CfgHandle);
-        GfParmReleaseHandle(TrackHandle);
-        return EXIT_SUCCESS;
+        ret = EXIT_SUCCESS;
+        goto end;
     }
 
     // dump the track segments to a file for debugging
@@ -328,17 +335,15 @@ int Application::generate()
         dumpTrackSegs(Track);
 
     // Get the output file radix.
-    char	buf2[1024] = { 0 };
     if (TrackACFilePath.empty())
         snprintf(buf2, sizeof(buf2), "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
     else
         snprintf(buf2, sizeof(buf2), "%s/%s", TrackACFilePath.c_str(), Track->internalname);
-    std::string OutputFileName(buf2);
+
+    OutputFileName = buf2;
 
     // Number of groups for the complete track.
-    Ac3d allAc3d;
     allAc3d.addDefaultMaterial();
-    bool all = false;
 
     if (TrackOnly) {
         // Track.
@@ -350,7 +355,6 @@ int Application::generate()
     }
 
     // Main Track.
-    const char *extName;
     if (Bump) {
         extName = "trk-bump";
     } else if (Raceline) {
@@ -363,14 +367,14 @@ int Application::generate()
         snprintf(buf2, sizeof(buf2), "%s-%s.ac", OutputFileName.c_str(), extName);
     else
         buf2[0] = 0;
-    std::string OutTrackName(buf2);
+
+    OutTrackName = buf2;
 
     GenerateTrack(Track, TrackHandle, OutTrackName, allAc3d, all, Bump, Raceline, Bridge, Acc);
 
     if (TrackOnly) {
-        GfParmReleaseHandle(CfgHandle);
-        GfParmReleaseHandle(TrackHandle);
-        return EXIT_SUCCESS;
+        ret = EXIT_SUCCESS;
+        goto end;
     }
 
     // Terrain.
@@ -379,14 +383,13 @@ int Application::generate()
         all = true;
     }
 
-    std::string OutMeshName;
     if (!Acc)
         OutMeshName = OutputFileName + "-msh.ac";
 
     GenerateTerrain(Track, TrackHandle, OutMeshName, allAc3d, all, DoSaveElevation, UseBorder, Acc);
 
     // add or set tiled texture uv coordinates for acc files with a tiled texture
-    const std::string TiledFile = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TILED, "");
+    TiledFile = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TILED, "");
     if (Acc && !TiledFile.empty())
     {
         std::vector<Ac3d::Object *> polys;
@@ -477,14 +480,12 @@ int Application::generate()
                 break;
         }
 
-        GfParmReleaseHandle(TrackHandle);
-        GfParmReleaseHandle(CfgHandle);
-
-        return EXIT_SUCCESS;
+        ret = EXIT_SUCCESS;
+        goto end;
     }
 
     // check if we should use the object's materials
-    const std::string useObjectMaterials = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_USE_OBJ_MATERIALS, "no");
+    useObjectMaterials = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_USE_OBJ_MATERIALS, "no");
 
     if (useObjectMaterials == "yes")
         MultipleMaterials = true;
@@ -502,10 +503,16 @@ int Application::generate()
         allAc3d.writeFile(OutputFileName + ".acc", false);
     }
 
-    GfParmReleaseHandle(TrackHandle);
-    GfParmReleaseHandle(CfgHandle);
+    ret = EXIT_SUCCESS;
 
-    return EXIT_SUCCESS;
+end:
+    if (TrackHandle)
+        GfParmReleaseHandle(TrackHandle);
+
+    if (CfgHandle)
+        GfParmReleaseHandle(CfgHandle);
+
+    return ret;
 }
 
 
