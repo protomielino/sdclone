@@ -84,8 +84,6 @@ TrackBuildv1(const char *trackfile)
 tTrack *
 TrackBuildEx(const char *trackfile)
 {
-        void	*TrackHandle;
-
         theTrack = (tTrack*)calloc(1, sizeof(tTrack));
         theCamList = (tRoadCam*)NULL;
 
