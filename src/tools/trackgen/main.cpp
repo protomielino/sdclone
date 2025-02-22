@@ -512,6 +512,9 @@ end:
     if (CfgHandle)
         GfParmReleaseHandle(CfgHandle);
 
+    if (PiTrackLoader)
+        PiTrackLoader->unload();
+
     return ret;
 }
 
