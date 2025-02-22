@@ -520,6 +520,9 @@ end:
     if (PiTrackLoader)
         PiTrackLoader->unload();
 
+    if (pmodTrkLoader)
+        GfModule::unload(pmodTrkLoader);
+
     return ret;
 }
 
