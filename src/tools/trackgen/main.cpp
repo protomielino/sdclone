@@ -280,6 +280,8 @@ int Application::generate()
     Ac3d allAc3d;
     const char *extName;
     bool all = false;
+    std::ostringstream ossModLibName;
+    GfModule *pmodTrkLoader = nullptr;
 
     ssgAddTextureFormat(".rgb", ssgLoadSGI);
     ssgAddTextureFormat(".rgba", ssgLoadSGI);
@@ -291,12 +293,15 @@ int Application::generate()
 
     // Get the trackgen paramaters.
     CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    if (!CfgHandle) {
+        GfLogError("Cannot find %s\n", CFG_FILE);
+        goto end;
+    }
 
     // Load and initialize the track loader module.
     GfLogInfo("Loading Track Loader ...\n");
-    std::ostringstream ossModLibName;
     ossModLibName << GfLibDir() << "modules/track/" << "trackv1" << DLLEXT;
-    GfModule *pmodTrkLoader = GfModule::load(ossModLibName.str());
+    pmodTrkLoader = GfModule::load(ossModLibName.str());
     if (!pmodTrkLoader) {
         GfLogError("Cannot find %s\n", ossModLibName.str().c_str());
         goto end;
