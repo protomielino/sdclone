@@ -328,6 +328,10 @@ int Application::generate()
 
     // Build the track structure with graphic extensions.
     Track = PiTrackLoader->load(trackdef, true);
+    if (!Track) {
+        GfLogError("Failed to load track from %s\n", trackdef);
+        goto end;
+    }
 
     if (JustCalculate) {
         CalculateTrack(Track, TrackHandle, Bump, Raceline, Bridge, Acc);
