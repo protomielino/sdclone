@@ -13,6 +13,8 @@ jobs:
     container:
       image: forge.a-lec.org/speed-dreams/debian-i686-w64-mingw32:stable
     steps:
+      - name: Dump event file
+        run: cat $GITHUB_EVENT_PATH
       - name: Clone repository
         run: forgejo-clone /src
       - name: Configure third-party libraries
