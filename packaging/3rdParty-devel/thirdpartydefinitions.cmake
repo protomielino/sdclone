@@ -86,22 +86,10 @@ set(OPENAL_LEGACY_URL https://github.com/kcat/openal-soft/archive/refs/tags/${OP
 set(OPENAL_LEGACY_HASH SHA256=a598241d1af2e90c25a1b91da4c9ddc0e7cb6a4b5f1477fc680d139c57cd38cc)
 
 # PLIB
-message(STATUS "TODO: Need special handling for PLIB")
-message(STATUS "TODO: Switch to the zip file once a download location is setup")
-message(STATUS "NOTE: PLIB_HEAD_HASH changes every time a  new zip is generated")
-set(PLIB_SVN_REPO svn://svn.code.sf.net/p/plib/code/trunk)
-set(PLIB_SVN_REVISION 2173)
-set(PLIB_HEAD_VERSION r${PLIB_SVN_REVISION})
-set(PLIB_HEAD_PROJECT plib-trunk-${PLIB_HEAD_VERSION})
-set(PLIB_HEAD_FILE plib-code-${PLIB_HEAD_VERSION}-trunk.zip)
-set(PLIB_HEAD_URL https://sourceforge.net/code-snapshots/svn/p/pl/plib/code/${PLIB_HEAD_FILE})
-set(PLIB_HEAD_HASH SHA256=395d27e3182d1e6b4f6c79bce1182040538e07dcc5357b8d7e96f10c7b77f347)
-
-set(PLIB_VERSION 1.8.5)
-set(PLIB_PROJECT plib-${PLIB_VERSION})
-set(PLIB_FILE ${PLIB_PROJECT}.tar.gz)
-set(PLIB_URL http://plib.sourceforge.net/dist/${PLIB_FILE})
-set(PLIB_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32)
+set(PLIB_TAG v1.8.5-sd3)
+set(PLIB_PROJECT plib-${PLIB_TAG})
+set(PLIB_URL https://forge.a-lec.org/speed-dreams/plib/archive/${PLIB_TAG}.tar.gz)
+set(PLIB_HASH SHA256=2ac882854467aea9ed077f2c522366bcba50dda2c92b79064230d697a514b37b)
 
 # jpeg
 set(JPEG_VERSION 9f)

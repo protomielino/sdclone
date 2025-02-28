@@ -96,7 +96,6 @@ option(OPTION_SDL2 "Download and Build SDL2" true)
 cmake_dependent_option(OPTION_SDL2_MIXER "Download and Build SDL2_Mixer" true "OPTION_SDL2" false)
 option(OPTION_OPENAL "Download and Build OpenAL" true)
 option(OPTION_PLIB "Download and Build PLIB" true)
-cmake_dependent_option(OPTION_PLIB_USE_HEAD "Download and Build PLIB from the latest revision" true "OPTION_PLIB" false)
 option(OPTION_JPEG "Download and Build libjpeg" true)
 option(OPTION_ENET "Download and Build Enet" true)
 option(OPTION_OGG "Download and Build libogg" true)
@@ -123,7 +122,6 @@ if(OPTION_CACHED_ARCHIVES)
    set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
    set(OPENAL_C11_URL "${CACHED_URL}/${OPENAL_C11_FILE}")
    set(OPENAL_LEGACY_URL "${CACHED_URL}/${OPENAL_LEGACY_FILE}")
-   set(PLIB_HEAD_URL "${CACHED_URL}/${PLIB_HEAD_FILE}")
    set(PLIB_URL "${CACHED_URL}/${PLIB_FILE}")
    set(JPEG_URL "${CACHED_URL}/${JPEG_FILE}")
    set(ENET_URL "${CACHED_URL}/${ENET_FILE}")
@@ -269,68 +267,11 @@ if(OPTION_OPENAL)
 endif()
 
 if(OPTION_PLIB)
-   if(OPTION_PLIB_USE_HEAD)
-      if(NOT OPTION_CACHED_ARCHIVES)
-         ExternalProject_Add(${PLIB_HEAD_PROJECT}
-            SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
-            SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
-            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-            DEPENDS OpenGL-headers)
-            ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-                    "<SOURCE_DIR>/CMakeLists.txt"
-            DEPENDEES update # do after update
-            DEPENDERS patch)  # do before patch
-
-         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_sl
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-               "${CMAKE_SOURCE_DIR}/patches/plib/sl.h"
-               "<SOURCE_DIR>/src/sl/sl.h"
-            DEPENDEES update # do after update
-            DEPENDERS patch)  # do before patch
-
-         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_sldsp
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-               "${CMAKE_SOURCE_DIR}/patches/plib/slDSP.cxx"
-               "<SOURCE_DIR>/src/sl/slDSP.cxx"
-            DEPENDEES update # do after update
-            DEPENDERS patch)  # do before patch
-
-         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_patch_ssgparser
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-               "${CMAKE_SOURCE_DIR}/patches/plib/ssgParser.cxx"
-               "<SOURCE_DIR>/src/ssg/ssgParser.cxx"
-            DEPENDEES update # do after update
-            DEPENDERS patch)  # do before patch
-      else()
-         # this archive corresponds to revision 2173
-         ExternalProject_Add(${PLIB_HEAD_PROJECT}
-            URL ${PLIB_HEAD_URL}
-            URL_HASH  ${PLIB_HEAD_HASH}
-            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-            DEPENDS OpenGL-headers)
-         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-                    "<SOURCE_DIR>/CMakeLists.txt"
-            DEPENDEES update # do after update
-            DEPENDERS patch)  # do before patch
-      endif()
-   else()
-      # this archive corresponds to revision 2131
-      ExternalProject_Add(${PLIB_PROJECT}
-         URL ${PLIB_URL}
-         URL_HASH  ${PLIB_HASH}
-         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-         DEPENDS OpenGL-headers)
-      ExternalProject_Add_Step(${PLIB_PROJECT} plib_add_cmake
-         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                 "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-                 "<SOURCE_DIR>/CMakeLists.txt"
-         DEPENDEES update # do after update
-         DEPENDERS patch)  # do before patch
-   endif()
+   ExternalProject_Add(${PLIB_PROJECT}
+      URL ${PLIB_URL}
+      URL_HASH  ${PLIB_HASH}
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+      DEPENDS OpenGL-headers)
 endif()
 
 if(OPTION_JPEG)
