@@ -696,7 +696,7 @@ int WebServer::readUserConfig (int userId)
     //get webServer enabled/disabled status
     this->isWebServerEnabled = (bool)GfParmGetNum(prHandle, xmlPath, "WebServerEnabled", (char*)NULL, (int)0);
     if (!this->isWebServerEnabled){
-        GfLogInfo("WebServer - Webserver is disabled as per user setting");
+        GfLogInfo("WebServer - Webserver is disabled as per user setting\n");
     }
 
 
