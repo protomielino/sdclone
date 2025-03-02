@@ -21,7 +21,7 @@
 #include "sim.h"
 
 //static int SimClouds = 0;
-static double simDegree = 0.00000009;  // Value 1 degree celsius / 12 hours
+static double simDegree;
 static int    simuMonth = 1;
 static double startDay  = 0.0;
 static double endDay    = 0.0;
@@ -38,6 +38,8 @@ void SimAtmospherePreConfig(tTrack *track)
     Tair = track->local.airtemperature + 273.15f;
     SimAirPressure = track->local.airpressure;
     SimAirDensity = track->local.airdensity;
+    // Value 1 degree celsius / 12 hours
+    simDegree = 0.00000009;
 
     if (SimAirPressure == 0.0f)
         SimAirPressure = 101300.0f;
