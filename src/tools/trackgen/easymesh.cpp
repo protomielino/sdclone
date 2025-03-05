@@ -1879,9 +1879,12 @@ static void groups(void)
     r_node = (struct nod *)calloc(Nn, sizeof(struct nod));
     r_elem = (struct ele *)calloc(Ne, sizeof(struct ele));
     r_side = (struct sid *)calloc(Ns, sizeof(struct sid));
-    if (r_side == nullptr)
+    if (r_side == nullptr || r_elem == nullptr || r_node == nullptr)
     {
         fprintf(stderr, "Sorry, cannot allocate enough memory !\n");
+        free(r_node);
+        free(r_elem);
+        free(r_side);
         return;
     }
 
