@@ -1101,7 +1101,7 @@ void new_node(int ugly)
     }
     else
     {
-        d = rho_M + sqrt(rho_M * rho_M - p * p);
+        d = rho_M + sqrt(std::fabs(rho_M * rho_M - p * p));
     }
 
     /*---------------------------------------------------------------------+
