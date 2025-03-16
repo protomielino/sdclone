@@ -922,7 +922,61 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
         distFromStartLine = car->_trackPositionCount - 1;
         //GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
     }
-    car->_currLapTimeAtTrackPosition[distFromStartLine] = (float)car->_curLapTime;
+
+    // Linearly extrapolate the time to correct for the loss in precision of the
+    // distance from start line. Naive way, solves simple line's equation.
+    // Due to the nature of the container, ~90% of the time data coming from the
+    // simulation will be thrown away. So, if this is not a different distance
+    // from before, there is no need to repeat the calculations.
+    if (distFromStartLine != car->_prevIntFromStartLine)
+    {
+        float x1 = 0.0f, y1 = 0.0f;
+        float x2 = 0.0f, y2 = 0.0f;
+        int x = 0; float y = 0.0f;
+        float m = 0.0f;
+        float q = 0.0f;
+
+        x1 = car->_prevIntFromStartLine;
+        y1 = car->_prevLapTime;
+
+        // The following '+ 1' (and '- 1') is a hack.
+        // By adding (or subtracting) 1 from car->_distFromStartLine
+        // we are projecting the time to the next meter forward (or backward).
+        // We are not interpolating the time, we are extrapolating it.
+        // This is a mistake (bug?), but the mistake is visible only at (extremely)
+        // high acceleration rates.
+        // If we are going forward.
+        if (distFromStartLine > car->_prevIntFromStartLine)
+        {
+            x2 = car->_distFromStartLine + 1;
+        }
+        // If we are going backward.
+        if (distFromStartLine < car->_prevIntFromStartLine)
+        {
+            x2 = car->_distFromStartLine - 1;
+        }
+        y2 = car->_curLapTime;
+
+
+        m = (y2 - y1) / (x2 - x1);
+        q = y2 - m * x2; //q = y1 - m * x1;
+
+        x = distFromStartLine;
+        y = m * x + q;
+
+        car->_currLapTimeAtTrackPosition_corrected = y;
+        car->_currLapTimeAtTrackPosition[x] = car->_currLapTimeAtTrackPosition_corrected;
+        car->_prevLapTime = car->_currLapTimeAtTrackPosition_corrected;
+        car->_prevIntFromStartLine = distFromStartLine;
+    }
+    else
+    {
+        // This is an inconvenience of the container.
+        // Most of the time data is lost, so we repeat for every update
+        // the same time we've extrapolated for the current position
+        // on the track.
+        car->_currLapTimeAtTrackPosition[distFromStartLine] = car->_currLapTimeAtTrackPosition_corrected;
+    }
 }
 
 void
