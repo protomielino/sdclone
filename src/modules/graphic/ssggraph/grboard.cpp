@@ -40,7 +40,7 @@ using std::string;
 static const string rgba[4] =
 { GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA };
 
-static const int NB_BOARDS = 3;
+static const int NB_BOARDS = 4;
 static const int NB_LBOARDS = 5;    // # of leaderboard states
 static const int NB_GFLAG = 4;
 static const int NB_DEBUG = 4;
@@ -1069,7 +1069,230 @@ cGrBoard::grDispCarBoard2(const tSituation *s)
     }
 }  // grDispCarBoard2
 
+//
+// grDispCarBoard3
+//
+// Displays driver-specific info (version 3)
+//
+// @param s[in] A pointer to the current situation
+// @param car[in] A pointer to the current driver's car
+// @return void
+//
+void
+cGrBoard::grDispCarBoard3(const tSituation *s)
+{
+    // Font sizes
+    int dy = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
+    static const int dy2 = GfuiFontHeight(GFUI_FONT_SMALL_C);
+    static const int dxc = 60;
+ 
+    const int x = leftAnchor + 15;    // constant text 1 left pos.
+    const int x2 = x + 40;            // volatile text 1 left pos.
+    const int x3 = x2 + dxc;          // constant text 2 left pos.
+    const int xr = x3 + dxc;          // volatile text 2 left pos.
+    int y = BOTTOM_ANCHOR + 8 * dy2 + dy + 5;      // first row top pos.
+    // (counting from the bottom, we have 6+2 rows to display)
 
+    // Populate buf to get the width of the drawing area
+    char buf[BUFSIZE];
+    snprintf(buf, sizeof(buf), "%s: %d/%d", car_->_name, car_->_pos, s->_ncars);
+    const int dx = MAX(GfuiFontWidth(GFUI_FONT_MEDIUM_C, buf), (xr - x));
+
+    // Display board
+    // We have 8 rows with small font and 1 with middle
+    grSetupDrawingArea(x - 5, y + dy + 5, x + dx + 5, y - dy2 * 8 - dy + 5);
+
+    // Display driver name and race position (in medium font size)
+    GfuiDrawString(buf, emphasized_color_, GFUI_FONT_MEDIUM_C, x, y);  //yellow
+    y -= dy;
+
+    // From now on we use small font
+    dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
+
+    // Display fuel
+    GfuiDrawString("Fuel:", normal_color_, GFUI_FONT_SMALL_C, x, y);
+    float *color = (car_->_fuel < 5.0) ? danger_color_ : normal_color_;    //red/white
+    snprintf(buf, sizeof(buf),  "%.1f l", car_->_fuel);
+    GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
+    y -= dy;
+
+    // Display lap counter
+    char const *lapsTimeLabel;
+    grGetLapsTime(s, buf, &lapsTimeLabel);
+    GfuiDrawString(lapsTimeLabel, normal_color_, GFUI_FONT_SMALL_C, x, y);
+    GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
+    y -= dy;
+
+    // Display best lap time and diff of last and best lap
+    GfuiDrawString("Best:", normal_color_, GFUI_FONT_SMALL_C, x, y);
+    grWriteTime(normal_color_, GFUI_FONT_SMALL_C, x2, y, dxc, car_->_bestLapTime, 0);
+    y -= dy;
+
+    // Display current lap time and split times
+    GfuiDrawString("Time:", normal_color_, GFUI_FONT_SMALL_C, x, y);
+    grWriteTime(normal_color_, GFUI_FONT_SMALL_C, x2, y, dxc, car_->_curLapTime, 0);
+    double time;
+
+    if (grGetSplitTime(s, false, time, NULL, &color))
+        grWriteTime(color, GFUI_FONT_SMALL_C, x3, y, dxc, time, 1);
+
+    y -= dy;
+    y -= dy;
+
+    double deltaAhead =0.0f;
+    double deltaBehind =0.0f;
+
+    color = normal_color_;  // white
+    // if we are not first get the gap to the car directly ahead of us
+    tCarElt *firstAheadCar;
+    firstAheadCar = s->cars[car_->_pos - 2];
+
+    if (car_->_pos > 1)
+    {
+        // if he is in my same lap
+        if (firstAheadCar->_laps == car_->_laps)
+        {
+            // get how much time it took him to reach his position from my position
+            deltaAhead = firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine] - firstAheadCar->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine];
+            deltaAhead = - deltaAhead;
+        }
+        else
+        {
+            // if he is on the next lap or many laps ahead
+            int lapsAhead = firstAheadCar->_laps - car_->_laps;
+
+            // if he has not lapped me
+            if (car_->_distFromStartLine > firstAheadCar->_distFromStartLine)
+            {
+                deltaAhead = (lapsAhead -1) * firstAheadCar->_lastLapTime; // for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                deltaAhead += firstAheadCar->_lastLapTime - firstAheadCar->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine]; // how much time took him to reach the startline from my position
+                deltaAhead += firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine]; // how much time took him to reach his position from the startline
+                deltaAhead = - deltaAhead;
+            // he has lapped me
+            }
+            else
+            {
+                deltaAhead += lapsAhead * firstAheadCar->_lastLapTime; // for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                deltaAhead += firstAheadCar->_currLapTimeAtTrackPosition[(int)firstAheadCar->_distFromStartLine]
+                        - firstAheadCar->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine]; // much time took him to reach his position from my position in this lap
+                deltaAhead = - deltaAhead;
+            }
+        }
+    }
+
+    // if we are not last get the gap to the car directly behind us
+    tCarElt *firstBehindCar;
+    firstBehindCar = s->cars[car_->_pos];
+    if (car_->_pos < s->_ncars)
+    {
+        // if he is in my same lap
+        if (firstBehindCar->_laps == car_->_laps)
+        {
+            // get how much time it took me to reach my position from my position
+            deltaBehind = car_->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine] -
+                    car_->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine];
+        }
+        else
+        {
+            // if he is on the prev lap or many laps Behind
+            int lapsBehind = car_->_laps - firstBehindCar->_laps;
+
+            // if we have not lapped him
+            if (car_->_distFromStartLine < firstBehindCar->_distFromStartLine)
+            {
+                deltaBehind = (lapsBehind -1) * car_->_lastLapTime; // for simplicity we consider our last laptime (this may be totally wrong if we for example have pitted in the last lap)
+                deltaBehind += car_->_lastLapTime - car_->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine]; // how much time took us to reach the startline from his position
+                deltaBehind += car_->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine]; // how much time took us to reach our position from the startline
+            // we have lapped him
+            }
+            else
+            {
+                deltaBehind += lapsBehind * car_->_lastLapTime; // for simplicity we consider his last laptime (this may be totally wrong if he for example pitted in the last lap)
+                deltaBehind += car_->_currLapTimeAtTrackPosition[(int)firstBehindCar->_distFromStartLine] - car_->_currLapTimeAtTrackPosition[(int)car_->_distFromStartLine]; // how much time took us to reach our position from his position in this lap
+            }
+        }
+    }
+
+    // Display car ahead and diff
+    color = ahead_color_;
+
+    if (car_->_pos != 1)
+    {
+        snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos - 2]->_sname);
+        GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
+
+        if (s->_raceType == RM_TYPE_RACE)
+        {
+           grWriteTime(color, GFUI_FONT_SMALL_C, x3, y, dxc, deltaAhead, 1);
+        }
+        else
+        {
+            if (car_->_bestLapTime > 0.0f)
+            {
+                grWriteTime(color, GFUI_FONT_SMALL_C, x3, y, dxc,
+                            car_->_bestLapTime - s->cars[car_->_pos - 2]->_bestLapTime, 1);
+            }
+            else
+            {
+                GfuiDrawString("--:---", color, GFUI_FONT_SMALL_C, x3, y, dxc,
+                               GFUI_ALIGN_HR);
+            }
+        }
+    }
+    else
+    {
+        GfuiDrawString(" ", color, GFUI_FONT_SMALL_C, x, y);
+        GfuiDrawString("--:---", color, GFUI_FONT_SMALL_C, x3, y, dxc, GFUI_ALIGN_HR);
+    }
+    y -= dy;
+
+    // Display car behind and diff
+    color = normal_color_;  //white
+
+    if (car_->_pos != s->_ncars)
+    {
+        snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos]->_sname);
+        GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
+
+        if (s->_raceType == RM_TYPE_RACE)
+        {
+           grWriteTime(color, GFUI_FONT_SMALL_C, x3, y, dxc, deltaBehind, 1);
+        }
+        else
+        {
+            if (s->cars[car_->_pos]->_bestLapTime > 0.0f)
+            {
+                grWriteTime(color, GFUI_FONT_SMALL_C, x3, y, dxc,
+                           s->cars[car_->_pos]->_bestLapTime - car_->_bestLapTime, 1);
+            }
+            else
+            {
+                GfuiDrawString("--:---", color, GFUI_FONT_SMALL_C, x3, y, dxc,
+                               GFUI_ALIGN_HR);
+            }
+        }
+    }
+    else
+    {
+        GfuiDrawString(" ", color, GFUI_FONT_SMALL_C, x, y);
+        GfuiDrawString("--:---", color, GFUI_FONT_SMALL_C, x3, y, dxc, GFUI_ALIGN_HR);
+    }
+
+    y -= dy;
+
+    // Display control messages
+    // (lines 3 and 4 only, ABS TCS SPD goes to separate indicator)
+    for (int i = 2; i < 4; ++i)
+    {
+        if (car_->ctrl.msg[i])
+        {
+            GfuiDrawString(car_->ctrl.msg[i], (float*)(car_->ctrl.msgColor),
+                           GFUI_FONT_SMALL_C, x, y);
+            y -= dy;
+        }
+    }
+}  // grDispCarBoard3
+ 
 void
 cGrBoard::grDispCarBoard(const tSituation *s)
 {
@@ -1085,6 +1308,11 @@ cGrBoard::grDispCarBoard(const tSituation *s)
 
     case 2:
         grDispCarBoard2(s);
+        if (true)
+            grDispIndicators(false);
+        break;
+    case 3:
+        grDispCarBoard3(s);
         if (true)
             grDispIndicators(false);
         break;

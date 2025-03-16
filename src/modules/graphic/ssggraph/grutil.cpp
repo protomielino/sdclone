@@ -289,10 +289,10 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals)
             break;
         }
         //sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign,h,m,s,ms);
+        //look into the "*" formatting. sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%*.*d", sign,h,m,s,decimals,decimals,ms);
     }
     else if (m)
     {
-        //sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
         switch (decimals)
         {
         case 1:
@@ -306,10 +306,11 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals)
             sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign, m, s, ms);
             break;
         }
+        //sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
+        //look into the "*" formatting. sprintf(buf, "   %s%2.2d:%2.2d.%*.*d", sign,m,s,decimals,decimals,ms);
     }
     else
     {
-        //sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
         switch (decimals)
         {
         case 1:
@@ -323,6 +324,8 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals)
             sprintf(buf, "      %s%2.2d.%3.3d", sign, s, ms);
             break;
         }
+        //sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
+        //look into the "*" formatting. sprintf(buf, "      %s%2.2d.%*.*d", sign,s,decimals,decimals,ms);
 	}
 }
 
