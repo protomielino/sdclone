@@ -2162,7 +2162,7 @@ cGrBoard::grDispDashboard()
         case DI_REPAIR:
             buf1 =strRepair;
             snprintf(buf2, sizeof(buf2), "%.0f", item->setup->desired_value);
-            snprintf(buf3, sizeof(buf3), "%d", car_->priv.wheel);
+            snprintf(buf3, sizeof(buf3), "%d", car_->_dammage);
             break;
         case DI_TYRE_SET:
             buf1 = strTireSet;
