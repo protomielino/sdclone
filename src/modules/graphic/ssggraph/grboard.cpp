@@ -2048,10 +2048,14 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
         if (car->_bestLapTime == 0) {
             snprintf(buf, sizeof(buf), "       --:---");
         } else {
+            struct writetime t;
+
             if (s->_raceType == RM_TYPE_RACE || s->_ncars <= 1)
-                grWriteTimeBuf(buf, car->_curTime, 0);
+                grWriteTimeBuf(t, car->_curTime, 0);
             else
-                grWriteTimeBuf(buf, car->_bestLapTime, 0);
+                grWriteTimeBuf(t, car->_bestLapTime, 0);
+
+            return t.buf;
         }
         return buf;
     }
@@ -2073,7 +2077,10 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
         if (car->_bestLapTime == 0 || car->_laps < s->cars[0]->_laps) {
             snprintf(buf, sizeof(buf), "       --:---");
         } else {
-            grWriteTimeBuf(buf, car->_timeBehindLeader, 1);
+            struct writetime t;
+
+            grWriteTimeBuf(t, car->_timeBehindLeader, 1);
+            return t.buf;
         }
         break;
 

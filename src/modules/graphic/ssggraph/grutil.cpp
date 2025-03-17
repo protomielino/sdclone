@@ -20,6 +20,9 @@
 
 #include <tgfclient.h>
 #include <algorithm>
+#include <ctime>
+#include <cmath>
+#include <cstdio>
 
 #include "grutil.h"
 #include "grscene.h"
@@ -234,10 +237,14 @@ cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexSche
  */
 void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int sgn)
 {
-	char  buf[256];
+	struct writetime t;
 
-	grWriteTimeBuf(buf, sec, sgn);
-	GfuiDrawString(buf, color, font, x, y, width, GFUI_ALIGN_HR);
+	if (grWriteTimeBuf(t, sec, sgn)) {
+		GfLogError("grWriteTimeBuf failed\n");
+		return;
+	}
+
+	GfuiDrawString(t.buf, color, font, x, y, width, GFUI_ALIGN_HR);
 }
 
 
@@ -252,35 +259,55 @@ void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int
  *
  * @return
  */
-void grWriteTimeBuf(char *buf, tdble sec, int sgn)
+int grWriteTimeBuf(struct writetime &t, tdble sec, int sgn)
 {
-	const char* sign;
+	struct tm tm = {0};
+	time_t s = abs(sec);
+	char fmt[sizeof "+%H:%M:%S"] = {0};
 
-	if (sec < 0.0) {
-		sec = -sec;
-		sign = "-";
-    } else {
-		if (sgn) {
-			sign = "+";
-		} else {
-			sign = "  ";
-		}
-    }
+	tm.tm_hour = s / 3600;
+	tm.tm_min = (s % 3600) / 60;
+	tm.tm_sec = s % 60;
 
-    const int h = (int)(sec / 3600.0);
-    sec -= 3600 * h;
-    const int m = (int)(sec / 60.0);
-    sec -= 60 * m;
-    const int s = (int)(sec);
-    sec -= s;
-    const int ms = (int)floor(sec * 1000.0);
-    if (h) {
-		sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign,h,m,s,ms);
-    } else if (m) {
-		sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
-    } else {
-		sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
-    }
+	if (sec < 0)
+		strcat(fmt, "-");
+	else if (sgn)
+		strcat(fmt, "+");
+
+	if (tm.tm_hour)
+		strcat(fmt, "%H:");
+
+	if (tm.tm_min)
+		strcat(fmt, "%M:");
+
+	strcat(fmt, "%S");
+
+	size_t n = sizeof t.buf - (sizeof ".000" - 1),
+		r = strftime(t.buf, n, fmt, &tm);
+
+	if (!r) {
+		GfLogError("strftime(3) failed\n");
+		return -1;
+	}
+
+	double integ, dec = modf(fabs(sec), &integ);
+	char decs[sizeof "0.000"];
+	int rr = snprintf(decs, sizeof decs, "%.3f", dec);
+
+	if (rr < 0 || (unsigned)rr >= sizeof decs) {
+		GfLogError("snprintf(3) decs failed with %d\n", rr);
+		return -1;
+	}
+
+	n = sizeof t.buf - r;
+	rr = snprintf(&t.buf[r], n, "%s", strchr(decs, '.'));
+
+	if (rr < 0 || (unsigned)rr >= n) {
+		GfLogError("snprintf(3) t.buf failed with %d\n", rr);
+		return -1;
+	}
+
+	return 0;
 }
 
 
