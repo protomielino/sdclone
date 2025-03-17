@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: docker
     container:
-      image: forge.a-lec.org/speed-dreams/debian-i686-w64-mingw32:stable
+      image: forge.a-lec.org/speed-dreams/ubuntu-i686-w64-mingw32:jammy
     steps:
       - name: Clone repository
         run: forgejo-clone /src
