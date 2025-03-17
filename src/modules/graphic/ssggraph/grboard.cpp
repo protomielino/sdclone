@@ -1325,16 +1325,8 @@ cGrBoard::grDispCarBoard(const tSituation *s)
 void
 cGrBoard::grDispDeltaBoard(const tSituation *s)
 {
-    switch (deltaFlag)
-    {
-    case 0:
-        break;
-    case 1:
+    if (deltaFlag) 
         grDispDeltaBestLap(s);
-        break;
-    default:
-        break;
-    }
 }
 
 #define ALIGN_CENTER  0
