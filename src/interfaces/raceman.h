@@ -364,7 +364,7 @@ typedef struct RmInfo
 #define RM_CONF_TIME_OF_DAY	0x0004
 #define RM_CONF_CLOUD_COVER	0x0008
 #define RM_CONF_RAIN_FALL	0x0010
-#define RM_CONF_WEATHER     0x0016
+#define RM_CONF_WEATHER     0x0020
 #define RM_CONF_SEASON      0x0100
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
