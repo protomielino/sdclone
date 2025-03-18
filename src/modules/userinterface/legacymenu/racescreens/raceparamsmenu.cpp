@@ -547,12 +547,6 @@ RmRaceParamsMenu(void *vrp)
     // 3) According to the race features.
     rmrpFeatures = MenuData->pRace->getSupportedFeatures();
 
-    if (!(rmrpFeatures & RM_FEATURE_WETTRACK) && (rmrpConfMask & RM_CONF_RAIN_FALL))
-    {
-        GfLogTrace("Will not configure Rain Fall as some drivers don't support wet track\n");
-        rmrpConfMask &= ~RM_CONF_RAIN_FALL;
-    }
-
     // 5) According to the competitors.
     if ((rmrpConfMask & RM_CONF_DISP_MODE) && MenuData->pRace->hasHumanCompetitors())
     {
