@@ -25,6 +25,8 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -99,49 +101,46 @@ public class TrackgenPanel extends JDialog implements Runnable
 	{
 		String path = Editor.getProperties().getPath();
 		String trackName = path.substring(path.lastIndexOf(sep) + 1);
-		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
-		String name = " -n " + trackName;
-		String args = category + name;
-
-		if (acc)
-		{
-			if (additionalArgs != null)
-			{
-				args = args + additionalArgs;
-			}
-			args += " --acc";
-		}
-		else
-		{
-			if (additionalArgs != null)
-			{
-				args = args + additionalArgs;
-
-				// don't create everything for race line
-				if (!args.contains("-r"))
-				{
-					args += " -a";
-				}
-			}
-			else
-			{
-				args += " -a";
-			}
-		}
-
-		System.out.println(args);
+		int result = -1;
 
 		try
 		{
+			List<String> args = new ArrayList<String>();
 			String ls_str;
 			String tmp = "";
-			String trackgen = editorFrame.getCarsSportsRacing() ? "csr-trackgen" : "sd2-trackgen";
+			String trackgen = editorFrame.getCarsSportsRacing() ? "csr-trackgen.exe" : "sd2-trackgen.exe";
 			if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
 			{
 				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
 			}
 
-			Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
+			args.add(trackgen);
+			args.add("-c");
+			args.add(editorFrame.getTrackData().getHeader().getCategory());
+			args.add("-n");
+			args.add(trackName);
+
+			if (additionalArgs != null)
+			{
+				for (String s : additionalArgs.split(" "))
+				{
+					args.add(s);
+				}
+			}
+
+			if (acc)
+			{
+				args.add("--acc");
+			}
+			else
+			{
+				args.add("-a");
+			}
+
+			System.out.println(args);
+
+			Process ls_proc = new ProcessBuilder(args).start();
+			// Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
 			BufferedReader ls_err = new BufferedReader(new InputStreamReader(ls_proc.getErrorStream()));
@@ -157,6 +156,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 					if (ls_err.ready())
 					{
 						String str = ls_err.readLine();
+						System.out.println("ls_err> " + str);
 						int index = str.indexOf("Error");
 						if (index != -1)
 						{
@@ -190,6 +190,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 					if (ls_in.ready())
 					{
 						ls_str = ls_in.readLine();
+						System.out.println("ls_in> " + ls_str);
 						if (ls_str.indexOf(" ") != -1)
 						{
 							tmp = ls_str.substring(0, ls_str.indexOf(" "));
@@ -245,7 +246,12 @@ public class TrackgenPanel extends JDialog implements Runnable
 						}
 					}
 				}
+
+				result = ls_proc.waitFor();
 			} catch (IOException e)
+			{
+				e.printStackTrace();
+			} catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
@@ -253,7 +259,14 @@ public class TrackgenPanel extends JDialog implements Runnable
 		{
 			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export ac" + (acc ? "c" : ""), JOptionPane.ERROR_MESSAGE);
 		}
-		this.waitLabel.setText("Track finished");
+
+		if (result == 0)
+		{
+			this.waitLabel.setText("Track finished");
+		} else
+		{
+			this.waitLabel.setText("Failed to generate track with exit status " + result);
+		}
 	}
 
 	private void append(JTextArea textArea, String text)
