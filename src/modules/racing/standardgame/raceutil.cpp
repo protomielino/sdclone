@@ -125,7 +125,7 @@ int RmGetFeaturesList( void* param )
 		} else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_TYPE, ROB_VAL_ROBOT ), ROB_VAL_ROBOT ) == 0 )
 		{
 			snprintf( buf, sizeof(buf), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
-			features = GfParmGetStr( robhdle, buf, ROB_ATTR_FEATURES, "" );
+			features = GfParmGetStr( robhdle, buf, ROB_ATTR_FEATURES, ROB_VAL_FEATURE_WETTRACK);
 			features_index = 0;
 			buf_index = 0;
 			while( true )

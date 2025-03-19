@@ -547,26 +547,6 @@ RmRaceParamsMenu(void *vrp)
     // 3) According to the race features.
     rmrpFeatures = MenuData->pRace->getSupportedFeatures();
 
-    if (!(rmrpFeatures & RM_FEATURE_WETTRACK) && (rmrpConfMask & RM_CONF_RAIN_FALL))
-    {
-        GfLogTrace("Will not configure Rain Fall as some drivers don't support wet track\n");
-        rmrpConfMask &= ~RM_CONF_RAIN_FALL;
-    }
-
-    if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_SEASON))
-    {
-        GfLogTrace("Will not configure Season as Sky Dome is disabled\n");
-        rmrpSeason = GfRace::eSeasonSummer;
-        rmrpConfMask &= ~RM_CONF_SEASON;
-    }
-
-    if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_WEATHER))
-    {
-        GfLogTrace("Will not configure Weather as Sky Dome is disabled\n");
-        rmrpWeather = GfRace::eWeatherConfig;
-        rmrpConfMask &= ~RM_CONF_WEATHER;
-    }
-
     // 5) According to the competitors.
     if ((rmrpConfMask & RM_CONF_DISP_MODE) && MenuData->pRace->hasHumanCompetitors())
     {
