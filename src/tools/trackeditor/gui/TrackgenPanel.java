@@ -23,6 +23,7 @@ package gui;
 import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -108,11 +109,8 @@ public class TrackgenPanel extends JDialog implements Runnable
 			List<String> args = new ArrayList<String>();
 			String ls_str;
 			String tmp = "";
-			String trackgen = editorFrame.getCarsSportsRacing() ? "csr-trackgen.exe" : "sd2-trackgen.exe";
-			if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
-			{
-				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
-			}
+			String trackgen = editorFrame.getCarsSportsRacing() ?
+				"./csr-trackgen.exe" : "./sd2-trackgen.exe";
 
 			args.add(trackgen);
 			args.add("-c");
@@ -139,7 +137,11 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 			System.out.println(args);
 
-			Process ls_proc = new ProcessBuilder(args).start();
+			ProcessBuilder pb = new ProcessBuilder(args);
+
+			pb.directory(new File(editorFrame.getBinDirectory()));
+
+			Process ls_proc = pb.start();
 			// Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
