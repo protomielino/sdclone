@@ -97,6 +97,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	public void run()
 	{
+		int result = -1;
 		String path = Editor.getProperties().getPath();
 		String trackName = path.substring(path.lastIndexOf(sep) + 1);
 		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
@@ -245,7 +246,12 @@ public class TrackgenPanel extends JDialog implements Runnable
 						}
 					}
 				}
+
+				result = ls_proc.waitFor();
 			} catch (IOException e)
+			{
+				e.printStackTrace();
+			} catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
@@ -253,7 +259,15 @@ public class TrackgenPanel extends JDialog implements Runnable
 		{
 			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export ac" + (acc ? "c" : ""), JOptionPane.ERROR_MESSAGE);
 		}
-		this.waitLabel.setText("Track finished");
+
+		if (result == 0)
+		{
+			this.waitLabel.setText("Track finished");
+		}
+		else
+		{
+			this.waitLabel.setText("Failed to generate track with exit status " + result);
+		}
 	}
 
 	private void append(JTextArea textArea, String text)
