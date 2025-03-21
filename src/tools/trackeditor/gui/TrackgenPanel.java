@@ -138,7 +138,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			String trackgen = editorFrame.getCarsSportsRacing() ? "csr-trackgen" : "sd2-trackgen";
 			if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
 			{
-				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
+				trackgen = "\"" + editorFrame.getBinDirectory() + sep + trackgen + "\"";
 			}
 
 			Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
