@@ -51,6 +51,10 @@ namespace ssggraph {
 extern float grGammaValue;
 extern int	 grMipMap;
 
+struct writetime {
+    char buf[sizeof "+00:00:00.000"];
+};
+
 extern void grSetFilePath(const char *paths);	/* Multiple path (: separated) used to search for files */
 
 extern cgrMultiTexState* grSsgEnvTexState(const char *img,
@@ -61,8 +65,8 @@ extern ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath,
 									 int wrap, int mipmap, int errIfNotFound = TRUE);
 extern void grShutdownState(void);
 extern void grWriteTime(float *color, int font, int x, int y, int width, tdble sec,
-                        int sgn, unsigned int decimals = 3);
-extern void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals = 3);
+                        int sgn);
+int grWriteTimeBuf(struct writetime &t, tdble sec, int sgn);
 extern float grGetHOT(float x, float y);
 
 inline float urandom() { return(((float)rand() / (1.0 + (float)RAND_MAX)));}

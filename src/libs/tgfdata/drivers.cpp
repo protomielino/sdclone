@@ -1043,7 +1043,8 @@ void GfDriver::load(void* hparmRobot)
     {
         _nFeatures = 0;
         char* pszDrvFeatures =
-            strdup(GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_FEATURES, ""));
+            strdup(GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(),
+                ROB_ATTR_FEATURES, ROB_VAL_FEATURE_WETTRACK));
         for (char* pszFeature = strtok(pszDrvFeatures, ";");
              pszFeature != 0; pszFeature = strtok(NULL, ";"))
         {

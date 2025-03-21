@@ -44,7 +44,6 @@ class cGrBoard
     int GFlag;
     int dashboardFlag;
     int arcadeFlag;
-    int deltaFlag;
     int boardWidth;
     int leftAnchor;
     int centerAnchor;
@@ -70,9 +69,6 @@ class cGrBoard
     void grDispCarBoard3(const tSituation *s);
 
     void grDispIndicators(const bool arcade);
-
-    void grDispDeltaBoard(const tSituation *s);
-    void grDispDeltaBestLap(const tSituation*s);
 
     void grDispLeaderBoard(const tSituation *s);
     void grDispCounterBoard2();
