@@ -214,6 +214,9 @@ typedef struct
     tCarPenaltyHead	penaltyList;	/**< List of current penalties */
     tdble       penaltyTime;
     tdble		prevFromStartLine;
+    int         prevIntFromStartLine = 0;
+    tdble       prevLapTime = 0.0f;
+    tdble       currLapTimeAtTrackPosition_corrected = 0.0f; // corrected value of currLapTimeAtTrackPosition
     double		wrongWayTime;
 } tCarRaceInfo;
 /* structure access */
@@ -249,6 +252,9 @@ typedef struct
 #define _event                  race.event
 #define _penaltyList		race.penaltyList
 #define _penaltyTime	        race.penaltyTime
+#define _prevIntFromStartLine  race.prevIntFromStartLine
+#define _prevLapTime                   race.prevLapTime
+#define _currLapTimeAtTrackPosition_corrected race.currLapTimeAtTrackPosition_corrected
 #define _prevFromStartLine	race.prevFromStartLine
 #define _wrongWayTime		race.wrongWayTime
 
