@@ -224,6 +224,7 @@ SimGearboxUpdate(tCar *car)
 	    if (gearbox->timeToEngage <= 0.0f) {
 		if (gearbox->gearNext == 0) {gearbox->timeToEngage = 0.0f;} /* disengaging gears happens immediately */
 		else {gearbox->timeToEngage = gearbox->shiftTime * 0.67f;}
+		car->ctrl->rgcApplying = true;
 		gearbox->gear = 0;
 		trans->curOverallRatio = trans->overallRatio[1];
 		trans->curI = trans->driveI[1] * clutch->transferValue + trans->freeI[1] * (1.0f - clutch->transferValue);
@@ -235,6 +236,7 @@ SimGearboxUpdate(tCar *car)
 	    if (gearbox->timeToEngage <= 0.0f) {
 		/* engage new gear */
 		gearbox->gear = gearbox->gearNext;
+		car->ctrl->rgcApplying = true;
 		gearbox->gearNext = 0;
 		trans->curOverallRatio = trans->overallRatio[gearbox->gear+1];
 		trans->curI = trans->driveI[gearbox->gear + 1] * clutch->transferValue + trans->freeI[gearbox->gear +  1] * (1.0f - clutch->transferValue);

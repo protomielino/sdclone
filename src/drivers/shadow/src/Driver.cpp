@@ -3410,6 +3410,13 @@ void	Driver::AvoidOtherCars(
 
 int		Driver::CalcGear( tCarElt* car, double& acc )
 {
+    const tCarCtrl &ctrl = car->ctrl;
+
+    if (ctrl.rgcApplying)
+    {
+        return ctrl.gear;
+    }
+
     if( car->_gear <= 0 )
     {
         return 1;

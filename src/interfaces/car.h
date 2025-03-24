@@ -574,6 +574,7 @@ typedef struct
 
     float	msgColor[4]; /**< RGBA of text */
     tDashboardItem *setupChangeCmd;	/* setup item changed in dashboard */
+    bool rgcApplying; /**< Applying real gear change (see FEAT_REALGEARCHANGE) */
 } tCarCtrl;
 #define _steerCmd	ctrl.steer
 #define _accelCmd	ctrl.accelCmd
