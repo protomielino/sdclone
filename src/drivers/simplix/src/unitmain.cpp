@@ -263,7 +263,7 @@ void* GetFileHandle(const char*	RobotName)
     snprintf(BufPathXMLRel, BUFSIZE,			  // Robot's xml-filename
         "drivers/%s/%s.xml",RobotName,RobotName);// relative to installation
 
-    std::string dirstr = std::string(GfLocalDir()) + "drivers" + RobotName;
+    std::string dirstr = std::string(GfLocalDir()) + "drivers/" + RobotName;
     const char *dir = dirstr.c_str();
 
     if (GfDirCreate(dir) != GF_DIR_CREATED)
