@@ -442,6 +442,12 @@ int MyCar::calcGear()
     double SHIFT_DOWN_MARGIN = 130.0; // [rad/s] down from rpmredline
     int shifttime = 25;
     int MAX_GEAR = mCar->_gearNb - 1;
+    const tCarCtrl &ctrl = mCar->ctrl;
+
+    if (ctrl.rgcApplying)
+    {
+        return ctrl.gear;
+    }
 
     if (mShiftUpPoint < 1.0  && mShiftUpPoint > 0.0)
     {
