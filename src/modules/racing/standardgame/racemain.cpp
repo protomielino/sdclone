@@ -368,7 +368,7 @@ static int
 ReFindRankIdx(void *h, const char *path)
 {
     const char *mod = GfParmGetStr(h, path, RE_ATTR_MODULE, nullptr),
-        *driver = GfParmGetStr(h, path, RE_ATTR_DRIVERNAME, nullptr);
+        *driver = GfParmGetStr(h, path, RE_ATTR_NAME, nullptr);
 
     if (!mod)
     {
