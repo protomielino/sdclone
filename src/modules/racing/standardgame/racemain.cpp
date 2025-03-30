@@ -364,6 +364,35 @@ ReFindDriverIdx (const char *modulename, const char *drivername)
     return -1;
 }
 
+static int
+ReFindRankIdx(void *h, const char *path)
+{
+    const char *mod = GfParmGetStr(h, path, RE_ATTR_MODULE, nullptr),
+        *driver = GfParmGetStr(h, path, RE_ATTR_NAME, nullptr);
+
+    if (!mod)
+    {
+        GfLogError("%s: undefined driver module\n", path);
+        return -1;
+    }
+    else if (!driver)
+    {
+        GfLogError("%s: undefined driver name\n", path);
+        return -1;
+    }
+
+    int idx = ReFindDriverIdx(mod, driver);
+
+    if (idx < 0)
+    {
+        GfLogError("Could not find driver index, module=%s, "
+            "name=%s\n", mod, driver);
+        return -1;
+    }
+
+    return idx;
+}
+
 
 int
 RePreRace(void)
@@ -552,9 +581,13 @@ RePreRace(void)
             {
                 snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                          ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, i);
-                ReStartingOrderIdx[i-1] =
-                    ReFindDriverIdx (GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
-                                    GfParmGetStr(results, path, RE_ATTR_DRIVERNAME, ""));
+
+                int idx = ReFindRankIdx(results, path);
+
+                if (idx < 0)
+                    return RM_ERROR;
+
+                ReStartingOrderIdx[i - 1] = idx;
             }
         }
 
@@ -574,9 +607,13 @@ RePreRace(void)
             {
                 snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                         ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, nCars - i + 1);
-                ReStartingOrderIdx[i-1] =
-                    ReFindDriverIdx (GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
-                                    GfParmGetStr(results, path, RE_ATTR_DRIVERNAME, ""));
+
+                int idx = ReFindRankIdx(results, path);
+
+                if (idx < 0)
+                    return RM_ERROR;
+
+                ReStartingOrderIdx[i - 1] = idx;
             }
         }
 
@@ -587,7 +624,6 @@ RePreRace(void)
 
             int gridpos = 1;
             int carnr;
-            const char *modulename;
             for (int i = 0; i < nGridList; i++)
             {
                 if (gridpos > nCars) {break;}
@@ -598,9 +634,9 @@ RePreRace(void)
                         if (gridpos > nCars) {break;}
                         snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                                 ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
-                        const char *drivername = GfParmGetStr(results, path, RE_ATTR_DRIVERNAME, "");
-                        modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
-                        carnr = ReFindDriverIdx(modulename, drivername);
+
+                        if ((carnr = ReFindRankIdx(results, path)) < 0)
+                            return RM_ERROR;
 
                         for (int k = 0; k < gridpos-1; k++)
                         {
@@ -625,9 +661,9 @@ RePreRace(void)
                         if (gridpos > nCars) {break;}
                         snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                                 ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
-                        const char *drivername = GfParmGetStr(results, path, RE_ATTR_DRIVERNAME, "");
-                        modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
-                        carnr = ReFindDriverIdx(modulename, drivername);
+
+                        if ((carnr = ReFindRankIdx(results, path)) < 0)
+                            return RM_ERROR;
 
                         for (int k = 0; k < gridpos-1; k++)
                         {
