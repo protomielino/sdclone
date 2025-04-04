@@ -232,11 +232,11 @@ cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexSche
  *
  * @return
  */
-void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int sgn, unsigned int decimals)
+void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int sgn)
 {
 	char  buf[256];
 
-	grWriteTimeBuf(buf, sec, sgn, decimals);
+	grWriteTimeBuf(buf, sec, sgn);
 	GfuiDrawString(buf, color, font, x, y, width, GFUI_ALIGN_HR);
 }
 
@@ -252,7 +252,7 @@ void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int
  *
  * @return
  */
-void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals)
+void grWriteTimeBuf(char *buf, tdble sec, int sgn)
 {
 	const char* sign;
 
@@ -275,58 +275,12 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn, unsigned int decimals)
     sec -= s;
     const int ms = (int)floor(sec * 1000.0);
     if (h) {
-        switch (decimals) 
-		{
-        case 1:
-            sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%1.1d", sign, h, m, s, ms/100);
-            break;
-        case 2:
-            sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%2.2d", sign, h, m, s, ms/10);
-            break;
-        case 3:
-        default:
-            sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign, h, m, s, ms);
-            break;
-        }
-        //sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign,h,m,s,ms);
-        //look into the "*" formatting. sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%*.*d", sign,h,m,s,decimals,decimals,ms);
+               sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign,h,m,s,ms);
+    } else if (m) {
+               sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
+    } else {
+               sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
     }
-    else if (m)
-    {
-        switch (decimals)
-        {
-        case 1:
-            sprintf(buf, "   %s%2.2d:%2.2d.%1.1d", sign, m, s, ms/100);
-            break;
-        case 2:
-            sprintf(buf, "   %s%2.2d:%2.2d.%2.2d", sign, m, s, ms/10);
-            break;
-        case 3:
-        default:
-            sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign, m, s, ms);
-            break;
-        }
-        //sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
-        //look into the "*" formatting. sprintf(buf, "   %s%2.2d:%2.2d.%*.*d", sign,m,s,decimals,decimals,ms);
-    }
-    else
-    {
-        switch (decimals)
-        {
-        case 1:
-            sprintf(buf, "      %s%2.2d.%1.1d", sign, s, ms/100);
-            break;
-        case 2:
-            sprintf(buf, "      %s%2.2d.%2.2d", sign, s, ms/10);
-            break;
-        case 3:
-        default:
-            sprintf(buf, "      %s%2.2d.%3.3d", sign, s, ms);
-            break;
-        }
-        //sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
-        //look into the "*" formatting. sprintf(buf, "      %s%2.2d.%*.*d", sign,s,decimals,decimals,ms);
-	}
 }
 
 
