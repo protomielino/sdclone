@@ -923,8 +923,8 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
         //GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
     }
 
-    // Linearly extrapolate the time to correct for the loss in precision of the
-    // distance from start line. Naive way, solves simple line's equation.
+    // Linearly interpolates the time to correct for the loss in precision of
+    // the distance from start line. Naive way, solves simple line's equation.
     // Due to the nature of the container, ~90% of the time data coming from the
     // simulation will be thrown away. So, if this is not a different distance
     // from before, there is no need to repeat the calculations.
@@ -939,22 +939,13 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
         x1 = car->_prevIntFromStartLine;
         y1 = car->_prevLapTime;
 
-        // The following '+ 1' (and '- 1') is a hack.
-        // By adding (or subtracting) 1 from car->_distFromStartLine
-        // we are projecting the time to the next meter forward (or backward).
-        // We are not interpolating the time, we are extrapolating it.
-        // This is a mistake (bug?), but the mistake is visible only at (extremely)
-        // high acceleration rates.
-        // If we are going forward.
-        if (distFromStartLine > car->_prevIntFromStartLine)
-        {
-            x2 = car->_distFromStartLine + 1;
-        }
-        // If we are going backward.
-        if (distFromStartLine < car->_prevIntFromStartLine)
-        {
-            x2 = car->_distFromStartLine - 1;
-        }
+/* NOTE: still needs thorough verification. */
+        x2 = distFromStartLine > car->_prevIntFromStartLine ?
+                car->_distFromStartLine:     // going forward
+                distFromStartLine - 2 < car->_prevIntFromStartLine ?
+                    distFromStartLine - 2: // going backward ** see above NOTE **
+                    car->_prevIntFromStartLine; // standing "still" at the same meter.
+/* :ETON */
         y2 = car->_curLapTime;
 
 
@@ -969,13 +960,16 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
         car->_prevLapTime = car->_currLapTimeAtTrackPosition_corrected;
         car->_prevIntFromStartLine = distFromStartLine;
     }
-    else
+// In this solution we are assumeing that the car never "skips" a meter.
+// In order to skip one meter on the track the car would have to move at
+// at least 1,800Km/h (1[m]/0.002[s]{RCM_MAX_DT_SIMU}).
+// It's not physically impossible, but...
+// Maybe the following check can be avoided, since it will always be true.
+    else // (distFromStartLine == car->_prevIntFromStartLine)
     {
-        // This is an inconvenience of the container.
-        // Most of the time data is lost, so we repeat for every update
-        // the same time we've extrapolated for the current position
-        // on the track.
+#if 0
         car->_currLapTimeAtTrackPosition[distFromStartLine] = car->_currLapTimeAtTrackPosition_corrected;
+#endif
     }
 }
 

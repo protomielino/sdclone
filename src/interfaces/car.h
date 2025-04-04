@@ -214,9 +214,10 @@ typedef struct
     tCarPenaltyHead	penaltyList;	/**< List of current penalties */
     tdble       penaltyTime;
     tdble		prevFromStartLine;
-    int         prevIntFromStartLine = 0;
-    tdble       prevLapTime = 0.0f;
-    tdble       currLapTimeAtTrackPosition_corrected = 0.0f; // corrected value of currLapTimeAtTrackPosition
+    int         prevIntFromStartLine;
+    tdble       prevLapTime;
+    // corrected value of currLapTimeAtTrackPosition at 'type int' position
+    tdble       currLapTimeAtTrackPosition_corrected;
     double		wrongWayTime;
 } tCarRaceInfo;
 /* structure access */
