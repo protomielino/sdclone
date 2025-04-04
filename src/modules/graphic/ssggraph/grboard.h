@@ -44,7 +44,6 @@ class cGrBoard
     int GFlag;
     int dashboardFlag;
     int arcadeFlag;
-    int deltaFlag;
     int boardWidth;
     int leftAnchor;
     int centerAnchor;
